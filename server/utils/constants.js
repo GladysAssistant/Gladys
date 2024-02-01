@@ -407,6 +407,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
+  ANGLE_SENSOR: 'angle-sensor',
   BATTERY: 'battery',
   BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
@@ -585,6 +586,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
+    INTEGER: 'integer',
   },
   UV_SENSOR: {
     INTEGER: 'integer',

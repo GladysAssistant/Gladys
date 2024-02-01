@@ -118,6 +118,23 @@
         "humidity": 78
       },
       {
+        "id": "06:00:00:yy:yy:yy",
+        "type": "NAModule2",
+        "battery_state": "medium",
+        "battery_level": 4993,
+        "firmware_revision": 27,
+        "rf_state": "very_low",
+        "rf_strength": 120,
+        "last_seen": 1706723822,
+        "reachable": true,
+        "bridge": "70:ee:50:jj:jj:jj",
+        "ts": 1706723822,
+        "wind_strength": 1,
+        "wind_angle": 276,
+        "wind_gust": 6,
+        "wind_gust_angle": 303
+      },
+      {
         "id": "03:00:00:xx:xx:xx",
         "type": "NAModule4",
         "battery_state": "medium",

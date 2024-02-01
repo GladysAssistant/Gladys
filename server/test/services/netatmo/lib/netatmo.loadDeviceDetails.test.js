@@ -48,13 +48,14 @@ describe('Netatmo Load Device Details', () => {
       .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
-    expect(devices).to.have.lengthOf(8);
+    expect(devices).to.have.lengthOf(9);
 
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
     const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
+    const natNAModule2Devices = devices.filter((device) => device.type === 'NAModule2');
     const natNAModule4Devices = devices.filter((device) => device.type === 'NAModule4');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
 
@@ -63,6 +64,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(1);
     expect(natNAModule1Devices).to.have.lengthOf(1);
+    expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
     natThermDevices.forEach((device) => {
@@ -95,12 +97,13 @@ describe('Netatmo Load Device Details', () => {
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
-    expect(devices).to.have.lengthOf(7);
+    expect(devices).to.have.lengthOf(8);
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
     const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
+    const natNAModule2Devices = devices.filter((device) => device.type === 'NAModule2');
     const natNAModule4Devices = devices.filter((device) => device.type === 'NAModule4');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
     expect(natThermDevices).to.have.lengthOf(0);
@@ -108,6 +111,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(1);
     expect(natNAModule1Devices).to.have.lengthOf(1);
+    expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
     expect(devices).to.be.an('array');
@@ -126,12 +130,13 @@ describe('Netatmo Load Device Details', () => {
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
-    expect(devices).to.have.lengthOf(7);
+    expect(devices).to.have.lengthOf(8);
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
     const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
+    const natNAModule2Devices = devices.filter((device) => device.type === 'NAModule2');
     const natNAModule4Devices = devices.filter((device) => device.type === 'NAModule4');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
     expect(natThermDevices).to.have.lengthOf(1);
@@ -139,6 +144,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(0);
     expect(natNAModule1Devices).to.have.lengthOf(1);
+    expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
   });

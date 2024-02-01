@@ -116,6 +116,30 @@ describe('Netatmo Convert Device', () => {
     expect(gladysDevice.params).to.be.an('array');
   });
 
+  it('should correctly convert a Netatmo Anemometer device', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAModule2')[0];
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAModule2')[0];
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
+    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE2);
+
+    const featureMock = gladysDevice.features.filter((feature) => feature.category === 'speed-sensor')[0];
+    expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:wind_strength`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'plug_name')[0];
+    expect(paramMock).to.have.property('value', deviceNetatmoMock.plug.name);
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
   it('should correctly convert a Netatmo device not supported', () => {
     const deviceGladysMock = devicesGladysMock.filter((device) => device.not_handled)[0];
     const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NOC')[0];

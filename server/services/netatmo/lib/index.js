@@ -24,6 +24,7 @@ const { updateNATherm1 } = require('./device/netatmo.updateNATherm1');
 const { updateNRV } = require('./device/netatmo.updateNRV');
 const { updateNAMain } = require('./device/netatmo.updateNAMain');
 const { updateNAModule1 } = require('./device/netatmo.updateNAModule1');
+const { updateNAModule2 } = require('./device/netatmo.updateNAModule2');
 const { updateNAModule4 } = require('./device/netatmo.updateNAModule4');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
@@ -75,6 +76,7 @@ NetatmoHandler.prototype.updateNATherm1 = updateNATherm1;
 NetatmoHandler.prototype.updateNRV = updateNRV;
 NetatmoHandler.prototype.updateNAMain = updateNAMain;
 NetatmoHandler.prototype.updateNAModule1 = updateNAModule1;
+NetatmoHandler.prototype.updateNAModule2 = updateNAModule2;
 NetatmoHandler.prototype.updateNAModule4 = updateNAModule4;
 
 module.exports = NetatmoHandler;

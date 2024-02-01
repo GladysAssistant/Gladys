@@ -77,6 +77,7 @@ const SUPPORTED_MODULE_TYPE = {
   NRV: 'NRV',
   NAMAIN: 'NAMain',
   NAMODULE1: 'NAModule1',
+  NAMODULE2: 'NAModule2',
   NAMODULE4: 'NAModule4',
 };
 

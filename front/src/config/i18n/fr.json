@@ -2887,7 +2887,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Vitesse",
-      "decimal": "Vitesse"
+      "decimal": "Vitesse (décimale)",
+      "integer": "Vitesse (entier)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Capteur de précipitations",
@@ -2957,6 +2958,10 @@
     "noise-sensor": {
       "shortCategoryName": "Capteur sonore",
       "integer": "Bruit (entier)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Angle",
+      "integer": "Angle (entier)"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
