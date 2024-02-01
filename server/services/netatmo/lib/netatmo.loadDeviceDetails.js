@@ -57,6 +57,7 @@ async function loadDeviceDetails(homeData) {
             if (
               typeModule === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
               typeModule === SUPPORTED_MODULE_TYPE.NAMODULE2 ||
+              typeModule === SUPPORTED_MODULE_TYPE.NAMODULE3 ||
               typeModule === SUPPORTED_MODULE_TYPE.NAMODULE4
             ) {
               typeModule = 'NAModule';

@@ -92,7 +92,7 @@ describe('Netatmo Convert Device', () => {
     expect(gladysDevice.params).to.be.an('array');
   });
 
-  it('should correctly convert a Netatmo Weather Station device', () => {
+  it('should correctly convert a Netatmo Weather Station NAMain device', () => {
     const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAMain')[0];
     const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAMain')[0];
 
@@ -116,7 +116,30 @@ describe('Netatmo Convert Device', () => {
     expect(gladysDevice.params).to.be.an('array');
   });
 
-  it('should correctly convert a Netatmo Anemometer device', () => {
+  it('should correctly convert a Netatmo Outdoor module NAModule1 device', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAModule1')[0];
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAModule1')[0];
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`); expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE1);
+
+    const featureMock = gladysDevice.features.filter((feature) => feature.category === 'humidity-sensor')[0];
+    expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:humidity`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'plug_name')[0];
+    expect(paramMock).to.have.property('value', deviceNetatmoMock.plug.name);
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
+  it('should correctly convert a Netatmo Anemometer NAModule2 device', () => {
     const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAModule2')[0];
     const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAModule2')[0];
 
@@ -127,11 +150,58 @@ describe('Netatmo Convert Device', () => {
     expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
 
     expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
-    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
-    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE2);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`); expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE2);
 
     const featureMock = gladysDevice.features.filter((feature) => feature.category === 'speed-sensor')[0];
     expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:wind_strength`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'plug_name')[0];
+    expect(paramMock).to.have.property('value', deviceNetatmoMock.plug.name);
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
+  it('should correctly convert a Netatmo Rain gauge Weather Station NAModule3 device', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAModule3')[0];
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAModule3')[0];
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
+    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE3);
+
+    const featureMock = gladysDevice.features.filter((feature) => feature.category === 'precipitation-sensor')[2];
+    expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:sum_rain_24`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'plug_name')[0];
+    expect(paramMock).to.have.property('value', deviceNetatmoMock.plug.name);
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
+  it('should correctly convert a Netatmo Indoor module Weather Station NAModule4 device', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAModule4')[0];
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAModule4')[0];
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
+    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMODULE4);
+
+    const featureMock = gladysDevice.features.filter((feature) => feature.category === 'temperature-sensor')[2];
+    expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:min_temp`);
 
     const paramMock = gladysDevice.params.filter((param) => param.name === 'plug_name')[0];
     expect(paramMock).to.have.property('value', deviceNetatmoMock.plug.name);

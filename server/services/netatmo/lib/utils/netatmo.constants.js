@@ -78,6 +78,7 @@ const SUPPORTED_MODULE_TYPE = {
   NAMAIN: 'NAMain',
   NAMODULE1: 'NAModule1',
   NAMODULE2: 'NAModule2',
+  NAMODULE3: 'NAModule3',
   NAMODULE4: 'NAModule4',
 };
 

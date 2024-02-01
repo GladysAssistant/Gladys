@@ -90,5 +90,15 @@ describe('Netatmo device mapping', () => {
       expect(mappingFunction(valueFromDevice)).to.equal(10);
       expect(mappingFunction(valueFromDeviceFloat)).to.equal(10);
     });
+    
+    it('should correctly transform PRECIPITATION_SENSOR.DECIMAL value from Netatmo to Gladys', () => {
+      const valueFromDevice = 1;
+      const valueFromDeviceFloat = 1.5;
+      const mappingFunction =
+        readValues[DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR][DEVICE_FEATURE_TYPES.SENSOR.DECIMAL];
+
+      expect(mappingFunction(valueFromDevice)).to.equal(1);
+      expect(mappingFunction(valueFromDeviceFloat)).to.equal(1.5);
+    });
   });
 });

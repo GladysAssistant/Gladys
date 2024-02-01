@@ -103,6 +103,12 @@ const readValues = {
       return valueToGladys;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: {
+    /* rain: 1.5 or sum_rain_1: 5.1 or sum_rain_24: 10.1 */
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
 };
 
 module.exports = { readValues, writeValues };

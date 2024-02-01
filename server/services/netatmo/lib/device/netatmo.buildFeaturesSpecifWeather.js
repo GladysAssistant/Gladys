@@ -108,7 +108,7 @@ function buildFeaturePressure(name, externalId, featureName) {
  * @param {string} featureName - Gladys external ID.
  * @returns {object} Gladys feature or undefined.
  * @example
- * buildFeaturePressure(device_name, 'netatmo:device_id', 'wind_strength');
+ * buildFeatureWindStrength(device_name, 'netatmo:device_id', 'wind_strength');
  */
 function buildFeatureWindStrength(name, externalId, featureName) {
   return {
@@ -133,7 +133,7 @@ function buildFeatureWindStrength(name, externalId, featureName) {
  * @param {string} featureName - Gladys external ID.
  * @returns {object} Gladys feature or undefined.
  * @example
- * buildFeaturePressure(device_name, 'netatmo:device_id', 'wind_angle');
+ * buildFeatureWindAngle(device_name, 'netatmo:device_id', 'wind_angle');
  */
 function buildFeatureWindAngle(name, externalId, featureName) {
   return {
@@ -147,10 +147,35 @@ function buildFeatureWindAngle(name, externalId, featureName) {
     keep_history: true,
     has_feedback: false,
     min: 0,
-    max: 300,
+    max: 360,
   };
 }
 
+/**
+ * @description Transforms Netatmo feature as Gladys feature.Precipitation per hour and sum of the day.
+ * @param { string } name - Name device from Netatmo.
+ * @param { string } externalId - Gladys external ID.
+ * @param { string } featureName - Gladys feature constructor.
+ * @param { string } unit - Gladys unit.
+ * @returns { object } Gladys feature or undefined.
+ * @example
+ * buildFeatureRain(device_name, 'netatmo:device_id', 'rain', 'mm');
+ */
+function buildFeatureRain(name, externalId, featureName, unit) {
+    return {
+      name,
+      external_id: `${externalId}:${featureName}`,
+      selector: `${externalId}:${featureName}`,
+      category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit,
+      read_only: true,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 100,
+    };
+  }
 module.exports = {
   buildFeatureCo2,
   buildFeatureHumidity,
@@ -158,4 +183,5 @@ module.exports = {
   buildFeaturePressure,
   buildFeatureWindStrength,
   buildFeatureWindAngle,
+  buildFeatureRain,
 };

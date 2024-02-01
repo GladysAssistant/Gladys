@@ -19,7 +19,7 @@ const gladys = {
 const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
-describe('Netatmo pollRefreshingValuess', () => {
+describe('Netatmo pollRefreshingValues', () => {
   let clock;
 
   beforeEach(() => {

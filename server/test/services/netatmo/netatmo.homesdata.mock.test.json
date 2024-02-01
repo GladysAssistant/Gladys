@@ -96,6 +96,14 @@
           "bridge": "70:ee:50:jj:jj:jj"
         },
         {
+          "id": "05:00:00:yy:yy:yy",
+          "type": "NAModule3",
+          "name": "STARK House Rain Gauge",
+          "setup_date": 1605604312,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
           "id": "03:00:00:xx:xx:xx",
           "type": "NAModule4",
           "name": "STARK House kitchen hygrometer",

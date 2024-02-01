@@ -87,6 +87,26 @@
           }
         },
         {
+          "_id": "05:00:00:yy:yy:yy",
+          "type": "NAModule3",
+          "module_name": "STARK House Rain Gauge",
+          "last_setup": 1605604312,
+          "data_type": ["Rain"],
+          "battery_percent": 52,
+          "reachable": false,
+          "firmware": 14,
+          "last_message": 1706021182,
+          "last_seen": 1705945317,
+          "rf_status": 96,
+          "battery_vp": 4944,
+          "dashboard_data": {
+            "time_utc": 1608764760,
+            "Rain": 0.101,
+            "sum_rain_1": 0.505,
+            "sum_rain_24": 0.1
+          }
+        },
+        {
           "_id": "03:00:00:yy:yy:yy",
           "type": "NAModule4",
           "module_name": "STARK House kitchen hygrometer",
@@ -161,6 +181,26 @@
         "max_wind_str": 11,
         "max_wind_angle": 137,
         "date_max_wind_str": 1706714453
+      }
+    },
+    {
+      "_id": "05:00:00:yy:yy:yy",
+      "type": "NAModule3",
+      "module_name": "STARK House Rain Gauge",
+      "last_setup": 1605604312,
+      "data_type": ["Rain"],
+      "battery_percent": 52,
+      "reachable": false,
+      "firmware": 14,
+      "last_message": 1706021182,
+      "last_seen": 1705945317,
+      "rf_status": 96,
+      "battery_vp": 4944,
+      "dashboard_data": {
+        "time_utc": 1608764760,
+        "Rain": 0.101,
+        "sum_rain_1": 0.505,
+        "sum_rain_24": 0.1
       }
     },
     {
