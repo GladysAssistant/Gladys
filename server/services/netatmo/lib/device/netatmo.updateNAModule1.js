@@ -10,7 +10,7 @@ const { readValues } = require('./netatmo.deviceMapping');
  * @example updateNAModule1(deviceGladys, deviceNetatmo, externalId);
  */
 async function updateNAModule1(deviceGladys, deviceNetatmo, externalId) {
-  const { room, dashboard_data: dashboardData } = deviceNetatmo;
+  const { dashboard_data: dashboardData } = deviceNetatmo;
   try {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
