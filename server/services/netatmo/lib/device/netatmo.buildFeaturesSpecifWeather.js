@@ -101,9 +101,35 @@ function buildFeaturePressure(name, externalId, featureName) {
   };
 }
 
+/**
+ * @description Transforms Netatmo feature as Gladys feature. Precipitation per hour and sum of the day.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @param {string} featureName - Gladys external ID.
+ * @returns {object} Gladys feature or undefined.
+ * @example
+ * buildFeatureRain(device_name, 'netatmo:device_id', 'rain', 'mm');
+ */
+function buildFeatureRain(name, externalId, featureName, unit) {
+  return {
+    name,
+    external_id: `${externalId}:${featureName}`,
+    selector: `${externalId}:${featureName}`,
+    category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    unit,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: -1000,
+    max: 2000,
+  };
+}
+
 module.exports = {
   buildFeatureCo2,
   buildFeatureHumidity,
   buildFeatureNoise,
   buildFeaturePressure,
+  buildFeatureRain
 };

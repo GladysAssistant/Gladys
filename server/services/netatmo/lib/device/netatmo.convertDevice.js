@@ -13,7 +13,9 @@ const {
   buildFeatureHumidity,
   buildFeatureNoise,
   buildFeaturePressure,
+  buildFeatureRain,
 } = require('./netatmo.buildFeaturesSpecifWeather');
+const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 
 /**
  * @description Transform Netatmo device to Gladys device.
@@ -77,6 +79,22 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeatureWifiStrength(name, externalId));
       /* params */
       params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
+      break;
+    }
+    case SUPPORTED_MODULE_TYPE.NAMODULE3: {
+      /* features common */
+      features.push(buildFeatureBattery(name, externalId));
+      /* features specific Netatmo Weather */
+      features.push(buildFeatureRain(`Current rain - ${name}`, externalId, 'rain', DEVICE_FEATURE_UNITS.MM));
+      features.push(buildFeatureRain(`Precipitation / 1h - ${name}`, externalId, 'sum_rain_1', DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR));
+      features.push(buildFeatureRain(`Sum rain / 24h - ${name}`, externalId, 'sum_rain_24', DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR));
+      /* features common modules RF */
+      features.push(buildFeatureRfStrength(name, externalId));
+      /* params */
+      params = [
+        { name: PARAMS.PLUG_ID, value: plug.id },
+        { name: PARAMS.PLUG_NAME, value: plug.name },
+      ];
       break;
     }
     default:
