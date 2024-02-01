@@ -121,8 +121,8 @@ function buildFeatureRain(name, externalId, featureName, unit) {
     read_only: true,
     keep_history: true,
     has_feedback: false,
-    min: -1000,
-    max: 2000,
+    min: 0,
+    max: 100,
   };
 }
 

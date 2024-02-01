@@ -13,6 +13,14 @@ async function updateNAModule3(deviceGladys, deviceNetatmo, externalId) {
   const { dashboard_data: dashboardData } = deviceNetatmo;
   try {
     deviceGladys.features
+      .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
+      .forEach((feature) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${externalId}:battery_percent`,
+          state: readValues[feature.category][feature.type](deviceNetatmo.battery_percent),
+        });
+      });
+    deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:rain`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {

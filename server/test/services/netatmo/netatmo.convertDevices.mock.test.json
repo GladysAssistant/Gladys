@@ -397,6 +397,102 @@
     ]
   },
   {
+		"name": "STARK House Rain Gauge",
+		"external_id": "netatmo:05:00:00:yy:yy:yy",
+		"selector": "netatmo:05:00:00:yy:yy:yy",
+		"model": "NAModule3",
+		"service_id": "serviceId",
+		"should_poll": false,
+		"features": [
+			{
+				"name": "Battery - STARK House Rain Gauge",
+				"external_id": "netatmo:05:00:00:yy:yy:yy:battery_percent",
+				"selector": "netatmo:05:00:00:yy:yy:yy:battery_percent",
+				"category": "battery",
+				"type": "integer",
+				"unit": "percent",
+				"read_only": true,
+				"keep_history": true,
+				"has_feedback": false,
+				"min": 0,
+				"max": 100
+			},
+			{
+				"name": "Current rain - STARK House Rain Gauge",
+				"external_id": "netatmo:05:00:00:yy:yy:yy:rain",
+				"selector": "netatmo:05:00:00:yy:yy:yy:rain",
+				"category": "precipitation-sensor",
+				"type": "decimal",
+				"unit": "mm",
+				"read_only": true,
+				"keep_history": true,
+				"has_feedback": false,
+				"min": 0,
+				"max": 100
+			},
+			{
+				"name": "Precipitation / 1h - STARK House Rain Gauge",
+				"external_id": "netatmo:05:00:00:yy:yy:yy:sum_rain_1",
+				"selector": "netatmo:05:00:00:yy:yy:yy:sum_rain_1",
+				"category": "precipitation-sensor",
+				"type": "decimal",
+				"unit": "millimeter-per-hour",
+				"read_only": true,
+				"keep_history": true,
+				"has_feedback": false,
+				"min": 0,
+				"max": 100
+			},
+			{
+				"name": "Sum rain / 24h - STARK House Rain Gauge",
+				"external_id": "netatmo:05:00:00:yy:yy:yy:sum_rain_24",
+				"selector": "netatmo:05:00:00:yy:yy:yy:sum_rain_24",
+				"category": "precipitation-sensor",
+				"type": "decimal",
+				"unit": "millimeter-per-day",
+				"read_only": true,
+				"keep_history": true,
+				"has_feedback": false,
+				"min": 0,
+				"max": 100
+			},
+			{
+				"name": "Link RF quality - STARK House Rain Gauge",
+				"external_id": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+				"selector": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+				"category": "signal",
+				"type": "integer",
+				"read_only": true,
+				"keep_history": true,
+				"has_feedback": false,
+				"min": 0,
+				"max": 100
+			}
+		],
+		"params": [
+			{
+				"name": "plug_id",
+				"value": "70:ee:50:jj:jj:jj"
+			},
+			{
+				"name": "plug_name",
+				"value": "Weather Station Test"
+			},
+			{
+				"name": "home_id",
+				"value": "5e1xxxxxxxxxxxxxxxxx"
+			},
+			{
+				"name": "room_id",
+				"value": "8765432109"
+			},
+			{
+				"name": "room_name",
+				"value": "Outdoor"
+			}
+		]
+  },
+  {
     "name": "Outdoor Parking Camera",
     "external_id": "netatmo:70:ee:00:xx:xx:xx",
     "selector": "netatmo:70:ee:00:xx:xx:xx",

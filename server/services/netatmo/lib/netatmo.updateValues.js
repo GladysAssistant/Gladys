@@ -1,4 +1,5 @@
 const { BadParameters } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
 /**
@@ -18,7 +19,7 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no id and category indicator`);
   }
   if (!reachable && typeof reachable !== 'undefined') {
-    throw new BadParameters(`Netatmo device "${deviceGladys.name}" is not reachable`);
+    logger.info(`Netatmo device "${deviceGladys.name}" is not reachable`);
   }
   switch (deviceNetatmo.type) {
     case SUPPORTED_MODULE_TYPE.PLUG: {
