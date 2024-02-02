@@ -817,7 +817,8 @@
       "setup_date": 1581000000,
       "room_id": "2812958323",
       "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
-    }
+    },
+    "categoryAPI": "Energy"
   },
   {
     "id": "70:ee:50:jj:jj:jj",
