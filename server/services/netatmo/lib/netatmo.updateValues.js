@@ -27,36 +27,6 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
       await this.updateNAPlug(deviceGladys, deviceNetatmo, externalId);
       break;
     }
-    case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
-      await this.updateNATherm1(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NRV: {
-      await this.updateNRV(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMAIN: {
-      await this.updateNAMain(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE1: {
-      await this.updateNAModule1(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE2: {
-      await this.updateNAModule2(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE3: {
-      await this.updateNAModule3(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE4: {
-      await this.updateNAModule4(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    default:
-      break;
   }
 }
 
