@@ -45,6 +45,15 @@ async function loadDeviceDetails(homeData) {
         weatherStations = deviceWeatherStations.weatherStations;
         modulesWeatherStations = deviceWeatherStations.modules;
       }
+      let cameras;
+      // let modulesCameras = [];
+      if (
+        modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.NACAMERA) !== undefined
+      ) {
+        const deviceCameras = await this.loadCameraDetails();
+        cameras = deviceCameras.cameras;
+        // modulesCameras = deviceCameras.modules;
+      }
       if (modulesHomestatus) {
         listDevices = modulesHomestatus
           .map((module) => {
@@ -53,6 +62,7 @@ async function loadDeviceDetails(homeData) {
             let device;
             let plugThermostat;
             let plugWeatherStation;
+            // let plugCamera;
             let typeModule = module.type;
             if (
               typeModule === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
@@ -127,6 +137,19 @@ async function loadDeviceDetails(homeData) {
                     .find((weatherStation) => weatherStation._id === module.bridge);
                 }
                 break;
+              case SUPPORTED_MODULE_TYPE.NACAMERA:
+                moduleSupported = true;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.SECURITY;
+                if (cameras) {
+                  device = cameras
+                    .map((camera) => {
+                      const { modules, ...rest } = camera;
+                      return rest;
+                    })
+                    // eslint-disable-next-line no-underscore-dangle
+                    .find((camera) => camera._id === module.id);
+                }
+                break;
               default:
                 moduleSupported = false;
                 categoryAPI = SUPPORTED_CATEGORY_TYPE.UNKNOWN;
@@ -141,7 +164,8 @@ async function loadDeviceDetails(homeData) {
               ...modulesHomeData.find((mod) => mod.id === module.bridge),
               ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
               ...plugThermostat,
-              ...plugWeatherStation,
+              ...plugWeatherStation, 
+              // ...plugCamera,
             };
             const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
             if (moduleSupported) {
