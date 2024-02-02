@@ -1,55 +1,71 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { readValues } = require('./netatmo.deviceMapping');
+const { readValues } = require('../device/netatmo.deviceMapping');
 
 /**
- * @description Save values of Smart Outdoor Module NAModule1 - Weather Station .
+ * @description Save values of Smart Anemometer Module NAModule2 - Weather Station .
  * @param {object} deviceGladys - Device object in Gladys.
  * @param {object} deviceNetatmo - Device object coming from the Netatmo API.
  * @param {string} externalId - Device identifier in gladys.
- * @example updateNAModule1(deviceGladys, deviceNetatmo, externalId);
+ * @example updateNAModule2(deviceGladys, deviceNetatmo, externalId);
  */
-async function updateNAModule1(deviceGladys, deviceNetatmo, externalId) {
+async function updateNAModule2(deviceGladys, deviceNetatmo, externalId) {
   const { dashboard_data: dashboardData } = deviceNetatmo;
   try {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
+          device_feature_external_id: `${externalId}:battery_percent`,
           state: readValues[feature.category][feature.type](deviceNetatmo.battery_percent),
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:temperature`)
+      .filter((feature) => feature.external_id === `${externalId}:wind_strength`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.temperature),
+          state: readValues[feature.category][feature.type](deviceNetatmo.wind_strength),
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:humidity`)
+      .filter((feature) => feature.external_id === `${externalId}:wind_angle`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.humidity),
+          state: readValues[feature.category][feature.type](deviceNetatmo.wind_angle),
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:min_temp`)
+      .filter((feature) => feature.external_id === `${externalId}:wind_gust`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](dashboardData.min_temp),
+          state: readValues[feature.category][feature.type](deviceNetatmo.wind_gust),
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:max_temp`)
+      .filter((feature) => feature.external_id === `${externalId}:wind_gust_angle`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](dashboardData.max_temp),
+          state: readValues[feature.category][feature.type](deviceNetatmo.wind_gust_angle),
+        });
+      });
+    deviceGladys.features
+      .filter((feature) => feature.external_id === `${externalId}:max_wind_str`)
+      .forEach((feature) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: feature.external_id,
+          state: readValues[feature.category][feature.type](dashboardData.max_wind_str),
+        });
+      });
+    deviceGladys.features
+      .filter((feature) => feature.external_id === `${externalId}:max_wind_angle`)
+      .forEach((feature) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: feature.external_id,
+          state: readValues[feature.category][feature.type](dashboardData.max_wind_angle),
         });
       });
     deviceGladys.features
@@ -61,10 +77,10 @@ async function updateNAModule1(deviceGladys, deviceNetatmo, externalId) {
         });
       });
   } catch (e) {
-    logger.error('deviceGladys NAModule1: ', deviceGladys.name, 'error: ', e);
+    logger.error('deviceGladys NAModule2: ', deviceGladys.name, 'error: ', e);
   }
 }
 
 module.exports = {
-  updateNAModule1,
+  updateNAModule2,
 };

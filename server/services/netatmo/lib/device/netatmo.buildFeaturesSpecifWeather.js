@@ -162,20 +162,20 @@ function buildFeatureWindAngle(name, externalId, featureName) {
  * buildFeatureRain(device_name, 'netatmo:device_id', 'rain', 'mm');
  */
 function buildFeatureRain(name, externalId, featureName, unit) {
-    return {
-      name,
-      external_id: `${externalId}:${featureName}`,
-      selector: `${externalId}:${featureName}`,
-      category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
-      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-      unit,
-      read_only: true,
-      keep_history: true,
-      has_feedback: false,
-      min: 0,
-      max: 100,
-    };
-  }
+  return {
+    name,
+    external_id: `${externalId}:${featureName}`,
+    selector: `${externalId}:${featureName}`,
+    category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    unit,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: 0,
+    max: 100,
+  };
+}
 module.exports = {
   buildFeatureCo2,
   buildFeatureHumidity,

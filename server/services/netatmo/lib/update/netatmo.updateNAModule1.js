@@ -1,16 +1,16 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { readValues } = require('./netatmo.deviceMapping');
+const { readValues } = require('../device/netatmo.deviceMapping');
 
 /**
- * @description Save values of Smart Indoor Module NAModule4 - Weather Station .
+ * @description Save values of Smart Outdoor Module NAModule1 - Weather Station .
  * @param {object} deviceGladys - Device object in Gladys.
  * @param {object} deviceNetatmo - Device object coming from the Netatmo API.
  * @param {string} externalId - Device identifier in gladys.
- * @example updateNAModule4(deviceGladys, deviceNetatmo, externalId);
+ * @example updateNAModule1(deviceGladys, deviceNetatmo, externalId);
  */
-async function updateNAModule4(deviceGladys, deviceNetatmo, externalId) {
-  const { room, dashboard_data: dashboardData } = deviceNetatmo;
+async function updateNAModule1(deviceGladys, deviceNetatmo, externalId) {
+  const { dashboard_data: dashboardData } = deviceNetatmo;
   try {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
@@ -26,22 +26,6 @@ async function updateNAModule4(deviceGladys, deviceNetatmo, externalId) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](deviceNetatmo.temperature),
-        });
-      });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:therm_measured_temperature`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](room.therm_measured_temperature),
-        });
-      });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:co2`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.co2),
         });
       });
     deviceGladys.features
@@ -77,10 +61,10 @@ async function updateNAModule4(deviceGladys, deviceNetatmo, externalId) {
         });
       });
   } catch (e) {
-    logger.error('deviceGladys NAModule4: ', deviceGladys.name, 'error: ', e);
+    logger.error('deviceGladys NAModule1: ', deviceGladys.name, 'error: ', e);
   }
 }
 
 module.exports = {
-  updateNAModule4,
+  updateNAModule1,
 };

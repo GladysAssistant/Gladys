@@ -129,6 +129,7 @@ async function loadDeviceDetails(homeData) {
                 break;
               default:
                 moduleSupported = false;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.UNKNOWN;
                 break;
             }
             const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);

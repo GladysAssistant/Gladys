@@ -16,16 +16,14 @@ const readValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
-    /* plug_connected_boiler: 1 */
-    /* boiler_status: true */
+    /* plug_connected_boiler: 1 or boiler_status: true */
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
       const valueToGladys = valueFromDevice === true || valueFromDevice === 1 ? 1 : 0;
       return valueToGladys;
     },
   },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
-    /* battery_percent: 76 */
-    /* battery_state: 'medium' */
+    /* battery_percent: 76 or battery_state: 'medium' */
     [DEVICE_FEATURE_TYPES.BATTERY.INTEGER]: (valueFromDevice) => {
       const batteryLevels = {
         max: 100,
@@ -48,8 +46,7 @@ const readValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: {
-    /* rf_strength: 76 */
-    /* wifi_strength: 76 */
+    /* rf_strength: 76 or wifi_strength: 76 */
     [DEVICE_FEATURE_TYPES.SIGNAL.QUALITY]: (valueFromDevice) => {
       const valueToGladys = parseInt(valueFromDevice, 10);
       return valueToGladys;

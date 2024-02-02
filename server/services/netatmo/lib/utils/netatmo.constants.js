@@ -69,6 +69,7 @@ const API = {
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
   WEATHER: 'Weather',
+  UNKNOWN: 'unknown',
 };
 
 const SUPPORTED_MODULE_TYPE = {

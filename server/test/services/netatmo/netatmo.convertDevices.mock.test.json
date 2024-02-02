@@ -8,9 +8,9 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Link RF quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "name": "Link Wifi quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -20,9 +20,9 @@
         "max": 100
       },
       {
-        "name": "Link Wifi quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "name": "Link RF quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -85,6 +85,18 @@
         "max": 100
       },
       {
+        "name": "Link RF quality - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Temperature - Thermostat Test",
         "external_id": "netatmo:04:00:00:xx:xx:xx:temperature",
         "selector": "netatmo:04:00:00:xx:xx:xx:temperature",
@@ -109,18 +121,6 @@
         "has_feedback": false,
         "min": -10,
         "max": 50
-      },
-      {
-        "name": "Link RF quality - Thermostat Test",
-        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       },
       {
         "name": "Setpoint temperature - Thermostat Test",
@@ -192,9 +192,9 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Link RF quality - Relais Salon Test",
-        "external_id": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
-        "selector": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "name": "Link Wifi quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -204,9 +204,9 @@
         "max": 100
       },
       {
-        "name": "Link Wifi quality - Relais Salon Test",
-        "external_id": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
-        "selector": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "name": "Link RF quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -261,6 +261,18 @@
         "max": 100
       },
       {
+        "name": "Link RF quality - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Temperature - room Office",
         "external_id": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
         "selector": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
@@ -272,18 +284,6 @@
         "has_feedback": false,
         "min": -10,
         "max": 50
-      },
-      {
-        "name": "Link RF quality - Valve Test",
-        "external_id": "netatmo:09:00:00:xx:xx:xx:rf_strength",
-        "selector": "netatmo:09:00:00:xx:xx:xx:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       },
       {
         "name": "Setpoint temperature - Valve Test",
@@ -354,6 +354,18 @@
     "service_id": "serviceId",
     "should_poll": false,
     "features": [
+      {
+        "name": "Link Wifi quality - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
       {
         "name": "Temperature - Weather Station Test",
         "external_id": "netatmo:70:ee:50:jj:jj:jj:temperature",
@@ -470,18 +482,6 @@
         "has_feedback": false,
         "min": -1000,
         "max": 2000
-      },
-      {
-        "name": "Link Wifi quality - Weather Station Test",
-        "external_id": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
-        "selector": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       }
     ],
     "params": [
@@ -518,6 +518,18 @@
         "category": "battery",
         "type": "integer",
         "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
         "read_only": true,
         "keep_history": true,
         "has_feedback": false,
@@ -575,18 +587,6 @@
         "has_feedback": false,
         "min": 0,
         "max": 100
-      },
-      {
-        "name": "Link RF quality - Outdoor Hygrometer",
-        "external_id": "netatmo:02:00:00:yy:yy:yy:rf_strength",
-        "selector": "netatmo:02:00:00:yy:yy:yy:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       }
     ],
     "params": [
@@ -627,6 +627,18 @@
         "category": "battery",
         "type": "integer",
         "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
         "read_only": true,
         "keep_history": true,
         "has_feedback": false,
@@ -710,18 +722,6 @@
         "has_feedback": false,
         "min": 0,
         "max": 360
-      },
-      {
-        "name": "Link RF quality - Anemometer STARK Home",
-        "external_id": "netatmo:06:00:00:yy:yy:yy:rf_strength",
-        "selector": "netatmo:06:00:00:yy:yy:yy:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       }
     ],
     "params": [
@@ -769,6 +769,18 @@
         "max": 100
       },
       {
+        "name": "Link RF quality - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Current rain - STARK House Rain Gauge",
         "external_id": "netatmo:05:00:00:yy:yy:yy:rain",
         "selector": "netatmo:05:00:00:yy:yy:yy:rain",
@@ -801,18 +813,6 @@
         "category": "precipitation-sensor",
         "type": "decimal",
         "unit": "millimeter-per-day",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "name": "Link RF quality - STARK House Rain Gauge",
-        "external_id": "netatmo:05:00:00:yy:yy:yy:rf_strength",
-        "selector": "netatmo:05:00:00:yy:yy:yy:rf_strength",
-        "category": "signal",
-        "type": "integer",
         "read_only": true,
         "keep_history": true,
         "has_feedback": false,
@@ -858,6 +858,18 @@
         "category": "battery",
         "type": "integer",
         "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
         "read_only": true,
         "keep_history": true,
         "has_feedback": false,
@@ -936,18 +948,6 @@
         "category": "humidity-sensor",
         "type": "decimal",
         "unit": "percent",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "name": "Link RF quality - STARK House kitchen hygrometer",
-        "external_id": "netatmo:03:00:00:yy:yy:yy:rf_strength",
-        "selector": "netatmo:03:00:00:yy:yy:yy:rf_strength",
-        "category": "signal",
-        "type": "integer",
         "read_only": true,
         "keep_history": true,
         "has_feedback": false,
