@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
@@ -46,13 +47,11 @@ async function loadDeviceDetails(homeData) {
         modulesWeatherStations = deviceWeatherStations.modules;
       }
       let cameras;
-      // let modulesCameras = [];
       if (
         modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.NACAMERA) !== undefined
       ) {
         const deviceCameras = await this.loadCameraDetails();
         cameras = deviceCameras.cameras;
-        // modulesCameras = deviceCameras.modules;
       }
       if (modulesHomestatus) {
         listDevices = modulesHomestatus
@@ -62,7 +61,6 @@ async function loadDeviceDetails(homeData) {
             let device;
             let plugThermostat;
             let plugWeatherStation;
-            // let plugCamera;
             let typeModule = module.type;
             if (
               typeModule === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
@@ -141,13 +139,8 @@ async function loadDeviceDetails(homeData) {
                 moduleSupported = true;
                 categoryAPI = SUPPORTED_CATEGORY_TYPE.SECURITY;
                 if (cameras) {
-                  device = cameras
-                    .map((camera) => {
-                      const { modules, ...rest } = camera;
-                      return rest;
-                    })
-                    // eslint-disable-next-line no-underscore-dangle
-                    .find((camera) => camera._id === module.id);
+                  const { modules, ...rest } = cameras.find((camera) => camera.id === module.id);
+                  device = rest;
                 }
                 break;
               default:
@@ -164,8 +157,7 @@ async function loadDeviceDetails(homeData) {
               ...modulesHomeData.find((mod) => mod.id === module.bridge),
               ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
               ...plugThermostat,
-              ...plugWeatherStation, 
-              // ...plugCamera,
+              ...plugWeatherStation,
             };
             const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
             if (moduleSupported) {
@@ -206,8 +198,8 @@ async function loadDeviceDetails(homeData) {
       e,
       ' - status error: ',
       e.status,
-      ' data error: ',
-      e.response.data.error,
+      ' - response: ',
+      e.response,
     );
     return undefined;
   }

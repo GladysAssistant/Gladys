@@ -42,6 +42,22 @@ function getDeviceParam(device, paramName) {
   return null;
 }
 
+/**
+ * @description Get Device service name by id.
+ * @param {Object} device - Device Object to parse.
+ * @param {string} serviceId - The name of the param to get.
+ * @returns {string} Return service name.
+ * @example
+ * const value = getServiceName(this.props.httpClient, 'test-test');
+ */
+async function getServiceName(httpClient, selector) {
+  const device = await httpClient.get(`/api/v1/device/${selector}`);
+  const serviceId = get(device, 'service_id');
+  const services = await httpClient.get(`/api/v1/service`);
+  const serviceName = services.find(service => service.id === serviceId).name;
+  return serviceName;
+}
+
 const shouldDisplayDeviceName = (device, deviceFeature) => {
   const deviceService = get(device, 'service.name');
 
@@ -77,4 +93,4 @@ const getDeviceName = (device, feature) => {
   return feature.name;
 };
 
-export { getDeviceFeatureName, getDeviceName, getDeviceParam, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES };
+export { getDeviceFeatureName, getDeviceName, getDeviceParam, getServiceName, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES };

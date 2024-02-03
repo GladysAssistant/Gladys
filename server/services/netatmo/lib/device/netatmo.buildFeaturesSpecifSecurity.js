@@ -1,7 +1,4 @@
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-} = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Transforms Netatmo feature as Gladys feature. Temperature setpoint.
@@ -23,7 +20,7 @@ function buildFeatureCamera(name, externalId) {
     has_feedback: false,
     min: 0,
     max: 0,
-  }
+  };
 }
 
 /**
@@ -34,11 +31,11 @@ function buildFeatureCamera(name, externalId) {
  * @example
  * buildFeaturePower(device_name, 'netatmo:device_id');
  */
-function buildFeaturePower(name, externalId) {
+function buildFeatureStatus(name, externalId) {
   return {
-    name: `Power - ${name}`,
-    selector: `${externalId}:power`,
-    external_id: `${externalId}:power`,
+    name: `Status power - ${name}`,
+    selector: `${externalId}:status`,
+    external_id: `${externalId}:status`,
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     read_only: true,
@@ -46,10 +43,10 @@ function buildFeaturePower(name, externalId) {
     has_feedback: true,
     min: 0,
     max: 1,
-  }
+  };
 }
 
 module.exports = {
   buildFeatureCamera,
-  buildFeaturePower,
+  buildFeatureStatus,
 };
