@@ -17,9 +17,12 @@ const SCOPES = {
   },
   HOME_SECURITY: {
     read_camera: 'read_camera',
+    write_camera: 'write_camera',
+    access_camera: 'access_camera',
     read_presence: 'read_presence',
     write_presence: 'write_presence',
     access_presence: 'access_presence',
+    access_doorbell: 'access_doorbell',
     read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
     read_smokedetector: 'read_smokedetector',
   },
@@ -98,8 +101,9 @@ const PARAMS = {
   PLUG_ID: 'plug_id',
   PLUG_NAME: 'plug_name',
   MODULES_BRIDGE_ID: 'modules_bridge_id',
-  CAMERA_URL: 'camera_url',
-  IP_ADRESS: 'ip_adress',
+  CAMERA_URL: 'CAMERA_URL',
+  CAMERA_LIVE_URL: 'CAMERA_LIVE_URL',
+  CAMERA_ROTATION: 'CAMERA_ROTATION',
 };
 
 module.exports = {

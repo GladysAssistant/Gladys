@@ -1,6 +1,7 @@
+const { default: axios } = require('axios');
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
-const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
+const { SUPPORTED_MODULE_TYPE, API, PARAMS } = require('./utils/netatmo.constants');
 
 /**
  * @description Save values of an Netatmo device.
@@ -11,7 +12,7 @@ const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
  */
 async function updateValues(deviceGladys, deviceNetatmo, externalId) {
   const [prefix, topic] = externalId.split(':');
-  const { reachable } = deviceNetatmo;
+  const { type: model, reachable, vpn_url: vpnUrl = undefined, is_local: isLocal = undefined } = deviceNetatmo;
   if (prefix !== 'netatmo') {
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" should starts with "netatmo:"`);
   }

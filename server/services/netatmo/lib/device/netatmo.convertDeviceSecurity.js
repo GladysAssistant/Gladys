@@ -1,7 +1,7 @@
 const logger = require('../../../../utils/logger');
 const { SUPPORTED_MODULE_TYPE, PARAMS } = require('../utils/netatmo.constants');
 const { buildFeatureWifiStrength } = require('./netatmo.buildFeaturesCommon');
-const { buildFeatureCamera, buildFeaturePower } = require('./netatmo.buildFeaturesSpecifSecurity');
+const { buildFeatureCamera, buildFeatureStatus } = require('./netatmo.buildFeaturesSpecifSecurity');
 
 /**
  * @description Transform Netatmo Security device to Gladys device.
@@ -11,7 +11,7 @@ const { buildFeatureCamera, buildFeaturePower } = require('./netatmo.buildFeatur
  * netatmo.convertDeviceSecurity({ ... });
  */
 function convertDeviceSecurity(netatmoDevice) {
-  const { home: homeId, name, type: model, id, room = {}, vpn_url: vpnUrl } = netatmoDevice;
+  const { home: homeId, name, type: model, id, room = {}, vpn_url: vpnUrl, is_local: isLocal } = netatmoDevice;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert Security device "${name}, ${model}"`);
   const features = [];
@@ -26,12 +26,20 @@ function convertDeviceSecurity(netatmoDevice) {
       const modulesBridged = netatmoDevice.modules_bridged || [];
       /* features specific Security */
       features.push(buildFeatureCamera(name, externalId));
-      features.push(buildFeaturePower(name, externalId));
+      features.push(buildFeatureStatus(name, externalId));
+
+      let cameraLiveUrl = `${vpnUrl}/live/files/high`;
+      if (isLocal) {
+        cameraLiveUrl = `${cameraLiveUrl}/index_local.m3u8`;
+      } else {
+        cameraLiveUrl = `${cameraLiveUrl}/index.m3u8`;
+      }
       /* params */
       params = [
         { name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) },
         { name: PARAMS.CAMERA_URL, value: `${vpnUrl}/live/snapshot_720.jpg` },
-        { name: PARAMS.IP_ADRESS, value: '' }
+        { name: PARAMS.CAMERA_LIVE_URL, value: cameraLiveUrl },
+        { name: PARAMS.CAMERA_ROTATION, value: 0 },
       ];
       break;
     }

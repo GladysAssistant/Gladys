@@ -33,12 +33,34 @@ const { updateNAModule2 } = require('./update/netatmo.updateNAModule2');
 const { updateNAModule3 } = require('./update/netatmo.updateNAModule3');
 const { updateNAModule4 } = require('./update/netatmo.updateNAModule4');
 const { updateNACamera } = require('./update/netatmo.updateNACamera');
+/* Cameras */
+const { checkIfLiveActive } = require('./camera/checkIfLiveActive');
+const { convertLocalStreamToGateway } = require('./camera/convertLocalStreamToGateway');
+const { onNewCameraFile } = require('./camera/onNewCameraFile');
+const { poll } = require('./camera/poll');
+const { getImage } = require('./camera/getImage');
+const { liveActivePing } = require('./camera/liveActivePing');
+const { sendCameraFileToGateway, sendCameraFileToGatewayLimited } = require('./camera/sendCameraFileToGateway');
+const { startStreaming } = require('./camera/startStreaming');
+const { startStreamingIfNotStarted } = require('./camera/startStreamingIfNotStarted');
+const { stopStreaming } = require('./camera/stopStreaming');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
 
-const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
+/**
+ * @description Add ability to connect to Netatmo API.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} ffmpeg - Ffmpeg library.
+ * @param {object} childProcess - ChildProcess library.
+ * @param {string} serviceId - UUID of the service in DB.
+ * @example
+ * const netatmoHandler = new NetatmoHandler(gladys, ffmpeg, childProcess, serviceId);
+ */
+const NetatmoHandler = function NetatmoHandler(gladys, ffmpeg, childProcess, serviceId) {
   this.gladys = gladys;
+  this.ffmpeg = ffmpeg;
+  this.childProcess = childProcess;
   this.serviceId = serviceId;
   this.configuration = {
     clientId: null,
@@ -57,6 +79,10 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.status = STATUS.NOT_INITIALIZED;
   this.pollRefreshToken = undefined;
   this.pollRefreshValues = undefined;
+  this.checkIfLiveActiveFrequencyInSeconds = 10;
+  this.liveStreams = new Map();
+  this.liveStreamsStarting = new Map();
+  this.checkIfLiveActiveInterval = null;
 };
 
 NetatmoHandler.prototype.init = init;
@@ -93,7 +119,19 @@ NetatmoHandler.prototype.updateNAMain = updateNAMain;
 NetatmoHandler.prototype.updateNAModule1 = updateNAModule1;
 NetatmoHandler.prototype.updateNAModule2 = updateNAModule2;
 NetatmoHandler.prototype.updateNAModule3 = updateNAModule3;
-NetatmoHandler.prototype.updateNAModule4 = updateNAModule4; 
+NetatmoHandler.prototype.updateNAModule4 = updateNAModule4;
 NetatmoHandler.prototype.updateNACamera = updateNACamera;
+/* Cameras */
+NetatmoHandler.prototype.checkIfLiveActive = checkIfLiveActive;
+NetatmoHandler.prototype.convertLocalStreamToGateway = convertLocalStreamToGateway;
+NetatmoHandler.prototype.onNewCameraFile = onNewCameraFile;
+NetatmoHandler.prototype.poll = poll;
+NetatmoHandler.prototype.getImage = getImage;
+NetatmoHandler.prototype.liveActivePing = liveActivePing;
+NetatmoHandler.prototype.sendCameraFileToGateway = sendCameraFileToGateway;
+NetatmoHandler.prototype.sendCameraFileToGatewayLimited = sendCameraFileToGatewayLimited;
+NetatmoHandler.prototype.startStreaming = startStreaming;
+NetatmoHandler.prototype.startStreamingIfNotStarted = startStreamingIfNotStarted;
+NetatmoHandler.prototype.stopStreaming = stopStreaming;
 
 module.exports = NetatmoHandler;

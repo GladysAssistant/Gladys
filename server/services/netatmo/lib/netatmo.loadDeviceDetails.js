@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');

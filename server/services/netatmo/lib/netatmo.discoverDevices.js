@@ -46,7 +46,7 @@ async function discoverDevices() {
       }
       return {
         ...discoveredDevice,
-        service_id: this.serviceId,
+        service_id: serviceId,
         deviceNetatmo: device,
       };
     });

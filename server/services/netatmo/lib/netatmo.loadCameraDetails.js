@@ -11,7 +11,6 @@ const { API } = require('./utils/netatmo.constants');
  */
 async function loadCameraDetails() {
   logger.debug('loading Cameras details...');
-  // let cameras;
   const cameras = [];
   const modules = [];
   try {
@@ -20,15 +19,12 @@ async function loadCameraDetails() {
       method: 'get',
       headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
     });
-    // console.log('coucou', response)
     const { body, status } = response.data;
-    logger.warn(body);
     const { homes } = body;
     if (status === 'ok') {
       homes.forEach((home) => {
         cameras.push(...home.cameras);
       });
-      logger.warn(cameras);
       if (cameras) {
         cameras.forEach((camera) => {
           if (camera.modules) {
@@ -36,17 +32,11 @@ async function loadCameraDetails() {
           }
         });
       }
-      logger.info(modules);
     }
     logger.debug('Cameras details loaded in home');
     return { cameras, modules };
   } catch (e) {
-    logger.error(
-      'Error getting Cameras details - status error: ',
-      e.status,
-      ' data error: ',
-      e.response.data.error,
-    );
+    logger.error('Error getting Cameras details - status error: ', e.status, ' data error: ', e.response.data.error);
     return { cameras: undefined, modules: undefined };
   }
 }

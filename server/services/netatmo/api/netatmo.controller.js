@@ -1,6 +1,12 @@
+const fs = require('fs');
+const path = require('path');
+
+const logger = require('../../../utils/logger');
+const { Error404, Error400 } = require('../../../utils/httpErrors');
+const { validateFilename, validateSessionId } = require('../lib/utils/netatmo.validateStreamParams');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function NetatmoController(netatmoHandler) {
+module.exports = function NetatmoController(gladys, netatmoHandler) {
   /**
    * @api {get} /api/v1/service/netatmo/configuration Get Netatmo Configuration.
    * @apiName getConfiguration
@@ -97,6 +103,74 @@ module.exports = function NetatmoController(netatmoHandler) {
     res.json(devices);
   }
 
+  /**
+   * @api {post} /api/v1/service/netatmo/camera/test Test connection
+   * @apiName TestConnection
+   * @apiGroup Netatmo
+   */
+  async function testConnection(req, res) {
+    const cameraImage = await netatmoHandler.getImage(req.body);
+    res.send(cameraImage);
+  }
+
+  /**
+   * @api {post} /api/v1/service/netatmo/camera/:camera_selector/streaming/start Start streaming
+   * @apiName startStreaming
+   * @apiGroup Netatmo
+   */
+  async function startStreaming(req, res) {
+    const response = await netatmoHandler.startStreamingIfNotStarted(
+      req.params.camera_selector,
+      req.body.is_gladys_gateway,
+      req.body.segment_duration,
+    );
+    res.send(response);
+  }
+
+  /**
+   * @api {post} /api/v1/service/netatmo/camera/:camera_selector/streaming/stop Stop streaming
+   * @apiName stopStreaming
+   * @apiGroup Netatmo
+   */
+  async function stopStreaming(req, res) {
+    await netatmoHandler.stopStreaming(req.params.camera_selector);
+    res.send({ success: true });
+  }
+
+  /**
+   * @api {post} /api/v1/service/netatmo/camera/:camera_selector/streaming/ping Live still active ping
+   * @apiName streamingPing
+   * @apiGroup Netatmo
+   */
+  async function streamingPing(req, res) {
+    await netatmoHandler.liveActivePing(req.params.camera_selector);
+    res.send({ success: true });
+  }
+
+  /**
+   * @api {get} /api/v1/service/netatmo/camera/streaming/:folder/:file Get streaming file
+   * @apiName getStreamingFile
+   * @apiGroup Netatmo
+   */
+  async function getStreamingFile(req, res) {
+    try {
+      validateSessionId(req.params.folder);
+      validateFilename(req.params.file);
+      const filePath = path.join(gladys.config.tempFolder, req.params.folder, req.params.file);
+      const filestream = fs.createReadStream(filePath);
+      filestream.on('error', (err) => {
+        res.status(404).end();
+      });
+      filestream.pipe(res);
+    } catch (e) {
+      if (e instanceof Error400) {
+        throw e;
+      }
+      logger.warn(e);
+      throw new Error404('FILE_NOT_FOUND');
+    }
+  }
+
   return {
     'get /api/v1/service/netatmo/configuration': {
       authenticated: true,
@@ -129,6 +203,31 @@ module.exports = function NetatmoController(netatmoHandler) {
     'get /api/v1/service/netatmo/discover': {
       authenticated: true,
       controller: asyncMiddleware(discover),
+    },
+    'post /api/v1/service/netatmo/camera/test': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(testConnection),
+    },
+    'post /api/v1/service/netatmo/camera/:camera_selector/streaming/start': {
+      authenticated: true,
+      admin: false,
+      controller: asyncMiddleware(startStreaming),
+    },
+    'post /api/v1/service/netatmo/camera/:camera_selector/streaming/stop': {
+      authenticated: true,
+      admin: false,
+      controller: asyncMiddleware(stopStreaming),
+    },
+    'post /api/v1/service/netatmo/camera/:camera_selector/streaming/ping': {
+      authenticated: true,
+      admin: false,
+      controller: asyncMiddleware(streamingPing),
+    },
+    'get /api/v1/service/netatmo/camera/streaming/:folder/:file': {
+      authenticated: true,
+      admin: false,
+      controller: asyncMiddleware(getStreamingFile),
     },
   };
 };

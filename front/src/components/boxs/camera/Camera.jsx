@@ -5,6 +5,7 @@ import { Text } from 'preact-i18n';
 import Hls from 'hls.js';
 
 import config from '../../../config';
+import { getServiceName } from '../../../utils/device.js';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import style from './style.css';
@@ -69,8 +70,9 @@ class CameraBoxComponent extends Component {
         ? SEGMENT_DURATIONS_PER_LATENCY[this.props.box.camera_latency]
         : SEGMENT_DURATIONS_PER_LATENCY.low;
 
+      const serviceName = await getServiceName(this.props.httpClient, this.props.box.camera);
       const [streamingParams, gatewayStreaming] = await Promise.all([
-        this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`, {
+        this.props.httpClient.post(`/api/v1/service/${serviceName}/camera/${this.props.box.camera}/streaming/start`, {
           origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
           is_gladys_gateway: isGladysPlus,
           segment_duration: segmentationDuration
@@ -160,8 +162,9 @@ class CameraBoxComponent extends Component {
           `${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/${gatewayStreaming.stream_access_key}/index.m3u8`
         );
       } else {
+        const serviceName = await getServiceName(this.props.httpClient, this.props.box.camera);
         this.hls.loadSource(
-          `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
+          `${config.localApiUrl}/api/v1/service/${serviceName}/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
         );
       }
 
@@ -210,7 +213,8 @@ class CameraBoxComponent extends Component {
 
   liveActivePing = async () => {
     try {
-      await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/ping`);
+      const serviceName = await getServiceName(this.props.httpClient, this.props.box.camera);
+      await this.props.httpClient.post(`/api/v1/service/${serviceName}/camera/${this.props.box.camera}/streaming/ping`);
     } catch (e) {
       console.error(e);
       // If the ping fails, it means the stream ended. We stop the stream.

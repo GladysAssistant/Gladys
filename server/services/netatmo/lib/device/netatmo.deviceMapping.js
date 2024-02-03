@@ -1,13 +1,20 @@
-const fse = require('fs-extra');
-const ffmpeg = require('fluent-ffmpeg');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
-const logger = require('../../../../utils/logger');
 
 const writeValues = {
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     /* therm_setpoint_temperature: 14 */
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice) => {
       return valueFromDevice;
+    },
+  },
+};
+
+const NETATMO_VALUES = {
+  SECURITY: {
+    STATUS: {
+      disconnected: 0,
+      off: 0,
+      on: 1,
     },
   },
 };
@@ -110,39 +117,10 @@ const readValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
-    /* vpn_url: https://prodvpn-eu-1.netatmo.net/restricted/10.255.10.50/xxxxxxxxxxxxxxxxxxxxxxxx/Mxxxxxxxxxxxxxxxxxxxxx_xxxxxxx,,/live/snapshot_720.jpg */
-    [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: (selectorCamera, filePath, valueFromDevice) => {
-      // we create a writestream
-      const writeStream = fse.createWriteStream(filePath);
-      // and send a camera thumbnail to this stream
-      ffmpeg(valueFromDevice)
-        .format('image2pipe') //TODO image2 is deprecated, use image2pipe
-        .outputOptions('-vframes 1')
-        // resize the image with max width = 640
-        .outputOptions('-vf scale=720:-1')
-        //  Effective range for JPEG is 2-31 with 31 being the worst quality.
-        .outputOptions('-qscale:v 15')
-        .output(writeStream)
-        .on('end', async () => {
-          const image = await fse.readFile(filePath);
-
-          // convert binary data to base64 encoded string
-          const cameraImageBase = Buffer.from(image).toString('base64');
-          const cameraImage = `image/png;base64,${cameraImageBase}`;
-          // logger.debug(cameraImage);
-          this.gladys.device.camera.setImage(selectorCamera, cameraImage);
-          await fse.remove(filePath);
-        })
-        .on('error', async (err, stdout, stderr) => {
-          logger.error(`Cannot process video: ${err.message}`);
-          logger.error(stderr);
-          logger.error(err.message);
-          await fse.remove(filePath);
-        })
-        .run();
+    [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: (valueFromDevice) => {
       return valueFromDevice;
     },
   },
 };
 
-module.exports = { readValues, writeValues };
+module.exports = { readValues, writeValues, NETATMO_VALUES };
