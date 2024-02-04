@@ -5,12 +5,13 @@ const { SUPPORTED_MODULE_TYPE, API, PARAMS } = require('./utils/netatmo.constant
 
 /**
  * @description Save values of an Netatmo device.
- * @param {object} deviceGladys - Device object in Gladys.
+ * @param {object} device - Device object in Gladys.
  * @param {object} deviceNetatmo - Device object coming from the Netatmo API.
  * @param {string} externalId - Device identifier in gladys.
  * @example updateValues(deviceGladys, deviceNetatmo, externalId);
  */
-async function updateValues(deviceGladys, deviceNetatmo, externalId) {
+async function updateValues(device, deviceNetatmo, externalId) {
+  let deviceGladys = device;
   const [prefix, topic] = externalId.split(':');
   const { type: model, reachable, vpn_url: vpnUrl = undefined, is_local: isLocal = undefined } = deviceNetatmo;
   if (prefix !== 'netatmo') {
