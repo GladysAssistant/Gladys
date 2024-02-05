@@ -151,10 +151,13 @@ const actionsFunc = {
         let newValue = 0;
         for (let i = 0; i < blinkingTime * 1000; i += blinkingInterval) {
           newValue = 1 - newValue;
-          self.device.setValue(device, deviceFeature, newValue);
-          timeout(blinkingInterval);
+          console.log("blink");
+          await self.device.setValue(device, deviceFeature, newValue);
+          console.log("wait");
+          await timeout(blinkingInterval);
+          console.log("end wait");
         }
-        self.device.setValue(device, deviceFeature, oldValue);
+        await self.device.setValue(device, deviceFeature, oldValue);
       } catch (e) {
         logger.warn(e);
       }
