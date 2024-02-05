@@ -122,7 +122,8 @@ const actionsFunc = {
     });
   },
   [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
-    const { blinkingSpeed, blinkingTime } = action;
+    const blinkingSpeed = action.blinking_speed;
+    const blinkingTime = action.blinking_time;
     let blinkingInterval;
     switch (blinkingSpeed) {
       case 'slow':
