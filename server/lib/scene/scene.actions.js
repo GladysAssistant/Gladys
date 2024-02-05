@@ -40,6 +40,17 @@ const { evaluate } = create({
   roundDependencies,
 });
 
+/**
+ * @description Let use setTimeout as blocking method with Promise.
+ * @param {number} ms - Number of ms to wait.
+ * @returns {Promise} Returns a promise that will resolve after N ms.
+ * @example
+ * timeout(500);
+ */
+function timeout(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     let device;
@@ -137,15 +148,12 @@ const actionsFunc = {
         );
         const oldValue = deviceFeature.last_value;
         let newValue = 0;
-        let timerId = setTimeout(function blink() {
+        for (let i = 0; i < blinkingTime * 1000; i += blinkingInterval) {
           newValue = 1 - newValue;
           self.device.setValue(device, deviceFeature, newValue);
-          timerId = setTimeout(blink, blinkingInterval);
-        }, blinkingInterval);
-        setTimeout(() => {
-          clearTimeout(timerId);
-          self.device.setValue(device, deviceFeature, oldValue);
-        }, blinkingTime * 1000 + blinkingInterval);
+          timeout(blinkingInterval);
+        }
+        self.device.setValue(device, deviceFeature, oldValue);
       } catch (e) {
         logger.warn(e);
       }

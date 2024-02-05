@@ -31,10 +31,10 @@ class BlinkLight extends Component {
   };
   handleChangeBlinkingTime = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingTime', newValue);
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_time', newValue);
   };
   handleChangeBlinkingSpeed = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingSpeed', e.target.value);
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_speed', e.target.value);
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
@@ -92,7 +92,7 @@ class BlinkLight extends Component {
                 <input
                   type="text"
                   class="form-control"
-                  value={props.action.blinkingTime}
+                  value={props.action.blinking_time}
                   onChange={this.handleChangeBlinkingTime}
                   placeholder={<Text id="editScene.actionsCard.blinkLights.blinkingTime.placeholder" />}
                 />
@@ -106,7 +106,7 @@ class BlinkLight extends Component {
               </div>
               <select
                 class="custom-select"
-                value={props.action.blinkingSpeed}
+                value={props.action.blinking_speed}
                 onChange={this.handleChangeBlinkingSpeed}
               >
                 <option value="slow">
