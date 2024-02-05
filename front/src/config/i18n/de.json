@@ -2944,6 +2944,10 @@
       "playback_state": "Musik: Wiedergabestatus",
       "play_notification": "Benachrichtigung senden"
     },
+    "lock": {
+      "binary": "Verriegelung",
+      "state": "Zustand"
+    },
     "unknown": {
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"

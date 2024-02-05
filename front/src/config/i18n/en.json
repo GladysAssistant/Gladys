@@ -2998,6 +2998,10 @@
       "playback_state": "Music playback state",
       "play_notification": "Broadcast a notification"
     },
+    "lock": {
+      "binary": "Lock / Unlock",
+      "state": "State"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"

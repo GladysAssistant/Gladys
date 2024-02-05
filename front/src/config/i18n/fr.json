@@ -3014,6 +3014,10 @@
       "playback_state": "Etat de la lecture musique",
       "play_notification": "Diffuser une notification"
     },
+    "lock": {
+      "binary": "Vérouillage",
+      "state": "Etat"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
