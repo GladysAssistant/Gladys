@@ -34,6 +34,7 @@ async function loadCameraDetails() {
       }
     }
     logger.debug('Cameras details loaded in home');
+    console.log({ cameras, modules });
     return { cameras, modules };
   } catch (e) {
     logger.error('Error getting Cameras details - status error: ', e.status, ' data error: ', e.response.data.error);

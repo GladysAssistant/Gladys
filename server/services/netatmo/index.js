@@ -2,7 +2,7 @@ const fse = require('fs-extra');
 const childProcess = require('child_process');
 
 const logger = require('../../utils/logger');
-const netatmoController = require('./api/netatmo.controller');
+const NetatmoController = require('./api/netatmo.controller');
 
 const NetatmoHandler = require('./lib');
 const { STATUS } = require('./lib/utils/netatmo.constants');
@@ -50,6 +50,6 @@ module.exports = function NetatmoService(gladys, serviceId) {
     stop,
     isUsed,
     device: netatmoHandler,
-    controllers: netatmoController(gladys, netatmoHandler),
+    controllers: NetatmoController(gladys, netatmoHandler),
   });
 };

@@ -36,13 +36,7 @@ async function updateValues(device, deviceNetatmo, externalId) {
       const videoId = partsVpnUrl[partsVpnUrl.length - 2];
 
       const cameraUrl = deviceGladys.params.find((param) => param.name === PARAMS.CAMERA_URL);
-      const cameraLiveUrl = deviceGladys.params.find((param) => param.name === PARAMS.CAMERA_LIVE_URL);
-      if (
-        !cameraUrl.value ||
-        !cameraUrl.value.includes(videoId) ||
-        !cameraLiveUrl.value ||
-        (cameraLiveUrl.value.includes('https') && isLocal)
-      ) {
+      if (!cameraUrl.value || !cameraUrl.value.includes(videoId) || (cameraUrl.value.includes('https') && isLocal)) {
         const responsePingCamera = await axios({
           url: `${vpnUrl}/command/ping`,
           method: 'get',
@@ -55,17 +49,13 @@ async function updateValues(device, deviceNetatmo, externalId) {
           headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
         });
         const { local_url: responseLocalUrl } = responsePingLocalCamera.data;
-        let cameraUrlDeviceNetatmo;
         let cameraLiveUrlDeviceNetatmo;
         if (responseLocalUrl === localUrl) {
-          cameraUrlDeviceNetatmo = `${localUrl}/live/snapshot_720.jpg`;
           cameraLiveUrlDeviceNetatmo = `${localUrl}/live/files/high/index.m3u8`;
         } else {
-          cameraUrlDeviceNetatmo = `${vpnUrl}/live/snapshot_720.jpg`;
           cameraLiveUrlDeviceNetatmo = `${vpnUrl}/live/files/high/index.m3u8`;
         }
-        await this.gladys.device.setParam(deviceGladys, PARAMS.CAMERA_URL, cameraUrlDeviceNetatmo);
-        await this.gladys.device.setParam(deviceGladys, PARAMS.CAMERA_LIVE_URL, cameraLiveUrlDeviceNetatmo);
+        await this.gladys.device.setParam(deviceGladys, PARAMS.CAMERA_URL, cameraLiveUrlDeviceNetatmo);
         deviceGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
       }
     }

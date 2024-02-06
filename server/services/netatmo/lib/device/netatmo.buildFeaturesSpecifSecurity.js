@@ -15,7 +15,7 @@ function buildFeatureCamera(name, externalId) {
     external_id: `${externalId}:camera`,
     category: DEVICE_FEATURE_CATEGORIES.CAMERA,
     type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
-    read_only: false,
+    read_only: true,
     keep_history: false,
     has_feedback: false,
     min: 0,
@@ -40,7 +40,7 @@ function buildFeatureStatus(name, externalId) {
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     read_only: true,
     keep_history: true,
-    has_feedback: true,
+    has_feedback: false,
     min: 0,
     max: 1,
   };

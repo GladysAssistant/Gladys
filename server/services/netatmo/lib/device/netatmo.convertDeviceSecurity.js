@@ -37,8 +37,7 @@ function convertDeviceSecurity(netatmoDevice) {
       /* params */
       params = [
         { name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) },
-        { name: PARAMS.CAMERA_URL, value: `${vpnUrl}/live/snapshot_720.jpg` },
-        { name: PARAMS.CAMERA_LIVE_URL, value: cameraLiveUrl },
+        { name: PARAMS.CAMERA_URL, value: cameraLiveUrl },
         { name: PARAMS.CAMERA_ROTATION, value: 0 },
       ];
       break;
