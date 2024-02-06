@@ -22,10 +22,10 @@ const serviceId = 'serviceId';
 
 const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
-describe('Netatmo update NAModule3 features', () => {
-  const deviceGladysNAModule3 = devicesGladys[7];
-  const deviceNetatmoNAModule3 = JSON.parse(JSON.stringify(devicesNetatmo[7]));
-  const externalIdNAModule3 = `netatmo:${devicesNetatmo[7].id}`;
+describe('Netatmo update NACamera features', () => {
+  const deviceGladysNACamera = devicesGladys[9];
+  const deviceNetatmoNACamera = JSON.parse(JSON.stringify(devicesNetatmo[9]));
+  const externalIdNACamera = `netatmo:${devicesNetatmo[9].id}`;
   beforeEach(() => {
     sinon.reset();
 
@@ -37,46 +37,36 @@ describe('Netatmo update NAModule3 features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await netatmoHandler.updateNAModule3(deviceGladysNAModule3, deviceNetatmoNAModule3, externalIdNAModule3);
+    netatmoHandler.getImage = sinon.fake.resolves('base64image');
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
+    await netatmoHandler.updateNACamera(deviceGladysNACamera, deviceNetatmoNACamera, externalIdNACamera);
+
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNAModule3.external_id}:battery_percent`,
-      state: 52,
+      device_feature_external_id: `${deviceGladysNACamera.external_id}:status`,
+      state: 1,
     });
     expect(
       netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:battery_percent',
-        state: 52,
+        device_feature_external_id: 'netatmo:70:ee:01:xx:xx:xx:status',
+        state: 1,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:rain',
-        state: 0,
+        device_feature_external_id: 'netatmo:70:ee:01:xx:xx:xx:wifi_strength',
+        state: 58,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(2).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:sum_rain_1',
-        state: 0,
-      }),
-    ).to.equal(true);
-    expect(
-      netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:sum_rain_24',
-        state: 0.1,
-      }),
-    ).to.equal(true);
-    expect(
-      netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:rf_strength',
-        state: 96,
+        device_feature_external_id: 'netatmo:70:ee:01:xx:xx:xx:camera',
+        text: 'base64image',
       }),
     ).to.equal(true);
   });
   it('should handle errors correctly', async () => {
-    deviceNetatmoNAModule3.battery_percent = undefined;
+    deviceNetatmoNACamera.battery_percent = undefined;
     const error = new Error('Test error');
     netatmoHandler.gladys = {
       event: {
@@ -86,7 +76,7 @@ describe('Netatmo update NAModule3 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAModule3(deviceGladysNAModule3, deviceNetatmoNAModule3, externalIdNAModule3);
+      await netatmoHandler.updateNACamera(deviceGladysNACamera, deviceNetatmoNACamera, externalIdNACamera);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

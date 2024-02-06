@@ -8,6 +8,7 @@ const devicesMock = require('../netatmo.loadDevices.mock.test.json');
 const discoverDevicesMock = require('../netatmo.discoverDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -19,7 +20,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo Discover devices', () => {
   beforeEach(() => {

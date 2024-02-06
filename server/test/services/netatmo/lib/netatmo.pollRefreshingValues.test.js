@@ -6,6 +6,7 @@ const { fake } = sinon;
 const devicesMock = require('../netatmo.loadDevices.mock.test.json');
 const devicesExistsMock = require('../netatmo.discoverDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -17,7 +18,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo pollRefreshingValues', () => {
   let clock;
@@ -37,7 +38,14 @@ describe('Netatmo pollRefreshingValues', () => {
   it('should refresh device values directly', async () => {
     netatmoHandler.status = 'connected';
     netatmoHandler.loadDevices = sinon.stub().resolves(devicesMock);
-    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(devicesExistsMock);
+    let callCount = 0;
+    netatmoHandler.gladys.stateManager.get = sinon.stub().callsFake(() => {
+      callCount += 1;
+      if (callCount === 1) {
+        return devicesExistsMock;
+      }
+      return undefined;
+    });
 
     await netatmoHandler.pollRefreshingValues();
 

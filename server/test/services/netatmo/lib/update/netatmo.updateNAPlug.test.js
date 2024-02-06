@@ -6,6 +6,7 @@ const { fake } = sinon;
 const devicesGladys = require('../../netatmo.convertDevices.mock.test.json');
 const devicesNetatmo = require('../../netatmo.loadDevices.mock.test.json');
 const { EVENTS } = require('../../../../../utils/constants');
+const { FfmpegMock, childProcessMock } = require('../../FfmpegMock.test');
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
 const logger = require('../../../../../utils/logger');
 
@@ -19,7 +20,7 @@ const gladys = {
 };
 const serviceId = 'serviceId';
 
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo update NAPlug features', () => {
   const deviceGladys = devicesGladys[0];

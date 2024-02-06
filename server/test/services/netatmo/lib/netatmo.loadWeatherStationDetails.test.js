@@ -6,6 +6,7 @@ const { fake } = sinon;
 
 const bodyGetWeatherStationMock = require('../netatmo.getWeatherStation.mock.test.json');
 const weatherStationsDetailsMock = require('../netatmo.loadWeatherStationDetails.mock.test.json');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -20,7 +21,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 const accessToken = 'testAccessToken';
 
 describe('Netatmo Load Weather Station Details', () => {

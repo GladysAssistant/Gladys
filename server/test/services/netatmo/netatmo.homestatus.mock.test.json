@@ -163,6 +163,18 @@
         "temperature": 18.1,
         "co2": 854,
         "humidity": 60
+      },
+      {
+        "id": "70:ee:01:xx:xx:xx",
+        "type": "NACamera",
+        "firmware_revision": 5020000,
+        "wifi_state": "high",
+        "wifi_strength": 58,
+        "sd_status": "on",
+        "alim_status": "on",
+        "vpn_url": "https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,",
+        "is_local": true,
+        "monitoring": "on"
       }
     ],
     "persons": [
