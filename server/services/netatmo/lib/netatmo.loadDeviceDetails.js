@@ -11,6 +11,11 @@ const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils
  */
 async function loadDeviceDetails(homeData) {
   const { rooms: roomsHomeData, modules: modulesHomeData, id: homeId } = homeData;
+  let listDevices = [];
+  let thermostats;
+  let modulesThermostat = [];
+  let weatherStations;
+  let modulesWeatherStations = [];
 
   logger.debug('loading devices details in home id: ', homeId, '...');
   const paramsForm = {
@@ -25,10 +30,7 @@ async function loadDeviceDetails(homeData) {
     });
     const { body: bodyGetHomestatus, status: statusGetHomestatus } = responseGetHomestatus.data;
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = bodyGetHomestatus.home;
-    let listDevices = [];
     if (statusGetHomestatus === 'ok') {
-      let thermostats;
-      let modulesThermostat = [];
       if (
         modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.THERMOSTAT) !== undefined
       ) {
@@ -36,8 +38,6 @@ async function loadDeviceDetails(homeData) {
         thermostats = deviceThermostats.thermostats;
         modulesThermostat = deviceThermostats.modules;
       }
-      let weatherStations;
-      let modulesWeatherStations = [];
       if (
         modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.NAMAIN) !== undefined
       ) {
@@ -182,8 +182,6 @@ async function loadDeviceDetails(homeData) {
       e,
       ' - status error: ',
       e.status,
-      ' data error: ',
-      e.response.data.error,
     );
     return undefined;
   }

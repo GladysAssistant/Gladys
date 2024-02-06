@@ -37,7 +37,7 @@ async function loadDevices() {
     logger.info(`Netatmo devices not supported : ${listHomeDevices.filter((device) => device.not_handled).length}`);
     return listHomeDevices;
   } catch (e) {
-    logger.error('e.status: ', e.status, 'e.data.error', e.response.data.error);
+    logger.error('e.status: ', e.status, 'e', e);
     return undefined;
   }
 }

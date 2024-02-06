@@ -33,8 +33,8 @@ async function loadWeatherStationDetails() {
     logger.error(
       'Error getting Weather Stations details - status error: ',
       e.status,
-      ' data error: ',
-      e.response.data.error,
+      ' e: ',
+      e,
     );
     return { weatherStations: undefined, modules: undefined };
   }

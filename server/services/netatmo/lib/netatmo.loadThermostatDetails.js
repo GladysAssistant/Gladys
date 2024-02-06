@@ -31,8 +31,8 @@ async function loadThermostatDetails() {
     logger.error(
       'Error getting thermostats details - status error: ',
       e.statusGetThermostat,
-      ' data error: ',
-      e.response.data.error,
+      ' e: ',
+      e,
     );
     return { thermostats: undefined, modules: undefined };
   }
