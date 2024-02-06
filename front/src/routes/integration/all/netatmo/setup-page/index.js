@@ -106,7 +106,7 @@ class NetatmoSetupPage extends Component {
     e.preventDefault();
 
     try {
-      this.props.httpClient.post('/api/v1/service/netatmo/configuration', {
+      await this.props.httpClient.post('/api/v1/service/netatmo/configuration', {
         clientId: this.state.netatmoClientId,
         clientSecret: this.state.netatmoClientSecret,
         energyApi: this.state.netatmoEnergyApi,
