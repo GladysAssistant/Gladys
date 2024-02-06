@@ -2,6 +2,8 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
 
+const { fake } = sinon;
+
 const devicesMock = JSON.parse(JSON.stringify(require('../netatmo.loadDevicesComplete.mock.test.json')));
 const deviceDetailsMock = JSON.parse(JSON.stringify(require('../netatmo.loadDevicesDetails.mock.test.json')));
 const thermostatsDetailsMock = JSON.parse(JSON.stringify(require('../netatmo.loadThermostatDetails.mock.test.json')));
@@ -9,12 +11,13 @@ const weatherStationsDetailsMock = JSON.parse(
   JSON.stringify(require('../netatmo.loadWeatherStationDetails.mock.test.json')),
 );
 const bodyHomesDataMock = JSON.parse(JSON.stringify(require('../netatmo.homesdata.mock.test.json')));
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 const logger = require('../../../../utils/logger');
 
 const gladys = {};
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 const accessToken = 'testAccessToken';
 
 describe('Netatmo Load Devices', () => {

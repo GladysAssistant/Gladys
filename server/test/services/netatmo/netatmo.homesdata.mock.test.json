@@ -110,6 +110,13 @@
           "setup_date": 1605564990,
           "room_id": "8765432109",
           "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
+          "id": "70:ee:01:xx:xx:xx",
+          "type": "NACamera",
+          "name": "Living room camera",
+          "setup_date": 1684397132,
+          "room_id": "3939900879"
         }
       ],
       "temperature_control_mode": "heating",

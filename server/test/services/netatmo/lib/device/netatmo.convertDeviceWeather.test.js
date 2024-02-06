@@ -4,11 +4,12 @@ const sinon = require('sinon');
 const { SUPPORTED_MODULE_TYPE } = require('../../../../../services/netatmo/lib/utils/netatmo.constants');
 const devicesNetatmoMock = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));
 const devicesGladysMock = JSON.parse(JSON.stringify(require('../../netatmo.convertDevices.mock.test.json')));
+const { FfmpegMock, childProcessMock } = require('../../FfmpegMock.test');
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
 
 const gladys = {};
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo Convert Weather Device', () => {
   beforeEach(() => {
@@ -189,6 +190,8 @@ describe('Netatmo Convert Weather Device', () => {
 
     const paramRoomMock = gladysDevice.params.filter((param) => param.name === 'room_name')[0];
     expect(paramRoomMock).to.equal(undefined);
+
+    deviceNetatmoMock.room = room;
   });
 
   it('should correctly convert a Netatmo Weather Station NAModule4 device without room and without plug', () => {

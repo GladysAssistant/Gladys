@@ -4,7 +4,13 @@ const sinon = require('sinon');
 const NetatmoController = require('../../../../services/netatmo/api/netatmo.controller');
 const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 
-const netatmoController = NetatmoController(NetatmoHandlerMock);
+const gladys = {
+  config: {
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
+  },
+};
+
+const netatmoController = NetatmoController(gladys, NetatmoHandlerMock);
 
 describe('Netatmo Controller', () => {
   let req;
@@ -38,7 +44,7 @@ describe('Netatmo Controller', () => {
   describe('getStatus', () => {
     it('should get the netatmo status', async () => {
       const status = { connected: true };
-      NetatmoHandlerMock.getStatus.resolves(status);
+      NetatmoHandlerMock.getStatus = sinon.fake.resolves(status);
 
       await netatmoController['get /api/v1/service/netatmo/status'].controller(req, res);
       expect(res.json.calledWith(status)).to.equal(true);
@@ -49,7 +55,7 @@ describe('Netatmo Controller', () => {
     it('should save the netatmo configuration', async () => {
       const configuration = { clientId: 'test', clientSecret: 'test', redirectUri: 'test' };
       req.body = configuration;
-      NetatmoHandlerMock.saveConfiguration.resolves(true);
+      NetatmoHandlerMock.saveConfiguration = sinon.fake.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/configuration'].controller(req, res);
       expect(res.json.calledWith({ success: true })).to.equal(true);
@@ -60,7 +66,7 @@ describe('Netatmo Controller', () => {
     it('should save the netatmo status', async () => {
       const status = { connected: true };
       req.body = status;
-      NetatmoHandlerMock.saveStatus.resolves(true);
+      NetatmoHandlerMock.saveStatus = sinon.fake.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/status'].controller(req, res);
       expect(res.json.calledWith({ success: true })).to.equal(true);
@@ -69,8 +75,8 @@ describe('Netatmo Controller', () => {
 
   describe('connect', () => {
     it('should connect netatmo', async () => {
-      NetatmoHandlerMock.getConfiguration.resolves(true);
-      NetatmoHandlerMock.connect.resolves(true);
+      NetatmoHandlerMock.getConfiguration = sinon.fake.resolves(true);
+      NetatmoHandlerMock.connect = sinon.fake.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/connect'].controller(req, res);
       expect(res.json.calledWith(true)).to.equal(true);
@@ -80,7 +86,10 @@ describe('Netatmo Controller', () => {
   describe('retrieveTokens', () => {
     it('should retrieve netatmo tokens', async () => {
       req.body = { code: 'test-code' };
-      NetatmoHandlerMock.retrieveTokens.resolves({ accessToken: 'test-token', refreshToken: 'test-refresh-token' });
+      NetatmoHandlerMock.retrieveTokens = sinon.fake.resolves({
+        accessToken: 'test-token',
+        refreshToken: 'test-refresh-token',
+      });
 
       await netatmoController['post /api/v1/service/netatmo/token'].controller(req, res);
       expect(
@@ -94,7 +103,7 @@ describe('Netatmo Controller', () => {
 
   describe('disconnect', () => {
     it('should disconnect netatmo', async () => {
-      NetatmoHandlerMock.disconnect.resolves();
+      NetatmoHandlerMock.disconnect = sinon.fake.resolves(null);
 
       await netatmoController['post /api/v1/service/netatmo/disconnect'].controller(req, res);
       expect(res.json.calledWith({ success: true })).to.equal(true);
@@ -104,7 +113,7 @@ describe('Netatmo Controller', () => {
   describe('discover', () => {
     it('should discover netatmo devices', async () => {
       const devices = [{ id: 'device1' }, { id: 'device2' }];
-      NetatmoHandlerMock.discoverDevices.resolves(devices);
+      NetatmoHandlerMock.discoverDevices = sinon.fake.resolves(devices);
 
       await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
       expect(res.json.calledWith(devices)).to.equal(true);

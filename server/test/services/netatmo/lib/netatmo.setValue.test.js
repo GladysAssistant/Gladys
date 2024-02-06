@@ -7,6 +7,7 @@ const { fake } = sinon;
 const devicesMock = require('../netatmo.convertDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
 const { BadParameters } = require('../../../../utils/coreErrors');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -18,7 +19,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 const [deviceMock] = devicesMock.filter((device) => device.model === 'NATherm1');
 
 describe('Netatmo Set Value', () => {

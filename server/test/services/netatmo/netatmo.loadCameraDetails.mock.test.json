@@ -1,0 +1,112 @@
+{
+  "cameras": [
+    {
+      "id": "70:ee:01:yy:yy:yy",
+      "type": "NACamera",
+      "status": "on",
+      "vpn_url": "https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,",
+      "is_local": true,
+      "sd_status": "on",
+      "alim_status": "on",
+      "name": "Floor hallway camera",
+      "modules": [
+        {
+          "id": "70:ee:02:xx:xx:xx",
+          "type": "NACamDoorTag",
+          "name": "Home Entrance Door",
+          "battery_percent": 48,
+          "room": "3939900879",
+          "rf": 71,
+          "status": "open",
+          "category": "door",
+          "last_activity": 1707068638
+        },
+        {
+          "id": "70:ee:02:yy:yy:yy",
+          "type": "NACamDoorTag",
+          "name": "Veranda Entrance Door",
+          "battery_percent": 8,
+          "room": "140642389",
+          "rf": 77,
+          "status": "no_news",
+          "category": "door",
+          "last_activity": 1674243295
+        },
+        {
+          "id": "70:ee:02:zz:zz:zz",
+          "type": "NIS",
+          "battery_percent": 73,
+          "room": "2812958323",
+          "rf": 72,
+          "status": "no_news",
+          "monitoring": "on",
+          "alim_source": "battery",
+          "name": "Siren Caméra couloir étages"
+        }
+      ],
+      "use_pin_code": true,
+      "last_setup": 1605543861
+    },
+    {
+      "id": "70:ee:01:xx:xx:xx",
+      "type": "NACamera",
+      "status": "on",
+      "vpn_url": "https://prodvpn-eu-3.netatmo.net/10.255.0.2/d258xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,",
+      "is_local": true,
+      "sd_status": "on",
+      "alim_status": "on",
+      "name": "Living room camera",
+      "use_pin_code": true,
+      "last_setup": 1684397132
+    },
+    {
+      "id": "70:ee:01:zz:zz:zz",
+      "type": "NOC",
+      "status": "on",
+      "vpn_url": "https://prodvpn-eu-4.netatmo.net/10.255.0.3/d259xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,",
+      "is_local": true,
+      "sd_status": "on",
+      "alim_status": "on",
+      "name": "Outdoor parking camera",
+      "use_pin_code": false,
+      "last_setup": 1608493953,
+      "light_mode_status": "off",
+      "siren_status": "no_sound"
+    }
+  ],
+  "modules": [
+    {
+      "id": "70:ee:02:xx:xx:xx",
+      "type": "NACamDoorTag",
+      "name": "Home Entrance Door",
+      "battery_percent": 48,
+      "room": "3939900879",
+      "rf": 71,
+      "status": "open",
+      "category": "door",
+      "last_activity": 1707068638
+    },
+    {
+      "id": "70:ee:02:yy:yy:yy",
+      "type": "NACamDoorTag",
+      "name": "Veranda Entrance Door",
+      "battery_percent": 8,
+      "room": "140642389",
+      "rf": 77,
+      "status": "no_news",
+      "category": "door",
+      "last_activity": 1674243295
+    },
+    {
+      "id": "70:ee:02:zz:zz:zz",
+      "type": "NIS",
+      "battery_percent": 73,
+      "room": "2812958323",
+      "rf": 72,
+      "status": "no_news",
+      "monitoring": "on",
+      "alim_source": "battery",
+      "name": "Siren Caméra couloir étages"
+    }
+  ]
+}

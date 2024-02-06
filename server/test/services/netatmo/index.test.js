@@ -12,7 +12,12 @@ describe('Netatmo Service', () => {
   let serviceId;
 
   beforeEach(() => {
-    gladys = { service: { getService: sinon.stub() } };
+    gladys = {
+      service: { getService: sinon.stub() },
+      config: {
+        tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
+      },
+    };
     serviceId = 'some-service-id';
 
     NetatmoService = proxyquire('../../../services/netatmo/index', {

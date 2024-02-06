@@ -6,6 +6,7 @@ const { fake } = sinon;
 const devicesMock = JSON.parse(JSON.stringify(require('../netatmo.loadDevices.mock.test.json')));
 const devicesExistsMock = JSON.parse(JSON.stringify(require('../netatmo.discoverDevices.mock.test.json')));
 const { EVENTS } = require('../../../../utils/constants');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 const logger = require('../../../../utils/logger');
 
@@ -27,7 +28,7 @@ describe('Netatmo pollRefreshingValues', () => {
     sinon.reset();
 
     clock = sinon.useFakeTimers();
-    netatmoHandler = new NetatmoHandler(gladys, serviceId);
+    netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
     netatmoHandler.status = 'not_initialized';
     netatmoHandler.configured = true;
     netatmoHandler.connected = true;

@@ -5,6 +5,7 @@ const nock = require('nock');
 const { fake } = sinon;
 
 const { EVENTS } = require('../../../../utils/constants');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -16,7 +17,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 netatmoHandler.pollRefreshingToken = fake.resolves(null);
 netatmoHandler.pollRefreshingValues = fake.resolves(null);
 

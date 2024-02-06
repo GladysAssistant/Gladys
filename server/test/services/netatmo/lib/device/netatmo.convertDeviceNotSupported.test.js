@@ -3,11 +3,12 @@ const sinon = require('sinon');
 
 const devicesNetatmoMock = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));
 const devicesGladysMock = JSON.parse(JSON.stringify(require('../../netatmo.convertDevices.mock.test.json')));
+const { FfmpegMock, childProcessMock } = require('../../FfmpegMock.test');
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
 
 const gladys = {};
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo Convert Device not supported', () => {
   beforeEach(() => {

@@ -5,6 +5,7 @@ const nock = require('nock');
 const { fake } = sinon;
 
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 
 const gladys = {
   event: {
@@ -12,7 +13,7 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo connect', () => {
   beforeEach(() => {
