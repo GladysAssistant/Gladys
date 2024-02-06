@@ -23,9 +23,11 @@ async function loadCameraDetails() {
     const { homes } = body;
     if (status === 'ok') {
       homes.forEach((home) => {
-        cameras.push(...home.cameras);
+        if (home.cameras) {
+          cameras.push(...home.cameras);
+        }
       });
-      if (cameras) {
+      if (cameras.length > 0) {
         cameras.forEach((camera) => {
           if (camera.modules) {
             modules.push(...camera.modules);
@@ -34,7 +36,6 @@ async function loadCameraDetails() {
       }
     }
     logger.debug('Cameras details loaded in home');
-    console.log({ cameras, modules });
     return { cameras, modules };
   } catch (e) {
     logger.error('Error getting Cameras details - status error: ', e.status, ' data error: ', e.response.data.error);

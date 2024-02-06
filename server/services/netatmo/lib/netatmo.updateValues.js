@@ -34,7 +34,6 @@ async function updateValues(device, deviceNetatmo, externalId) {
       */
       const partsVpnUrl = vpnUrl.split('/');
       const videoId = partsVpnUrl[partsVpnUrl.length - 2];
-
       const cameraUrl = deviceGladys.params.find((param) => param.name === PARAMS.CAMERA_URL);
       if (!cameraUrl.value || !cameraUrl.value.includes(videoId) || (cameraUrl.value.includes('https') && isLocal)) {
         const responsePingCamera = await axios({
@@ -59,7 +58,6 @@ async function updateValues(device, deviceNetatmo, externalId) {
         deviceGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
       }
     }
-
     switch (model) {
       case SUPPORTED_MODULE_TYPE.PLUG: {
         await this.updateNAPlug(deviceGladys, deviceNetatmo, externalId);
