@@ -2999,7 +2999,7 @@
       "play_notification": "Broadcast a notification"
     },
     "lock": {
-      "binary": "Lock / Unlock",
+      "binary": "Locking",
       "state": "State"
     },
     "unknown": {
