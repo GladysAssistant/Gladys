@@ -17,6 +17,13 @@ module.exports = {
     max: 10000,
   },
   names: {
+    duration: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.SECONDS,
+      },
+    },
     battery: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,

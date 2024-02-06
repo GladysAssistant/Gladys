@@ -42,6 +42,14 @@ const BUTTON_STATUS = {
   DISARM: 36,
   ARM_DAY_ZONES: 37,
   ARM_ALL_ZONES: 38,
+  ON_PRESS: 39,
+  ON_HOLD: 40,
+  UP_PRESS: 41,
+  UP_HOLD: 42,
+  DOWN_PRESS: 43,
+  DOWN_HOLD: 44,
+  OFF_PRESS: 45,
+  OFF_HOLD: 46,
 };
 
 const COVER_STATE = {
@@ -63,6 +71,11 @@ const MUSIC_PLAYBACK_STATE = {
   PAUSED: 0,
 };
 
+const OPENING_SENSOR_STATE = {
+  OPEN: 0,
+  CLOSE: 1,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -72,6 +85,7 @@ const USER_ROLE = {
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
   FR: 'fr',
+  DE: 'de',
 };
 
 const SESSION_TOKEN_TYPES = {
@@ -984,6 +998,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DRIVER_READY: 'rflink.driver-ready',
     NEW_DEVICE: 'rflink.new-device',
   },
+  ZWAVEJS_UI: {
+    CONNECTED: 'zwavejs-ui.connected',
+    ERROR: 'zwavejs-ui.error',
+    SCAN_COMPLETED: 'zwavejs-ui.scan-completed',
+  },
   ZIGBEE2MQTT: {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
@@ -1013,6 +1032,14 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+  },
+  NETATMO: {
+    STATUS: 'netatmo.status',
+    ERROR: {
+      CONNECTED: 'netatmo.error-connected',
+      CONNECTING: 'netatmo.error-connecting',
+      PROCESSING_TOKEN: 'netatmo.error-processing-token',
+    },
   },
   MELCLOUD: {
     STATUS: 'melcloud.status',
@@ -1210,3 +1237,4 @@ module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
+module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

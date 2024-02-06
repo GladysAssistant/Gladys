@@ -97,6 +97,7 @@
       "languageLabel": "Language",
       "english": "English",
       "french": "Français",
+      "german": "Deutsch",
       "birthdateLabel": "Birthdate",
       "birthdatePlaceHolder": "Enter your birthdate",
       "january": "January",
@@ -587,6 +588,82 @@
       "rotation18O": "180°",
       "rotation27O": "270°"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "description": "Control Netatmo equipment",
+      "deviceTab": "Devices",
+      "discoverTab": "Netatmo Discovery",
+      "setupTab": "Setup",
+      "documentation": "Netatmo Documentation",
+      "discoverDeviceDescr": "Automatically scan Netatmo devices",
+      "status": {
+        "notConfigured": "The Netatmo service is not configured",
+        "disconnect": "Gladys is not connected to Netatmo",
+        "notConnected": "Gladys failed to connect to the Netatmo account, please verify your credentials on the ",
+        "setupPageLink": "Netatmo Setup Page.",
+        "connect": "Gladys is connected to Netatmo",
+        "connecting": "Configuration saved. Connecting to your Netatmo account...",
+        "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
+        "getDevicesValues": "Data recovery in progress...",
+        "dicoveringDevices": "Device recovery in progress...",
+        "errorConnecting": {
+          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
+          "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
+          "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
+        }
+      },
+      "device": {
+        "title": "Netatmo Devices in Gladys",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
+        "noDeviceFound": "No Netatmo devices have been added yet.",
+        "sidLabel": "Netatmo device SID",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter your device name",
+        "modelLabel": "Model",
+        "roomLabel": "Room",
+        "connectedPlugLabel": "Connected to bridge",
+        "roomNetatmoApiLabel": "Room in Netatmo API",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "noValueReceived": "No value received."
+      },
+      "discover": {
+        "title": "Your Netatmo Devices Compatible with Gladys",
+        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
+        "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
+        "alreadyCreatedButton": "Already Created",
+        "unmanagedModelButton": "Unsupported model",
+        "updateButton": "Update",
+        "scan": "Scan",
+        "refresh": "Refresh"
+      },
+      "setup": {
+        "title": "Netatmo Setup",
+        "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
+        "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/en-us/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
+        "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+        "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
+        "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
+        "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
+        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "clientIdLabel": "Client ID",
+        "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
+        "clientSecretLabel": "Client Secret",
+        "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
+        "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
+        "saveLabel": "Save and connect",
+        "disconnectLabel": "Disconnect"
+      },
+      "error": {
+        "defaultError": "An error occurred while registering the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Control your Tasmota devices in HTTP or MQTT.",
@@ -1016,6 +1093,62 @@
         "noDeviceFound": "No Sonos devices were discovered.",
         "errorWhileScanning": "An error occurred during scanning.",
         "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
+    "zwavejs-ui": {
+      "title": "ZWave JS UI",
+      "description": "Control your devices in Z-Wave JS UI",
+      "deviceTab": "Devices",
+      "discoverTab": "Z-Wave JS UI Discovery",
+      "setupTab": "Configuration",
+      "documentation": "Z-Wave JS UI Documentation",
+      "discoverDeviceDescr": "Automatically scan for Z-Wave JS UI devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "noFeaturesHandled": "This device is not yet supported by Gladys; feel free to submit it for inclusion!",
+      "featuresLabel": "Features",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "alphaWarning": "This integration is in alpha and currently only supports one device: The Fibaro Door/Window sensor. We welcome any assistance to integrate other devices!",
+      "device": {
+        "title": "Z-Wave JS UI Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Z-Wave JS UI devices found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Z-Wave JS UI instance",
+        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name and a 'location' are displayed here. If you edit these settings, you will need to re-pair the device in Gladys.",
+        "error": "Error discovering Z-Wave JS UI devices. Is your MQTT broker available and accessible?",
+        "noDeviceFound": "No Z-Wave JS UI devices were discovered.",
+        "errorWhileScanning": "An error occurred during discovery.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Configuration",
+        "description": "You must connect Gladys to the MQTT broker to which your Z-Wave JS UI instance is connected. This integration is for users who already have Z-Wave devices. If you are starting your installation, we recommend using the Zigbee protocol.",
+        "zwaveJsUiConfigurationTitle": "Configure Z-Wave JS UI",
+        "zwaveJsUiConfigurationMqttDescription": "On the Z-Wave JS UI side, you need to fill in the \"Name\" field in \"MQTT\" with \"zwave-js-ui,\" otherwise, the prefix for some MQTT topics will be incorrect.",
+        "zwaveJsUiConfigurationGatewayDescription": "Next, please fill in the \"Gateway\" section with these exact parameters:",
+        "mqttConfigurationTitle": "Configure MQTT Server",
+        "urlLabel": "Broker URL",
+        "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter the MQTT broker username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter the MQTT broker password",
+        "saveLabel": "Save Configuration",
+        "error": "An error occurred while saving the configuration.",
+        "connecting": "Configuration saved. Connecting to the MQTT broker...",
+        "connected": "Successfully connected to the MQTT broker!",
+        "notConnected": "Error connecting. Please check your configuration."
       },
       "error": {
         "defaultError": "An error occurred while saving the device.",
@@ -1997,6 +2130,7 @@
     "languageLabel": "Language",
     "english": "English",
     "french": "Français",
+    "german": "Deutsch",
     "roleLabel": "Role",
     "passwordLabel": "Password (min 8 characters)",
     "passwordPlaceholder": "Enter your password",
@@ -2569,7 +2703,15 @@
           "35": "Emergency",
           "36": "Disarm",
           "37": "Arm day zones",
-          "38": "Arm all zones"
+          "38": "Arm all zones",
+          "39": "On press",
+          "40": "On hold",
+          "41": "Up press",
+          "42": "Up hold",
+          "43": "Down press",
+          "44": "Down hold",
+          "45": "Off press",
+          "46": "Off hold"
         }
       },
       "opening-sensor": {
