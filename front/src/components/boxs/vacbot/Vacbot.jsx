@@ -22,7 +22,7 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
 };
 
 const VacbotBox = ({ children, ...props }) => {
-  const { boxTitle, deviceFeatures = [], device = {} } = props;
+  const { boxTitle, deviceFeatures = [] } = props;
 
   const debug = false;
 
