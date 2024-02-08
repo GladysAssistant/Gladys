@@ -25,10 +25,7 @@ const VacbotBox = ({ children, ...props }) => {
   const { boxTitle, deviceFeatures = [], device = {} } = props;
 
   const debug = false;
-  if (debug) {
-    console.log(`${device.name} features : ${deviceFeatures.map(deviceFeature => deviceFeature.name)}`);
-  }
-
+  
   return (
     <div class="card">
       {props.error && (
