@@ -25,7 +25,7 @@ const VacbotBox = ({ children, ...props }) => {
   const { boxTitle, deviceFeatures = [], device = {} } = props;
 
   const debug = false;
-  
+
   return (
     <div class="card">
       {props.error && (
