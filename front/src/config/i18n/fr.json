@@ -1628,7 +1628,7 @@
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
     "createTag": "Créer le tag : '{{tagName}}'",
     "tagsTitle": "Tags",
-    "editTagsPlaceholder": "Entrez un tag pour la scène",
+    "editTagsPlaceholder": "Entrez ou choisissez un tag pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
