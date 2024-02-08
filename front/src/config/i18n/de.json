@@ -498,7 +498,6 @@
         "saveError": "Fehler beim Speichern oder Löschen des Geräts",
         "saveConflictError": "Konflikt: Sind Sie sicher, dass alle externen IDs der Gerätefunktionen eindeutig sind?"
       }
-    
     },
     "telegram": {
       "title": "Telegram",
