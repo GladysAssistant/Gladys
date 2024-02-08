@@ -106,8 +106,6 @@ class RoomTemperatureBoxComponent extends Component {
       temperature_max = DEFAULT_VALUE_TEMPERATURE.MAXIMUM;
     }
 
-    console.log('unit', unit);
-
     if (unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
       temperature_min = celsiusToFahrenheit(temperature_min);
       temperature_max = celsiusToFahrenheit(temperature_min);
