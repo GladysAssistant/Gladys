@@ -420,6 +420,86 @@
         "navigation": "Navigation"
       }
     },
+    "rflink": {
+      "title": "RFLink",
+      "description": "Verbindung zum RFLink-Gateway herstellen.",
+      "settingsTab": "Einstellungen",
+      "deviceTab": "Geräte",
+      "roomLabel": "Raum",
+      "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+      "settings": {
+        "title": "RFLink-USB-Einstellungen",
+        "description": "Um RFLink in Gladys zu verwenden, benötigen Sie ein mit Ihrer Gladys-Instanz verbundenes RFLink-Gateway.",
+        "connectButton": "Verbinden",
+        "disconnectButton": "Trennen",
+        "refreshButton": "USB-Liste aktualisieren",
+        "notConnected": "Gladys ist nicht mit einem RFLink-Gateway verbunden.",
+        "connectedWithSuccess": "RFLink-Gateway erfolgreich verbunden.",
+        "connecting": "Versuche, eine Verbindung zum RFLink-Gateway herzustellen...",
+        "driverFailedError": "Beim Versuch, eine Verbindung zum RFLink-Gateway herzustellen, ist ein Fehler aufgetreten.",
+        "rflinkUsbDriverPathLabel": "Wählen Sie den Pfad zum RFLink-Gateway-USB aus:",
+        "debug": {
+          "title": "RFLink-Debug-Konsole",
+          "info": "Hier können Sie den letzten Befehl sehen, den RFLink an Gladys gesendet hat. Es hat dieses Format: '20;02;MODEL;ID;LABEL=Daten;LABEL1=Daten1;'...",
+          "placeholder": "Die zu sendende Nachricht",
+          "sendButton": "Senden"
+        },
+        "milight": {
+          "title": "RFLink Milight-Einstellungen",
+          "gatewayBarinfo": "Gateway-Nummer:",
+          "zoneInfo": "Gateway-Zone:",
+          "about": "Sie können Ihre aktuelle Milight-Bridge-ID verwenden oder, wenn Sie kein Gateway haben, ein neues verwenden (standardmäßig F746). Die ID ist nur ein Code zur Identifizierung des Gateways. Sie können beliebig viele Milight verwenden, aber jedes Gateway hat 4 Zonen.",
+          "pairButton": "Koppeln",
+          "unpairButton": "Trennen"
+        }
+      },
+      "feature": {
+        "nameLabel": "Name",
+        "readOnlyLabel": "Ist dies eine schreibgeschützte Funktion?",
+        "readOnlyButton": "Ja, diese Funktion sendet nur Daten an Gladys.",
+        "model": "Modell",
+        "message": "Sie können nur Aktoren erstellen. Sensoren werden automatisch erkannt und im Geräte-Tab hinzugefügt, wenn sie Nachrichten senden.",
+        "namePlaceholder": "Feature-Namen eingeben",
+        "switchIdLabel": "ID",
+        "switchIdPlaceholder": "RFLink-Geräte-ID",
+        "switchNumberLabel": "Kanal",
+        "switchNumberPlaceholder": "Wert von SWITCH in der Debug-Konsole (Einstellungen-Tab)",
+        "unitLabel": "Einheit",
+        "minLabel": "Minimalwert",
+        "minPlaceholder": "Minimalwert des Features eingeben",
+        "maxLabel": "Maximalwert",
+        "maxPlaceholder": "Maximalwert des Features eingeben",
+        "addButton": "Feature hinzufügen",
+        "deleteLabel": "Feature löschen"
+      },
+      "device": {
+        "title": "Geräte in Gladys",
+        "devicesInfo": "Einige Geräte werden als Sensoren erkannt. In diesem Fall können Sie dies ändern, indem Sie die Schreibgeschützt-Eigenschaft des Geräts bearbeiten.",
+        "deviceOnNetworkTitle": "Vom Gateway erkannte Geräte",
+        "connectButton": "Verbinden/Erneut verbinden",
+        "search": "Geräte suchen",
+        "deviceNotHandled": "Gerät noch nicht behandelt, bitte kontaktieren Sie uns, um uns bei der Verbindung in Gladys zu helfen!",
+        "noDevices": "Keine Geräte gefunden. Sie können Geräte mit dem neuen Geräte-Tab hinzufügen.",
+        "scanButton": "Scannen",
+        "noDevicesFound": "Keine Geräte gefunden. Stellen Sie sicher, dass Sie ein verbundenes RFLink-Gateway im Einstellungen-Tab haben.",
+        "found": "Alle erkannten Geräte werden hier angezeigt.",
+        "nameLabel": "Name",
+        "featuresLabel": "Features",
+        "noFeatures": "Keine Features",
+        "newButton": "Neu",
+        "saveButton": "Speichern",
+        "deleteButton": "Löschen",
+        "editButton": "Bearbeiten",
+        "noNameLabel": "Kein Name",
+        "roomLabel": "Raum",
+        "returnButton": "Zurück",
+        "notFound": "Angefordertes Gerät nicht gefunden.",
+        "backToList": "Zurück zur Geräteliste",
+        "saveError": "Fehler beim Speichern oder Löschen des Geräts",
+        "saveConflictError": "Konflikt: Sind Sie sicher, dass alle externen IDs der Gerätefunktionen eindeutig sind?"
+      }
+    
+    },
     "telegram": {
       "title": "Telegram",
       "description": "Chatte in Telegram mit Gladys.",
