@@ -137,9 +137,6 @@ class CameraBoxComponent extends Component {
         }
       });
       this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {});
-      this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        console.log(`manifest loaded, found ${data.levels.length} quality level`);
-      });
       this.hls.on(Hls.Events.ERROR, (event, data) => {
         console.error(event, data);
         const errorType = data.type;
