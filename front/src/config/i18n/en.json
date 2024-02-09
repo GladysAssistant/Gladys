@@ -1625,7 +1625,7 @@
     "iconLabel": "Icon",
     "editDescriptionPlaceholder": "Enter a scene description",
     "tagsTitle": "Tags",
-    "editTagsPlaceholder": "Enter a scene tags",
+    "editTagsPlaceholder": "Enter or choose a tag scene",
     "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
