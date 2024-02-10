@@ -30,12 +30,7 @@ async function loadWeatherStationDetails() {
     logger.debug('Weather Stations details loaded in home');
     return { weatherStations, modules };
   } catch (e) {
-    logger.error(
-      'Error getting Weather Stations details - status error: ',
-      e.status,
-      ' e: ',
-      e,
-    );
+    logger.error('Error getting Weather Stations details - status error: ', e.status, ' e: ', e);
     return { weatherStations: undefined, modules: undefined };
   }
 }

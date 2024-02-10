@@ -177,12 +177,7 @@ async function loadDeviceDetails(homeData) {
     }
     return listDevices;
   } catch (e) {
-    logger.error(
-      'Error getting devices details - error: ',
-      e,
-      ' - status error: ',
-      e.status,
-    );
+    logger.error('Error getting devices details - error: ', e, ' - status error: ', e.status);
     return undefined;
   }
 }

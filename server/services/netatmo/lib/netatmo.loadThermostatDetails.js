@@ -28,12 +28,7 @@ async function loadThermostatDetails() {
     logger.debug('Thermostats details loaded in home');
     return { thermostats, modules };
   } catch (e) {
-    logger.error(
-      'Error getting thermostats details - status error: ',
-      e.statusGetThermostat,
-      ' e: ',
-      e,
-    );
+    logger.error('Error getting thermostats details - status error: ', e.statusGetThermostat, ' e: ', e);
     return { thermostats: undefined, modules: undefined };
   }
 }

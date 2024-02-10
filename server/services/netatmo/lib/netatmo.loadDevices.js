@@ -23,6 +23,7 @@ async function loadDevices() {
       const results = await Promise.map(
         homes,
         async (home) => {
+          logger.warn('home', home.id, 'home name: ', home.name);
           const { modules } = home;
           if (modules) {
             return this.loadDeviceDetails(home);
