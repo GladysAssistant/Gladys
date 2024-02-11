@@ -576,6 +576,8 @@
         "clientSecretLabel": "Client Secret",
         "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
         "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
+        "energyApiLabel": "Enable \"Energy\" API (retrieve Netatmo Plug, Thermostat, and Valve devices)",
+        "weatherApiLabel": "Enable \"Weather\" API (retrieve Netatmo Weather Station devices)",
         "saveLabel": "Save and connect",
         "disconnectLabel": "Disconnect"
       },

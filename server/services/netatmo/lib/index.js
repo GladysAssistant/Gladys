@@ -32,6 +32,8 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.configuration = {
     clientId: null,
     clientSecret: null,
+    energyApi: null,
+    weatherApi: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;

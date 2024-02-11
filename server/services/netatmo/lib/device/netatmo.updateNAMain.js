@@ -15,9 +15,10 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:temperature`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.temperature || dashboardData.Temperature;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.temperature),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
@@ -31,41 +32,46 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:co2`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.co2 || dashboardData.CO2;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.co2),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:humidity`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.humidity || dashboardData.Humidity;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.humidity),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:noise`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.noise || dashboardData.Noise;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.noise),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:pressure`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.pressure || dashboardData.Pressure;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.pressure),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:absolute_pressure`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.absolute_pressure || dashboardData.AbsolutePressure;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.absolute_pressure),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
     deviceGladys.features
@@ -87,9 +93,10 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:wifi_strength`)
       .forEach((feature) => {
+        const valueDeviceNetatmo = deviceNetatmo.wifi_strength || deviceNetatmo.wifi_status;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.wifi_strength),
+          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
   } catch (e) {

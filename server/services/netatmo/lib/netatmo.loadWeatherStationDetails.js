@@ -1,6 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API } = require('./utils/netatmo.constants');
+const { API, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Discover Netatmo cloud weather stations.
@@ -18,24 +18,21 @@ async function loadWeatherStationDetails() {
       method: 'get',
       headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
     });
-
     const { body, status } = response.data;
-
     weatherStations = body.devices;
     if (status === 'ok') {
       weatherStations.forEach((weatherStation) => {
+        weatherStation.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER
+        weatherStation.modules.forEach((module) => {
+          module.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER
+        });
         modules.push(...weatherStation.modules);
       });
     }
     logger.debug('Weather Stations details loaded in home');
     return { weatherStations, modules };
   } catch (e) {
-    logger.error(
-      'Error getting Weather Stations details - status error: ',
-      e.status,
-      ' data error: ',
-      e.response.data.error,
-    );
+    logger.error('Error getting Weather Stations details - error: ', e);
     return { weatherStations: undefined, modules: undefined };
   }
 }
