@@ -25,9 +25,13 @@ const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
  * netatmo.convertDeviceWeather({ ... });
  */
 function convertDeviceWeather(netatmoDevice) {
-  const { home: homeId, name, type: model, id, room = {}, plug = {} } = netatmoDevice;
+  const { home, name, type: model } = netatmoDevice;
+  const { room = {}, plug = {}, station_name = undefined, module_name = undefined } = netatmoDevice;
+  const id = netatmoDevice.id || netatmoDevice._id;
+  const homeId = home || netatmoDevice.home_id;
+  const nameDevice = name || module_name || station_name;
   const externalId = `netatmo:${id}`;
-  logger.debug(`Netatmo convert Weather device "${name}, ${model}"`);
+  logger.debug(`Netatmo convert Weather device "${nameDevice}, ${model}"`);
   const features = [];
   let params = [];
   let roomName = 'undefined';
@@ -39,17 +43,21 @@ function convertDeviceWeather(netatmoDevice) {
     model === SUPPORTED_MODULE_TYPE.NAMODULE4;
 
   if (isBatteryDevice) {
-    features.push(buildFeatureBattery(name, externalId));
-    features.push(buildFeatureRfStrength(name, externalId));
+    features.push(buildFeatureBattery(nameDevice, externalId));
+    features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
-    params = [
-      { name: PARAMS.PLUG_ID, value: plug.id },
-      { name: PARAMS.PLUG_NAME, value: plug.name },
-    ];
+    const plugId = plug.id || plug._id || undefined
+    const plugName = plug.name || plug.module_name || plug.station_name;
+    if (plugId) {
+      params = [
+        { name: PARAMS.PLUG_ID, value: plugId },
+        { name: PARAMS.PLUG_NAME, value: plugName },
+      ];
+    }
   }
   if (isNotBatteryDevice) {
     const modulesBridged = netatmoDevice.modules_bridged || [];
-    features.push(buildFeatureWifiStrength(name, externalId));
+    features.push(buildFeatureWifiStrength(nameDevice, externalId));
     /* params */
     params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
   }
@@ -63,43 +71,45 @@ function convertDeviceWeather(netatmoDevice) {
   switch (model) {
     case SUPPORTED_MODULE_TYPE.NAMAIN: {
       /* features common Netatmo */
-      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
-      features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
+      if (room.id) {
+        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      }
       features.push(buildFeatureTemperature(`Minimum in ${roomName}`, externalId, 'min_temp'));
       features.push(buildFeatureTemperature(`Maximum in ${roomName}`, externalId, 'max_temp'));
       /* features specific Netatmo Weather */
-      features.push(buildFeatureCo2(name, externalId));
-      features.push(buildFeatureHumidity(name, externalId));
-      features.push(buildFeatureNoise(name, externalId));
-      features.push(buildFeaturePressure(`Pressure - ${name}`, externalId, 'pressure'));
-      features.push(buildFeaturePressure(`Absolute pressure - ${name}`, externalId, 'absolute_pressure'));
+      features.push(buildFeatureCo2(nameDevice, externalId));
+      features.push(buildFeatureHumidity(nameDevice, externalId));
+      features.push(buildFeatureNoise(nameDevice, externalId));
+      features.push(buildFeaturePressure(`Pressure - ${nameDevice}`, externalId, 'pressure'));
+      features.push(buildFeaturePressure(`Absolute pressure - ${nameDevice}`, externalId, 'absolute_pressure'));
       break;
     }
     case SUPPORTED_MODULE_TYPE.NAMODULE1: {
       /* features common Netatmo */
-      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
+      features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
       features.push(buildFeatureTemperature(`Minimum in ${roomName}`, externalId, 'min_temp'));
       features.push(buildFeatureTemperature(`Maximum in ${roomName}`, externalId, 'max_temp'));
       /* features specific Netatmo Weather */
-      features.push(buildFeatureHumidity(name, externalId));
+      features.push(buildFeatureHumidity(nameDevice, externalId));
       break;
     }
     case SUPPORTED_MODULE_TYPE.NAMODULE2: {
       /* features specific Netatmo Weather */
-      features.push(buildFeatureWindStrength(`Wind strength - ${name}`, externalId, 'wind_strength'));
-      features.push(buildFeatureWindAngle(`Wind angle - ${name}`, externalId, 'wind_angle'));
-      features.push(buildFeatureWindStrength(`Gust strength - ${name}`, externalId, 'wind_gust'));
-      features.push(buildFeatureWindAngle(`Gust angle - ${name}`, externalId, 'wind_gust_angle'));
-      features.push(buildFeatureWindStrength(`Maximum wind strength - ${name}`, externalId, 'max_wind_str'));
-      features.push(buildFeatureWindAngle(`Maximum wind angle - ${name}`, externalId, 'max_wind_angle'));
+      features.push(buildFeatureWindStrength(`Wind strength - ${nameDevice}`, externalId, 'wind_strength'));
+      features.push(buildFeatureWindAngle(`Wind angle - ${nameDevice}`, externalId, 'wind_angle'));
+      features.push(buildFeatureWindStrength(`Gust strength - ${nameDevice}`, externalId, 'wind_gust'));
+      features.push(buildFeatureWindAngle(`Gust angle - ${nameDevice}`, externalId, 'wind_gust_angle'));
+      features.push(buildFeatureWindStrength(`Maximum wind strength - ${nameDevice}`, externalId, 'max_wind_str'));
+      features.push(buildFeatureWindAngle(`Maximum wind angle - ${nameDevice}`, externalId, 'max_wind_angle'));
       break;
     }
     case SUPPORTED_MODULE_TYPE.NAMODULE3: {
       /* features specific Netatmo Weather */
-      features.push(buildFeatureRain(`Current rain - ${name}`, externalId, 'rain', DEVICE_FEATURE_UNITS.MM));
+      features.push(buildFeatureRain(`Current rain - ${nameDevice}`, externalId, 'rain', DEVICE_FEATURE_UNITS.MM));
       features.push(
         buildFeatureRain(
-          `Precipitation / 1h - ${name}`,
+          `Precipitation / 1h - ${nameDevice}`,
           externalId,
           'sum_rain_1',
           DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
@@ -107,7 +117,7 @@ function convertDeviceWeather(netatmoDevice) {
       );
       features.push(
         buildFeatureRain(
-          `Sum rain / 24h - ${name}`,
+          `Sum rain / 24h - ${nameDevice}`,
           externalId,
           'sum_rain_24',
           DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
@@ -117,20 +127,22 @@ function convertDeviceWeather(netatmoDevice) {
     }
     case SUPPORTED_MODULE_TYPE.NAMODULE4: {
       /* features common Netatmo */
-      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
-      features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
+      if (room.id) {
+        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      }
       features.push(buildFeatureTemperature(`Minimum in ${roomName}`, externalId, 'min_temp'));
       features.push(buildFeatureTemperature(`Maximum in ${roomName}`, externalId, 'max_temp'));
       /* features specific Netatmo Weather */
-      features.push(buildFeatureCo2(name, externalId));
-      features.push(buildFeatureHumidity(name, externalId));
+      features.push(buildFeatureCo2(nameDevice, externalId));
+      features.push(buildFeatureHumidity(nameDevice, externalId));
       break;
     }
     default:
       break;
   }
   const device = {
-    name,
+    name: nameDevice,
     external_id: externalId,
     selector: externalId,
     model,
@@ -142,7 +154,7 @@ function convertDeviceWeather(netatmoDevice) {
   if (netatmoDevice.not_handled) {
     device.not_handled = true;
   }
-  logger.info(`Netatmo Weather device"${name}, ${model}" converted`);
+  logger.info(`Netatmo Weather device"${nameDevice}, ${model}" converted`);
   return device;
 }
 

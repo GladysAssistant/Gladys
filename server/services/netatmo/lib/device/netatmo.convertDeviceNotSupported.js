@@ -9,17 +9,20 @@ const { PARAMS } = require('../utils/netatmo.constants');
  * netatmo.convertDeviceNotSupported({ ... });
  */
 function convertDeviceNotSupported(netatmoDevice) {
-  const { home: homeId, name, type: model, id, room = {} } = netatmoDevice;
+  const { home, name, type: model } = netatmoDevice;
+  const { room = {}, station_name = undefined, module_name = undefined } = netatmoDevice;
+  const id = netatmoDevice.id || netatmoDevice._id;
+  const homeId = home || netatmoDevice.home_id;
+  const nameDevice = name || module_name || station_name;
   const externalId = `netatmo:${id}`;
-  logger.debug(`Netatmo convert device not supported "${name}, ${model}"`);
-
+  logger.debug(`Netatmo convert device not supported "${nameDevice}, ${model}"`);
   /* params common to all devices features */
   const params = [{ name: PARAMS.HOME_ID, value: homeId }];
   if (room.id) {
     params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: room.name });
   }
   const device = {
-    name,
+    name: nameDevice,
     external_id: externalId,
     selector: externalId,
     model,
@@ -29,7 +32,7 @@ function convertDeviceNotSupported(netatmoDevice) {
     params: params.filter((param) => param),
     not_handled: true,
   };
-  logger.info(`Netatmo device not supported "${name}, ${model}" converted`);
+  logger.info(`Netatmo device not supported "${nameDevice}, ${model}" converted`);
   return device;
 }
 

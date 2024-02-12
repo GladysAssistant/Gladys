@@ -22,9 +22,13 @@ const {
  * netatmo.convertDeviceEnergy({ ... });
  */
 function convertDeviceEnergy(netatmoDevice) {
-  const { home: homeId, name, type: model, id, room = {}, plug = {} } = netatmoDevice;
+  const { home, name, type: model } = netatmoDevice;
+  const { room = {}, plug = {}, station_name = undefined, module_name = undefined } = netatmoDevice;
+  const id = netatmoDevice.id || netatmoDevice._id;
+  const homeId = home || netatmoDevice.home_id;
+  const nameDevice = name || module_name || station_name;
   const externalId = `netatmo:${id}`;
-  logger.debug(`Netatmo convert Energy device "${name}, ${model}"`);
+  logger.debug(`Netatmo convert Energy device "${nameDevice}, ${model}"`);
   const features = [];
   let params = [];
   let roomName = 'undefined';
@@ -32,18 +36,22 @@ function convertDeviceEnergy(netatmoDevice) {
   const isBatteryDevice = model === SUPPORTED_MODULE_TYPE.THERMOSTAT || model === SUPPORTED_MODULE_TYPE.NRV;
 
   if (isBatteryDevice) {
-    features.push(buildFeatureBattery(name, externalId));
-    features.push(buildFeatureRfStrength(name, externalId));
+    features.push(buildFeatureBattery(nameDevice, externalId));
+    features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
-    params = [
-      { name: PARAMS.PLUG_ID, value: plug.id },
-      { name: PARAMS.PLUG_NAME, value: plug.name },
-    ];
+    const plugId = plug.id || plug._id || undefined
+    const plugName = plug.name || plug.module_name || plug.station_name;
+    if (plugId) {
+      params = [
+        { name: PARAMS.PLUG_ID, value: plugId },
+        { name: PARAMS.PLUG_NAME, value: plugName },
+      ];
+    }
   }
   if (isNotBatteryDevice) {
     const modulesBridged = netatmoDevice.modules_bridged || [];
-    features.push(buildFeatureWifiStrength(name, externalId));
-    features.push(buildFeatureRfStrength(name, externalId));
+    features.push(buildFeatureWifiStrength(nameDevice, externalId));
+    features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
     params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
   }
@@ -56,33 +64,37 @@ function convertDeviceEnergy(netatmoDevice) {
   switch (model) {
     case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
       /* features common Netatmo */
-      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
-      features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
+      if (room.id) {
+        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      }
       /* features specific Energy */
-      features.push(buildFeatureThermSetpointTemperature(name, externalId));
-      features.push(buildFeatureOpenWindow(name, externalId));
-      features.push(buildFeatureBoilerStatus(name, externalId));
+      features.push(buildFeatureThermSetpointTemperature(nameDevice, externalId));
+      features.push(buildFeatureOpenWindow(nameDevice, externalId));
+      features.push(buildFeatureBoilerStatus(nameDevice, externalId));
       break;
     }
     case SUPPORTED_MODULE_TYPE.PLUG: {
       /* features specific Plugs */
-      features.push(buildFeaturePlugConnectedBoiler(name, externalId));
+      features.push(buildFeaturePlugConnectedBoiler(nameDevice, externalId));
       break;
     }
     case SUPPORTED_MODULE_TYPE.NRV: {
       /* features common Netatmo */
-      features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      if (room.id) {
+        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+      }
       /* features specific Energy */
-      features.push(buildFeatureThermSetpointTemperature(name, externalId));
-      features.push(buildFeatureOpenWindow(name, externalId));
-      features.push(buildFeatureHeatingPowerRequest(name, externalId));
+      features.push(buildFeatureThermSetpointTemperature(nameDevice, externalId));
+      features.push(buildFeatureOpenWindow(nameDevice, externalId));
+      features.push(buildFeatureHeatingPowerRequest(nameDevice, externalId));
       break;
     }
     default:
       break;
   }
   const device = {
-    name,
+    name: nameDevice,
     external_id: externalId,
     selector: externalId,
     model,
@@ -94,7 +106,7 @@ function convertDeviceEnergy(netatmoDevice) {
   if (netatmoDevice.not_handled) {
     device.not_handled = true;
   }
-  logger.info(`Netatmo Energy device "${name}, ${model}" converted`);
+  logger.info(`Netatmo Energy device "${nameDevice}, ${model}" converted`);
   return device;
 }
 

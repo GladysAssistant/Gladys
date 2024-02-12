@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API } = require('./utils/netatmo.constants');
+const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Discover Netatmo cloud devices.
@@ -11,32 +11,145 @@ const { API } = require('./utils/netatmo.constants');
  */
 async function loadDevices() {
   try {
-    const responsePage = await axios({
-      url: API.HOMESDATA,
-      method: 'get',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
-    });
-    const { body, status } = responsePage.data;
-    const { homes } = body;
-    let listHomeDevices = [];
-    if (status === 'ok') {
-      const results = await Promise.map(
-        homes,
-        async (home) => {
-          logger.warn('home', home.id, 'home name: ', home.name);
-          const { modules } = home;
-          if (modules) {
-            return this.loadDeviceDetails(home);
-          }
-          return undefined;
-        },
-        { concurrency: 2 },
-      );
-      listHomeDevices = results.filter((device) => device !== undefined).flat();
+    let listDevices = [];
+
+    if (this.configuration.energyApi) {
+      const responsePage = await axios({
+        url: API.HOMESDATA,
+        method: 'get',
+        headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
+      });
+      const { body, status } = responsePage.data;
+      const { homes } = body;
+      if (status === 'ok') {
+        const results = await Promise.map(
+          homes,
+          async (home) => {
+            logger.warn('home', home.id, 'home name: ', home.name);
+            const { modules } = home;
+            if (modules) {
+              return this.loadDeviceDetails(home);
+            }
+            return undefined;
+          },
+          { concurrency: 2 },
+        );
+        listDevices = results.filter((device) => device !== undefined).flat();
+      }
     }
-    logger.debug(`${listHomeDevices.length} Netatmo devices loaded`);
-    logger.info(`Netatmo devices not supported : ${listHomeDevices.filter((device) => device.not_handled).length}`);
-    return listHomeDevices;
+
+    if (this.configuration.energyApi) {
+      const { plugs, thermostats } = await this.loadThermostatDetails();
+      if (listDevices.length > 0) {
+        // we add the properties of the "getThermostats" API request to those of the previous "Energy" API request
+        listDevices = listDevices.map(device => {
+          const plug = plugs.find(plug => plug._id === device.id);
+          if (plug) {
+            return { ...device, ...plug };
+          }
+          const thermostat = thermostats.find(modulePlug => modulePlug._id === device.id);
+          if (thermostat) {
+            const plugThermostat = plugs
+              .map((plug) => {
+                const { modules, ...rest } = plug;
+                return rest;
+              })
+              // eslint-disable-next-line no-underscore-dangle
+              .find((plug) => plug._id === device.bridge);
+            device.plug = {
+              ...device.plug,
+              ...plugThermostat,
+            }
+            return { ...device, ...thermostat };
+          }
+          return device;
+        });
+        // then we add the plugs and thermostats that would belong to a house that does not have devices in the "Energy" category
+        listDevices = [...listDevices, ...plugs.filter(
+          plug => !listDevices.some(device => device.id === plug._id)
+        ), ...thermostats.filter(
+          thermostat => !listDevices.some(device => device.id === thermostat._id)
+        )];
+      } else {
+        // otherwise we retrieve the plugs and thermostats as the "getThermostats" API request provides them to us
+        listDevices = [...plugs, ...thermostats];
+      }
+      listDevices
+        .filter(device => device.type === SUPPORTED_MODULE_TYPE.PLUG)
+        .forEach((plug) => {
+          if (!plug.modules_bridged) {
+            plug.modules_bridged = plug.modules.map(module => module._id);
+          }
+        });
+    }
+
+    if (this.configuration.weatherApi) {
+      const { weatherStations, modules: modulesWeatherStations } = await this.loadWeatherStationDetails();
+      if (listDevices.length > 0) {
+        // we add the properties of the "Weather" API request to those of the previous "Energy" API request
+        listDevices = listDevices.map(device => {
+          const weatherStation = weatherStations.find(station => station._id === device.id);
+          if (weatherStation) {
+            return { ...device, ...weatherStation };
+          }
+          const moduleWeatherStation = modulesWeatherStations.find(moduleWeatherStation => moduleWeatherStation._id === device.id);
+          if (moduleWeatherStation) {
+
+
+            // if (weatherStations && modulesWeatherStations) {
+            //   device = modulesWeatherStations.find(
+            //     // eslint-disable-next-line no-underscore-dangle
+            //     (moduleWeatherStation) => moduleWeatherStation._id === module.id,
+            //   );
+            //   plugWeatherStation = weatherStations
+            //     .map((weatherStation) => {
+            //       const { modules, ...rest } = weatherStation;
+            //       return rest;
+            //     })
+            //     // eslint-disable-next-line no-underscore-dangle
+            //     .find((weatherStation) => weatherStation._id === module.bridge);
+            // }
+
+
+
+
+
+            const plugModuleWeatherStation = weatherStations
+              .map((weatherStation) => {
+                const { modules, ...rest } = weatherStation;
+                return rest;
+              })
+              // eslint-disable-next-line no-underscore-dangle
+              .find((plug) => plug._id === device.bridge);
+            device.plug = {
+              ...device.plug,
+              ...plugModuleWeatherStation,
+            }
+            return { ...device, ...moduleWeatherStation };
+          }
+          return device;
+        });
+        // then we add the weather stations that would belong to a house that does not have devices in the "Energy" category
+        listDevices = [...listDevices, ...weatherStations.filter(
+          station => !listDevices.some(device => device.id === station._id)
+        ), ...modulesWeatherStations.filter(
+          moduleStation => !listDevices.some(device => device.id === moduleStation._id)
+        )];
+      } else {
+        // otherwise we retrieve the weather stations as the "Weather" API request provides them to us
+        listDevices = [...weatherStations, ...modulesWeatherStations];
+      }
+      listDevices
+        .filter(device => device.type === SUPPORTED_MODULE_TYPE.NAMAIN)
+        .forEach((weatherStation) => {
+          if (!weatherStation.modules_bridged) {
+            weatherStation.modules_bridged = weatherStation.modules.map(module => module._id);
+          }
+        });
+    }
+    logger.debug(`${listDevices.length} Netatmo devices loaded`);
+    logger.info(`Netatmo devices not supported : ${listDevices.filter((device) => device.not_handled).length}`);
+    return listDevices;
   } catch (e) {
     logger.error('e.status: ', e.status, 'e', e);
     return undefined;
