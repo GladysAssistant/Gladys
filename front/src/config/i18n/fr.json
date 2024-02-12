@@ -704,6 +704,8 @@
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
         "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
+        "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
         "disconnectLabel": "Déconnecter"
       },

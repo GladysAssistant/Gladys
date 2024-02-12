@@ -34,6 +34,20 @@ class SetupTab extends Component {
   updateClientSecret = e => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
   };
+  updateEnergyApi = () => {
+    if (this.props.netatmoEnergyApi === true) {
+      this.props.updateStateInIndex({ netatmoEnergyApi: false });
+    } else {
+      this.props.updateStateInIndex({ netatmoEnergyApi: true });
+    }
+  };
+  updateWeatherApi = () => {
+    if (this.props.netatmoWeatherApi === true) {
+      this.props.updateStateInIndex({ netatmoWeatherApi: false });
+    } else {
+      this.props.updateStateInIndex({ netatmoWeatherApi: true });
+    }
+  };
   toggleClientSecret = () => {
     const { showClientSecret } = this.state;
 
@@ -136,6 +150,35 @@ class SetupTab extends Component {
                     </span>
                   </div>
                 </div>
+
+                <div class="form-group">
+                  <label class="netatmoEnergyApi" className="form-label">
+                    <input
+                      type="checkbox"
+                      name="netatmoEnergyApi"
+                      class="custom-switch-input"
+                      checked={props.netatmoEnergyApi}
+                      onClick={this.updateEnergyApi}
+                    />
+                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
+                    <Text id={`integration.netatmo.setup.energyApiLabel`} />
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label class="netatmoWeatherApi" className="form-label">
+                    <input
+                      type="checkbox"
+                      name="netatmoWeatherApi"
+                      class="custom-switch-input"
+                      checked={props.netatmoWeatherApi}
+                      onClick={this.updateWeatherApi}
+                    />
+                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
+                    <Text id={`integration.netatmo.setup.weatherApiLabel`} />
+                  </label>
+                </div>
+
                 <div class="form-group">
                   <label htmlFor="netatmoSetupConnectionInfo" className="form-label">
                     <Text id="integration.netatmo.setup.connectionInfoLabel" />

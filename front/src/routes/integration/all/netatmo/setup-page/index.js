@@ -107,7 +107,9 @@ class NetatmoSetupPage extends Component {
     try {
       this.props.httpClient.post('/api/v1/service/netatmo/configuration', {
         clientId: this.state.netatmoClientId,
-        clientSecret: this.state.netatmoClientSecret
+        clientSecret: this.state.netatmoClientSecret,
+        energyApi: this.state.netatmoEnergyApi,
+        weatherApi: this.state.netatmoWeatherApi
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -163,6 +165,8 @@ class NetatmoSetupPage extends Component {
       await this.setState({
         netatmoClientId: configuration.clientId,
         netatmoClientSecret: configuration.clientSecret,
+        netatmoEnergyApi: configuration.energyApi,
+        netatmoWeatherApi: configuration.weatherApi,
         clientSecretChanges: false
       });
     }

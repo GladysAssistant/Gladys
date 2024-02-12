@@ -576,6 +576,8 @@
         "clientSecretLabel": "Kundengeheimnis",
         "clientSecretPlaceholder": "Kundengeheimnis von My Apps in Netatmo Connect",
         "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
+        "energyApiLabel": "Aktiviere \"Energy\" API (Netatmo Stecker, Thermostat und Ventile abrufen)",
+        "weatherApiLabel": "Aktiviere \"Weather\" API (Netatmo Wetterstation Geräte abrufen)",
         "saveLabel": "Speichern und verbinden",
         "disconnectLabel": "Trennen"
       },

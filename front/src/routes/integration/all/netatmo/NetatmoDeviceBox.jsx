@@ -126,8 +126,9 @@ class NetatmoDeviceBox extends Component {
 
     let plugName = null;
     const plugNameParam = device.params.find(param => param.name === PARAMS.PLUG_NAME);
+    const plugIdParam = device.params.find(param => param.name === PARAMS.PLUG_ID);
     if (plugNameParam) {
-      plugName = plugNameParam.value;
+      plugName = `${plugNameParam.value} (${plugIdParam.value})`;
     }
 
     const isDeviceReachable = (device, now = new Date()) => {
