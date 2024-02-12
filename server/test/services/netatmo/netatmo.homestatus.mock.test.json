@@ -77,6 +77,16 @@
         "firmware_revision": 236,
         "rf_strength": 106,
         "wifi_strength": 66
+      },
+      {
+        "id": "09:00:00:xx:xx:xx",
+        "type": "NRV",
+        "battery_state": "full",
+        "battery_level": 2956,
+        "firmware_revision": 100,
+        "rf_strength": 80,
+        "reachable": true,
+        "bridge": "70:ee:50:yy:yy:yy"
       }
     ],
     "persons": [

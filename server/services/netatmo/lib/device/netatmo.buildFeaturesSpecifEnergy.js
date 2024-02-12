@@ -52,6 +52,29 @@ function buildFeatureBoilerStatus(name, externalId) {
 }
 
 /**
+ * @description Transforms Netatmo feature as Gladys feature. Heating power request.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @returns {object} Gladys feature or undefined.
+ * @example
+ * buildFeatureHeatingPowerRequest(device_name, 'netatmo:device_id');
+ */
+function buildFeatureHeatingPowerRequest(name, externalId) {
+  return {
+    name: `Heating power request - ${name}`,
+    external_id: `${externalId}:heating_power_request`,
+    selector: `${externalId}:heating_power_request`,
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: 0,
+    max: 1,
+  };
+}
+
+/**
  * @description Transforms Netatmo feature as Gladys feature. Plug connected boiler.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
@@ -77,5 +100,6 @@ function buildFeaturePlugConnectedBoiler(name, externalId) {
 module.exports = {
   buildFeatureThermSetpointTemperature,
   buildFeatureBoilerStatus,
+  buildFeatureHeatingPowerRequest,
   buildFeaturePlugConnectedBoiler,
 };
