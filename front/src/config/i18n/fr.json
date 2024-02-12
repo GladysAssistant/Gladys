@@ -1166,7 +1166,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un seul appareil: Le capteur d'ouverture de porte Fibaro. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un nombre limité d'appareils. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1175,7 +1175,7 @@
       },
       "discover": {
         "title": "Appareils détectés sur votre instance Z-Wave JS UI",
-        "description": "Les appareils Z-Wave JS UI sont automatiquement découverts. Attention, seuls les appareils avec un nom et une \"location\" sont affichés ici. Si vous éditez ces paramètres, vous devrez réappairer l'appareil dans Gladys.",
+        "description": "Les appareils Z-Wave JS UI sont automatiquement découverts. Attention, seuls les appareils avec un nom sont affichés ici.",
         "error": "Erreur de découverte des appareils Z-Wave JS UI. Est-ce que votre broker MQTT est bien disponible et accessible ?",
         "noDeviceFound": "Aucun appareil Z-Wave JS UI n'a été découvert.",
         "errorWhileScanning": "Une erreur est survenue lors de la découverte.",

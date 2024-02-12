@@ -1037,7 +1037,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration is in alpha and currently only supports one device: The Fibaro Door/Window sensor. We welcome any assistance to integrate other devices!",
+      "alphaWarning": "This integration is in alpha and currently only supports few devices. We welcome any assistance to integrate other devices!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
@@ -1046,7 +1046,7 @@
       },
       "discover": {
         "title": "Devices detected on your Z-Wave JS UI instance",
-        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name and a 'location' are displayed here. If you edit these settings, you will need to re-pair the device in Gladys.",
+        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name are displayed here.",
         "error": "Error discovering Z-Wave JS UI devices. Is your MQTT broker available and accessible?",
         "noDeviceFound": "No Z-Wave JS UI devices were discovered.",
         "errorWhileScanning": "An error occurred during discovery.",
