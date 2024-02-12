@@ -10,6 +10,12 @@
 .btnTextLineSpacing {
   line-height: 1.5;
 }
+
+.customSwitchIndicator {
+  margin-right: 10px;
+}
+
+
 /* Default style for large screens */
 .buttonGroup {
   display: flex;

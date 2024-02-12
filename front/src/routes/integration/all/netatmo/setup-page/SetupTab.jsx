@@ -34,15 +34,19 @@ class SetupTab extends Component {
   updateClientSecret = e => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
   };
-  updateEnergyApi = e => {
-    if (this.props.netatmoEnergyApi === true){
+  updateEnergyApi = () => {
+    if (this.props.netatmoEnergyApi === true) {
       this.props.updateStateInIndex({ netatmoEnergyApi: false });
     } else {
       this.props.updateStateInIndex({ netatmoEnergyApi: true });
     }
   };
-  updateWeatherApi = e => {
-    this.props.updateStateInIndex({ netatmoWeatherApi: e.target.value });
+  updateWeatherApi = () => {
+    if (this.props.netatmoWeatherApi === true) {
+      this.props.updateStateInIndex({ netatmoWeatherApi: false });
+    } else {
+      this.props.updateStateInIndex({ netatmoWeatherApi: true });
+    }
   };
   toggleClientSecret = () => {
     const { showClientSecret } = this.state;
@@ -156,7 +160,7 @@ class SetupTab extends Component {
                       checked={props.netatmoEnergyApi}
                       onClick={this.updateEnergyApi}
                     />
-                    <span class="custom-switch-indicator" style={{ marginRight: '10px' }} />
+                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
                     <Text id={`integration.netatmo.setup.energyApiLabel`} />
                   </label>
                 </div>
@@ -170,7 +174,7 @@ class SetupTab extends Component {
                       checked={props.netatmoWeatherApi}
                       onClick={this.updateWeatherApi}
                     />
-                    <span class="custom-switch-indicator" style={{ marginRight: '10px' }} />
+                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
                     <Text id={`integration.netatmo.setup.weatherApiLabel`} />
                   </label>
                 </div>
