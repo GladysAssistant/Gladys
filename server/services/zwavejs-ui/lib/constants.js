@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   OPENING_SENSOR_STATE,
   STATE,
+  DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
 
 const CONFIGURATION = {
@@ -13,18 +14,27 @@ const CONFIGURATION = {
 
 const STATES = {
   binary_switch: {
-    currentvalue: {
-      [STATE.OFF]: false,
-      [STATE.ON]: true,
-      false: STATE.OFF,
-      true: STATE.ON,
+    currentvalue: (val) => {
+      switch(val) {
+        case STATE.OFF: return false;
+        case STATE.ON:  return true;
+        case false: return STATE.OFF;
+        case true: return STATE.ON;
+        default: return val;
+      }
     },
+  },
+  multilevel_sensor: {
+    air_temperature: val => val
   },
   notification: {
     access_control: {
-      door_state_simple: {
-        22: OPENING_SENSOR_STATE.OPEN,
-        23: OPENING_SENSOR_STATE.CLOSE,
+      door_state_simple: (val) => {
+        switch(val) {
+          case 22: return OPENING_SENSOR_STATE.OPEN;
+          case 23: return OPENING_SENSOR_STATE.CLOSE;
+          default: return val;
+        }
       },
     },
   },
@@ -35,7 +45,7 @@ const COMMANDS = {
     currentvalue: {
       getName: (_nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => {
-        return [STATES.binary_switch.currentvalue[value]];
+        return [STATES.binary_switch.currentvalue(value)];
       },
     },
   },
@@ -52,6 +62,18 @@ const EXPOSES = {
       read_only: false,
       has_feedback: true,
     },
+  },
+  multilevel_sensor: {
+    air_temperature: {
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      min: -100,
+      max: 150,
+      keep_history: true,
+      read_only: true,
+      has_feedback: true,
+    }
   },
   notification: {
     access_control: {
