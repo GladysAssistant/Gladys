@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../models');
 const { GLADYS_VARIABLES } = require('../services/netatmo/lib/utils/netatmo.constants');
+const logger = require('../utils/logger');
 
 module.exports = {
   up: async () => {
@@ -9,9 +10,8 @@ module.exports = {
         name: GLADYS_VARIABLES.ENERGY_API,
       },
     });
-    console.log('netatmoVariableEnergyApi: ', netatmoVariableEnergyApi);
     if (netatmoVariableEnergyApi) {
-      console.log('Netatmo variable energy api already exists.');
+      logger.info('Netatmo variable energy api already exists.');
       return;
     }
     const netatmoService = await db.Service.findOne({
@@ -19,32 +19,23 @@ module.exports = {
         name: 'netatmo',
       },
     });
-    console.log('netatmoService: ', netatmoService);
     if (!netatmoService) {
-      console.log('Netatmo service not found.');
+      logger.info('Netatmo service not found.');
       return;
     }
+    logger.info(`Netatmo migration: Found service netatmo = ${netatmoService.id}`);
 
-    console.log('model: ', {
-      where: {
-        service_id: netatmoService.id,
-        model: {
-          [Op.in]: ['NAPlug', 'NATherm1', 'NRV']
-        }
-      },
-    });
     const netatmoDevice = await db.Device.findOne({
       where: {
         service_id: netatmoService.id,
         model: {
-          [Op.in]: ['NAPlug', 'NATherm1', 'NRV']
-        }
+          [Op.in]: ['NAPlug', 'NATherm1', 'NRV'],
+        },
       },
     });
-    console.log('netatmoDevice: ', netatmoDevice);
     const energyApiValue = netatmoDevice ? '1' : '0'; // true: '1', false: '0'
+    logger.info(`Netatmo migration: Found at least 1 netatmo device`);
 
-    console.log('energyApiValue: ', energyApiValue);
     await db.Variable.upsert({
       service_id: netatmoService.id,
       name: GLADYS_VARIABLES.ENERGY_API,
@@ -57,5 +48,5 @@ module.exports = {
     });
   },
 
-  down: async () => { },
+  down: async () => {},
 };

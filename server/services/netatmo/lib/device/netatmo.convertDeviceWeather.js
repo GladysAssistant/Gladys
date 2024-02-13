@@ -25,11 +25,10 @@ const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
  * netatmo.convertDeviceWeather({ ... });
  */
 function convertDeviceWeather(netatmoDevice) {
-  const { home, name, type: model } = netatmoDevice;
-  const { room = {}, plug = {}, station_name = undefined, module_name = undefined } = netatmoDevice;
+  const { home, name, type: model, room = {}, plug = {} } = netatmoDevice;
   const id = netatmoDevice.id || netatmoDevice._id;
   const homeId = home || netatmoDevice.home_id;
-  const nameDevice = name || module_name || station_name;
+  const nameDevice = name || netatmoDevice.module_name || netatmoDevice.station_name;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert Weather device "${nameDevice}, ${model}"`);
   const features = [];
@@ -46,7 +45,7 @@ function convertDeviceWeather(netatmoDevice) {
     features.push(buildFeatureBattery(nameDevice, externalId));
     features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
-    const plugId = plug.id || plug._id || undefined
+    const plugId = plug.id || plug._id || undefined;
     const plugName = plug.name || plug.module_name || plug.station_name;
     if (plugId) {
       params = [

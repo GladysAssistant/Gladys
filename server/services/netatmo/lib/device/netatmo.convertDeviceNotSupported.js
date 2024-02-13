@@ -9,11 +9,10 @@ const { PARAMS } = require('../utils/netatmo.constants');
  * netatmo.convertDeviceNotSupported({ ... });
  */
 function convertDeviceNotSupported(netatmoDevice) {
-  const { home, name, type: model } = netatmoDevice;
-  const { room = {}, station_name = undefined, module_name = undefined } = netatmoDevice;
+  const { home, name, type: model, room = {} } = netatmoDevice;
   const id = netatmoDevice.id || netatmoDevice._id;
   const homeId = home || netatmoDevice.home_id;
-  const nameDevice = name || module_name || station_name;
+  const nameDevice = name || netatmoDevice.module_name || netatmoDevice.station_name;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert device not supported "${nameDevice}, ${model}"`);
   /* params common to all devices features */
