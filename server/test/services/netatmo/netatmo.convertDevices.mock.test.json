@@ -123,6 +123,18 @@
         "max": 50
       },
       {
+        "name": "Link RF quality - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Setpoint temperature - Thermostat Test",
         "external_id": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
         "selector": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
