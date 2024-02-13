@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-// const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
 /**
  * @description Load vacbot device.
