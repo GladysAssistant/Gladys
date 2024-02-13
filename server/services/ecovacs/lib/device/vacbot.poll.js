@@ -19,13 +19,9 @@ async function poll(device) {
   if (!this.connected) {
     await this.connect();
   }
-  let vacbot;
-  // get vacbot object TODO : improve this part (new util func ie: this.vacbots[device])
-  this.vacbots.forEach((value, key) => {
-    if (key.external_id === device.external_id) {
-      vacbot = value;
-    }
-  });
+  const vacbot = this.getVacbotFromExternalId(device.external_id);
+  
+  // ERROR const vacbot = await this.getVacbotObj(device.external_id);
   if (vacbot.is_ready) {
     await Promise.mapSeries(device.features || [], (feature) => {
       switch (feature.category) {
@@ -37,11 +33,12 @@ async function poll(device) {
         default:
           break;
       }
+      // Retrieve states
+      vacbot.run('GetCleanState'); // retrieve the cleaning status. Answer : { trigger: 'alert', state: 'idle' }
+      vacbot.run('GetChargeState'); // retrieve the charging status. Answer : { isCharging: 1, mode: 'slot' }
+      vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
     });
-    // Retrieve states
-    vacbot.run('GetCleanState'); // retrieve the cleaning status. Answer : { trigger: 'alert', state: 'idle' }
-    vacbot.run('GetChargeState'); // retrieve the charging status. Answer : { isCharging: 1, mode: 'slot' }
-    vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
+    
   }
   switch (vacbot.errorCode) {
     case '3': // String (see ecovacs-deebot.js/library/errorCodes.json)
@@ -49,7 +46,6 @@ async function poll(device) {
       break;
     case '4200':
       logger.error(`Error "${vacbot.errorCode}" occured : ${vacbot.errorDescription}.`);
-      this.connected = false;
       vacbot.disconnect();
       break;
     default:

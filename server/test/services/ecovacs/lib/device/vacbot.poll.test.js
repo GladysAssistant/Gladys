@@ -39,11 +39,10 @@ describe('Ecovacs : vacbot polling', () => {
     assert.calledWith(fakes.run, 'GetSleepStatus');
   });
 
-  it('should poll device, handle errorCode 4200 and disconnect', async () => {
+  it('should poll device, handle errorCode 4200 and disconnect vacbot', async () => {
     fakes.errorCode = '4200'; // vacbot with errorCode 4200
     ecovacsService.device.vacbots.set(devices[0], fakes);
     await ecovacsService.device.poll(devices[0]);
-    expect(ecovacsService.device.connected).to.equal(false);
     assert.calledOnce(fakes.disconnect);
   });
 
