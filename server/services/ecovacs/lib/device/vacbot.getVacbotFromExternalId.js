@@ -1,9 +1,9 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Get Vacbot Obj from Gladys device external Id
- * @param {string} externalId - Gladys device external_id
- * @returns {Object} Vacbot object.
+ * @description Get Vacbot Obj from Gladys device external Id.
+ * @param {string} externalId - Gladys device external_id.
+ * @returns {object} Vacbot object.
  * @example
  * vacbot.getVacbotFromExternalId(external_id);
  */

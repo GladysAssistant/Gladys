@@ -1,4 +1,3 @@
-const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const { event, serviceId, devices, variableOk } = require('../../consts.test');

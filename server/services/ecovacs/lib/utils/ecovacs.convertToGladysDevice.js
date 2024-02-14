@@ -4,7 +4,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   DEVICE_POLL_FREQUENCIES,
-  VACBOT_MODE
+  VACBOT_MODE,
 } = require('../../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -24,7 +24,6 @@ addMapping('state', VACBOT_MODE.CLEAN, 'CLEAN');
 addMapping('state', VACBOT_MODE.PAUSE, 'PAUSE');
 addMapping('state', VACBOT_MODE.STOP, 'STOP');
 addMapping('state', VACBOT_MODE.CHARGE, 'CHARGE');
-
 
 const convertToGladysDevice = (serviceId, device) => {
   return {
@@ -61,7 +60,7 @@ const convertToGladysDevice = (serviceId, device) => {
         has_feedback: true,
         min: 0,
         max: 100,
-      }     
+      },
     ],
   };
 };

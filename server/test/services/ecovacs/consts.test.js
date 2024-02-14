@@ -219,7 +219,7 @@ const serviceWith0Devices = {
 
 const serviceWith2Devices = {
   get: () => {
-    return [ devices[0], devices[1], ];
+    return [devices[0], devices[1]];
   },
 };
 
@@ -278,5 +278,5 @@ module.exports = {
   stateManagerFull,
   serviceWith0Devices,
   serviceWith2Devices,
-  serviceWithPlentyOfDevices
+  serviceWithPlentyOfDevices,
 };

@@ -20,7 +20,7 @@ async function poll(device) {
     await this.connect();
   }
   const vacbot = this.getVacbotFromExternalId(device.external_id);
-  
+
   // ERROR const vacbot = await this.getVacbotObj(device.external_id);
   if (vacbot.is_ready) {
     await Promise.mapSeries(device.features || [], (feature) => {
@@ -38,7 +38,6 @@ async function poll(device) {
       vacbot.run('GetChargeState'); // retrieve the charging status. Answer : { isCharging: 1, mode: 'slot' }
       vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
     });
-    
   }
   switch (vacbot.errorCode) {
     case '3': // String (see ecovacs-deebot.js/library/errorCodes.json)
