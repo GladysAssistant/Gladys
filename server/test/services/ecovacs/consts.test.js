@@ -211,6 +211,24 @@ const deviceManagerFull = {
   get: fake.resolves(true),
 };
 
+const serviceWith0Devices = {
+  get: () => {
+    return [];
+  },
+};
+
+const serviceWith2Devices = {
+  get: () => {
+    return [ devices[0], devices[1], ];
+  },
+};
+
+const serviceWithPlentyOfDevices = {
+  get: () => {
+    return devices;
+  },
+};
+
 const stateManagerWith0Devices = {
   get: (key, externalId) => {
     return undefined;
@@ -258,4 +276,7 @@ module.exports = {
   stateManagerWith0Devices,
   stateManagerWith2Devices,
   stateManagerFull,
+  serviceWith0Devices,
+  serviceWith2Devices,
+  serviceWithPlentyOfDevices
 };

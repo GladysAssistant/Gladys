@@ -9,8 +9,8 @@ const {
   serviceId,
   devices,
   variableOk,
-  stateManagerWith0Devices,
-  stateManagerWith2Devices,
+  serviceWith0Devices,
+  serviceWith2Devices,
 } = require('../../consts.test');
 
 const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
@@ -35,12 +35,12 @@ const EcovacsServiceEmpty = proxyquire('../../../../../services/ecovacs/index', 
 const gladysWith0Devices = {
   variable: variableOk,
   event,
-  stateManager: stateManagerWith0Devices,
+  device: serviceWith0Devices,
 };
 const gladysWith2Devices = {
   variable: variableOk,
   event,
-  stateManager: stateManagerWith2Devices,
+  device: serviceWith2Devices,
 };
 
 describe('Ecovacs : vacbot discovering', () => {
