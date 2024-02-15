@@ -12,40 +12,59 @@ const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_PASSWORD_KEY: 'ZWAVEJS_UI_MQTT_PASSWORD',
 };
 
+/**
+ * Convert a zWave value format to the
+ * Gladys format.
+ */
 const STATES = {
   binary_switch: {
     currentvalue: (val) => {
-      switch(val) {
-        case STATE.OFF: return false;
-        case STATE.ON:  return true;
-        case false: return STATE.OFF;
-        case true: return STATE.ON;
-        default: return val;
+      switch (val) {
+        case false:
+          return STATE.OFF;
+        case true:
+          return STATE.ON;
+        default:
+          return val;
       }
     },
   },
   multilevel_sensor: {
-    air_temperature: val => val
+    air_temperature: (val) => val,
   },
   notification: {
     access_control: {
       door_state_simple: (val) => {
-        switch(val) {
-          case 22: return OPENING_SENSOR_STATE.OPEN;
-          case 23: return OPENING_SENSOR_STATE.CLOSE;
-          default: return val;
+        switch (val) {
+          case 22:
+            return OPENING_SENSOR_STATE.OPEN;
+          case 23:
+            return OPENING_SENSOR_STATE.CLOSE;
+          default:
+            return val;
         }
       },
     },
   },
 };
 
+/**
+ * Convert value from Gladys format to
+ * the Zwave MQTT expected format.
+ */
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
       getName: (_nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => {
-        return [STATES.binary_switch.currentvalue(value)];
+        switch (value) {
+          case `${STATE.OFF}`:
+            return [false];
+          case `${STATE.ON}`:
+            return [true];
+          default:
+            return [value];
+        }
       },
     },
   },
@@ -73,7 +92,7 @@ const EXPOSES = {
       keep_history: true,
       read_only: true,
       has_feedback: true,
-    }
+    },
   },
   notification: {
     access_control: {

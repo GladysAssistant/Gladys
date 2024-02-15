@@ -213,3 +213,35 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
   });
 });
+it('should save a new air temperature value', async () => {
+  const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+  zwaveJSUIHandler.devices = [
+    {
+      external_id: 'zwavejs-ui:2',
+      features: [
+        {
+          external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
+        },
+      ],
+    },
+  ];
+
+  await zwaveJSUIHandler.onNodeValueUpdated({
+    data: [
+      { id: 2 },
+      {
+        commandClassName: 'Multilevel Sensor',
+        commandClass: 49,
+        property: 'Air temperature',
+        endpoint: 0,
+        newValue: 20.8,
+        prevValue: 17.5,
+        propertyName: 'Air temperature',
+      },
+    ],
+  });
+  assert.calledWith(gladys.event.emit, 'device.new-state', {
+    device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
+    state: 20.8,
+  });
+});
