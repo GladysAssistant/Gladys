@@ -18,6 +18,7 @@ const get = require('get-value');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const { setTimeout: promiseSetTimeout } = require('timers/promises');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
@@ -39,17 +40,6 @@ const { evaluate } = create({
   smallerEqDependencies,
   roundDependencies,
 });
-
-/**
- * @description Let use setTimeout as blocking method with Promise.
- * @param {number} ms - Number of ms to wait.
- * @returns {Promise} Returns a promise that will resolve after N ms.
- * @example
- * timeout(500);
- */
-function timeout(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
@@ -149,14 +139,14 @@ const actionsFunc = {
         );
         const oldValue = deviceFeature.last_value;
         let newValue = 0;
+        /* eslint-disable no-await-in-loop */
+        // We want this loops to be sequential
         for (let i = 0; i < blinkingTime * 1000; i += blinkingInterval) {
           newValue = 1 - newValue;
-          console.log("blink");
           await self.device.setValue(device, deviceFeature, newValue);
-          console.log("wait");
-          await timeout(blinkingInterval);
-          console.log("end wait");
+          await promiseSetTimeout(blinkingInterval);
         }
+        /* eslint-enable no-await-in-loop */
         await self.device.setValue(device, deviceFeature, oldValue);
       } catch (e) {
         logger.warn(e);
