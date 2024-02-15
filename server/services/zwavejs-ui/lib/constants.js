@@ -102,8 +102,8 @@ const EXPOSES = {
       max: 5000,
       keep_history: true,
       read_only: true,
-      has_feedback: false
-    }
+      has_feedback: false,
+    },
   },
   notification: {
     access_control: {
