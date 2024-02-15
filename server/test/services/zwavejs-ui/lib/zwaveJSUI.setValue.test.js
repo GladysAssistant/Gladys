@@ -5,6 +5,7 @@ const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
 const { BadParameters } = require('../../../../utils/coreErrors');
+const { STATE } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -165,7 +166,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     await zwaveJSUIHandler.setValue(
       { external_id: 'zwavejs-ui:3' },
       { external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue' },
-      '0',
+      STATE.OFF,
     );
 
     const mqttPayload = {
@@ -218,7 +219,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     await zwaveJSUIHandler.setValue(
       { external_id: 'zwavejs-ui:3' },
       { external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue' },
-      '1',
+      STATE.ON,
     );
 
     const mqttPayload = {

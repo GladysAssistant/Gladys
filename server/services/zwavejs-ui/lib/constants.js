@@ -31,6 +31,7 @@ const STATES = {
   },
   multilevel_sensor: {
     air_temperature: (val) => val,
+    power: (val) => val,
   },
   notification: {
     access_control: {
@@ -58,9 +59,9 @@ const COMMANDS = {
       getName: (_nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => {
         switch (value) {
-          case `${STATE.OFF}`:
+          case STATE.OFF:
             return [false];
-          case `${STATE.ON}`:
+          case STATE.ON:
             return [true];
           default:
             return [value];
@@ -93,6 +94,16 @@ const EXPOSES = {
       read_only: true,
       has_feedback: true,
     },
+    power: {
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+      unit: DEVICE_FEATURE_UNITS.WATT,
+      min: 0,
+      max: 5000,
+      keep_history: true,
+      read_only: true,
+      has_feedback: false
+    }
   },
   notification: {
     access_control: {

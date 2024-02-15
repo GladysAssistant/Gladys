@@ -245,3 +245,36 @@ it('should save a new air temperature value', async () => {
     state: 20.8,
   });
 });
+
+it('should save a new power value', async () => {
+  const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+  zwaveJSUIHandler.devices = [
+    {
+      external_id: 'zwavejs-ui:2',
+      features: [
+        {
+          external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
+        },
+      ],
+    },
+  ];
+
+  await zwaveJSUIHandler.onNodeValueUpdated({
+    data: [
+      { id: 2 },
+      {
+        commandClassName: 'Multilevel Sensor',
+        commandClass: 49,
+        property: 'Power',
+        endpoint: 0,
+        newValue: 1.7,
+        prevValue: 0,
+        propertyName: 'Power',
+      },
+    ],
+  });
+  assert.calledWith(gladys.event.emit, 'device.new-state', {
+    device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
+    state: 1.7,
+  });
+});

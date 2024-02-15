@@ -51,7 +51,7 @@ function getNodeFeature(node, nodeFeatureId) {
  * @description Set the new device value from Gladys to MQTT.
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
- * @param {string} value - The new device feature value.
+ * @param {string|number} value - The new device feature value.
  * @returns {Promise} - The execution promise.
  * @example
  * setValue(device, deviceFeature, 0);
