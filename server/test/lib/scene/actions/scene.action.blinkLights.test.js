@@ -1,21 +1,23 @@
-/*
-const { fake, assert } = require('sinon');
+const { fake, assert, useFakeTimers } = require('sinon');
 const EventEmitter = require('events');
-const proxyquire = require('proxyquire').noCallThru();
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { executeActions } = require('../../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
-const { executeActions } = proxyquire('../../../../lib/scene/scene.executeActions', {
-  'timers/promises': {
-    setTimeout: () => fake.returns(null)
-  }
-});
-
 describe('scene.blink-lights', () => {
+  let clock;
+
+  beforeEach(() => {
+    clock = useFakeTimers();
+  });
+
+  afterEach(() => {
+    clock.restore();
+  });
 
   it('should blink light in slow mode', async () => {
     const stateManager = new StateManager(event);
@@ -36,7 +38,7 @@ describe('scene.blink-lights', () => {
     stateManager.setState('device', 'light-1', device);
 
     const scope = {};
-    await executeActions(
+    executeActions(
       { stateManager, event, device },
       [
         [
@@ -50,9 +52,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
+    await clock.tickAsync(3000);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 3);
+    assert.callCount(device.setValue, 4);
   });
 
   it('should blink light in medium mode', async () => {
@@ -74,7 +77,7 @@ describe('scene.blink-lights', () => {
     stateManager.setState('device', 'light-1', device);
 
     const scope = {};
-    await executeActions(
+    executeActions(
       { stateManager, event, device },
       [
         [
@@ -88,9 +91,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
+    await clock.tickAsync(3000);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 5);
+    assert.callCount(device.setValue, 6);
   });
 
   it('should blink light in fast mode', async () => {
@@ -112,7 +116,7 @@ describe('scene.blink-lights', () => {
     stateManager.setState('device', 'light-1', device);
 
     const scope = {};
-    await executeActions(
+    executeActions(
       { stateManager, event, device },
       [
         [
@@ -126,9 +130,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
+    await clock.tickAsync(3000);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 11);
+    assert.callCount(device.setValue, 12);
   });
 
   it('should blink light in unknown mode', async () => {
@@ -150,7 +155,7 @@ describe('scene.blink-lights', () => {
     stateManager.setState('device', 'light-1', device);
 
     const scope = {};
-    await executeActions(
+    executeActions(
       { stateManager, event, device },
       [
         [
@@ -164,9 +169,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
+    await clock.tickAsync(3000);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 11);
+    assert.callCount(device.setValue, 12);
   });
 
   it('should throw error when blinking light', async () => {
@@ -198,4 +204,3 @@ describe('scene.blink-lights', () => {
     assert.notCalled(device.setValue);
   });
 });
-*/

@@ -18,7 +18,6 @@ const get = require('get-value');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { setTimeout: promiseSetTimeout } = require('timers/promises');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
@@ -113,7 +112,7 @@ const actionsFunc = {
   },
   [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
     const blinkingSpeed = action.blinking_speed;
-    const blinkingTime = action.blinking_time;
+    const blinkingTime = action.blinking_time * 1000 + 1;
     let blinkingInterval;
     switch (blinkingSpeed) {
       case 'slow':
@@ -141,10 +140,10 @@ const actionsFunc = {
         let newValue = 0;
         /* eslint-disable no-await-in-loop */
         // We want this loops to be sequential
-        for (let i = 0; i < blinkingTime * 1000; i += blinkingInterval) {
+        for (let i = 0; i < blinkingTime; i += blinkingInterval) {
           newValue = 1 - newValue;
           await self.device.setValue(device, deviceFeature, newValue);
-          await promiseSetTimeout(blinkingInterval);
+          await new Promise((resolve) => setTimeout(resolve, blinkingInterval));
         }
         /* eslint-enable no-await-in-loop */
         await self.device.setValue(device, deviceFeature, oldValue);
