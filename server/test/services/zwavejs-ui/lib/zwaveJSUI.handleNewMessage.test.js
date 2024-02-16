@@ -38,26 +38,15 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/getNodes', 'toto');
   });
-  it('should save a new open value', async () => {
+
+  it('should call onNodeValueUpdated', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    const sut = sinon.stub(zwaveJSUIHandler, 'onNodeValueUpdated').resolves();
     await zwaveJSUIHandler.handleNewMessage(
-      'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":22, "nodeId": 2}',
+      'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
+      JSON.stringify({}),
     );
-    assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
-      state: 0,
-    });
-  });
-  it('should save a new closed value', async () => {
-    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
-    await zwaveJSUIHandler.handleNewMessage(
-      'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":23, "nodeId": 2}',
-    );
-    assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
-      state: 1,
-    });
+
+    assert.calledOnce(sut);
   });
 });

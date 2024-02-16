@@ -24,7 +24,13 @@
           "id": "8765432109",
           "name": "Extérieur",
           "type": "outdoor",
-          "module_ids": ["70:ee:00:xx:xx:xx", "02:00:00:xx:xx:xx", "05:00:00:xx:xx:xx", "06:00:00:xx:xx:xx"]
+          "module_ids": [
+            "70:ee:00:xx:xx:xx",
+            "02:00:00:xx:xx:xx",
+            "05:00:00:xx:xx:xx",
+            "06:00:00:xx:xx:xx",
+            "09:00:00:xx:xx:xx"
+          ]
         }
       ],
       "modules": [
@@ -56,6 +62,14 @@
           "type": "NAPlug",
           "name": "Relais Salon Test",
           "setup_date": 1578496638
+        },
+        {
+          "id": "09:00:00:xx:xx:xx",
+          "type": "NRV",
+          "name": "Valve Test",
+          "setup_date": 1705912152,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:yy:yy:yy"
         }
       ],
       "temperature_control_mode": "heating",

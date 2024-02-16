@@ -703,7 +703,7 @@
       },
       "setup": {
         "title": "Zigbee2mqtt configuration",
-        "description": "This service uses two independent docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
+        "description": "This service uses two independent Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
         "enableLabel": "Zigbee2mqtt activation",
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
@@ -765,9 +765,9 @@
       },
       "setup": {
         "title": "Node-RED configuration",
-        "description": "This service uses docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
+        "description": "This service uses Docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
         "descriptionBackup": "For the moment, Node-RED is not backup into Gladys Plus.\nIf you want a backup for Node-RED, please follow this <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">docs</a>",
-        "error": "An error occured while starting  Node-RED.",
+        "error": "An error occured while starting Node-RED.",
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
@@ -1037,7 +1037,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration is in alpha and currently only supports one device: The Fibaro Door/Window sensor. We welcome any assistance to integrate other devices!",
+      "alphaWarning": "This integration is in alpha and currently only supports few devices. We welcome any assistance to integrate other devices!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
@@ -1046,7 +1046,7 @@
       },
       "discover": {
         "title": "Devices detected on your Z-Wave JS UI instance",
-        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name and a 'location' are displayed here. If you edit these settings, you will need to re-pair the device in Gladys.",
+        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name are displayed here.",
         "error": "Error discovering Z-Wave JS UI devices. Is your MQTT broker available and accessible?",
         "noDeviceFound": "No Z-Wave JS UI devices were discovered.",
         "errorWhileScanning": "An error occurred during discovery.",
@@ -1625,7 +1625,7 @@
     "iconLabel": "Icon",
     "editDescriptionPlaceholder": "Enter a scene description",
     "tagsTitle": "Tags",
-    "editTagsPlaceholder": "Enter a scene tags",
+    "editTagsPlaceholder": "Enter or choose a tag scene",
     "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
