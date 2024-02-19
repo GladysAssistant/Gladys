@@ -2,6 +2,7 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 
 const BATTERY_FEATURE_INDEX = 1;
+const CLEAN_REPORT_FEATURE_INDEX = 2;
 
 /**
  * @description Ecovacs onMessage callback.
@@ -21,6 +22,10 @@ function onMessage(type, device, value) {
       break;
     case 'CleanReport':
       logger.trace(`CleanReport: ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${device.features[CLEAN_REPORT_FEATURE_INDEX].external_id}`,
+        text: value,
+      });
       break;
     default:
       logger.info(`Event ${type} with value "${value}" is not handled yet.`);

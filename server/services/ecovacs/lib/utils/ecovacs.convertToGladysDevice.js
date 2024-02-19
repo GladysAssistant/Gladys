@@ -61,6 +61,18 @@ const convertToGladysDevice = (serviceId, device) => {
         min: 0,
         max: 100,
       },
+      {
+        name: 'report',
+        selector: `ecovacs:${device.pid}:${DEVICE_FEATURE_TYPES.VACBOT.CLEAN_REPORT}:${device.deviceNumber}`,
+        external_id: `ecovacs:${device.pid}:${DEVICE_FEATURE_TYPES.VACBOT.CLEAN_REPORT}:${device.deviceNumber}`,
+        category: DEVICE_FEATURE_CATEGORIES.VACBOT,
+        type: DEVICE_FEATURE_TYPES.VACBOT.CLEAN_REPORT,
+        read_only: true,
+        keep_history: false,
+        has_feedback: false,
+        min: 0,
+        max: 1,
+      },
     ],
   };
 };
