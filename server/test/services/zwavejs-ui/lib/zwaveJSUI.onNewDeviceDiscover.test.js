@@ -34,6 +34,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
       {
         name: 'capteur-ouverture',
         external_id: 'zwavejs-ui:2',
+        selector: `zwavejs-ui:2:capteur-ouverture`,
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: false,
         features: [

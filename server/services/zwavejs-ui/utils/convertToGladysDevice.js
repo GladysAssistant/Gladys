@@ -55,6 +55,7 @@ const convertToGladysDevice = (serviceId, device) => {
   return {
     name: device.name,
     external_id: `zwavejs-ui:${device.id}`,
+    selector: `zwavejs-ui:${device.id}:${device.name}`,
     service_id: serviceId,
     should_poll: false,
     features,

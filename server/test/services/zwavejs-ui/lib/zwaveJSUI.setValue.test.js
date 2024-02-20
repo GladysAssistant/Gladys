@@ -135,6 +135,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       {
         name: 'prise01-wp',
         external_id: 'zwavejs-ui:3',
+        selector: 'zwavejs-ui:3:prise01-wp',
         service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
         should_poll: false,
         features: [
@@ -186,6 +187,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       {
         name: 'prise01-wp',
         external_id: 'zwavejs-ui:3',
+        selector: 'zwavejs-ui:3:prise01-wp',
         service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
         should_poll: false,
         features: [
