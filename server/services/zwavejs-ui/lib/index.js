@@ -4,9 +4,11 @@ const { disconnect } = require('./zwaveJSUI.disconnect');
 const { getConfiguration } = require('./zwaveJSUI.getConfiguration');
 const { handleNewMessage } = require('./zwaveJSUI.handleNewMessage');
 const { onNewDeviceDiscover } = require('./zwaveJSUI.onNewDeviceDiscover');
+const { onNodeValueUpdated } = require('./zwaveJSUI.onNodeValueUpdated');
 const { publish } = require('./zwaveJSUI.publish');
 const { scan } = require('./zwaveJSUI.scan');
 const { saveConfiguration } = require('./zwaveJSUI.saveConfiguration');
+const { setValue } = require('./zwaveJSUI.setValue');
 
 /**
  * @description Z-Wave JS UI handler.
@@ -32,8 +34,10 @@ ZwaveJSUIHandler.prototype.disconnect = disconnect;
 ZwaveJSUIHandler.prototype.getConfiguration = getConfiguration;
 ZwaveJSUIHandler.prototype.handleNewMessage = handleNewMessage;
 ZwaveJSUIHandler.prototype.onNewDeviceDiscover = onNewDeviceDiscover;
+ZwaveJSUIHandler.prototype.onNodeValueUpdated = onNodeValueUpdated;
 ZwaveJSUIHandler.prototype.publish = publish;
 ZwaveJSUIHandler.prototype.scan = scan;
 ZwaveJSUIHandler.prototype.saveConfiguration = saveConfiguration;
+ZwaveJSUIHandler.prototype.setValue = setValue;
 
 module.exports = ZwaveJSUIHandler;

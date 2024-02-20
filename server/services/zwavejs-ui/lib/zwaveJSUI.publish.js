@@ -7,7 +7,7 @@ const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
  * @param {string} message - MQTT message.
  * @example zwaveJSUI.publish('zwave/test', '{}');
  */
-async function publish(topic, message) {
+function publish(topic, message) {
   if (!this.mqttClient) {
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }

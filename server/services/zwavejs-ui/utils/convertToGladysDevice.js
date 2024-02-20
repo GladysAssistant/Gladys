@@ -13,8 +13,12 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
-const getDeviceFeatureExternalId = (nodeId, endpoint, comClass, property, propertyKey) =>
-  `zwavejs-ui:${nodeId}:${endpoint}:${comClass}:${property}:${propertyKey}`;
+const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName) => {
+  const propertyKeyNameClean = cleanNames(propertyKeyName);
+  return `zwavejs-ui:${nodeId}:${endpoint}:${cleanNames(commandClassName)}:${cleanNames(propertyName)}${
+    propertyKeyNameClean !== '' ? `:${propertyKeyNameClean}` : ''
+  }`;
+};
 
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
@@ -22,22 +26,28 @@ const convertToGladysDevice = (serviceId, device) => {
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(device.values).forEach((valueKey) => {
     const value = device.values[valueKey];
-    const { commandClassName, property, propertyKey, endpoint } = value;
+    const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
     const commandClassNameClean = cleanNames(commandClassName);
-    const propertyClean = cleanNames(property);
-    const propertyKeyClean = cleanNames(propertyKey);
-    const exposeFound = get(EXPOSES, `${commandClassNameClean}.${propertyClean}.${propertyKeyClean}`);
+    const propertyClean = cleanNames(propertyName);
+    const propertyKeyClean = cleanNames(propertyKeyName);
+    let exposePath = `${commandClassNameClean}.${propertyClean}`;
+    if (propertyKeyClean !== '') {
+      exposePath += `.${propertyKeyClean}`;
+    }
+    const exposeFound = get(EXPOSES, exposePath);
     if (exposeFound) {
       features.push({
         ...exposeFound,
         name: value.id,
-        external_id: getDeviceFeatureExternalId(
-          device.id,
-          endpoint,
-          commandClassNameClean,
-          propertyClean,
-          propertyKeyClean,
-        ),
+        external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
+        node_id: device.id,
+        // These are custom properties only available on the object in memory (not in DB)
+        command_class_version: commandClassVersion,
+        command_class_name: commandClassName,
+        command_class: commandClass,
+        endpoint,
+        property_name: propertyName,
+        property_key_name: propertyKeyName,
       });
     }
   });
@@ -53,6 +63,6 @@ const convertToGladysDevice = (serviceId, device) => {
 
 module.exports = {
   cleanNames,
-  getDeviceFeatureExternalId,
+  getDeviceFeatureId,
   convertToGladysDevice,
 };

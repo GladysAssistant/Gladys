@@ -111,6 +111,18 @@
         "max": 50
       },
       {
+        "name": "Link RF quality - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Setpoint temperature - Thermostat Test",
         "external_id": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
         "selector": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
@@ -134,18 +146,6 @@
         "has_feedback": false,
         "min": 0,
         "max": 1
-      },
-      {
-        "name": "Link RF quality - Thermostat Test",
-        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       },
       {
         "name": "Boiler status - Thermostat Test",
@@ -236,6 +236,113 @@
       {
         "name": "home_id",
         "value": "5e1xxxxxxxxxxxxxxxxx"
+      }
+    ]
+  },
+  {
+    "name": "Valve Test",
+    "external_id": "netatmo:09:00:00:xx:xx:xx",
+    "selector": "netatmo:09:00:00:xx:xx:xx",
+    "model": "NRV",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:battery_percent",
+        "selector": "netatmo:09:00:00:xx:xx:xx:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - room Office",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
+        "selector": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Link RF quality - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Setpoint temperature - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:therm_setpoint_temperature",
+        "selector": "netatmo:09:00:00:xx:xx:xx:therm_setpoint_temperature",
+        "category": "thermostat",
+        "type": "target-temperature",
+        "unit": "celsius",
+        "read_only": false,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 5,
+        "max": 30
+      },
+      {
+        "name": "Detecting open window - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:open_window",
+        "selector": "netatmo:09:00:00:xx:xx:xx:open_window",
+        "category": "opening-sensor",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "name": "Heating power request - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:heating_power_request",
+        "selector": "netatmo:09:00:00:xx:xx:xx:heating_power_request",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:yy:yy:yy"
+      },
+      {
+        "name": "plug_name",
+        "value": "Relais Salon Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Office"
       }
     ]
   },
