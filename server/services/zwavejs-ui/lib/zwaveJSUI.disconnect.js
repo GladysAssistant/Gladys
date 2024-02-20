@@ -4,7 +4,7 @@ const logger = require('../../../utils/logger');
  * @description This function will disconnect the MQTT broker.
  * @example zwaveJSUI.disconnect();
  */
-async function disconnect() {
+function disconnect() {
   this.connected = false;
 
   if (this.mqttClient) {

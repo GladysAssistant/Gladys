@@ -1695,7 +1695,7 @@
     "iconLabel": "Symbol",
     "editDescriptionPlaceholder": "Gib eine Beschreibung für die Szene ein",
     "tagsTitle": "Tags",
-    "editTagsPlaceholder": "Gib Tags für die Szene ein",
+    "editTagsPlaceholder": "Geben Sie ein Tag für die Szene ein oder wählen Sie es aus",
     "createTag": "Tag erstellen: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Sichern",

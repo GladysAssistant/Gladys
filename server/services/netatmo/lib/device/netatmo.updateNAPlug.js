@@ -15,7 +15,7 @@ async function updateNAPlug(deviceGladys, deviceNetatmo, externalId) {
       .filter((feature) => feature.external_id === `${externalId}:rf_strength`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:rf_strength`,
+          device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](deviceNetatmo.rf_strength),
         });
       });
@@ -24,7 +24,7 @@ async function updateNAPlug(deviceGladys, deviceNetatmo, externalId) {
       .filter((feature) => feature.external_id === `${externalId}:wifi_strength`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:wifi_strength`,
+          device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](deviceNetatmo.wifi_strength),
         });
       });
@@ -33,12 +33,12 @@ async function updateNAPlug(deviceGladys, deviceNetatmo, externalId) {
       .forEach((feature) => {
         if (typeof deviceNetatmo.plug_connected_boiler !== 'undefined') {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: `${externalId}:plug_connected_boiler`,
+            device_feature_external_id: feature.external_id,
             state: readValues[feature.category][feature.type](deviceNetatmo.plug_connected_boiler),
           });
         } else {
           this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: `${externalId}:plug_connected_boiler`,
+            device_feature_external_id: feature.external_id,
             state: readValues[feature.category][feature.type](false),
           });
         }

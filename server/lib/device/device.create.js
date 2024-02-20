@@ -67,7 +67,7 @@ async function create(device) {
 
   const deviceFeaturesIdsToPurge = [];
 
-  // we execute the whole insert in a transaction to avoir inconsistent state
+  // we execute the whole insert in a transaction to avoid inconsistent state
   await db.sequelize.transaction(async (transaction) => {
     // external_id is a required parameter
     if (!device.external_id) {
