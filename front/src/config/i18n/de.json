@@ -2993,6 +2993,7 @@
     "vacbot": {
       "shortCategoryName": "Vacbot",
       "state": "Vacbot state",
+      "clean-report": "Berichterstattung",
       "integer": "Batterie Level",
       "binary": "Power",
       "map": "Standort",

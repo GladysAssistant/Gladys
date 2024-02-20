@@ -2995,6 +2995,7 @@
     "vacbot": {
       "shortCategoryName": "Vacbot",
       "state": "Vacbot state",
+      "clean-report": "Reporting",
       "integer": "Battery level",
       "binary": "Power",
       "map": "Location",

@@ -2996,7 +2996,8 @@
     },
     "vacbot": {
       "shortCategoryName": "Aspirateur Robot",
-      "state": "Etat de l'aspirateur robot",
+      "state": "Contrôles de l'aspirateur robot",
+      "clean-report": "Rapport",
       "integer": "Niveau de charge de la batterie",
       "binary": "Power",
       "map": "Localisation",
