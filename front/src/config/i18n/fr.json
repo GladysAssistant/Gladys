@@ -660,7 +660,9 @@
           "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
           "invalid_client": "Identifiant client invalide. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Weather\" dans le but d'avoir accès à la totalité des informations de votre station.",
+        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils."
       },
       "device": {
         "title": "Appareils Netatmo dans Gladys",
@@ -675,12 +677,13 @@
         "roomNetatmoApiLabel": "Pièce dans l'API Netatmo",
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
+        "saveNotAllowButton": "Sauvegarde impossible",
         "deleteButton": "Supprimer",
         "noValueReceived": "Aucune valeur reçue."
       },
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
-        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats associés à leur Plug. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats et les vannes associés à leur Plug (API Energy) ainsi que les stations météo et leurs modules (API Weather). S'il vous manque des appareils, veuillez vérifier que vous avez bien sélectionné les bonnes API dans la page de configuration. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
         "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
         "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
         "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous êtes certains de posséder un appareil Netatmo supporté par Gladys, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",

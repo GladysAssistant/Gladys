@@ -101,7 +101,8 @@
         "module_ids": ["01:00:00:xx:xx:xx"]
       },
       "plug": null,
-      "categoryAPI": "Energy"
+      "categoryAPI": "Energy",
+      "apiNotConfigured": true
     }
   }
 ]

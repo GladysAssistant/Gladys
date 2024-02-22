@@ -532,7 +532,9 @@
           "access_denied": "Autorisierung abgelehnt, bitte versuchen Sie es erneut und akzeptieren Sie den Zugriff auf Ihre Daten.",
           "invalid_client": "Ungültige Kunden-ID. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>.",
           "get_access_token_fail": "Falsche Informationen eingegeben oder Konto deaktiviert. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Weather\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Station zu erhalten.",
+        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten."
       },
       "device": {
         "title": "Netatmo-Geräte in Gladys",
@@ -547,12 +549,13 @@
         "roomNetatmoApiLabel": "Raum in der Netatmo-API",
         "featuresLabel": "Funktionen",
         "saveButton": "Speichern",
+        "saveNotAllowButton": "Speichern nicht möglich",
         "deleteButton": "Löschen",
         "noValueReceived": "Kein Wert empfangen."
       },
       "discover": {
         "title": "Ihre mit Gladys kompatiblen Netatmo-Geräte",
-        "description": "Ihre Netatmo-Geräte müssen zuerst zu Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate unterstützt, die mit ihrem Plug verbunden sind. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie die neuen Funktionen Ihrer Geräte abrufen möchten.",
+        "description": "Ihre Netatmo-Geräte müssen Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate und die damit verbundenen Ventile ihres Steckers (API Energy) sowie Wetterstationen und deren Module (API Weather) unterstützt. Wenn Ihnen Geräte fehlen, überprüfen Sie bitte, ob Sie die richtigen APIs auf der Konfigurationsseite ausgewählt haben. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie neue Funktionen Ihrer Geräte abrufen möchten.",
         "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
         "descriptionInformation": "Der Statusabruf erfolgt derzeit alle 2 Minuten (Einschränkung der Netatmo-API).",
         "noDeviceFound": "Keine Netatmo-Geräte gefunden. Wenn Sie sicher sind, dass Sie über ein von Gladys unterstütztes Netatmo-Gerät verfügen, um Ihre Geräte in der Netatmo-API zu registrieren?",

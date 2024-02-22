@@ -25,7 +25,7 @@ function convertDeviceEnergy(netatmoDevice) {
   const { home, name, type: model, room = {}, plug = {} } = netatmoDevice;
   const id = netatmoDevice.id || netatmoDevice._id;
   const homeId = home || netatmoDevice.home_id;
-  const nameDevice = name || netatmoDevice.module_name || netatmoDevice.station_name;
+  const nameDevice = name || netatmoDevice.module_name;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert Energy device "${nameDevice}, ${model}"`);
   const features = [];
@@ -38,8 +38,8 @@ function convertDeviceEnergy(netatmoDevice) {
     features.push(buildFeatureBattery(nameDevice, externalId));
     features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
-    const plugId = plug.id || plug._id || undefined;
-    const plugName = plug.name || plug.module_name || plug.station_name;
+    const plugId = plug.id || plug._id;
+    const plugName = plug.name || plug.module_name;
     if (plugId) {
       params = [
         { name: PARAMS.PLUG_ID, value: plugId },

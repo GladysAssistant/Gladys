@@ -60,7 +60,50 @@
             "date_max_temp": 1706524020,
             "date_min_temp": 1706487105,
             "temp_trend": "up"
-          }
+          },
+          "home_id": "5e1xxxxxxxxxxxxxxxxx",
+          "plug": {
+            "_id": "70:ee:50:jj:jj:jj",
+            "categoryAPI": "Weather",
+            "apiNotConfigured": true,
+            "co2_calibrating": false,
+            "dashboard_data": {
+              "AbsolutePressure": 1007.8,
+              "CO2": 506,
+              "Humidity": 51,
+              "Noise": 32,
+              "Pressure": 1022.5,
+              "Temperature": 20.1,
+              "date_max_temp": 1706396673,
+              "date_min_temp": 1706420184,
+              "max_temp": 20.7,
+              "min_temp": 18.5,
+              "pressure_trend": "down",
+              "temp_trend": "stable",
+              "time_utc": 1706464169
+            },
+            "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+            "date_setup": 1605564990,
+            "firmware": 202,
+            "home_id": "5e1xxxxxxxxxxxxxxxxx",
+            "home_name": "Maison STARK",
+            "last_setup": 1605564990,
+            "last_status_store": 1706464170,
+            "module_name": "Weather Station Test",
+            "place": {
+              "altitude": 50,
+              "city": "Ville Test",
+              "country": "FR",
+              "location": [1.234, 2.345],
+              "timezone": "Europe/Paris"
+            },
+            "reachable": true,
+            "station_name": "Maison STARK (Weather Station Test)",
+            "type": "NAMain",
+            "wifi_status": 39
+          },
+          "categoryAPI": "Weather",
+          "apiNotConfigured": true
         },
         {
           "_id": "06:00:00:yy:yy:yy",
@@ -84,7 +127,50 @@
             "max_wind_str": 11,
             "max_wind_angle": 137,
             "date_max_wind_str": 1706714453
-          }
+          },
+          "home_id": "5e1xxxxxxxxxxxxxxxxx",
+          "plug": {
+            "_id": "70:ee:50:jj:jj:jj",
+            "categoryAPI": "Weather",
+            "apiNotConfigured": true,
+            "co2_calibrating": false,
+            "dashboard_data": {
+              "AbsolutePressure": 1007.8,
+              "CO2": 506,
+              "Humidity": 51,
+              "Noise": 32,
+              "Pressure": 1022.5,
+              "Temperature": 20.1,
+              "date_max_temp": 1706396673,
+              "date_min_temp": 1706420184,
+              "max_temp": 20.7,
+              "min_temp": 18.5,
+              "pressure_trend": "down",
+              "temp_trend": "stable",
+              "time_utc": 1706464169
+            },
+            "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+            "date_setup": 1605564990,
+            "firmware": 202,
+            "home_id": "5e1xxxxxxxxxxxxxxxxx",
+            "home_name": "Maison STARK",
+            "last_setup": 1605564990,
+            "last_status_store": 1706464170,
+            "module_name": "Weather Station Test",
+            "place": {
+              "altitude": 50,
+              "city": "Ville Test",
+              "country": "FR",
+              "location": [1.234, 2.345],
+              "timezone": "Europe/Paris"
+            },
+            "reachable": true,
+            "station_name": "Maison STARK (Weather Station Test)",
+            "type": "NAMain",
+            "wifi_status": 39
+          },
+          "categoryAPI": "Weather",
+          "apiNotConfigured": true
         },
         {
           "_id": "05:00:00:yy:yy:yy",
@@ -104,7 +190,50 @@
             "Rain": 0.101,
             "sum_rain_1": 0.505,
             "sum_rain_24": 0.1
-          }
+          },
+          "home_id": "5e1xxxxxxxxxxxxxxxxx",
+          "plug": {
+            "_id": "70:ee:50:jj:jj:jj",
+            "categoryAPI": "Weather",
+            "apiNotConfigured": true,
+            "co2_calibrating": false,
+            "dashboard_data": {
+              "AbsolutePressure": 1007.8,
+              "CO2": 506,
+              "Humidity": 51,
+              "Noise": 32,
+              "Pressure": 1022.5,
+              "Temperature": 20.1,
+              "date_max_temp": 1706396673,
+              "date_min_temp": 1706420184,
+              "max_temp": 20.7,
+              "min_temp": 18.5,
+              "pressure_trend": "down",
+              "temp_trend": "stable",
+              "time_utc": 1706464169
+            },
+            "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+            "date_setup": 1605564990,
+            "firmware": 202,
+            "home_id": "5e1xxxxxxxxxxxxxxxxx",
+            "home_name": "Maison STARK",
+            "last_setup": 1605564990,
+            "last_status_store": 1706464170,
+            "module_name": "Weather Station Test",
+            "place": {
+              "altitude": 50,
+              "city": "Ville Test",
+              "country": "FR",
+              "location": [1.234, 2.345],
+              "timezone": "Europe/Paris"
+            },
+            "reachable": true,
+            "station_name": "Maison STARK (Weather Station Test)",
+            "type": "NAMain",
+            "wifi_status": 39
+          },
+          "categoryAPI": "Weather",
+          "apiNotConfigured": true
         },
         {
           "_id": "03:00:00:yy:yy:yy",
@@ -129,12 +258,57 @@
             "date_max_temp": 1706513445,
             "date_min_temp": 1706503755,
             "temp_trend": "stable"
-          }
+          },
+          "home_id": "5e1xxxxxxxxxxxxxxxxx",
+          "plug": {
+            "_id": "70:ee:50:jj:jj:jj",
+            "categoryAPI": "Weather",
+            "apiNotConfigured": true,
+            "co2_calibrating": false,
+            "dashboard_data": {
+              "AbsolutePressure": 1007.8,
+              "CO2": 506,
+              "Humidity": 51,
+              "Noise": 32,
+              "Pressure": 1022.5,
+              "Temperature": 20.1,
+              "date_max_temp": 1706396673,
+              "date_min_temp": 1706420184,
+              "max_temp": 20.7,
+              "min_temp": 18.5,
+              "pressure_trend": "down",
+              "temp_trend": "stable",
+              "time_utc": 1706464169
+            },
+            "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+            "date_setup": 1605564990,
+            "firmware": 202,
+            "home_id": "5e1xxxxxxxxxxxxxxxxx",
+            "home_name": "Maison STARK",
+            "last_setup": 1605564990,
+            "last_status_store": 1706464170,
+            "module_name": "Weather Station Test",
+            "place": {
+              "altitude": 50,
+              "city": "Ville Test",
+              "country": "FR",
+              "location": [1.234, 2.345],
+              "timezone": "Europe/Paris"
+            },
+            "reachable": true,
+            "station_name": "Maison STARK (Weather Station Test)",
+            "type": "NAMain",
+            "wifi_status": 39
+          },
+          "categoryAPI": "Weather",
+          "apiNotConfigured": true
         }
-      ]
+      ],
+      "categoryAPI": "Weather",
+      "apiNotConfigured": true
     }
   ],
-  "modules": [
+  "modulesWeatherStations": [
     {
       "_id": "02:00:00:yy:yy:yy",
       "type": "NAModule1",
@@ -157,7 +331,50 @@
         "date_max_temp": 1706524020,
         "date_min_temp": 1706487105,
         "temp_trend": "up"
-      }
+      },
+      "home_id": "5e1xxxxxxxxxxxxxxxxx",
+      "plug": {
+        "_id": "70:ee:50:jj:jj:jj",
+        "categoryAPI": "Weather",
+        "apiNotConfigured": true,
+        "co2_calibrating": false,
+        "dashboard_data": {
+          "AbsolutePressure": 1007.8,
+          "CO2": 506,
+          "Humidity": 51,
+          "Noise": 32,
+          "Pressure": 1022.5,
+          "Temperature": 20.1,
+          "date_max_temp": 1706396673,
+          "date_min_temp": 1706420184,
+          "max_temp": 20.7,
+          "min_temp": 18.5,
+          "pressure_trend": "down",
+          "temp_trend": "stable",
+          "time_utc": 1706464169
+        },
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+        "date_setup": 1605564990,
+        "firmware": 202,
+        "home_id": "5e1xxxxxxxxxxxxxxxxx",
+        "home_name": "Maison STARK",
+        "last_setup": 1605564990,
+        "last_status_store": 1706464170,
+        "module_name": "Weather Station Test",
+        "place": {
+          "altitude": 50,
+          "city": "Ville Test",
+          "country": "FR",
+          "location": [1.234, 2.345],
+          "timezone": "Europe/Paris"
+        },
+        "reachable": true,
+        "station_name": "Maison STARK (Weather Station Test)",
+        "type": "NAMain",
+        "wifi_status": 39
+      },
+      "categoryAPI": "Weather",
+      "apiNotConfigured": true
     },
     {
       "_id": "06:00:00:yy:yy:yy",
@@ -181,7 +398,50 @@
         "max_wind_str": 11,
         "max_wind_angle": 137,
         "date_max_wind_str": 1706714453
-      }
+      },
+      "home_id": "5e1xxxxxxxxxxxxxxxxx",
+      "plug": {
+        "_id": "70:ee:50:jj:jj:jj",
+        "categoryAPI": "Weather",
+        "apiNotConfigured": true,
+        "co2_calibrating": false,
+        "dashboard_data": {
+          "AbsolutePressure": 1007.8,
+          "CO2": 506,
+          "Humidity": 51,
+          "Noise": 32,
+          "Pressure": 1022.5,
+          "Temperature": 20.1,
+          "date_max_temp": 1706396673,
+          "date_min_temp": 1706420184,
+          "max_temp": 20.7,
+          "min_temp": 18.5,
+          "pressure_trend": "down",
+          "temp_trend": "stable",
+          "time_utc": 1706464169
+        },
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+        "date_setup": 1605564990,
+        "firmware": 202,
+        "home_id": "5e1xxxxxxxxxxxxxxxxx",
+        "home_name": "Maison STARK",
+        "last_setup": 1605564990,
+        "last_status_store": 1706464170,
+        "module_name": "Weather Station Test",
+        "place": {
+          "altitude": 50,
+          "city": "Ville Test",
+          "country": "FR",
+          "location": [1.234, 2.345],
+          "timezone": "Europe/Paris"
+        },
+        "reachable": true,
+        "station_name": "Maison STARK (Weather Station Test)",
+        "type": "NAMain",
+        "wifi_status": 39
+      },
+      "categoryAPI": "Weather",
+      "apiNotConfigured": true
     },
     {
       "_id": "05:00:00:yy:yy:yy",
@@ -201,7 +461,50 @@
         "Rain": 0.101,
         "sum_rain_1": 0.505,
         "sum_rain_24": 0.1
-      }
+      },
+      "home_id": "5e1xxxxxxxxxxxxxxxxx",
+      "plug": {
+        "_id": "70:ee:50:jj:jj:jj",
+        "categoryAPI": "Weather",
+        "apiNotConfigured": true,
+        "co2_calibrating": false,
+        "dashboard_data": {
+          "AbsolutePressure": 1007.8,
+          "CO2": 506,
+          "Humidity": 51,
+          "Noise": 32,
+          "Pressure": 1022.5,
+          "Temperature": 20.1,
+          "date_max_temp": 1706396673,
+          "date_min_temp": 1706420184,
+          "max_temp": 20.7,
+          "min_temp": 18.5,
+          "pressure_trend": "down",
+          "temp_trend": "stable",
+          "time_utc": 1706464169
+        },
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+        "date_setup": 1605564990,
+        "firmware": 202,
+        "home_id": "5e1xxxxxxxxxxxxxxxxx",
+        "home_name": "Maison STARK",
+        "last_setup": 1605564990,
+        "last_status_store": 1706464170,
+        "module_name": "Weather Station Test",
+        "place": {
+          "altitude": 50,
+          "city": "Ville Test",
+          "country": "FR",
+          "location": [1.234, 2.345],
+          "timezone": "Europe/Paris"
+        },
+        "reachable": true,
+        "station_name": "Maison STARK (Weather Station Test)",
+        "type": "NAMain",
+        "wifi_status": 39
+      },
+      "categoryAPI": "Weather",
+      "apiNotConfigured": true
     },
     {
       "_id": "03:00:00:yy:yy:yy",
@@ -226,7 +529,50 @@
         "date_max_temp": 1706513445,
         "date_min_temp": 1706503755,
         "temp_trend": "stable"
-      }
+      },
+      "home_id": "5e1xxxxxxxxxxxxxxxxx",
+      "plug": {
+        "_id": "70:ee:50:jj:jj:jj",
+        "categoryAPI": "Weather",
+        "apiNotConfigured": true,
+        "co2_calibrating": false,
+        "dashboard_data": {
+          "AbsolutePressure": 1007.8,
+          "CO2": 506,
+          "Humidity": 51,
+          "Noise": 32,
+          "Pressure": 1022.5,
+          "Temperature": 20.1,
+          "date_max_temp": 1706396673,
+          "date_min_temp": 1706420184,
+          "max_temp": 20.7,
+          "min_temp": 18.5,
+          "pressure_trend": "down",
+          "temp_trend": "stable",
+          "time_utc": 1706464169
+        },
+        "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+        "date_setup": 1605564990,
+        "firmware": 202,
+        "home_id": "5e1xxxxxxxxxxxxxxxxx",
+        "home_name": "Maison STARK",
+        "last_setup": 1605564990,
+        "last_status_store": 1706464170,
+        "module_name": "Weather Station Test",
+        "place": {
+          "altitude": 50,
+          "city": "Ville Test",
+          "country": "FR",
+          "location": [1.234, 2.345],
+          "timezone": "Europe/Paris"
+        },
+        "reachable": true,
+        "station_name": "Maison STARK (Weather Station Test)",
+        "type": "NAMain",
+        "wifi_status": 39
+      },
+      "categoryAPI": "Weather",
+      "apiNotConfigured": true
     }
   ]
 }

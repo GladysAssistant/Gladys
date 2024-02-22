@@ -45,7 +45,7 @@ function convertDeviceWeather(netatmoDevice) {
     features.push(buildFeatureBattery(nameDevice, externalId));
     features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
-    const plugId = plug.id || plug._id || undefined;
+    const plugId = plug.id || plug._id;
     const plugName = plug.name || plug.module_name || plug.station_name;
     if (plugId) {
       params = [

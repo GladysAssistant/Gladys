@@ -22,10 +22,20 @@ async function loadWeatherStationDetails() {
     weatherStations = body.devices;
     if (status === 'ok') {
       weatherStations.forEach((weatherStation) => {
+        if (!this.configuration.weatherApi) {
+          weatherStation.apiNotConfigured = true;
+        } else {
+          weatherStation.apiNotConfigured = false;
+        }
         weatherStation.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
         weatherStation.modules.forEach((module) => {
           const { modules, ...rest } = weatherStation;
           module.plug = rest;
+          if (!this.configuration.weatherApi) {
+            module.apiNotConfigured = true;
+          } else {
+            module.apiNotConfigured = false;
+          }
           module.home_id = weatherStation.home_id;
           module.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
         });

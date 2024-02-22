@@ -21,6 +21,7 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
   if (!reachable && typeof reachable !== 'undefined') {
     logger.info(`Netatmo device "${deviceGladys.name}" is not reachable`);
   }
+
   switch (deviceNetatmo.type) {
     case SUPPORTED_MODULE_TYPE.PLUG: {
       await this.updateNAPlug(deviceGladys, deviceNetatmo, externalId);

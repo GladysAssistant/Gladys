@@ -69,7 +69,6 @@ describe('Netatmo pollRefreshingToken', () => {
 
     clock.tick(3600 * 1000);
     clock.restore();
-    // eslint-disable-next-line no-promise-executor-return
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(netatmoHandler.accessToken).to.equal('new-access-token');
     expect(netatmoHandler.refreshToken).to.equal('new-refresh-token2');

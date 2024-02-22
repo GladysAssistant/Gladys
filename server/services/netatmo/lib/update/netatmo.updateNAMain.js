@@ -15,24 +15,26 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:temperature`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.temperature || dashboardData.Temperature;
+        const valueDeviceNetatmo = deviceNetatmo.temperature || (dashboardData && dashboardData.Temperature);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:therm_measured_temperature`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](room.therm_measured_temperature),
+    if (room) {
+      deviceGladys.features
+        .filter((feature) => feature.external_id === `${externalId}:therm_measured_temperature`)
+        .forEach((feature) => {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: feature.external_id,
+            state: readValues[feature.category][feature.type](room.therm_measured_temperature),
+          });
         });
-      });
+    }
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:co2`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.co2 || dashboardData.CO2;
+        const valueDeviceNetatmo = deviceNetatmo.co2 || (dashboardData && dashboardData.CO2);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
@@ -41,7 +43,7 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:humidity`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.humidity || dashboardData.Humidity;
+        const valueDeviceNetatmo = deviceNetatmo.humidity || (dashboardData && dashboardData.Humidity);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
@@ -50,7 +52,7 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:noise`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.noise || dashboardData.Noise;
+        const valueDeviceNetatmo = deviceNetatmo.noise || (dashboardData && dashboardData.Noise);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
@@ -59,7 +61,7 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:pressure`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.pressure || dashboardData.Pressure;
+        const valueDeviceNetatmo = deviceNetatmo.pressure || (dashboardData && dashboardData.Pressure);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
@@ -68,28 +70,30 @@ async function updateNAMain(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:absolute_pressure`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.absolute_pressure || dashboardData.AbsolutePressure;
+        const valueDeviceNetatmo = deviceNetatmo.absolute_pressure || (dashboardData && dashboardData.AbsolutePressure);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: feature.external_id,
           state: readValues[feature.category][feature.type](valueDeviceNetatmo),
         });
       });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:min_temp`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](dashboardData.min_temp),
+    if (dashboardData) {
+      deviceGladys.features
+        .filter((feature) => feature.external_id === `${externalId}:min_temp`)
+        .forEach((feature) => {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: feature.external_id,
+            state: readValues[feature.category][feature.type](dashboardData.min_temp),
+          });
         });
-      });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:max_temp`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](dashboardData.max_temp),
+      deviceGladys.features
+        .filter((feature) => feature.external_id === `${externalId}:max_temp`)
+        .forEach((feature) => {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: feature.external_id,
+            state: readValues[feature.category][feature.type](dashboardData.max_temp),
+          });
         });
-      });
+    }
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:wifi_strength`)
       .forEach((feature) => {

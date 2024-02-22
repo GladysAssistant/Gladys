@@ -12,6 +12,8 @@ describe('NetatmoHandler Constructor', () => {
     expect(netatmoHandler.configuration).to.deep.equal({
       clientId: null,
       clientSecret: null,
+      energyApi: null,
+      weatherApi: null,
       scopes: {
         scopeAircare: 'read_homecoach',
         scopeEnergy: 'read_thermostat write_thermostat',

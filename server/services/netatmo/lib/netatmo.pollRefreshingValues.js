@@ -42,10 +42,16 @@ async function refreshNetatmoValues() {
  * @example pollRefreshingValues();
  */
 function pollRefreshingValues() {
-  refreshNetatmoValues.bind(this)();
-  this.pollRefreshValues = setInterval(refreshNetatmoValues.bind(this), 120 * 1000);
+  this.pollRefreshValues = setInterval(async () => {
+    try {
+      await this.refreshNetatmoValues();
+    } catch (error) {
+      logger.error('Error refreshing Netatmo values:', error);
+    }
+  }, 120 * 1000);
 }
 
 module.exports = {
   pollRefreshingValues,
+  refreshNetatmoValues,
 };

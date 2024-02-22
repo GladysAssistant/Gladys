@@ -22,11 +22,20 @@ async function loadThermostatDetails() {
     plugs = body.devices;
     if (status === 'ok') {
       plugs.forEach((plug) => {
+        if (!this.configuration.energyApi) {
+          plug.apiNotConfigured = true;
+        } else {
+          plug.apiNotConfigured = false;
+        }
         plug.categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
         plug.modules.forEach((module) => {
           const { modules, ...rest } = plug;
           module.plug = rest;
-          module.home_id = plug.home_id;
+          if (!this.configuration.energyApi) {
+            module.apiNotConfigured = true;
+          } else {
+            module.apiNotConfigured = false;
+          }
           module.categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
         });
         thermostats.push(...plug.modules);

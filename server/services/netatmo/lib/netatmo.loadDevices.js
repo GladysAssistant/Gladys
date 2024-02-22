@@ -10,10 +10,10 @@ const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
  * await loadDevices();
  */
 async function loadDevices() {
-  try {
-    let listDevices = [];
+  let listDevices = [];
 
-    if (this.configuration.energyApi) {
+  if (this.configuration.energyApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+    try {
       const responsePage = await axios({
         url: API.HOMESDATA,
         method: 'get',
@@ -25,9 +25,8 @@ async function loadDevices() {
         const results = await Promise.map(
           homes,
           async (home) => {
-            logger.warn('home', home.id, 'home name: ', home.name);
             const { modules } = home;
-            if (modules) {
+            if (modules && modules.length > 0) {
               return this.loadDeviceDetails(home);
             }
             return undefined;
@@ -36,32 +35,37 @@ async function loadDevices() {
         );
         listDevices = results.filter((device) => device !== undefined).flat();
       }
+    } catch (e) {
+      logger.error('Error request ', API.HOMESDATA, ' - e.status: ', e.status, 'e', e);
     }
+  }
 
-    if (this.configuration.energyApi) {
+  if (this.configuration.energyApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+    try {
       const { plugs, thermostats } = await this.loadThermostatDetails();
       if (listDevices.length > 0) {
-        // we add the properties of the "getThermostats" API request to those of the previous "Energy" API request
-        listDevices = listDevices.map((device) => {
-          const plugEnergy = plugs.find((plug) => plug._id === device.id);
+        /* we add the properties of the "Weather" API request to those of the previous "Energy" API request */
+        const listDeviceIds = listDevices.map((device) => device._id || device.id);
+        listDevices = listDeviceIds.map((id) => {
+          let deviceList = listDevices.find((device) => device._id === id || device.id === id);
+          const plugEnergy = plugs.find((plug) => plug._id === id);
+          const thermostat = thermostats.find((t) => t._id === id);
           if (plugEnergy) {
-            return { ...device, ...plugEnergy };
+            deviceList = { ...deviceList, ...plugEnergy };
           }
-          const thermostat = thermostats.find((modulePlug) => modulePlug._id === device.id);
           if (thermostat) {
             const plugThermostat = plugs
               .map((plug) => {
                 const { modules, ...rest } = plug;
                 return rest;
               })
-              .find((plug) => plug._id === device.bridge);
-            device.plug = {
-              ...device.plug,
-              ...plugThermostat,
-            };
-            return { ...device, ...thermostat };
+              .find((plug) => plug._id === deviceList.bridge);
+
+            deviceList.plug = { ...deviceList.plug, ...plugThermostat };
+            deviceList = { ...deviceList, ...thermostat };
           }
-          return device;
+
+          return deviceList;
         });
         /* then we add the plugs and thermostats that would belong to a house 
         that does not have devices in the "Energy" category */
@@ -71,7 +75,7 @@ async function loadDevices() {
           ...thermostats.filter((thermostat) => !listDevices.some((device) => device.id === thermostat._id)),
         ];
       } else {
-        // otherwise we retrieve the plugs and thermostats as the "getThermostats" API request provides them to us
+        /* otherwise we retrieve the plugs and thermostats as the "getThermostats" API request provides them to us */
         listDevices = [...plugs, ...thermostats];
       }
       listDevices
@@ -81,12 +85,16 @@ async function loadDevices() {
             plug.modules_bridged = plug.modules.map((module) => module._id);
           }
         });
+    } catch (e) {
+      logger.error('Error on loadThermostatDetails - e.status: ', e.status, 'e', e);
     }
+  }
 
-    if (this.configuration.weatherApi) {
-      const { weatherStations, modules: modulesWeatherStations } = await this.loadWeatherStationDetails();
+  if (this.configuration.weatherApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+    try {
+      const { weatherStations, modulesWeatherStations } = await this.loadWeatherStationDetails();
       if (listDevices.length > 0) {
-        // we add the properties of the "Weather" API request to those of the previous "Energy" API request
+        /* we add the properties of the "Weather" API request to those of the previous "Energy" API request */
         listDevices = listDevices.map((device) => {
           const weatherStation = weatherStations.find((station) => station._id === device.id);
           if (weatherStation) {
@@ -120,7 +128,7 @@ async function loadDevices() {
           ),
         ];
       } else {
-        // otherwise we retrieve the weather stations as the "Weather" API request provides them to us
+        /* otherwise we retrieve the plugs and thermostats as the "getThermostats" API request provides them to us */
         listDevices = [...weatherStations, ...modulesWeatherStations];
       }
       listDevices
@@ -130,14 +138,13 @@ async function loadDevices() {
             weatherStation.modules_bridged = weatherStation.modules.map((module) => module._id);
           }
         });
+    } catch (e) {
+      logger.error('Error on loadWeatherStationDetails - e.status: ', e.status, 'e', e);
     }
-    logger.debug(`${listDevices.length} Netatmo devices loaded`);
-    logger.info(`Netatmo devices not supported : ${listDevices.filter((device) => device.not_handled).length}`);
-    return listDevices;
-  } catch (e) {
-    logger.error('e.status: ', e.status, 'e', e);
-    return undefined;
   }
+  logger.debug(`${listDevices.length} Netatmo devices loaded`);
+  logger.info(`Netatmo devices not supported : ${listDevices.filter((device) => device.not_handled).length}`);
+  return listDevices;
 }
 
 module.exports = {

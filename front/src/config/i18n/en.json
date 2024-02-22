@@ -532,7 +532,9 @@
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
           "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices."
       },
       "device": {
         "title": "Netatmo Devices in Gladys",
@@ -547,12 +549,13 @@
         "roomNetatmoApiLabel": "Room in Netatmo API",
         "featuresLabel": "Features",
         "saveButton": "Save",
+        "saveNotAllowButton": "Save not possible",
         "deleteButton": "Delete",
         "noValueReceived": "No value received."
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
-        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats and the valves associated with their Plug (API Energy) as well as weather stations and their modules (API Weather). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
         "noDeviceFound": "No Netatmo devices were found. If you are certain that you have a Netatmo device supported by Gladys, have you completed all the steps in the documentation to register your devices on the Netatmo API?",

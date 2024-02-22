@@ -38,7 +38,8 @@
       "module_ids": ["01:00:00:xx:xx:xx"]
     },
     "plug": null,
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "04:00:00:xx:xx:xx",
@@ -135,7 +136,8 @@
       "udp_conn": true,
       "last_plug_seen": 1600000000
     },
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:50:yy:yy:yy",
@@ -151,7 +153,8 @@
     "home": "5e1xxxxxxxxxxxxxxxxx",
     "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"],
     "plug": null,
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "09:00:00:xx:xx:xx",
@@ -191,7 +194,8 @@
       "room_id": "2812958323",
       "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
     },
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:50:jj:jj:jj",
@@ -257,7 +261,8 @@
       "therm_setpoint_start_time": 1706461202,
       "therm_setpoint_mode": "schedule"
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "02:00:00:yy:yy:yy",
@@ -363,7 +368,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "06:00:00:yy:yy:yy",
@@ -471,7 +477,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "05:00:00:yy:yy:yy",
@@ -484,8 +491,8 @@
     "last_seen": 1705945317,
     "reachable": false,
     "bridge": "70:ee:50:jj:jj:jj",
-    "rain": 0,
-    "sum_rain_1": 0,
+    "rain": 0.101,
+    "sum_rain_1": 0.505,
     "name": "STARK House Rain Gauge",
     "setup_date": 1605604312,
     "room_id": "8765432109",
@@ -581,7 +588,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "03:00:00:yy:yy:yy",
@@ -689,7 +697,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "09:00:00:xx:xx:xx",
@@ -729,6 +738,47 @@
       "room_id": "2812958323",
       "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
     }
+  },
+  {
+    "_id": "70:ee:50:mm:mm:mm",
+    "station_name": "Maison STARK Secondaire (Weather Station Test)",
+    "date_setup": 1605564990,
+    "last_setup": 1605564990,
+    "type": "NAMain",
+    "last_status_store": 1706464170,
+    "module_name": "Weather Station Test",
+    "firmware": 202,
+    "wifi_status": 39,
+    "reachable": true,
+    "co2_calibrating": false,
+    "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
+    "place": {
+      "altitude": 50,
+      "city": "Ville Test",
+      "country": "FR",
+      "timezone": "Europe/Paris",
+      "location": [1.234, 2.345]
+    },
+    "home_id": "5e1xxxxxxxxxxxxxxxxx",
+    "home_name": "Maison STARK Secondaire",
+    "dashboard_data": {
+      "time_utc": 1706464169,
+      "Temperature": 20.1,
+      "CO2": 506,
+      "Humidity": 51,
+      "Noise": 32,
+      "Pressure": 1022.5,
+      "AbsolutePressure": 1007.8,
+      "min_temp": 18.5,
+      "max_temp": 20.7,
+      "date_max_temp": 1706396673,
+      "date_min_temp": 1706420184,
+      "temp_trend": "stable",
+      "pressure_trend": "down"
+    },
+    "modules": [],
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:00:xx:xx:xx",

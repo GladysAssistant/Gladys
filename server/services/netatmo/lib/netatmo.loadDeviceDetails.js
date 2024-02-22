@@ -28,57 +28,67 @@ async function loadDeviceDetails(homeData) {
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = body.home;
     if (status === 'ok') {
       if (modulesHomestatus) {
-        listDevices = modulesHomestatus
-          .map((module) => {
-            let moduleSupported = false;
-            let categoryAPI = SUPPORTED_CATEGORY_TYPE.UNKNOWN;
-            const { type: model } = module;
-            if (
-              model === SUPPORTED_MODULE_TYPE.THERMOSTAT ||
-              model === SUPPORTED_MODULE_TYPE.PLUG ||
-              model === SUPPORTED_MODULE_TYPE.NRV
-            ) {
-              moduleSupported = true;
-              categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+        listDevices = modulesHomestatus.map((module) => {
+          let moduleSupported = false;
+          let apiNotConfigured = false;
+          let categoryAPI = SUPPORTED_CATEGORY_TYPE.UNKNOWN;
+          const { type: model } = module;
+          if (
+            model === SUPPORTED_MODULE_TYPE.THERMOSTAT ||
+            model === SUPPORTED_MODULE_TYPE.PLUG ||
+            model === SUPPORTED_MODULE_TYPE.NRV
+          ) {
+            if (!this.configuration.energyApi) {
+              apiNotConfigured = true;
+            } else {
+              apiNotConfigured = false;
             }
-            if (
-              model === SUPPORTED_MODULE_TYPE.NAMAIN ||
-              model === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
-              model === SUPPORTED_MODULE_TYPE.NAMODULE2 ||
-              model === SUPPORTED_MODULE_TYPE.NAMODULE3 ||
-              model === SUPPORTED_MODULE_TYPE.NAMODULE4
-            ) {
-              moduleSupported = true;
-              categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+            moduleSupported = true;
+            categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+          }
+          if (
+            model === SUPPORTED_MODULE_TYPE.NAMAIN ||
+            model === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
+            model === SUPPORTED_MODULE_TYPE.NAMODULE2 ||
+            model === SUPPORTED_MODULE_TYPE.NAMODULE3 ||
+            model === SUPPORTED_MODULE_TYPE.NAMODULE4
+          ) {
+            if (!this.configuration.weatherApi) {
+              apiNotConfigured = true;
+            } else {
+              apiNotConfigured = false;
             }
+            moduleSupported = true;
+            categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+          }
 
-            const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
-            const roomDevice = {
-              ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
-              ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
-            };
-            const plugDevice = {
-              ...modulesHomeData.find((mod) => mod.id === module.bridge),
-              ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
-            };
-            const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
-            const deviceSupported = {
-              ...module,
-              ...moduleHomeData,
-              home: homeId,
-              room: roomDevice,
-              plug,
-              categoryAPI,
-            };
-            if (moduleSupported) {
-              return deviceSupported;
-            }
-            return {
-              ...deviceSupported,
-              not_handled: true,
-            };
-          })
-          .filter((item) => item !== undefined);
+          const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
+          const roomDevice = {
+            ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
+            ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
+          };
+          const plugDevice = {
+            ...modulesHomeData.find((mod) => mod.id === module.bridge),
+            ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
+          };
+          const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
+          const deviceSupported = {
+            ...module,
+            ...moduleHomeData,
+            home: homeId,
+            room: roomDevice,
+            plug,
+            categoryAPI,
+            apiNotConfigured,
+          };
+          if (moduleSupported) {
+            return deviceSupported;
+          }
+          return {
+            ...deviceSupported,
+            not_handled: true,
+          };
+        });
       } else {
         listDevices = undefined;
       }
