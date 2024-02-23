@@ -94,15 +94,21 @@ class SetupTab extends Component {
                 <MarkupText id="integration.netatmo.setup.descriptionGetKeys" />
               </p>
               <p>
-                <label htmlFor="titleAdditionalInformation" className={`form-label ${style.italicText}`}>
+                <label htmlFor="descriptionScopeInformation" className={`form-label ${style.italicText}`}>
                   <MarkupText id="integration.netatmo.setup.descriptionScopeInformation" />
                 </label>
               </p>
               <p>
-                <label htmlFor="titleAdditionalInformation" className={`form-label ${style.highlightText}`}>
-                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformation" />
+                <label htmlFor="titleAdditionalInformationEnergyApi" className={`form-label ${style.highlightText}`}>
+                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformationEnergyApi" />
                 </label>
-                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformation" />
+                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationEnergyApi" />
+              </p>
+              <p>
+                <label htmlFor="titleAdditionalInformationWeatherApi" className={`form-label ${style.highlightText}`}>
+                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformationWeatherApi" />
+                </label>
+                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationWeatherApi" />
               </p>
 
               <form>
