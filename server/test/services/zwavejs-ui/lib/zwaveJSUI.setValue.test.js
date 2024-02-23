@@ -135,6 +135,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       {
         name: 'prise01-wp',
         external_id: 'zwavejs-ui:3',
+        selector: 'zwavejs-ui:3',
         service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
         should_poll: false,
         features: [
@@ -148,6 +149,7 @@ describe('zwaveJSUIHandler.setValue', () => {
             has_feedback: true,
             name: '3-37-0-currentValue',
             external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+            selector: 'zwavejs-ui:3:0:binary_switch:currentvalue',
             node_id: 3,
             command_class_version: 1,
             command_class_name: 'Binary Switch',
@@ -186,6 +188,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       {
         name: 'prise01-wp',
         external_id: 'zwavejs-ui:3',
+        selector: 'zwavejs-ui:3',
         service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
         should_poll: false,
         features: [
@@ -199,6 +202,7 @@ describe('zwaveJSUIHandler.setValue', () => {
             has_feedback: true,
             name: '3-37-0-currentValue',
             external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+            selector: 'zwavejs-ui:3:0:binary_switch:currentvalue',
             node_id: 3,
             command_class_version: 1,
             command_class_name: 'Binary Switch',
