@@ -39,7 +39,7 @@ function convertDeviceEnergy(netatmoDevice) {
     features.push(buildFeatureRfStrength(nameDevice, externalId));
     /* params */
     const plugId = plug.id || plug._id;
-    const plugName = plug.name || plug.module_name;
+    const plugName = plug.name || plug.module_name || plug.station_name;
     if (plugId) {
       params = [
         { name: PARAMS.PLUG_ID, value: plugId },
