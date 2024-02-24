@@ -11,6 +11,10 @@ const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_PASSWORD_KEY: 'ZWAVEJS_UI_MQTT_PASSWORD',
 };
 
+const PARAMS = {
+  LOCATION: `location`,
+};
+
 const STATES = {
   binary_switch: {
     currentvalue: {
@@ -73,4 +77,5 @@ module.exports = {
   CONFIGURATION,
   EXPOSES,
   STATES,
+  PARAMS,
 };
