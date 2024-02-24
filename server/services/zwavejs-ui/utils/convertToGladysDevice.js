@@ -40,6 +40,7 @@ const convertToGladysDevice = (serviceId, device) => {
         ...exposeFound,
         name: value.id,
         external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
+        selector: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
         node_id: device.id,
         // These are custom properties only available on the object in memory (not in DB)
         command_class_version: commandClassVersion,
@@ -55,6 +56,7 @@ const convertToGladysDevice = (serviceId, device) => {
   return {
     name: device.name,
     external_id: `zwavejs-ui:${device.id}`,
+    selector: `zwavejs-ui:${device.id}`,
     service_id: serviceId,
     should_poll: false,
     features,
