@@ -25,6 +25,10 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
       await this.updateNATherm1(deviceGladys, deviceNetatmo, externalId);
       break;
     }
+    case SUPPORTED_MODULE_TYPE.NRV: {
+      await this.updateNRV(deviceGladys, deviceNetatmo, externalId);
+      break;
+    }
     default:
       break;
   }

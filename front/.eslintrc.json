@@ -26,7 +26,8 @@
         "selector": "CallExpression[callee.object.name='store'][callee.property.name='setState']",
         "message": "Usage of unistore is not recommended anymore, please use local states instead."
       } */
-    ]
+    ],
+    "no-console": ["error", { "allow": ["error"] }]
   },
   "env": {
     "browser": true

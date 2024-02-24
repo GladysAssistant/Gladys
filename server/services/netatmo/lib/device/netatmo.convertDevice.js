@@ -6,6 +6,7 @@ const { buildFeatureRfStrength, buildFeatureWifiStrength } = require('./netatmo.
 const {
   buildFeatureThermSetpointTemperature,
   buildFeatureBoilerStatus,
+  buildFeatureHeatingPowerRequest,
   buildFeaturePlugConnectedBoiler,
 } = require('./netatmo.buildFeaturesSpecifEnergy');
 
@@ -26,14 +27,14 @@ function convertDevice(netatmoDevice) {
     case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
       /* features common */
       features.push(buildFeatureBattery(name, externalId));
-      /* features common Netatmo Energy */
+      /* features common Netatmo */
       features.push(buildFeatureTemperature(name, externalId, 'temperature'));
       features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
-      features.push(buildFeatureThermSetpointTemperature(name, externalId));
-      features.push(buildFeatureOpenWindow(name, externalId));
       /* features common modules RF */
       features.push(buildFeatureRfStrength(name, externalId));
       /* features specific Energy */
+      features.push(buildFeatureThermSetpointTemperature(name, externalId));
+      features.push(buildFeatureOpenWindow(name, externalId));
       features.push(buildFeatureBoilerStatus(name, externalId));
       /* params */
       params = [
@@ -52,6 +53,24 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeaturePlugConnectedBoiler(name, externalId));
       /* params */
       params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
+      break;
+    }
+    case SUPPORTED_MODULE_TYPE.NRV: {
+      /* features common */
+      features.push(buildFeatureBattery(name, externalId));
+      /* features common Netatmo */
+      features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
+      /* features common modules RF */
+      features.push(buildFeatureRfStrength(name, externalId));
+      /* features specific Energy */
+      features.push(buildFeatureThermSetpointTemperature(name, externalId));
+      features.push(buildFeatureOpenWindow(name, externalId));
+      features.push(buildFeatureHeatingPowerRequest(name, externalId));
+      /* params */
+      params = [
+        { name: PARAMS.PLUG_ID, value: plug.id },
+        { name: PARAMS.PLUG_NAME, value: plug.name },
+      ];
       break;
     }
     default:

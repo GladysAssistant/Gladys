@@ -9,12 +9,12 @@ const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 async function onNewDeviceDiscover(data) {
   const devices = [];
   data.result.forEach((zwaveJSDevice) => {
-    if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0 && zwaveJSDevice.loc && zwaveJSDevice.loc.length > 0) {
+    if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0) {
       devices.push(convertToGladysDevice(this.serviceId, zwaveJSDevice));
     }
   });
   this.devices = devices;
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.SCAN_COMPLETED,
   });
 }

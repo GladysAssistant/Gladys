@@ -166,6 +166,45 @@
     "plug": null
   },
   {
+    "id": "09:00:00:xx:xx:xx",
+    "type": "NRV",
+    "battery_state": "full",
+    "battery_level": 2956,
+    "firmware_revision": 100,
+    "rf_strength": 80,
+    "reachable": true,
+    "bridge": "70:ee:50:yy:yy:yy",
+    "name": "Valve Test",
+    "setup_date": 1705912152,
+    "room_id": "8765432109",
+    "home": "5e1xxxxxxxxxxxxxxxxx",
+    "room": {
+      "id": "8765432109",
+      "name": "Office",
+      "type": "home_office",
+      "module_ids": ["09:00:00:xx:xx:xx"],
+      "reachable": true,
+      "anticipating": false,
+      "heating_power_request": 100,
+      "open_window": false,
+      "therm_measured_temperature": 18.5,
+      "therm_setpoint_temperature": 19,
+      "therm_setpoint_start_time": 1706421605,
+      "therm_setpoint_mode": "schedule"
+    },
+    "plug": {
+      "id": "70:ee:50:yy:yy:yy",
+      "type": "NAPlug",
+      "firmware_revision": 124,
+      "rf_strength": 65,
+      "wifi_strength": 55,
+      "name": "Relais Salon Test",
+      "setup_date": 1581000000,
+      "room_id": "2812958323",
+      "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
+    }
+  },
+  {
     "id": "70:ee:00:xx:xx:xx",
     "type": "NOC",
     "firmware_revision": 3018000,
