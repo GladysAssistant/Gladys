@@ -509,6 +509,82 @@
       "rotation18O": "180°",
       "rotation27O": "270°"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "description": "Netatmo-Geräte steuern",
+      "deviceTab": "Geräte",
+      "discoverTab": "Netatmo-Entdeckung",
+      "setupTab": "Konfiguration",
+      "documentation": "Netatmo-Dokumentation",
+      "discoverDeviceDescr": "Netatmo-Geräte automatisch scannen",
+      "status": {
+        "notConfigured": "Der Netatmo-Dienst ist nicht konfiguriert",
+        "disconnect": "Gladys ist nicht mit Netatmo verbunden",
+        "notConnected": "Gladys konnte keine Verbindung zum Netatmo-Konto herstellen, bitte überprüfen Sie Ihre Anmeldeinformationen auf der ",
+        "setupPageLink": "Netatmo-Konfigurationsseite.",
+        "connect": "Gladys ist mit Netatmo verbunden",
+        "connecting": "Konfiguration gespeichert. Verbindung zu Ihrem Netatmo-Konto wird hergestellt...",
+        "processingToken": "Verbindung zu Ihrem Netatmo-Konto... Zugriffstoken wird abgerufen.",
+        "getDevicesValues": "Datenwiederherstellung läuft...",
+        "dicoveringDevices": "Gerätewiederherstellung läuft...",
+        "errorConnecting": {
+          "other_error": "Fehler bei der Autorisierung. Sie können den Fehler in der Konsole Ihres Browsers mit einem Rechtsklick untersuchen. Wenn der Fehler weiterhin besteht, posten Sie bitte die Protokolle im Forum.",
+          "access_denied": "Autorisierung abgelehnt, bitte versuchen Sie es erneut und akzeptieren Sie den Zugriff auf Ihre Daten.",
+          "invalid_client": "Ungültige Kunden-ID. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>.",
+          "get_access_token_fail": "Falsche Informationen eingegeben oder Konto deaktiviert. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>."
+        }
+      },
+      "device": {
+        "title": "Netatmo-Geräte in Gladys",
+        "descriptionInformation": "Der Statusabruf erfolgt derzeit alle 2 Minuten (Einschränkung der Netatmo-API).",
+        "noDeviceFound": "Noch keine Netatmo-Geräte hinzugefügt.",
+        "sidLabel": "Netatmo-SID des Geräts",
+        "nameLabel": "Gerätename",
+        "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+        "modelLabel": "Modell",
+        "roomLabel": "Raum",
+        "connectedPlugLabel": "Mit der Brücke verbunden",
+        "roomNetatmoApiLabel": "Raum in der Netatmo-API",
+        "featuresLabel": "Funktionen",
+        "saveButton": "Speichern",
+        "deleteButton": "Löschen",
+        "noValueReceived": "Kein Wert empfangen."
+      },
+      "discover": {
+        "title": "Ihre mit Gladys kompatiblen Netatmo-Geräte",
+        "description": "Ihre Netatmo-Geräte müssen zuerst zu Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate unterstützt, die mit ihrem Plug verbunden sind. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie die neuen Funktionen Ihrer Geräte abrufen möchten.",
+        "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
+        "descriptionInformation": "Der Statusabruf erfolgt derzeit alle 2 Minuten (Einschränkung der Netatmo-API).",
+        "noDeviceFound": "Keine Netatmo-Geräte gefunden. Haben Sie alle Schritte der Dokumentation befolgt, um Ihre Geräte in der Netatmo-API zu registrieren?",
+        "alreadyCreatedButton": "Bereits erstellt",
+        "updateButton": "Aktualisieren",
+        "unmanagedModelButton": "Nicht unterstütztes Modell",
+        "scan": "Scannen",
+        "refresh": "Aktualisieren"
+      },
+      "setup": {
+        "title": "Netatmo-Konfiguration",
+        "description": "Sie können Gladys mit Ihrem Netatmo-Konto verbinden, um die zugehörigen Geräte zu steuern.",
+        "descriptionCreateAccount": "Sie müssen ein Konto auf <a href=\"https://auth.netatmo.com/de-de/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a> erstellen.",
+        "descriptionCreateProject": "Danach müssen Sie eine \"Anwendung\" in Ihrem Netatmo-Entwicklerkonto über das Menü <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a> erstellen.",
+        "descriptionGetKeys": "Dann haben Sie Zugriff auf zwei Schlüssel: \"Kunden-ID\" und \"Kundengeheimnis\", die Sie unten kopieren können.",
+        "descriptionScopeInformation": "Wenn Sie Gladys mit Ihrer dedizierten Netatmo-App verbinden, erteilen Sie ihr die Berechtigung, auf Ihre Daten zum Lesen und Schreiben zuzugreifen (genannt Scopes \"read\" und \"write\"). Sie müssen nichts konfigurieren, diese Scopes sind automatisch integriert und werden Ihnen bei der Verbindungsanfrage angezeigt (siehe Dokumentation bei Bedarf). Da Gladys lokal installiert ist, werden keine dieser Daten preisgegeben.",
+        "titleAdditionalInformation": "Weitere Informationen über die Funktionsweise der \"Energy\"-API:",
+        "descriptionAdditionalInformation": "Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
+        "clientIdLabel": "Kunden-ID",
+        "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
+        "clientSecretLabel": "Kundengeheimnis",
+        "clientSecretPlaceholder": "Kundengeheimnis von My Apps in Netatmo Connect",
+        "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
+        "saveLabel": "Speichern und verbinden",
+        "disconnectLabel": "Trennen"
+      },
+      "error": {
+        "defaultError": "Ein Fehler ist bei der Registrierung des Geräts aufgetreten.",
+        "defaultDeletionError": "Ein Fehler ist bei der Löschung des Geräts aufgetreten.",
+        "conflictError": "Das aktuelle Gerät ist bereits in Gladys."
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Steuere deine Tasmota-Geräte über HTTP oder MQTT.",
@@ -1547,7 +1623,7 @@
     "iconLabel": "Symbol",
     "editDescriptionPlaceholder": "Gib eine Beschreibung für die Szene ein",
     "tagsTitle": "Tags",
-    "editTagsPlaceholder": "Gib Tags für die Szene ein",
+    "editTagsPlaceholder": "Geben Sie ein Tag für die Szene ein oder wählen Sie es aus",
     "createTag": "Tag erstellen: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Sichern",
@@ -2546,7 +2622,15 @@
           "35": "Notfall",
           "36": "Alarm ausschalten",
           "37": "Alarm für Tageszonen scharf schalten",
-          "38": "Alarm für alle Zonen scharf schalten"
+          "38": "Alarm für alle Zonen scharf schalten",
+          "39": "An-Taste gedrückt",
+          "40": "An-Taste gehalten",
+          "41": "Auf-Taste gedrückt",
+          "42": "Auf-Taste gehalten",
+          "43": "Ab-Taste gedrückt",
+          "44": "Ab-Taste gehalten",
+          "45": "Aus-Taste gedrückt",
+          "46": "Aus-Taste gehalten"
         }
       },
       "opening-sensor": {

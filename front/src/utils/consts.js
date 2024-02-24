@@ -74,6 +74,8 @@ export const RequestStatus = {
   ConflictError: 'ConflictError',
   ValidationError: 'ValidationError',
   RateLimitError: 'RateLimitError',
+  ServiceConnected: 'ServiceConnected',
+  ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',

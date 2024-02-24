@@ -34,6 +34,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
       {
         name: 'capteur-ouverture',
         external_id: 'zwavejs-ui:2',
+        selector: `zwavejs-ui:2`,
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: false,
         features: [
@@ -46,7 +47,15 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             read_only: true,
             has_feedback: true,
             name: '2-113-0-Access Control-Door state (simple)',
+            command_class: 113,
+            command_class_name: 'Notification',
+            command_class_version: 5,
+            endpoint: 0,
             external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+            selector: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+            node_id: 2,
+            property_name: 'Access Control',
+            property_key_name: 'Door state (simple)',
           },
         ],
       },
