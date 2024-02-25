@@ -2,7 +2,7 @@ const logger = require('../../utils/logger');
 const UsbController = require('./api/usb.controller');
 
 module.exports = function UsbService(gladys, serviceId) {
-  const SerialPort = require('serialport');
+  const { SerialPort } = require('serialport');
   /**
    * @public
    * @description This function starts the service.
