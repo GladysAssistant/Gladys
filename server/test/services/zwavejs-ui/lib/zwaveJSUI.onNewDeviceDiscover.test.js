@@ -54,6 +54,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             property_key_name: undefined,
             property_name: 'Air temperature',
             read_only: true,
+            selector: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
             type: 'decimal',
             unit: 'celsius',
           },
