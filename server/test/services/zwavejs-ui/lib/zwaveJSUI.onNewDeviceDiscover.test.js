@@ -61,8 +61,8 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
         params: [
           {
             name: `location`,
-            value: `salon`
-          }
+            value: `salon`,
+          },
         ],
       },
     ]);

@@ -101,7 +101,7 @@ class ZwaveJSUIDeviceBox extends Component {
     if (!device.features) {
       return null;
     }
-    
+
     let locationZwaveUi = null;
     const locationZwaveUiParam = device.params.find(param => param.name === PARAMS.LOCATION);
     if (locationZwaveUiParam) {
@@ -156,7 +156,7 @@ class ZwaveJSUIDeviceBox extends Component {
                     />
                   </Localizer>
                 </div>
-                
+
                 {locationZwaveUi && (
                   <div class="form-group">
                     <label class="form-label" for={`location_${deviceIndex}`}>
@@ -165,13 +165,13 @@ class ZwaveJSUIDeviceBox extends Component {
                     <input
                       id={`location_${deviceIndex}`}
                       type="text"
-                      value={locationZwaveUi} 
+                      value={locationZwaveUi}
                       class="form-control"
                       disabled="true"
                     />
                   </div>
                 )}
-                
+
                 {housesWithRooms && (
                   <div class="form-group">
                     <label class="form-label" for={`room_${deviceIndex}`}>

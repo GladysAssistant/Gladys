@@ -52,9 +52,7 @@ const convertToGladysDevice = (serviceId, device) => {
         property_key_name: propertyKeyName,
       });
     }
-    params = [
-      {name: PARAMS.LOCATION, value: device.loc},
-    ];
+    params = [{ name: PARAMS.LOCATION, value: device.loc }];
   });
 
   return {
