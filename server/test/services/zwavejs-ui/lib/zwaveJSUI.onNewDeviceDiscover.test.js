@@ -45,7 +45,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             command_class_version: 5,
             endpoint: 0,
             external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
-            has_feedback: true,
+            has_feedback: false,
             keep_history: true,
             max: 150,
             min: -100,

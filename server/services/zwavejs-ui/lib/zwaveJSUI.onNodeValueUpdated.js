@@ -34,10 +34,12 @@ async function onNodeValueUpdated(message) {
   }
 
   const valueConverter = get(STATES, statePath);
-  if (valueConverter !== undefined) {
+  const convertedValue = valueConverter !== undefined ? valueConverter(newValue) : null;
+
+  if (convertedValue !== null) {
     await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: nodeFeature.external_id,
-      state: valueConverter(newValue),
+      state: convertedValue,
     });
   }
 }

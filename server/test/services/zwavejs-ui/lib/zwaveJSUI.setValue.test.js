@@ -231,4 +231,54 @@ describe('zwaveJSUIHandler.setValue', () => {
       JSON.stringify(mqttPayload),
     );
   });
+
+  it('should fail on invalid binary switch value', async () => {
+    const mqttClient = {
+      publish: fake.returns(null),
+    };
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.mqttClient = mqttClient;
+    zwaveJSUIHandler.devices = [
+      {
+        name: 'prise01-wp',
+        external_id: 'zwavejs-ui:3',
+        service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
+        should_poll: false,
+        features: [
+          {
+            category: 'switch',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            keep_history: true,
+            read_only: false,
+            has_feedback: true,
+            name: '3-37-0-currentValue',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+            node_id: 3,
+            command_class_version: 1,
+            command_class_name: 'Binary Switch',
+            command_class: 37,
+            endpoint: 0,
+            property_name: 'currentValue',
+            property_key_name: undefined,
+          },
+        ],
+      },
+    ];
+
+    try {
+      await zwaveJSUIHandler.setValue(
+        { external_id: 'zwavejs-ui:3' },
+        { external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue' },
+        4,
+      );
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+
+      return;
+    }
+
+    assert.fail();
+  });
 });

@@ -25,7 +25,7 @@ const STATES = {
         case true:
           return STATE.ON;
         default:
-          return val;
+          return null;
       }
     },
   },
@@ -42,7 +42,7 @@ const STATES = {
           case 23:
             return OPENING_SENSOR_STATE.CLOSE;
           default:
-            return val;
+            return null;
         }
       },
     },
@@ -64,7 +64,7 @@ const COMMANDS = {
           case STATE.ON:
             return [true];
           default:
-            return [value];
+            return null;
         }
       },
     },
@@ -92,7 +92,7 @@ const EXPOSES = {
       max: 150,
       keep_history: true,
       read_only: true,
-      has_feedback: true,
+      has_feedback: false,
     },
     power: {
       category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
