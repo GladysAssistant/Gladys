@@ -58,6 +58,12 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             property_key_name: 'Door state (simple)',
           },
         ],
+        params: [
+          {
+            name: `location`,
+            value: `salon`
+          }
+        ],
       },
     ]);
   });
