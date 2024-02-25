@@ -1,6 +1,6 @@
 # STEP 1
 # Prepare server package*.json files
-FROM node:18-alpine as json-files
+FROM node:20-alpine as json-files
 COPY ./server /json-files/server
 WORKDIR /json-files/server/
 RUN find . -type f \! -name "package*.json" -exec rm -r {} \;
@@ -10,7 +10,7 @@ COPY ./server/utils /json-files/server/utils
 
 # STEP 3
 # Gladys Bundle
-FROM node:18-alpine as gladys
+FROM node:20-alpine as gladys
 
 # System dependencies
 RUN apk add --no-cache \

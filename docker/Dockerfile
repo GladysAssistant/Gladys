@@ -2,7 +2,7 @@ ARG TARGET
 ARG VERSION
 ARG BUILD_DATE
 
-FROM $TARGET/node:18-alpine
+FROM $TARGET/node:20-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
