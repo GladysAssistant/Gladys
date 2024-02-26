@@ -35,7 +35,7 @@ class DiscoverTab extends Component {
     }
   }
 
-  async getDiscoveredDevices() {
+  getDiscoveredDevices = async () => {
     this.setState({
       loading: true
     });
@@ -52,7 +52,7 @@ class DiscoverTab extends Component {
         errorLoading: true
       });
     }
-  }
+  };
 
   render(props, { loading, errorLoading, discoveredDevices, housesWithRooms }) {
     return (
@@ -62,11 +62,7 @@ class DiscoverTab extends Component {
             <Text id="integration.melcloud.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button
-              onClick={this.getDiscoveredDevices.bind(this)}
-              class="btn btn-outline-primary ml-2"
-              disabled={loading}
-            >
+            <button onClick={this.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
               <Text id="integration.melcloud.discover.scan" /> <i class="fe fe-radio" />
             </button>
           </div>

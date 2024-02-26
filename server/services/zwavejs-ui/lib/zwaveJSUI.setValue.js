@@ -51,7 +51,7 @@ function getNodeFeature(node, nodeFeatureId) {
  * @description Set the new device value from Gladys to MQTT.
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
- * @param {string} value - The new device feature value.
+ * @param {string|number} value - The new device feature value.
  * @returns {Promise} - The execution promise.
  * @example
  * setValue(device, deviceFeature, 0);
@@ -79,6 +79,11 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`ZWaveJS-UI command not found: "${deviceFeature.external_id}"`);
   }
 
+  const commandArgs = command.getArgs(value, nodeFeature);
+  if (commandArgs === null) {
+    throw new BadParameters(`ZWaveJS-UI command value not supported: "${value}"`);
+  }
+
   // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=send-command
   // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=sendcommand
   const mqttPayload = {
@@ -89,7 +94,7 @@ function setValue(device, deviceFeature, value) {
         endpoint: nodeFeature.endpoint,
       },
       command.getName(nodeFeature),
-      command.getArgs(value, nodeFeature),
+      commandArgs,
     ],
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));

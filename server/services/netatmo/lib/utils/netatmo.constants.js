@@ -2,6 +2,9 @@ const GLADYS_VARIABLES = {
   CLIENT_ID: 'NETATMO_CLIENT_ID',
   CLIENT_SECRET: 'NETATMO_CLIENT_SECRET',
 
+  ENERGY_API: 'NETATMO_ENERGY_API',
+  WEATHER_API: 'NETATMO_WEATHER_API',
+
   ACCESS_TOKEN: 'NETATMO_ACCESS_TOKEN',
   REFRESH_TOKEN: 'NETATMO_REFRESH_TOKEN',
   EXPIRE_IN_TOKEN: 'NETATMO_EXPIRE_IN_TOKEN',
@@ -56,6 +59,7 @@ const API = {
   OAUTH2: `${BASE_API}/oauth2/authorize`,
   TOKEN: `${BASE_API}/oauth2/token`,
   GET_THERMOSTATS: `${BASE_API}/api/getthermostatsdata`,
+  GET_WEATHER_STATIONS: `${BASE_API}/api/getstationsdata?get_favorites=false`,
   POST_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
   HOMESDATA: `${BASE_API}/api/homesdata`,
   HOMESTATUS: `${BASE_API}/api/homestatus`,
@@ -67,12 +71,19 @@ const API = {
 
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
+  WEATHER: 'Weather',
+  UNKNOWN: 'unknown',
 };
 
 const SUPPORTED_MODULE_TYPE = {
   THERMOSTAT: 'NATherm1',
   PLUG: 'NAPlug',
   NRV: 'NRV',
+  NAMAIN: 'NAMain',
+  NAMODULE1: 'NAModule1',
+  NAMODULE2: 'NAModule2',
+  NAMODULE3: 'NAModule3',
+  NAMODULE4: 'NAModule4',
 };
 
 const PARAMS = {

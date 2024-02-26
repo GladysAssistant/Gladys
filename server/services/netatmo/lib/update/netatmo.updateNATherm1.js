@@ -1,6 +1,6 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { readValues } = require('./netatmo.deviceMapping');
+const { readValues } = require('../device/netatmo.deviceMapping');
 
 /**
  * @description Save values of Thermostats NATherm1.
