@@ -12,6 +12,10 @@ const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_PASSWORD_KEY: 'ZWAVEJS_UI_MQTT_PASSWORD',
 };
 
+const PARAMS = {
+  LOCATION: `location`,
+};
+
 /**
  * Convert a zWave value format to the
  * Gladys format.
@@ -125,4 +129,5 @@ module.exports = {
   CONFIGURATION,
   EXPOSES,
   STATES,
+  PARAMS,
 };

@@ -1168,6 +1168,7 @@
       "discoverDeviceDescr": "Scanner automatiquement les appareils Z-Wave JS UI",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
+      "locationLabel": "Emplacement de l'appareil",
       "noFeaturesHandled": "Cet appareil n'est pas encore géré par Gladys, n'hésitez pas à nous le soumettre pour qu'il soit ajouté !",
       "featuresLabel": "Fonctionnalités",
       "roomLabel": "Pièce",

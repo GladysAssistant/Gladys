@@ -1,6 +1,6 @@
 const get = require('get-value');
 
-const { EXPOSES } = require('../lib/constants');
+const { EXPOSES, PARAMS } = require('../lib/constants');
 
 const cleanNames = (text) => {
   if (!text || typeof text !== 'string') {
@@ -22,6 +22,7 @@ const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, pr
 
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
+  let params = [];
 
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(device.values).forEach((valueKey) => {
@@ -51,6 +52,7 @@ const convertToGladysDevice = (serviceId, device) => {
         property_key_name: propertyKeyName,
       });
     }
+    params = [{ name: PARAMS.LOCATION, value: device.loc }];
   });
 
   return {
@@ -60,6 +62,7 @@ const convertToGladysDevice = (serviceId, device) => {
     service_id: serviceId,
     should_poll: false,
     features,
+    params,
   };
 };
 

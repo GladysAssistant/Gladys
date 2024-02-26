@@ -1039,6 +1039,7 @@
       "discoverDeviceDescr": "Automatically scan for Z-Wave JS UI devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter your device name",
+      "locationLabel": "Device Location",
       "noFeaturesHandled": "This device is not yet supported by Gladys; feel free to submit it for inclusion!",
       "featuresLabel": "Features",
       "roomLabel": "Room",
