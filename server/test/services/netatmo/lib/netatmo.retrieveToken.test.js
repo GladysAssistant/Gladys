@@ -106,6 +106,38 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.notCalled(netatmoHandler.pollRefreshingValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+  });
+
+  it('should retrieve tokens and launch pollRefreshingValues', async () => {
+    const tokens = {
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      expire_in: 3600,
+    };
+    netatmoHandler.configuration.energyApi = true;
+
+    nock('https://api.netatmo.com')
+      .persist()
+      .post('/oauth2/token')
+      .reply(200, tokens);
+
+    const result = await netatmoHandler.retrieveTokens(body);
+
+    expect(result).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal('connected');
+    expect(netatmoHandler.configured).to.equal(true);
+    expect(netatmoHandler.connected).to.equal(true);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'processing token' },
+      }),
+    ).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
   });
 
   it('should throw an error when axios request fails', async () => {

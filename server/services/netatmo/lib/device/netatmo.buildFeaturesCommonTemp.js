@@ -29,30 +29,6 @@ function buildFeatureTemperature(name, externalId, featureName) {
   };
 }
 
-/**
- * @description Transforms Netatmo feature as Gladys feature.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureOpenWindow(device_name, 'netatmo:device_id');
- */
-function buildFeatureOpenWindow(name, externalId) {
-  return {
-    name: `Detecting open window - ${name}`,
-    external_id: `${externalId}:open_window`,
-    selector: `${externalId}:open_window`,
-    category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-    read_only: true,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 1,
-  };
-}
-
 module.exports = {
   buildFeatureTemperature,
-  buildFeatureOpenWindow,
 };
