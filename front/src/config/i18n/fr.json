@@ -280,7 +280,8 @@
         "noRecentValue": "Pas de valeur récente",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
-        "substractButton": "-"
+        "substractButton": "-",
+        "motionDetected": "Mouvement détecté"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
@@ -660,7 +661,9 @@
           "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
           "invalid_client": "Identifiant client invalide. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Weather\" dans le but d'avoir accès à la totalité des informations de votre station.",
+        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils."
       },
       "device": {
         "title": "Appareils Netatmo dans Gladys",
@@ -675,15 +678,16 @@
         "roomNetatmoApiLabel": "Pièce dans l'API Netatmo",
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
+        "saveNotAllowButton": "Sauvegarde impossible",
         "deleteButton": "Supprimer",
         "noValueReceived": "Aucune valeur reçue."
       },
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
-        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats associés à leur Plug. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats et les vannes associés à leur Plug (API Energy) ainsi que les stations météo et leurs modules (API Weather). S'il vous manque des appareils, veuillez vérifier que vous avez bien sélectionné les bonnes API dans la page de configuration. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
         "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
         "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
-        "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous possédez un Thermostat Netatmo, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
+        "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous êtes certains de posséder un appareil Netatmo supporté par Gladys, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
         "unmanagedModelButton": "Modèle non pris en charge",
@@ -696,14 +700,18 @@
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "Vous devrez ensuite créer une \"application\" dans votre compte développeur Netatmo via le menu <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
-        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configuré, ces scopes sont automatiquement intégrés et vous serons exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposées.",
-        "titleAdditionalInformation": "Informations complémentaires sur le fonctionnement de l'API \"Energy\" :",
-        "descriptionAdditionalInformation": "Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
+        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configurer, ces scopes sont automatiquement intégrés et vous seront exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposée.",
+        "titleAdditionalInformationEnergyApi": "Informations complémentaires sur le fonctionnement de l'API \"Energy\" :",
+        "descriptionAdditionalInformationEnergyApi": "Vous devez sélectionner l'API \"Energy\" en bas de page pour accéder aux appareils correspondants. Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
+        "titleAdditionalInformationWeatherApi": "Informations complémentaires sur le fonctionnement de l'API \"Weather\" :",
+        "descriptionAdditionalInformationWeatherApi": "Vous devez sélectionner l'API \"Weather\" en bas de page pour accéder aux appareils correspondants. Si vous avez également des appareils appartenant à l'API \"Energy\" (Plug, thermostat ou vanne) vous aurez accès à une fonctionnalité supplémentaire sur les appareils hygromètres intérieurs pour obtenir la température moyenne de la pièce correspondante. N'oubliez donc pas de sélectionner l'API \"Energy\" pour accéder à cette fonctionnalité.",
         "clientIdLabel": "Identifiant client",
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
         "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
+        "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
         "disconnectLabel": "Déconnecter"
       },
@@ -2424,6 +2432,7 @@
     "hPa": "Hectopascal (hPa)",
     "bar": "Bar",
     "psi": "Livre-force par pouce carré (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
     "watt": "Watt (W)",
@@ -2489,7 +2498,8 @@
     "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
     "square-centimeter": "Centimètre carré (cm²)",
     "square-meter": "Mètre carré (m²)",
-    "square-kilometer": "Kilomètre carré (km²)"
+    "square-kilometer": "Kilomètre carré (km²)",
+    "decibel": "Décibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2500,6 +2510,7 @@
     "hPa": "hPa",
     "bar": "bar",
     "psi": "psi",
+    "milli-bar": "mbar",
     "lux": "lx",
     "ppm": "ppm",
     "ppb": "ppb",
@@ -2565,7 +2576,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2763,7 +2775,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
-      "decimal": "Niveau de CO2"
+      "decimal": "Niveau de CO2 (décimal)",
+      "integer": "Niveau de CO2 (entier)"
     },
     "switch": {
       "shortCategoryName": "Prise",
@@ -2790,7 +2803,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Capteur de pression",
-      "decimal": "Valeur décimale pression"
+      "decimal": "Pression (décimale)",
+      "integer": "Pression (entier)"
     },
     "leak-sensor": {
       "shortCategoryName": "Détecteur de fuite",
@@ -2896,7 +2910,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Vitesse",
-      "decimal": "Vitesse"
+      "decimal": "Vitesse (décimale)",
+      "integer": "Vitesse (entier)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Capteur de précipitations",
@@ -2962,6 +2977,14 @@
       "next": "Bouton suivant musique",
       "playback_state": "Etat de la lecture musique",
       "play_notification": "Diffuser une notification"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Capteur sonore",
+      "integer": "Bruit (entier)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Angle",
+      "integer": "Angle (entier)"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
