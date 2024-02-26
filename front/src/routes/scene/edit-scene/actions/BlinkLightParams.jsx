@@ -57,6 +57,9 @@ class BlinkLight extends Component {
   }
   async componentDidMount() {
     this.getOptions();
+    if (!this.props.action.blinking_speed) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_speed', 'slow');
+    }
   }
 
   componentWillReceiveProps(nextProps) {

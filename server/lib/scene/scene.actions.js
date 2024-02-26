@@ -143,7 +143,7 @@ const actionsFunc = {
         for (let i = 0; i < blinkingTime; i += blinkingInterval) {
           newValue = 1 - newValue;
           await self.device.setValue(device, deviceFeature, newValue);
-          await new Promise((resolve) => setTimeout(resolve, blinkingInterval));
+          await Promise.delay(blinkingInterval);
         }
         /* eslint-enable no-await-in-loop */
         await self.device.setValue(device, deviceFeature, oldValue);
