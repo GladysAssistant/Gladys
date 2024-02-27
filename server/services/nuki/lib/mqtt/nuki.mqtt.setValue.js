@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { getTopicFromExternalId } = require('../utils/nuki.externalId');
 
 /**
  * @description Set value value.
@@ -11,12 +10,11 @@ const { getTopicFromExternalId } = require('../utils/nuki.externalId');
  * nukiMQTTHandler.setValue(device, topic, command, value);
  */
 function setValue(device, topic, command, value) {
-  const base = getTopicFromExternalId(device);
   logger.debug(`set value for ${device.external_id}`);
   // Send message to Nuki topics
   logger.trace(`nuki/${topic}/${command}`);
   logger.trace(`nuki/${topic}/${value}`);
-  
+
   this.mqttService.device.publish(`nuki/${topic}/${command}`, `true`);
 }
 

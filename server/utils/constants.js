@@ -969,9 +969,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'ewelink.error',
   },
   NUKI: {
-      CONNECTED: 'nuki.connected',
-      NEW_MQTT_DEVICE: 'nuki.new-mqtt-device',
-      ERROR: 'nuki.error',
+    CONNECTED: 'nuki.connected',
+    NEW_MQTT_DEVICE: 'nuki.new-mqtt-device',
+    ERROR: 'nuki.error',
   },
   BROADLINK: {
     LEARN_MODE: 'broadlink.learn',

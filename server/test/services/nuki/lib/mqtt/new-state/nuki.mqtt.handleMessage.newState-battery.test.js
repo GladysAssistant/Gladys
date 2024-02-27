@@ -29,6 +29,5 @@ describe('Nuki - MQTT - handle new battery state', () => {
       state: 66,
     };
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
-
   });
 });

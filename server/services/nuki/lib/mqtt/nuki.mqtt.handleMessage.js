@@ -16,14 +16,14 @@ function handleMessage(topic, message) {
   // logger.trace(`NUKI MESSAGE ${message}`);
   let device;
   if (main === 'homeassistant') {
-      logger.trace(topic, deviceType);
-      device = this.convertToDevice(message);
-      this.discoveredDevices[device.external_id] = device;
-      // logger.trace(device);
-      this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_MQTT_DEVICE);
+    logger.trace(topic, deviceType);
+    device = this.convertToDevice(message);
+    this.discoveredDevices[device.external_id] = device;
+    // logger.trace(device);
+    this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_MQTT_DEVICE);
   } else if (main === 'nuki') {
     let externalId;
-    const gladys = this.nukiHandler.gladys;
+    const { gladys } = this.nukiHandler;
 
     switch (feature) {
       case 'batteryChargeState': {
@@ -57,17 +57,17 @@ function handleMessage(topic, message) {
       }
       case 'lockActionEvent': {
         /* 1,172,0,0,0
-        *  ● LockAction
-        *  ● Trigger
-        *  ● Auth-ID: Auth-ID of the user
-        *  ● Code-ID: ID of the Keypad code, 0 = unknown
-        *  ● Auto-Unlock (0 or 1) or number of button presses (only
-        *    button & fob actions) or Keypad source (0 = back key, 1 =
-        *    code, 2 = fingerprint)
-        *  ● Only lock actions that are attempted to be executed are reported. 
-        *    E.g. unsuccessful Keypad code entries or lock commands
-        *    outside of a time window are not published.
-        */
+         *  ● LockAction
+         *  ● Trigger
+         *  ● Auth-ID: Auth-ID of the user
+         *  ● Code-ID: ID of the Keypad code, 0 = unknown
+         *  ● Auto-Unlock (0 or 1) or number of button presses (only
+         *    button & fob actions) or Keypad source (0 = back key, 1 =
+         *    code, 2 = fingerprint)
+         *  ● Only lock actions that are attempted to be executed are reported.
+         *    E.g. unsuccessful Keypad code entries or lock commands
+         *    outside of a time window are not published.
+         */
         logger.trace(feature, message);
         break;
       }

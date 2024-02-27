@@ -33,9 +33,7 @@ describe('Nuki - MQTT - setValue', () => {
       assert.fail('Should ends on error');
     } catch (e) {
       assert.notCalled(mqttService.device.publish);
-      expect(e.message).to.eq(
-        'Nuki device external_id is invalid: "deviceInvalidTopic" should starts with "nuki:"',
-      );
+      expect(e.message).to.eq('Nuki device external_id is invalid: "deviceInvalidTopic" should starts with "nuki:"');
     }
   });
 
@@ -54,5 +52,4 @@ describe('Nuki - MQTT - setValue', () => {
       expect(e.message).to.eq('Nuki device external_id is invalid: "nuki:" have no network indicator');
     }
   });
-
 });

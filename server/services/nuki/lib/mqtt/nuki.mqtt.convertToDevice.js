@@ -8,7 +8,6 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 
-
 /**
  * @description Discover Nuki devices through MQTT.
  * @param {string} message - MQTT message.
@@ -34,7 +33,7 @@ function convertToDevice(message) {
   */
   const config = JSON.parse(message);
 
-  const deviceExternalId = config.dev.ids.replace(/[\[\]']+/g,'');
+  const deviceExternalId = config.dev.ids.replace(/[[\]']+/g, '');
   logger.trace(`Id ${deviceExternalId} `);
   delete this.discoveredDevices[deviceExternalId];
 
@@ -57,7 +56,7 @@ function convertToDevice(message) {
     ],
   };
   addSelector(device);
-  
+
   // battery
   device.features.push({
     name: 'battery',

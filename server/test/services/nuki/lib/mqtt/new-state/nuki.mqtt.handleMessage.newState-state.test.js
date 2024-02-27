@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 
-const { fake, assert } = sinon;
+const { fake } = sinon;
 const NukiHandler = require('../../../../../../services/nuki/lib');
 const { EVENTS } = require('../../../../../../utils/constants');
 

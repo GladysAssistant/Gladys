@@ -15,7 +15,6 @@ const gladys = {
   },
 };
 
-
 describe('nuki.getConfiguration config command', () => {
   afterEach(() => {
     sinon.reset();

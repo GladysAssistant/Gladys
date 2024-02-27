@@ -1,9 +1,7 @@
 const sinon = require('sinon');
-const chai = require('chai');
 
-const { expect } = chai;
-const { fake, assert } = sinon;
-const { serviceId, existingDevices } = require('../../mocks/consts.test');
+const { fake } = sinon;
+const { serviceId } = require('../../mocks/consts.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
 
@@ -17,7 +15,7 @@ const gladys = {
     getService: fake.returns(mqttService),
   },
   device: {
-    get: fake.resolves([{external_id: 'nuki:4242'}, {external_id: 'nuki:4343'}]),
+    get: fake.resolves([{ external_id: 'nuki:4242' }, { external_id: 'nuki:4343' }]),
   },
 };
 

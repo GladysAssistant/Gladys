@@ -39,61 +39,61 @@ describe('Nuki - MQTT - create LOCK device with BATTERY and LOCK features', () =
 
   it('decode HOMEASSISTANT (topic for device creation) message', () => {
     nukiHandler.handleMessage('homeassistant/lock/nuki_398172F4_lock/config', JSON.stringify(messages));
-    const expectedExternalId = "nuki:398172F4";
+    const expectedExternalId = 'nuki:398172F4';
     const expectedDevice = {
       external_id: expectedExternalId,
-      model: "Smart Lock 3.0 Pro",
-      name: "Smart Lock 3.0 Pro",
-      selector: "nuki-398172f4",
-      service_id: "service-uuid-random",
+      model: 'Smart Lock 3.0 Pro',
+      name: 'Smart Lock 3.0 Pro',
+      selector: 'nuki-398172f4',
+      service_id: 'service-uuid-random',
       should_poll: false,
       features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-            external_id: "nuki:398172F4:battery",
-            has_feedback: true,
-            keep_history: true,
-            max: 100,
-            min: 0,
-            name: "battery",
-            read_only: true,
-            selector: "nuki:398172F4:battery",
-            type: DEVICE_FEATURE_TYPES.LOCK.INTEGER,
-            unit: DEVICE_FEATURE_UNITS.PERCENT,
-          },
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LOCK,
-            external_id: "nuki:398172F4:button",
-            has_feedback: true,
-            keep_history: true,
-            max: 1,
-            min: 0,
-            name: "lock",
-            read_only: false,
-            selector: "nuki:398172F4:button",
-            type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
-          },
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LOCK,
-            external_id: "nuki:398172F4:state",
-            has_feedback: true,
-            keep_history: true,
-            max: 255,
-            min: 0,
-            name: "lock-state",
-            read_only: true,
-            selector: "nuki:398172F4:state",
-            type: DEVICE_FEATURE_TYPES.LOCK.STATE,
-          }
-        ],
-        params: [
-                {
-                  name: "protocol",
-                  value: "mqtt",
-                }
-              ]      
+        {
+          category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+          external_id: 'nuki:398172F4:battery',
+          has_feedback: true,
+          keep_history: true,
+          max: 100,
+          min: 0,
+          name: 'battery',
+          read_only: true,
+          selector: 'nuki:398172F4:battery',
+          type: DEVICE_FEATURE_TYPES.LOCK.INTEGER,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.LOCK,
+          external_id: 'nuki:398172F4:button',
+          has_feedback: true,
+          keep_history: true,
+          max: 1,
+          min: 0,
+          name: 'lock',
+          read_only: false,
+          selector: 'nuki:398172F4:button',
+          type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.LOCK,
+          external_id: 'nuki:398172F4:state',
+          has_feedback: true,
+          keep_history: true,
+          max: 255,
+          min: 0,
+          name: 'lock-state',
+          read_only: true,
+          selector: 'nuki:398172F4:state',
+          type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+        },
+      ],
+      params: [
+        {
+          name: 'protocol',
+          value: 'mqtt',
+        },
+      ],
     };
-    
+
     expect(nukiHandler.discoveredDevices[expectedExternalId]).to.deep.eq(expectedDevice);
 
     assert.notCalled(mqttService.device.publish);
@@ -103,5 +103,4 @@ describe('Nuki - MQTT - create LOCK device with BATTERY and LOCK features', () =
       payload: expectedDevice,
     });
   });
-
 });

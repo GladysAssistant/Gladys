@@ -15,5 +15,4 @@ describe('nuki.status command', () => {
     // TODO : complete
     expect(result).deep.eq(null);
   });
-
 });

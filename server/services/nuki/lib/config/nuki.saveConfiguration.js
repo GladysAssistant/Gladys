@@ -3,7 +3,7 @@ const { CONFIGURATION } = require('../utils/nuki.constants');
 
 /**
  * @description Return Nuki status.
- * @param {Object} [configuration] - Nuki configuration.
+ * @param {object} [configuration] - Nuki configuration.
  * @param {string} [configuration.login] - Nuki username.
  * @param {string} [configuration.password] -  Nuki password.
  * @returns {any} Null.

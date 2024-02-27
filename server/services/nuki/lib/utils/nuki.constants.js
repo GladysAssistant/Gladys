@@ -41,7 +41,7 @@ const LOCK_STATES = {
   7: 'unlatching opening',
   253: 'boot run',
   254: 'motor blocked',
-  255: 'undefined'
+  255: 'undefined',
 };
 
 const DISCOVERY_TOPIC = 'homeassistant/#'; // this TOPIC is hardcoded in Nuki ...
@@ -55,5 +55,5 @@ module.exports = {
   DEVICE_PARAM_VALUE,
   DISCOVERY_TOPIC,
   TOPICS,
-  LOCK_STATES
+  LOCK_STATES,
 };

@@ -9,7 +9,7 @@ const logger = require('../../../../utils/logger');
 function subscribeDeviceTopic(device) {
   const topic = `nuki/${device.external_id.split(':')[1]}/#`;
   logger.debug(`Subscribe to ${topic}`);
-  this.mqttService.device.subscribe(topic, this.handleMessage.bind(this)); 
+  this.mqttService.device.subscribe(topic, this.handleMessage.bind(this));
 }
 
 module.exports = {

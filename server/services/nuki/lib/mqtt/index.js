@@ -21,7 +21,6 @@ const NukiMQTTHandler = function NukiMQTTHandler(nukiHandler) {
   this.discoveredDevices = {};
 };
 
-
 // Commons
 NukiMQTTHandler.prototype.connect = connect;
 NukiMQTTHandler.prototype.disconnect = disconnect;

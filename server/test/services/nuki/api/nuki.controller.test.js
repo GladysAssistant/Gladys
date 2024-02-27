@@ -56,7 +56,7 @@ describe('POST /api/v1/service/nuki/config', () => {
 
   it('Save nuki configuration', async () => {
     const req = {
-      body: []
+      body: [],
     };
     const res = {
       json: fake.returns(null),
@@ -75,7 +75,7 @@ describe('GET /api/v1/service/nuki/discover/mqtt', () => {
       getDiscoveredDevices: fake.returns(discoveredDevices),
       scan: fake.resolves(discoveredDevices),
     };
-    
+
     controllers = NukiController(nukiHandler);
   });
 
@@ -98,12 +98,9 @@ describe('GET /api/v1/service/nuki/discover/mqtt', () => {
     assert.notCalled(nukiHandler.scan);
     assert.calledWith(res.json, discoveredDevices);
   });
-
 });
 
-
 describe('POST /api/v1/service/nuki/discover/mqtt', () => {
-
   beforeEach(() => {
     nukiHandler = new NukiHandlerMock({}, serviceId);
     controllers = NukiController(nukiHandler);

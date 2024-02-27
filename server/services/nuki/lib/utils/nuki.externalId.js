@@ -8,10 +8,9 @@ const { DEVICE_EXTERNAL_ID_BASE } = require('./nuki.constants');
  * getTopicFromExternalId(device);
  */
 function getTopicFromExternalId(device) {
-    return `${DEVICE_EXTERNAL_ID_BASE}/${device.external_id.split(':')[1]}/`;
+  return `${DEVICE_EXTERNAL_ID_BASE}/${device.external_id.split(':')[1]}/`;
 }
 
 module.exports = {
   getTopicFromExternalId,
-  
 };

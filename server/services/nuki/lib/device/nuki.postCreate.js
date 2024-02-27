@@ -8,15 +8,14 @@ const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../utils/nuki.constan
  * postCreate(device)
  */
 function postCreate(device) {
-    logger.debug(`Post creation of ${device.external_id}`);
-    const protocol = this.getProtocolFromDevice(device);
-    if (protocol === DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT) {
-        const mqttHandler = this.getHandler(protocol);
-        mqttHandler.subscribeDeviceTopic(device);
-    };
+  logger.debug(`Post creation of ${device.external_id}`);
+  const protocol = this.getProtocolFromDevice(device);
+  if (protocol === DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT) {
+    const mqttHandler = this.getHandler(protocol);
+    mqttHandler.subscribeDeviceTopic(device);
+  }
 }
 
 module.exports = {
-    postCreate,
+  postCreate,
 };
-  

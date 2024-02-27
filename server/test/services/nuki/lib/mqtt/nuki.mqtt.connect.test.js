@@ -42,7 +42,5 @@ describe('nuki.mqtt.connect command', () => {
     assert.calledWith(gladys.service.getService, 'mqtt');
     assert.callCount(mqttService.device.subscribe, 1);
     mqttService.device.subscribe.firstCall.calledWith('stat/+/+', nukiHandler.handleMessage.bind(nukiHandler));
-    
   });
-
 });

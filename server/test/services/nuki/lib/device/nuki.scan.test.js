@@ -1,9 +1,9 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const { serviceId } = require('../../mocks/consts.test');
-const { assert } = sinon;
 const NukiProtocolHandlerMock = require('../../mocks/nuki.protocol.mock.test');
 
+const { assert } = sinon;
 const mockInstance = new NukiProtocolHandlerMock();
 
 const NukiHandler = proxyquire('../../../../../services/nuki/lib', {
