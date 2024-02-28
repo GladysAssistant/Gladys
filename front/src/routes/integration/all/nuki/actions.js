@@ -83,35 +83,13 @@ function createActions(store) {
         });
       }
     },
-    async getNukiDevices(state) {
-      store.setState({
-        getNukiDevicesStatus: RequestStatus.Getting
-      });
-      try {
-        const options = {
-          order_dir: 'asc'
-        };
-        if (state.nukiSearch && state.awesomeSearch.length) {
-          options.search = state.nukiSearch;
-        }
-        const nukiDevices = await state.httpClient.get('/api/v1/service/nuki/device', options);
-        store.setState({
-          nukiDevices,
-          getNukiDevicesStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getNukiDevicesStatus: RequestStatus.Error
-        });
-      }
-    },
     async getDiscoveredNukiDevices(state, type) {
       store.setState({
         loading: true
       });
       try {
-        // const discoveredDevices = await state.httpClient.get(`/api/v1/service/nuki/discover/${type}`);
-        const discoveredDevices = [];
+        const discoveredDevices = await state.httpClient.get(`/api/v1/service/nuki/discover/${type}`);
+        // const discoveredDevices = [];
         store.setState({
           discoveredDevices,
           loading: false,
