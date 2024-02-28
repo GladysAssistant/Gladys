@@ -86,7 +86,7 @@ function convertToDevice(message) {
     max: 1,
   });
 
-  // lock button
+  // lock state
   device.features.push({
     name: 'lock-state',
     selector: `${externalId}:state`,
