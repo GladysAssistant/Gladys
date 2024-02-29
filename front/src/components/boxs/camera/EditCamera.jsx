@@ -104,7 +104,6 @@ class EditCameraBoxComponent extends Component {
 
   updateCameraLiveAutoStart = e => {
     const newValue = e.target.checked;
-    console.log({ newValue });
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       camera_live_auto_start: newValue
     });

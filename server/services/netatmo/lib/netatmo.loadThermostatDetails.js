@@ -1,6 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API } = require('./utils/netatmo.constants');
+const { API, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Discover Netatmo cloud thermostats.
@@ -10,31 +10,42 @@ const { API } = require('./utils/netatmo.constants');
  */
 async function loadThermostatDetails() {
   logger.debug('loading Thermostats details...');
-  let thermostats;
-  const modules = [];
+  let plugs;
+  const thermostats = [];
   try {
     const responseGetThermostat = await axios({
       url: API.GET_THERMOSTATS,
       method: 'get',
       headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
     });
-    const { body: bodyGetThermostat, status: statusGetThermostat } = responseGetThermostat.data;
-    thermostats = bodyGetThermostat.devices;
-    if (statusGetThermostat === 'ok') {
-      thermostats.forEach((thermostat) => {
-        modules.push(...thermostat.modules);
+    const { body, status } = responseGetThermostat.data;
+    plugs = body.devices;
+    if (status === 'ok') {
+      plugs.forEach((plug) => {
+        if (!this.configuration.energyApi) {
+          plug.apiNotConfigured = true;
+        } else {
+          plug.apiNotConfigured = false;
+        }
+        plug.categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+        plug.modules.forEach((module) => {
+          const { modules, ...rest } = plug;
+          module.plug = rest;
+          if (!this.configuration.energyApi) {
+            module.apiNotConfigured = true;
+          } else {
+            module.apiNotConfigured = false;
+          }
+          module.categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+        });
+        thermostats.push(...plug.modules);
       });
     }
     logger.debug('Thermostats details loaded in home');
-    return { thermostats, modules };
+    return { plugs, thermostats };
   } catch (e) {
-    logger.error(
-      'Error getting thermostats details - status error: ',
-      e.statusGetThermostat,
-      ' data error: ',
-      e.response.data.error,
-    );
-    return { thermostats: undefined, modules: undefined };
+    logger.error('Error getting thermostats details - error: ', e);
+    return { plugs: undefined, thermostats: undefined };
   }
 }
 

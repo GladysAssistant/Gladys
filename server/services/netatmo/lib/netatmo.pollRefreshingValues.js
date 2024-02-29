@@ -23,7 +23,8 @@ async function refreshNetatmoValues() {
   await Promise.map(
     devicesNetatmo,
     async (device) => {
-      const externalId = `netatmo:${device.id}`;
+      const id = device.id || device._id;
+      const externalId = `netatmo:${id}`;
       const deviceExistInGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
       if (deviceExistInGladys) {
         await this.updateValues(deviceExistInGladys, device, externalId);
@@ -41,10 +42,16 @@ async function refreshNetatmoValues() {
  * @example pollRefreshingValues();
  */
 function pollRefreshingValues() {
-  refreshNetatmoValues.bind(this)();
-  this.pollRefreshValues = setInterval(refreshNetatmoValues.bind(this), 120 * 1000);
+  this.pollRefreshValues = setInterval(async () => {
+    try {
+      await this.refreshNetatmoValues();
+    } catch (error) {
+      logger.error('Error refreshing Netatmo values:', error);
+    }
+  }, 120 * 1000);
 }
 
 module.exports = {
   pollRefreshingValues,
+  refreshNetatmoValues,
 };

@@ -336,7 +336,6 @@ class EditScene extends Component {
   };
 
   updateSceneIcon = e => {
-    console.log('updateSceneIcon', e.target.value);
     this.setState(prevState => {
       const newState = update(prevState, {
         scene: {

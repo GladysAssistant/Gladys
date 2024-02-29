@@ -69,7 +69,6 @@ class DiscoverTab extends Component {
     await this.setState({ loading: true });
     await this.getStatus();
     await this.getConfiguration();
-    console.log('Finish init');
     await this.setState({ loading: false });
   };
 

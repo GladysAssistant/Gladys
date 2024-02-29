@@ -109,4 +109,24 @@ describe('zwaveJSUIHandler.connect', () => {
       payload: 'DISCONNECTED',
     });
   });
+
+  it('should handleMessage on message', async () => {
+    const mqttClient = {
+      end: fake.returns(null),
+      removeAllListeners: fake.returns(null),
+      on: (event, cb) => {
+        if (event === 'message') {
+          cb('', '');
+        }
+      },
+    };
+    const mqttLibrary = {
+      connect: fake.returns(mqttClient),
+    };
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
+    const sut = sinon.stub(zwaveJSUIHandler, 'handleNewMessage').resolves();
+    await zwaveJSUIHandler.connect();
+
+    assert.calledOnce(sut);
+  });
 });

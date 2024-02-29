@@ -38,7 +38,8 @@
       "module_ids": ["01:00:00:xx:xx:xx"]
     },
     "plug": null,
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "04:00:00:xx:xx:xx",
@@ -135,7 +136,8 @@
       "udp_conn": true,
       "last_plug_seen": 1600000000
     },
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:50:yy:yy:yy",
@@ -166,7 +168,8 @@
       "therm_setpoint_mode": "schedule"
     },
     "plug": null,
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "09:00:00:xx:xx:xx",
@@ -206,7 +209,8 @@
       "room_id": "2812958323",
       "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
     },
-    "categoryAPI": "Energy"
+    "categoryAPI": "Energy",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:50:jj:jj:jj",
@@ -272,7 +276,8 @@
       "therm_setpoint_start_time": 1706461202,
       "therm_setpoint_mode": "schedule"
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "02:00:00:yy:yy:yy",
@@ -378,7 +383,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "06:00:00:yy:yy:yy",
@@ -486,7 +492,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "05:00:00:yy:yy:yy",
@@ -596,7 +603,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "03:00:00:yy:yy:yy",
@@ -704,7 +712,8 @@
         "pressure_trend": "stable"
       }
     },
-    "categoryAPI": "Weather"
+    "categoryAPI": "Weather",
+    "apiNotConfigured": true
   },
   {
     "id": "70:ee:01:xx:xx:xx",

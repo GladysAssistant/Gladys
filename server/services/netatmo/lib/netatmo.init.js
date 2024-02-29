@@ -10,6 +10,7 @@ async function init() {
   const response = await this.refreshingTokens();
   if (response.success) {
     await this.pollRefreshingToken();
+    await this.refreshNetatmoValues();
     await this.pollRefreshingValues();
   }
 }

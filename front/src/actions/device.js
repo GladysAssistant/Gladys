@@ -8,7 +8,7 @@ function createActions(store) {
         DeviceGetStatus: DeviceGetByRoomStatus.Getting
       });
       try {
-        const rooms = await state.httpClient.get('/api/v1/room?expand=devices');
+        const rooms = await state.httpClient.get('/api/v1/room', { expand: 'devices' });
         store.setState({
           rooms,
           DeviceGetStatus: DeviceGetByRoomStatus.Success

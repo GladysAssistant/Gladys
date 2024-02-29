@@ -21,7 +21,7 @@ class DeviceTab extends Component {
     this.getHouses();
   }
 
-  async getSonosDevices() {
+  getSonosDevices = async () => {
     this.setState({
       getSonosStatus: RequestStatus.Getting
     });
@@ -43,7 +43,7 @@ class DeviceTab extends Component {
         getSonosStatus: e.message
       });
     }
-  }
+  };
 
   async getHouses() {
     this.setState({
@@ -71,12 +71,13 @@ class DeviceTab extends Component {
     });
     this.getSonosDevices();
   }
-  async changeOrderDir(e) {
+
+  changeOrderDir = async e => {
     await this.setState({
       orderDir: e.target.value
     });
     this.getSonosDevices();
-  }
+  };
 
   render({}, { orderDir, search, getSonosStatus, sonosDevices, housesWithRooms }) {
     return (
@@ -88,7 +89,7 @@ class DeviceTab extends Component {
           <div class="page-options d-flex">
             <Localizer>
               <CardFilter
-                changeOrderDir={this.changeOrderDir.bind(this)}
+                changeOrderDir={this.changeOrderDir}
                 orderValue={orderDir}
                 search={this.debouncedSearch}
                 searchValue={search}
@@ -115,7 +116,7 @@ class DeviceTab extends Component {
                       deleteButton
                       device={device}
                       deviceIndex={index}
-                      getSonosDevices={this.getSonosDevices.bind(this)}
+                      getSonosDevices={this.getSonosDevices}
                       housesWithRooms={housesWithRooms}
                     />
                   ))}

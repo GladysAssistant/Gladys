@@ -21,7 +21,7 @@ class DeviceTab extends Component {
     this.getHouses();
   }
 
-  async getDevices() {
+  getDevices = async () => {
     this.setState({
       getMelCloudStatus: RequestStatus.Getting
     });
@@ -43,7 +43,7 @@ class DeviceTab extends Component {
         getMelCloudStatus: e.message
       });
     }
-  }
+  };
 
   async getHouses() {
     this.setState({
@@ -71,12 +71,13 @@ class DeviceTab extends Component {
     });
     this.getDevices();
   }
-  async changeOrderDir(e) {
+
+  changeOrderDir = async e => {
     await this.setState({
       orderDir: e.target.value
     });
     this.getDevices();
-  }
+  };
 
   render({}, { orderDir, search, getMELCloudStatus, melcloudDevices, housesWithRooms }) {
     return (
@@ -88,7 +89,7 @@ class DeviceTab extends Component {
           <div class="page-options d-flex">
             <Localizer>
               <CardFilter
-                changeOrderDir={this.changeOrderDir.bind(this)}
+                changeOrderDir={this.changeOrderDir}
                 orderValue={orderDir}
                 search={this.debouncedSearch}
                 searchValue={search}
@@ -115,7 +116,7 @@ class DeviceTab extends Component {
                       deleteButton
                       device={device}
                       deviceIndex={index}
-                      getDevices={this.getDevices.bind(this)}
+                      getDevices={this.getDevices}
                       housesWithRooms={housesWithRooms}
                     />
                   ))}

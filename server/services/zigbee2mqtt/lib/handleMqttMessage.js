@@ -103,7 +103,7 @@ async function handleMqttMessage(topic, message) {
                 logger.error(`Failed to convert value for device ${deviceName}:`, e);
               }
             } else {
-              logger.warn(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
+              logger.debug(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
             }
           });
         } else {

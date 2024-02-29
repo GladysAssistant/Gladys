@@ -1,10 +1,10 @@
 [
   {
     "label": "openai.request.fail",
-    "answers": ["La requête vers OpenAI a échoué, merci de re-essayer !"]
+    "answers": ["La requête vers OpenAI a échoué, merci de réessayer !"]
   },
   {
     "label": "openai.request.tooManyRequests",
-    "answers": ["Vous avez fais trop de requêtes ce mois-ci vers OpenAI !"]
+    "answers": ["Vous avez fait trop de requêtes ce mois-ci vers OpenAI !"]
   }
 ]

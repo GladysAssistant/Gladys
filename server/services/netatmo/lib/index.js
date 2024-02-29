@@ -21,7 +21,7 @@ const { loadCameraDetails } = require('./netatmo.loadCameraDetails');
 const { loadThermostatDetails } = require('./netatmo.loadThermostatDetails');
 const { loadWeatherStationDetails } = require('./netatmo.loadWeatherStationDetails');
 const { pollRefreshingToken } = require('./netatmo.pollRefreshingToken');
-const { pollRefreshingValues } = require('./netatmo.pollRefreshingValues');
+const { pollRefreshingValues, refreshNetatmoValues } = require('./netatmo.pollRefreshingValues');
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
 const { updateNAPlug } = require('./update/netatmo.updateNAPlug');
@@ -56,6 +56,8 @@ const NetatmoHandler = function NetatmoHandler(gladys, ffmpeg, childProcess, ser
   this.configuration = {
     clientId: null,
     clientSecret: null,
+    energyApi: null,
+    weatherApi: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
@@ -93,6 +95,7 @@ NetatmoHandler.prototype.loadCameraDetails = loadCameraDetails;
 NetatmoHandler.prototype.loadThermostatDetails = loadThermostatDetails;
 NetatmoHandler.prototype.loadWeatherStationDetails = loadWeatherStationDetails;
 NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
+NetatmoHandler.prototype.refreshNetatmoValues = refreshNetatmoValues;
 NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
 NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;

@@ -7,7 +7,11 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
-import { GITHUB_BASE_URL, PARAMS } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
+import {
+  GITHUB_BASE_URL,
+  PARAMS,
+  SUPPORTED_CATEGORY_TYPE
+} from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import styles from './style.css';
 
 const createGithubUrl = device => {
@@ -126,10 +130,17 @@ class NetatmoDeviceBox extends Component {
 
     let plugName = null;
     const plugNameParam = device.params.find(param => param.name === PARAMS.PLUG_NAME);
+    const plugIdParam = device.params.find(param => param.name === PARAMS.PLUG_ID);
     if (plugNameParam) {
-      plugName = plugNameParam.value;
+      plugName = `${plugNameParam.value} (${plugIdParam.value})`;
     }
 
+    let categoryAPI = null;
+    let apiNotConfigured = null;
+    if (device.deviceNetatmo) {
+      categoryAPI = device.deviceNetatmo.categoryAPI;
+      apiNotConfigured = device.deviceNetatmo.apiNotConfigured;
+    }
     const isDeviceReachable = (device, now = new Date()) => {
       const isRecent = (date, time) => (now - new Date(date)) / (1000 * 60) <= time;
       const hasRecentFeature = device.features.some(feature => isRecent(feature.last_value_changed, 15));
@@ -148,7 +159,9 @@ class NetatmoDeviceBox extends Component {
       mostRecentValueAt,
       roomNameNetatmo,
       plugName,
-      online
+      online,
+      categoryAPI,
+      apiNotConfigured
     };
   };
 
@@ -166,7 +179,15 @@ class NetatmoDeviceBox extends Component {
     { device, user, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = (device.features && device.features.length > 0) || !device.not_handled;
-    const { batteryLevel, mostRecentValueAt, roomNameNetatmo, plugName, online } = this.getDeviceProperty();
+    const {
+      batteryLevel,
+      mostRecentValueAt,
+      roomNameNetatmo,
+      plugName,
+      online,
+      categoryAPI,
+      apiNotConfigured
+    } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
     const saveButtonCondition =
       (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
@@ -338,10 +359,26 @@ class NetatmoDeviceBox extends Component {
                     </button>
                   )}
 
-                  {validModel && saveButtonCondition && (
+                  {validModel && saveButtonCondition && !apiNotConfigured && (
                     <button onClick={this.saveDevice} class={`btn btn-success mr-2`}>
                       <Text id="integration.netatmo.device.saveButton" />
                     </button>
+                  )}
+
+                  {validModel && saveButtonCondition && apiNotConfigured && (
+                    <div class="form-group">
+                      <label class="form-label">
+                        {categoryAPI === SUPPORTED_CATEGORY_TYPE.WEATHER && (
+                          <Text id="integration.netatmo.status.weatherApiNotConfigured" />
+                        )}
+                        {categoryAPI === SUPPORTED_CATEGORY_TYPE.ENERGY && (
+                          <Text id="integration.netatmo.status.energyApiNotConfigured" />
+                        )}
+                      </label>
+                      <button class={`btn btn-warning mr-2`} disabled="true">
+                        <Text id="integration.netatmo.device.saveNotAllowButton" />
+                      </button>
+                    </div>
                   )}
 
                   {validModel && deleteButton && (

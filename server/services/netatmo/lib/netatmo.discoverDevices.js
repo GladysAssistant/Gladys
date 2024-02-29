@@ -10,10 +10,8 @@ const { STATUS, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants')
  */
 async function discoverDevices() {
   logger.debug('Looking for Netatmo devices...');
-  const { status, serviceId } = this;
-
-  if (status !== STATUS.CONNECTED) {
-    this.saveStatus({ statusType: status, message: null });
+  if (this.status !== STATUS.CONNECTED) {
+    await this.saveStatus({ statusType: this.status, message: null });
     throw new ServiceNotConfiguredError('Unable to discover Netatmo devices until service is not well configured');
   }
   this.discoveredDevices = [];
@@ -48,7 +46,7 @@ async function discoverDevices() {
       }
       return {
         ...discoveredDevice,
-        service_id: serviceId,
+        service_id: this.serviceId,
         deviceNetatmo: device,
       };
     });

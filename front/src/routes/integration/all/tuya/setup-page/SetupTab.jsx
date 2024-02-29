@@ -52,7 +52,7 @@ class SetupTab extends Component {
     }
   }
 
-  async saveTuyaConfiguration(e) {
+  saveTuyaConfiguration = async e => {
     e.preventDefault();
     this.setState({
       tuyaSaveSettingsStatus: RequestStatus.Getting
@@ -84,13 +84,13 @@ class SetupTab extends Component {
         tuyaSaveSettingsStatus: RequestStatus.Error
       });
     }
-  }
+  };
 
-  updateConfiguration(e) {
+  updateConfiguration = e => {
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
+  };
 
   render(props, state) {
     return (
@@ -126,7 +126,7 @@ class SetupTab extends Component {
                     className="form-control"
                     name="tuyaEndpoint"
                     value={state.tuyaEndpoint}
-                    onChange={this.updateConfiguration.bind(this)}
+                    onChange={this.updateConfiguration}
                   >
                     <option value="china">
                       <Text id="integration.tuya.setup.endpoints.china" />
@@ -160,7 +160,7 @@ class SetupTab extends Component {
                       placeholder={<Text id="integration.tuya.setup.accessKeyPlaceholder" />}
                       value={state.tuyaAccessKey}
                       class="form-control"
-                      onInput={this.updateConfiguration.bind(this)}
+                      onInput={this.updateConfiguration}
                     />
                   </Localizer>
                 </div>
@@ -176,7 +176,7 @@ class SetupTab extends Component {
                       placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder" />}
                       value={state.tuyaSecretKey}
                       className="form-control"
-                      onInput={this.updateConfiguration.bind(this)}
+                      onInput={this.updateConfiguration}
                     />
                   </Localizer>
                 </div>
@@ -192,14 +192,14 @@ class SetupTab extends Component {
                       placeholder={<Text id="integration.tuya.setup.appAccountIdPlaceholder" />}
                       value={state.tuyaAppAccountId}
                       className="form-control"
-                      onInput={this.updateConfiguration.bind(this)}
+                      onInput={this.updateConfiguration}
                     />
                   </Localizer>
                 </div>
 
                 <div class="row mt-5">
                   <div class="col">
-                    <button type="submit" class="btn btn-success" onClick={this.saveTuyaConfiguration.bind(this)}>
+                    <button type="submit" class="btn btn-success" onClick={this.saveTuyaConfiguration}>
                       <Text id="integration.tuya.setup.saveLabel" />
                     </button>
                   </div>

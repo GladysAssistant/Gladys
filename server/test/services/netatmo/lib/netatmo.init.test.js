@@ -48,6 +48,12 @@ describe('Netatmo Init', () => {
       if (variableName === 'NETATMO_CLIENT_SECRET') {
         return Promise.resolve('valid_client_secret');
       }
+      if (variableName === 'NETATMO_ENERGY_API') {
+        return Promise.resolve('1');
+      }
+      if (variableName === 'NETATMO_WEATHER_API') {
+        return Promise.resolve('0');
+      }
       if (variableName === 'NETATMO_ACCESS_TOKEN') {
         return Promise.resolve('valid_access_token');
       }
@@ -69,6 +75,8 @@ describe('Netatmo Init', () => {
   it('should handle valid access and refresh tokens', async () => {
     netatmoHandler.configuration.clientId = 'valid_client_id';
     netatmoHandler.configuration.clientSecret = 'valid_client_secret';
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.configuration.weatherApi = false;
     netatmoHandler.accessToken = 'valid_access_token';
     netatmoHandler.refreshToken = 'valid_refresh_token';
 

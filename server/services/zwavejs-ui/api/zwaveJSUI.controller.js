@@ -6,8 +6,8 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
    * @apiName discover
    * @apiGroup ZwaveJSUI
    */
-  async function discover(req, res) {
-    await zwaveJSUIHandler.scan();
+  function discover(req, res) {
+    zwaveJSUIHandler.scan();
     res.json({ success: true });
   }
   /**
@@ -44,7 +44,7 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
    * @apiName getNodes
    * @apiGroup ZwaveJSUI
    */
-  async function getNodes(req, res) {
+  function getNodes(req, res) {
     res.json(zwaveJSUIHandler.devices);
   }
 
@@ -53,7 +53,7 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
    * @apiName getStatus
    * @apiGroup ZwaveJSUI
    */
-  async function getStatus(req, res) {
+  function getStatus(req, res) {
     res.json({
       connected: zwaveJSUIHandler.connected,
       configured: zwaveJSUIHandler.configured,

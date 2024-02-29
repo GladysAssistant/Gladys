@@ -55,8 +55,10 @@ async function retrieveTokens(body) {
     this.accessToken = tokens.accessToken;
     await this.saveStatus({ statusType: STATUS.CONNECTED });
     logger.debug('Netatmo new access tokens well loaded');
+    if (this.configuration.energyApi || this.configuration.weatherApi) {
+      await this.pollRefreshingValues();
+    }
     await this.pollRefreshingToken();
-    await this.pollRefreshingValues();
     return { success: true };
   } catch (e) {
     this.saveStatus({

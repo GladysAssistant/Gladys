@@ -19,7 +19,7 @@ class SettingsSystem extends Component {
   getJobs = async page => {
     try {
       const skip = page * NUMBER_OF_JOBS_PER_PAGE;
-      const jobs = await this.props.httpClient.get(`/api/v1/job?take=${NUMBER_OF_JOBS_PER_PAGE}&skip=${skip}`);
+      const jobs = await this.props.httpClient.get('/api/v1/job', { take: NUMBER_OF_JOBS_PER_PAGE, skip });
 
       jobs.forEach(job => (job.created_at = this.convertGladysDateToISO8601(job.created_at)));
 

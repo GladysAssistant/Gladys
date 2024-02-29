@@ -9,7 +9,7 @@ class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
       // we get the rooms with the devices
-      const rooms = await this.props.httpClient.get('/api/v1/room?expand=devices');
+      const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
       const deviceOptions = [];
 
       const deviceDictionnary = {};

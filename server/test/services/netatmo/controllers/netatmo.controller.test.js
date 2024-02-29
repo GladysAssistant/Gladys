@@ -35,7 +35,9 @@ describe('Netatmo Controller', () => {
     it('should get the netatmo configuration', async () => {
       const configuration = { clientId: 'test', clientSecret: 'test', redirectUri: 'test' };
       NetatmoHandlerMock.getConfiguration = sinon.fake.resolves(configuration);
-      await netatmoController['get /api/v1/service/netatmo/config'].controller(req, res);
+
+      await netatmoController['get /api/v1/service/netatmo/configuration'].controller(req, res);
+
       expect(res.json.calledWith(configuration)).to.equal(true);
     });
   });

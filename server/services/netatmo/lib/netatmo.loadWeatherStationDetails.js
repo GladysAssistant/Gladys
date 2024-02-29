@@ -1,6 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API } = require('./utils/netatmo.constants');
+const { API, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Discover Netatmo cloud weather stations.
@@ -11,32 +11,42 @@ const { API } = require('./utils/netatmo.constants');
 async function loadWeatherStationDetails() {
   logger.debug('loading Weather Stations details...');
   let weatherStations;
-  const modules = [];
+  const modulesWeatherStations = [];
   try {
     const response = await axios({
       url: API.GET_WEATHER_STATIONS,
       method: 'get',
       headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
     });
-
     const { body, status } = response.data;
-
     weatherStations = body.devices;
     if (status === 'ok') {
       weatherStations.forEach((weatherStation) => {
-        modules.push(...weatherStation.modules);
+        if (!this.configuration.weatherApi) {
+          weatherStation.apiNotConfigured = true;
+        } else {
+          weatherStation.apiNotConfigured = false;
+        }
+        weatherStation.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+        weatherStation.modules.forEach((module) => {
+          const { modules, ...rest } = weatherStation;
+          module.plug = rest;
+          if (!this.configuration.weatherApi) {
+            module.apiNotConfigured = true;
+          } else {
+            module.apiNotConfigured = false;
+          }
+          module.home_id = weatherStation.home_id;
+          module.categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+        });
+        modulesWeatherStations.push(...weatherStation.modules);
       });
     }
     logger.debug('Weather Stations details loaded in home');
-    return { weatherStations, modules };
+    return { weatherStations, modulesWeatherStations };
   } catch (e) {
-    logger.error(
-      'Error getting Weather Stations details - status error: ',
-      e.status,
-      ' data error: ',
-      e.response.data.error,
-    );
-    return { weatherStations: undefined, modules: undefined };
+    logger.error('Error getting Weather Stations details - error: ', e);
+    return { weatherStations: undefined, modulesWeatherStations: undefined };
   }
 }
 

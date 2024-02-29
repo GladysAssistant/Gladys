@@ -18,6 +18,7 @@ export class DemoHttpClient {
   async get(url, query) {
     await this.getDemoFile();
     let key = `get ${url}`;
+    let response = this.responses[key];
 
     if (query) {
       for (const [index, [param, value]] of Object.entries(query).entries()) {
@@ -28,13 +29,14 @@ export class DemoHttpClient {
         }
         key += `${param}=${value}`;
       }
+      response = this.responses[key] || response;
     }
 
-    if (!this.responses[key]) {
+    if (!response) {
       console.error(`${key} not found in demo.js`);
       throw new Error(`${key} not found in demo.js`);
     }
-    return Promise.resolve(this.responses[key]);
+    return Promise.resolve(response);
   }
 
   async post(url) {
