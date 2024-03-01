@@ -374,6 +374,9 @@ class NetatmoDeviceBox extends Component {
                         {categoryAPI === SUPPORTED_CATEGORY_TYPE.ENERGY && (
                           <Text id="integration.netatmo.status.energyApiNotConfigured" />
                         )}
+                        {categoryAPI === SUPPORTED_CATEGORY_TYPE.SECURITY && (
+                          <Text id="integration.netatmo.status.securityApiNotConfigured" />
+                        )}
                       </label>
                       <button class={`btn btn-warning mr-2`} disabled="true">
                         <Text id="integration.netatmo.device.saveNotAllowButton" />

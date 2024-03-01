@@ -18,6 +18,8 @@ async function getConfiguration() {
       (await this.gladys.variable.getValue(GLADYS_VARIABLES.ENERGY_API, serviceId)) === '1';
     this.configuration.weatherApi =
       (await this.gladys.variable.getValue(GLADYS_VARIABLES.WEATHER_API, serviceId)) === '1';
+    this.configuration.securityApi =
+      (await this.gladys.variable.getValue(GLADYS_VARIABLES.SECURITY_API, serviceId)) === '1';
     logger.debug(`Netatmo configuration get: clientId='${this.configuration.clientId}'`);
     return this.configuration;
   } catch (e) {

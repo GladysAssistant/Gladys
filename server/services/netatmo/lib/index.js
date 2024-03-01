@@ -14,6 +14,7 @@ const { convertDeviceEnergy } = require('./device/netatmo.convertDeviceEnergy');
 const { convertDeviceSecurity } = require('./device/netatmo.convertDeviceSecurity');
 const { convertDeviceWeather } = require('./device/netatmo.convertDeviceWeather');
 const { convertDeviceNotSupported } = require('./device/netatmo.convertDeviceNotSupported');
+const { mergeDeviceDetails } = require('./netatmo.deviceDetailsMerger');
 const { discoverDevices } = require('./netatmo.discoverDevices');
 const { loadDevices } = require('./netatmo.loadDevices');
 const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
@@ -58,6 +59,7 @@ const NetatmoHandler = function NetatmoHandler(gladys, ffmpeg, childProcess, ser
     clientSecret: null,
     energyApi: null,
     weatherApi: null,
+    securityApi: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
@@ -88,6 +90,7 @@ NetatmoHandler.prototype.convertDeviceEnergy = convertDeviceEnergy;
 NetatmoHandler.prototype.convertDeviceSecurity = convertDeviceSecurity;
 NetatmoHandler.prototype.convertDeviceWeather = convertDeviceWeather;
 NetatmoHandler.prototype.convertDeviceNotSupported = convertDeviceNotSupported;
+NetatmoHandler.prototype.mergeDeviceDetails = mergeDeviceDetails;
 NetatmoHandler.prototype.discoverDevices = discoverDevices;
 NetatmoHandler.prototype.loadDevices = loadDevices;
 NetatmoHandler.prototype.loadDeviceDetails = loadDeviceDetails;
