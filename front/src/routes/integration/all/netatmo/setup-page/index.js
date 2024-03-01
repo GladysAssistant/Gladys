@@ -110,7 +110,8 @@ class NetatmoSetupPage extends Component {
         clientId: this.state.netatmoClientId,
         clientSecret: this.state.netatmoClientSecret,
         energyApi: this.state.netatmoEnergyApi,
-        weatherApi: this.state.netatmoWeatherApi
+        weatherApi: this.state.netatmoWeatherApi,
+        securityApi: this.state.netatmoSecurityApi
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -168,6 +169,7 @@ class NetatmoSetupPage extends Component {
         netatmoClientSecret: configuration.clientSecret,
         netatmoEnergyApi: configuration.energyApi,
         netatmoWeatherApi: configuration.weatherApi,
+        netatmoSecurityApi: configuration.securityApi,
         clientSecretChanges: false
       });
     }
