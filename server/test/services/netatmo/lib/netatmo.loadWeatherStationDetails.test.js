@@ -34,35 +34,35 @@ describe('Netatmo Load Weather Station Details', () => {
       .get('/api/getstationsdata?get_favorites=false')
       .reply(200, { body: bodyGetWeatherStationMock, status: 'ok' });
 
-    const { weatherStations, modulesWeatherStations } = await netatmoHandler.loadWeatherStationDetails();
-    expect(weatherStations).to.deep.eq(weatherStationsDetailsMock.weatherStations);
-    expect(modulesWeatherStations).to.deep.eq(weatherStationsDetailsMock.modulesWeatherStations);
-    expect(weatherStations).to.be.an('array');
-    expect(modulesWeatherStations).to.be.an('array');
+    const { devices, modules } = await netatmoHandler.loadWeatherStationDetails();
+    expect(devices).to.deep.eq(weatherStationsDetailsMock.devices);
+    expect(modules).to.deep.eq(weatherStationsDetailsMock.modules);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
   });
 
   it('should load weather station details successfully with API configured', async () => {
     netatmoHandler.configuration.weatherApi = true;
-    weatherStationsDetailsMock.weatherStations.forEach((weatherStation) => {
-      weatherStation.apiNotConfigured = false;
-      weatherStation.modules.forEach((module) => {
+    weatherStationsDetailsMock.devices.forEach((device) => {
+      device.apiNotConfigured = false;
+      device.modules.forEach((module) => {
         module.apiNotConfigured = false;
         module.plug.apiNotConfigured = false;
       });
     });
-    weatherStationsDetailsMock.modulesWeatherStations.forEach((moduleWeatherStations) => {
-      moduleWeatherStations.apiNotConfigured = false;
-      moduleWeatherStations.plug.apiNotConfigured = false;
+    weatherStationsDetailsMock.modules.forEach((module) => {
+      module.apiNotConfigured = false;
+      module.plug.apiNotConfigured = false;
     });
     nock('https://api.netatmo.com')
       .get('/api/getstationsdata?get_favorites=false')
       .reply(200, { body: bodyGetWeatherStationMock, status: 'ok' });
 
-    const { weatherStations, modulesWeatherStations } = await netatmoHandler.loadWeatherStationDetails();
-    expect(weatherStations).to.deep.eq(weatherStationsDetailsMock.weatherStations);
-    expect(modulesWeatherStations).to.deep.eq(weatherStationsDetailsMock.modulesWeatherStations);
-    expect(weatherStations).to.be.an('array');
-    expect(modulesWeatherStations).to.be.an('array');
+    const { devices, modules } = await netatmoHandler.loadWeatherStationDetails();
+    expect(devices).to.deep.eq(weatherStationsDetailsMock.devices);
+    expect(modules).to.deep.eq(weatherStationsDetailsMock.modules);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
   });
 
   it('should handle API errors gracefully', async () => {
@@ -81,10 +81,10 @@ describe('Netatmo Load Weather Station Details', () => {
         },
       });
 
-    const { weatherStations, modulesWeatherStations } = await netatmoHandler.loadWeatherStationDetails();
+    const { devices, modules } = await netatmoHandler.loadWeatherStationDetails();
 
-    expect(weatherStations).to.be.eq(undefined);
-    expect(modulesWeatherStations).to.be.eq(undefined);
+    expect(devices).to.be.eq(undefined);
+    expect(modules).to.be.eq(undefined);
   });
 
   it('should handle unexpected API responses', async () => {
@@ -92,11 +92,11 @@ describe('Netatmo Load Weather Station Details', () => {
       .get('/api/getstationsdata?get_favorites=false')
       .reply(200, { body: bodyGetWeatherStationMock, status: 'error' });
 
-    const { weatherStations, modulesWeatherStations } = await netatmoHandler.loadWeatherStationDetails();
-    expect(weatherStations).to.deep.eq(bodyGetWeatherStationMock.devices);
-    expect(modulesWeatherStations).to.deep.eq([]);
-    expect(weatherStations).to.be.an('array');
-    expect(modulesWeatherStations).to.be.an('array');
-    expect(modulesWeatherStations).to.have.lengthOf(0);
+    const { devices, modules } = await netatmoHandler.loadWeatherStationDetails();
+    expect(devices).to.deep.eq(bodyGetWeatherStationMock.devices);
+    expect(modules).to.deep.eq([]);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
+    expect(modules).to.have.lengthOf(0);
   });
 });

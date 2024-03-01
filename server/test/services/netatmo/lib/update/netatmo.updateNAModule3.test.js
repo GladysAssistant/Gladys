@@ -6,6 +6,7 @@ const { fake } = sinon;
 const devicesGladys = JSON.parse(JSON.stringify(require('../../netatmo.convertDevices.mock.test.json')));
 const devicesNetatmo = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));
 const { EVENTS } = require('../../../../../utils/constants');
+const { FfmpegMock, childProcessMock } = require('../../FfmpegMock.test');
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
 const logger = require('../../../../../utils/logger');
 

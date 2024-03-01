@@ -1,5 +1,5 @@
 {
-  "plugs": [
+  "devices": [
     {
       "_id": "70:ee:50:xx:xx:xx",
       "type": "NAPlug",
@@ -72,7 +72,7 @@
       "apiNotConfigured": true
     }
   ],
-  "thermostats": [
+  "modules": [
     {
       "_id": "04:00:00:xx:xx:xx",
       "type": "NATherm1",

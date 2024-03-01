@@ -8,10 +8,7 @@
     "name": "Relais Test",
     "setup_date": 1580000000,
     "room_id": "1234567890",
-    "modules_bridged": [
-      "01:00:00:xx:xx:xx",
-      "02:00:00:xx:xx:xx"
-    ],
+    "modules_bridged": ["01:00:00:xx:xx:xx", "02:00:00:xx:xx:xx"],
     "_id": "70:ee:50:xx:xx:xx",
     "last_setup": 1580000000,
     "firmware": 123,
@@ -29,10 +26,7 @@
       "continent": "Europe",
       "country": "FR",
       "country_name": "France",
-      "location": [
-        1.234,
-        2.345
-      ],
+      "location": [1.234, 2.345],
       "street": "Rue de Test",
       "timezone": "Europe/Paris",
       "trust_location": true
@@ -44,9 +38,7 @@
       "id": "1234567890",
       "name": "Garage Test",
       "type": "garage",
-      "module_ids": [
-        "01:00:00:xx:xx:xx"
-      ]
+      "module_ids": ["01:00:00:xx:xx:xx"]
     },
     "plug": null,
     "categoryAPI": "Energy",
@@ -77,14 +69,8 @@
     "module_name": "Thermostat Test",
     "battery_percent": 60,
     "event_history": {
-      "boiler_not_responding_events": [
-        "event1",
-        "event2"
-      ],
-      "boiler_responding_events": [
-        "event3",
-        "event4"
-      ]
+      "boiler_not_responding_events": ["event1", "event2"],
+      "boiler_responding_events": ["event3", "event4"]
     },
     "setpoint_history": [
       {
@@ -132,9 +118,7 @@
       "id": "0987654321",
       "name": "Maison Test",
       "type": "livingroom",
-      "module_ids": [
-        "04:00:00:xx:xx:xx"
-      ],
+      "module_ids": ["04:00:00:xx:xx:xx"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 50,
@@ -151,9 +135,7 @@
       "name": "Relais Test",
       "setup_date": 1580000000,
       "room_id": "1234567890",
-      "modules_bridged": [
-        "01:00:00:xx:xx:xx"
-      ],
+      "modules_bridged": ["01:00:00:xx:xx:xx"],
       "firmware_revision": 123,
       "rf_strength": 70,
       "wifi_strength": 45,
@@ -174,10 +156,7 @@
         "continent": "Europe",
         "country": "FR",
         "country_name": "France",
-        "location": [
-          1.234,
-          2.345
-        ],
+        "location": [1.234, 2.345],
         "street": "Rue de Test",
         "timezone": "Europe/Paris",
         "trust_location": true
@@ -200,11 +179,7 @@
     "firmware": 124,
     "last_status_store": 1601000000,
     "home": "5e1xxxxxxxxxxxxxxxxx",
-    "modules_bridged": [
-      "09:00:00:xx:xx:xx",
-      "09:00:00:yy:yy:yy",
-      "09:00:00:zz:zz:zz"
-    ],
+    "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"],
     "plug": null,
     "categoryAPI": "Energy",
     "apiNotConfigured": true
@@ -226,9 +201,7 @@
       "id": "8765432109",
       "name": "Office",
       "type": "home_office",
-      "module_ids": [
-        "09:00:00:xx:xx:xx"
-      ],
+      "module_ids": ["09:00:00:xx:xx:xx"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 100,
@@ -247,11 +220,7 @@
       "name": "Relais Salon Test",
       "setup_date": 1581000000,
       "room_id": "2812958323",
-      "modules_bridged": [
-        "09:00:00:xx:xx:xx",
-        "09:00:00:yy:yy:yy",
-        "09:00:00:zz:zz:zz"
-      ]
+      "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
     },
     "categoryAPI": "Energy",
     "apiNotConfigured": true
@@ -272,12 +241,7 @@
     "name": "Weather Station Test",
     "setup_date": 1605564990,
     "room_id": "8765432109",
-    "modules_bridged": [
-      "02:00:00:yy:yy:yy",
-      "05:00:00:yy:yy:yy",
-      "06:00:00:yy:yy:yy",
-      "03:00:00:yy:yy:yy"
-    ],
+    "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
     "_id": "70:ee:50:jj:jj:jj",
     "station_name": "Maison STARK (Weather Station Test)",
     "date_setup": 1605564990,
@@ -288,22 +252,13 @@
     "wifi_status": 39,
     "reachable": true,
     "co2_calibrating": false,
-    "data_type": [
-      "Temperature",
-      "CO2",
-      "Humidity",
-      "Noise",
-      "Pressure"
-    ],
+    "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
     "place": {
       "altitude": 50,
       "city": "Ville Test",
       "country": "FR",
       "timezone": "Europe/Paris",
-      "location": [
-        1.234,
-        2.345
-      ]
+      "location": [1.234, 2.345]
     },
     "home_id": "5e1xxxxxxxxxxxxxxxxx",
     "home_name": "Maison STARK",
@@ -327,12 +282,7 @@
       "id": "8765432109",
       "name": "Office",
       "type": "home_office",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": false,
       "therm_measured_temperature": 20.5,
       "therm_setpoint_temperature": 20.5,
@@ -362,10 +312,7 @@
     "_id": "02:00:00:yy:yy:yy",
     "module_name": "Outdoor Hygrometer",
     "last_setup": 1605564992,
-    "data_type": [
-      "Temperature",
-      "Humidity"
-    ],
+    "data_type": ["Temperature", "Humidity"],
     "battery_percent": 32,
     "firmware": 53,
     "last_message": 1706525865,
@@ -386,12 +333,7 @@
       "id": "8765432109",
       "name": "Outdoor",
       "type": "outdoor",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -407,12 +349,7 @@
       "name": "Weather Station Test",
       "setup_date": 1605564990,
       "room_id": "8765432109",
-      "modules_bridged": [
-        "02:00:00:yy:yy:yy",
-        "05:00:00:yy:yy:yy",
-        "06:00:00:yy:yy:yy",
-        "03:00:00:yy:yy:yy"
-      ],
+      "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
       "firmware_revision": 202,
       "wifi_state": "full",
       "wifi_strength": 39,
@@ -433,22 +370,13 @@
       "wifi_status": 40,
       "reachable": true,
       "co2_calibrating": false,
-      "data_type": [
-        "Temperature",
-        "CO2",
-        "Humidity",
-        "Noise",
-        "Pressure"
-      ],
+      "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
       "place": {
         "altitude": 50,
         "city": "Ville Test",
         "country": "FR",
         "timezone": "Europe/Paris",
-        "location": [
-          1.234,
-          2.345
-        ]
+        "location": [1.234, 2.345]
       },
       "home_id": "5e1xxxxxxxxxxxxxxxxx",
       "home_name": "Maison STARK",
@@ -493,9 +421,7 @@
     "_id": "06:00:00:yy:yy:yy",
     "module_name": "Anemometer STARK Home",
     "last_setup": 1605604559,
-    "data_type": [
-      "Wind"
-    ],
+    "data_type": ["Wind"],
     "battery_percent": 51,
     "firmware": 27,
     "last_message": 1706723822,
@@ -516,12 +442,7 @@
       "id": "8765432109",
       "name": "Outdoor",
       "type": "outdoor",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -537,12 +458,7 @@
       "name": "Weather Station Test",
       "setup_date": 1605564990,
       "room_id": "8765432109",
-      "modules_bridged": [
-        "02:00:00:yy:yy:yy",
-        "05:00:00:yy:yy:yy",
-        "06:00:00:yy:yy:yy",
-        "03:00:00:yy:yy:yy"
-      ],
+      "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
       "firmware_revision": 202,
       "wifi_state": "full",
       "wifi_strength": 39,
@@ -563,22 +479,13 @@
       "wifi_status": 40,
       "reachable": true,
       "co2_calibrating": false,
-      "data_type": [
-        "Temperature",
-        "CO2",
-        "Humidity",
-        "Noise",
-        "Pressure"
-      ],
+      "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
       "place": {
         "altitude": 50,
         "city": "Ville Test",
         "country": "FR",
         "timezone": "Europe/Paris",
-        "location": [
-          1.234,
-          2.345
-        ]
+        "location": [1.234, 2.345]
       },
       "home_id": "5e1xxxxxxxxxxxxxxxxx",
       "home_name": "Maison STARK",
@@ -620,18 +527,13 @@
     "_id": "05:00:00:yy:yy:yy",
     "module_name": "STARK House Rain Gauge",
     "last_setup": 1605604312,
-    "data_type": [
-      "Rain"
-    ],
+    "data_type": ["Rain"],
     "place": {
       "altitude": 50,
       "city": "Ville Test",
       "country": "FR",
       "timezone": "Europe/Paris",
-      "location": [
-        1.234,
-        2.345
-      ]
+      "location": [1.234, 2.345]
     },
     "home_id": "5e1xxxxxxxxxxxxxxxxx",
     "home_name": "Maison STARK",
@@ -651,12 +553,7 @@
       "id": "8765432109",
       "name": "Outdoor",
       "type": "outdoor",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -672,12 +569,7 @@
       "name": "Weather Station Test",
       "setup_date": 1605564990,
       "room_id": "8765432109",
-      "modules_bridged": [
-        "02:00:00:yy:yy:yy",
-        "05:00:00:yy:yy:yy",
-        "06:00:00:yy:yy:yy",
-        "03:00:00:yy:yy:yy"
-      ],
+      "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
       "firmware_revision": 202,
       "wifi_state": "full",
       "wifi_strength": 39,
@@ -698,22 +590,13 @@
       "wifi_status": 40,
       "reachable": true,
       "co2_calibrating": false,
-      "data_type": [
-        "Temperature",
-        "CO2",
-        "Humidity",
-        "Noise",
-        "Pressure"
-      ],
+      "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
       "place": {
         "altitude": 50,
         "city": "Ville Test",
         "country": "FR",
         "timezone": "Europe/Paris",
-        "location": [
-          1.234,
-          2.345
-        ]
+        "location": [1.234, 2.345]
       },
       "home_id": "5e1xxxxxxxxxxxxxxxxx",
       "home_name": "Maison STARK",
@@ -757,11 +640,7 @@
     "_id": "03:00:00:yy:yy:yy",
     "module_name": "STARK House kitchen hygrometer",
     "last_setup": 1608046641,
-    "data_type": [
-      "Temperature",
-      "CO2",
-      "Humidity"
-    ],
+    "data_type": ["Temperature", "CO2", "Humidity"],
     "battery_percent": 41,
     "firmware": 53,
     "last_message": 1706517399,
@@ -783,12 +662,7 @@
       "id": "8765432109",
       "name": "Kitchen",
       "type": "home_kitchen",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -804,12 +678,7 @@
       "name": "Weather Station Test",
       "setup_date": 1605564990,
       "room_id": "8765432109",
-      "modules_bridged": [
-        "02:00:00:yy:yy:yy",
-        "05:00:00:yy:yy:yy",
-        "06:00:00:yy:yy:yy",
-        "03:00:00:yy:yy:yy"
-      ],
+      "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
       "firmware_revision": 202,
       "wifi_state": "full",
       "wifi_strength": 39,
@@ -830,22 +699,13 @@
       "wifi_status": 40,
       "reachable": true,
       "co2_calibrating": false,
-      "data_type": [
-        "Temperature",
-        "CO2",
-        "Humidity",
-        "Noise",
-        "Pressure"
-      ],
+      "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
       "place": {
         "altitude": 50,
         "city": "Ville Test",
         "country": "FR",
         "timezone": "Europe/Paris",
-        "location": [
-          1.234,
-          2.345
-        ]
+        "location": [1.234, 2.345]
       },
       "home_id": "5e1xxxxxxxxxxxxxxxxx",
       "home_name": "Maison STARK",
@@ -885,9 +745,7 @@
       "id": "8765432109",
       "name": "Office",
       "type": "home_office",
-      "module_ids": [
-        "09:00:00:xx:xx:xx"
-      ],
+      "module_ids": ["09:00:00:xx:xx:xx"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 100,
@@ -906,11 +764,7 @@
       "name": "Relais Salon Test",
       "setup_date": 1581000000,
       "room_id": "2812958323",
-      "modules_bridged": [
-        "09:00:00:xx:xx:xx",
-        "09:00:00:yy:yy:yy",
-        "09:00:00:zz:zz:zz"
-      ]
+      "modules_bridged": ["09:00:00:xx:xx:xx", "09:00:00:yy:yy:yy", "09:00:00:zz:zz:zz"]
     }
   },
   {
@@ -925,22 +779,13 @@
     "wifi_status": 39,
     "reachable": true,
     "co2_calibrating": false,
-    "data_type": [
-      "Temperature",
-      "CO2",
-      "Humidity",
-      "Noise",
-      "Pressure"
-    ],
+    "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
     "place": {
       "altitude": 50,
       "city": "Ville Test",
       "country": "FR",
       "timezone": "Europe/Paris",
-      "location": [
-        1.234,
-        2.345
-      ]
+      "location": [1.234, 2.345]
     },
     "home_id": "5e1xxxxxxxxxxxxxxxxx",
     "home_name": "Maison STARK Secondaire",
@@ -985,11 +830,7 @@
       "id": "3939900879",
       "name": "Living room",
       "type": "custom",
-      "module_ids": [
-        "70:ee:00:xx:xx:xx",
-        "70:ee:01:xx:xx:xx",
-        "09:00:00:yy:yy:yy"
-      ],
+      "module_ids": ["70:ee:00:xx:xx:xx", "70:ee:01:xx:xx:xx", "09:00:00:yy:yy:yy"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -1020,12 +861,7 @@
       "id": "8765432109",
       "name": "Extérieur",
       "type": "outdoor",
-      "module_ids": [
-        "70:ee:00:xx:xx:xx",
-        "02:00:00:xx:xx:xx",
-        "05:00:00:xx:xx:xx",
-        "06:00:00:xx:xx:xx"
-      ]
+      "module_ids": ["70:ee:00:xx:xx:xx", "02:00:00:xx:xx:xx", "05:00:00:xx:xx:xx", "06:00:00:xx:xx:xx"]
     },
     "not_handled": true
   }

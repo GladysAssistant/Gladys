@@ -76,7 +76,8 @@ describe('Netatmo Load Device Details', () => {
         .to.have.property('modules_bridged')
         .that.is.an('array');
     });
-    natNACameraDevices.forEach((device) => { // TODO TEST
+    natNACameraDevices.forEach((device) => {
+      // TODO TEST
       expect(device.categoryAPI).to.be.eq('Security');
       expect(device)
         .to.have.property('vpn_url')
@@ -93,7 +94,7 @@ describe('Netatmo Load Device Details', () => {
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
-    expect(devices).to.have.lengthOf(10);
+    expect(devices).to.have.lengthOf(11);
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
     natThermDevices.forEach((device) => {
