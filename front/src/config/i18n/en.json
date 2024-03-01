@@ -1686,6 +1686,20 @@
         "label": "Select the lights you want to toggle",
         "description": "This action turn on the light if state is off or turn off the light if state is on"
       },
+      "blinkLights": {
+        "label": "Select the lights you want to make blink",
+        "description": "Configure blinking duration and speed",
+        "blinkingTime": {
+          "label": "Duration (in seconds)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
+        }
+      },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
       },
@@ -1827,7 +1841,8 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights",
-        "toggle": "Toggle the Lights"
+        "toggle": "Toggle the Lights",
+        "blink": "Make the Lights blink"
       },
       "switch": {
         "turn-on": "Turn On the Switches",

@@ -1688,6 +1688,20 @@
         "label": "Sélectionnez les lumières que vous souhaitez inverser",
         "description": "Cette action allume la lumière si éteinte, sinon éteins la lumière"
       },
+      "blinkLights": {
+        "label": "Sélectionnez les lumières que vous souhaitez faire clignoter",
+        "description": "Réglez la durée et la vitesse de clignotement",
+        "blinkingTime": {
+          "label": "Durée (en secondes)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Lent",
+          "medium": "Normal",
+          "fast": "Rapide"
+        }
+      },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
       },
@@ -1827,9 +1841,10 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières",
-        "toggle": "Inverser les lumières"
+        "toggle": "Inverser les lumières",
+        "blink": "Faire clignoter les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",

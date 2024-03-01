@@ -1684,6 +1684,20 @@
         "label": "Wähle die Lichter aus, die umgeschaltet werden sollen",
         "description": "Diese Aktion schaltet das Licht ein, wenn es ausgeschaltet ist bzw. schaltet es aus, wenn es eingeschaltet ist"
       },
+      "blinkLights": {
+        "label": "Wählen Sie die Lichter aus, die Sie zum Blinken bringen möchten",
+        "description": "Stellen Sie die Dauer und die Geschwindigkeit des Blinkens ein",
+        "blinkingTime": {
+          "label": "Dauer (in Sekunden)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Modus",
+          "slow": "Langsam",
+          "medium": "Mittel",
+          "fast": "Schnell"
+        }
+      },
       "turnOnSwitches": {
         "label": "Wähle die Schalter aus, die eingeschaltet werden sollen"
       },
@@ -1825,7 +1839,8 @@
       "light": {
         "turn-on": "Licht einschalten",
         "turn-off": "Licht ausschalten",
-        "toggle": "Lichter umschalten"
+        "toggle": "Lichter umschalten",
+        "blink": "Lichter blinken lassen"
       },
       "switch": {
         "turn-on": "Schalter einschalten",
