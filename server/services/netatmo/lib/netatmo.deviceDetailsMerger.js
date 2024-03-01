@@ -15,8 +15,8 @@ async function mergeDeviceDetails(listDevices, devices, modules, SUPPORTED_MODUL
     const listDeviceIds = updatedListDevices.map((device) => device._id || device.id);
     updatedListDevices = listDeviceIds.map((id) => {
       let deviceList = updatedListDevices.find((device) => device._id === id || device.id === id);
-      const matchedDevice = devices.find((d) => d._id === id);
-      const matchedModule = modules.find((m) => m._id === id);
+      const matchedDevice = devices.find((d) => d._id === id || d.id === id);
+      const matchedModule = modules.find((m) => m._id === id || m.id === id);
       if (matchedDevice) {
         deviceList = { ...deviceList, ...matchedDevice };
       }
@@ -26,7 +26,7 @@ async function mergeDeviceDetails(listDevices, devices, modules, SUPPORTED_MODUL
             const { modules: mods, ...rest } = dev;
             return rest;
           })
-          .find((mod) => mod._id === deviceList.bridge);
+          .find((mod) => mod._id === deviceList.bridge || mod.id === id);
         deviceList.plug = { ...deviceList.plug, ...moduleData };
         deviceList = { ...deviceList, ...matchedModule };
       }
@@ -36,8 +36,8 @@ async function mergeDeviceDetails(listDevices, devices, modules, SUPPORTED_MODUL
     who does not have devices in the corresponding category */
     updatedListDevices = [
       ...updatedListDevices,
-      ...devices.filter((dev) => !updatedListDevices.some((device) => device.id === dev._id)),
-      ...modules.filter((mod) => !updatedListDevices.some((device) => device.id === mod._id)),
+      ...devices.filter((dev) => !updatedListDevices.some((device) => device.id === dev._id || device.id === dev.id)),
+      ...modules.filter((mod) => !updatedListDevices.some((device) => device.id === mod._id || device.id === mod.id)),
     ];
   } else {
     /* otherwise we retrieve the devices and modules as the API request provides them to us */
@@ -46,8 +46,8 @@ async function mergeDeviceDetails(listDevices, devices, modules, SUPPORTED_MODUL
   updatedListDevices
     .filter((device) => device.type === SUPPORTED_MODULE_TYPE)
     .forEach((device) => {
-      if (!device.modules_bridged) {
-        device.modules_bridged = device.modules.map((module) => module._id);
+      if (!device.modules_bridged && device.modules) {
+        device.modules_bridged = device.modules.map((module) => module._id || module.id);
       }
     });
   return updatedListDevices;

@@ -24,7 +24,7 @@ async function updateValues(device, deviceNetatmo, externalId) {
     logger.info(`Netatmo device "${deviceGladys.name}" is not reachable`);
   } else {
     const isCameraDevice = model === SUPPORTED_MODULE_TYPE.NACAMERA;
-    if (isCameraDevice) {
+    if (isCameraDevice && vpnUrl) {
       /*
         vpn_url example: 
           'https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,'
