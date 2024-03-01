@@ -1,5 +1,5 @@
 {
-  "weatherStations": [
+  "devices": [
     {
       "_id": "70:ee:50:jj:jj:jj",
       "station_name": "Maison STARK (Weather Station Test)",
@@ -308,7 +308,7 @@
       "apiNotConfigured": true
     }
   ],
-  "modulesWeatherStations": [
+  "modules": [
     {
       "_id": "02:00:00:yy:yy:yy",
       "type": "NAModule1",

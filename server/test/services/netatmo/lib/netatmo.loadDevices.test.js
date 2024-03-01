@@ -65,17 +65,17 @@ describe('Netatmo Load Devices', () => {
   it('should load thermostat devices successfully if no devices in loadDeviceDetails', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.loadDeviceDetails = sinon.stub().resolves([]);
-    const plugsMock = [...JSON.parse(JSON.stringify(thermostatsDetailsMock.plugs))];
-    const thermostatsMock = [...JSON.parse(JSON.stringify(thermostatsDetailsMock.thermostats))];
+    const plugsMock = [...JSON.parse(JSON.stringify(thermostatsDetailsMock.devices))];
+    const thermostatsMock = [...JSON.parse(JSON.stringify(thermostatsDetailsMock.modules))];
 
-    thermostatsMock.forEach((thermostat) => {
-      plugsMock.push(thermostat);
+    thermostatsMock.forEach((module) => {
+      plugsMock.push(module);
     });
     plugsMock
       .filter((device) => device.type === 'NAPlug')
-      .forEach((plug) => {
-        if (!plug.modules_bridged) {
-          plug.modules_bridged = plug.modules.map((module) => module._id);
+      .forEach((device) => {
+        if (!device.modules_bridged) {
+          device.modules_bridged = device.modules.map((module) => module._id);
         }
       });
     nock('https://api.netatmo.com')
@@ -90,18 +90,16 @@ describe('Netatmo Load Devices', () => {
   it('should load weather devices successfully if no devices in loadDeviceDetails', async () => {
     netatmoHandler.configuration.weatherApi = true;
     netatmoHandler.loadDeviceDetails = sinon.stub().resolves([]);
-    const weatherStationsMock = [...JSON.parse(JSON.stringify(weatherStationsDetailsMock.weatherStations))];
-    const modulesWeatherStationsMock = [
-      ...JSON.parse(JSON.stringify(weatherStationsDetailsMock.modulesWeatherStations)),
-    ];
-    modulesWeatherStationsMock.forEach((moduleWeatherStation) => {
-      weatherStationsMock.push(moduleWeatherStation);
+    const weatherStationsMock = [...JSON.parse(JSON.stringify(weatherStationsDetailsMock.devices))];
+    const modulesWeatherStationsMock = [...JSON.parse(JSON.stringify(weatherStationsDetailsMock.modules))];
+    modulesWeatherStationsMock.forEach((module) => {
+      weatherStationsMock.push(module);
     });
     weatherStationsMock
       .filter((device) => device.type === 'NAMain')
-      .forEach((plug) => {
-        if (!plug.modules_bridged) {
-          plug.modules_bridged = plug.modules.map((module) => module._id);
+      .forEach((device) => {
+        if (!device.modules_bridged) {
+          device.modules_bridged = device.modules.map((module) => module._id);
         }
       });
     const devices = await netatmoHandler.loadDevices();
@@ -123,9 +121,23 @@ describe('Netatmo Load Devices', () => {
     expect(devices).to.deep.eq(devicesMock);
   });
 
+  it('should load energy, weather and security devices successfully', async () => {
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.configuration.weatherApi = true;
+    netatmoHandler.configuration.securityApi = true;
+    nock('https://api.netatmo.com')
+      .get('/api/homesdata')
+      .reply(200, { body: bodyHomesDataMock, status: 'ok' });
+
+    const devices = await netatmoHandler.loadDevices();
+
+    expect(devices).to.be.an('array');
+    expect(devices).to.deep.eq(devicesMock);
+  });
+
   it('should handle API errors gracefully', async () => {
     netatmoHandler.configuration.energyApi = true;
-    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ devices: [], modules: [] });
     nock('https://api.netatmo.com')
       .get('/api/homesdata')
       .reply(400, {
@@ -148,7 +160,7 @@ describe('Netatmo Load Devices', () => {
 
   it('should handle unexpected API responses', async () => {
     netatmoHandler.configuration.energyApi = true;
-    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ devices: [], modules: [] });
     nock('https://api.netatmo.com')
       .get('/api/homesdata')
       .reply(200, {
@@ -164,7 +176,7 @@ describe('Netatmo Load Devices', () => {
 
   it('should handle API errors gracefully', async () => {
     netatmoHandler.configuration.energyApi = true;
-    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ devices: [], modules: [] });
     const badBodyHomesData = { ...JSON.parse(JSON.stringify(bodyHomesDataMock)) };
     badBodyHomesData.homes[0].modules = undefined;
     badBodyHomesData.homes[1].modules = undefined;
@@ -182,7 +194,7 @@ describe('Netatmo Load Devices', () => {
 
   it('should return an empty array if no homes are returned from the API', async () => {
     netatmoHandler.configuration.energyApi = true;
-    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ devices: [], modules: [] });
     const bodyHomesDataEmpty = { ...JSON.parse(JSON.stringify(bodyHomesDataMock)) };
     bodyHomesDataEmpty.homes = [];
 
@@ -197,7 +209,7 @@ describe('Netatmo Load Devices', () => {
 
   it('should return an empty array if homes are returned without modules', async () => {
     netatmoHandler.configuration.energyApi = true;
-    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ devices: [], modules: [] });
     const bodyHomesDataNoModules = { ...JSON.parse(JSON.stringify(bodyHomesDataMock)) };
     bodyHomesDataNoModules.homes.forEach((home) => {
       home.modules = undefined;

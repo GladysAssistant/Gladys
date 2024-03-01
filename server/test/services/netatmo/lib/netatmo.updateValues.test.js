@@ -295,4 +295,77 @@ describe('Netatmo update features type', () => {
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(8);
   });
+
+  it('should save params and save all values according for a NACamera device with localUrl', async () => {
+    const deviceGladys = { ...JSON.parse(JSON.stringify(devicesGladys[9])) };
+    const deviceNetatmo = { ...JSON.parse(JSON.stringify(devicesNetatmo[9])) };
+    const externalId = `netatmo:${deviceNetatmo.id}`;
+    nock('https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,')
+      .get('/command/ping')
+      .reply(200, { local_url: 'http://192.168.128.232/52ced8bcc8149xxxxxxxxxx', type: 'nsv', status: 'ok' });
+
+    nock('http://192.168.128.232/52ced8bcc8149xxxxxxxxxx')
+      .get('/command/ping')
+      .reply(200, { local_url: 'http://192.168.128.232/52ced8bcc8149xxxxxxxxxx', type: 'nsv', status: 'ok' });
+
+    netatmoHandler.gladys.device.setParam = sinon.stub().resolves();
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(deviceGladys);
+    netatmoHandler.getImage = sinon.fake.resolves('base64image');
+
+    await netatmoHandler.updateValues(deviceGladys, deviceNetatmo, externalId);
+
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.device.setParam,
+      deviceGladys,
+      'CAMERA_URL',
+      'http://192.168.128.232/52ced8bcc8149xxxxxxxxxx/live/files/high/index.m3u8',
+    );
+    sinon.assert.calledWith(netatmoHandler.gladys.stateManager.get, 'deviceByExternalId', externalId);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
+  });
+
+  it('should not update param but update only values NACamera device with vpnUrl', async () => {
+    const deviceGladys = { ...JSON.parse(JSON.stringify(devicesGladys[9])) };
+    const deviceNetatmo = { ...JSON.parse(JSON.stringify(devicesNetatmo[9])) };
+    const externalId = `netatmo:${deviceNetatmo.id}`;
+
+    deviceNetatmo.is_local = undefined;
+    netatmoHandler.gladys.device.setParam = sinon.stub().resolves();
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(deviceGladys);
+    netatmoHandler.getImage = sinon.fake.resolves('base64image');
+
+    await netatmoHandler.updateValues(deviceGladys, deviceNetatmo, externalId);
+
+    sinon.assert.notCalled(netatmoHandler.gladys.device.setParam);
+    sinon.assert.notCalled(netatmoHandler.gladys.stateManager.get);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
+  });
+
+  it('should save params for a NACamera device with vpnUrl', async () => {
+    const deviceGladys = { ...JSON.parse(JSON.stringify(devicesGladys[9])) };
+    const deviceNetatmo = { ...JSON.parse(JSON.stringify(devicesNetatmo[9])) };
+    const externalId = `netatmo:${deviceNetatmo.id}`;
+    nock('https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,')
+      .get('/command/ping')
+      .reply(200, { local_url: 'http://192.168.128.232/52ced8bcc8149xxxxxxxxxx', type: 'nsv', status: 'ok' });
+
+    nock('http://192.168.128.232/52ced8bcc8149xxxxxxxxxx')
+      .get('/command/ping')
+      .reply(200, { local_url: '', type: 'nsv', status: 'ok' });
+
+    deviceNetatmo.is_local = true;
+    netatmoHandler.gladys.device.setParam = sinon.stub().resolves();
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(deviceGladys);
+    netatmoHandler.updateNACamera = sinon.stub().resolves();
+
+    await netatmoHandler.updateValues(deviceGladys, deviceNetatmo, externalId);
+
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.device.setParam,
+      deviceGladys,
+      'CAMERA_URL',
+      'https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,/live/files/high/index.m3u8',
+    );
+    sinon.assert.calledWith(netatmoHandler.gladys.stateManager.get, 'deviceByExternalId', externalId);
+  });
 });

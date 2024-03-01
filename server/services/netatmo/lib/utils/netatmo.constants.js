@@ -23,6 +23,7 @@ const SCOPES = {
     read_presence: 'read_presence',
     write_presence: 'write_presence',
     access_presence: 'access_presence',
+    read_doorbell: 'read_doorbell',
     access_doorbell: 'access_doorbell',
     read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
     read_smokedetector: 'read_smokedetector',

@@ -50,7 +50,7 @@ describe('Netatmo Convert Security Device', () => {
     deviceGladysMock.params
       .filter((param) => param.name === 'CAMERA_URL')
       .forEach((param) => {
-        const {value} = param;
+        const { value } = param;
         param.value = value.replace('index_local', 'index');
       });
     deviceNetatmoMock.is_local = false;

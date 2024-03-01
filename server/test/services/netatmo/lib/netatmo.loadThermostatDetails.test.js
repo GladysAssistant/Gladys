@@ -32,35 +32,35 @@ describe('Netatmo Load Thermostat Details', () => {
       .get('/api/getthermostatsdata')
       .reply(200, { body: bodyGetThermostatMock, status: 'ok' });
 
-    const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
-    expect(plugs).to.deep.eq(thermostatsDetailsMock.plugs);
-    expect(thermostats).to.deep.eq(thermostatsDetailsMock.thermostats);
-    expect(plugs).to.be.an('array');
-    expect(thermostats).to.be.an('array');
+    const { devices, modules } = await netatmoHandler.loadThermostatDetails();
+    expect(devices).to.deep.eq(thermostatsDetailsMock.devices);
+    expect(modules).to.deep.eq(thermostatsDetailsMock.modules);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
   });
 
   it('should load thermostat details successfully with API configured', async () => {
     netatmoHandler.configuration.energyApi = true;
-    thermostatsDetailsMock.plugs.forEach((plug) => {
-      plug.apiNotConfigured = false;
-      plug.modules.forEach((module) => {
+    thermostatsDetailsMock.devices.forEach((device) => {
+      device.apiNotConfigured = false;
+      device.modules.forEach((module) => {
         module.apiNotConfigured = false;
         module.plug.apiNotConfigured = false;
       });
     });
-    thermostatsDetailsMock.thermostats.forEach((thermostat) => {
-      thermostat.apiNotConfigured = false;
-      thermostat.plug.apiNotConfigured = false;
+    thermostatsDetailsMock.modules.forEach((module) => {
+      module.apiNotConfigured = false;
+      module.plug.apiNotConfigured = false;
     });
     nock('https://api.netatmo.com')
       .get('/api/getthermostatsdata')
       .reply(200, { body: bodyGetThermostatMock, status: 'ok' });
 
-    const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
-    expect(plugs).to.deep.eq(thermostatsDetailsMock.plugs);
-    expect(thermostats).to.deep.eq(thermostatsDetailsMock.thermostats);
-    expect(plugs).to.be.an('array');
-    expect(thermostats).to.be.an('array');
+    const { devices, modules } = await netatmoHandler.loadThermostatDetails();
+    expect(devices).to.deep.eq(thermostatsDetailsMock.devices);
+    expect(modules).to.deep.eq(thermostatsDetailsMock.modules);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
   });
 
   it('should handle API errors gracefully', async () => {
@@ -79,10 +79,10 @@ describe('Netatmo Load Thermostat Details', () => {
         },
       });
 
-    const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
+    const { devices, modules } = await netatmoHandler.loadThermostatDetails();
 
-    expect(plugs).to.be.eq(undefined);
-    expect(thermostats).to.be.eq(undefined);
+    expect(devices).to.be.eq(undefined);
+    expect(modules).to.be.eq(undefined);
   });
 
   it('should handle unexpected API responses', async () => {
@@ -90,11 +90,11 @@ describe('Netatmo Load Thermostat Details', () => {
       .get('/api/getthermostatsdata')
       .reply(200, { body: bodyGetThermostatMock, status: 'error' });
 
-    const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
-    expect(plugs).to.deep.eq(bodyGetThermostatMock.devices);
-    expect(thermostats).to.deep.eq([]);
-    expect(plugs).to.be.an('array');
-    expect(thermostats).to.be.an('array');
-    expect(thermostats).to.have.lengthOf(0);
+    const { devices, modules } = await netatmoHandler.loadThermostatDetails();
+    expect(devices).to.deep.eq(bodyGetThermostatMock.devices);
+    expect(modules).to.deep.eq([]);
+    expect(devices).to.be.an('array');
+    expect(modules).to.be.an('array');
+    expect(modules).to.have.lengthOf(0);
   });
 });
