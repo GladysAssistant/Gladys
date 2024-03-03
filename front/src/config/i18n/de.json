@@ -2658,7 +2658,17 @@
           "43": "Ab-Taste gedrückt",
           "44": "Ab-Taste gehalten",
           "45": "Aus-Taste gedrückt",
-          "46": "Aus-Taste gehalten"
+          "46": "Aus-Taste gehalten",
+          "47": "Taste 1 einmal drücken",
+          "48": "Taste 1 lang drücken",
+          "49": "Taste 1 kurz drücken",
+          "50": "Taste 1 langes Loslassen",
+          "51": "Taste 1 doppelt drücken",
+          "52": "Taste 2 einfach drücken",
+          "53": "Taste 2 lang drücken",
+          "54": "Taste 2 kurz drücken",
+          "55": "Taste 2 langes Loslassen",
+          "56": "Taste 2 doppelt drücken"
         }
       },
       "opening-sensor": {

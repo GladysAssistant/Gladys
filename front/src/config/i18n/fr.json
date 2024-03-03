@@ -2662,7 +2662,17 @@
           "43": "Bouton Moins pressé",
           "44": "Bouton Moins maintenu",
           "45": "Bouton Off pressé",
-          "46": "Bouton Off maintenu"
+          "46": "Bouton Off maintenu",
+          "47": "Button 1 pression unique",
+          "48": "Button 1 pression longue",
+          "49": "Button 1 relâchement court",
+          "50": "Button 1 relâchement long",
+          "51": "Button 1 pression double",
+          "52": "Button 2 pression unique",
+          "53": "Button 2 pression longue",
+          "54": "Button 2 relâchement court",
+          "55": "Button 2 relâchement long",
+          "56": "Button 2 pression double"
         }
       },
       "opening-sensor": {
