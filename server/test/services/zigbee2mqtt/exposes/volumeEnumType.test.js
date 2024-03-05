@@ -15,12 +15,12 @@ describe('zigbee2mqtt cover enumType', () => {
     { enumValue: 'high', intValue: SIREN_VOLUME.HIGH },
   ].forEach((mapping) => {
     const { enumValue, intValue } = mapping;
-  
+
     it(`should write ${enumValue} value as ${intValue} value`, () => {
       const result = enumType.writeValue(expose, intValue);
       assert.equal(result, enumValue);
     });
-    
+
     it(`should read ${intValue} value as ${enumValue}`, () => {
       const result = enumType.readValue(expose, enumValue);
       assert.equal(result, intValue);
@@ -44,5 +44,4 @@ describe('zigbee2mqtt cover enumType', () => {
     const result = enumType.readValue(expose, 'unknown');
     assert.equal(result, undefined);
   });
-
 });
