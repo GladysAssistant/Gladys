@@ -500,6 +500,7 @@ const DEVICE_FEATURE_TYPES = {
   SIREN: {
     BINARY: 'binary',
     VOLUME: 'volume',
+    MELODY: 'melody',
   },
   CHILD_LOCK: {
     BINARY: 'binary',

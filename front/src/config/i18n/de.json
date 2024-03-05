@@ -2795,7 +2795,8 @@
     "siren": {
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
-      "volume": "Lautstärke der Sirene"
+      "volume": "Lautstärke der Sirene",
+      "melody": "Melodie"
     },
     "cube": {
       "shortCategoryName": "Würfel",

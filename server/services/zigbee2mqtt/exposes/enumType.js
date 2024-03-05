@@ -82,6 +82,11 @@ addMapping('volume', SIREN_VOLUME.HIGH, 'high');
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
+
+    if (expose.name === 'melody') {
+      return value;
+    }
+    
     const relatedValue = (WRITE_VALUE_MAPPING[expose.name] || {})[value];
 
     if (relatedValue && expose.values.includes(relatedValue)) {
@@ -91,6 +96,12 @@ module.exports = {
     return undefined;
   },
   readValue: (expose, value) => {
+
+    if (expose.name === 'melody') {
+      const intValue = parseInt(value, 10);
+      return intValue; 
+    } 
+
     const subValue = value.replace(/^(\d+_)?/, '');
     return (READ_VALUE_MAPPING[expose.name] || {})[subValue];
   },
@@ -120,6 +131,14 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.VOLUME,
+      },
+    },
+    melody: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+        min: 1,
+        max: 18,
       },
     },
   },

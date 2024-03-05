@@ -2799,7 +2799,8 @@
     "siren": {
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
-      "volume": "Volume de la sirène"
+      "volume": "Volume de la sirène",
+      "melody": "Mélodie"
     },
     "cube": {
       "shortCategoryName": "Cube",

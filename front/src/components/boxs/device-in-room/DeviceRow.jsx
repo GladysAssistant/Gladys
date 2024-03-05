@@ -29,7 +29,8 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: ThermostatDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: ThermostatDeviceFeature,
-  [DEVICE_FEATURE_TYPES.SIREN.VOLUME]: VolumeDeviceFeature
+  [DEVICE_FEATURE_TYPES.SIREN.VOLUME]: VolumeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.MELODY]: NumberDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {
