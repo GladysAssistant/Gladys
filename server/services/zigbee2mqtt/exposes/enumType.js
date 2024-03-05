@@ -82,11 +82,10 @@ addMapping('volume', SIREN_VOLUME.HIGH, 'high');
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
-
     if (expose.name === 'melody') {
       return value;
     }
-    
+
     const relatedValue = (WRITE_VALUE_MAPPING[expose.name] || {})[value];
 
     if (relatedValue && expose.values.includes(relatedValue)) {
@@ -96,11 +95,10 @@ module.exports = {
     return undefined;
   },
   readValue: (expose, value) => {
-
     if (expose.name === 'melody') {
       const intValue = parseInt(value, 10);
-      return intValue; 
-    } 
+      return intValue;
+    }
 
     const subValue = value.replace(/^(\d+_)?/, '');
     return (READ_VALUE_MAPPING[expose.name] || {})[subValue];

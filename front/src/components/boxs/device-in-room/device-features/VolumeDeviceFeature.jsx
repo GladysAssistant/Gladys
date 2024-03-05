@@ -66,4 +66,4 @@ const VolumeDeviceFeature = ({ children, ...props }) => {
   );
 };
 
-export default VolumeDeviceFeature; 
+export default VolumeDeviceFeature;
