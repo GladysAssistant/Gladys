@@ -2598,6 +2598,13 @@
           "cooling": "Kühlen",
           "heating": "Heizen"
         }
+      },
+      "siren": {
+        "volume": {
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch"
+        }
       }
     }
   },
@@ -2787,7 +2794,8 @@
     },
     "siren": {
       "shortCategoryName": "Sirene",
-      "binary": "Sirene"
+      "binary": "Sirene",
+      "volume": "Lautstärke der Sirene"
     },
     "cube": {
       "shortCategoryName": "Würfel",

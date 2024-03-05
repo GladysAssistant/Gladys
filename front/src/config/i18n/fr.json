@@ -2602,6 +2602,13 @@
           "cooling": "Clim.",
           "heating": "Chauffage"
         }
+      },
+      "siren": {
+        "volume": {
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Fort"
+        }
       }
     }
   },
@@ -2791,7 +2798,8 @@
     },
     "siren": {
       "shortCategoryName": "Sirène",
-      "binary": "Sirène On/Off"
+      "binary": "Sirène On/Off",
+      "volume": "Volume de la sirène"
     },
     "cube": {
       "shortCategoryName": "Cube",

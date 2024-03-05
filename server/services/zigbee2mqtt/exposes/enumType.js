@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   BUTTON_STATUS,
   COVER_STATE,
+  SIREN_VOLUME,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -74,6 +75,10 @@ addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
 
+addMapping('volume', SIREN_VOLUME.LOW, 'low');
+addMapping('volume', SIREN_VOLUME.MEDIUM, 'medium');
+addMapping('volume', SIREN_VOLUME.HIGH, 'high');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -109,6 +114,12 @@ module.exports = {
           max: 1,
           forceOverride: true,
         },
+      },
+    },
+    volume: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.VOLUME,
       },
     },
   },
