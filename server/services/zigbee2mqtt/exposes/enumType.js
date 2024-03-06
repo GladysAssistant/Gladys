@@ -70,19 +70,11 @@ addMapping('action', BUTTON_STATUS.DOWN_HOLD, 'down-hold');
 addMapping('action', BUTTON_STATUS.OFF_PRESS, 'off-press');
 addMapping('action', BUTTON_STATUS.OFF_HOLD, 'off-hold');
 
-addMapping('action', BUTTON_STATUS.INITIAL_PRESS_1, 'initial_press');
-addMapping('action', BUTTON_STATUS.LONG_PRESS_1, 'long_press');
-addMapping('action', BUTTON_STATUS.SHORT_RELEASE_1, 'short_release');
-addMapping('action', BUTTON_STATUS.LONG_RELEASE_1, 'long_release');
-addMapping('action', BUTTON_STATUS.DOUBLE_PRESS_1, 'double_press');
-
-/*
-addMapping('action', BUTTON_STATUS.INITIAL_PRESS_2, '2_initial_press');
-addMapping('action', BUTTON_STATUS.LONG_PRESS_2, '2_long_press');
-addMapping('action', BUTTON_STATUS.SHORT_RELEASE_2, '2_short_release');
-addMapping('action', BUTTON_STATUS.LONG_RELEASE_2, '2_long_release');
-addMapping('action', BUTTON_STATUS.DOUBLE_PRESS_2, '2_double_press');
-*/
+addMapping('action', BUTTON_STATUS.CLICK, 'initial_press');
+addMapping('action', BUTTON_STATUS.LONG_CLICK_PRESS, 'long_press');
+addMapping('action', BUTTON_STATUS.SHORT_CLICK_RELEASE, 'short_release');
+addMapping('action', BUTTON_STATUS.LONG_CLICK_RELEASE, 'long_release');
+addMapping('action', BUTTON_STATUS.DOUBLE_CLICK, 'double_press');
 
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
