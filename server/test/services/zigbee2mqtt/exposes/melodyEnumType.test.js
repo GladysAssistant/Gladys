@@ -16,5 +16,4 @@ describe('zigbee2mqtt melody enumType', () => {
     const result = enumType.readValue(expose, '1');
     assert.equal(result, 1);
   });
-
 });
