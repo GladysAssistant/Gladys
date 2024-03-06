@@ -2,6 +2,9 @@ const exposesMap = require('../../exposes');
 const { mapUnit } = require('./mapUnit');
 const { completeFeature } = require('./completeFeature');
 
+const logger = require('../../../utils/logger');
+
+
 /**
  * @description Load feature from parent type.
  * @param {object} types - Zigbee "expose" parent type features.
@@ -85,6 +88,9 @@ function buildFeatures(deviceName, expose, parentType) {
   // Add missing properties
   const typeFeaturesIndexes = getFeatureIndexes(values);
   const featureIndexes = typeFeaturesIndexes.length === 0 ? [0] : typeFeaturesIndexes;
+
+  logger.warn(`featureIndexes ${featureIndexes}`);
+
   return featureIndexes.map((suffixIndex) => completeFeature(deviceName, definedFeature, property, suffixIndex));
 }
 
