@@ -70,11 +70,11 @@ addMapping('action', BUTTON_STATUS.DOWN_HOLD, 'down-hold');
 addMapping('action', BUTTON_STATUS.OFF_PRESS, 'off-press');
 addMapping('action', BUTTON_STATUS.OFF_HOLD, 'off-hold');
 
-addMapping('action', BUTTON_STATUS.CLICK, 'initial_press');
-addMapping('action', BUTTON_STATUS.LONG_CLICK_PRESS, 'long_press');
-addMapping('action', BUTTON_STATUS.SHORT_CLICK_RELEASE, 'short_release');
-addMapping('action', BUTTON_STATUS.LONG_CLICK_RELEASE, 'long_release');
-addMapping('action', BUTTON_STATUS.DOUBLE_CLICK, 'double_press');
+addMapping('action', BUTTON_STATUS.INITIAL_PRESS, 'initial_press');
+addMapping('action', BUTTON_STATUS.LONG_PRESS, 'long_press');
+addMapping('action', BUTTON_STATUS.SHORT_RELEASE, 'short_release');
+addMapping('action', BUTTON_STATUS.LONG_RELEASE, 'long_release');
+addMapping('action', BUTTON_STATUS.DOUBLE_PRESS, 'double_press');
 
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');

@@ -2659,7 +2659,11 @@
           "44": "Ab-Taste gehalten",
           "45": "Aus-Taste gedrückt",
           "46": "Aus-Taste gehalten",
-          "47": "Kurzfreigabe"
+          "47": "Einmaliges Drücken",
+          "48": "Langer Druck",
+          "49": "Kurzes Loslassen",
+          "50": "Langes Loslassen",
+          "51": "Doppeltes Drücken"
         }
       },
       "opening-sensor": {

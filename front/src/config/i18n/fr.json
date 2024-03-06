@@ -2663,7 +2663,11 @@
           "44": "Bouton Moins maintenu",
           "45": "Bouton Off pressé",
           "46": "Bouton Off maintenu",
-          "47": "Relâche clic court"
+          "47": "Pression unique",
+          "48": "Pression longue",
+          "49": "Relâchement court",
+          "50": "Relâchement long",
+          "51": "Pression double"
         }
       },
       "opening-sensor": {
