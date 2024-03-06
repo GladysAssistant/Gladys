@@ -2,7 +2,7 @@ const exposesMap = require('../../exposes');
 const { mapUnit } = require('./mapUnit');
 const { completeFeature } = require('./completeFeature');
 
-const logger = require('../../../utils/logger');
+const logger = require('../../../../utils/logger');
 
 
 /**
