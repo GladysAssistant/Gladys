@@ -3,7 +3,7 @@ const { assert } = require('chai');
 const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
 const { SIREN_VOLUME } = require('../../../../utils/constants');
 
-describe('zigbee2mqtt cover enumType', () => {
+describe('zigbee2mqtt volume enumType', () => {
   const expose = {
     name: 'volume',
     values: ['low', 'medium', 'high'],
