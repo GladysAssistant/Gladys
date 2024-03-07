@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 
