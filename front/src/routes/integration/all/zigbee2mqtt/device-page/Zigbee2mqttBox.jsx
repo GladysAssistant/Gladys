@@ -89,7 +89,7 @@ class Zigbee2mqttBox extends Component {
       deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
-    
+
     return {
       batteryLevel
     };
