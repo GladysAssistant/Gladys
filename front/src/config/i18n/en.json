@@ -2660,7 +2660,12 @@
           "43": "Down press",
           "44": "Down hold",
           "45": "Off press",
-          "46": "Off hold"
+          "46": "Off hold",
+          "47": "Single press",
+          "48": "Long press",
+          "49": "Short release",
+          "50": "Long release",
+          "51": "Double press"
         }
       },
       "opening-sensor": {
