@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -47,11 +47,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -91,9 +91,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -106,7 +106,7 @@ jobs:
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
-        uses: cypress-io/github-action@v3.1.0
+        uses: cypress-io/github-action@v6
         with:
           install: false
           start: npm run start:cypress
@@ -120,9 +120,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -140,7 +140,7 @@ jobs:
         with:
           webpackStatsFile: ./front/stats.json
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: static
           path: front/build
@@ -153,19 +153,19 @@ jobs:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           version: latest
       - name: ↙️ Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: static
           path: static
       - name: 🐳 Build AMD64 images
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./docker/Dockerfile.buildx
