@@ -11,6 +11,7 @@ module.exports.telegram = require('./telegram');
 module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.tasmota = require('./tasmota');
+module.exports.rflink = require('./rflink');
 module.exports.bluetooth = require('./bluetooth');
 module.exports.ewelink = require('./ewelink');
 module.exports['tp-link'] = require('./tp-link');
