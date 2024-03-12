@@ -273,7 +273,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
           prevValue: 0,
           propertyName: 'currentValue',
         },
-        [0]
+        [0],
       ],
     });
     assert.calledWith(gladys.event.emit, 'device.new-state', {

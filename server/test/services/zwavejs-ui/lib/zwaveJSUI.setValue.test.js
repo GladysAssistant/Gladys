@@ -263,8 +263,8 @@ describe('zwaveJSUIHandler.setValue', () => {
             command_class: 38,
             endpoint: 2,
             property_name: 'currentValue',
-            property_key_name: undefined
-          }
+            property_key_name: undefined,
+          },
         ],
       },
     ];
