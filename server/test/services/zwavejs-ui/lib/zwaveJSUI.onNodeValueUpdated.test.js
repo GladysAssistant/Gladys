@@ -114,6 +114,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 0,
     });
   });
+
   it('should save a new closed value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -148,6 +149,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 1,
     });
   });
+
   it('should not fail on unsupported door value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -179,6 +181,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
     assert.notCalled(gladys.event.emit);
   });
+
   it('should save a new true binary value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -211,6 +214,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 1,
     });
   });
+
   it('should save a new false binary value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -244,6 +248,40 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
   });
 
+  it('should save a new multilevel value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:4',
+        features: [
+          {
+            external_id: 'zwavejs-ui:4:2:multilevel_switch:currentvalue',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 4 },
+        {
+          commandClassName: 'Multilevel Switch',
+          commandClass: 38,
+          property: 'currentValue',
+          endpoint: 2,
+          newValue: 50,
+          prevValue: 0,
+          propertyName: 'currentValue',
+        },
+        [0]
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:4:2:multilevel_switch:currentvalue',
+      state: 50,
+    });
+  });
+
   it('should not fail on unsupported binary switch value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -273,6 +311,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
     assert.notCalled(gladys.event.emit);
   });
+
   it('should save a new air temperature value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [

@@ -232,6 +232,59 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
   });
 
+  it('should set a value to multilevel switch', async () => {
+    const mqttClient = {
+      publish: fake.returns(null),
+    };
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.mqttClient = mqttClient;
+    zwaveJSUIHandler.devices = [
+      {
+        name: 'light-test',
+        external_id: 'zwavejs-ui:4',
+        selector: 'zwavejs-ui:4',
+        service_id: 'ee03cc7e-8551-4774-bd47-ca7565f6665d',
+        should_poll: false,
+        features: [
+          {
+            category: 'light',
+            type: 'brightness',
+            min: 0,
+            max: 99,
+            keep_history: true,
+            read_only: false,
+            has_feedback: true,
+            name: '4-38-2-currentValue',
+            external_id: 'zwavejs-ui:4:2:multilevel_switch:currentvalue',
+            selector: 'zwavejs-ui:4:2:multilevel_switch:currentvalue',
+            node_id: 4,
+            command_class_version: 3,
+            command_class_name: 'Multilevel Switch',
+            command_class: 38,
+            endpoint: 2,
+            property_name: 'currentValue',
+            property_key_name: undefined
+          }
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.setValue(
+      { external_id: 'zwavejs-ui:4' },
+      { external_id: 'zwavejs-ui:4:2:multilevel_switch:currentvalue' },
+      50,
+    );
+
+    const mqttPayload = {
+      args: [{ nodeId: 4, commandClass: 38, endpoint: 2 }, 'set', [50]],
+    };
+    assert.calledWith(
+      mqttClient.publish,
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
+      JSON.stringify(mqttPayload),
+    );
+  });
+
   it('should fail on invalid binary switch value', async () => {
     const mqttClient = {
       publish: fake.returns(null),
