@@ -342,7 +342,7 @@
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "chartType": "Select the type of chart to display",
-        "chartColor": "Select the color of the chart{{i}}",
+        "chartColor": "Select the color of data{{i}}",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
