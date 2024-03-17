@@ -47,7 +47,8 @@ class EditChart extends Component {
     } else {
       colors[i] = null;
     }
-    this.props.updateBoxConfig(this.props.x, this.props.y, { colors });
+    const atLeastOneColor = colors.some(Boolean);
+    this.props.updateBoxConfig(this.props.x, this.props.y, { colors: atLeastOneColor ? colors : undefined });
   };
 
   updateDisplayAxes = e => {
@@ -238,7 +239,7 @@ class EditChart extends Component {
                     <option value="#206BC4">Blue</option>
                     <option value="#FF7878">Red</option>
                     <option value="#6BC420">Green</option>
-                    <option value="#E0C097">Yellow</option>
+                    <option value="#F7D59C">Yellow</option>
                   </select>
                 </div>
               ))}

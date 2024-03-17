@@ -11,6 +11,7 @@ import { getApexChartBarOptions } from './ApexChartBarOptions';
 import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
+import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
 
@@ -43,7 +44,7 @@ class ApexChartComponent extends Component {
     const options = getApexChartBarOptions({
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      colors: this.props.colors || DEFAULT_COLORS, // TODO: merge arrays to fallback any null value to a default one
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
@@ -63,7 +64,7 @@ class ApexChartComponent extends Component {
       height,
       series: this.props.series,
       displayAxes: this.props.display_axes,
-      colors: this.props.colors || DEFAULT_COLORS,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
@@ -82,7 +83,7 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartLineOptions({
       height,
-      colors: this.props.colors || DEFAULT_COLORS,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
@@ -102,7 +103,7 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartStepLineOptions({
       height,
-      colors: this.props.colors || DEFAULT_COLORS,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
