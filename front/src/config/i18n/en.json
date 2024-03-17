@@ -342,6 +342,7 @@
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "chartType": "Select the type of chart to display",
+        "chartColor": "Select the color of the chart{{i}}",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
@@ -762,7 +763,6 @@
       "description": "Control your devices with Node-RED.",
       "setupTab": "Setup",
       "documentation": "Node-RED documentation",
-
       "status": {
         "notInstalled": "Node-RED server failed to install.",
         "notRunning": "Node-RED server failed to start.",
@@ -792,7 +792,6 @@
         "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
-
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google Home documentation",

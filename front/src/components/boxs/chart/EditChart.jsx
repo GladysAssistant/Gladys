@@ -40,6 +40,16 @@ class EditChart extends Component {
     }
   };
 
+  updateChartColor = (i, e) => {
+    const colors = this.props.box.colors || [];
+    if (e.target.value && e.target.value.length) {
+      colors[i] = e.target.value;
+    } else {
+      colors[i] = null;
+    }
+    this.props.updateBoxConfig(this.props.x, this.props.y, { colors });
+  };
+
   updateDisplayAxes = e => {
     if (e.target.value && e.target.value.length) {
       const valueBoolean = e.target.value === 'yes';
@@ -207,6 +217,31 @@ class EditChart extends Component {
                 </option>
               </select>
             </div>
+            {selectedDeviceFeaturesOptions &&
+              selectedDeviceFeaturesOptions.length &&
+              selectedDeviceFeaturesOptions.map((_, i) => (
+                <div class="form-group">
+                  <label>
+                    <Text
+                      id="dashboard.boxes.chart.chartColors"
+                      fields={{ i: selectedDeviceFeaturesOptions.length > 1 ? ` ${i + 1}` : null }}
+                    />
+                  </label>
+                  <select
+                    onChange={e => this.updateChartColor(i, e)}
+                    class="form-control"
+                    value={props.box.colors && props.box.colors.length ? props.box.colors[i] : null}
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value="#206BC4">Blue</option>
+                    <option value="#FF7878">Red</option>
+                    <option value="#6BC420">Green</option>
+                    <option value="#E0C097">Yellow</option>
+                  </select>
+                </div>
+              ))}
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.displayAxes" />
