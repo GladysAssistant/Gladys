@@ -441,6 +441,7 @@ class Chartbox extends Component {
                 size="big"
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
+                colors={props.box.colors}
               />
             </div>
           )}
@@ -477,6 +478,7 @@ class Chartbox extends Component {
                 size="big"
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
+                colors={props.box.colors}
               />
             )}
           </div>
