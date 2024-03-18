@@ -161,6 +161,7 @@ class EditChart extends Component {
   }
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
+    const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -219,13 +220,12 @@ class EditChart extends Component {
               </select>
             </div>
             {selectedDeviceFeaturesOptions &&
-              selectedDeviceFeaturesOptions.length &&
-              selectedDeviceFeaturesOptions.map((_, i) => (
+              selectedDeviceFeaturesOptions.map((feature, i) => (
                 <div class="form-group">
                   <label>
                     <Text
-                      id="dashboard.boxes.chart.chartColors"
-                      fields={{ i: selectedDeviceFeaturesOptions.length > 1 ? ` ${i + 1}` : null }}
+                      id={`dashboard.boxes.chart.${manyFeatures ? 'dataColor' : 'chartColor'}`}
+                      fields={{ featureLabel: feature && feature.label }}
                     />
                   </label>
                   <select
