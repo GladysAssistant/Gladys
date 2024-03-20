@@ -135,8 +135,6 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
-        min: 1,
-        max: 18,
       },
     },
   },
