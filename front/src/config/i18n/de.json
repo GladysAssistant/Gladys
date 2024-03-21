@@ -316,7 +316,7 @@
         "latencyBoxDescription": "Je niedriger die Latenz, die du auswählst, desto schneller wird der Livestream starten. Um jedoch eine niedrige Latenz zu haben, benötigst du eine sehr schnelle Internetverbindung mit einem Mindest-Ping, da das Video sonst ruckelig wird. Wir empfehlen mittlere oder niedrige Latenz.",
         "upgradeGladysPlusPlanError": "Die Kameraübertragung ist in deinem Gladys-Plus-Plan nicht enthalten. Du musst ihn in unter Einstellungen -> Abrechnung aktualisieren.",
         "liveStartError": "Beim Starten dieses Livestreams ist ein Fehler aufgetreten. Bist du sicher, dass die URL deiner Kamera ein Video-Feed und kein Bild ist?",
-        "notNotSupportedBrowser": "Dieser Browser wird nicht unterstützt. Um die Ende-zu-Ende-Verschlüsselung dieses Videostreams zu ermöglichen, verwenden wir die MediaSource-API, die leider auf dem Safari iPhone nicht verfügbar ist. Seltsamerweise ist diese Funktion auf Safari iPad und MacOS verfügbar … Wir müssen also geduldig sein. Lass uns hoffen, dass die API bald auf dem iPhone verfügbar sein wird!",
+        "notNotSupportedBrowser": "Dieser Browser wird nicht unterstützt. Um eine End-to-End-Verschlüsselung dieses Videostreams zu ermöglichen, verwenden wir die MediaSource-API, die in diesem Browser möglicherweise nicht unterstützt wird. Wir empfehlen Ihnen Firefox, Safari oder einen auf Chromium basierenden Browser.",
         "tooManyRequests": "Du hast dein monatliches Videobandbreitenlimit erreicht. Kontaktiere uns per E-Mail oder im Forum, um mehr Bandbreite zu erhalten!",
         "liveAutoStartLabel": "Starte den Livestream automatisch",
         "liveAutoStartDescription": "Warnung: Dies kann die Belastung deines Gerätes sowie Netzwerks erhöhen.",
