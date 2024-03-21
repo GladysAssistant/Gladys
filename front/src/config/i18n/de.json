@@ -342,6 +342,8 @@
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
+        "chartColor": "Wählen Sie die Farbe des Diagramms aus",
+        "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",
