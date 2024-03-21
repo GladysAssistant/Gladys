@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 
 const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
-const { SIREN_VOLUME } = require('../../../../utils/constants');
+const { SIREN_LMH_VOLUME } = require('../../../../utils/constants');
 
 describe('zigbee2mqtt volume enumType', () => {
   const expose = {
@@ -10,9 +10,9 @@ describe('zigbee2mqtt volume enumType', () => {
   };
 
   [
-    { enumValue: 'low', intValue: SIREN_VOLUME.LOW },
-    { enumValue: 'medium', intValue: SIREN_VOLUME.MEDIUM },
-    { enumValue: 'high', intValue: SIREN_VOLUME.HIGH },
+    { enumValue: 'low', intValue: SIREN_LMH_VOLUME.LOW },
+    { enumValue: 'medium', intValue: SIREN_LMH_VOLUME.MEDIUM },
+    { enumValue: 'high', intValue: SIREN_LMH_VOLUME.HIGH },
   ].forEach((mapping) => {
     const { enumValue, intValue } = mapping;
 
@@ -31,7 +31,7 @@ describe('zigbee2mqtt volume enumType', () => {
     const missingEnumExpose = {
       values: ['low', 'medium'],
     };
-    const result = enumType.writeValue(missingEnumExpose, SIREN_VOLUME.HIGH);
+    const result = enumType.writeValue(missingEnumExpose, SIREN_LMH_VOLUME.HIGH);
     assert.equal(result, undefined);
   });
 
