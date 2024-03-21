@@ -10,6 +10,16 @@
   "hours": [
     {
       "temperature": 15,
+      "humidity": 78,
+      "pressure": 1018,
+      "datetime": "2023-05-01T12:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 4.01,
+      "wind_direction": 298,
+      "weather": "rain"
+    },
+    {
+      "temperature": 15,
       "humidity": 77,
       "pressure": 1018,
       "datetime": "2023-05-01T15:00:00.000Z",
@@ -76,16 +86,6 @@
       "units": "metric",
       "wind_speed": 2.01,
       "wind_direction": 8,
-      "weather": "cloud"
-    },
-    {
-      "temperature": 17,
-      "humidity": 52,
-      "pressure": 1022,
-      "datetime": "2023-05-02T12:00:00.000Z",
-      "units": "metric",
-      "wind_speed": 2.92,
-      "wind_direction": 20,
       "weather": "cloud"
     }
   ],

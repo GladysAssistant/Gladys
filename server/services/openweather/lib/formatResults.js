@@ -51,7 +51,7 @@ function formatResults(options, result, forecast) {
 
   if (forecast) {
     dataToReturn.hours = [];
-    for (let i = 1; i < 9; i += 1) {
+    for (let i = 0; i < 8; i += 1) {
       dataToReturn.hours.push({
         temperature: Math.round(forecast.list[i].main.temp),
         humidity: forecast.list[i].main.humidity,
