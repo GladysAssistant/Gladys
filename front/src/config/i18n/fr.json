@@ -316,7 +316,7 @@
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
         "upgradeGladysPlusPlanError": "Le streaming de caméra n'est pas compris dans votre plan Gladys Plus. Vous devez le mettre à jour dans Paramètres -> Facturation.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
-        "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est malheureusement pas disponible sur Safari iPhone. Etrangement, cette fonctionnalité est disponible sur Safari iPad et MacOS... Il faudra s'armer de patience, espérons que l'API arrive vite sur iPhone !",
+        "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est peut-être pas supporté sur ce navigateur. Nous vous recommandons Firefox, Safari, ou tout navigateur basé sur Chromium.",
         "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
         "liveAutoStartLabel": "Lancer automatiquement le streaming",
         "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
