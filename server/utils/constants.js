@@ -58,7 +58,7 @@ const COVER_STATE = {
   CLOSE: -1,
 };
 
-const SIREN_VOLUME = {
+const SIREN_LMH_VOLUME = {
   LOW: 0,
   MEDIUM: 1,
   HIGH: 2,
@@ -499,7 +499,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   SIREN: {
     BINARY: 'binary',
-    VOLUME: 'volume',
+    LMH_VOLUME: 'volume',
     MELODY: 'melody',
   },
   CHILD_LOCK: {
@@ -1114,7 +1114,7 @@ const ALARM_MODES_LIST = createList(ALARM_MODES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
-module.exports.SIREN_VOLUME = SIREN_VOLUME;
+module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;

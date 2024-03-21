@@ -3,9 +3,9 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { SIREN_VOLUME } from '../../../../../../server/utils/constants';
+import { SIREN_LMH_VOLUME } from '../../../../../../server/utils/constants';
 
-const VolumeDeviceFeature = ({ children, ...props }) => {
+const LMHVolumeDeviceFeature = ({ children, ...props }) => {
   const { deviceFeature } = props;
   const { category, type, last_value: lastValue } = deviceFeature;
 
@@ -14,15 +14,15 @@ const VolumeDeviceFeature = ({ children, ...props }) => {
   }
 
   function low() {
-    updateValue(SIREN_VOLUME.LOW);
+    updateValue(SIREN_LMH_VOLUME.LOW);
   }
 
   function medium() {
-    updateValue(SIREN_VOLUME.MEDIUM);
+    updateValue(SIREN_LMH_VOLUME.MEDIUM);
   }
 
   function high() {
-    updateValue(SIREN_VOLUME.HIGH);
+    updateValue(SIREN_LMH_VOLUME.HIGH);
   }
 
   return (
@@ -37,27 +37,27 @@ const VolumeDeviceFeature = ({ children, ...props }) => {
           <div class="btn-group" role="group">
             <button
               class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === SIREN_VOLUME.LOW
+                active: lastValue === SIREN_LMH_VOLUME.LOW
               })}
               onClick={low}
             >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.low`} plural={SIREN_VOLUME.HIGH} />
+              <Text id={`deviceFeatureAction.category.${category}.${type}.low`} plural={SIREN_LMH_VOLUME.HIGH} />
             </button>
             <button
               class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === SIREN_VOLUME.MEDIUM
+                active: lastValue === SIREN_LMH_VOLUME.MEDIUM
               })}
               onClick={medium}
             >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.medium`} plural={SIREN_VOLUME.HIGH} />
+              <Text id={`deviceFeatureAction.category.${category}.${type}.medium`} plural={SIREN_LMH_VOLUME.HIGH} />
             </button>
             <button
               class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === SIREN_VOLUME.HIGH
+                active: lastValue === SIREN_LMH_VOLUME.HIGH
               })}
               onClick={high}
             >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.high`} plural={SIREN_VOLUME.HIGH} />
+              <Text id={`deviceFeatureAction.category.${category}.${type}.high`} plural={SIREN_LMH_VOLUME.HIGH} />
             </button>
           </div>
         </div>
@@ -66,4 +66,4 @@ const VolumeDeviceFeature = ({ children, ...props }) => {
   );
 };
 
-export default VolumeDeviceFeature;
+export default LMHVolumeDeviceFeature;
