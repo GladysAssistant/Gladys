@@ -15,7 +15,18 @@ import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
 
-const DEFAULT_COLORS = ['#206bc4', '#FF7878', '#E0C097', '#F7D59C'];
+const DEFAULT_COLORS = [
+  '#316cbe',
+  '#d63031',
+  '#00b894',
+  '#fdcb6e',
+  '#6c5ce7',
+  '#00cec9',
+  '#e84393',
+  '#e17055',
+  '#636e72'
+];
+const DEFAULT_COLORS_NAME = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Aqua', 'Pink', 'Orange', 'Grey'];
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
@@ -156,3 +167,5 @@ class ApexChartComponent extends Component {
 }
 
 export default ApexChartComponent;
+
+export { DEFAULT_COLORS, DEFAULT_COLORS_NAME };
