@@ -9,12 +9,48 @@ import Chart from './Chart';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
   [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
   [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
+};
+
+const square = (color = 'transparent') => ({
+  alignItems: 'center',
+  display: 'flex',
+
+  ':before': {
+    backgroundColor: color,
+    content: '" "',
+    display: 'block',
+    marginRight: 8,
+    height: 10,
+    width: 10
+  }
+});
+
+const colorSelectorStyles = {
+  control: styles => ({ ...styles, backgroundColor: 'white' }),
+  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+    const { value: color } = data;
+    return {
+      ...styles,
+      backgroundColor: isDisabled ? undefined : isSelected ? color : isFocused ? color : undefined,
+      color: isDisabled ? '#ccc' : isSelected ? 'white' : isFocused ? 'white' : color,
+      cursor: isDisabled ? 'not-allowed' : 'default',
+
+      ':active': {
+        ...styles[':active'],
+        backgroundColor: !isDisabled ? color : undefined
+      }
+    };
+  },
+  input: styles => ({ ...styles, ...square() }),
+  placeholder: styles => ({ ...styles, ...square('#ccc') }),
+  singleValue: (styles, { data }) => ({ ...styles, ...square(data.value) })
 };
 
 class EditChart extends Component {
@@ -40,10 +76,10 @@ class EditChart extends Component {
     }
   };
 
-  updateChartColor = (i, e) => {
+  updateChartColor = (i, value) => {
     const colors = this.props.box.colors || [];
-    if (e.target.value && e.target.value.length) {
-      colors[i] = e.target.value;
+    if (value) {
+      colors[i] = value;
     } else {
       colors[i] = null;
     }
@@ -162,6 +198,10 @@ class EditChart extends Component {
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
+    const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
+      value: colorValue,
+      label: DEFAULT_COLORS_NAME[i]
+    }));
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -228,19 +268,17 @@ class EditChart extends Component {
                       fields={{ featureLabel: feature && feature.label }}
                     />
                   </label>
-                  <select
-                    onChange={e => this.updateChartColor(i, e)}
-                    class="form-control"
-                    value={props.box.colors && props.box.colors.length ? props.box.colors[i] : null}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value="#206BC4">Blue</option>
-                    <option value="#FF7878">Red</option>
-                    <option value="#6BC420">Green</option>
-                    <option value="#F7D59C">Yellow</option>
-                  </select>
+                  <Select
+                    defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[i])}
+                    value={
+                      props.box.colors &&
+                      props.box.colors.length &&
+                      colorOptions.find(({ value }) => value === props.box.colors[i])
+                    }
+                    onChange={({ value }) => this.updateChartColor(i, value)}
+                    options={colorOptions}
+                    styles={colorSelectorStyles}
+                  />
                 </div>
               ))}
             <div class="form-group">
