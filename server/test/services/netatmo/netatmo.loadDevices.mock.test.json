@@ -15,7 +15,10 @@
     "last_status_store": 1600000000,
     "plug_connected_boiler": false,
     "wifi_status": 50,
-    "last_bilan": { "y": 2022, "m": 6 },
+    "last_bilan": {
+      "y": 2022,
+      "m": 6
+    },
     "station_name": "Relais Test",
     "place": {
       "altitude": 50,
@@ -70,8 +73,14 @@
       "boiler_responding_events": ["event3", "event4"]
     },
     "setpoint_history": [
-      { "time": 1600500000, "setpoint_temp": 19 },
-      { "time": 1600600000, "setpoint_temp": 20 }
+      {
+        "time": 1600500000,
+        "setpoint_temp": 19
+      },
+      {
+        "time": 1600600000,
+        "setpoint_temp": 20
+      }
     ],
     "last_therm_seen": 1600500000,
     "setpoint": {
@@ -80,8 +89,24 @@
       "setpoint_endtime": 1703096987
     },
     "therm_program_list": [
-      { "monday": [{ "start": "06:00", "end": "09:00", "temp": 19 }] },
-      { "tuesday": [{ "start": "06:00", "end": "09:00", "temp": 19.5 }] }
+      {
+        "monday": [
+          {
+            "start": "06:00",
+            "end": "09:00",
+            "temp": 19
+          }
+        ]
+      },
+      {
+        "tuesday": [
+          {
+            "start": "06:00",
+            "end": "09:00",
+            "temp": 19.5
+          }
+        ]
+      }
     ],
     "measured": {
       "time": 1600498668,
@@ -120,7 +145,10 @@
       "last_status_store": 1600000000,
       "plug_connected_boiler": false,
       "wifi_status": 50,
-      "last_bilan": { "y": 2022, "m": 6 },
+      "last_bilan": {
+        "y": 2022,
+        "m": 6
+      },
       "station_name": "Relais Test",
       "place": {
         "altitude": 100,
@@ -778,6 +806,41 @@
     },
     "modules": [],
     "categoryAPI": "Weather",
+    "apiNotConfigured": true
+  },
+  {
+    "id": "70:ee:01:xx:xx:xx",
+    "type": "NACamera",
+    "firmware_revision": 5020000,
+    "wifi_state": "high",
+    "wifi_strength": 58,
+    "sd_status": "on",
+    "alim_status": "on",
+    "vpn_url": "https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,",
+    "is_local": true,
+    "monitoring": "on",
+    "name": "Living room camera",
+    "setup_date": 1684397132,
+    "room_id": "3939900879",
+    "status": "on",
+    "use_pin_code": true,
+    "last_setup": 1684397132,
+    "home": "5e1xxxxxxxxxxxxxxxxx",
+    "room": {
+      "id": "3939900879",
+      "name": "Living room",
+      "type": "custom",
+      "module_ids": ["70:ee:00:xx:xx:xx", "70:ee:01:xx:xx:xx", "09:00:00:yy:yy:yy"],
+      "reachable": true,
+      "anticipating": false,
+      "heating_power_request": 0,
+      "open_window": false,
+      "therm_measured_temperature": 19,
+      "therm_setpoint_temperature": 19,
+      "therm_setpoint_start_time": 1707026402,
+      "therm_setpoint_mode": "schedule"
+    },
+    "categoryAPI": "Security",
     "apiNotConfigured": true
   },
   {

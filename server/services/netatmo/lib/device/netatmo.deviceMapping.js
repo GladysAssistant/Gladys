@@ -9,6 +9,16 @@ const writeValues = {
   },
 };
 
+const NETATMO_VALUES = {
+  SECURITY: {
+    STATUS: {
+      disconnected: 0,
+      off: 0,
+      on: 1,
+    },
+  },
+};
+
 const readValues = {
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice) => {
@@ -106,6 +116,11 @@ const readValues = {
       return valueFromDevice;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
+    [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
 };
 
-module.exports = { readValues, writeValues };
+module.exports = { readValues, writeValues, NETATMO_VALUES };

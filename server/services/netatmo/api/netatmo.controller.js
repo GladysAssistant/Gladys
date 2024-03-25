@@ -1,6 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function NetatmoController(netatmoHandler) {
+module.exports = function NetatmoController(gladys, netatmoHandler) {
   /**
    * @api {get} /api/v1/service/netatmo/configuration Get Netatmo Configuration.
    * @apiName getConfiguration
@@ -8,6 +8,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    */
   async function getConfiguration(req, res) {
     const configuration = await netatmoHandler.getConfiguration();
+    console.log('configuration', configuration);
     res.json(configuration);
   }
 

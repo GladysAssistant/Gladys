@@ -1,11 +1,15 @@
+const fse = require('fs-extra');
+const childProcess = require('child_process');
+
 const logger = require('../../utils/logger');
-const netatmoController = require('./api/netatmo.controller');
+const NetatmoController = require('./api/netatmo.controller');
 
 const NetatmoHandler = require('./lib');
 const { STATUS } = require('./lib/utils/netatmo.constants');
 
 module.exports = function NetatmoService(gladys, serviceId) {
-  const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+  const ffmpeg = require('fluent-ffmpeg');
+  const netatmoHandler = new NetatmoHandler(gladys, ffmpeg, childProcess, serviceId);
 
   /**
    * @public
@@ -15,6 +19,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Netatmo service', serviceId);
+    await fse.ensureDir(gladys.config.tempFolder);
     await netatmoHandler.init();
   }
 
@@ -45,6 +50,6 @@ module.exports = function NetatmoService(gladys, serviceId) {
     stop,
     isUsed,
     device: netatmoHandler,
-    controllers: netatmoController(netatmoHandler),
+    controllers: NetatmoController(gladys, netatmoHandler),
   });
 };
