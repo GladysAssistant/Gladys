@@ -45,7 +45,8 @@ class MqttNodePage extends Component {
     this.setState(config);
   };
 
-  saveConfiguration = async () => {
+  saveConfiguration = async e => {
+    e.preventDefault();
     this.setState({
       connectMqttStatus: RequestStatus.Getting,
       mqttConnected: false,
