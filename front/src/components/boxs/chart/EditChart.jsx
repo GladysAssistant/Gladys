@@ -200,7 +200,7 @@ class EditChart extends Component {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
-      label: DEFAULT_COLORS_NAME[i]
+      label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i]
     }));
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>

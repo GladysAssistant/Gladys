@@ -26,7 +26,7 @@ const DEFAULT_COLORS = [
   '#e17055',
   '#636e72'
 ];
-const DEFAULT_COLORS_NAME = ['Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Aqua', 'Pink', 'Orange', 'Grey'];
+const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua', 'pink', 'orange', 'grey'];
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
