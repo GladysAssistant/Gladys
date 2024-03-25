@@ -33,6 +33,9 @@ const STATES = {
       }
     },
   },
+  multilevel_switch: {
+    currentvalue: (val) => val,
+  },
   multilevel_sensor: {
     air_temperature: (val) => val,
     power: (val) => val,
@@ -73,6 +76,12 @@ const COMMANDS = {
       },
     },
   },
+  multilevel_switch: {
+    currentvalue: {
+      getName: (_nodeFeature) => 'set',
+      getArgs: (value, _nodeFeature) => [value],
+    },
+  },
 };
 
 const EXPOSES = {
@@ -82,6 +91,17 @@ const EXPOSES = {
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       min: 0,
       max: 1,
+      keep_history: true,
+      read_only: false,
+      has_feedback: true,
+    },
+  },
+  multilevel_switch: {
+    currentvalue: {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      min: 0,
+      max: 99,
       keep_history: true,
       read_only: false,
       has_feedback: true,
