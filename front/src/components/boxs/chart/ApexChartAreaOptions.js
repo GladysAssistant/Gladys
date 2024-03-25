@@ -1,4 +1,4 @@
-const getApexChartAreaOptions = ({ displayAxes, height, series, COLORS, locales, defaultLocale }) => {
+const getApexChartAreaOptions = ({ displayAxes, height, series, colors, locales, defaultLocale }) => {
   const options = {
     chart: {
       locales,
@@ -54,7 +54,7 @@ const getApexChartAreaOptions = ({ displayAxes, height, series, COLORS, locales,
         padding: 4
       }
     },
-    colors: COLORS,
+    colors,
     legend: {
       show: displayAxes,
       position: 'bottom'

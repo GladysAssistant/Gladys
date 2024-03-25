@@ -1,4 +1,4 @@
-const getApexChartStepLineOptions = ({ height, displayAxes, series, COLORS, locales, defaultLocale }) => {
+const getApexChartStepLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale }) => {
   const options = {
     chart: {
       locales,
@@ -52,7 +52,7 @@ const getApexChartStepLineOptions = ({ height, displayAxes, series, COLORS, loca
         padding: 4
       }
     },
-    colors: COLORS,
+    colors,
     legend: {
       show: displayAxes,
       position: 'bottom'

@@ -21,12 +21,16 @@
     "selectPlaceholder": "Select..."
   },
   "color": {
-    "blue": "Blue",
-    "red": "Red",
-    "green": "Green",
+    "aqua": "Aqua",
     "black": "Black",
-    "yellow": "Yellow",
-    "purple": "Purple"
+    "blue": "Blue",
+    "green": "Green",
+    "grey": "Grey",
+    "orange": "Orange",
+    "pink": "Pink",
+    "purple": "Purple",
+    "red": "Red",
+    "yellow": "Yellow"
   },
   "calendar": {
     "allDay": "All Day",
@@ -342,6 +346,8 @@
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "chartType": "Select the type of chart to display",
+        "chartColor": "Select the color of chart",
+        "dataColor": "Select color for {{featureLabel}}",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
@@ -762,7 +768,6 @@
       "description": "Control your devices with Node-RED.",
       "setupTab": "Setup",
       "documentation": "Node-RED documentation",
-
       "status": {
         "notInstalled": "Node-RED server failed to install.",
         "notRunning": "Node-RED server failed to start.",
@@ -792,7 +797,6 @@
         "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
-
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google Home documentation",
