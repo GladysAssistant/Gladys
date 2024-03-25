@@ -76,6 +76,7 @@ Thanks goes to these wonderful people 👏
       <td align="center" valign="top" width="14.28%"><a href="http://magarcia.io"><img src="https://avatars.githubusercontent.com/u/651610?v=4?s=100" width="100px;" alt="Martin Garcia"/><br /><sub><b>Martin Garcia</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=magarcia" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/euguuu"><img src="https://avatars.githubusercontent.com/u/9742965?v=4?s=100" width="100px;" alt="euguuu"/><br /><sub><b>euguuu</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=euguuu" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jbrisavoine"><img src="https://avatars.githubusercontent.com/u/138247436?v=4?s=100" width="100px;" alt="Jonathan Brisavoine"/><br /><sub><b>Jonathan Brisavoine</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=jbrisavoine" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/GziAzman"><img src="https://avatars.githubusercontent.com/u/14886739?v=4?s=100" width="100px;" alt="Alex"/><br /><sub><b>Alex</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=GziAzman" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
