@@ -21,12 +21,16 @@
     "selectPlaceholder": "Select..."
   },
   "color": {
-    "blue": "Blue",
-    "red": "Red",
-    "green": "Green",
+    "aqua": "Aqua",
     "black": "Black",
-    "yellow": "Yellow",
-    "purple": "Purple"
+    "blue": "Blue",
+    "green": "Green",
+    "grey": "Grey",
+    "orange": "Orange",
+    "pink": "Pink",
+    "purple": "Purple",
+    "red": "Red",
+    "yellow": "Yellow"
   },
   "calendar": {
     "allDay": "All Day",
