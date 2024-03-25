@@ -58,8 +58,8 @@ describe('Device.addFeature', () => {
       features: [
         {
           id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
-          name: 'On/Off',
-          selector: 'philips-hue-binary',
+          name: 'Test device feature',
+          selector: 'test-device-feature',
           external_id: 'philips-hue:1:binary',
           category: 'light',
           type: 'binary',
@@ -83,14 +83,15 @@ describe('Device.addFeature', () => {
       keep_history: true,
       has_feedback: false,
       min: 0,
-      max: 1,
+      max: 2,
     });
     expect(newDevice).to.have.property('name', 'Philips Hue');
     expect(newDevice).to.have.property('selector', 'test-device');
     expect(newDevice).to.have.property('features');
     expect(newDevice).to.have.property('params');
     const newDeviceFeature = newDevice.features.find((f) => f.external_id === 'philips-hue:1:binary');
-    expect(newDeviceFeature).to.have.property('name', 'On/Off');
-    expect(newDeviceFeature).to.have.property('selector', 'philips-hue-binary');
+    expect(newDeviceFeature).to.have.property('name', 'Test device feature');
+    expect(newDeviceFeature).to.have.property('selector', 'test-device-feature');
+    expect(newDeviceFeature).to.have.property('max', 2);
   });
 });
