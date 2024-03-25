@@ -2600,6 +2600,13 @@
           "cooling": "Cool",
           "heating": "Heat"
         }
+      },
+      "siren": {
+        "volume": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        }
       }
     }
   },
@@ -2794,7 +2801,9 @@
     },
     "siren": {
       "shortCategoryName": "Siren",
-      "binary": "Siren"
+      "binary": "Siren",
+      "volume": "Siren volume",
+      "melody": "Melody"
     },
     "cube": {
       "shortCategoryName": "Cube",

@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   BUTTON_STATUS,
   COVER_STATE,
+  SIREN_LMH_VOLUME,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -80,9 +81,17 @@ addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
 
+addMapping('volume', SIREN_LMH_VOLUME.LOW, 'low');
+addMapping('volume', SIREN_LMH_VOLUME.MEDIUM, 'medium');
+addMapping('volume', SIREN_LMH_VOLUME.HIGH, 'high');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
+    if (expose.name === 'melody') {
+      return value;
+    }
+
     const relatedValue = (WRITE_VALUE_MAPPING[expose.name] || {})[value];
 
     if (relatedValue && expose.values.includes(relatedValue)) {
@@ -92,6 +101,11 @@ module.exports = {
     return undefined;
   },
   readValue: (expose, value) => {
+    if (expose.name === 'melody') {
+      const intValue = parseInt(value, 10);
+      return intValue;
+    }
+
     const subValue = value.replace(/^(\d+_)?/, '');
     return (READ_VALUE_MAPPING[expose.name] || {})[subValue];
   },
@@ -115,6 +129,18 @@ module.exports = {
           max: 1,
           forceOverride: true,
         },
+      },
+    },
+    volume: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME,
+      },
+    },
+    melody: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
       },
     },
   },
