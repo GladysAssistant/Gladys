@@ -71,6 +71,13 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const VACBOT_MODE = {
+  STOP: 0,
+  CLEAN: 1,
+  PAUSE: -1,
+  CHARGE: 2,
+};
+
 const MUSIC_PLAYBACK_STATE = {
   PLAYING: 1,
   PAUSED: 0,
@@ -445,6 +452,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRESSURE_SENSOR: 'pressure-sensor',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
+  VACBOT: 'vacbot',
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
@@ -571,6 +579,17 @@ const DEVICE_FEATURE_TYPES = {
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
+  },
+  VACBOT: {
+    STATE: 'state',
+    CLEAN_REPORT: 'clean-report',
+    INTEGER: 'integer',
+    BINARY: 'binary',
+    MAP: 'map',
+    CLEAN: 'clean',
+    PAUSE: 'pause',
+    STOP: 'stop',
+    CHARGE: 'charge',
   },
   MUSIC: {
     VOLUME: 'volume',
@@ -973,6 +992,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
   },
+  ECOVACS: {
+    CONNECTED: 'ecovacs.connected',
+    NEW_DEVICE: 'ecovacs.new-device',
+    ERROR: 'ecovacs.error',
+  },
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
@@ -1010,6 +1034,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES: 'devices',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
+  VACBOT: 'vacbot',
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',
@@ -1112,6 +1137,7 @@ module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.AC_MODE = AC_MODE;
+module.exports.VACBOT_MODE = VACBOT_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
