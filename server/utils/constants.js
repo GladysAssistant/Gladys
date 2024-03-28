@@ -965,9 +965,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'bluetooth.discover',
   },
   EWELINK: {
-    CONNECTED: 'ewelink.connected',
-    NEW_DEVICE: 'ewelink.new-device',
-    ERROR: 'ewelink.error',
+    STATUS: 'ewelink.status',
   },
   BROADLINK: {
     LEARN_MODE: 'broadlink.learn',

@@ -22,7 +22,8 @@ const PAGES_WITHOUT_HEADER = [
   '/confirm-email',
   '/dashboard/integration/device/google-home/authorize',
   '/dashboard/integration/device/alexa/authorize',
-  '/locked'
+  '/locked',
+  '/dashboard/integration/device/ewelink/setup/login'
 ];
 
 const Header = ({ ...props }) => {

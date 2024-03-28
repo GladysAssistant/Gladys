@@ -1,7 +1,6 @@
-const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { titleize } = require('../../../../utils/titleize');
-const { DEVICE_IP_ADDRESS, DEVICE_FIRMWARE, DEVICE_ONLINE } = require('../utils/constants');
+const { readParams } = require('../params');
 const { getExternalId } = require('../utils/externalId');
 
 // Features
@@ -9,9 +8,11 @@ const binaryFeature = require('./binary');
 const humidityFeature = require('./humidity');
 const temperatureFeature = require('./temperature');
 
+const AVAILABLE_FEATURES = [binaryFeature, humidityFeature, temperatureFeature];
+
 const AVAILABLE_FEATURE_MODELS = {
   binary: {
-    uiid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15],
+    uiid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 126],
     feature: binaryFeature,
   },
   humidity: {
@@ -38,28 +39,17 @@ const getDeviceName = (device) => {
 };
 
 /**
- * @description Convert online state.
- * @param {boolean} online - Online device state.
- * @returns {string} Return the prefix, the device ID and the channel count.
- * @example
- * readOnlineValue(true);
- */
-function readOnlineValue(online) {
-  return online ? '1' : '0';
-}
-
-/**
  * @description Create an eWeLink device for Gladys.
  * @param {string} serviceId - The UUID of the service.
  * @param {object} device - The eWeLink device.
- * @param {number} channel - The channel of the device to control.
  * @returns {object} Return Gladys device.
  * @example
  * getDevice(serviceId, device, channel);
  */
-function getDevice(serviceId, device, channel = 0) {
+function getDevice(serviceId, device) {
   const name = getDeviceName(device);
   const externalId = getExternalId(device);
+  const { params = {} } = device;
 
   const createdDevice = {
     name,
@@ -68,27 +58,15 @@ function getDevice(serviceId, device, channel = 0) {
     selector: externalId,
     features: [],
     service_id: serviceId,
-    should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
-    params: [
-      {
-        name: DEVICE_IP_ADDRESS,
-        value: device.ip || '?.?.?.?',
-      },
-      {
-        name: DEVICE_FIRMWARE,
-        value: (device.params && device.params.fwVersion) || '?.?.?',
-      },
-      {
-        name: DEVICE_ONLINE,
-        value: readOnlineValue(device.online),
-      },
-    ],
+    should_poll: false,
+    params: readParams(device),
   };
 
-  if (device.online) {
+  const deviceUiid = (device.extra || {}).uiid;
+  if (device.online && deviceUiid) {
+    const channel = params.switch ? 1 : (params.switches || []).length;
     Object.keys(AVAILABLE_FEATURE_MODELS).forEach((type) => {
-      if (AVAILABLE_FEATURE_MODELS[type].uiid.includes(device.uiid)) {
+      if (AVAILABLE_FEATURE_MODELS[type].uiid.includes(deviceUiid)) {
         let ch = 1;
         do {
           const featureExternalId = (type === 'binary' ? [externalId, type, ch] : [externalId, type]).join(':');
@@ -109,7 +87,26 @@ function getDevice(serviceId, device, channel = 0) {
   return createdDevice;
 }
 
+/**
+ * @description Read and decode Gladys feature state from eWeLink object.
+ * @param {string} externalId - Device external ID.
+ * @param {object} params - EWeLink received params.
+ * @returns {Array} Arry of featureExternalId / state objects.
+ * @example
+ * const states = readStates('ewelink:10001a', { switch: 'on' });
+ */
+function readStates(externalId, params) {
+  const states = [];
+  AVAILABLE_FEATURES.forEach((feature) => {
+    const updatedStates = feature.readStates(externalId, params);
+    updatedStates.forEach((state) => {
+      states.push(state);
+    });
+  });
+  return states;
+}
+
 module.exports = {
-  readOnlineValue,
   getDevice,
+  readStates,
 };

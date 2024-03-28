@@ -4,7 +4,7 @@
  * @param {object} feature - The feature to add.
  * @returns {object} The device.
  * @example
- * setDeviceParam({ features: [] }, { selector: 'feature' })
+ * setDeviceFeature({ features: [] }, { selector: 'feature' })
  */
 function setDeviceFeature(device, feature) {
   let { features } = device;

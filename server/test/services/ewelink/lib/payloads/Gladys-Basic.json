@@ -1,0 +1,46 @@
+{
+  "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+  "name": "Test 6",
+  "model": "Basic",
+  "external_id": "ewelink:10004536ae",
+  "selector": "ewelink:10004536ae",
+  "should_poll": false,
+  "features": [
+    {
+      "name": "Test 6 On/Off",
+      "external_id": "ewelink:10004536ae:binary:1",
+      "selector": "ewelink:10004536ae:binary:1",
+      "category": "switch",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": true,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "Test 6 unknown",
+      "external_id": "ewelink:10004536ae:unknown",
+      "selector": "ewelink:10004536ae:unknown",
+      "category": "unknown",
+      "type": "unknown",
+      "read_only": false,
+      "has_feedback": true,
+      "min": 0,
+      "max": 1
+    }
+  ],
+  "params": [
+    {
+      "name": "FIRMWARE",
+      "value": "3.1.2"
+    },
+    {
+      "name": "ONLINE",
+      "value": "0"
+    },
+    {
+      "name": "API_KEY",
+      "value": "validApikey"
+    }
+  ]
+}

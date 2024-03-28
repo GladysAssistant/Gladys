@@ -1,6 +1,4 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
-const logger = require('../../../../utils/logger');
-const { parseExternalId } = require('../utils/externalId');
 
 module.exports = {
   // Gladys feature
@@ -15,25 +13,42 @@ module.exports = {
       max: 1,
     };
   },
-  pollBinary: (eWeLinkDevice, feature) => {
-    const { deviceId, channel } = parseExternalId(feature.external_id);
-    let state = (eWeLinkDevice.params && eWeLinkDevice.params.switch) || false;
-    const switches = (eWeLinkDevice.params && eWeLinkDevice.params.switches) || false;
-    if (state || switches) {
-      if (switches) {
-        state = switches[channel - 1].switch;
-      }
+  readStates: (externalId, params) => {
+    const states = [];
+
+    // Single switch
+    if (params.switch) {
+      const state = params.switch === 'on' ? STATE.ON : STATE.OFF;
+      states.push({ featureExternalId: `${externalId}:binary:0`, state });
     }
-    const currentBinaryState = state === 'on' ? STATE.ON : STATE.OFF;
-    // if the value is different from the value we have, save new state
-    if (state && feature.last_value !== currentBinaryState) {
-      logger.debug(`eWeLink: Polling device "${deviceId}", binary new value = ${currentBinaryState}`);
-      return currentBinaryState;
+
+    // Multiple switches
+    if (params.switches) {
+      params.switches.forEach(({ switch: value, outlet }) => {
+        const state = value === 'on' ? STATE.ON : STATE.OFF;
+        states.push({
+          featureExternalId: `${externalId}:binary:${outlet + 1}`,
+          state,
+        });
+      });
     }
-    return null;
+
+    return states;
   },
-  // Gladys vs eWeLink transformers
-  writeBinaryValue: (value) => {
-    return value ? 'on' : 'off';
+  writeParams: (device, parsedExternalId, value) => {
+    const convertedValue = value ? 'on' : 'off';
+
+    // Count number of binary features to determine if "switch" or "switches" param need to be changed
+    const nbBinaryFeatures = device.features.reduce(
+      (acc, currentFeature) => (currentFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ? acc + 1 : acc),
+      0,
+    );
+
+    if (nbBinaryFeatures > 1) {
+      const { channel } = parsedExternalId;
+      return { switches: [{ switch: convertedValue, outlet: channel - 1 }] };
+    }
+
+    return { switch: convertedValue };
   },
 };

@@ -1,0 +1,19 @@
+{
+  "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+  "name": "Test 2",
+  "model": "MINI",
+  "external_id": "ewelink:10004532ae",
+  "selector": "ewelink:10004532ae",
+  "should_poll": false,
+  "features": [],
+  "params": [
+    {
+      "name": "ONLINE",
+      "value": "0"
+    },
+    {
+      "name": "API_KEY",
+      "value": "validApikey"
+    }
+  ]
+}
