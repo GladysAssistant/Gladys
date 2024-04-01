@@ -21,12 +21,16 @@
     "selectPlaceholder": "Auswählen …"
   },
   "color": {
-    "blue": "Blau",
-    "red": "Rot",
-    "green": "Grün",
+    "aqua": "Aqua",
     "black": "Schwarz",
-    "yellow": "Gelb",
-    "purple": "Lila"
+    "blue": "Blau",
+    "green": "Grün",
+    "grey": "Grau",
+    "orange": "Orange",
+    "pink": "Rosa",
+    "purple": "Lila",
+    "red": "Rot",
+    "yellow": "Gelb"
   },
   "calendar": {
     "allDay": "Ganztägig",
@@ -342,6 +346,8 @@
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
+        "chartColor": "Wählen Sie die Farbe des Diagramms aus",
+        "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",

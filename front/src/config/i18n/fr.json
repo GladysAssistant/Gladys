@@ -21,12 +21,16 @@
     "selectPlaceholder": "Sélectionnez..."
   },
   "color": {
-    "blue": "Bleu",
-    "red": "Rouge",
-    "green": "Vert",
+    "aqua": "Aqua",
     "black": "Noir",
-    "yellow": "Jaune",
-    "purple": "Violet"
+    "blue": "Bleu",
+    "green": "Vert",
+    "grey": "Gris",
+    "orange": "Orange",
+    "pink": "Rose",
+    "purple": "Violet",
+    "red": "Rouge",
+    "yellow": "Jaune"
   },
   "calendar": {
     "allDay": "Toute la journée",
@@ -342,6 +346,8 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
         "editRoomLabel": "Sélectionnez une pièce",
         "chartType": "Sélectionner le type de graphique",
+        "chartColor": "Sélectionner la couleur du graphique",
+        "dataColor": "Sélectionner la couleur pour {{featureLabel}}",
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
@@ -919,7 +925,6 @@
         "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
       }
     },
-
     "googleHome": {
       "title": "Google Home",
       "documentation": "Documentation Google Home",
@@ -1115,7 +1120,6 @@
         "connected": "Connexion réussie au compte cloud Tuya !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
-
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
@@ -1151,7 +1155,6 @@
         "errorWhileScanning": "Une erreur est survenue lors du scan.",
         "scan": "Scanner"
       },
-
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
@@ -1265,7 +1268,6 @@
         "connected": "Connexion réussie au compte cloud MELCloud !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
-
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
