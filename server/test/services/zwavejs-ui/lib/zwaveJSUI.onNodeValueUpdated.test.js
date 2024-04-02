@@ -148,6 +148,37 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 1,
     });
   });
+  it('should not fail on unsupported door value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 45,
+          prevValue: 22,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+          propertyKeyName: 'Door state (simple)',
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
   it('should save a new true binary value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -210,6 +241,101 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
       state: 0,
+    });
+  });
+
+  it('should not fail on unsupported binary switch value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Switch',
+          commandClass: 37,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: -1,
+          prevValue: true,
+          propertyName: 'currentValue',
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+  it('should save a new air temperature value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Multilevel Sensor',
+          commandClass: 49,
+          property: 'Air temperature',
+          endpoint: 0,
+          newValue: 20.8,
+          prevValue: 17.5,
+          propertyName: 'Air temperature',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
+      state: 20.8,
+    });
+  });
+
+  it('should save a new power value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Multilevel Sensor',
+          commandClass: 49,
+          property: 'Power',
+          endpoint: 0,
+          newValue: 1.7,
+          prevValue: 0,
+          propertyName: 'Power',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
+      state: 1.7,
     });
   });
 });

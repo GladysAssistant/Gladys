@@ -3,8 +3,8 @@ const sinon = require('sinon');
 
 const { fake } = sinon;
 
-const devicesGladys = require('../../netatmo.convertDevices.mock.test.json');
-const devicesNetatmo = require('../../netatmo.loadDevices.mock.test.json');
+const devicesGladys = JSON.parse(JSON.stringify(require('../../netatmo.convertDevices.mock.test.json')));
+const devicesNetatmo = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));
 const { EVENTS } = require('../../../../../utils/constants');
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
 const logger = require('../../../../../utils/logger');
@@ -22,12 +22,15 @@ const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('Netatmo update NRV features', () => {
-  const deviceGladysNRV = devicesGladys[3];
-  const deviceNetatmoNRV = JSON.parse(JSON.stringify(devicesNetatmo[3]));
-  const externalIdNRV = `netatmo:${devicesNetatmo[3].id}`;
+  let deviceGladysMock;
+  let deviceNetatmoMock;
+  let externalIdMock;
   beforeEach(() => {
     sinon.reset();
 
+    deviceGladysMock = { ...JSON.parse(JSON.stringify(devicesGladys[3])) };
+    deviceNetatmoMock = { ...JSON.parse(JSON.stringify(devicesNetatmo[3])) };
+    externalIdMock = `netatmo:${deviceNetatmoMock.id}`;
     netatmoHandler.status = 'not_initialized';
   });
 
@@ -36,11 +39,11 @@ describe('Netatmo update NRV features', () => {
   });
 
   it('should save all values according to all cases with heating power request', async () => {
-    await netatmoHandler.updateNRV(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNRV.external_id}:battery_percent`,
+      device_feature_external_id: `${deviceGladysMock.external_id}:battery_percent`,
       state: 90,
     });
     expect(
@@ -82,19 +85,19 @@ describe('Netatmo update NRV features', () => {
   });
 
   it('should save all values according to all cases without heating power request', async () => {
-    deviceNetatmoNRV.room.heating_power_request = 0;
+    deviceNetatmoMock.room.heating_power_request = 0;
 
-    await netatmoHandler.updateNRV(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNRV.external_id}:heating_power_request`,
+      device_feature_external_id: `${deviceGladysMock.external_id}:heating_power_request`,
       state: 0,
     });
   });
 
   it('should handle errors correctly', async () => {
-    deviceNetatmoNRV.battery_percent = undefined;
+    deviceNetatmoMock.battery_percent = undefined;
     const error = new Error('Test error');
     netatmoHandler.gladys = {
       event: {
@@ -104,7 +107,7 @@ describe('Netatmo update NRV features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNRV(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+      await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

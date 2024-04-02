@@ -4,6 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import { PARAMS } from '../../../../../../server/services/zwavejs-ui/lib/constants';
 
 import { connect } from 'unistore/preact';
 
@@ -95,11 +96,27 @@ class ZwaveJSUIDeviceBox extends Component {
     });
   };
 
+  getDeviceProperty = () => {
+    const device = this.state.device;
+    if (!device.features) {
+      return null;
+    }
+
+    let locationZwaveUi = null;
+    const locationZwaveUiParam = device.params.find(param => param.name === PARAMS.LOCATION);
+    if (locationZwaveUiParam) {
+      locationZwaveUi = locationZwaveUiParam.value;
+    }
+
+    return { locationZwaveUi };
+  };
+
   render(
     { deviceIndex, editable, deleteButton, housesWithRooms },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
+    const { locationZwaveUi } = this.getDeviceProperty();
 
     return (
       <div class="col-md-6">
@@ -139,6 +156,21 @@ class ZwaveJSUIDeviceBox extends Component {
                     />
                   </Localizer>
                 </div>
+
+                {locationZwaveUi && (
+                  <div class="form-group">
+                    <label class="form-label" for={`location_${deviceIndex}`}>
+                      <Text id="integration.zwavejs-ui.locationLabel" />
+                    </label>
+                    <input
+                      id={`location_${deviceIndex}`}
+                      type="text"
+                      value={locationZwaveUi}
+                      class="form-control"
+                      disabled="true"
+                    />
+                  </div>
+                )}
 
                 {housesWithRooms && (
                   <div class="form-group">

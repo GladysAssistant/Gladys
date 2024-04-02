@@ -20,7 +20,6 @@ async function onNodeValueUpdated(message) {
   if (propertyKeyNameClean !== '') {
     statePath += `.${propertyKeyNameClean}`;
   }
-  const valueConverted = get(STATES, `${statePath}.${newValue}`);
 
   const nodeId = `zwavejs-ui:${messageNode.id}`;
   const node = this.devices.find((n) => n.external_id === nodeId);
@@ -34,10 +33,13 @@ async function onNodeValueUpdated(message) {
     return;
   }
 
-  if (valueConverted !== undefined) {
+  const valueConverter = get(STATES, statePath);
+  const convertedValue = valueConverter !== undefined ? valueConverter(newValue) : null;
+
+  if (convertedValue !== null) {
     await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: nodeFeature.external_id,
-      state: valueConverted,
+      state: convertedValue,
     });
   }
 }

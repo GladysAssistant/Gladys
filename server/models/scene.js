@@ -60,6 +60,8 @@ const actionSchema = Joi.array().items(
       alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
       topic: Joi.string(),
       message: Joi.string().allow(''),
+      blinking_time: Joi.number(),
+      blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
     }),
   ),
 );

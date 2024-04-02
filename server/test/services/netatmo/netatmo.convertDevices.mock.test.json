@@ -8,9 +8,9 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Link RF quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "name": "Link Wifi quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -20,9 +20,9 @@
         "max": 100
       },
       {
-        "name": "Link Wifi quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "name": "Link RF quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -85,6 +85,18 @@
         "max": 100
       },
       {
+        "name": "Link RF quality - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Temperature - Thermostat Test",
         "external_id": "netatmo:04:00:00:xx:xx:xx:temperature",
         "selector": "netatmo:04:00:00:xx:xx:xx:temperature",
@@ -109,18 +121,6 @@
         "has_feedback": false,
         "min": -10,
         "max": 50
-      },
-      {
-        "name": "Link RF quality - Thermostat Test",
-        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       },
       {
         "name": "Setpoint temperature - Thermostat Test",
@@ -192,9 +192,9 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Link RF quality - Relais Salon Test",
-        "external_id": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
-        "selector": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "name": "Link Wifi quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -204,9 +204,9 @@
         "max": 100
       },
       {
-        "name": "Link Wifi quality - Relais Salon Test",
-        "external_id": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
-        "selector": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "name": "Link RF quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -261,6 +261,18 @@
         "max": 100
       },
       {
+        "name": "Link RF quality - Valve Test",
+        "external_id": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:09:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
         "name": "Temperature - room Office",
         "external_id": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
         "selector": "netatmo:09:00:00:xx:xx:xx:therm_measured_temperature",
@@ -272,18 +284,6 @@
         "has_feedback": false,
         "min": -10,
         "max": 50
-      },
-      {
-        "name": "Link RF quality - Valve Test",
-        "external_id": "netatmo:09:00:00:xx:xx:xx:rf_strength",
-        "selector": "netatmo:09:00:00:xx:xx:xx:rf_strength",
-        "category": "signal",
-        "type": "integer",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 100
       },
       {
         "name": "Setpoint temperature - Valve Test",
@@ -343,6 +343,638 @@
       {
         "name": "room_name",
         "value": "Office"
+      }
+    ]
+  },
+  {
+    "name": "Weather Station Test",
+    "external_id": "netatmo:70:ee:50:jj:jj:jj",
+    "selector": "netatmo:70:ee:50:jj:jj:jj",
+    "model": "NAMain",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Link Wifi quality - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:temperature",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - room Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:therm_measured_temperature",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:min_temp",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:max_temp",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "CO2 - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:co2",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:co2",
+        "category": "co2-sensor",
+        "type": "integer",
+        "unit": "ppm",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "name": "Humidity - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:humidity",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Noise - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:noise",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:noise",
+        "category": "noise-sensor",
+        "type": "integer",
+        "unit": "decibel",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 250
+      },
+      {
+        "name": "Pressure - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:pressure",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:pressure",
+        "category": "pressure-sensor",
+        "type": "integer",
+        "unit": "milli-bar",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -1000,
+        "max": 2000
+      },
+      {
+        "name": "Absolute pressure - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:absolute_pressure",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:absolute_pressure",
+        "category": "pressure-sensor",
+        "type": "integer",
+        "unit": "milli-bar",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -1000,
+        "max": 2000
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[\"02:00:00:yy:yy:yy\",\"05:00:00:yy:yy:yy\",\"06:00:00:yy:yy:yy\",\"03:00:00:yy:yy:yy\"]"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Office"
+      }
+    ]
+  },
+  {
+    "name": "Outdoor Hygrometer",
+    "external_id": "netatmo:02:00:00:yy:yy:yy",
+    "selector": "netatmo:02:00:00:yy:yy:yy",
+    "model": "NAModule1",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:02:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:temperature",
+        "selector": "netatmo:02:00:00:yy:yy:yy:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Outdoor",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:min_temp",
+        "selector": "netatmo:02:00:00:yy:yy:yy:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Outdoor",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:max_temp",
+        "selector": "netatmo:02:00:00:yy:yy:yy:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Humidity - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:humidity",
+        "selector": "netatmo:02:00:00:yy:yy:yy:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Outdoor"
+      }
+    ]
+  },
+  {
+    "name": "Anemometer STARK Home",
+    "external_id": "netatmo:06:00:00:yy:yy:yy",
+    "selector": "netatmo:06:00:00:yy:yy:yy",
+    "model": "NAModule2",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:06:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Wind strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_strength",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_strength",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Wind angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 360
+      },
+      {
+        "name": "Gust strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_gust",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Gust angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 360
+      },
+      {
+        "name": "Maximum wind strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
+        "selector": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Maximum wind angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 360
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Outdoor"
+      }
+    ]
+  },
+  {
+    "name": "STARK House Rain Gauge",
+    "external_id": "netatmo:05:00:00:yy:yy:yy",
+    "selector": "netatmo:05:00:00:yy:yy:yy",
+    "model": "NAModule3",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:05:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:05:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Current rain - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:rain",
+        "selector": "netatmo:05:00:00:yy:yy:yy:rain",
+        "category": "precipitation-sensor",
+        "type": "decimal",
+        "unit": "mm",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Precipitation / 1h - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:sum_rain_1",
+        "selector": "netatmo:05:00:00:yy:yy:yy:sum_rain_1",
+        "category": "precipitation-sensor",
+        "type": "decimal",
+        "unit": "millimeter-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Sum rain / 24h - STARK House Rain Gauge",
+        "external_id": "netatmo:05:00:00:yy:yy:yy:sum_rain_24",
+        "selector": "netatmo:05:00:00:yy:yy:yy:sum_rain_24",
+        "category": "precipitation-sensor",
+        "type": "decimal",
+        "unit": "millimeter-per-day",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Outdoor"
+      }
+    ]
+  },
+  {
+    "name": "STARK House kitchen hygrometer",
+    "external_id": "netatmo:03:00:00:yy:yy:yy",
+    "selector": "netatmo:03:00:00:yy:yy:yy",
+    "model": "NAModule4",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:03:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:temperature",
+        "selector": "netatmo:03:00:00:yy:yy:yy:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - room Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:therm_measured_temperature",
+        "selector": "netatmo:03:00:00:yy:yy:yy:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:min_temp",
+        "selector": "netatmo:03:00:00:yy:yy:yy:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:max_temp",
+        "selector": "netatmo:03:00:00:yy:yy:yy:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "CO2 - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:co2",
+        "selector": "netatmo:03:00:00:yy:yy:yy:co2",
+        "category": "co2-sensor",
+        "type": "integer",
+        "unit": "ppm",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "name": "Humidity - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:humidity",
+        "selector": "netatmo:03:00:00:yy:yy:yy:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Kitchen"
       }
     ]
   },

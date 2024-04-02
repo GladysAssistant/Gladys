@@ -21,12 +21,16 @@
     "selectPlaceholder": "Select..."
   },
   "color": {
-    "blue": "Blue",
-    "red": "Red",
-    "green": "Green",
+    "aqua": "Aqua",
     "black": "Black",
-    "yellow": "Yellow",
-    "purple": "Purple"
+    "blue": "Blue",
+    "green": "Green",
+    "grey": "Grey",
+    "orange": "Orange",
+    "pink": "Pink",
+    "purple": "Purple",
+    "red": "Red",
+    "yellow": "Yellow"
   },
   "calendar": {
     "allDay": "All Day",
@@ -281,7 +285,8 @@
         "noRecentValue": "No recent value",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
-        "substractButton": "-"
+        "substractButton": "-",
+        "motionDetected": "Motion detected"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
@@ -316,7 +321,7 @@
         "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
         "upgradeGladysPlusPlanError": "Camera streaming is not included in your Gladys Plus plan. You need to update it in Settings -> Billing.",
         "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
-        "notNotSupportedBrowser": "This browser is not supported. In order to enable end-to-end encryption of this video stream, we use the MediaSource API, which is unfortunately not available on Safari iPhone. Strangely, this feature is available on Safari iPad and MacOS... We'll have to be patient, let's hope the API will be available on iPhone soon!",
+        "notNotSupportedBrowser": "This browser is not supported. To enable end-to-end encryption of this video stream, we use the MediaSource API, which may not be supported on this browser. We recommend Firefox, Safari, or any Chromium-based browser.",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
         "liveAutoStartLabel": "Start automatically the live streaming",
         "liveAutoStartDescription": "Warning: This can increase the load on your machine/network.",
@@ -342,6 +347,8 @@
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "chartType": "Select the type of chart to display",
+        "chartColor": "Select the color of chart",
+        "dataColor": "Select color for {{featureLabel}}",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
@@ -539,7 +546,9 @@
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
           "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices."
       },
       "device": {
         "title": "Netatmo Devices in Gladys",
@@ -554,15 +563,16 @@
         "roomNetatmoApiLabel": "Room in Netatmo API",
         "featuresLabel": "Features",
         "saveButton": "Save",
+        "saveNotAllowButton": "Save not possible",
         "deleteButton": "Delete",
         "noValueReceived": "No value received."
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
-        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats and the valves associated with their Plug (API Energy) as well as weather stations and their modules (API Weather). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
-        "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
+        "noDeviceFound": "No Netatmo devices were found. If you are certain that you have a Netatmo device supported by Gladys, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
         "unmanagedModelButton": "Unsupported model",
         "updateButton": "Update",
@@ -576,13 +586,17 @@
         "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
         "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
-        "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
-        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "titleAdditionalInformationEnergyApi": "Additional Information on the Operation of the \"Energy\" API:",
+        "descriptionAdditionalInformationEnergyApi": "You must select the \"Energy\" API at the bottom of the page to access the corresponding devices. Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "titleAdditionalInformationWeatherApi": "Additional Information on the Operation of the \"Weather\" API:",
+        "descriptionAdditionalInformationWeatherApi": "You must select the \"Weather\" API at the bottom of the page to access the corresponding devices. If you also have devices belonging to the \"Energy\" API (Plug, thermostat or valve) you will have access to an additional functionality on indoor hygrometer devices to obtain the average temperature of the corresponding room. So don't forget to select the \"Energy\" API to access this functionality.",
         "clientIdLabel": "Client ID",
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",
         "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
         "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
+        "energyApiLabel": "Enable \"Energy\" API (retrieve Netatmo Plug, Thermostat, and Valve devices)",
+        "weatherApiLabel": "Enable \"Weather\" API (retrieve Netatmo Weather Station devices)",
         "saveLabel": "Save and connect",
         "disconnectLabel": "Disconnect"
       },
@@ -819,7 +833,6 @@
       "description": "Control your devices with Node-RED.",
       "setupTab": "Setup",
       "documentation": "Node-RED documentation",
-
       "status": {
         "notInstalled": "Node-RED server failed to install.",
         "notRunning": "Node-RED server failed to start.",
@@ -849,7 +862,6 @@
         "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
-
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google Home documentation",
@@ -1096,6 +1108,7 @@
       "discoverDeviceDescr": "Automatically scan for Z-Wave JS UI devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter your device name",
+      "locationLabel": "Device Location",
       "noFeaturesHandled": "This device is not yet supported by Gladys; feel free to submit it for inclusion!",
       "featuresLabel": "Features",
       "roomLabel": "Room",
@@ -1749,6 +1762,20 @@
         "label": "Select the lights you want to toggle",
         "description": "This action turn on the light if state is off or turn off the light if state is on"
       },
+      "blinkLights": {
+        "label": "Select the lights you want to make blink",
+        "description": "Configure blinking duration and speed",
+        "blinkingTime": {
+          "label": "Duration (in seconds)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
+        }
+      },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
       },
@@ -1890,7 +1917,8 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights",
-        "toggle": "Toggle the Lights"
+        "toggle": "Toggle the Lights",
+        "blink": "Make the Lights blink"
       },
       "switch": {
         "turn-on": "Turn On the Switches",
@@ -2479,6 +2507,7 @@
     "hPa": "Hectopascal (hPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
@@ -2544,7 +2573,8 @@
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
-    "square-kilometer": "Square kilometer (km²)"
+    "square-kilometer": "Square kilometer (km²)",
+    "decibel": "Decibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2554,6 +2584,7 @@
     "pascal": "Pa",
     "hPa": "hPa",
     "bar": "bar",
+    "milli-bar": "mbar",
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
@@ -2620,7 +2651,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2651,6 +2683,13 @@
           "auto": "Auto",
           "cooling": "Cool",
           "heating": "Heat"
+        }
+      },
+      "siren": {
+        "volume": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
         }
       }
     }
@@ -2712,7 +2751,12 @@
           "43": "Down press",
           "44": "Down hold",
           "45": "Off press",
-          "46": "Off hold"
+          "46": "Off hold",
+          "47": "Single press",
+          "48": "Long press",
+          "49": "Short release",
+          "50": "Long release",
+          "51": "Double press"
         }
       },
       "opening-sensor": {
@@ -2826,7 +2870,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "Co2 Sensor",
-      "decimal": "Co2 (decimal)"
+      "decimal": "Co2 (decimal)",
+      "integer": "Co2 (integer)"
     },
     "switch": {
       "shortCategoryName": "Switch",
@@ -2840,7 +2885,9 @@
     },
     "siren": {
       "shortCategoryName": "Siren",
-      "binary": "Siren"
+      "binary": "Siren",
+      "volume": "Siren volume",
+      "melody": "Melody"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -2853,7 +2900,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Pressure sensor",
-      "decimal": "Pressure (decimal)"
+      "decimal": "Pressure (decimal)",
+      "integer": "Pressure (integer)"
     },
     "leak-sensor": {
       "shortCategoryName": "Leak sensor",
@@ -2959,7 +3007,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Speed sensor",
-      "decimal": "Speed"
+      "decimal": "Speed (decimal)",
+      "integer": "Speed (integer)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Precipitation sensor",
@@ -3037,6 +3086,14 @@
       "next": "Music next button",
       "playback_state": "Music playback state",
       "play_notification": "Broadcast a notification"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Sound sensor",
+      "integer": "Noise (integer)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Angle sensor",
+      "integer": "Angle (integer)"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

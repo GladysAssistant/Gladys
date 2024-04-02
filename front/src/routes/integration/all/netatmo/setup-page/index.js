@@ -76,12 +76,13 @@ class NetatmoSetupPage extends Component {
         await this.props.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_CONNECTED', {
           value: successfulNewToken
         });
-        this.setState({
+        await this.setState({
           connectNetatmoStatus: STATUS.CONNECTED,
           connected: true,
           configured: true,
           errored: false
         });
+        await this.props.httpClient.get('/api/v1/service/netatmo/discover', { refresh: true });
         setTimeout(() => {
           route('/dashboard/integration/device/netatmo/setup', true);
         }, 100);
@@ -107,7 +108,9 @@ class NetatmoSetupPage extends Component {
     try {
       this.props.httpClient.post('/api/v1/service/netatmo/configuration', {
         clientId: this.state.netatmoClientId,
-        clientSecret: this.state.netatmoClientSecret
+        clientSecret: this.state.netatmoClientSecret,
+        energyApi: this.state.netatmoEnergyApi,
+        weatherApi: this.state.netatmoWeatherApi
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -155,7 +158,7 @@ class NetatmoSetupPage extends Component {
   loadProps = async () => {
     let configuration = {};
     try {
-      configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
+      configuration = await this.props.httpClient.get('/api/v1/service/netatmo/configuration');
     } catch (e) {
       console.error(e);
       await this.setState({ errored: true });
@@ -163,6 +166,8 @@ class NetatmoSetupPage extends Component {
       await this.setState({
         netatmoClientId: configuration.clientId,
         netatmoClientSecret: configuration.clientSecret,
+        netatmoEnergyApi: configuration.energyApi,
+        netatmoWeatherApi: configuration.weatherApi,
         clientSecretChanges: false
       });
     }

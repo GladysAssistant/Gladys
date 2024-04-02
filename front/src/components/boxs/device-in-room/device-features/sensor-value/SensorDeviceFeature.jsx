@@ -6,6 +6,7 @@ import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
 import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
+import MotionSensorDeviceValue from './MotionSensorDeviceValue';
 import BadgeNumberDeviceValue from './BadgeNumberDeviceValue';
 import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
@@ -14,7 +15,7 @@ import TextDeviceValue from './TextDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
-  [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: IconBinaryDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,

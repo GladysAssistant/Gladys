@@ -36,6 +36,7 @@ const boxesSchema = Joi.array().items(
       temperature_use_custom_value: Joi.boolean(),
       temperature_min: Joi.number(),
       temperature_max: Joi.number(),
+      colors: Joi.array().items(Joi.string()),
     }),
   ),
 );
