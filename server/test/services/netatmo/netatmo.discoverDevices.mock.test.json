@@ -8,9 +8,9 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Link RF quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "name": "Link Wifi quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -20,9 +20,9 @@
         "max": 100
       },
       {
-        "name": "Link Wifi quality - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "name": "Link RF quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
         "category": "signal",
         "type": "integer",
         "read_only": true,
@@ -100,7 +100,9 @@
         "type": "garage",
         "module_ids": ["01:00:00:xx:xx:xx"]
       },
-      "plug": null
+      "plug": null,
+      "categoryAPI": "Energy",
+      "apiNotConfigured": true
     }
   }
 ]

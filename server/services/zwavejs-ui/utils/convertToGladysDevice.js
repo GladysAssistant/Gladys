@@ -1,6 +1,6 @@
 const get = require('get-value');
 
-const { EXPOSES } = require('../lib/constants');
+const { EXPOSES, PARAMS } = require('../lib/constants');
 
 const cleanNames = (text) => {
   if (!text || typeof text !== 'string') {
@@ -22,6 +22,7 @@ const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, pr
 
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
+  let params = [];
 
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(device.values).forEach((valueKey) => {
@@ -40,6 +41,7 @@ const convertToGladysDevice = (serviceId, device) => {
         ...exposeFound,
         name: value.id,
         external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
+        selector: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
         node_id: device.id,
         // These are custom properties only available on the object in memory (not in DB)
         command_class_version: commandClassVersion,
@@ -50,14 +52,17 @@ const convertToGladysDevice = (serviceId, device) => {
         property_key_name: propertyKeyName,
       });
     }
+    params = [{ name: PARAMS.LOCATION, value: device.loc }];
   });
 
   return {
     name: device.name,
     external_id: `zwavejs-ui:${device.id}`,
+    selector: `zwavejs-ui:${device.id}`,
     service_id: serviceId,
     should_poll: false,
     features,
+    params,
   };
 };
 

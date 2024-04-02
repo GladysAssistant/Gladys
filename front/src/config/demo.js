@@ -1001,7 +1001,7 @@ const data = {
       is_read: true,
       created_at: dayjs()
         .subtract(1, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -1012,7 +1012,7 @@ const data = {
       created_at: dayjs()
         .subtract(1, 'hour')
         .subtract(1, 'seconds')
-        .toDate()
+        .toISOString()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -1023,7 +1023,7 @@ const data = {
       created_at: dayjs()
         .subtract(1, 'hour')
         .subtract(2, 'seconds')
-        .toDate()
+        .toISOString()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -1034,7 +1034,7 @@ const data = {
       created_at: dayjs()
         .subtract(1, 'hour')
         .subtract(3, 'seconds')
-        .toDate()
+        .toISOString()
     }
   ],
   'post /api/v1/message': {
@@ -3912,185 +3912,185 @@ const data = {
         name: 'Kitchen temperature'
       },
       values: [
-        { created_at: dayjs().toDate(), value: 28 },
+        { created_at: dayjs().toISOString(), value: 28 },
         {
           created_at: dayjs()
             .subtract(1, 'day')
-            .toDate(),
+            .toISOString(),
           value: 33
         },
         {
           created_at: dayjs()
             .subtract(2, 'day')
-            .toDate(),
+            .toISOString(),
           value: 44
         },
         {
           created_at: dayjs()
             .subtract(3, 'day')
-            .toDate(),
+            .toISOString(),
           value: 28
         },
         {
           created_at: dayjs()
             .subtract(4, 'day')
-            .toDate(),
+            .toISOString(),
           value: 36
         },
         {
           created_at: dayjs()
             .subtract(5, 'day')
-            .toDate(),
+            .toISOString(),
           value: 24
         },
         {
           created_at: dayjs()
             .subtract(5, 'day')
-            .toDate(),
+            .toISOString(),
           value: 65
         },
         {
           created_at: dayjs()
             .subtract(6, 'day')
-            .toDate(),
+            .toISOString(),
           value: 31
         },
         {
           created_at: dayjs()
             .subtract(7, 'day')
-            .toDate(),
+            .toISOString(),
           value: 37
         },
         {
           created_at: dayjs()
             .subtract(8, 'day')
-            .toDate(),
+            .toISOString(),
           value: 39
         },
         {
           created_at: dayjs()
             .subtract(9, 'day')
-            .toDate(),
+            .toISOString(),
           value: 62
         },
         {
           created_at: dayjs()
             .subtract(10, 'day')
-            .toDate(),
+            .toISOString(),
           value: 51
         },
         {
           created_at: dayjs()
             .subtract(11, 'day')
-            .toDate(),
+            .toISOString(),
           value: 35
         },
         {
           created_at: dayjs()
             .subtract(12, 'day')
-            .toDate(),
+            .toISOString(),
           value: 41
         },
         {
           created_at: dayjs()
             .subtract(13, 'day')
-            .toDate(),
+            .toISOString(),
           value: 35
         },
         {
           created_at: dayjs()
             .subtract(14, 'day')
-            .toDate(),
+            .toISOString(),
           value: 27
         },
         {
           created_at: dayjs()
             .subtract(15, 'day')
-            .toDate(),
+            .toISOString(),
           value: 93
         },
         {
           created_at: dayjs()
             .subtract(16, 'day')
-            .toDate(),
+            .toISOString(),
           value: 53
         },
         {
           created_at: dayjs()
             .subtract(17, 'day')
-            .toDate(),
+            .toISOString(),
           value: 61
         },
         {
           created_at: dayjs()
             .subtract(18, 'day')
-            .toDate(),
+            .toISOString(),
           value: 27
         },
         {
           created_at: dayjs()
             .subtract(19, 'day')
-            .toDate(),
+            .toISOString(),
           value: 54
         },
         {
           created_at: dayjs()
             .subtract(20, 'day')
-            .toDate(),
+            .toISOString(),
           value: 43
         },
         {
           created_at: dayjs()
             .subtract(21, 'day')
-            .toDate(),
+            .toISOString(),
           value: 19
         },
         {
           created_at: dayjs()
             .subtract(22, 'day')
-            .toDate(),
+            .toISOString(),
           value: 46
         },
         {
           created_at: dayjs()
             .subtract(23, 'day')
-            .toDate(),
+            .toISOString(),
           value: 39
         },
         {
           created_at: dayjs()
             .subtract(24, 'day')
-            .toDate(),
+            .toISOString(),
           value: 62
         },
         {
           created_at: dayjs()
             .subtract(25, 'day')
-            .toDate(),
+            .toISOString(),
           value: 51
         },
         {
           created_at: dayjs()
             .subtract(26, 'day')
-            .toDate(),
+            .toISOString(),
           value: 35
         },
         {
           created_at: dayjs()
             .subtract(27, 'day')
-            .toDate(),
+            .toISOString(),
           value: 41
         },
         {
           created_at: dayjs()
             .subtract(28, 'day')
-            .toDate(),
+            .toISOString(),
           value: 33
         }
       ]
     }
   ],
-  'get /api/v1/job?take=500': [
+  'get /api/v1/job': [
     {
       id: 'f69252f4-1216-4021-8fc0-83234da71a4a',
       type: 'monthly-device-state-aggregate',
@@ -4099,7 +4099,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(1, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: 'b2d590aa-40d7-435a-910a-cf370dde06a9',
@@ -4109,7 +4109,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(1, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: 'd1e7ee47-229c-4b9f-bbaa-201db860cc25',
@@ -4119,7 +4119,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(1, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: '06411e01-a909-4531-9246-2e935c16ba69',
@@ -4129,7 +4129,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(2, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: '10469873-569a-4dfb-b35c-4468c26542a4',
@@ -4139,7 +4139,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(2, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: '5307b306-8d95-41e3-9ec6-a5c29d386c9b',
@@ -4149,7 +4149,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(2, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: 'c3da516f-3565-4b00-be82-ddd00fe39a12',
@@ -4159,7 +4159,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(3, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: '5ca896b5-e810-48f5-bfb6-f3039a6776c5',
@@ -4169,7 +4169,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(3, 'hour')
-        .toDate()
+        .toISOString()
     },
     {
       id: 'ae916efe-6209-49cb-a2fc-323f3ab5f91d',
@@ -4179,7 +4179,7 @@ const data = {
       data: {},
       created_at: dayjs()
         .subtract(3, 'hour')
-        .toDate()
+        .toISOString()
     }
   ],
   'get /api/v1/service/sonos/device': [

@@ -2,7 +2,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function NetatmoController(netatmoHandler) {
   /**
-   * @api {get} /api/v1/service/netatmo/config Get Netatmo Configuration.
+   * @api {get} /api/v1/service/netatmo/configuration Get Netatmo Configuration.
    * @apiName getConfiguration
    * @apiGroup Netatmo
    */
@@ -98,7 +98,7 @@ module.exports = function NetatmoController(netatmoHandler) {
   }
 
   return {
-    'get /api/v1/service/netatmo/config': {
+    'get /api/v1/service/netatmo/configuration': {
       authenticated: true,
       controller: asyncMiddleware(getConfiguration),
     },

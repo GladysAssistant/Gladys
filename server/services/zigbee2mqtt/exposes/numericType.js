@@ -33,6 +33,15 @@ module.exports = {
         max: 100,
       },
     },
+    battpercentage: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    },
     brightness: {
       types: {
         light: {

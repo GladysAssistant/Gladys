@@ -110,6 +110,48 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
+    const blinkingSpeed = action.blinking_speed;
+    const blinkingTime = action.blinking_time * 1000 + 1;
+    let blinkingInterval;
+    switch (blinkingSpeed) {
+      case 'slow':
+        blinkingInterval = 1000;
+        break;
+      case 'medium':
+        blinkingInterval = 500;
+        break;
+      case 'fast':
+        blinkingInterval = 200;
+        break;
+      default:
+        blinkingInterval = 200;
+        break;
+    }
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
+        const oldValue = deviceFeature.last_value;
+        let newValue = 0;
+        /* eslint-disable no-await-in-loop */
+        // We want this loops to be sequential
+        for (let i = 0; i < blinkingTime; i += blinkingInterval) {
+          newValue = 1 - newValue;
+          await self.device.setValue(device, deviceFeature, newValue);
+          await Promise.delay(blinkingInterval);
+        }
+        /* eslint-enable no-await-in-loop */
+        await self.device.setValue(device, deviceFeature, oldValue);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
