@@ -83,9 +83,17 @@ jobs:
         working-directory: ./server
         run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
+          token: 08cd0d46-0291-42ed-b352-50924cb6cca6
+
+          ## Yes, we are storing the CODECOV token in plain text here and not as a secret.
+          ## This is because Codecov report upload keeps failing because of a Github Action rate limit
+          ## And as we are an open source project, we need forks to be able to upload reports as well, so
+          ## we followed the recommandatiom from CodeCov:
+          ## https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
+          ## It's not that dangerous to do it, and it's the best tradeoff we could find
   cypress-run:
     name: Cypress run
     runs-on: ubuntu-22.04
