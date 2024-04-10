@@ -2806,7 +2806,7 @@
     "siren": {
       "shortCategoryName": "Siren",
       "binary": "Siren",
-      "volume": "Siren volume",
+      "lmh_volume": "Siren volume",
       "melody": "Melody"
     },
     "cube": {

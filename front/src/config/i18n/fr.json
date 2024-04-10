@@ -2606,7 +2606,7 @@
         }
       },
       "siren": {
-        "volume": {
+        "lmh_volume": {
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
@@ -2806,7 +2806,7 @@
     "siren": {
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
-      "volume": "Volume de la sirène",
+      "lmh_volume": "Volume de la sirène",
       "melody": "Mélodie"
     },
     "cube": {
