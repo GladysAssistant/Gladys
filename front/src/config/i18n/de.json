@@ -2606,7 +2606,7 @@
         }
       },
       "siren": {
-        "volume": {
+        "lmh_volume": {
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
