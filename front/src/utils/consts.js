@@ -341,4 +341,3 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell'
   }
 };
-
