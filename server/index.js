@@ -45,6 +45,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   // create Gladys object
   const gladys = Gladys({
     jwtSecret: process.env.JWT_SECRET,
+    disableDeviceStateAggregation: true,
   });
 
   // start Gladys
