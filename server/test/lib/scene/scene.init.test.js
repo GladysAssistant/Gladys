@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const db = require('../../../models');
 const SceneManager = require('../../../lib/scene');
 
 const { fake, assert } = sinon;
@@ -57,5 +58,36 @@ describe('scene.init', () => {
     // Check that scheduled method send an event
     scheduler.scheduleJob.getCall(3).callback();
     assert.calledOnceWithExactly(event.emit, 'calendar.check-if-event-is-coming');
+  });
+  it('should init scene with failure but not crash', async () => {
+    await db.Scene.create({
+      name: 'broken-scene',
+      icon: 'activity',
+      triggers: [
+        {
+          type: 'time.changed',
+          scheduler_type: 'every-month',
+          day_of_the_month: 1,
+        },
+      ],
+      actions: [[]],
+    });
+    await sceneManager.init();
+  });
+  it('should init scheduled scene with with no days of the week specified, but prevent node-schedule from blocking forever', async () => {
+    await db.Scene.create({
+      name: 'broken-scene',
+      icon: 'activity',
+      triggers: [
+        {
+          type: 'time.changed',
+          scheduler_type: 'every-week',
+          days_of_the_week: [],
+          time: '12:00',
+        },
+      ],
+      actions: [[]],
+    });
+    await sceneManager.init();
   });
 });

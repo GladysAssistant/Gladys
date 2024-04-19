@@ -48,6 +48,17 @@ function addScene(sceneRaw) {
             break;
           case 'every-week':
             rule.dayOfWeek = trigger.days_of_the_week.map((day) => nodeScheduleDaysOfWeek[day]);
+            if (rule.dayOfWeek.length === 0) {
+              rule.dayOfWeek = [
+                nodeScheduleDaysOfWeek.monday,
+                nodeScheduleDaysOfWeek.tuesday,
+                nodeScheduleDaysOfWeek.wednesday,
+                nodeScheduleDaysOfWeek.thursday,
+                nodeScheduleDaysOfWeek.friday,
+                nodeScheduleDaysOfWeek.saturday,
+                nodeScheduleDaysOfWeek.sunday,
+              ];
+            }
             rule.hour = parseInt(trigger.time.substr(0, 2), 10);
             rule.minute = parseInt(trigger.time.substr(3, 2), 10);
             rule.second = 0;
