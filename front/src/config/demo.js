@@ -131,6 +131,9 @@ const data = {
           type: 'devices-in-room',
           room: 'exterior',
           device_features: ['aqi-city']
+        },
+        {
+          type: 'edf-tempo'
         }
       ],
       [
@@ -4149,7 +4152,12 @@ const data = {
         }
       ]
     }
-  ]
+  ],
+  'get /api/v1/service/edf-tempo/state': {
+    today_peak_state: 'blue',
+    tomorrow_peak_state: 'blue',
+    current_hour_peak_state: 'peak-hour'
+  }
 };
 
 export default data;
