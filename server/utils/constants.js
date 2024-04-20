@@ -1018,6 +1018,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES: 'devices',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
+  EDF_TEMPO: 'edf-tempo',
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',
