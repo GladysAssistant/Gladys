@@ -382,6 +382,9 @@ const ACTIONS = {
   ECOWATT: {
     CONDITION: 'ecowatt.condition',
   },
+  EDF_TEMPO: {
+    CONDITION: 'edf-tempo.condition',
+  },
   MQTT: {
     SEND: 'mqtt.send',
   },

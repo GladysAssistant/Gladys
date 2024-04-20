@@ -481,6 +481,31 @@ const actionsFunc = {
       throw new AbortScene(e.message);
     }
   },
+  [ACTIONS.EDF_TEMPO.CONDITION]: async (self, action) => {
+    try {
+      const edfTempoService = self.service.getService('edf-tempo');
+      const data = await edfTempoService.getEdfTempoStates();
+      let peakDayTypeValid;
+      let peakHourTypeValid;
+      if (action.edf_tempo_day === 'today') {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.today_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid =
+          action.edf_tempo_peak_hour_type === data.current_hour_peak_state ||
+          action.edf_tempo_peak_hour_type === 'no-check';
+      } else {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.tomorrow_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid = true;
+      }
+      const conditionValid = peakDayTypeValid && peakHourTypeValid;
+      if (!conditionValid) {
+        throw new AbortScene('EDF_TEMPO_DIFFERENT_STATE');
+      }
+    } catch (e) {
+      throw new AbortScene(e.message);
+    }
+  },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);
     if (house.alarm_mode !== action.alarm_mode) {

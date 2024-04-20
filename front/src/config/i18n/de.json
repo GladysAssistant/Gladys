@@ -255,6 +255,7 @@
       "devices": "Geräte",
       "chart": "Diagramm",
       "ecowatt": "Ecowatt (Frankreich)",
+      "edf-tempo": "EDF Tempo",
       "clock": "Uhr",
       "scene": "Szene",
       "music": "Musik"
@@ -368,6 +369,17 @@
         "ok": "Netz in Ordnung",
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
+      },
+      "edfTempo": {
+        "description": "Dieses Widget ermöglicht es Ihnen, den aktuellen Zustand von EDF Tempo anzuzeigen.",
+        "link": "Mehr über EDF Tempo erfahren",
+        "blueDay": "Blauer Tag",
+        "whiteDay": "Weißer Tag",
+        "redDay": "Roter Tag",
+        "notDefinedDay": "Nicht definiert",
+        "currentHourState": "Aktuell",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde"
       },
       "clock": {
         "analog": "Analog",
@@ -1804,6 +1816,21 @@
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
       },
+      "edfTempoCondition": {
+        "description": "Die Szene wird fortgesetzt, wenn die untenstehenden Bedingungen für EDF Tempo erfüllt sind.",
+        "selectDay": "Für den Tag",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "selectPeakDayType": "Wenn der Tag im",
+        "blueDay": "Blauen Tag",
+        "whiteDay": "Weißen Tag",
+        "redDay": "Roten Tag",
+        "noPeakDayCheck": "Beliebig",
+        "noPeakHourCheck": "Beliebig",
+        "selectPeakHourType": "Und wenn es",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde"
+      },
       "alarmCheckMode": {
         "description": "Die Szene wird fortgesetzt, wenn die Alarmanlage im ausgewählten Modus ist.",
         "houseLabel": "Zuhause",
@@ -1878,6 +1905,9 @@
       },
       "ecowatt": {
         "condition": "Bedingung für Ecowatt (Frankreich)"
+      },
+      "edf-tempo": {
+        "condition": "Bedingung für EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
