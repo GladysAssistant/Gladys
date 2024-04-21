@@ -3,6 +3,9 @@ import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
 
+// Refresh EDF Tempo data every 2 hours
+const BOX_REFRESH_INTERVAL_MS = 2 * 60 * 60 * 1000;
+
 const PeakState = ({ state }) => (
   <div>
     {state === 'blue' && (
@@ -120,6 +123,11 @@ class EdfTempo extends Component {
 
   componentDidMount() {
     this.refreshData();
+    this.interval = setInterval(() => this.refreshData(), BOX_REFRESH_INTERVAL_MS);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   constructor(props) {
