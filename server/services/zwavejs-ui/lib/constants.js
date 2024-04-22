@@ -98,8 +98,8 @@ const EXPOSES = {
   },
   multilevel_switch: {
     currentvalue: {
-      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
       min: 0,
       max: 99,
       keep_history: true,
