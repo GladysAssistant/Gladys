@@ -255,6 +255,7 @@
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
+      "edf-tempo": "EDF Tempo",
       "clock": "Horloge",
       "scene": "Scène",
       "music": "Musique"
@@ -368,6 +369,18 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      },
+      "edfTempo": {
+        "description": "Ce widget vous permet d'afficher l'état EDF Tempo actuel.",
+        "link": "En savoir plus sur EDF Tempo",
+        "blueDay": "Jour bleu",
+        "whiteDay": "Jour blanc",
+        "redDay": "Jour rouge",
+        "notDefinedDay": "Non défini",
+        "currentHourState": "Actuellement",
+        "peakHour": "Heure pleine",
+        "offPeakHour": "Heure creuse",
+        "dayPeakTitle": "Jours tempo"
       },
       "clock": {
         "analog": "Analogique",
@@ -1804,6 +1817,21 @@
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
       },
+      "edfTempoCondition": {
+        "description": "La scène continuera si les conditions ci-dessous sur EDF Tempo sont vérifiées.",
+        "selectDay": "Pour le jour",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "selectPeakDayType": "Si le jour est en",
+        "blueDay": "Jour bleu",
+        "whiteDay": "Jour blanc",
+        "redDay": "Jour rouge",
+        "noPeakDayCheck": "Indifférent",
+        "noPeakHourCheck": "Indifférent",
+        "selectPeakHourType": "Et que nous sommes en",
+        "peakHour": "Heure pleine",
+        "offPeakHour": "Heure creuse"
+      },
       "alarmCheckMode": {
         "description": "La scène continuera si l'alarme est dans le mode sélectionné.",
         "houseLabel": "Maison",
@@ -1878,6 +1906,9 @@
       },
       "ecowatt": {
         "condition": "Condition sur Ecowatt ( France )"
+      },
+      "edf-tempo": {
+        "condition": "Condition sur EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "Si l'alarme est en mode",

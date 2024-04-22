@@ -255,6 +255,7 @@
       "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
+      "edf-tempo": "Tempo EDF",
       "clock": "Clock",
       "scene": "Scene",
       "music": "Music"
@@ -368,6 +369,18 @@
         "ok": "Network ok",
         "warning": "Network warning",
         "critical": "Network critical"
+      },
+      "edfTempo": {
+        "description": "This widget allows you to display the current EDF Tempo state.",
+        "link": "Learn more about EDF Tempo",
+        "blueDay": "Blue Day",
+        "whiteDay": "White Day",
+        "redDay": "Red Day",
+        "notDefinedDay": "Not Defined",
+        "currentHourState": "Currently",
+        "peakHour": "Peak Hour",
+        "offPeakHour": "Off-Peak Hour",
+        "dayPeakTitle": "Tempo days"
       },
       "clock": {
         "analog": "Analog",
@@ -1804,6 +1817,21 @@
         "warning": "Network warning",
         "critical": "Network critical"
       },
+      "edfTempoCondition": {
+        "description": "The scene will continue if the following conditions on EDF Tempo are met.",
+        "selectDay": "For the day",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "selectPeakDayType": "If the day is",
+        "blueDay": "Blue Day",
+        "whiteDay": "White Day",
+        "redDay": "Red Day",
+        "noPeakDayCheck": "Any",
+        "noPeakHourCheck": "Any",
+        "selectPeakHourType": "And if it's",
+        "peakHour": "Peak Hour",
+        "offPeakHour": "Off-Peak Hour"
+      },
       "alarmCheckMode": {
         "description": "The scene will continue if the alarm is in the selected mode.",
         "houseLabel": "House",
@@ -1878,6 +1906,9 @@
       },
       "ecowatt": {
         "condition": "Condition on Ecowatt (France)"
+      },
+      "edf-tempo": {
+        "condition": "Condition on EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
