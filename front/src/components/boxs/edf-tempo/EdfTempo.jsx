@@ -2,9 +2,14 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
-// Refresh EDF Tempo data every 2 hours
-const BOX_REFRESH_INTERVAL_MS = 2 * 60 * 60 * 1000;
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Refresh EDF Tempo data every 1 hour
+const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 60 * 1000;
 
 const PeakState = ({ state }) => (
   <div>
@@ -103,7 +108,6 @@ class EdfTempo extends Component {
         .locale(this.props.user.language)
         .format('ddd LL');
 
-      const currentHourPeakState = edfTempoData.current_hour_peak_state;
       const todayPeakState = edfTempoData.today_peak_state;
       const tomorrowPeakState = edfTempoData.tomorrow_peak_state;
 
@@ -112,7 +116,6 @@ class EdfTempo extends Component {
         loading: false,
         today,
         tomorrow,
-        currentHourPeakState,
         todayPeakState,
         tomorrowPeakState
       });
@@ -121,13 +124,24 @@ class EdfTempo extends Component {
     }
   };
 
+  refreshPeakHourState = () => {
+    const today = dayjs();
+    const todayHour = today.tz('Europe/Paris').hour();
+    const currentHourPeakState = todayHour >= 6 && todayHour < 22 ? 'peak-hour' : 'off-peak-hour';
+    this.setState({ currentHourPeakState });
+  };
+
   componentDidMount() {
+    this.refreshPeakHourState();
     this.refreshData();
     this.interval = setInterval(() => this.refreshData(), BOX_REFRESH_INTERVAL_MS);
+    // Every minute, refresh peak hour state
+    this.peakHourRefreshInterval = setInterval(() => this.refreshPeakHourState(), 60 * 1000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    clearInterval(this.peakHourRefreshInterval);
   }
 
   constructor(props) {
