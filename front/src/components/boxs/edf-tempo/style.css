@@ -1,0 +1,24 @@
+.h4Title {
+  font-size: 16px;
+}
+
+.hourDisplay {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  border-radius: 0.3rem;
+  text-align: 'center';
+}
+
+.peakHour {
+  color: #f1c40f;
+  background-color: transparent;
+  background-image: none;
+  border-color: #f1c40f;
+  border: 1px solid;
+}
+
+.offPeakHour {
+  border: 1px solid;
+}

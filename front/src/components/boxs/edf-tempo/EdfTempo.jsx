@@ -1,9 +1,11 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
+import cx from 'classnames';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import style from './style.css';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -61,31 +63,39 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
           <div class="dimmer-content">
             <div class="row mb-1">
               <div class="col">
-                <Text id="dashboard.boxes.edfTempo.currentHourState" />
-              </div>
-              <div class="col-auto">
                 {currentHourPeakState === 'peak-hour' && (
-                  <span class="badge badge-warning">
+                  <div
+                    class={cx(style.hourDisplay, style.peakHour, 'd-flex align-items-center justify-content-center')}
+                  >
+                    <i class="fe fe-sun mr-4" />
                     <Text id="dashboard.boxes.edfTempo.peakHour" />
-                  </span>
+                  </div>
                 )}
                 {currentHourPeakState === 'off-peak-hour' && (
-                  <span class="badge badge-success">
+                  <div
+                    class={cx(style.hourDisplay, style.offPeakHour, 'd-flex align-items-center justify-content-center')}
+                  >
+                    <i class="fe fe-moon mr-4" />
                     <Text id="dashboard.boxes.edfTempo.offPeakHour" />
-                  </span>
+                  </div>
                 )}
               </div>
             </div>
-            <div class="row mb-1">
-              <div class="col">{today}</div>
-              <div class="col-auto">
-                <PeakState state={todayPeakState} />
+            <div class="mt-3">
+              <h4 class={style.h4Title}>
+                <Text id="dashboard.boxes.edfTempo.dayPeakTitle" />
+              </h4>
+              <div class="row mb-1">
+                <div class="col">{today}</div>
+                <div class="col-auto">
+                  <PeakState state={todayPeakState} />
+                </div>
               </div>
-            </div>
-            <div class="row mb-1">
-              <div class="col">{tomorrow}</div>
-              <div class="col-auto">
-                <PeakState state={tomorrowPeakState} />
+              <div class="row mb-1">
+                <div class="col">{tomorrow}</div>
+                <div class="col-auto">
+                  <PeakState state={tomorrowPeakState} />
+                </div>
               </div>
             </div>
           </div>

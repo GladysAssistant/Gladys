@@ -379,7 +379,8 @@
         "notDefinedDay": "Non défini",
         "currentHourState": "Actuellement",
         "peakHour": "Heure pleine",
-        "offPeakHour": "Heure creuse"
+        "offPeakHour": "Heure creuse",
+        "dayPeakTitle": "Jours tempo"
       },
       "clock": {
         "analog": "Analogique",

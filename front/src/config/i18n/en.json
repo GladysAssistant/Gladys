@@ -379,7 +379,8 @@
         "notDefinedDay": "Not Defined",
         "currentHourState": "Currently",
         "peakHour": "Peak Hour",
-        "offPeakHour": "Off-Peak Hour"
+        "offPeakHour": "Off-Peak Hour",
+        "dayPeakTitle": "Tempo days"
       },
       "clock": {
         "analog": "Analog",
