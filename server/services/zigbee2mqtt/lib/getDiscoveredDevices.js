@@ -25,6 +25,19 @@ function getDiscoveredDevices(filters = {}) {
     devices = devices.filter((device) => device.id === undefined || device.updatable);
   }
 
+  devices.forEach((device) => {
+    // Remove features with duplicate external_id
+    // This code is needed because AQARA motion sensor
+    // Returns 2 illuminance features and it doesn't work with Gladys
+    device.features = device.features.reduce((acc, current) => {
+      const isDuplicate = acc.some((feature) => feature.external_id === current.external_id);
+      if (!isDuplicate) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+  });
+
   return devices;
 }
 

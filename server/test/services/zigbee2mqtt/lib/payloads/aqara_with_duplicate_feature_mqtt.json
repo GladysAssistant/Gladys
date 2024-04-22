@@ -1,0 +1,108 @@
+[
+  {
+    "date_code": "20161129",
+    "definition": {
+      "description": "Aqara temperature, humidity and pressure sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Measured temperature value",
+          "name": "temperature",
+          "property": "temperature",
+          "type": "numeric",
+          "unit": "°C"
+        },
+        {
+          "access": 1,
+          "description": "Measured relative humidity",
+          "name": "humidity",
+          "property": "humidity",
+          "type": "numeric",
+          "unit": "%"
+        },
+        {
+          "access": 1,
+          "description": "Measured relative humidity (duplicate)",
+          "name": "humidity",
+          "property": "humidity",
+          "type": "numeric"
+        },
+        {
+          "access": 7,
+          "description": "Any binary feature",
+          "name": "alarm",
+          "property": "alarm",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 1,
+          "description": "The measured atmospheric pressure",
+          "name": "pressure",
+          "property": "pressure",
+          "type": "numeric",
+          "unit": "hPa"
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "WSDCGQ11LM",
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [
+            "genBasic",
+            "genIdentify",
+            "msTemperatureMeasurement",
+            "msPressureMeasurement",
+            "msRelativeHumidity"
+          ],
+          "output": ["genBasic", "genGroups"]
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d00045b2740",
+    "ieee_address": "0x00158d00045b2740",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.weather",
+    "network_address": 23007,
+    "power_source": "Battery",
+    "software_build_id": "3000-0001",
+    "supported": true,
+    "type": "EndDevice"
+  }
+]
