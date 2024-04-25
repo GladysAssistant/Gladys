@@ -3,14 +3,18 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 
-class BlinkLight extends Component {
+class BlinkDeviceParams extends Component {
   getOptions = async () => {
     try {
-      const devices = await this.props.httpClient.get('/api/v1/device', {
+      const lightDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
-      const deviceOptions = devices.map(device => ({
+      const switchDevices = await this.props.httpClient.get('/api/v1/device', {
+        device_feature_category: 'switch',
+        device_feature_type: 'binary'
+      });
+      const deviceOptions = [...lightDevices, ...switchDevices].map(device => ({
         value: device.selector,
         label: device.name
       }));
@@ -23,8 +27,8 @@ class BlinkLight extends Component {
   };
   handleChange = selectedOptions => {
     if (selectedOptions) {
-      const lights = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
+      const devices = selectedOptions.map(selectedOption => selectedOption.value);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', devices);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
@@ -39,8 +43,8 @@ class BlinkLight extends Component {
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
+      nextProps.action.devices.forEach(device => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === device);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -73,7 +77,7 @@ class BlinkLight extends Component {
           <div class="col-sm-12">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkLigths.label" />
+                <Text id="editScene.actionsCard.blinkDevices.label" />
               </div>
               <Select
                 defaultValue={[]}
@@ -89,7 +93,7 @@ class BlinkLight extends Component {
           <div class="col-sm-6">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkLights.blinkingTime.label" />
+                <Text id="editScene.actionsCard.blinkDevices.blinkingTime.label" />
               </div>
               <Localizer>
                 <input
@@ -97,7 +101,7 @@ class BlinkLight extends Component {
                   class="form-control"
                   value={props.action.blinking_time}
                   onChange={this.handleChangeBlinkingTime}
-                  placeholder={<Text id="editScene.actionsCard.blinkLights.blinkingTime.placeholder" />}
+                  placeholder={<Text id="editScene.actionsCard.blinkDevices.blinkingTime.placeholder" />}
                 />
               </Localizer>
             </div>
@@ -105,7 +109,7 @@ class BlinkLight extends Component {
           <div class="col-sm-6">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.label" />
+                <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.label" />
               </div>
               <select
                 class="custom-select"
@@ -113,13 +117,13 @@ class BlinkLight extends Component {
                 onChange={this.handleChangeBlinkingSpeed}
               >
                 <option value="slow">
-                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.slow" />
+                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.slow" />
                 </option>
                 <option value="medium">
-                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.medium" />
+                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.medium" />
                 </option>
                 <option value="fast">
-                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.fast" />
+                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.fast" />
                 </option>
               </select>
             </div>
@@ -130,4 +134,4 @@ class BlinkLight extends Component {
   }
 }
 
-export default connect('httpClient', {})(BlinkLight);
+export default connect('httpClient', {})(BlinkDeviceParams);

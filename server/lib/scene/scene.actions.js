@@ -110,7 +110,7 @@ const actionsFunc = {
       }
     });
   },
-  [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
+  [ACTIONS.DEVICE.BLINK]: async (self, action, scope) => {
     const blinkingSpeed = action.blinking_speed;
     const blinkingTime = action.blinking_time * 1000 + 1;
     let blinkingInterval;
@@ -131,11 +131,18 @@ const actionsFunc = {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
         const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
+        let deviceFeature = getDeviceFeature(
           device,
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
+        if (!deviceFeature) {
+          deviceFeature = getDeviceFeature(
+            device,
+            DEVICE_FEATURE_CATEGORIES.SWITCH,
+            DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          );
+        }
         const oldValue = deviceFeature.last_value;
         let newValue = 0;
         /* eslint-disable no-await-in-loop */
