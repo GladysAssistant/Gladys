@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, MQTT_MODE } = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
@@ -26,8 +26,8 @@ async function init(setupMode = false) {
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
-  const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, mqttUsername } = configuration;
-  console.log({ mqttMode, mqttUrl, mqttPassword, mqttUsername });
+  const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl } = configuration;
+  console.log(configuration);
 
   try {
     const dockerBased = await this.gladys.system.isDocker();
@@ -96,6 +96,9 @@ async function init(setupMode = false) {
 
   if (this.usbConfigured) {
     logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
+    // We force set the mqttMode to local for existing instances
+    configuration.mqttMode = MQTT_MODE.LOCAL;
+
     await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration, setupMode);
@@ -108,7 +111,7 @@ async function init(setupMode = false) {
         this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
       }
     }
-  } else if (configuration.mqttMode === 'external') {
+  } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
     await this.connect(configuration);
   }
 

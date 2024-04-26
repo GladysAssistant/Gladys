@@ -16,6 +16,11 @@ const CONFIGURATION = {
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
 };
 
+const MQTT_MODE = {
+  LOCAL: 'local',
+  EXTERNAL: 'external',
+};
+
 const SETUP_VARIABLES = [
   CONFIGURATION.Z2M_DRIVER_PATH,
   CONFIGURATION.ZIGBEE_DONGLE_NAME,
@@ -73,6 +78,7 @@ const DEFAULT = {
 
 module.exports = {
   CONFIGURATION,
+  MQTT_MODE,
   SETUP_VARIABLES,
   DEFAULT,
 };

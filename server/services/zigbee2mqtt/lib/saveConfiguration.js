@@ -20,6 +20,7 @@ async function saveConfiguration(config) {
     [CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY]: config.mqttPassword,
     [CONFIGURATION.DOCKER_MQTT_VERSION]: config.dockerMqttVersion,
     [CONFIGURATION.DOCKER_Z2M_VERSION]: config.dockerZ2mVersion,
+    [CONFIGURATION.Z2M_MQTT_MODE]: config.mqttMode,
   };
 
   const variableKeys = Object.keys(keyValueMap);
