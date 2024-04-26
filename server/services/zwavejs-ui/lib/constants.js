@@ -113,9 +113,10 @@ const EXPOSES = {
     },
   },
   multilevel_switch: {
+    // Default deviceClass refers to LIGHT
     currentvalue: {
-      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       unit: DEVICE_FEATURE_UNITS.PERCENT,
       min: 0,
       max: 99,
@@ -123,16 +124,48 @@ const EXPOSES = {
       read_only: false,
       has_feedback: true,
     },
-    // targetvalue: {
-    //   category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-    //   type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-    //   unit: DEVICE_FEATURE_UNITS.PERCENT,
-    //   min: 0,
-    //   max: 99,
-    //   keep_history: false,
-    //   read_only: false,
-    //   has_feedback: false,
-    // }
+    /// Curtains
+    // Class A Motor: Window Covering No Position/Endpoint Device Type
+    '17-5': {
+      currentvalue: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 99,
+        keep_history: true,
+        read_only: false,
+        has_feedback: true,
+      },
+    },
+    /// Curtains
+    // Class B Motor : Window Covering Endpoint Aware Device Type
+    '17-6': {
+      currentvalue: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 99,
+        keep_history: true,
+        read_only: false,
+        has_feedback: true,
+      },
+    },
+    /// Curtains
+    // Class C Motor : Window Covering Position/Endpoint Aware Device Type
+    '17-7': {
+      currentvalue: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 99,
+        keep_history: true,
+        read_only: false,
+        has_feedback: true,
+      },
+    }
   },
   notification: {
     access_control: {
