@@ -1,6 +1,5 @@
 const MQTT_MODE = {
   LOCAL: 'local',
-  GLADYS: 'gladys',
   EXTERNAL: 'external'
 };
 

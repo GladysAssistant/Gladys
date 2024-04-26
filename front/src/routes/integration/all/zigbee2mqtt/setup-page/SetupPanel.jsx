@@ -29,18 +29,15 @@ class SetupPanel extends Component {
   constructor(props) {
     super(props);
 
-    const { configuration, zigbee2mqttStatus = {} } = props;
+    const { configuration } = props;
 
     let setupMode = null;
 
     if (configuration.mqttMode === MQTT_MODE.LOCAL) {
       setupMode = SETUP_MODES.LOCAL;
-    } else if (configuration.mqttMode === MQTT_MODE.GLADYS) {
-      setupMode = SETUP_MODES.REMOTE;
     } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
       setupMode = SETUP_MODES.REMOTE;
     }
-    console.log({ configuration, setupMode });
     this.state = {
       setupMode,
       configuration

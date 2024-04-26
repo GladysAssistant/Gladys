@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { MarkupText, Text, Localizer } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { MQTT_MODE } from '../constants';
 import cx from 'classnames';
 
@@ -70,39 +70,6 @@ class SetupRemoteOptions extends Component {
           <Text id="integration.zigbee2mqtt.setup.modes.remote.detailsDescription" />
         </p>
         <div class="form-group">
-          <label class="form-label">
-            <Text id="integration.zigbee2mqtt.setup.modes.remote.mqttModeLabel" />
-          </label>
-        </div>
-        <div class="d-flex mb-4">
-          <div class="btn-group mx-auto">
-            <button
-              class={cx('btn', 'btn-light', { active: mqttMode === MQTT_MODE.GLADYS })}
-              onClick={this.selectGladysMQTT}
-              disabled={disabled}
-              data-cy="z2m-setup-remote-gladys-mqtt-mode"
-            >
-              <Text id="integration.zigbee2mqtt.setup.modes.remote.gladys.modeLabel" />
-            </button>
-            <button
-              class={cx('btn', 'btn-light', { active: mqttMode === MQTT_MODE.EXTERNAL })}
-              onClick={this.selectExternalMQTT}
-              disabled={disabled}
-              data-cy="z2m-setup-remote-external-mqtt-mode"
-            >
-              <Text id="integration.zigbee2mqtt.setup.modes.remote.external.modeLabel" />
-            </button>
-          </div>
-        </div>
-        <div class="form-group">
-          {mqttMode === MQTT_MODE.GLADYS && (
-            <div class="alert alert-info">
-              <MarkupText
-                id="integration.zigbee2mqtt.setup.modes.remote.gladys.modeDescription"
-                data-cy="z2m-setup-remote-gladys-mqtt-description"
-              />
-            </div>
-          )}
           {mqttMode === MQTT_MODE.EXTERNAL && (
             <form>
               <div class="form-group">

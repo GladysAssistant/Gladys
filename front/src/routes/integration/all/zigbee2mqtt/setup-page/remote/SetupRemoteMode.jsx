@@ -10,8 +10,17 @@ class SetupRemoteMode extends Component {
     this.props.saveConfiguration(configuration);
   };
 
+  resetConfiguration = () => {
+    this.props.resetConfiguration();
+    this.disableEditionMode();
+  };
+
   enableEditionMode = () => {
     this.setState({ editionMode: true });
+  };
+
+  disableEditionMode = () => {
+    this.setState({ editionMode: false });
   };
 
   constructor(props) {
@@ -32,14 +41,14 @@ class SetupRemoteMode extends Component {
     }
   }
 
-  render({ configuration, disabled, resetConfiguration }, { editionMode }) {
+  render({ configuration, disabled }, { editionMode }) {
     if (editionMode) {
       return (
         <SetupRemoteOptions
           disabled={disabled}
           configuration={configuration}
           saveConfiguration={this.saveConfiguration}
-          resetConfiguration={resetConfiguration}
+          resetConfiguration={this.resetConfiguration}
         />
       );
     }

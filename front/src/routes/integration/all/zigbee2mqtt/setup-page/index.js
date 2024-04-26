@@ -41,7 +41,6 @@ class Zigbee2mqttSetupPage extends Component {
       const savedConfig = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
-      console.log(configuration);
       this.setState({
         configuration,
         loadZigbee2mqttConfig: RequestStatus.Success
