@@ -84,16 +84,30 @@ class Session {
     return this.user;
   }
 
+  setTabletModeCurrentHouseSelector(houseSelector) {
+    if (houseSelector) {
+      localStorage.setItem('current_house_selector', houseSelector);
+    } else {
+      localStorage.removeItem('current_house_selector');
+    }
+  }
+
+  getTabletModeCurrentHouseSelector() {
+    return localStorage.getItem('current_house_selector');
+  }
+
   getRefreshToken() {
-    if (this.user) {
-      return this.user.refresh_token;
+    const user = this.getUser();
+    if (user) {
+      return user.refresh_token;
     }
     return null;
   }
 
   getAccessToken() {
-    if (this.user) {
-      return this.user.access_token;
+    const user = this.getUser();
+    if (user) {
+      return user.access_token;
     }
     return null;
   }

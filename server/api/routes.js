@@ -229,6 +229,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: houseController.create,
     },
+    'get /api/v1/house/:house_selector': {
+      authenticated: true,
+      controller: houseController.getBySelector,
+    },
     'patch /api/v1/house/:house_selector': {
       authenticated: true,
       admin: true,
@@ -250,6 +254,27 @@ function getRoutes(gladys) {
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
       controller: houseController.userSeen,
+    },
+    // House Alarm
+    'post /api/v1/house/:house_selector/arm': {
+      authenticated: true,
+      controller: houseController.arm,
+    },
+    'post /api/v1/house/:house_selector/disarm': {
+      authenticated: true,
+      controller: houseController.disarm,
+    },
+    'post /api/v1/house/:house_selector/disarm_with_code': {
+      alarmAuth: true,
+      controller: houseController.disarmWithCode,
+    },
+    'post /api/v1/house/:house_selector/partial_arm': {
+      authenticated: true,
+      controller: houseController.partialArm,
+    },
+    'post /api/v1/house/:house_selector/panic': {
+      authenticated: true,
+      controller: houseController.panic,
     },
     // job
     'get /api/v1/job': {
@@ -436,6 +461,14 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sessionController.revoke,
     },
+    'post /api/v1/session/tablet_mode': {
+      authenticated: true,
+      controller: sessionController.setTabletMode,
+    },
+    'get /api/v1/session/tablet_mode': {
+      authenticated: true,
+      controller: sessionController.getTabletMode,
+    },
     'post /api/v1/session/api_key': {
       authenticated: true,
       controller: sessionController.createApiKey,
@@ -480,6 +513,10 @@ function getRoutes(gladys) {
     'post /api/v1/scene/:scene_selector/duplicate': {
       authenticated: true,
       controller: sceneController.duplicate,
+    },
+    'get /api/v1/tag_scene': {
+      authenticated: true,
+      controller: sceneController.getTag,
     },
     // system
     'get /api/v1/system/info': {

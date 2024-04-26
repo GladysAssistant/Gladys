@@ -18,7 +18,7 @@ const get = require('get-value');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
+const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
@@ -61,7 +61,9 @@ const actionsFunc = {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
-    return self.device.setValue(device, deviceFeature, value);
+    const valueInNumber = Number(value);
+
+    return self.device.setValue(device, deviceFeature, valueInNumber);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
@@ -103,6 +105,48 @@ const actionsFunc = {
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
         await self.device.setValue(device, deviceFeature, deviceFeature.last_value === 0 ? 1 : 0);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
+  [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
+    const blinkingSpeed = action.blinking_speed;
+    const blinkingTime = action.blinking_time * 1000 + 1;
+    let blinkingInterval;
+    switch (blinkingSpeed) {
+      case 'slow':
+        blinkingInterval = 1000;
+        break;
+      case 'medium':
+        blinkingInterval = 500;
+        break;
+      case 'fast':
+        blinkingInterval = 200;
+        break;
+      default:
+        blinkingInterval = 200;
+        break;
+    }
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
+        const oldValue = deviceFeature.last_value;
+        let newValue = 0;
+        /* eslint-disable no-await-in-loop */
+        // We want this loops to be sequential
+        for (let i = 0; i < blinkingTime; i += blinkingInterval) {
+          newValue = 1 - newValue;
+          await self.device.setValue(device, deviceFeature, newValue);
+          await Promise.delay(blinkingInterval);
+        }
+        /* eslint-enable no-await-in-loop */
+        await self.device.setValue(device, deviceFeature, oldValue);
       } catch (e) {
         logger.warn(e);
       }
@@ -436,6 +480,74 @@ const actionsFunc = {
     } catch (e) {
       throw new AbortScene(e.message);
     }
+  },
+  [ACTIONS.EDF_TEMPO.CONDITION]: async (self, action) => {
+    try {
+      const edfTempoService = self.service.getService('edf-tempo');
+      const data = await edfTempoService.getEdfTempoStates();
+      let peakDayTypeValid;
+      let peakHourTypeValid;
+      if (action.edf_tempo_day === 'today') {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.today_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid =
+          action.edf_tempo_peak_hour_type === data.current_hour_peak_state ||
+          action.edf_tempo_peak_hour_type === 'no-check';
+      } else {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.tomorrow_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid = true;
+      }
+      const conditionValid = peakDayTypeValid && peakHourTypeValid;
+      if (!conditionValid) {
+        throw new AbortScene('EDF_TEMPO_DIFFERENT_STATE');
+      }
+    } catch (e) {
+      throw new AbortScene(e.message);
+    }
+  },
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
+    const house = await self.house.getBySelector(action.house);
+    if (house.alarm_mode !== action.alarm_mode) {
+      throw new AbortScene(`House "${house.name}" is not in mode ${action.alarm_mode}`);
+    }
+  },
+  [ACTIONS.ALARM.SET_ALARM_MODE]: async (self, action) => {
+    if (action.alarm_mode === ALARM_MODES.ARMED) {
+      await self.house.arm(action.house, true);
+    }
+    if (action.alarm_mode === ALARM_MODES.DISARMED) {
+      await self.house.disarm(action.house);
+    }
+    if (action.alarm_mode === ALARM_MODES.PARTIALLY_ARMED) {
+      await self.house.partialArm(action.house);
+    }
+    if (action.alarm_mode === ALARM_MODES.PANIC) {
+      await self.house.panic(action.house);
+    }
+  },
+  [ACTIONS.MQTT.SEND]: (self, action, scope) => {
+    const mqttService = self.service.getService('mqtt');
+
+    if (mqttService) {
+      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      mqttService.device.publish(action.topic, messageWithVariables);
+    }
+  },
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
+    // Get device
+    const device = self.stateManager.get('device', action.device);
+    const deviceFeature = getDeviceFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.MUSIC,
+      DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+    );
+    // replace variable in text
+    const messageWithVariables = Handlebars.compile(action.text)(scope);
+    // Get TTS URL
+    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+    // Play TTS Notification on device
+    await self.device.setValue(device, deviceFeature, url);
   },
 };
 

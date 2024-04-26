@@ -1,8 +1,14 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Gladys Assistant Forum
+  - name: Gladys Assistant english forum
+    url: https://en-community.gladysassistant.com/
+    about: We use this forum for questions & support in english.
+  - name: Gladys Assistant french Forum
     url: https://community.gladysassistant.com/
-    about: We use the forum for questions & support.
-  - name: Feature Requests
+    about: We use the forum for questions & support in french.
+  - name: Feature Requests (english)
+    url: https://en-community.gladysassistant.com/c/feature-requests/7/l/latest?order=votes
+    about: We use our forum as feature requests. You can create feature requests there, and vote for them.
+  - name: Feature Requests (french)
     url: https://community.gladysassistant.com/c/international/feature-requests/53
     about: We use our forum as feature requests. You can create feature requests there, and vote for them.

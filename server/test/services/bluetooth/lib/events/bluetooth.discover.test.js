@@ -57,7 +57,7 @@ describe('bluetooth.discover event', () => {
       name: 'ADDRESS',
       selector: 'bluetooth-uuid',
       features: [],
-      params: [{ name: 'loaded', value: true }],
+      params: [{ name: 'loaded', value: 'true' }],
     };
 
     assert.calledWith(eventWS, { payload: expectedWSPeripheral, type: 'bluetooth.discover' });

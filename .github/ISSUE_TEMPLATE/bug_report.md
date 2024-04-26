@@ -5,7 +5,7 @@ about: Report a bug to help us improve Gladys Assistant
 
 First, are you sure that you found a Gladys bug?
 
-If you are not sure, you can come discuss with us on [Gladys Community](http://community.gladysassistant.com/) 🙂
+If you are not sure, you can come discuss with us on our community, in [french](http://community.gladysassistant.com/) or [english](https://en-community.gladysassistant.com/) 🙂
 
 **Describe the bug**
 A clear and concise description of what the bug is.

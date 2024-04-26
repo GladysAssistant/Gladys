@@ -21,7 +21,7 @@ We use github to host code, to track issues and feature requests, as well as acc
 
 ## Before making a Pull Request
 
-Make sure you discussed with the team on [Gladys Community](https://community.gladysassistant.com/) to ensure your pull request goes in the same direction as current developements 🙂
+Make sure you discussed with the team on our Gladys [french forum](https://community.gladysassistant.com/) or [english forum](https://en-community.gladysassistant.com/) to ensure your pull request goes in the same direction as current developements 🙂
 
 Then, create a GitHub Issue to indicate that you're working on the topic.
 

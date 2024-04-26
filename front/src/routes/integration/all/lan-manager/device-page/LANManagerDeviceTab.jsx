@@ -9,9 +9,9 @@ import style from '../style.css';
 const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerDevices, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">
+      <h1 class="card-title">
         <Text id="integration.lanManager.device.title" />
-      </h3>
+      </h1>
       <div class="page-options d-flex">
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
           <option value="asc">

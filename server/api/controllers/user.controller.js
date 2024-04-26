@@ -2,7 +2,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const logger = require('../../utils/logger');
 const { BadParameters } = require('../../utils/coreErrors');
 
-const LOGIN_SESSION_VALIDITY_IN_SECONDS = 30 * 24 * 60 * 60;
+const LOGIN_SESSION_VALIDITY_IN_SECONDS = 365 * 24 * 60 * 60;
 
 module.exports = function UserController(gladys) {
   /**
@@ -15,7 +15,7 @@ module.exports = function UserController(gladys) {
    * @apiParam {String} password Password of the user
    * @apiParam {string="admin","habitant", "guest"} role role of the user
    * @apiParam {date} birthdate Birthdate of the user
-   * @apiParam {string="en", "fr"} language Language of the user
+   * @apiParam {string="en", "fr", "de"} language Language of the user
    * @apiSuccess {String} id id of the created user
    */
   async function create(req, res, next) {

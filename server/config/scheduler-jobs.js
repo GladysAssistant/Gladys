@@ -8,7 +8,7 @@ const jobs = [
   },
   {
     name: 'purge-device-states',
-    rule: '0 30 */4 * * *', // every 4 hours
+    rule: '0 0 4 * * *', // At 4 AM every day
     event: EVENTS.DEVICE.PURGE_STATES,
   },
   {
@@ -20,6 +20,11 @@ const jobs = [
     name: 'daily-purge-of-old-jobs',
     rule: '0 0 22 * * *', // every day at 22:00
     event: EVENTS.JOB.PURGE_OLD_JOBS,
+  },
+  {
+    name: 'check-device-batteries',
+    rule: '0 0 9 * * 6', // At 09:00 AM, only on Saturday
+    event: EVENTS.DEVICE.CHECK_BATTERIES,
   },
 ];
 

@@ -70,6 +70,12 @@ describe('Mqtt handle message', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should execute scene', () => {
+    mqttHandler.handleNewMessage('gladys/master/scene/test-scene/start', '');
+
+    assert.calledWith(gladys.event.emit, EVENTS.SCENE.TRIGGERED, 'test-scene');
+  });
+
   it('handle strict topic', () => {
     mqttHandler.handleNewMessage('gladys/master/random-topic', '{}');
 

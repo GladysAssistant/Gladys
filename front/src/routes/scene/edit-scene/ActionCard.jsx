@@ -15,6 +15,7 @@ import DeviceSetValue from './actions/DeviceSetValue';
 import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
 import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
+import BlinkLightParams from './actions/BlinkLightParams';
 import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 import StartSceneParams from './actions/StartSceneParams';
 import UserPresence from './actions/UserPresence';
@@ -25,6 +26,11 @@ import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
+import CheckAlarmMode from './actions/CheckAlarmMode';
+import SetAlarmMode from './actions/SetAlarmMode';
+import SendMqttMessage from './actions/SendMqttMessage';
+import PlayNotification from './actions/PlayNotification';
+import EdfTempoCondition from './actions/EdfTempoCondition';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -34,6 +40,7 @@ const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
+  [ACTIONS.LIGHT.BLINK]: 'fe fe-star',
   [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
@@ -52,7 +59,12 @@ const ACTION_ICON = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
-  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap'
+  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
+  [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
+  [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
+  [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker'
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -87,7 +99,10 @@ const ActionCard = ({ children, ...props }) => {
       class={cx({
         'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
         'col-lg-6':
-          props.action.type === ACTIONS.MESSAGE.SEND || props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+          props.action.type === ACTIONS.MESSAGE.SEND ||
+          props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
+          props.action.type === ACTIONS.MQTT.SEND ||
+          props.action.type === ACTIONS.LIGHT.BLINK,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
@@ -157,6 +172,14 @@ const ActionCard = ({ children, ...props }) => {
           )}
           {props.action.type === ACTIONS.LIGHT.TOGGLE && (
             <TurnOnOffLightParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.LIGHT.BLINK && (
+            <BlinkLightParams
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}
@@ -330,6 +353,52 @@ const ActionCard = ({ children, ...props }) => {
               columnIndex={props.columnIndex}
               index={props.index}
               updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.EDF_TEMPO.CONDITION && (
+            <EdfTempoCondition
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.ALARM.CHECK_ALARM_MODE && (
+            <CheckAlarmMode
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.ALARM.SET_ALARM_MODE && (
+            <SetAlarmMode
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.MQTT.SEND && (
+            <SendMqttMessage
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.MUSIC.PLAY_NOTIFICATION && (
+            <PlayNotification
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
             />
           )}
         </div>

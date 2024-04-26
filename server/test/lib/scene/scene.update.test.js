@@ -22,6 +22,29 @@ describe('scene.update', () => {
     assertSinon.calledOnce(brain.addNamedEntity);
     assertSinon.calledOnce(brain.removeNamedEntity);
   });
+  it('should update a scene with tags', async () => {
+    const scene = await sceneManager.update('test-scene', {
+      name: 'Name updated',
+      tags: [{ name: 'tag 1' }],
+    });
+    expect(scene).to.have.property('selector', 'test-scene');
+    expect(scene).to.have.property('name', 'Name updated');
+    expect(scene).to.have.property('tags');
+    expect(scene.tags).deep.eq([{ name: 'tag 1' }]);
+    assertSinon.calledOnce(brain.addNamedEntity);
+    assertSinon.calledOnce(brain.removeNamedEntity);
+  });
+  it('should not delete tags when patching scene', async () => {
+    const scene = await sceneManager.update('test-scene', {
+      name: 'Name updated',
+      tags: [{ name: 'tag 1' }],
+    });
+    expect(scene.tags).deep.eq([{ name: 'tag 1' }]);
+    const scene2 = await sceneManager.update('test-scene', {
+      name: 'Name updated 2',
+    });
+    expect(scene2.tags).deep.eq([{ name: 'tag 1' }]);
+  });
   it('should return not found', async () => {
     const promise = sceneManager.update('not-found-scene', {
       name: 'Updated scene',

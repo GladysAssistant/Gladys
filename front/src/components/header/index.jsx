@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
@@ -20,13 +21,19 @@ const PAGES_WITHOUT_HEADER = [
   '/gateway-configure-two-factor',
   '/confirm-email',
   '/dashboard/integration/device/google-home/authorize',
-  '/dashboard/integration/device/alexa/authorize'
+  '/dashboard/integration/device/alexa/authorize',
+  '/locked'
 ];
 
 const Header = ({ ...props }) => {
   if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
     return null;
   }
+  // Adapt forum URL to user language
+  const userLanguage = get(props, 'user.language');
+  const forumUrl =
+    userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://en-community.gladysassistant.com/';
+
   if (props.fullScreen) {
     return null;
   }
@@ -73,12 +80,7 @@ const Header = ({ ...props }) => {
                     </a>
                   )}
                   <div class="dropdown-divider" />
-                  <a
-                    class="dropdown-item"
-                    href="https://community.gladysassistant.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
                     <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
                   </a>
                   <a class="dropdown-item" href="" onClick={props.logout}>

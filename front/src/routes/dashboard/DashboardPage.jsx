@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
+import SetTabletMode from './SetTabletMode';
 
 import style from './style.css';
 
@@ -41,17 +42,31 @@ const DashboardPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="page-options d-flex align-content-between flex-wrap">
-                  {!props.dashboardNotConfigured && props.browserFullScreenCompatible && (
-                    <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
-                      <span>
-                        {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
-                        {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                        {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                        {props.fullScreen && <i class="fe fe-minimize-2" />}
-                      </span>
+                  {!props.isGladysPlus && (
+                    <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
+                      <span class={style.editDashboardText}>
+                        {props.defineTabletModeOpened ? (
+                          <Text id="dashboard.closeDefineTabletMode" />
+                        ) : (
+                          <Text id="dashboard.toggleDefineTabletMode" />
+                        )}
+                      </span>{' '}
+                      <i class="fe fe-tablet" />
                     </button>
                   )}
-                  {props.currentDashboard && (
+                  {!props.dashboardNotConfigured &&
+                    props.browserFullScreenCompatible &&
+                    !props.hideExitFullScreenButton && (
+                      <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
+                        <span>
+                          {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
+                          {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
+                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                          {props.fullScreen && <i class="fe fe-minimize-2" />}
+                        </span>
+                      </button>
+                    )}
+                  {props.currentDashboard && !props.hideExitFullScreenButton && (
                     <button onClick={props.editDashboard} class={cx('btn btn-outline-primary ml-2')}>
                       <span class={style.editDashboardText}>
                         <Text id="dashboard.editDashboardButton" />
@@ -61,12 +76,15 @@ const DashboardPage = ({ children, ...props }) => (
                   )}
                 </div>
               </div>
-
               {props.gatewayInstanceNotFound && (
                 <div class="alert alert-warning">
                   <Text id="dashboard.gatewayInstanceNotFoundError" />
                 </div>
               )}
+              <SetTabletMode
+                toggleDefineTabletMode={props.toggleDefineTabletMode}
+                defineTabletModeOpened={props.defineTabletModeOpened}
+              />
               {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
               {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
             </div>

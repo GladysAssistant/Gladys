@@ -18,6 +18,9 @@ class Scene extends Component {
       if (this.state.sceneSearch && this.state.sceneSearch.length) {
         params.search = this.state.sceneSearch;
       }
+      if (this.state.sceneTagSearch && this.state.sceneTagSearch.length) {
+        params.searchTags = this.state.sceneTagSearch.join(',');
+      }
       const scenes = await this.props.httpClient.get('/api/v1/scene', params);
       this.setState({
         scenes,
@@ -31,12 +34,29 @@ class Scene extends Component {
       });
     }
   };
+  getTags = async () => {
+    try {
+      const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
+      this.setState({
+        tags
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
   search = async e => {
     await this.setState({
       sceneSearch: e.target.value
     });
     await this.getScenes();
   };
+  searchTags = async tags => {
+    await this.setState({
+      sceneTagSearch: tags
+    });
+    await this.getScenes();
+  };
+
   changeOrderDir = async e => {
     await this.setState({
       getScenesOrderDir: e.target.value
@@ -88,6 +108,7 @@ class Scene extends Component {
       getScenesOrderDir: 'asc',
       scenes: [],
       sceneSearch: null,
+      sceneTagSearch: null,
       loading: true
     };
     this.debouncedSearch = debounce(this.search.bind(this), 200);
@@ -95,9 +116,10 @@ class Scene extends Component {
 
   componentWillMount() {
     this.getScenes();
+    this.getTags();
   }
 
-  render(props, { scenes, loading, getError }) {
+  render(props, { scenes, loading, getError, tags, sceneTagSearch }) {
     return (
       <ScenePage
         httpClient={props.httpClient}
@@ -108,6 +130,9 @@ class Scene extends Component {
         debouncedSearch={this.debouncedSearch}
         changeOrderDir={this.changeOrderDir}
         switchActiveScene={this.switchActiveScene}
+        tags={tags}
+        searchTags={this.searchTags}
+        sceneTagSearch={sceneTagSearch}
       />
     );
   }

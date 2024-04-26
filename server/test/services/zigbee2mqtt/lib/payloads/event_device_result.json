@@ -51,6 +51,7 @@
         "unit": null
       }
     ],
+    "id": "gladys-id",
     "model": "WXKG01LM",
     "name": "device-name",
     "room_id": "room_id",
@@ -62,6 +63,9 @@
     "name": "0x00158d00033e88d1",
     "model": "TS0043",
     "external_id": "zigbee2mqtt:0x00158d00033e88d1",
+    "id": "gladys-id-2",
+    "room_id": "room_id",
+    "updatable": false,
     "features": [
       {
         "name": "Battery",

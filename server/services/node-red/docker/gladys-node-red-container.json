@@ -1,0 +1,37 @@
+{
+  "name": "gladys-node-red",
+  "Image": "nodered/node-red:3.1",
+  "ExposedPorts": {
+    "1880/tcp": {}
+  },
+  "HostConfig": {
+    "Binds": ["/var/lib/gladysassistant/node-red:/data"],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
+    "PortBindings": {
+      "1880/tcp": [
+        {
+          "HostPort": "1881"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

@@ -147,6 +147,7 @@ class TasmotaDeviceBox extends Component {
                         id={`username_${deviceIndex}`}
                         type="text"
                         class="form-control"
+                        autocomplete="off"
                         onInput={this.updateUsername}
                         placeholder={<Text id="integration.tasmota.discover.http.usernameLabel" />}
                       />
@@ -159,6 +160,7 @@ class TasmotaDeviceBox extends Component {
                     <Localizer>
                       <input
                         id={`password_${deviceIndex}`}
+                        autocomplete="off"
                         type="password"
                         class="form-control"
                         onInput={this.updatePassword}

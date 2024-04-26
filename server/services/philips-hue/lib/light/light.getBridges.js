@@ -9,10 +9,18 @@ const TIMEOUT = 10000;
  * getBridges();
  */
 async function getBridges() {
-  this.bridges = await this.hueClient.discovery.upnpSearch(TIMEOUT);
-  logger.info(`PhilipsHueService: Found ${this.bridges.length} bridges`);
+  // Launch faster N-UPnP Search
+  this.bridges = await this.hueClient.discovery.nupnpSearch();
+  logger.info(`PhilipsHueService: Found ${this.bridges.length} bridges with N-UPnP Search`);
+
+  // Fallback on UPnP Search
+  if (this.bridges.length === 0) {
+    this.bridges = await this.hueClient.discovery.upnpSearch(TIMEOUT);
+    logger.info(`PhilipsHueService: Found ${this.bridges.length} bridges with UPnP Search`);
+  }
+
   this.bridges.forEach((bridge) => {
-    this.bridgesBySerialNumber.set(bridge.model.serial, bridge);
+    this.bridgesByIP.set(bridge.ipaddress, bridge);
   });
   return this.bridges;
 }

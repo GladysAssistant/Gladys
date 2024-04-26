@@ -33,8 +33,13 @@ class DeviceSetValue extends Component {
       this.props.updateActionProperty(columnIndex, index, 'device_feature', null);
     }
     if (deviceFeatureChanged) {
-      this.props.updateActionProperty(columnIndex, index, 'value', undefined);
-      this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+      if (deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+        this.props.updateActionProperty(columnIndex, index, 'value', 0);
+        this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+      } else {
+        this.props.updateActionProperty(columnIndex, index, 'value', undefined);
+        this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+      }
     }
     this.setState({ deviceFeature, device });
   };

@@ -307,3 +307,103 @@ body {
 .react-clock__second-hand {
   transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }
+
+.opacity-60 {
+  opacity: 60%;
+}
+
+
+.humidity-slider {
+  width: 100%;
+  max-width: 500px;
+  height: 30px;
+}
+
+.humidity-slider-thumb {
+  font-size: 0.9em;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.humidity-slider-thumb.active {
+  border: 1px solid #467fcf;
+}
+
+.humidity-slider-track {
+  position: relative;
+  background: #f1c40f;
+}
+
+.humidity-slider-track-1 {
+  background: #5eba00;
+}
+
+.humidity-slider-track-2 {
+  background: #467fcf ;
+}
+
+.humidity-slider .humidity-slider-track {
+  top: 10px;
+  height: 10px;
+}
+
+.humidity-slider .humidity-slider-thumb {
+  top: 3px;
+  width: 41px;
+  height: 24px;
+  line-height: 22px;
+}
+
+
+.temperature-slider {
+  width: 100%;
+  max-width: 500px;
+  height: 30px;
+}
+
+.temperature-slider-thumb {
+  font-size: 0.9em;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.temperature-slider-thumb.active {
+  border: 1px solid #467fcf;
+}
+
+.temperature-slider-track {
+  position: relative;
+  background: #467fcf;
+}
+
+.temperature-slider-track-1 {
+  background: #5eba00;
+}
+
+.temperature-slider-track-2 {
+  background: #cd201f;
+}
+
+.temperature-slider .temperature-slider-track {
+  top: 10px;
+  height: 10px;
+}
+
+.temperature-slider .temperature-slider-thumb {
+  top: 3px;
+  width: 41px;
+  height: 24px;
+  line-height: 22px;
+}
+
+.rti--tag button:focus {
+  outline: none !important;
+}

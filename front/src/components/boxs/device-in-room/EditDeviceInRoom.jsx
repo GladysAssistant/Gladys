@@ -26,7 +26,7 @@ class EditDeviceInRoom extends Component {
     try {
       this.setState({ loading: true });
       // we get the rooms with the devices
-      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}?expand=devices`);
+      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}`, { expand: 'devices' });
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
 
@@ -74,8 +74,12 @@ class EditDeviceInRoom extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
-      this.getDeviceFeatures();
+    if (prevProps.box && this.props.box && this.props.box.room) {
+      const deviceFeaturesChanged = prevProps.box.device_features !== this.props.box.device_features;
+      const roomChanged = prevProps.box.room !== this.props.box.room;
+      if (deviceFeaturesChanged || roomChanged) {
+        this.getDeviceFeatures();
+      }
     }
   }
 

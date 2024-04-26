@@ -1,13 +1,17 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
 const db = require('../../models');
+const { isNumeric } = require('../../utils/device');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 const DEFAULT_OPTIONS = {
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
 };
+
+const DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED = 48;
 
 /**
  * @description Get list of device.
@@ -107,9 +111,33 @@ async function get(options) {
     queryParams.where = queryParams.where ? Sequelize.and(queryParams.where, condition) : condition;
   }
 
+  // A device state is not valid forever, we need to determine when a value is "outdated"
+  // The default is 48 hours, but it can be changed with this setting
+  let numberOfHoursBeforeStateIsOutdated = await this.variable.getValue(
+    SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED,
+  );
+  if (!numberOfHoursBeforeStateIsOutdated) {
+    numberOfHoursBeforeStateIsOutdated = DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED;
+  } else {
+    numberOfHoursBeforeStateIsOutdated = parseInt(numberOfHoursBeforeStateIsOutdated, 10);
+  }
+
   const devices = await db.Device.findAll(queryParams);
 
-  const devicesPlain = devices.map((device) => device.get({ plain: true }));
+  const devicesPlain = devices.map((device) => {
+    const rawDevice = device.get({ plain: true });
+    // We fill the "last_value_is_too_old" attribute for each feature
+    rawDevice.features.forEach((feature) => {
+      let lastValueInTimestamp = new Date(feature.last_value_changed).getTime();
+      if (!isNumeric(lastValueInTimestamp)) {
+        lastValueInTimestamp = 0;
+      }
+      const tooOldTimestamp = Date.now() - numberOfHoursBeforeStateIsOutdated * 60 * 60 * 1000;
+      const lastValueIsToOld = lastValueInTimestamp < tooOldTimestamp;
+      feature.last_value_is_too_old = lastValueIsToOld;
+    });
+    return rawDevice;
+  });
 
   return devicesPlain;
 }

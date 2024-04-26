@@ -1,0 +1,269 @@
+{
+  "name": "ZSS-ZK-THL",
+  "mqttDevice": {
+    "date_code": "",
+    "definition": {
+      "description": "Smart temperature and humidity meter with display",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "label": "Battery",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Raw measured illuminance",
+          "label": "Illuminance",
+          "name": "illuminance",
+          "property": "illuminance",
+          "type": "numeric"
+        },
+        {
+          "access": 1,
+          "description": "Measured illuminance in lux",
+          "label": "Illuminance (lux)",
+          "name": "illuminance_lux",
+          "property": "illuminance_lux",
+          "type": "numeric",
+          "unit": "lx"
+        },
+        {
+          "access": 1,
+          "description": "Measured relative humidity",
+          "label": "Humidity",
+          "name": "humidity",
+          "property": "humidity",
+          "type": "numeric",
+          "unit": "%"
+        },
+        {
+          "access": 1,
+          "description": "Measured temperature value",
+          "label": "Temperature",
+          "name": "temperature",
+          "property": "temperature",
+          "type": "numeric",
+          "unit": "°C"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "label": "Linkquality",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "ZSS-ZK-THL",
+      "options": [
+        {
+          "access": 2,
+          "description": "Calibrates the illuminance value (percentual offset), takes into effect on next report of device.",
+          "label": "Illuminance calibration",
+          "name": "illuminance_calibration",
+          "property": "illuminance_calibration",
+          "type": "numeric"
+        },
+        {
+          "access": 2,
+          "description": "Calibrates the illuminance_lux value (percentual offset), takes into effect on next report of device.",
+          "label": "Illuminance lux calibration",
+          "name": "illuminance_lux_calibration",
+          "property": "illuminance_lux_calibration",
+          "type": "numeric"
+        },
+        {
+          "access": 2,
+          "description": "Number of digits after decimal point for humidity, takes into effect on next report of device.",
+          "label": "Humidity precision",
+          "name": "humidity_precision",
+          "property": "humidity_precision",
+          "type": "numeric",
+          "value_max": 3,
+          "value_min": 0
+        },
+        {
+          "access": 2,
+          "description": "Calibrates the humidity value (absolute offset), takes into effect on next report of device.",
+          "label": "Humidity calibration",
+          "name": "humidity_calibration",
+          "property": "humidity_calibration",
+          "type": "numeric"
+        },
+        {
+          "access": 2,
+          "description": "Number of digits after decimal point for temperature, takes into effect on next report of device.",
+          "label": "Temperature precision",
+          "name": "temperature_precision",
+          "property": "temperature_precision",
+          "type": "numeric",
+          "value_max": 3,
+          "value_min": 0
+        },
+        {
+          "access": 2,
+          "description": "Calibrates the temperature value (absolute offset), takes into effect on next report of device.",
+          "label": "Temperature calibration",
+          "name": "temperature_calibration",
+          "property": "temperature_calibration",
+          "type": "numeric"
+        }
+      ],
+      "supports_ota": false,
+      "vendor": "Moes"
+    },
+    "disabled": false,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": ["genBasic", "genPowerCfg", "msIlluminanceMeasurement"],
+          "output": ["genOta", "genTime"]
+        },
+        "configured_reportings": [],
+        "scenes": []
+      },
+      "2": {
+        "bindings": [],
+        "clusters": {
+          "input": ["msTemperatureMeasurement", "msRelativeHumidity"],
+          "output": []
+        },
+        "configured_reportings": [],
+        "scenes": []
+      }
+    },
+    "friendly_name": "0xe0798dfffedeae2b",
+    "ieee_address": "0xe0798dfffedeae2b",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "_TYZB01_ftdkanlj",
+    "model_id": "TS0222",
+    "network_address": 32231,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  "gladysDevice": {
+    "name": "0xe0798dfffedeae2b",
+    "model": "ZSS-ZK-THL",
+    "external_id": "zigbee2mqtt:0xe0798dfffedeae2b",
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:battery:integer:battery",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-battery-integer-battery"
+      },
+      {
+        "name": "Illuminance",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100000,
+        "category": "light-sensor",
+        "type": "decimal",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:light-sensor:decimal:illuminance",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-light-sensor-decimal-illuminance"
+      },
+      {
+        "name": "Illuminance lux",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100000,
+        "category": "light-sensor",
+        "type": "decimal",
+        "unit": "lux",
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:light-sensor:decimal:illuminance_lux",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-light-sensor-decimal-illuminance-lux"
+      },
+      {
+        "name": "Humidity",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:humidity-sensor:decimal:humidity",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-humidity-sensor-decimal-humidity"
+      },
+      {
+        "name": "Temperature",
+        "read_only": true,
+        "has_feedback": false,
+        "min": -100,
+        "max": 150,
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:temperature-sensor:decimal:temperature",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-temperature-sensor-decimal-temperature"
+      },
+      {
+        "name": "Linkquality",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 5,
+        "category": "signal",
+        "type": "integer",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:signal:integer:linkquality",
+        "selector": "zigbee2mqtt-0xe0798dfffedeae2b-signal-integer-linkquality"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
+  },
+  "values": [
+    {
+      "internal": 97,
+      "external": 97,
+      "property": "battery"
+    },
+    {
+      "internal": 45622.1,
+      "external": 45622.1,
+      "property": "illuminance"
+    },
+    {
+      "internal": 456.6,
+      "external": 456.6,
+      "property": "illuminance_lux"
+    },
+    {
+      "internal": 56.6,
+      "external": 56.6,
+      "property": "humidity"
+    },
+    {
+      "internal": 45.1,
+      "external": 45.1,
+      "property": "temperature"
+    },
+    {
+      "internal": 2,
+      "external": 102,
+      "property": "linkquality"
+    }
+  ]
+}

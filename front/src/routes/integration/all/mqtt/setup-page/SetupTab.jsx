@@ -43,6 +43,12 @@ class SetupTab extends Component {
               <Text id="integration.mqtt.setup.disconnected" />
             </p>
           );
+        } else if (mqttConnectionError === RequestStatus.NetworkError) {
+          alertMessage = (
+            <p class="alert alert-danger">
+              <Text id="integration.mqtt.setup.networkError" />
+            </p>
+          );
         } else if (mqttConnectionError || mqttConnected === false) {
           alertMessage = (
             <p class="alert alert-danger">
@@ -62,9 +68,9 @@ class SetupTab extends Component {
     return (
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">
+          <h1 class="card-title">
             <Text id="integration.mqtt.setup.title" />
-          </h3>
+          </h1>
         </div>
         <div class="card-body">
           <div
