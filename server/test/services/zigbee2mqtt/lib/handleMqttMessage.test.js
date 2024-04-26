@@ -45,13 +45,13 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     sinon.reset();
   });
 
-  it('it should set at connected', async () => {
+  it('should set at connected / exist / running', async () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unkown', JSON.stringify({}));
     // ASSERT
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
         dockerBased: true,
@@ -62,13 +62,13 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         usbConfigured: false,
         z2mEnabled: false,
         zigbee2mqttConnected: true,
-        zigbee2mqttExist: false,
-        zigbee2mqttRunning: false,
+        zigbee2mqttExist: true,
+        zigbee2mqttRunning: true,
       },
     });
   });
 
-  it('it should receive devices', async () => {
+  it('should receive devices', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub
@@ -89,7 +89,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get permit join from config', async () => {
+  it('should get permit join from config', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config', `{"permit_join": true}`);
     // ASSERT
@@ -100,7 +100,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
-  it('it should get permit join from response/permit_join', async () => {
+  it('should get permit join from response/permit_join', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"data": {"value": true}}`);
     // ASSERT
@@ -130,7 +130,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should log error when bad message but not crash service', async () => {
+  it('should log error when bad message but not crash service', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -149,7 +149,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get bad topic', async () => {
+  it('should get bad topic', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic/wrongtopic', `anymessage`);
     // ASSERT
@@ -157,7 +157,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic', async () => {
+  it('should get good topic', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -184,7 +184,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic with sub-feature', async () => {
+  it('should get good topic with sub-feature', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -211,7 +211,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic but device not managed', async () => {
+  it('should get good topic but device not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns(null);
@@ -223,7 +223,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic but feature not managed', async () => {
+  it('should get good topic but feature not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -242,7 +242,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should store backup', async () => {
+  it('should store backup', async () => {
     zigbee2mqttManager.saveZ2mBackup = fake.resolves(true);
 
     // PREPARE
