@@ -75,6 +75,9 @@ const COMMANDS = {
   },
 };
 
+/**
+ * List of supported features
+ */
 const EXPOSES = {
   binary_switch: {
     currentvalue: {
@@ -84,7 +87,7 @@ const EXPOSES = {
       max: 1,
       keep_history: true,
       read_only: false,
-      has_feedback: true,
+      has_feedback: false,
     },
   },
   multilevel_sensor: {
@@ -109,6 +112,28 @@ const EXPOSES = {
       has_feedback: false,
     },
   },
+  multilevel_switch: {
+    currentvalue: {
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      unit: DEVICE_FEATURE_UNITS.PERCENT,
+      min: 0,
+      max: 99,
+      keep_history: true,
+      read_only: false,
+      has_feedback: true,
+    },
+    // targetvalue: {
+    //   category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+    //   type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+    //   unit: DEVICE_FEATURE_UNITS.PERCENT,
+    //   min: 0,
+    //   max: 99,
+    //   keep_history: false,
+    //   read_only: false,
+    //   has_feedback: false,
+    // }
+  },
   notification: {
     access_control: {
       door_state_simple: {
@@ -118,7 +143,7 @@ const EXPOSES = {
         max: 1,
         keep_history: true,
         read_only: true,
-        has_feedback: true,
+        has_feedback: false,
       },
     },
   },
