@@ -39,8 +39,6 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
       this.gladysConnected = true;
       this.mqttRunning = true;
       this.mqttExist = true;
-      this.zigbee2mqttRunning = true;
-      this.zigbee2mqttExist = true;
       this.emitStatusEvent();
     });
 

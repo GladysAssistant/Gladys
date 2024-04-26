@@ -14,6 +14,8 @@ async function handleMqttMessage(topic, message) {
   // Limit events only on status changes
   if (!this.zigbee2mqttConnected) {
     this.zigbee2mqttConnected = true;
+    this.zigbee2mqttRunning = true;
+    this.zigbee2mqttExist = true;
     this.emitStatusEvent();
   }
 

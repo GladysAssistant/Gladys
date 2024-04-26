@@ -110,7 +110,7 @@ describe('zigbee2mqtt connect', () => {
       payload: {
         dockerBased: true,
         gladysConnected: true,
-        mqttExist: false,
+        mqttExist: true,
         mqttRunning: true,
         networkModeValid: true,
         usbConfigured: false,

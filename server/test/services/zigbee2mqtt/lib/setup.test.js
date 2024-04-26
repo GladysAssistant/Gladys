@@ -27,6 +27,7 @@ describe('zigbee2mqtt setup', () => {
       },
       variable: {
         setValue: fake.resolves('fake'),
+        destroy: fake.resolves(null),
       },
     };
 
@@ -51,6 +52,34 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', 'usb0', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE_DONGLE_NAME', 'dongle-name', serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
+
+    // z2m was not running, we don't reload it
+    assert.calledOnceWithExactly(init, true);
+  });
+
+  it('should store configuration for external broker', async () => {
+    // PREPARE
+    const config = {
+      Z2M_MQTT_MODE: 'external',
+      Z2M_MQTT_USERNAME: '',
+      Z2M_TCP_PORT: null,
+      Z2M_MQTT_URL: 'mqtt://localhost',
+      Z2M_MQTT_PASSWORD: '',
+      ZIGBEE_DONGLE_NAME: null,
+      ZIGBEE2MQTT_DRIVER_PATH: null,
+    };
+    // EXECUTE
+    await zigbee2MqttManager.setup(config);
+    // ASSERT
+    assert.callCount(gladys.variable.setValue, 4);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', 'mqtt://localhost', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_USERNAME', '', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_PASSWORD', '', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_MODE', 'external', serviceId);
+    // Destroy variables
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
 
     // z2m was not running, we don't reload it
     assert.calledOnceWithExactly(init, true);

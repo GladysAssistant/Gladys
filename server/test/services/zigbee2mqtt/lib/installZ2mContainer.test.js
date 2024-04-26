@@ -86,7 +86,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     sinon.reset();
   });
 
-  it('it should restart z2m container (container stopped)', async () => {
+  it('should restart z2m container (container stopped)', async () => {
     // PREPARE
     const config = {};
     // EXECUTE
@@ -94,7 +94,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
         dockerBased: true,
@@ -106,14 +106,14 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mEnabled: false,
         zigbee2mqttConnected: false,
         zigbee2mqttExist: true,
-        zigbee2mqttRunning: true,
+        zigbee2mqttRunning: false,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
-  it('it should restart z2m container (container running but config changed)', async () => {
+  it('should restart z2m container (container running but config changed)', async () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([container]);
@@ -123,7 +123,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.configureContainer, basePathOnContainer, config, false);
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
         dockerBased: true,
@@ -142,7 +142,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
-  it('it should do nothing', async () => {
+  it('should do nothing', async () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([container]);
@@ -151,7 +151,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // ASSERT
     assert.notCalled(gladys.system.restartContainer);
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
       payload: {
         dockerBased: true,

@@ -67,9 +67,12 @@ describe('zigbee2mqtt init', () => {
     sinon.reset();
   });
 
-  it('it should fail because not a Docker System', async () => {
+  it('should fail because not a Docker System', async () => {
     // PREPARE
     gladys.system.isDocker = fake.resolves(false);
+    zigbee2mqttManager.getConfiguration = fake.resolves({
+      mqttMode: 'local',
+    });
     // EXECUTE
     try {
       await zigbee2mqttManager.init();
@@ -79,7 +82,7 @@ describe('zigbee2mqtt init', () => {
     }
     // ASSERT
     expect(zigbee2mqttManager.dockerBased).to.equal(false);
-    assert.notCalled(zigbee2mqttManager.getConfiguration);
+    assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.notCalled(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
@@ -89,9 +92,32 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should fail because not a host network', async () => {
+  it('should init system in remote mode', async () => {
+    // PREPARE
+    gladys.system.isDocker = fake.resolves(false);
+    zigbee2mqttManager.getConfiguration = fake.resolves({
+      mqttMode: 'external',
+    });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    expect(zigbee2mqttManager.dockerBased).to.equal(false);
+    assert.calledOnce(zigbee2mqttManager.getConfiguration);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
+    assert.notCalled(zigbee2mqttManager.installMqttContainer);
+    assert.notCalled(zigbee2mqttManager.installZ2mContainer);
+    assert.notCalled(zigbee2mqttManager.isEnabled);
+    assert.calledOnce(zigbee2mqttManager.connect);
+    assert.called(zigbee2mqttManager.emitStatusEvent);
+  });
+
+  it('should fail because not a host network', async () => {
     // PREPARE
     gladys.system.getNetworkMode = fake.resolves('container');
+    zigbee2mqttManager.getConfiguration = fake.resolves({
+      mqttMode: 'local',
+    });
     // EXECUTE
     try {
       await zigbee2mqttManager.init();
@@ -101,7 +127,7 @@ describe('zigbee2mqtt init', () => {
     }
     // ASSERT
     expect(zigbee2mqttManager.networkModeValid).to.equal(false);
-    assert.notCalled(zigbee2mqttManager.getConfiguration);
+    assert.calledOnce(zigbee2mqttManager.getConfiguration);
     assert.notCalled(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
