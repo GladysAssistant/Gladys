@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
+import { MQTT_MODE } from '../constants';
 import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
 
@@ -24,8 +25,8 @@ class SetupLocalOptions extends Component {
   };
 
   saveConfiguration = () => {
-    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = this.state;
-    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort });
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort, mqttMode } = this.state;
+    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort, mqttMode });
   };
 
   resetConfiguration = () => {
@@ -107,7 +108,8 @@ class SetupLocalOptions extends Component {
       z2mDongleName,
       zigbeeAdapters: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
-      z2mTcpPort
+      z2mTcpPort,
+      mqttMode: MQTT_MODE.LOCAL
     };
   }
 

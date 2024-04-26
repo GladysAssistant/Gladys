@@ -46,11 +46,10 @@ const SetupTab = props => {
                 </li>
               )}
 
-              {false && (
-                <li class={cx('list-group-item', { 'loading-border': saving })} data-cy="z2m-toggle-status">
-                  <EnableStatus {...props} disabled={disabled} />
-                </li>
-              )}
+              <li class={cx('list-group-item', { 'loading-border': saving })} data-cy="z2m-toggle-status">
+                <EnableStatus {...props} disabled={disabled} />
+              </li>
+
               {props.z2mUrl && (
                 <li class="list-group-item">
                   <MarkupText

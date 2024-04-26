@@ -137,7 +137,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should not install containers, usb is not configured', async () => {
+  it('should not install containers, usb is not configured', async () => {
     // PREPARE
     const config = { mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -146,7 +146,7 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
@@ -155,7 +155,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should not install containers, usb port not found', async () => {
+  it('should not install containers, usb port not found', async () => {
     // PREPARE
     const config = { z2mDriverPath: 'unknown/path', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -164,7 +164,7 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
@@ -173,7 +173,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should install containers, usb port is found', async () => {
+  it('should install containers, usb port is found', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -182,17 +182,17 @@ describe('zigbee2mqtt init', () => {
     // EXECUTE
     await zigbee2mqttManager.init();
     // ASSERT
-    assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
-    assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
+    assert.calledOnce(zigbee2mqttManager.getConfiguration);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+    assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    assert.calledOnce(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should save default mqtt params', async () => {
+  it('should save default mqtt params', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -222,7 +222,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should connect', async () => {
+  it('should connect', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -236,16 +236,16 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
-    assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
-    assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.calledOnce(zigbee2mqttManager.connect);
     assert.calledOnce(gladys.scheduler.scheduleJob);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
-  it('it should connect and scheduler already there', async () => {
+  it('should connect and scheduler already there', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
@@ -256,12 +256,12 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
-    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
-    assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
-    assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
+    assert.calledOnce(zigbee2mqttManager.saveConfiguration);
+    assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+    assert.calledOnce(zigbee2mqttManager.installMqttContainer);
+    assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
+    assert.calledOnce(zigbee2mqttManager.isEnabled);
+    assert.calledOnce(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 });

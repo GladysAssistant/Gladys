@@ -4,7 +4,7 @@ import { connect } from 'unistore/preact';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../utils/consts';
 import config from '../../../../../config';
-import { SETUP_MODES } from './constants';
+import { MQTT_MODE } from './constants';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SetupTab from './SetupTab';
 
@@ -45,9 +45,9 @@ class Zigbee2mqttSetupPage extends Component {
         configuration,
         loadZigbee2mqttConfig: RequestStatus.Success
       });
-      if (this.props.session.gatewayClient === undefined && configuration.setupMode === SETUP_MODES.LOCAL) {
+      if (this.props.session.gatewayClient === undefined && configuration.mqttMode === MQTT_MODE.LOCAL) {
         const url = new URL(config.localApiUrl);
-        const z2mUrl = `${url.protocol}//${url.hostname}:8080`;
+        const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort || '8080'}`;
         this.setState({ z2mUrl });
       }
     } catch (e) {

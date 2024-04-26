@@ -71,17 +71,23 @@ async function init(setupMode = false) {
 
   this.emitStatusEvent();
 
-  // Check for existing credentials for Gladys & Z2M for connection to broker
+  // Check for existing credentials for Gladys
   if (!mqttPassword) {
-    configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
-    configuration.z2mMqttUsername = CONFIGURATION.Z2M_MQTT_USERNAME_VALUE;
-    configuration.z2mMqttPassword = generate(20, {
+    configuration.mqttUsername = CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE;
+    configuration.mqttPassword = generate(20, {
       number: true,
       lowercase: true,
       uppercase: true,
     });
-    configuration.mqttUsername = CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE;
-    configuration.mqttPassword = generate(20, {
+  }
+  // Verify that mqttUrl is present
+  if (!mqttUrl) {
+    configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
+  }
+  // Check for existing credentials for Z2M
+  if (!configuration.z2mMqttPassword) {
+    configuration.z2mMqttUsername = CONFIGURATION.Z2M_MQTT_USERNAME_VALUE;
+    configuration.z2mMqttPassword = generate(20, {
       number: true,
       lowercase: true,
       uppercase: true,

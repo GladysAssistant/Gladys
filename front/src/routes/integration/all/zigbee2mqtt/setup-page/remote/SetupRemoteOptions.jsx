@@ -6,18 +6,6 @@ import cx from 'classnames';
 import SubmitConfiguration from '../components/SubmitConfiguration';
 
 class SetupRemoteOptions extends Component {
-  selectGladysMQTT = () => {
-    this.setState({
-      mqttMode: MQTT_MODE.GLADYS
-    });
-  };
-
-  selectExternalMQTT = () => {
-    this.setState({
-      mqttMode: MQTT_MODE.EXTERNAL
-    });
-  };
-
   updateMqttUrl = e => {
     this.setState({ mqttUrl: e.target.value });
   };
@@ -52,10 +40,10 @@ class SetupRemoteOptions extends Component {
     super(props);
 
     const { configuration } = props;
-    const { mqttMode, mqttUrl, mqttPassword, mqttUsername } = configuration;
+    const { mqttUrl, mqttPassword, mqttUsername } = configuration;
 
     this.state = {
-      mqttMode,
+      mqttMode: MQTT_MODE.EXTERNAL,
       mqttUrl,
       mqttPassword,
       mqttUsername,

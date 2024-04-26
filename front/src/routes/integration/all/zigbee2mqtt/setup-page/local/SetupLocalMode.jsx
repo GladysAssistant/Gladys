@@ -10,6 +10,15 @@ class SetupLocalMode extends Component {
     this.props.saveConfiguration(configuration);
   };
 
+  disableEditionMode = () => {
+    this.setState({ editionMode: false });
+  };
+
+  resetConfiguration = () => {
+    this.props.resetConfiguration();
+    this.disableEditionMode();
+  };
+
   enableEditionMode = () => {
     this.setState({ editionMode: true });
   };
@@ -32,7 +41,7 @@ class SetupLocalMode extends Component {
     }
   }
 
-  render({ configuration, httpClient, disabled, resetConfiguration }, { editionMode }) {
+  render({ configuration, httpClient, disabled }, { editionMode }) {
     if (editionMode) {
       return (
         <SetupLocalOptions
@@ -40,7 +49,7 @@ class SetupLocalMode extends Component {
           httpClient={httpClient}
           configuration={configuration}
           saveConfiguration={this.saveConfiguration}
-          resetConfiguration={resetConfiguration}
+          resetConfiguration={this.resetConfiguration}
         />
       );
     }
