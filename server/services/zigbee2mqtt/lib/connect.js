@@ -7,6 +7,7 @@ const { DEFAULT } = require('./constants');
  * @param {string} MqttParam.mqttUrl - MQTT URL.
  * @param {string} MqttParam.mqttUsername - MQTT Username.
  * @param {string} MqttParam.mqttPassword - MQTT Password.
+ * @param {string} MqttParam.mqttMode - MQTT Password.
  * @returns {Promise} Resolve when connected.
  * @example
  * connect();
@@ -36,6 +37,10 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
         this.subscribe(topic, this.handleMqttMessage.bind(this));
       });
       this.gladysConnected = true;
+      this.mqttRunning = true;
+      this.mqttExist = true;
+      this.zigbee2mqttRunning = true;
+      this.zigbee2mqttExist = true;
       this.emitStatusEvent();
     });
 

@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -45,9 +45,22 @@ const SetupTab = props => {
                   </div>
                 </li>
               )}
-              <li class={cx('list-group-item', { 'loading-border': saving })} data-cy="z2m-toggle-status">
-                <EnableStatus {...props} disabled={disabled} />
-              </li>
+
+              {false && (
+                <li class={cx('list-group-item', { 'loading-border': saving })} data-cy="z2m-toggle-status">
+                  <EnableStatus {...props} disabled={disabled} />
+                </li>
+              )}
+              {props.z2mUrl && (
+                <li class="list-group-item">
+                  <MarkupText
+                    id="integration.zigbee2mqtt.setup.connectionUrl"
+                    fields={{
+                      url: props.z2mUrl
+                    }}
+                  />
+                </li>
+              )}
               <li class="list-group-item" data-cy="z2m-running-status">
                 <RunningStatus {...props} disabled={disabled} />
               </li>

@@ -3,7 +3,8 @@ import { connect } from 'unistore/preact';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../utils/consts';
-
+import config from '../../../../../config';
+import { SETUP_MODES } from './constants';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SetupTab from './SetupTab';
 
@@ -40,10 +41,16 @@ class Zigbee2mqttSetupPage extends Component {
       const savedConfig = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
+      console.log(configuration);
       this.setState({
         configuration,
         loadZigbee2mqttConfig: RequestStatus.Success
       });
+      if (this.props.session.gatewayClient === undefined && configuration.setupMode === SETUP_MODES.LOCAL) {
+        const url = new URL(config.localApiUrl);
+        const z2mUrl = `${url.protocol}//${url.hostname}:8080`;
+        this.setState({ z2mUrl });
+      }
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
       this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });

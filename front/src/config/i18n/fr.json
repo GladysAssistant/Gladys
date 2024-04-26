@@ -838,13 +838,63 @@
       },
       "setup": {
         "title": "Configuration du service Zigbee2mqtt",
+        "modes": {
+          "local": {
+            "title": "Installation depuis Gladys",
+            "description": "Gladys va configurer deux containers Docker : MQTT and Zigbee2mqtt.",
+            "dockerInstallationRequirementLabel": "Gladys doit s'exécuter sous Docker",
+            "dockerNetworkHostRequirementLabel": "Le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"",
+            "usbDongleRequirementLabel": "Le dongle USB Zigbee doit être connecté",
+            "detailsDescription": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee.",
+            "usbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee est inséré",
+            "usbDriverPathPlaceholder": "Port USB",
+            "usbDongleNameLabel": "Sélectionner le modèle du dongle Zigbee utilisé",
+            "usbDongleNamePlaceholder": "Modèle du dongle Zigbee",
+            "z2mTcpPortLabel": "Entrer le port TCP exposé par l'application Web Zigbee2Mqtt",
+            "z2mTcpPortDescription": "Si vous laissez vide, un port aléatoire sera utilisé.",
+            "summary": {
+              "title": "Configuration",
+              "usbPort": "Port USB",
+              "dongleName": "Dongle",
+              "unknownDongle": "Non défini",
+              "tcpPort": "Port TCP"
+            }
+          },
+          "remote": {
+            "title": "Connexion a une installation existante",
+            "description": "Gladys va se connecter à une installation externe existante à travers MQTT.",
+            "z2mInstallationRequirementLabel": "Une application Zigbe2Mqtt autonome",
+            "mqttBrokerRequirementLabel": "Un broker MQTT connecté à l'application Zigbee2Mqtt",
+            "detailsDescription": "Avec ce mode de configuration, il est possible de se connecter à une installation Zigbee2Mqtt externe avec son broker MQTT.",
+            "mqttModeLabel": "Choix du broker MQTT",
+            "gladys": {
+              "modeLabel": "MQTT avec Gladys",
+              "modeDescription": "Le broker MQTT configuré avec le service MQTT sera utilisé. Assurez-vous que le service MQTT est correctement configuré sur <a href=\"/dashboard/integration/device/mqtt/setup\">sa page de configuration</a>."
+            },
+            "external": {
+              "modeLabel": "MQTT externe"
+            },
+            "summary": {
+              "title": "Configuration",
+              "mqttMode": "Broker MQTT"
+            }
+          }
+        },
+        "requirementsLabel": "<u>Conditions</u> :",
+        "selectInstallationMode": "Choisir",
+        "changeButtonLabel": "Modifier",
+        "resetLabel": "Annuler",
+        "errorLoadingStatesLabel": "Une erreur est survenue du chargement des informations du service Gladys. Assurez-vous que Gladys est bien à jour, sinon consultez les logs.",
+        "saveError": "La configuration n'a pas permis de démarrer le service, merci de la vérifier.",
+        "enableLabel": "Activer ou désactiver le service",
+        "enableDescription": "Au prochain redémarrage de Gladys, le service démarrera de nouveau. Il est possible de désactiver le service de manière pérenne depuis cette page : <a href=\"/dashboard/settings/service\">Paramètres > Services</a>.",
+        "toggleError": "Une erreur est survenue. Veuillez vérifier la configuration du service.",
+        "serviceStatus": "Etat du service",
         "description": "Ce service utilise deux containers Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
-        "enableLabel": "Activation du service Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "enableZigbee2mqtt": "Activer Zigbee2mqtt",
         "containersStatus": "Conteneurs liés à Zigbee2mqtt",
-        "serviceStatus": "Etat du service Zigbee2mqtt",
         "link": "Lien",
         "connected": "Zigbee2mqtt démarré avec succès.",
         "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt.",
