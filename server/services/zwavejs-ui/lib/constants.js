@@ -73,6 +73,21 @@ const COMMANDS = {
       },
     },
   },
+  multilevel_switch: {
+    up: {
+      getName: (_nodeFeature) => 'set',
+      getArgs: (value, _nodeFeature) => {
+        switch (value) {
+          case STATE.OFF:
+            return [0];
+          case STATE.ON:
+            return [99];
+          default:
+            return null;
+        }
+      }
+    }
+  }
 };
 
 /**
@@ -124,6 +139,18 @@ const EXPOSES = {
       read_only: false,
       has_feedback: true,
     },
+    // We only map the up for the binary state.
+    // If OFF is requested, on command execution, we will use
+    // the right property
+    up: {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      min: 0,
+      max: 1,
+      keep_history: false,
+      read_only: false,
+      has_feedback: false,
+    },
     /// Curtains
     // Class A Motor: Window Covering No Position/Endpoint Device Type
     '17-5': {
@@ -137,6 +164,18 @@ const EXPOSES = {
         read_only: false,
         has_feedback: true,
       },
+      // We only map the up for the state.
+      // If CLOSE is requested, on command execution, we will use
+      // the right property
+      up: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+        min: 0,
+        max: 1,
+        keep_history: false,
+        read_only: false,
+        has_feedback: false,
+      }
     },
     /// Curtains
     // Class B Motor : Window Covering Endpoint Aware Device Type
@@ -151,6 +190,18 @@ const EXPOSES = {
         read_only: false,
         has_feedback: true,
       },
+      // We only map the up for the state.
+      // If CLOSE is requested, on command execution, we will use
+      // the right property
+      up: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+        min: 0,
+        max: 1,
+        keep_history: false,
+        read_only: false,
+        has_feedback: false,
+      }
     },
     /// Curtains
     // Class C Motor : Window Covering Position/Endpoint Aware Device Type
@@ -165,6 +216,18 @@ const EXPOSES = {
         read_only: false,
         has_feedback: true,
       },
+      // We only map the up for the state.
+      // If CLOSE is requested, on command execution, we will use
+      // the right property
+      up: {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+        min: 0,
+        max: 1,
+        keep_history: false,
+        read_only: false,
+        has_feedback: false,
+      }
     }
   },
   notification: {

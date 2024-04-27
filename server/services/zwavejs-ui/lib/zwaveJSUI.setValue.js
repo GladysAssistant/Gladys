@@ -5,31 +5,21 @@ const { cleanNames } = require('../utils/convertToGladysDevice');
 
 /**
  * @description Returns the command wrapper.
+ * @param {object} zwaveJsNode - The zWaveJsDevice node.
  * @param {object} nodeFeature - The feature.
  * @returns {object} The Command Class command.
  * @example
- * getCommand({command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'})
+ * getCommand({id: 5, deviceClass: { basic: 4, generic: 17, specific: 6}}, {command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'})
  */
-function getCommand(nodeFeature) {
-  let commandPath = `${cleanNames(nodeFeature.command_class_name)}.${cleanNames(nodeFeature.property_name)}`;
+function getCommand(zwaveJsNode, nodeFeature) {
+  let baseCommandPath = cleanNames(nodeFeature.property_name);
   const propertyKeyNameClean = cleanNames(nodeFeature.property_key_name);
   if (propertyKeyNameClean !== '') {
-    commandPath += `.${propertyKeyNameClean}`;
+    baseCommandPath += `.${propertyKeyNameClean}`;
   }
 
-  return get(COMMANDS, commandPath);
-}
-
-/**
- * @description Returns a node from its external id.
- * @param {Array} nodes - All nodes available.
- * @param {string} nodeId - The node to find.
- * @returns {object} The node if found.
- * @example
- * getNode([{external_id: 'zwavejs-ui:3'}], 'zwavejs-ui:3')
- */
-function getNode(nodes, nodeId) {
-  return nodes.find((n) => n.external_id === nodeId);
+  return get(COMMANDS, `${cleanNames(nodeFeature.command_class_name)}.${zwaveJsNode.deviceClass.generic}-${zwaveJsNode.deviceClass.specific}.${baseCommandPath}`)
+    || get(COMMANDS, `${cleanNames(nodeFeature.command_class_name)}.${baseCommandPath}`);
 }
 
 /**
@@ -63,9 +53,14 @@ function setValue(device, deviceFeature, value) {
     );
   }
 
-  const node = getNode(this.devices, device.external_id);
+  const node = this.getDevice(device.external_id);
   if (!node) {
-    throw new BadParameters(`ZWaveJs-UI node not found: "${device.external_id}".`);
+    throw new BadParameters(`ZWaveJs-UI Gladys node not found: "${device.external_id}".`);
+  }
+
+  const zwaveJsNode = this.getZwaveJsDevice(node.external_id);
+  if (!zwaveJsNode) {
+    throw new BadParameters(`ZWaveJs-UI node not found: "${node.external_id}".`);
   }
 
   const nodeFeature = getNodeFeature(node, deviceFeature.external_id);
@@ -73,7 +68,7 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`ZWaveJs-UI feature not found: "${deviceFeature.external_id}".`);
   }
 
-  const command = getCommand(nodeFeature);
+  const command = getCommand(zwaveJsNode, nodeFeature);
   if (!command) {
     // We do not manage this feature for writing
     throw new BadParameters(`ZWaveJS-UI command not found: "${deviceFeature.external_id}"`);
