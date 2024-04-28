@@ -84,7 +84,17 @@ const COMMANDS = {
     },
     '17-5': {
       up: {
-        getName: (_nodeFeature) => 'set',
+        getName: (value, _nodeFeature) => {
+          switch(value) {
+            case COVER_STATE.OPEN:
+            case COVER_STATE.CLOSE:
+              return 'set'; // We will set the targetValue property to the min/max
+            case COVER_STATE.STOP:
+              return 'stopLevelChange';
+            default:
+              return null;
+          }
+        },
         getArgs: (value, _nodeFeature) => {
           switch (value) {
             case COVER_STATE.OPEN:
@@ -92,7 +102,7 @@ const COMMANDS = {
             case COVER_STATE.CLOSE:
               return [99];
             case COVER_STATE.STOP:
-              return [50];
+              return [];
             default:
               return null;
           }
@@ -101,7 +111,17 @@ const COMMANDS = {
     },
     '17-6': {
       up: {
-        getName: (_nodeFeature) => 'set',
+        getName: (value, _nodeFeature) => {
+          switch(value) {
+            case COVER_STATE.OPEN:
+            case COVER_STATE.CLOSE:
+              return 'set'; // We will set the targetValue property to the min/max
+            case COVER_STATE.STOP:
+              return 'stopLevelChange';
+            default:
+              return null;
+          }
+        },
         getArgs: (value, _nodeFeature) => {
           switch (value) {
             case COVER_STATE.OPEN:
@@ -109,7 +129,7 @@ const COMMANDS = {
             case COVER_STATE.CLOSE:
               return [99];
             case COVER_STATE.STOP:
-              return [50];
+              return [];
             default:
               return null;
           }
@@ -118,7 +138,17 @@ const COMMANDS = {
     },
     '17-7': {
       up: {
-        getName: (_nodeFeature) => 'set',
+        getName: (value, _nodeFeature) => {
+          switch(value) {
+            case COVER_STATE.OPEN:
+            case COVER_STATE.CLOSE:
+              return 'set'; // We will set the targetValue property to the min/max
+            case COVER_STATE.STOP:
+              return 'stopLevelChange';
+            default:
+              return null;
+          }
+        },
         getArgs: (value, _nodeFeature) => {
           switch (value) {
             case COVER_STATE.OPEN:
@@ -126,7 +156,7 @@ const COMMANDS = {
             case COVER_STATE.CLOSE:
               return [99];
             case COVER_STATE.STOP:
-              return [50];
+              return [];
             default:
               return null;
           }
