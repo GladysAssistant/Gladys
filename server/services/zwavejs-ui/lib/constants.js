@@ -39,10 +39,12 @@ const STATES = {
     power: (val) => val,
   },
   multilevel_switch: {
-    currentvalue: [{
-      name: 'position',
-      converter: (val) => val
-    }]
+    currentvalue: [
+      {
+        name: 'position',
+        converter: (val) => val,
+      },
+    ],
   },
   notification: {
     access_control: {
@@ -68,7 +70,7 @@ const multilevelSwitchCurtainsCommandDefault = {
   currentvalue: {
     state: {
       getName: (value, _nodeFeature) => {
-        switch(value) {
+        switch (value) {
           case COVER_STATE.STOP:
             return 'stopLevelChange';
           default:
@@ -76,24 +78,30 @@ const multilevelSwitchCurtainsCommandDefault = {
         }
       },
       getArgs: (value, _nodeFeature) => {
-        switch(value) {
-          case COVER_STATE.OPEN: return [0];
-          case COVER_STATE.CLOSE: return [99];
-          default: return [];
+        switch (value) {
+          case COVER_STATE.OPEN:
+            return [0];
+          case COVER_STATE.CLOSE:
+            return [99];
+          default:
+            return [];
         }
       },
       getStateUpdate: (value, _nodeFeature) => {
-        switch(value) {
-          case COVER_STATE.OPEN: return {name: 'position', value: 0};
-          case COVER_STATE.CLOSE: return {name: 'position', value: 99};
-          default: return null; // On explicit stopLevelChange, the device will send the new currentValue
+        switch (value) {
+          case COVER_STATE.OPEN:
+            return { name: 'position', value: 0 };
+          case COVER_STATE.CLOSE:
+            return { name: 'position', value: 99 };
+          default:
+            return null; // On explicit stopLevelChange, the device will send the new currentValue
         }
-      }
+      },
     },
     position: {
       getName: (_value, _nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => [value],
-    }
+    },
   },
 };
 
@@ -118,35 +126,41 @@ const COMMANDS = {
       state: {
         getName: (_value, _nodeFeature) => 'set',
         getArgs: (value, _nodeFeature) => {
-            switch(value) {
-              case STATE.ON: return [99];
-              case STATE.OFF: return [0];
-              default: return null;
-            }
+          switch (value) {
+            case STATE.ON:
+              return [99];
+            case STATE.OFF:
+              return [0];
+            default:
+              return null;
+          }
         },
         getStateUpdate: (value, _nodeFeature) => {
-            switch(value) {
-              case STATE.ON: return {name: 'position', value: 99};
-              case STATE.OFF: return {name: 'position', value: 0};
-              default: return null;
-            }
+          switch (value) {
+            case STATE.ON:
+              return { name: 'position', value: 99 };
+            case STATE.OFF:
+              return { name: 'position', value: 0 };
+            default:
+              return null;
+          }
         },
       },
       position: {
         getName: (_value, _nodeFeature) => 'set',
         getArgs: (value, _nodeFeature) => [value],
         getStateUpdate: (value, _nodeFeature) => {
-            return {
-              name: 'state',
-              value: value > 0 ? STATE.ON : STATE.OFF
-            };
-        }
-      }
+          return {
+            name: 'state',
+            value: value > 0 ? STATE.ON : STATE.OFF,
+          };
+        },
+      },
     },
     '17-5': multilevelSwitchCurtainsCommandDefault,
     '17-6': multilevelSwitchCurtainsCommandDefault,
-    '17-7': multilevelSwitchCurtainsCommandDefault
-  }
+    '17-7': multilevelSwitchCurtainsCommandDefault,
+  },
 };
 
 /**
@@ -188,114 +202,126 @@ const EXPOSES = {
   },
   multilevel_switch: {
     // Default deviceClass refers to SWITCH
-    currentvalue: [{
-      name: 'position',
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
-        unit: DEVICE_FEATURE_UNITS.PERCENT,
-        min: 0,
-        max: 99,
-        keep_history: true,
-        read_only: false,
-        has_feedback: false,
-      }
-    }, {
-      name: 'state',
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        min: 0,
-        max: 1,
-        keep_history: true,
-        read_only: false,
-        has_feedback: false,
-      }
-    }],
-    /// Curtains
-    // Class A Motor: Window Covering No Position/Endpoint Device Type
-    '17-5': {
-      currentvalue: [{
+    currentvalue: [
+      {
         name: 'position',
         feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
           unit: DEVICE_FEATURE_UNITS.PERCENT,
           min: 0,
           max: 99,
           keep_history: true,
           read_only: false,
           has_feedback: false,
-        }
-      }, {
+        },
+      },
+      {
         name: 'state',
         feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
           min: 0,
           max: 1,
           keep_history: true,
           read_only: false,
           has_feedback: false,
-        }
-      }],
+        },
+      },
+    ],
+    /// Curtains
+    // Class A Motor: Window Covering No Position/Endpoint Device Type
+    '17-5': {
+      currentvalue: [
+        {
+          name: 'position',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            min: 0,
+            max: 99,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+        {
+          name: 'state',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+            min: 0,
+            max: 1,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+      ],
     },
     /// Curtains
     // Class B Motor : Window Covering Endpoint Aware Device Type
     '17-6': {
-      currentvalue: [{
-        name: 'position',
-        feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-          unit: DEVICE_FEATURE_UNITS.PERCENT,
-          min: 0,
-          max: 99,
-          keep_history: true,
-          read_only: false,
-          has_feedback: false,
-        }
-      }, {
-        name: 'state',
-        feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-          min: 0,
-          max: 1,
-          keep_history: true,
-          read_only: false,
-          has_feedback: false,
-        }
-      }],
+      currentvalue: [
+        {
+          name: 'position',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            min: 0,
+            max: 99,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+        {
+          name: 'state',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+            min: 0,
+            max: 1,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+      ],
     },
     /// Curtains
     // Class C Motor : Window Covering Position/Endpoint Aware Device Type
     '17-7': {
-      currentvalue: [{
-        name: 'position',
-        feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-          unit: DEVICE_FEATURE_UNITS.PERCENT,
-          min: 0,
-          max: 99,
-          keep_history: true,
-          read_only: false,
-          has_feedback: false,
-        }
-      }, {
-        name: 'state',
-        feature: {
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-          min: 0,
-          max: 1,
-          keep_history: true,
-          read_only: false,
-          has_feedback: false,
-        }
-      }],
-    }
+      currentvalue: [
+        {
+          name: 'position',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            min: 0,
+            max: 99,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+        {
+          name: 'state',
+          feature: {
+            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+            type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+            min: 0,
+            max: 1,
+            keep_history: true,
+            read_only: false,
+            has_feedback: false,
+          },
+        },
+      ],
+    },
   },
   notification: {
     access_control: {

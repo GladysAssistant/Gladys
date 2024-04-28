@@ -32,27 +32,38 @@ async function onNodeValueUpdated(message) {
     return;
   }
 
-  let valueConverters = 
-    get(STATES, `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`)
-    || get(STATES, `${comClassNameClean}.${baseStatePath}`);
-  
+  let valueConverters =
+    get(
+      STATES,
+      `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`,
+    ) || get(STATES, `${comClassNameClean}.${baseStatePath}`);
+
   if (!valueConverters) {
     return;
   }
 
   if (!Array.isArray(valueConverters)) {
-    valueConverters = [{
-      name: '',
-      converter: valueConverters
-    }];
+    valueConverters = [
+      {
+        name: '',
+        converter: valueConverters,
+      },
+    ];
   }
-  
-  for(let i = 0; i < valueConverters.length; i += 1) {
+
+  for (let i = 0; i < valueConverters.length; i += 1) {
     const valueConverter = valueConverters[i];
     const convertedValue = valueConverter.converter(newValue);
     if (convertedValue !== null) {
       await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureId(messageNode.id, commandClassName, endpoint, propertyName, propertyKeyName, valueConverter.name),
+        device_feature_external_id: getDeviceFeatureId(
+          messageNode.id,
+          commandClassName,
+          endpoint,
+          propertyName,
+          propertyKeyName,
+          valueConverter.name,
+        ),
         state: convertedValue,
       });
     }
