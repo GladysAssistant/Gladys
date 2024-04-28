@@ -17,6 +17,15 @@ const PARAMS = {
   LOCATION: `location`,
 };
 
+const multilevelSwitchCurtainsStateDefault = {
+  currentvalue: [
+    {
+      name: 'position',
+      converter: (val) => val,
+    }
+  ],
+};
+
 /**
  * Convert a zWave value format to the
  * Gladys format.
@@ -43,8 +52,14 @@ const STATES = {
       {
         name: 'position',
         converter: (val) => val,
+      }, {
+        name: 'state',
+        converter: (val) => val > 0 ? STATE.ON : STATE.OFF,
       },
     ],
+    '17-5': multilevelSwitchCurtainsStateDefault,
+    '17-6': multilevelSwitchCurtainsStateDefault,
+    '17-7': multilevelSwitchCurtainsStateDefault,
   },
   notification: {
     access_control: {
@@ -62,10 +77,7 @@ const STATES = {
   },
 };
 
-/**
- * Convert value from Gladys format to
- * the Zwave MQTT expected format.
- */
+
 const multilevelSwitchCurtainsCommandDefault = {
   currentvalue: {
     state: {
@@ -104,7 +116,10 @@ const multilevelSwitchCurtainsCommandDefault = {
     },
   },
 };
-
+/**
+ * Convert value from Gladys format to
+ * the Zwave MQTT expected format.
+ */
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
