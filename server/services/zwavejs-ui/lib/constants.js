@@ -347,7 +347,7 @@ const EXPOSES = {
         max: 1,
         keep_history: true,
         read_only: true,
-        has_feedback: false,
+        has_feedback: true,
       },
     },
   },
