@@ -75,27 +75,18 @@ const COMMANDS = {
     },
   },
   multilevel_switch: {
+    currentvalue: {
+      getName: (_value, _nodeFeature) => 'set',
+      getArgs: (value, _nodeFeature) => [value]
+    },
     up: {
-      getName: (value, _nodeFeature) => {
-        if (value === STATE.ON) {
-          // On Turn ON requested, let's turn on the light to the
-          // latest value
-          return 'startLevelChange';
-        }
-
-        return 'set';
-      },
+      getName: (_value, _nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => {
         switch (value) {
           case STATE.OFF:
             return [0];
           case STATE.ON:
-            // startLevelChange command. Options are of type MultilevelSwitchCCStartLevelChangeOptions 
-            return [{
-              duration: '1s',
-              direction: 'up',
-              ignoreStartLevel: true
-            }];
+            return [99];
           default:
             return null;
         }
