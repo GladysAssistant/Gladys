@@ -38,6 +38,9 @@ const STATES = {
     air_temperature: (val) => val,
     power: (val) => val,
   },
+  multilevel_switch: {
+    currentvalue: (val) => val
+  },
   notification: {
     access_control: {
       door_state_simple: (val) => {
@@ -186,8 +189,8 @@ const EXPOSES = {
   multilevel_switch: {
     // Default deviceClass refers to LIGHT
     currentvalue: {
-      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
       unit: DEVICE_FEATURE_UNITS.PERCENT,
       min: 0,
       max: 99,
@@ -199,8 +202,8 @@ const EXPOSES = {
     // If OFF is requested, on command execution, we will use
     // the right property
     up: {
-      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       min: 0,
       max: 1,
       keep_history: false,
