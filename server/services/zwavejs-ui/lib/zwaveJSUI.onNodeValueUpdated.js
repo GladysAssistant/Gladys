@@ -57,17 +57,19 @@ function onNodeValueUpdated(message) {
     const valueConverter = valueConverters[i];
     const convertedValue = valueConverter.converter(newValue);
     if (convertedValue !== null) {
-      promises.push(this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureId(
-          messageNode.id,
-          commandClassName,
-          endpoint,
-          propertyName,
-          propertyKeyName,
-          valueConverter.name,
-        ),
-        state: convertedValue,
-      }));
+      promises.push(
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: getDeviceFeatureId(
+            messageNode.id,
+            commandClassName,
+            endpoint,
+            propertyName,
+            propertyKeyName,
+            valueConverter.name,
+          ),
+          state: convertedValue,
+        }),
+      );
     }
   }
 
