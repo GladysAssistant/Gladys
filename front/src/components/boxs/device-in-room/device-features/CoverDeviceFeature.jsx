@@ -41,7 +41,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
               })}
               onClick={open}
             >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.open`} />
+              <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
             </button>
             <button
               class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
@@ -55,7 +55,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
               })}
               onClick={close}
             >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.close`} />
+              <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
             </button>
           </div>
         </div>
