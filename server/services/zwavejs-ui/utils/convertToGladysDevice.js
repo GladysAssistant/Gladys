@@ -32,17 +32,17 @@ const convertToGladysDevice = (serviceId, device) => {
     const propertyClean = cleanNames(propertyName);
     const propertyKeyClean = cleanNames(propertyKeyName);
 
+    let baseExposePath = propertyClean;
+    if (propertyKeyClean !== '') {
+      baseExposePath += `.${propertyKeyClean}`;
+    }
+
     // Some devices have the same command class and property. But we need to classify
     // the device to map to the right CATEGORY. We use for that the deviceClass property.
     // We try to find an exposed feature specific to the deviceClass first.
     // For example: Multilevel Switch devices. They might be curtains or light switch.
     // They use the same command class. Only the deviceClass could provide some hints
     // about the real intention of the device.
-    let baseExposePath = propertyClean;
-    if (propertyKeyClean !== '') {
-      baseExposePath += `.${propertyKeyClean}`;
-    }
-
     let exposes =
       get(
         EXPOSES,
