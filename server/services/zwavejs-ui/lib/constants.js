@@ -22,7 +22,7 @@ const multilevelSwitchCurtainsStateDefault = {
     {
       name: 'position',
       converter: (val) => val,
-    }
+    },
   ],
 };
 
@@ -52,9 +52,10 @@ const STATES = {
       {
         name: 'position',
         converter: (val) => val,
-      }, {
+      },
+      {
         name: 'state',
-        converter: (val) => val > 0 ? STATE.ON : STATE.OFF,
+        converter: (val) => (val > 0 ? STATE.ON : STATE.OFF),
       },
     ],
     '17-5': multilevelSwitchCurtainsStateDefault,
@@ -76,7 +77,6 @@ const STATES = {
     },
   },
 };
-
 
 const multilevelSwitchCurtainsCommandDefault = {
   currentvalue: {
