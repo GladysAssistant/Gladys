@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
+const { STATE } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -144,6 +145,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 0,
     });
   });
+
   it('should save a new closed value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -188,6 +190,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 1,
     });
   });
+
   it('should not fail on unsupported door value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -229,6 +232,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
     assert.notCalled(gladys.event.emit);
   });
+
   it('should save a new true binary value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -271,6 +275,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: 1,
     });
   });
+
   it('should save a new false binary value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -353,6 +358,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
     assert.notCalled(gladys.event.emit);
   });
+
   it('should save a new air temperature value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
@@ -436,6 +442,268 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
       state: 1.7,
+    });
+  });
+
+  it('should save a new multilevel switch value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            feature_name: 'state',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-currentValue:state',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            type: 'binary',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            feature_name: 'position',
+            has_feedback: false,
+            keep_history: true,
+            max: 99,
+            min: 0,
+            name: '6-38-0-currentValue:position',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            type: 'dimmer',
+            unit: 'percent',
+          },
+        ],
+        name: 'inter-01',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Multilevel Switch',
+          commandClass: 38,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: 45,
+          prevValue: 0,
+          propertyName: 'currentvalue',
+        },
+      ],
+    });
+
+    gladys.event.emit.firstCall.calledWith('device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+      state: 45,
+    });
+
+    gladys.event.emit.secondCall.calledWith('device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+      state: STATE.ON,
+    });
+  });
+
+  it('should turn off state on a new multilevel switch value of 0', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            feature_name: 'state',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-currentValue:state',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            type: 'binary',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            feature_name: 'position',
+            has_feedback: false,
+            keep_history: true,
+            max: 99,
+            min: 0,
+            name: '6-38-0-currentValue:position',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            type: 'dimmer',
+            unit: 'percent',
+          },
+        ],
+        name: 'inter-01',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Multilevel Switch',
+          commandClass: 38,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: 0,
+          prevValue: 99,
+          propertyName: 'currentvalue',
+        },
+      ],
+    });
+
+    gladys.event.emit.firstCall.calledWith('device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+      state: 0,
+    });
+
+    gladys.event.emit.secondCall.calledWith('device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should save a new curtain multilevel switch value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            feature_name: 'state',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-currentValue:state',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            type: 'binary',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            feature_name: 'position',
+            has_feedback: false,
+            keep_history: true,
+            max: 99,
+            min: 0,
+            name: '6-38-0-currentValue:position',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            type: 'dimmer',
+            unit: 'percent',
+          },
+        ],
+        name: 'curtain-01',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 6,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Multilevel Switch',
+          commandClass: 38,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: 45,
+          prevValue: 0,
+          propertyName: 'currentvalue',
+        },
+      ],
+    });
+
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+      state: 45,
     });
   });
 });
