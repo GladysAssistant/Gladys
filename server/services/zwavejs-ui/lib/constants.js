@@ -83,7 +83,13 @@ const COMMANDS = {
   multilevel_switch: {
     currentvalue: {
       getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => [value],
+      getArgs: (value, _nodeFeature) => {
+        switch(value) {
+          case STATE.ON: return [99];
+          case STATE.OFF: return [0];
+          default: return [value];
+        }
+      },
       getStateUpdate: (value, _nodeFeature) => {
         switch(value) {
           case STATE.ON: return {name: 'position', value: 99};
