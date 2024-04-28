@@ -16,14 +16,19 @@ async function onNodeValueUpdated(message) {
   const comClassNameClean = cleanNames(commandClassName);
   const propertyNameClean = cleanNames(propertyName);
   const propertyKeyNameClean = cleanNames(propertyKeyName);
-  let statePath = `${comClassNameClean}.${propertyNameClean}`;
+  let baseStatePath = propertyNameClean;
   if (propertyKeyNameClean !== '') {
-    statePath += `.${propertyKeyNameClean}`;
+    baseStatePath += `.${propertyKeyNameClean}`;
   }
 
   const nodeId = `zwavejs-ui:${messageNode.id}`;
-  const node = this.devices.find((n) => n.external_id === nodeId);
+  const node = this.getDevice(nodeId);
   if (!node) {
+    return;
+  }
+
+  const zwaveJSNode = this.getZwaveJsDevice(nodeId);
+  if (!zwaveJSNode) {
     return;
   }
 
@@ -33,7 +38,9 @@ async function onNodeValueUpdated(message) {
     return;
   }
 
-  const valueConverter = get(STATES, statePath);
+  const valueConverter = 
+    get(STATES, `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`)
+    || get(STATES, `${comClassNameClean}.${baseStatePath}`);
   const convertedValue = valueConverter !== undefined ? valueConverter(newValue) : null;
 
   if (convertedValue !== null) {
