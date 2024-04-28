@@ -36,6 +36,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
       data: [
@@ -60,6 +70,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       {
         external_id: 'zwavejs-ui:2',
         features: [],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
       },
     ];
 
@@ -90,6 +110,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
       },
     ];
 
@@ -126,6 +156,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
       data: [
@@ -160,6 +200,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
       data: [
@@ -189,6 +239,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
       },
     ];
 
@@ -221,6 +281,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
       },
     ];
 
@@ -256,6 +326,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
       data: [
@@ -283,6 +363,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
       },
     ];
 
@@ -316,6 +406,16 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             external_id: 'zwavejs-ui:2:0:multilevel_sensor:power',
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
       },
     ];
 

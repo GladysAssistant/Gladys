@@ -77,6 +77,16 @@ describe('zwaveJSUIHandler.setValue', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
     try {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
@@ -109,6 +119,17 @@ describe('zwaveJSUIHandler.setValue', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
+
     try {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
@@ -160,6 +181,16 @@ describe('zwaveJSUIHandler.setValue', () => {
             property_key_name: undefined,
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
       },
     ];
 
@@ -215,6 +246,16 @@ describe('zwaveJSUIHandler.setValue', () => {
         ],
       },
     ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
 
     await zwaveJSUIHandler.setValue(
       { external_id: 'zwavejs-ui:3' },
@@ -264,6 +305,16 @@ describe('zwaveJSUIHandler.setValue', () => {
             property_key_name: undefined,
           },
         ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
       },
     ];
 
