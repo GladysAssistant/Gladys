@@ -141,24 +141,18 @@ const COMMANDS = {
       state: {
         getName: (_value, _nodeFeature) => 'set',
         getArgs: (value, _nodeFeature) => {
-          switch (value) {
-            case STATE.ON:
-              return [99];
-            case STATE.OFF:
-              return [0];
-            default:
-              return null;
+          if (value === STATE.ON) {
+            return [99];
           }
+
+          return [0];
         },
         getStateUpdate: (value, _nodeFeature) => {
-          switch (value) {
-            case STATE.ON:
-              return { name: 'position', value: 99 };
-            case STATE.OFF:
-              return { name: 'position', value: 0 };
-            default:
-              return null;
+          if (value === STATE.ON) {
+            return { name: 'position', value: 99 };
           }
+
+          return { name: 'position', value: 0 };
         },
       },
       position: {
