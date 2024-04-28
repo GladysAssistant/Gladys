@@ -64,6 +64,39 @@ const STATES = {
  * Convert value from Gladys format to
  * the Zwave MQTT expected format.
  */
+const multilevelSwitchCurtainsCommandDefault = {
+  currentvalue: {
+    state: {
+      getName: (value, _nodeFeature) => {
+        switch(value) {
+          case COVER_STATE.STOP:
+            return 'stopLevelChange';
+          default:
+            return 'set';
+        }
+      },
+      getArgs: (value, _nodeFeature) => {
+        switch(value) {
+          case COVER_STATE.OPEN: return [0];
+          case COVER_STATE.CLOSE: return [99];
+          default: return [];
+        }
+      },
+      getStateUpdate: (value, _nodeFeature) => {
+        switch(value) {
+          case COVER_STATE.OPEN: return {name: 'position', value: 0};
+          case COVER_STATE.CLOSE: return {name: 'position', value: 99};
+          default: return null; // On explicit stopLevelChange, the device will send the new currentValue
+        }
+      }
+    },
+    position: {
+      getName: (_value, _nodeFeature) => 'set',
+      getArgs: (value, _nodeFeature) => [value],
+    }
+  },
+};
+
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
@@ -110,89 +143,9 @@ const COMMANDS = {
         }
       }
     },
-    '17-5': {
-      currentvalue: {
-        getName: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.STOP:
-              return 'stopLevelChange';
-            default:
-              return 'set';
-          }
-        },
-        getArgs: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return [0];
-            case COVER_STATE.CLOSE: return [99];
-            case COVER_STATE.STOP: return [];
-            default: return [value];
-          }
-        },
-        getStateUpdate: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return {name: 'position', value: 0};
-            case COVER_STATE.CLOSE: return {name: 'position', value: 99};
-            case COVER_STATE.STOP: return null;
-            default: return {name: 'position', value};
-          }
-        }
-      },
-    },
-    '17-6': {
-      currentvalue: {
-        getName: (value, nodeFeature) => {
-          if (nodeFeature.feature_name === 'state' && value === COVER_STATE.STOP) {
-            return 'stopLevelChange';
-          }
-
-          return 'set';
-        },
-        getArgs: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return [0];
-            case COVER_STATE.CLOSE: return [99];
-            case COVER_STATE.STOP: return [];
-            default: return [value];
-          }
-        },
-        getStateUpdate: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return {name: 'position', value: 0};
-            case COVER_STATE.CLOSE: return {name: 'position', value: 99};
-            case COVER_STATE.STOP: return null;
-            default: return {name: 'position', value};
-          }
-        }
-      },
-    },
-    '17-7': {
-      currentvalue: {
-        getName: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.STOP:
-              return 'stopLevelChange';
-            default:
-              return 'set';
-          }
-        },
-        getArgs: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return [0];
-            case COVER_STATE.CLOSE: return [99];
-            case COVER_STATE.STOP: return [];
-            default: return [value];
-          }
-        },
-        getStateUpdate: (value, nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.OPEN: return {name: 'position', value: 0};
-            case COVER_STATE.CLOSE: return {name: 'position', value: 99};
-            case COVER_STATE.STOP: return null;
-            default: return {name: 'position', value};
-          }
-        }
-      },
-    }
+    '17-5': multilevelSwitchCurtainsCommandDefault,
+    '17-6': multilevelSwitchCurtainsCommandDefault,
+    '17-7': multilevelSwitchCurtainsCommandDefault
   }
 };
 
@@ -281,9 +234,9 @@ const EXPOSES = {
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,
           max: 1,
-          keep_history: false,
+          keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }],
     },
@@ -309,9 +262,9 @@ const EXPOSES = {
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,
           max: 1,
-          keep_history: false,
+          keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }],
     },
@@ -337,9 +290,9 @@ const EXPOSES = {
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,
           max: 1,
-          keep_history: false,
+          keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }],
     }

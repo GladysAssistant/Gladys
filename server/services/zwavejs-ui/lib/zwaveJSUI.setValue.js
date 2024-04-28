@@ -98,11 +98,13 @@ async function setValue(device, deviceFeature, value) {
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
 
-  const stateUpdate = command.getStateUpdate(value, nodeFeature);
-  if (stateUpdate !== null) {
-    const featureId = getDeviceFeatureId(zwaveJsNode.id, nodeFeature.command_class_name, nodeFeature.endpoint, nodeFeature.property_name, nodeFeature.property_key_name || '', stateUpdate.name ||'');
-    const updatedFeature = device.features.find(f => f.external_id === featureId);
-    await this.gladys.device.saveState(updatedFeature, stateUpdate.value);
+  if (command.getStateUpdate) {
+    const stateUpdate = command.getStateUpdate(value, nodeFeature);
+    if (stateUpdate !== null) {
+      const featureId = getDeviceFeatureId(zwaveJsNode.id, nodeFeature.command_class_name, nodeFeature.endpoint, nodeFeature.property_name, nodeFeature.property_key_name || '', stateUpdate.name ||'');
+      const updatedFeature = device.features.find(f => f.external_id === featureId);
+      await this.gladys.device.saveState(updatedFeature, stateUpdate.value);
+    }
   }
 }
 
