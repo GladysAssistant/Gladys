@@ -18,6 +18,10 @@ function getCommand(zwaveJsNode, nodeFeature) {
     baseCommandPath += `.${propertyKeyNameClean}`;
   }
 
+  if (nodeFeature.feature_name) {
+    baseCommandPath += `.${nodeFeature.feature_name}`;
+  }
+
   return get(COMMANDS, `${cleanNames(nodeFeature.command_class_name)}.${zwaveJsNode.deviceClass.generic}-${zwaveJsNode.deviceClass.specific}.${baseCommandPath}`)
     || get(COMMANDS, `${cleanNames(nodeFeature.command_class_name)}.${baseCommandPath}`);
 }

@@ -82,35 +82,32 @@ const COMMANDS = {
   },
   multilevel_switch: {
     currentvalue: {
-      getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, nodeFeature) => {
-        if (nodeFeature.feature_name === 'state') {
-          switch(value) {
-            case STATE.ON: return [99];
-            case STATE.OFF: return [0];
-            default: return null;
-          }
-        }
-
-        return [value];
+      state: {
+        getName: (_value, _nodeFeature) => 'set',
+        getArgs: (value, _nodeFeature) => {
+            switch(value) {
+              case STATE.ON: return [99];
+              case STATE.OFF: return [0];
+              default: return null;
+            }
+        },
+        getStateUpdate: (value, _nodeFeature) => {
+            switch(value) {
+              case STATE.ON: return {name: 'position', value: 99};
+              case STATE.OFF: return {name: 'position', value: 0};
+              default: return null;
+            }
+        },
       },
-      getStateUpdate: (value, nodeFeature) => {
-        if (nodeFeature.feature_name === 'state') {
-          switch(value) {
-            case STATE.ON: return {name: 'position', value: 99};
-            case STATE.OFF: return {name: 'position', value: 0};
-            default: return null;
-          }
+      position: {
+        getName: (_value, _nodeFeature) => 'set',
+        getArgs: (value, _nodeFeature) => [value],
+        getStateUpdate: (value, _nodeFeature) => {
+            return {
+              name: 'state',
+              value: value > 0 ? STATE.ON : STATE.OFF
+            };
         }
-        
-        if (nodeFeature.feature_name === 'position') {
-          return {
-            name: 'state',
-            value: value > 0 ? STATE.ON : STATE.OFF
-          };
-        }
-
-        return null;
       }
     },
     '17-5': {
@@ -143,13 +140,12 @@ const COMMANDS = {
     },
     '17-6': {
       currentvalue: {
-        getName: (value, _nodeFeature) => {
-          switch(value) {
-            case COVER_STATE.STOP:
-              return 'stopLevelChange';
-            default:
-              return 'set';
+        getName: (value, nodeFeature) => {
+          if (nodeFeature.feature_name === 'state' && value === COVER_STATE.STOP) {
+            return 'stopLevelChange';
           }
+
+          return 'set';
         },
         getArgs: (value, _nodeFeature) => {
           switch(value) {
@@ -241,7 +237,7 @@ const EXPOSES = {
     // Default deviceClass refers to SWITCH
     currentvalue: [{
       name: 'position',
-      expose: {
+      feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
         unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -253,14 +249,14 @@ const EXPOSES = {
       }
     }, {
       name: 'state',
-      expose: {
+      feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         min: 0,
         max: 1,
         keep_history: true,
         read_only: false,
-        has_feedback: true,
+        has_feedback: false,
       }
     }],
     /// Curtains
@@ -268,7 +264,7 @@ const EXPOSES = {
     '17-5': {
       currentvalue: [{
         name: 'position',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -280,7 +276,7 @@ const EXPOSES = {
         }
       }, {
         name: 'state',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,
@@ -296,7 +292,7 @@ const EXPOSES = {
     '17-6': {
       currentvalue: [{
         name: 'position',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -308,7 +304,7 @@ const EXPOSES = {
         }
       }, {
         name: 'state',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,
@@ -324,7 +320,7 @@ const EXPOSES = {
     '17-7': {
       currentvalue: [{
         name: 'position',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -336,7 +332,7 @@ const EXPOSES = {
         }
       }, {
         name: 'state',
-        expose: {
+        feature: {
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           min: 0,

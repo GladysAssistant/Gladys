@@ -52,13 +52,13 @@ const convertToGladysDevice = (serviceId, device) => {
       if (!Array.isArray(exposes)) {
         exposes = [{
           name: '',
-          expose: exposes
+          feature: exposes
         }];
       }
 
       exposes.forEach(exposeFound => {
         features.push({
-          ...exposeFound.expose,
+          ...exposeFound.feature,
           name: `${value.id}${exposeFound.name !== '' ? `:${exposeFound.name}` : ''}`,
           external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName, exposeFound.name),
           selector: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName, exposeFound.name),
