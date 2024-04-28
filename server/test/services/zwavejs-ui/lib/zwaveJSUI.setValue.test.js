@@ -30,6 +30,25 @@ describe('zwaveJSUIHandler.setValue', () => {
     sinon.reset();
   });
 
+  it('should fail on non zwavejs-ui feature', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    try {
+      await zwaveJSUIHandler.setValue(
+        {},
+        {
+          external_id: 'not-zwavejs-ui:42:0:unused:unused:unused',
+        },
+        '1',
+      );
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+
+      return;
+    }
+
+    assert.fail();
+  });
+
   it('should fail on unknown Gladys device', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     try {
@@ -49,16 +68,30 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.fail();
   });
 
-  it('should fail on invalid feature', async () => {
+  it('should fail on unknown zWave device', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
-    try {
-      await zwaveJSUIHandler.setValue(
-        { external_id: 'zwavejs-ui:2' },
-        {
-          external_id: 'not-zwavejs-ui:42:0:unused:unused:unused',
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
         },
-        '1',
-      );
+      },
+    ];
+    try {
+      await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], '1');
     } catch (e) {
       expect(e).instanceOf(BadParameters);
 
