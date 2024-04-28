@@ -25,7 +25,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     sinon.reset();
   });
 
-  it('should not fail on unknown device', async () => {
+  it('should not fail on unknown Gladys device', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
       {
@@ -65,7 +65,82 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
   });
 
-  it('should not fail on unknown feature', async () => {
+  it('should not fail on unknown zWave device', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 22,
+          prevValue: 23,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+        },
+      ],
+    });
+  });
+
+  it('should not fail on unknown state updated', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 1150,
+          property: 'Unexisting',
+          endpoint: 0,
+          newValue: 22,
+          prevValue: 23,
+          propertyName: 'Unexisting',
+        },
+      ],
+    });
+  });
+
+  it('should not fail on unknown feature on device', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
       {
@@ -96,6 +171,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
           prevValue: 23,
           propertyName: 'Access Control',
           propertyKey: 'Door state (simple)',
+          propertyKeyName: 'Door state (simple)',
         },
       ],
     });
