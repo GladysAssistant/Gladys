@@ -164,7 +164,7 @@ const COMMANDS = {
 };
 
 /**
- * List of supported features
+ * List of supported features.
  */
 const EXPOSES = {
   binary_switch: {

@@ -6,9 +6,10 @@ const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevi
 /**
  * @description This will be called when new Z-Wave node value is updated.
  * @param {object} message - Data sent by ZWave JS UI.
+ * @returns {Promise} - Promise execution.
  * @example zwaveJSUI.onNodeValueUpdated({data: [{node}, {value}]});
  */
-async function onNodeValueUpdated(message) {
+function onNodeValueUpdated(message) {
   // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
   const messageNode = message.data[0];
   const updatedValue = message.data[1];
@@ -24,12 +25,12 @@ async function onNodeValueUpdated(message) {
   const nodeId = `zwavejs-ui:${messageNode.id}`;
   const node = this.getDevice(nodeId);
   if (!node) {
-    return;
+    return Promise.resolve();
   }
 
   const zwaveJSNode = this.getZwaveJsDevice(nodeId);
   if (!zwaveJSNode) {
-    return;
+    return Promise.resolve();
   }
 
   let valueConverters =
@@ -39,7 +40,7 @@ async function onNodeValueUpdated(message) {
     ) || get(STATES, `${comClassNameClean}.${baseStatePath}`);
 
   if (!valueConverters) {
-    return;
+    return Promise.resolve();
   }
 
   if (!Array.isArray(valueConverters)) {
@@ -51,11 +52,12 @@ async function onNodeValueUpdated(message) {
     ];
   }
 
+  const promises = [];
   for (let i = 0; i < valueConverters.length; i += 1) {
     const valueConverter = valueConverters[i];
     const convertedValue = valueConverter.converter(newValue);
     if (convertedValue !== null) {
-      await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      promises.push(this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: getDeviceFeatureId(
           messageNode.id,
           commandClassName,
@@ -65,9 +67,15 @@ async function onNodeValueUpdated(message) {
           valueConverter.name,
         ),
         state: convertedValue,
-      });
+      }));
     }
   }
+
+  if (promises.length > 0) {
+    return Promise.allSettled(promises);
+  }
+
+  return Promise.resolve();
 }
 
 module.exports = {

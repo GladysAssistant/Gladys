@@ -9,7 +9,10 @@ const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevi
  * @param {object} nodeFeature - The feature.
  * @returns {object} The Command Class command.
  * @example
- * getCommand({id: 5, deviceClass: { basic: 4, generic: 17, specific: 6}}, {command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'})
+ * getCommand(
+ *  {id: 5, deviceClass: { basic: 4, generic: 17, specific: 6}},
+ *  {command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'}
+ * )
  */
 function getCommand(zwaveJsNode, nodeFeature) {
   let baseCommandPath = cleanNames(nodeFeature.property_name);
