@@ -88,7 +88,7 @@ function setValue(device, deviceFeature, value) {
         commandClass: nodeFeature.command_class,
         endpoint: nodeFeature.endpoint,
       },
-      command.getName(nodeFeature),
+      command.getName(value, nodeFeature),
       commandArgs,
     ],
   };

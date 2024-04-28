@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   OPENING_SENSOR_STATE,
   STATE,
+  COVER_STATE,
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
 
@@ -60,7 +61,7 @@ const STATES = {
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
-      getName: (_nodeFeature) => 'set',
+      getName: (_value, _nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => {
         switch (value) {
           case STATE.OFF:
@@ -75,17 +76,81 @@ const COMMANDS = {
   },
   multilevel_switch: {
     up: {
-      getName: (_nodeFeature) => 'set',
+      getName: (value, _nodeFeature) => {
+        if (value === STATE.ON) {
+          // On Turn ON requested, let's turn on the light to the
+          // latest value
+          return 'startLevelChange';
+        }
+
+        return 'set';
+      },
       getArgs: (value, _nodeFeature) => {
         switch (value) {
           case STATE.OFF:
             return [0];
           case STATE.ON:
-            return [99];
+            // startLevelChange command. Options are of type MultilevelSwitchCCStartLevelChangeOptions 
+            return [{
+              duration: '1s',
+              direction: 'up',
+              ignoreStartLevel: true
+            }];
           default:
             return null;
         }
       }
+    },
+    '17-5': {
+      up: {
+        getName: (_nodeFeature) => 'set',
+        getArgs: (value, _nodeFeature) => {
+          switch (value) {
+            case COVER_STATE.OPEN:
+              return [0];
+            case COVER_STATE.CLOSE:
+              return [99];
+            case COVER_STATE.STOP:
+              return [50];
+            default:
+              return null;
+          }
+        }
+      },
+    },
+    '17-6': {
+      up: {
+        getName: (_nodeFeature) => 'set',
+        getArgs: (value, _nodeFeature) => {
+          switch (value) {
+            case COVER_STATE.OPEN:
+              return [0];
+            case COVER_STATE.CLOSE:
+              return [99];
+            case COVER_STATE.STOP:
+              return [50];
+            default:
+              return null;
+          }
+        }
+      },
+    },
+    '17-7': {
+      up: {
+        getName: (_nodeFeature) => 'set',
+        getArgs: (value, _nodeFeature) => {
+          switch (value) {
+            case COVER_STATE.OPEN:
+              return [0];
+            case COVER_STATE.CLOSE:
+              return [99];
+            case COVER_STATE.STOP:
+              return [50];
+            default:
+              return null;
+          }
+        }
+      },
     }
   }
 };
