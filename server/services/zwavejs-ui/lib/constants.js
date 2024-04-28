@@ -82,19 +82,6 @@ const COMMANDS = {
       getName: (_value, _nodeFeature) => 'set',
       getArgs: (value, _nodeFeature) => [value]
     },
-    up: {
-      getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => {
-        switch (value) {
-          case STATE.OFF:
-            return [0];
-          case STATE.ON:
-            return [99];
-          default:
-            return null;
-        }
-      }
-    },
     '17-5': {
       up: {
         getName: (_nodeFeature) => 'set',
@@ -187,7 +174,7 @@ const EXPOSES = {
     },
   },
   multilevel_switch: {
-    // Default deviceClass refers to LIGHT
+    // Default deviceClass refers to SWITCH
     currentvalue: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
@@ -197,18 +184,6 @@ const EXPOSES = {
       keep_history: true,
       read_only: false,
       has_feedback: true,
-    },
-    // We only map the up for the binary state.
-    // If OFF is requested, on command execution, we will use
-    // the right property
-    up: {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-      min: 0,
-      max: 1,
-      keep_history: false,
-      read_only: false,
-      has_feedback: false,
     },
     /// Curtains
     // Class A Motor: Window Covering No Position/Endpoint Device Type
