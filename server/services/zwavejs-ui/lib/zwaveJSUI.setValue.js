@@ -1,7 +1,7 @@
 const get = require('get-value');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { COMMANDS } = require('./constants');
-const { cleanNames } = require('../utils/convertToGladysDevice');
+const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevice');
 
 /**
  * @description Returns the command wrapper.
@@ -46,7 +46,7 @@ function getNodeFeature(node, nodeFeatureId) {
  * @example
  * setValue(device, deviceFeature, 0);
  */
-function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value) {
   if (!deviceFeature.external_id.startsWith('zwavejs-ui:')) {
     throw new BadParameters(
       `ZWaveJs-UI deviceFeature external_id is invalid: "${deviceFeature.external_id}" should starts with "zwavejs-ui:"`,
@@ -94,7 +94,12 @@ function setValue(device, deviceFeature, value) {
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
 
-  return Promise.resolve();
+  const stateUpdate = command.getStateUpdate(value, nodeFeature);
+  if (stateUpdate !== null) {
+    const featureId = getDeviceFeatureId(zwaveJsNode.id, nodeFeature.command_class_name, nodeFeature.endpoint, nodeFeature.property_name, nodeFeature.property_key_name || '', stateUpdate.name ||'');
+    const updatedFeature = device.features.find(f => f.external_id === featureId);
+    await this.gladys.device.saveState(updatedFeature, stateUpdate.value);
+  }
 }
 
 module.exports = {

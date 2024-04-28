@@ -58,9 +58,9 @@ const BUTTON_STATUS = {
 };
 
 const COVER_STATE = {
-  STOP: 0,
-  OPEN: 1,
-  CLOSE: -1,
+  STOP: -1,
+  OPEN: -2,
+  CLOSE: -3,
 };
 
 const SIREN_LMH_VOLUME = {

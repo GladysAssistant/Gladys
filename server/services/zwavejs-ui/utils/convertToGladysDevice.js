@@ -13,10 +13,12 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
-const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName) => {
+const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, exposedName) => {
   const propertyKeyNameClean = cleanNames(propertyKeyName);
   return `zwavejs-ui:${nodeId}:${endpoint}:${cleanNames(commandClassName)}:${cleanNames(propertyName)}${
     propertyKeyNameClean !== '' ? `:${propertyKeyNameClean}` : ''
+  }${
+    exposedName !== '' ? `:${exposedName}` : ''
   }`;
 };
 
@@ -43,23 +45,32 @@ const convertToGladysDevice = (serviceId, device) => {
       baseExposePath += `.${propertyKeyClean}`;
     }
 
-    const exposeFound = 
+    let exposes = 
          get(EXPOSES, `${commandClassNameClean}.${device.deviceClass.generic}-${device.deviceClass.specific}.${baseExposePath}`) 
       || get(EXPOSES, `${commandClassNameClean}.${baseExposePath}`);
-    if (exposeFound) {
-      features.push({
-        ...exposeFound,
-        name: value.id,
-        external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
-        selector: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
-        node_id: device.id,
-        // These are custom properties only available on the object in memory (not in DB)
-        command_class_version: commandClassVersion,
-        command_class_name: commandClassName,
-        command_class: commandClass,
-        endpoint,
-        property_name: propertyName,
-        property_key_name: propertyKeyName,
+    if (exposes) {
+      if (!Array.isArray(exposes)) {
+        exposes = [{
+          name: '',
+          expose: exposes
+        }];
+      }
+
+      exposes.forEach(exposeFound => {
+        features.push({
+          ...exposeFound.expose,
+          name: `${value.id}${exposeFound.name !== '' ? `:${exposeFound.name}` : ''}`,
+          external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName, exposeFound.name),
+          selector: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName, exposeFound.name),
+          node_id: device.id,
+          // These are custom properties only available on the object in memory (not in DB)
+          command_class_version: commandClassVersion,
+          command_class_name: commandClassName,
+          command_class: commandClass,
+          endpoint,
+          property_name: propertyName,
+          property_key_name: propertyKeyName,
+        });
       });
     }
     params = [{ name: PARAMS.LOCATION, value: device.loc }];

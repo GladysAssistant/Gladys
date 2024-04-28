@@ -32,22 +32,30 @@ async function onNodeValueUpdated(message) {
     return;
   }
 
-  const featureId = getDeviceFeatureId(messageNode.id, commandClassName, endpoint, propertyName, propertyKeyName);
-  const nodeFeature = node.features.find((f) => f.external_id === featureId);
-  if (!nodeFeature) {
+  let valueConverters = 
+    get(STATES, `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`)
+    || get(STATES, `${comClassNameClean}.${baseStatePath}`);
+  
+  if (!valueConverters) {
     return;
   }
 
-  const valueConverter = 
-    get(STATES, `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`)
-    || get(STATES, `${comClassNameClean}.${baseStatePath}`);
-  const convertedValue = valueConverter !== undefined ? valueConverter(newValue) : null;
-
-  if (convertedValue !== null) {
-    await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: nodeFeature.external_id,
-      state: convertedValue,
-    });
+  if (!Array.isArray(valueConverters)) {
+    valueConverters = [{
+      name: '',
+      converter: valueConverters
+    }];
+  }
+  
+  for(let i = 0; i < valueConverters.length; i += 1) {
+    const valueConverter = valueConverters[i];
+    const convertedValue = valueConverter.converter(newValue);
+    if (convertedValue !== null) {
+      await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: getDeviceFeatureId(messageNode.id, commandClassName, endpoint, propertyName, propertyKeyName, valueConverter.name),
+        state: convertedValue,
+      });
+    }
   }
 }
 

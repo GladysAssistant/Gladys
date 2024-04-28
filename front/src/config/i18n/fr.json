@@ -2619,16 +2619,14 @@
     "category": {
       "shutter": {
         "state": {
-          "zero": "Arrêter",
-          "one": "Ouvrir",
-          "other": "Fermer"
+          "open": "Ouvrir",
+          "close": "Fermer"
         }
       },
       "curtain": {
         "state": {
-          "zero": "Arrêter",
-          "one": "Ouvrir",
-          "other": "Fermer"
+          "open": "Ouvrir",
+          "close": "Fermer"
         }
       },
       "air-conditioning": {
