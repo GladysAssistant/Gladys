@@ -83,19 +83,34 @@ const COMMANDS = {
   multilevel_switch: {
     currentvalue: {
       getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => {
-        switch(value) {
-          case STATE.ON: return [99];
-          case STATE.OFF: return [0];
-          default: return [value];
+      getArgs: (value, nodeFeature) => {
+        if (nodeFeature.feature_name === 'state') {
+          switch(value) {
+            case STATE.ON: return [99];
+            case STATE.OFF: return [0];
+            default: return null;
+          }
         }
+
+        return [value];
       },
-      getStateUpdate: (value, _nodeFeature) => {
-        switch(value) {
-          case STATE.ON: return {name: 'position', value: 99};
-          case STATE.OFF: return {name: 'position', value: 0};
-          default: return {name: 'position', value};
+      getStateUpdate: (value, nodeFeature) => {
+        if (nodeFeature.feature_name === 'state') {
+          switch(value) {
+            case STATE.ON: return {name: 'position', value: 99};
+            case STATE.OFF: return {name: 'position', value: 0};
+            default: return null;
+          }
         }
+        
+        if (nodeFeature.feature_name === 'position') {
+          return {
+            name: 'state',
+            value: value > 0 ? STATE.ON : STATE.OFF
+          };
+        }
+
+        return null;
       }
     },
     '17-5': {
@@ -172,7 +187,7 @@ const COMMANDS = {
             default: return [value];
           }
         },
-        getStateUpdate: (value, _nodeFeature) => {
+        getStateUpdate: (value, nodeFeature) => {
           switch(value) {
             case COVER_STATE.OPEN: return {name: 'position', value: 0};
             case COVER_STATE.CLOSE: return {name: 'position', value: 99};
@@ -234,7 +249,7 @@ const EXPOSES = {
         max: 99,
         keep_history: true,
         read_only: false,
-        has_feedback: true,
+        has_feedback: false,
       }
     }, {
       name: 'state',
@@ -243,7 +258,7 @@ const EXPOSES = {
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
         min: 0,
         max: 1,
-        keep_history: false,
+        keep_history: true,
         read_only: false,
         has_feedback: true,
       }
@@ -261,7 +276,7 @@ const EXPOSES = {
           max: 99,
           keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }, {
         name: 'state',
@@ -289,7 +304,7 @@ const EXPOSES = {
           max: 99,
           keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }, {
         name: 'state',
@@ -317,7 +332,7 @@ const EXPOSES = {
           max: 99,
           keep_history: true,
           read_only: false,
-          has_feedback: true,
+          has_feedback: false,
         }
       }, {
         name: 'state',

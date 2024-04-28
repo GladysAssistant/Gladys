@@ -70,6 +70,7 @@ const convertToGladysDevice = (serviceId, device) => {
           endpoint,
           property_name: propertyName,
           property_key_name: propertyKeyName,
+          feature_name: exposeFound.name,
         });
       });
     }
