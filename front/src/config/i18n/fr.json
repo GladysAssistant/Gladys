@@ -867,10 +867,6 @@
             "mqttBrokerRequirementLabel": "Un broker MQTT connecté à l'application Zigbee2Mqtt",
             "detailsDescription": "Avec ce mode de configuration, il est possible de se connecter à une installation Zigbee2Mqtt externe avec son broker MQTT.",
             "mqttModeLabel": "Choix du broker MQTT",
-            "gladys": {
-              "modeLabel": "MQTT avec Gladys",
-              "modeDescription": "Le broker MQTT configuré avec le service MQTT sera utilisé. Assurez-vous que le service MQTT est correctement configuré sur <a href=\"/dashboard/integration/device/mqtt/setup\">sa page de configuration</a>."
-            },
             "external": {
               "modeLabel": "MQTT externe"
             },

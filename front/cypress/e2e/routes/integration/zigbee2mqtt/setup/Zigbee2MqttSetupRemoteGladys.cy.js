@@ -46,20 +46,6 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-remote-panel]').within(() => {
       cy.get('button').click();
     });
-
-    cy.get('[data-cy=z2m-setup-remote-gladys-mqtt-mode]')
-      .should('exist')
-      .should('not.be.disabled');
-
-    cy.get('[data-cy=z2m-setup-remote-external-mqtt-mode]')
-      .should('exist')
-      .should('be.disabled');
-  });
-
-  it('Select Gladys MQTT mode', () => {
-    cy.get('[data-cy=z2m-setup-remote-gladys-mqtt-mode]').click();
-
-    cy.get('[data-cy=z2m-setup-remote-gladys-mqtt-description]').should('exist');
   });
 
   it('Save configuration with error', () => {
@@ -82,7 +68,7 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.wait('@setup')
       .its('request.body')
       .should('deep.eq', {
-        MQTT_MODE: 'gladys'
+        Z2M_MQTT_MODE: 'external'
       });
 
     // Check error panel
@@ -93,6 +79,10 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     // Check error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('exist');
 
+    cy.get('[data-cy=z2m-setup-remote-broker-url-field]').type('mqtt://localhost');
+    cy.get('[data-cy=z2m-setup-remote-broker-username-field]').type('admin');
+    cy.get('[data-cy=z2m-setup-remote-broker-password-field]').type('test');
+
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
@@ -102,7 +92,10 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
       {
         statusCode: 200,
         body: {
-          MQTT_MODE: 'gladys'
+          Z2M_MQTT_MODE: 'external',
+          Z2M_MQTT_URL: 'mqtt://localhost',
+          Z2M_MQTT_USERNAME: 'admin',
+          Z2M_MQTT_PASSWORD: 'test'
         }
       }
     ).as('setup');
@@ -112,7 +105,10 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.wait('@setup')
       .its('request.body')
       .should('deep.eq', {
-        MQTT_MODE: 'gladys'
+        Z2M_MQTT_MODE: 'external',
+        Z2M_MQTT_URL: 'mqtt://localhost',
+        Z2M_MQTT_USERNAME: 'admin',
+        Z2M_MQTT_PASSWORD: 'test'
       });
 
     // Check error panel
@@ -120,7 +116,7 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
 
     // Check summary
     cy.get('[data-cy=z2m-setup-remote-mqtt-mode-summary]').i18n(
-      'integration.zigbee2mqtt.setup.modes.remote.gladys.modeLabel'
+      'integration.zigbee2mqtt.setup.modes.remote.external.modeLabel'
     );
 
     cy.sendWebSocket({

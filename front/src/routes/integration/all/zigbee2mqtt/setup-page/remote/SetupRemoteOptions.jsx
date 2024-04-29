@@ -68,6 +68,7 @@ class SetupRemoteOptions extends Component {
                   <input
                     id="mqttUrl"
                     name="mqttUrl"
+                    data-cy="z2m-setup-remote-broker-url-field"
                     placeholder={<Text id="integration.mqtt.setup.urlPlaceholder" />}
                     value={mqttUrl}
                     class="form-control"
@@ -84,6 +85,7 @@ class SetupRemoteOptions extends Component {
                   <input
                     id="mqttUsername"
                     name="mqttUsername"
+                    data-cy="z2m-setup-remote-broker-username-field"
                     placeholder={<Text id="integration.mqtt.setup.userPlaceholder" />}
                     value={mqttUsername}
                     class="form-control"
@@ -102,6 +104,7 @@ class SetupRemoteOptions extends Component {
                     <input
                       id="mqttPassword"
                       name="mqttPassword"
+                      data-cy="z2m-setup-remote-broker-password-field"
                       type={showPassword ? 'text' : 'password'}
                       placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
                       value={mqttPassword}

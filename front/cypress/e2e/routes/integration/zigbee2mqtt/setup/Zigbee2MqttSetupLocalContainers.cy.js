@@ -100,11 +100,6 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .should('not.be.disabled');
   });
 
-  it('Reset configuration', () => {
-    cy.get('[data-cy=z2m-setup-reset]').click();
-    cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
-  });
-
   it('Save configuration with error', () => {
     // Check no error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('not.exist');
@@ -135,7 +130,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .its('request.body')
       .should('deep.eq', {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-        Z2M_TCP_PORT: '12345'
+        ZIGBEE_DONGLE_NAME: "CircuitSetup's CC2652P2 USB Coordinator",
+        Z2M_TCP_PORT: '12345',
+        Z2M_MQTT_MODE: 'local'
       });
 
     // Check error panel
@@ -178,7 +175,8 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .should('deep.eq', {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
         ZIGBEE_DONGLE_NAME: "CircuitSetup's CC2652P2 USB Coordinator",
-        Z2M_TCP_PORT: null
+        Z2M_TCP_PORT: null,
+        Z2M_MQTT_MODE: 'local'
       });
 
     // Check error panel
@@ -204,5 +202,17 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         networkModeValid: true
       }
     });
+  });
+
+  it('Reset configuration', () => {
+    cy.get('[data-cy=z2m-setup-save]').should('not.exist');
+    cy.get('[data-cy=z2m-setup-local-summary]')
+      .should('exist')
+      .within(() => {
+        cy.get('button')
+          .contains('integration.zigbee2mqtt.setup.changeButtonLabel')
+          .click();
+      });
+    cy.get('[data-cy=z2m-setup-reset]').click();
   });
 });
