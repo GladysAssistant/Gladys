@@ -479,6 +479,8 @@
         "disconnectButton": "Trennen",
         "bridgesOnNetwork": "Bridges im Netzwerk",
         "connectButton": "Verbinden/Erneut verbinden",
+        "syncBridges": "Brücken synchronisieren",
+        "bridgeNotUpToDateInfo": "Wenn Sie gerade eine Glühbirne zur Philips Hue-App hinzugefügt haben und diese Glühbirne nicht direkt von Gladys gesteuert werden kann, müssen Sie hierher kommen und auf die Schaltfläche \"Brücken synchronisieren\" klicken, um alle Informationen über diese neue Glühbirne wieder in Gladys zu bringen.",
         "scanButton": "Suchen",
         "bridgeButtonNotPressed": "Bridge-Taste nicht gedrückt. Bitte drücke die Taste auf deiner Philips Hue Bridge und versuche es erneut.",
         "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community.",
