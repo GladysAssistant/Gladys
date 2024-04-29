@@ -6,6 +6,9 @@ import cx from 'classnames';
 import SubmitConfiguration from '../components/SubmitConfiguration';
 
 class SetupRemoteOptions extends Component {
+  togglePassword = () => {
+    this.setState(prevState => ({ showPassword: !prevState.showPassword }));
+  };
   updateMqttUrl = e => {
     this.setState({ mqttUrl: e.target.value });
   };
