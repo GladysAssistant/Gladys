@@ -88,25 +88,38 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   const nodeContext = { node, nodeFeature, zwaveJsNode, gladysDevice, gladysFeature };
-  const commandArgs = command.getArgs(value, nodeContext);
-  if (commandArgs === null) {
-    throw new BadParameters(`ZWaveJS-UI command value not supported: "${value}"`);
+  if (command.isCommand(value, nodeContext)) {
+    // API sendCommand
+    // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=sendcommand
+    const mqttPayload = {
+      args: [
+        {
+          nodeId: nodeFeature.node_id,
+          commandClass: nodeFeature.command_class,
+          endpoint: nodeFeature.endpoint,
+        },
+        command.getCommandName(value, nodeContext),
+        command.getCommandArgs(value, nodeContext)
+      ],
+    };
+    this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
+  } else {
+    // API writeValue
+    // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=writevalue
+    const mqttPayload = {
+      args: [
+        {
+          nodeId: nodeFeature.node_id,
+          commandClass: nodeFeature.command_class,
+          endpoint: nodeFeature.endpoint,
+          property: command.getProperty(value, nodeContext)
+        },
+        command.getValue(value, nodeContext)
+      ],
+    };
+    this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set', JSON.stringify(mqttPayload));
   }
 
-  // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=send-command
-  // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=sendcommand
-  const mqttPayload = {
-    args: [
-      {
-        nodeId: nodeFeature.node_id,
-        commandClass: nodeFeature.command_class,
-        endpoint: nodeFeature.endpoint,
-      },
-      command.getName(value, nodeContext),
-      commandArgs,
-    ],
-  };
-  this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
 
   if (command.getStateUpdate) {
     const stateUpdate = command.getStateUpdate(value, nodeContext);
