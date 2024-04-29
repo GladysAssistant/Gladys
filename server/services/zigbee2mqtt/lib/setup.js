@@ -9,7 +9,6 @@ const { SETUP_VARIABLES } = require('./constants');
  */
 async function setup(config) {
   logger.debug('Zigbee2mqtt: storing setp...', config);
-  console.log(SETUP_VARIABLES.map((key) => config[key]));
   await Promise.all(SETUP_VARIABLES.map((key) => this.saveOrDestroyVariable(key, config[key])));
 
   // Reload z2m container with new USB configuration
