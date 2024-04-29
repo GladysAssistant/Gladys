@@ -1,4 +1,5 @@
 const { assert, fake } = require('sinon');
+const chaiAssert = require('chai').assert;
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient, hueApi } = require('../mocks.test');
@@ -32,5 +33,13 @@ describe('PhilipsHueService', () => {
     await philipsHueService.device.configureBridge('192.168.1.10');
     await philipsHueService.device.syncWithBridge();
     assert.called(hueApi.syncWithBridge);
+  });
+  it('should reject (error with Api not found)', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.getBridges();
+    await philipsHueService.device.configureBridge('192.168.1.10');
+    philipsHueService.device.hueApisBySerialNumber = new Map();
+    const promise = philipsHueService.device.syncWithBridge();
+    return chaiAssert.isRejected(promise);
   });
 });
