@@ -78,101 +78,88 @@ const STATES = {
   },
 };
 
-const multilevelSwitchCurtainsCommandDefault = {
-  currentvalue: {
-    state: {
-      isCommand: (value, _nodeContext) => {
-        return value === COVER_STATE.STOP;
-      },
-      getCommandName: (_value, _nodeContext) => {
-        return 'stopLevelChange';
-      },
-      getCommandArgs: (_value, _nodeContext) => [],
-      
-      getProperty: (_value, _nodeContext) => 'targetValue',
-      getValue: (value, _nodeContext) => {
-        if (value === COVER_STATE.OPEN) {
-          return 0;
-        }
+/**
+ * @description Build a command action.
+ * @param {string} name - Command name.
+ * @param {any[]} value - Value to send to the command.
+ * @param {object|null} stateUpdate - State synchronization.
+ * @returns {object} Action to perform.
+ * @example buildCommandAction('stopLevelChange', []);
+ */
+function buildCommandAction(name, value, stateUpdate) {
+  return {
+    isCommand: true,
+    name,
+    value,
+    stateUpdate: stateUpdate || null
+  };
+}
 
-        return 99;
-      },
-      getStateUpdate: (value, _nodeContext) => {
-        switch (value) {
-          case COVER_STATE.OPEN:
-            return { name: 'position', value: 0 };
-          case COVER_STATE.CLOSE:
-            return { name: 'position', value: 99 };
-          default:
-            return null; // On explicit stopLevelChange, the device will send the new currentValue
-        }
-      },
+/**
+ * @description Build a writeValue action.
+ * @param {string} property - Property name.
+ * @param {any} value - Value to write.
+ * @param {object|null} stateUpdate - State synchronization.
+ * @returns {object} Action to perform.
+ * @example buildWriteValueAction('targetValue', 99, {position: 99})
+ */
+function buildWriteValueAction(property, value, stateUpdate) {
+  return {
+    isCommand: false,
+    name: property,
+    value,
+    stateUpdate: stateUpdate || null
+  };
+}
+const multilevelSwitchCurtainsActionsDefault = {
+  currentvalue: {
+    state: (value, _nodeContext) => {
+      if (value === COVER_STATE.STOP) {
+        return buildCommandAction('stopLevelChange', []);
+      }
+      
+      if (value === COVER_STATE.OPEN) {
+        return buildWriteValueAction(
+          'targetValue',
+          0,
+          { position: 0 }
+        );
+      }
+      
+      // COVER_STATE.CLOSE
+      return buildWriteValueAction(
+        'targetValue',
+        99,
+        { position: 99 }
+      );
     },
-    position: {
-      isCommand: (_value, _nodeContext) => false,
-      getProperty: (_value, _nodeContext) => 'targetValue',
-      getValue: (value, _nodeContext) => value,
-    },
+    position: (value, _nodeContext) => buildWriteValueAction('targetValue', value)
   },
 };
 /**
  * Convert value from Gladys format to
  * the Zwave MQTT expected format.
  */
-const COMMANDS = {
+const ACTIONS = {
   binary_switch: {
-    currentvalue: {
-      isCommand: (_value, _nodeContext) => false,
-      getProperty: (_value, _nodeFeature) => 'currentValue',
-      getValue: (value, _nodeFeature) => {
-        if (value === STATE.ON) {
-          return true;
-        }
-
-        return false;
-      },
-    },
+    currentvalue: (value, _nodeContext) => buildWriteValueAction('targetValue', value === STATE.ON)
   },
   multilevel_switch: {
     currentvalue: {
-      state: {
-        isCommand: (_value, _nodeContext) => false,
-        getProperty: (value, _nodeFeature) => {
-          if (value === STATE.ON) {
-            return 'restorePrevious';
-          }
+      state: (value, _nodeContext) => {
+        if (value === STATE.ON) {
+          // On multilevel switch dimmers, when turning ON, let's go back
+          // to the latest value. Same behavior as pushing the real button.
+          return buildWriteValueAction('restorePrevious', true);
+        }
 
-          return 'targetValue';
-        },
-        getValue: (value, _nodeContext) => {
-          if (value === STATE.ON) {
-            return true;
-          }
-
-          return 0;
-        },
-        getStateUpdate: (value, _nodeContext) => {
-          if (value === STATE.ON) {
-            return { name: 'position', value: 99 };
-          }
-
-          return { name: 'position', value: 0 };
-        },
+        return buildWriteValueAction('targetValue', 0, { position: 0 });
       },
-      position: {
-        getProperty: (_value, _nodeContext) => 'targetValue',
-        getArgs: (value, _nodeContext) => value,
-        getStateUpdate: (value, _nodeContext) => {
-          return {
-            name: 'state',
-            value: value > 0 ? STATE.ON : STATE.OFF,
-          };
-        },
-      },
+      position: (value, _nodeContext) => buildWriteValueAction('targetValue', value, { state: value > 0 ? STATE.ON : STATE.OFF})
     },
-    '17-5': multilevelSwitchCurtainsCommandDefault,
-    '17-6': multilevelSwitchCurtainsCommandDefault,
-    '17-7': multilevelSwitchCurtainsCommandDefault,
+    '17-5': multilevelSwitchCurtainsActionsDefault,
+    '17-6': multilevelSwitchCurtainsActionsDefault,
+    '17-7': multilevelSwitchCurtainsActionsDefault,
   },
 };
 
@@ -352,7 +339,7 @@ const EXPOSES = {
 };
 
 module.exports = {
-  COMMANDS,
+  ACTIONS,
   CONFIGURATION,
   EXPOSES,
   STATES,

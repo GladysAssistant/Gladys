@@ -1,20 +1,20 @@
 const get = require('get-value');
 const { BadParameters } = require('../../../utils/coreErrors');
-const { COMMANDS } = require('./constants');
+const { ACTIONS } = require('./constants');
 const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevice');
 
 /**
- * @description Returns the command wrapper.
+ * @description Returns the action wrapper.
  * @param {object} zwaveJsNode - The zWaveJsDevice node.
  * @param {object} nodeFeature - The feature.
- * @returns {object} The Command Class command.
+ * @returns {object} The Command Class action.
  * @example
- * getCommand(
+ * getAction(
  *  {id: 5, deviceClass: { basic: 4, generic: 17, specific: 6}},
  *  {command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'}
  * )
  */
-function getCommand(zwaveJsNode, nodeFeature) {
+function getAction(zwaveJsNode, nodeFeature) {
   let baseCommandPath = cleanNames(nodeFeature.property_name);
   const propertyKeyNameClean = cleanNames(nodeFeature.property_key_name);
   if (propertyKeyNameClean !== '') {
@@ -27,11 +27,11 @@ function getCommand(zwaveJsNode, nodeFeature) {
 
   return (
     get(
-      COMMANDS,
+      ACTIONS,
       `${cleanNames(nodeFeature.command_class_name)}.${zwaveJsNode.deviceClass.generic}-${
         zwaveJsNode.deviceClass.specific
       }.${baseCommandPath}`,
-    ) || get(COMMANDS, `${cleanNames(nodeFeature.command_class_name)}.${baseCommandPath}`)
+    ) || get(ACTIONS, `${cleanNames(nodeFeature.command_class_name)}.${baseCommandPath}`)
   );
 }
 
@@ -81,14 +81,15 @@ async function setValue(gladysDevice, gladysFeature, value) {
     throw new BadParameters(`ZWaveJs-UI feature not found: "${gladysFeature.external_id}".`);
   }
 
-  const command = getCommand(zwaveJsNode, nodeFeature);
-  if (!command) {
+  const actionDescriptor = getAction(zwaveJsNode, nodeFeature);
+  if (!actionDescriptor) {
     // We do not manage this feature for writing
-    throw new BadParameters(`ZWaveJS-UI command not found: "${gladysFeature.external_id}"`);
+    throw new BadParameters(`ZWaveJS-UI action not found: "${gladysFeature.external_id}"`);
   }
 
   const nodeContext = { node, nodeFeature, zwaveJsNode, gladysDevice, gladysFeature };
-  if (command.isCommand(value, nodeContext)) {
+  const action = actionDescriptor(value, nodeContext);
+  if (action.isCommand) {
     // API sendCommand
     // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=sendcommand
     const mqttPayload = {
@@ -98,8 +99,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
           commandClass: nodeFeature.command_class,
           endpoint: nodeFeature.endpoint,
         },
-        command.getCommandName(value, nodeContext),
-        command.getCommandArgs(value, nodeContext)
+        action.name,
+        action.value
       ],
     };
     this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
@@ -112,29 +113,30 @@ async function setValue(gladysDevice, gladysFeature, value) {
           nodeId: nodeFeature.node_id,
           commandClass: nodeFeature.command_class,
           endpoint: nodeFeature.endpoint,
-          property: command.getProperty(value, nodeContext)
+          property: action.name
         },
-        command.getValue(value, nodeContext)
+        action.value
       ],
     };
     this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set', JSON.stringify(mqttPayload));
   }
 
-
-  if (command.getStateUpdate) {
-    const stateUpdate = command.getStateUpdate(value, nodeContext);
-    if (stateUpdate !== null) {
+  if (action.stateUpdate) {
+    const promises = [];
+    Object.keys(action.stateUpdate).forEach((featureName) => {
       const featureId = getDeviceFeatureId(
         zwaveJsNode.id,
         nodeFeature.command_class_name,
         nodeFeature.endpoint,
         nodeFeature.property_name,
         nodeFeature.property_key_name || '',
-        stateUpdate.name || '',
+        featureName,
       );
       const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
-      await this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value);
-    }
+      promises.push(this.gladys.device.saveState(gladysUpdatedFeature, action.stateUpdate[featureName]));
+    });
+    
+    await Promise.allSettled(promises);
   }
 }
 
