@@ -755,7 +755,7 @@
         "errorLoadingStatesLabel": "An error occurred while loading Gladys service information. Make sure Gladys is up to date, otherwise check the logs.",
         "saveError": "The configuration did not allow the service to start, please verify it.",
         "enableLabel": "Enable or disable the service",
-        "enableDescription": "At the next restart of Gladys, the service will start again. It is possible to permanently disable the service from this page: <a href=\"/dashboard/settings/service\">Settings > Services</a>.",
+        "enableDescription": "At the next restart of Gladys, the service will start again. Depending on the power of your machine and the speed of your network, starting this service in \"Installation from Gladys\" mode can take between 2 minutes and 1 hour. It is possible to permanently disable the service from this page: <a href=\"/dashboard/settings/service\">Settings > Services</a>.",
         "toggleError": "An error occurred. Please check the service configuration.",
         "serviceStatus": "Service Status",
         "description": "This service uses two Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt to deploy these containers. For more information, visit the Zigbee2mqtt documentation page.",
