@@ -91,7 +91,7 @@ function buildCommandAction(name, value, stateUpdate) {
     isCommand: true,
     name,
     value,
-    stateUpdate: stateUpdate || null
+    stateUpdate: stateUpdate || null,
   };
 }
 
@@ -108,7 +108,7 @@ function buildWriteValueAction(property, value, stateUpdate) {
     isCommand: false,
     name: property,
     value,
-    stateUpdate: stateUpdate || null
+    stateUpdate: stateUpdate || null,
   };
 }
 const multilevelSwitchCurtainsActionsDefault = {
@@ -117,23 +117,15 @@ const multilevelSwitchCurtainsActionsDefault = {
       if (value === COVER_STATE.STOP) {
         return buildCommandAction('stopLevelChange', []);
       }
-      
+
       if (value === COVER_STATE.OPEN) {
-        return buildWriteValueAction(
-          'targetValue',
-          0,
-          { position: 0 }
-        );
+        return buildWriteValueAction('targetValue', 0, { position: 0 });
       }
-      
+
       // COVER_STATE.CLOSE
-      return buildWriteValueAction(
-        'targetValue',
-        99,
-        { position: 99 }
-      );
+      return buildWriteValueAction('targetValue', 99, { position: 99 });
     },
-    position: (value, _nodeContext) => buildWriteValueAction('targetValue', value)
+    position: (value, _nodeContext) => buildWriteValueAction('targetValue', value),
   },
 };
 /**
@@ -142,7 +134,7 @@ const multilevelSwitchCurtainsActionsDefault = {
  */
 const ACTIONS = {
   binary_switch: {
-    currentvalue: (value, _nodeContext) => buildWriteValueAction('targetValue', value === STATE.ON)
+    currentvalue: (value, _nodeContext) => buildWriteValueAction('targetValue', value === STATE.ON),
   },
   multilevel_switch: {
     currentvalue: {
@@ -155,7 +147,8 @@ const ACTIONS = {
 
         return buildWriteValueAction('targetValue', 0, { position: 0 });
       },
-      position: (value, _nodeContext) => buildWriteValueAction('targetValue', value, { state: value > 0 ? STATE.ON : STATE.OFF})
+      position: (value, _nodeContext) =>
+        buildWriteValueAction('targetValue', value, { state: value > 0 ? STATE.ON : STATE.OFF }),
     },
     '17-5': multilevelSwitchCurtainsActionsDefault,
     '17-6': multilevelSwitchCurtainsActionsDefault,

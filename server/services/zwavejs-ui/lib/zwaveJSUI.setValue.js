@@ -100,7 +100,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
           endpoint: nodeFeature.endpoint,
         },
         action.name,
-        action.value
+        action.value,
       ],
     };
     this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
@@ -113,9 +113,9 @@ async function setValue(gladysDevice, gladysFeature, value) {
           nodeId: nodeFeature.node_id,
           commandClass: nodeFeature.command_class,
           endpoint: nodeFeature.endpoint,
-          property: action.name
+          property: action.name,
         },
-        action.value
+        action.value,
       ],
     };
     this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set', JSON.stringify(mqttPayload));
@@ -135,7 +135,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
       const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
       promises.push(this.gladys.device.saveState(gladysUpdatedFeature, action.stateUpdate[featureName]));
     });
-    
+
     await Promise.allSettled(promises);
   }
 }
