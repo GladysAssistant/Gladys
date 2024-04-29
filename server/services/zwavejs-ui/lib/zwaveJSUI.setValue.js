@@ -52,23 +52,23 @@ function getNodeFeature(node, nodeFeatureId) {
 
 /**
  * @description Set the new device value from Gladys to MQTT.
- * @param {object} device - Updated Gladys device.
- * @param {object} deviceFeature - Updated Gladys device feature.
+ * @param {object} gladysDevice - Updated Gladys device.
+ * @param {object} gladysFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
  * @returns {Promise} - The execution promise.
  * @example
  * setValue(device, deviceFeature, 0);
  */
-async function setValue(device, deviceFeature, value) {
-  if (!deviceFeature.external_id.startsWith('zwavejs-ui:')) {
+async function setValue(gladysDevice, gladysFeature, value) {
+  if (!gladysFeature.external_id.startsWith('zwavejs-ui:')) {
     throw new BadParameters(
-      `ZWaveJs-UI deviceFeature external_id is invalid: "${deviceFeature.external_id}" should starts with "zwavejs-ui:"`,
+      `ZWaveJs-UI deviceFeature external_id is invalid: "${gladysFeature.external_id}" should starts with "zwavejs-ui:"`,
     );
   }
 
-  const node = this.getDevice(device.external_id);
+  const node = this.getDevice(gladysDevice.external_id);
   if (!node) {
-    throw new BadParameters(`ZWaveJs-UI Gladys node not found: "${device.external_id}".`);
+    throw new BadParameters(`ZWaveJs-UI Gladys node not found: "${gladysDevice.external_id}".`);
   }
 
   const zwaveJsNode = this.getZwaveJsDevice(node.external_id);
@@ -76,18 +76,19 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`ZWaveJs-UI node not found: "${node.external_id}".`);
   }
 
-  const nodeFeature = getNodeFeature(node, deviceFeature.external_id);
+  const nodeFeature = getNodeFeature(node, gladysFeature.external_id);
   if (!nodeFeature) {
-    throw new BadParameters(`ZWaveJs-UI feature not found: "${deviceFeature.external_id}".`);
+    throw new BadParameters(`ZWaveJs-UI feature not found: "${gladysFeature.external_id}".`);
   }
 
   const command = getCommand(zwaveJsNode, nodeFeature);
   if (!command) {
     // We do not manage this feature for writing
-    throw new BadParameters(`ZWaveJS-UI command not found: "${deviceFeature.external_id}"`);
+    throw new BadParameters(`ZWaveJS-UI command not found: "${gladysFeature.external_id}"`);
   }
-
-  const commandArgs = command.getArgs(value, nodeFeature);
+  
+  const nodeContext = { node, nodeFeature, zwaveJsNode, gladysDevice, gladysFeature };
+  const commandArgs = command.getArgs(value, nodeContext);
   if (commandArgs === null) {
     throw new BadParameters(`ZWaveJS-UI command value not supported: "${value}"`);
   }
@@ -101,14 +102,14 @@ async function setValue(device, deviceFeature, value) {
         commandClass: nodeFeature.command_class,
         endpoint: nodeFeature.endpoint,
       },
-      command.getName(value, nodeFeature),
+      command.getName(value, nodeContext),
       commandArgs,
     ],
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
 
   if (command.getStateUpdate) {
-    const stateUpdate = command.getStateUpdate(value, nodeFeature);
+    const stateUpdate = command.getStateUpdate(value, nodeContext);
     if (stateUpdate !== null) {
       const featureId = getDeviceFeatureId(
         zwaveJsNode.id,
@@ -118,8 +119,8 @@ async function setValue(device, deviceFeature, value) {
         nodeFeature.property_key_name || '',
         stateUpdate.name || '',
       );
-      const updatedFeature = device.features.find((f) => f.external_id === featureId);
-      await this.gladys.device.saveState(updatedFeature, stateUpdate.value);
+      const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
+      await this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value);
     }
   }
 }

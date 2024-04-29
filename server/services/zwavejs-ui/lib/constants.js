@@ -89,7 +89,7 @@ const multilevelSwitchCurtainsCommandDefault = {
             return 'set';
         }
       },
-      getArgs: (value, _nodeFeature) => {
+      getArgs: (value, _nodeContext) => {
         switch (value) {
           case COVER_STATE.OPEN:
             return [0];
@@ -99,7 +99,7 @@ const multilevelSwitchCurtainsCommandDefault = {
             return [];
         }
       },
-      getStateUpdate: (value, _nodeFeature) => {
+      getStateUpdate: (value, _nodeContext) => {
         switch (value) {
           case COVER_STATE.OPEN:
             return { name: 'position', value: 0 };
@@ -111,8 +111,8 @@ const multilevelSwitchCurtainsCommandDefault = {
       },
     },
     position: {
-      getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => [value],
+      getName: (_value, _nodeContext) => 'set',
+      getArgs: (value, _nodeContext) => [value],
     },
   },
 };
@@ -139,15 +139,15 @@ const COMMANDS = {
   multilevel_switch: {
     currentvalue: {
       state: {
-        getName: (_value, _nodeFeature) => 'set',
-        getArgs: (value, _nodeFeature) => {
+        getName: (_value, _nodeContext) => 'set',
+        getArgs: (value, _nodeContext) => {
           if (value === STATE.ON) {
             return [99];
           }
 
           return [0];
         },
-        getStateUpdate: (value, _nodeFeature) => {
+        getStateUpdate: (value, _nodeContext) => {
           if (value === STATE.ON) {
             return { name: 'position', value: 99 };
           }
@@ -156,9 +156,9 @@ const COMMANDS = {
         },
       },
       position: {
-        getName: (_value, _nodeFeature) => 'set',
-        getArgs: (value, _nodeFeature) => [value],
-        getStateUpdate: (value, _nodeFeature) => {
+        getName: (_value, _nodeContext) => 'set',
+        getArgs: (value, _nodeContext) => [value],
+        getStateUpdate: (value, _nodeContext) => {
           return {
             name: 'state',
             value: value > 0 ? STATE.ON : STATE.OFF,
