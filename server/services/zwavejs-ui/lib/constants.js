@@ -81,7 +81,7 @@ const STATES = {
 const multilevelSwitchCurtainsCommandDefault = {
   currentvalue: {
     state: {
-      getName: (value, _nodeFeature) => {
+      getName: (value, _deviceContext) => {
         switch (value) {
           case COVER_STATE.STOP:
             return 'stopLevelChange';
@@ -89,7 +89,7 @@ const multilevelSwitchCurtainsCommandDefault = {
             return 'set';
         }
       },
-      getArgs: (value, _nodeFeature) => {
+      getArgs: (value, _deviceContext) => {
         switch (value) {
           case COVER_STATE.OPEN:
             return [0];
@@ -99,7 +99,7 @@ const multilevelSwitchCurtainsCommandDefault = {
             return [];
         }
       },
-      getStateUpdate: (value, _nodeFeature) => {
+      getStateUpdate: (value, _deviceContext) => {
         switch (value) {
           case COVER_STATE.OPEN:
             return { name: 'position', value: 0 };
@@ -111,8 +111,8 @@ const multilevelSwitchCurtainsCommandDefault = {
       },
     },
     position: {
-      getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => [value],
+      getName: (_value, _deviceContext) => 'set',
+      getArgs: (value, _deviceContext) => [value],
     },
   },
 };
@@ -123,8 +123,8 @@ const multilevelSwitchCurtainsCommandDefault = {
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
-      getName: (_value, _nodeFeature) => 'set',
-      getArgs: (value, _nodeFeature) => {
+      getName: (_value, _deviceContext) => 'set',
+      getArgs: (value, _deviceContext) => {
         switch (value) {
           case STATE.OFF:
             return [false];
@@ -139,15 +139,15 @@ const COMMANDS = {
   multilevel_switch: {
     currentvalue: {
       state: {
-        getName: (_value, _nodeFeature) => 'set',
-        getArgs: (value, _nodeFeature) => {
+        getName: (_value, _deviceContext) => 'set',
+        getArgs: (value, _deviceContext) => {
           if (value === STATE.ON) {
             return [99];
           }
 
           return [0];
         },
-        getStateUpdate: (value, _nodeFeature) => {
+        getStateUpdate: (value, _deviceContext) => {
           if (value === STATE.ON) {
             return { name: 'position', value: 99 };
           }
