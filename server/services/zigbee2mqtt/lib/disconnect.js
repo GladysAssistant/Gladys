@@ -33,8 +33,10 @@ async function disconnect() {
     all: true,
     filters: { name: [mqttContainerDescriptor.name] },
   });
-  [container] = dockerContainer;
-  await this.gladys.system.stopContainer(container.id);
+  if (dockerContainer.length > 0) {
+    [container] = dockerContainer;
+    await this.gladys.system.stopContainer(container.id);
+  }
   this.mqttRunning = false;
   this.emitStatusEvent();
 
@@ -43,8 +45,10 @@ async function disconnect() {
     all: true,
     filters: { name: [zigbee2mqttContainerDescriptor.name] },
   });
-  [container] = dockerContainer;
-  await this.gladys.system.stopContainer(container.id);
+  if (dockerContainer.length > 0) {
+    [container] = dockerContainer;
+    await this.gladys.system.stopContainer(container.id);
+  }
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
   this.emitStatusEvent();
