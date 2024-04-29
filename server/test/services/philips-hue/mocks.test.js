@@ -18,6 +18,7 @@ LightState.prototype.rgb = fakes.rgb;
 LightState.prototype.brightness = fakes.brightness;
 
 const hueApi = {
+  syncWithBridge: fake.resolves(null),
   users: {
     createUser: fake.resolves({
       username: 'username',
@@ -121,4 +122,5 @@ module.exports = {
   STATE_ON,
   STATE_OFF,
   fakes,
+  hueApi,
 };

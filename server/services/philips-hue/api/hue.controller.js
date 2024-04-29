@@ -23,6 +23,16 @@ module.exports = function HueController(philipsHueLightHandler) {
   }
 
   /**
+   * @api {post} /api/v1/service/philips-hue/bridge/sync Sync Philips Hue Bridge
+   * @apiName SyncWithBridge
+   * @apiGroup PhilipsHue
+   */
+  async function syncWithBridge(req, res) {
+    await philipsHueLightHandler.syncWithBridge();
+    res.json({ success: true });
+  }
+
+  /**
    * @api {get} /api/v1/service/philips-hue/light Get lights
    * @apiName GetLights
    * @apiGroup PhilipsHue
@@ -63,6 +73,11 @@ module.exports = function HueController(philipsHueLightHandler) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(configureBridge),
+    },
+    'post /api/v1/service/philips-hue/bridge/sync': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(syncWithBridge),
     },
     'get /api/v1/service/philips-hue/light': {
       authenticated: true,

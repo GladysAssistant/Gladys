@@ -479,6 +479,8 @@
         "disconnectButton": "Disconnect",
         "bridgesOnNetwork": "Bridges on network",
         "connectButton": "Connect/Reconnect",
+        "syncBridges": "Sync bridges",
+        "bridgeNotUpToDateInfo": "If you've just added a bulb to the Philips Hue app and that bulb isn't directly controllable by Gladys, you need to come here and click the \"Sync Bridges\" button, which will bring back all the information about this new bulb into Gladys.",
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
