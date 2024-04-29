@@ -119,13 +119,13 @@ const multilevelSwitchCurtainsActionsDefault = {
       }
 
       if (value === COVER_STATE.OPEN) {
-        return buildWriteValueAction('targetValue', 0, { position: 0 });
+        return buildCommandAction('set', [0], { position: 0 });
       }
 
       // COVER_STATE.CLOSE
-      return buildWriteValueAction('targetValue', 99, { position: 99 });
+      return buildCommandAction('set', [99], { position: 99 });
     },
-    position: (value, _nodeContext) => buildWriteValueAction('targetValue', value),
+    position: (value, _nodeContext) => buildCommandAction('set', [value]),
   },
 };
 /**
@@ -134,7 +134,7 @@ const multilevelSwitchCurtainsActionsDefault = {
  */
 const ACTIONS = {
   binary_switch: {
-    currentvalue: (value, _nodeContext) => buildWriteValueAction('targetValue', value === STATE.ON),
+    currentvalue: (value, _nodeContext) => buildCommandAction('set', [value === STATE.ON]),
   },
   multilevel_switch: {
     currentvalue: {
@@ -145,10 +145,10 @@ const ACTIONS = {
           return buildWriteValueAction('restorePrevious', true);
         }
 
-        return buildWriteValueAction('targetValue', 0, { position: 0 });
+        return buildCommandAction('set', [0], { position: 0 });
       },
       position: (value, _nodeContext) =>
-        buildWriteValueAction('targetValue', value, { state: value > 0 ? STATE.ON : STATE.OFF }),
+        buildCommandAction('set', [value], { state: value > 0 ? STATE.ON : STATE.OFF }),
     },
     '17-5': multilevelSwitchCurtainsActionsDefault,
     '17-6': multilevelSwitchCurtainsActionsDefault,

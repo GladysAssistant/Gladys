@@ -282,11 +282,11 @@ describe('zwaveJSUIHandler.setValue', () => {
     await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.OFF);
 
     const mqttPayload = {
-      args: [{ nodeId: 3, commandClass: 37, endpoint: 0, property: 'targetValue' }, false],
+      args: [{ nodeId: 3, commandClass: 37, endpoint: 0 }, 'set', [false]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
   });
@@ -354,11 +354,11 @@ describe('zwaveJSUIHandler.setValue', () => {
     await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.ON);
 
     const mqttPayload = {
-      args: [{ nodeId: 3, commandClass: 37, endpoint: 0, property: 'targetValue' }, true],
+      args: [{ nodeId: 3, commandClass: 37, endpoint: 0 }, 'set', [true]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
   });
@@ -453,11 +453,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 0],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -465,7 +465,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
   });
 
-  it('should restore multilevel switch targetValue on state ON', async () => {
+  it('should restore multilevel switch currentValue on state ON', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -564,7 +564,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
   });
 
-  it('should set multilevel switch targetValue to 0 and synchronize state on position set to 0', async () => {
+  it('should set multilevel switch currentValue to 0 and synchronize state on position set to 0', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -654,11 +654,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 0],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -666,7 +666,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.OFF);
   });
 
-  it('should set multilevel switch targetValue to value and synchronize state on positive position updated', async () => {
+  it('should set multilevel switch currentValue to value and synchronize state on positive position updated', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -756,11 +756,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 42],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [42]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -768,7 +768,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.ON);
   });
 
-  it('should set curtains multilevel switch targetValue to 99 and synchronize position on state CLOSE', async () => {
+  it('should set curtains multilevel switch currentValue to 99 and synchronize position on state CLOSE', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -858,11 +858,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 99],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [99]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -870,7 +870,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 99);
   });
 
-  it('should set curtains multilevel switch targetValue to 0 and synchronize position on state OPEN', async () => {
+  it('should set curtains multilevel switch currentValue to 0 and synchronize position on state OPEN', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -960,11 +960,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 0],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -1074,7 +1074,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.neverCalledWith(gladys.device.saveState, gladysDevice.features[1], sinon.match.any);
   });
 
-  it('should set curtain multilevel switch targetValue to 0 on position set to 0', async () => {
+  it('should set curtain multilevel switch currentValue to 0 on position set to 0', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -1164,11 +1164,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 0],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
@@ -1266,11 +1266,11 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'targetValue' }, 42],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [42]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
 
