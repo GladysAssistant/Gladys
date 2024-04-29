@@ -1705,8 +1705,8 @@
         "label": "Sélectionnez les lumières que vous souhaitez inverser",
         "description": "Cette action allume la lumière si éteinte, sinon éteins la lumière"
       },
-      "blinkDevices": {
-        "label": "Sélectionnez les lumières/prises que vous souhaitez faire clignoter",
+      "blinkLights": {
+        "label": "Sélectionnez les lumières que vous souhaitez faire clignoter",
         "description": "Réglez la durée et la vitesse de clignotement",
         "blinkingTime": {
           "label": "Durée (en secondes)",
@@ -1865,8 +1865,7 @@
       },
       "device": {
         "get-value": "Récupérer le dernier état",
-        "set-value": "Contrôler un appareil",
-        "blink": "Faire clignoter les lumières/prises"
+        "set-value": "Contrôler un appareil"
       },
       "message": {
         "send": "Envoyer un message",
@@ -1876,7 +1875,8 @@
       "light": {
         "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières",
-        "toggle": "Inverser les lumières"
+        "toggle": "Inverser les lumières",
+        "blink": "Faire clignoter les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",

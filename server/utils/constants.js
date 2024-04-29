@@ -341,12 +341,12 @@ const ACTIONS = {
   DEVICE: {
     SET_VALUE: 'device.set-value',
     GET_VALUE: 'device.get-value',
-    BLINK: 'device.blink',
   },
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
     TOGGLE: 'light.toggle',
+    BLINK: 'light.blink',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',

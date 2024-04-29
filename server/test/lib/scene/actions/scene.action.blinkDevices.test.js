@@ -43,7 +43,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['light-1'],
             blinking_speed: 'slow',
             blinking_time: 2,
@@ -82,7 +82,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['light-1'],
             blinking_speed: 'medium',
             blinking_time: 2,
@@ -121,7 +121,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['light-1'],
             blinking_speed: 'fast',
             blinking_time: 2,
@@ -160,7 +160,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['switch-1'],
             blinking_speed: 'fast',
             blinking_time: 2,
@@ -199,7 +199,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['light-1'],
             blinking_speed: 'unknown',
             blinking_time: 2,
@@ -231,7 +231,7 @@ describe('scene.blink-devices', () => {
       [
         [
           {
-            type: ACTIONS.DEVICE.BLINK,
+            type: ACTIONS.LIGHT.BLINK,
             devices: ['my-device'],
             blinking_speed: 'slow',
             blinking_time: 1,

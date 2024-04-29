@@ -15,7 +15,7 @@ import DeviceSetValue from './actions/DeviceSetValue';
 import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
 import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
-import BlinkDeviceParams from './actions/BlinkDeviceParams';
+import BlinkLightParams from './actions/BlinkLightParams';
 import TurnOnOffSwitchParams from './actions/TurnOnOffSwitchParams';
 import StartSceneParams from './actions/StartSceneParams';
 import UserPresence from './actions/UserPresence';
@@ -40,7 +40,7 @@ const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
-  [ACTIONS.DEVICE.BLINK]: 'fe fe-star',
+  [ACTIONS.LIGHT.BLINK]: 'fe fe-star',
   [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
@@ -102,7 +102,7 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
           props.action.type === ACTIONS.MQTT.SEND ||
-          props.action.type === ACTIONS.DEVICE.BLINK,
+          props.action.type === ACTIONS.LIGHT.BLINK,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
@@ -178,8 +178,8 @@ const ActionCard = ({ children, ...props }) => {
               updateActionProperty={props.updateActionProperty}
             />
           )}
-          {props.action.type === ACTIONS.DEVICE.BLINK && (
-            <BlinkDeviceParams
+          {props.action.type === ACTIONS.LIGHT.BLINK && (
+            <BlinkLightParams
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}

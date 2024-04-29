@@ -110,7 +110,7 @@ const actionsFunc = {
       }
     });
   },
-  [ACTIONS.DEVICE.BLINK]: async (self, action, scope) => {
+  [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
     const blinkingSpeed = action.blinking_speed;
     const blinkingTime = action.blinking_time * 1000 + 1;
     let blinkingInterval;

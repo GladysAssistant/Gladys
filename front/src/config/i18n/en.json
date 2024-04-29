@@ -1705,8 +1705,8 @@
         "label": "Select the lights you want to toggle",
         "description": "This action turn on the light if state is off or turn off the light if state is on"
       },
-      "blinkDevices": {
-        "label": "Select the lights/switches you want to make blink",
+      "blinkLights": {
+        "label": "Select the lights you want to make blink",
         "description": "Configure blinking duration and speed",
         "blinkingTime": {
           "label": "Duration (in seconds)",
@@ -1865,8 +1865,7 @@
       },
       "device": {
         "get-value": "Get device value",
-        "set-value": "Set device value",
-        "blink": "Make the Lights/Switches blink"
+        "set-value": "Set device value"
       },
       "message": {
         "send": "Send Message",
@@ -1876,7 +1875,8 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights",
-        "toggle": "Toggle the Lights"
+        "toggle": "Toggle the Lights",
+        "blink": "Make the Lights blink"
       },
       "switch": {
         "turn-on": "Turn On the Switches",

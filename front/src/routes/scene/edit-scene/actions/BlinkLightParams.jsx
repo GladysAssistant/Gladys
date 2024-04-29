@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 
-class BlinkDeviceParams extends Component {
+class BlinkLight extends Component {
   getOptions = async () => {
     try {
       const lightDevices = await this.props.httpClient.get('/api/v1/device', {
@@ -43,8 +43,8 @@ class BlinkDeviceParams extends Component {
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(device => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === device);
+      nextProps.action.devices.forEach(light => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -77,7 +77,7 @@ class BlinkDeviceParams extends Component {
           <div class="col-sm-12">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkDevices.label" />
+                <Text id="editScene.actionsCard.blinkLigths.label" />
               </div>
               <Select
                 defaultValue={[]}
@@ -93,7 +93,7 @@ class BlinkDeviceParams extends Component {
           <div class="col-sm-6">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkDevices.blinkingTime.label" />
+                <Text id="editScene.actionsCard.blinkLights.blinkingTime.label" />
               </div>
               <Localizer>
                 <input
@@ -101,7 +101,7 @@ class BlinkDeviceParams extends Component {
                   class="form-control"
                   value={props.action.blinking_time}
                   onChange={this.handleChangeBlinkingTime}
-                  placeholder={<Text id="editScene.actionsCard.blinkDevices.blinkingTime.placeholder" />}
+                  placeholder={<Text id="editScene.actionsCard.blinkLights.blinkingTime.placeholder" />}
                 />
               </Localizer>
             </div>
@@ -109,7 +109,7 @@ class BlinkDeviceParams extends Component {
           <div class="col-sm-6">
             <div class="form-group">
               <div class="form-label">
-                <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.label" />
+                <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.label" />
               </div>
               <select
                 class="custom-select"
@@ -117,13 +117,13 @@ class BlinkDeviceParams extends Component {
                 onChange={this.handleChangeBlinkingSpeed}
               >
                 <option value="slow">
-                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.slow" />
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.slow" />
                 </option>
                 <option value="medium">
-                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.medium" />
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.medium" />
                 </option>
                 <option value="fast">
-                  <Text id="editScene.actionsCard.blinkDevices.blinkingSpeed.fast" />
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.fast" />
                 </option>
               </select>
             </div>
@@ -134,4 +134,4 @@ class BlinkDeviceParams extends Component {
   }
 }
 
-export default connect('httpClient', {})(BlinkDeviceParams);
+export default connect('httpClient', {})(BlinkLight);
