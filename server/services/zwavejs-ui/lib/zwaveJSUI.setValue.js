@@ -83,7 +83,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   const actionDescriptor = getAction(zwaveJsNode, nodeFeature);
   if (!actionDescriptor) {
-    // We do not manage this feature for writing
+    // We do not manage this feature for setValue
     throw new BadParameters(`ZWaveJS-UI action not found: "${gladysFeature.external_id}"`);
   }
 
