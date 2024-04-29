@@ -194,7 +194,7 @@ describe('zigbee2mqtt init', () => {
 
   it('should save default mqtt params', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const config = { mqttMode: 'local', z2mDriverPath: '/dev/ttyUSB0' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
     zigbee2mqttManager.isEnabled.returns(false);
 
