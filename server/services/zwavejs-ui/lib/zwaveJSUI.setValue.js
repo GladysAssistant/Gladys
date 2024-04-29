@@ -86,7 +86,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     // We do not manage this feature for writing
     throw new BadParameters(`ZWaveJS-UI command not found: "${gladysFeature.external_id}"`);
   }
-  
+
   const nodeContext = { node, nodeFeature, zwaveJsNode, gladysDevice, gladysFeature };
   const commandArgs = command.getArgs(value, nodeContext);
   if (commandArgs === null) {

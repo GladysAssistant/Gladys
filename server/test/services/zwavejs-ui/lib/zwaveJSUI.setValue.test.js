@@ -91,7 +91,21 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
     try {
-      await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], '1');
+      // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+      // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      };
+
+      await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], '1');
     } catch (e) {
       expect(e).instanceOf(BadParameters);
 
@@ -124,9 +138,24 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
     try {
+      // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+      // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      };
       await zwaveJSUIHandler.setValue(
-        zwaveJSUIHandler.devices[0],
+        gladysDevice,
         {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
           external_id: 'zwavejs-ui:2:0:other:not_known:not_known',
         },
         '1',
@@ -167,7 +196,20 @@ describe('zwaveJSUIHandler.setValue', () => {
     ];
 
     try {
-      await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], '1');
+      // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+      // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
+          },
+        ],
+      };
+      await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], '1');
     } catch (e) {
       expect(e).instanceOf(BadParameters);
 
@@ -224,7 +266,20 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], STATE.OFF);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:3',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.OFF);
 
     const mqttPayload = {
       args: [{ nodeId: 3, commandClass: 37, endpoint: 0 }, 'set', [false]],
@@ -283,7 +338,20 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], STATE.ON);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:3',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.ON);
 
     const mqttPayload = {
       args: [{ nodeId: 3, commandClass: 37, endpoint: 0 }, 'set', [true]],
@@ -341,7 +409,20 @@ describe('zwaveJSUIHandler.setValue', () => {
     ];
 
     try {
-      await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], 4);
+      // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+      // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
+          },
+        ],
+      };
+      await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], 4);
     } catch (e) {
       expect(e).instanceOf(BadParameters);
 
@@ -419,7 +500,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], STATE.OFF);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.OFF);
 
     // Assert message published
     const mqttPayload = {
@@ -432,7 +531,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[1], 0);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
   });
 
   it('should set multilevel switch currentvalue to 99 on state ON', async () => {
@@ -503,7 +602,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[0], STATE.ON);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], STATE.ON);
 
     // Assert message published
     const mqttPayload = {
@@ -516,7 +633,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[1], 99);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 99);
   });
 
   it('should set multilevel switch currentvalue to value on position set to 0', async () => {
@@ -587,7 +704,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[1], 0);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[1], 0);
 
     // Assert message published
     const mqttPayload = {
@@ -600,7 +735,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[0], STATE.OFF);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.OFF);
   });
 
   it('should set multilevel switch currentvalue to value on positive position updated', async () => {
@@ -671,7 +806,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[1], 42);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[1], 42);
 
     // Assert message published
     const mqttPayload = {
@@ -684,7 +837,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[0], STATE.ON);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.ON);
   });
 
   it('should set curtains multilevel switch currentvalue to 99 on state CLOSE', async () => {
@@ -755,11 +908,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(
-      zwaveJSUIHandler.devices[0],
-      zwaveJSUIHandler.devices[0].features[0],
-      COVER_STATE.CLOSE,
-    );
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], COVER_STATE.CLOSE);
 
     // Assert message published
     const mqttPayload = {
@@ -772,7 +939,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[1], 99);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 99);
   });
 
   it('should set curtains multilevel switch currentvalue to 0 on state OPEN', async () => {
@@ -843,11 +1010,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(
-      zwaveJSUIHandler.devices[0],
-      zwaveJSUIHandler.devices[0].features[0],
-      COVER_STATE.OPEN,
-    );
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], COVER_STATE.OPEN);
 
     // Assert message published
     const mqttPayload = {
@@ -860,7 +1041,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[1], 0);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
   });
 
   it('should stop curtains multilevel switch on state STOP', async () => {
@@ -931,11 +1112,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(
-      zwaveJSUIHandler.devices[0],
-      zwaveJSUIHandler.devices[0].features[0],
-      COVER_STATE.STOP,
-    );
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], COVER_STATE.STOP);
 
     // Assert message published
     const mqttPayload = {
@@ -948,7 +1143,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Asserts we do not try to update the position.
-    assert.neverCalledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[1], sinon.match.any);
+    assert.neverCalledWith(gladys.device.saveState, gladysDevice.features[1], sinon.match.any);
   });
 
   it('should set curtain multilevel switch currentvalue to value on position set to 0', async () => {
@@ -1019,7 +1214,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[1], 0);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[1], 0);
 
     // Assert message published
     const mqttPayload = {
@@ -1032,7 +1245,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert state has not been updated
-    assert.neverCalledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[0], sinon.match.any);
+    assert.neverCalledWith(gladys.device.saveState, gladysDevice.features[0], sinon.match.any);
   });
 
   it('should set curtain multilevel switch currentvalue to value on positive position updated', async () => {
@@ -1103,7 +1316,25 @@ describe('zwaveJSUIHandler.setValue', () => {
       },
     ];
 
-    await zwaveJSUIHandler.setValue(zwaveJSUIHandler.devices[0], zwaveJSUIHandler.devices[0].features[1], 42);
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[1], 42);
 
     // Assert message published
     const mqttPayload = {
@@ -1116,6 +1347,6 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert state has not been updated
-    assert.neverCalledWith(gladys.device.saveState, zwaveJSUIHandler.devices[0].features[0], sinon.match.any);
+    assert.neverCalledWith(gladys.device.saveState, gladysDevice.features[0], sinon.match.any);
   });
 });
