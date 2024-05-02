@@ -22,6 +22,13 @@ function handleNewMessage(topic, message) {
       }
     }, this);
 
+    // Handle custom device listener
+    const foundCustomListener = this.deviceFeatureCustomMqttTopics.find((t) => topic.match(t.regex_key));
+    if (foundCustomListener) {
+      forwardedMessage = true;
+      foundCustomListener.callback(topic, message);
+    }
+
     if (!forwardedMessage) {
       logger.warn(`No subscription found for MQTT topic ${topic}`);
     }

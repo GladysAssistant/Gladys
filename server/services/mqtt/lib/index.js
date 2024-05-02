@@ -10,6 +10,8 @@ const { status } = require('./status');
 const { getConfiguration } = require('./getConfiguration');
 const { saveConfiguration } = require('./saveConfiguration');
 const { installContainer } = require('./installContainer');
+const { listenToCustomMqttTopicIfNeeded } = require('./listenToCustomMqttTopicIfNeeded');
+const { unListenToCustomMqttTopic } = require('./unListenToCustomMqttTopic');
 const { configureContainer } = require('./configureContainer');
 const { updateContainer } = require('./updateContainer');
 const { checkDockerNetwork } = require('./checkDockerNetwork');
@@ -30,6 +32,7 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
   this.mqttClient = null;
 
   this.topicBinds = {};
+  this.deviceFeatureCustomMqttTopics = [];
   this.configured = false;
   this.connected = false;
 };
@@ -46,6 +49,8 @@ MqttHandler.prototype.status = status;
 MqttHandler.prototype.getConfiguration = getConfiguration;
 MqttHandler.prototype.saveConfiguration = saveConfiguration;
 MqttHandler.prototype.installContainer = installContainer;
+MqttHandler.prototype.listenToCustomMqttTopicIfNeeded = listenToCustomMqttTopicIfNeeded;
+MqttHandler.prototype.unListenToCustomMqttTopic = unListenToCustomMqttTopic;
 MqttHandler.prototype.configureContainer = configureContainer;
 MqttHandler.prototype.updateContainer = updateContainer;
 MqttHandler.prototype.checkDockerNetwork = checkDockerNetwork;

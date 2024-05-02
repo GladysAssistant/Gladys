@@ -1337,7 +1337,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys écoute ce topic. Si vous publiez une valeur dedans, Gladys l'associera à cette fonctionnalité. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
         "mqttTopicToListenExampleLabel": "Topic MQTT à écouter",
         "mqttTopicToListenExampleDescription": "Gladys publiera un message dans ce topic si cet appareil est contrôlé depuis Gladys. Vous devez écouter ce topic. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
+        "mqttCustomTopic": "Topic MQTT personnalisé",
+        "mqttCustomTopicDescription": "Gladys propose une API MQTT par défaut, mais vous permet d'utiliser des topics personnalisés si vous utilisez un appareil qui publie nativement sur un topic particulier.",
+        "mqttCustomTopicPlaceholder": "Entrez un topic MQTT",
         "copyMqttTopic": "Copier le topic MQTT",
+        "mqttCustomObjectPath": "Message MQTT JSON",
+        "mqttCustomObjectPathDescription": "Si votre objet connecté envoie des messages MQTT sous forme d'un JSON, Gladys vous permet de spécifier ici le chemin de la propriété à utiliser par Gladys. Exemple: property1.property2.property3. Laissez vide si le format n'est pas du JSON.",
+        "mqttCustomObjectPathPlaceholder": "Chemin à suivre dans le JSON",
         "copied": "Copié !",
         "copyFailed": "Erreur lors de la copie",
         "deleteLabel": "Supprimer la fonctionnalité"

@@ -87,6 +87,12 @@ async function create(device) {
       actionEvent = EVENTS.DEVICE.UPDATE;
       oldPollFrequency = deviceInDb.poll_frequency;
 
+      // Remove MQTT subscription to custom MQTT topic
+      const mqttService = this.serviceManager.getService('mqtt');
+      if (mqttService) {
+        mqttService.device.unListenToCustomMqttTopic(deviceInDb);
+      }
+
       // or update it
       await deviceInDb.update(device, { transaction });
 
