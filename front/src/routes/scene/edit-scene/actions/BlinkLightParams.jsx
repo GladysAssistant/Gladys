@@ -14,10 +14,12 @@ class BlinkLight extends Component {
         device_feature_category: 'switch',
         device_feature_type: 'binary'
       });
-      const deviceOptions = [...lightDevices, ...switchDevices].map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
+      const deviceOptions = [...lightDevices, ...switchDevices]
+        .map(device => ({
+          value: device.selector,
+          label: device.name
+        }))
+        .sort((d1, d2) => d1.label.localeCompare(d2.label));
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
@@ -43,13 +45,14 @@ class BlinkLight extends Component {
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
+      nextProps.action.devices.forEach(device => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === device);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
       });
     }
+    selectedOptions.sort((d1, d2) => d1.label.localeCompare(d2.label));
     this.setState({ selectedOptions });
   };
   constructor(props) {

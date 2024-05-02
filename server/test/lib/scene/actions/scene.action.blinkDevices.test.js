@@ -8,7 +8,7 @@ const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
-describe('scene.blink-devices', () => {
+describe('scene.blink-lights', () => {
   let clock;
 
   beforeEach(() => {
