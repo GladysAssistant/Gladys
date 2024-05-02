@@ -1373,7 +1373,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker. Attention, cette option va lancer un container Mosquitto sur le port 1883. Si vous avez déjà un serveur MQTT sur cette machine sur le port 1883, cela ne fonctionnera pas.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
