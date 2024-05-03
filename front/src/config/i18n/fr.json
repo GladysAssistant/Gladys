@@ -608,6 +608,8 @@
         "bridgesOnNetwork": "Ponts sur le réseau",
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
+        "syncBridges": "Synchroniser les ponts",
+        "bridgeNotUpToDateInfo": "Si vous venez d'ajouter une ampoule à l'application Philips Hue, et que cette ampoule n'est pas directement contrôlable par Gladys, il faut venir ici et cliquer sur le bouton \"Synchroniser les ponts\" ce qui rapatriera dans Gladys toutes les informations sur cette nouvelle lampe.",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
         "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
         "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?",
