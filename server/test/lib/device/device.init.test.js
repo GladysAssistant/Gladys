@@ -12,11 +12,13 @@ const event = {
 const brain = {
   addNamedEntity: fake.returns(null),
 };
+const service = {
+  getService: () => {},
+};
 
 describe('Device.init', () => {
   it('should init device', async () => {
     const stateManager = new StateManager(event);
-    const service = {};
     const job = new Job(event);
     const device = new Device(event, {}, stateManager, service, {}, {}, job, brain);
 
