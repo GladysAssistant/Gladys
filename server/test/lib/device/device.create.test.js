@@ -32,6 +32,25 @@ describe('Device', () => {
     expect(newDevice).to.have.property('features');
     expect(newDevice).to.have.property('params');
   });
+  it('should create device and check if need to subscribe to custom MQTT topic', async () => {
+    const stateManager = new StateManager(event);
+    const mqttService = {
+      device: {
+        listenToCustomMqttTopicIfNeeded: fake.returns(null),
+      },
+    };
+    const serviceManager = {
+      getService: fake.returns(mqttService),
+    };
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Philips Hue 1',
+      external_id: 'philips-hue-new',
+      params: [],
+    });
+    assert.calledOnce(mqttService.device.listenToCustomMqttTopicIfNeeded);
+  });
   it('should update device which already exist', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceByExternalId', 'test-device-external', {
