@@ -8,6 +8,11 @@ const gladys = {
   variable: {
     getValue: fake.resolves('result'),
   },
+  stateManager: {
+    get: fake.returns({
+      external_id: 'device_feature_external_id',
+    }),
+  },
   event: {
     emit: fake.returns(null),
   },
@@ -78,6 +83,93 @@ describe('Mqtt handle message', () => {
 
   it('handle strict topic', () => {
     mqttHandler.handleNewMessage('gladys/master/random-topic', '{}');
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('handle device with custom topic', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '12');
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: '12',
+    });
+  });
+  it('handle device with custom topic and custom object path', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: 18,
+        },
+      }),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 18,
+    });
+  });
+  it('handle device with multiple features on same custom topic', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+      {
+        device_feature_id: '309c9ec6-193b-4fb5-a4db-29874984e834',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.co2',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: 18,
+          co2: 500,
+        },
+      }),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 18,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 500,
+    });
+  });
+  it('handle device with custom topic, custom object path and broken JSON', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', 'broken-JSON');
 
     assert.notCalled(gladys.event.emit);
   });
