@@ -9,6 +9,7 @@ const mqttHandler = {
   getConfiguration: fake.returns(configuration),
   saveConfiguration: fake.returns(true),
   installContainer: fake.returns(true),
+  setDebugMode: fake.returns(null),
 };
 
 describe('POST /api/v1/service/mqtt/connect', () => {
@@ -143,6 +144,30 @@ describe('POST /api/v1/service/mqtt/config/docker', () => {
 
     await controller['post /api/v1/service/mqtt/config/docker'].controller(req, res);
     assert.calledOnce(mqttHandler.installContainer);
+    assert.calledOnce(res.json);
+  });
+});
+
+describe('POST /api/v1/service/mqtt/debug_mode', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+    sinon.reset();
+  });
+
+  it('Set debug mode to true', async () => {
+    const req = {
+      body: {
+        debug_mode: true,
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/mqtt/debug_mode'].controller(req, res);
+    assert.calledWith(mqttHandler.setDebugMode, true);
     assert.calledOnce(res.json);
   });
 });

@@ -17,6 +17,7 @@ const { configureContainer } = require('./configureContainer');
 const { updateContainer } = require('./updateContainer');
 const { checkDockerNetwork } = require('./checkDockerNetwork');
 const { setValue } = require('./setValue');
+const { setDebugMode } = require('./setDebugMode');
 
 /**
  * @description Add ability to connect to a MQTT broker.
@@ -36,6 +37,8 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
   this.deviceFeatureCustomMqttTopics = [];
   this.configured = false;
   this.connected = false;
+  this.debugMode = false;
+  this.debugModeTimeout = 120 * 1000;
 };
 
 MqttHandler.prototype.init = init;
@@ -57,5 +60,6 @@ MqttHandler.prototype.configureContainer = configureContainer;
 MqttHandler.prototype.updateContainer = updateContainer;
 MqttHandler.prototype.checkDockerNetwork = checkDockerNetwork;
 MqttHandler.prototype.setValue = setValue;
+MqttHandler.prototype.setDebugMode = setDebugMode;
 
 module.exports = MqttHandler;

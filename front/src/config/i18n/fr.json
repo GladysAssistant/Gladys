@@ -1319,6 +1319,7 @@
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
       "deviceTab": "Appareils",
+      "debugTab": "Debug MQTT",
       "setupTab": "Configuration",
       "documentation": "Documentation MQTT",
       "apiDocumentation": "Documentation MQTT API",
@@ -1398,6 +1399,15 @@
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "networkError": "Impossible de contacter Gladys, est-ce que votre instance Gladys est bien connectée et accessible ?",
         "disconnected": "Déconnecté du broker MQTT."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "Cet onglet vous permet de voir en temps réel les messages MQTT qui arrivent sur votre instance Gladys, ce qui vous permet de débugger simplement. Au bout de 2 minutes sur cet onglet, le mode débug se désactivera automatiquement. Vous pouvez le réactiver avec le bouton rafraichir en haut à droite.",
+        "activateDebugMode": "Activer",
+        "debugModeActivated": "Mode debug activé",
+        "date": "Heure",
+        "topic": "Topic",
+        "message": "Contenu du message"
       }
     },
     "broadlink": {
