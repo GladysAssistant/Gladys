@@ -1,16 +1,14 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const EventEmitter = require('events');
 
 const { assert, fake } = sinon;
-const EventEmitter = require('events');
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
-
-const eventMqtt = new EventEmitter();
 
 const configuration = { mqttUrl: 'fakeUrl', mqttUsername: 'username', mqttPassword: 'password' };
 
@@ -34,6 +32,8 @@ describe('zigbee2mqtt connect', () => {
         emit: fake.resolves(null),
       },
     };
+
+    const eventMqtt = new EventEmitter();
     mqttClient = Object.assign(eventMqtt, {
       subscribe: fake.resolves(null),
       end: fake.resolves(null),
@@ -44,6 +44,8 @@ describe('zigbee2mqtt connect', () => {
     };
 
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, mqttLibrary, serviceId);
+    zigbee2mqttManager.dockerBased = true;
+    zigbee2mqttManager.networkModeValid = true;
   });
 
   afterEach(() => {
@@ -72,6 +74,7 @@ describe('zigbee2mqtt connect', () => {
     assert.notCalled(mqttLibrary.connect);
     assert.notCalled(mqttClient.end);
     assert.notCalled(mqttClient.removeAllListeners);
+    assert.notCalled(gladys.event.emit);
   });
 
   it('it should try to connect to mqtt', async () => {
@@ -80,10 +83,19 @@ describe('zigbee2mqtt connect', () => {
     // EXECUTE
     await zigbee2mqttManager.connect(configuration);
     // ASSERT
-    // TODO: check parameters
     assert.calledOnce(mqttLibrary.connect);
     assert.notCalled(mqttClient.end);
     assert.notCalled(mqttClient.removeAllListeners);
+    assert.calledWithMatch(
+      mqttLibrary.connect,
+      configuration.mqttUrl,
+      sinon.match({
+        username: configuration.mqttUsername,
+        password: configuration.mqttPassword,
+        reconnectPeriod: 5000,
+      }),
+    );
+    assert.notCalled(gladys.event.emit);
   });
 
   it('it should receive mqtt connect message', async () => {
@@ -93,11 +105,22 @@ describe('zigbee2mqtt connect', () => {
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('connect');
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: true,
+        mqttExist: true,
+        mqttRunning: true,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
     });
-    expect(zigbee2mqttManager.gladysConnected).to.equal(true);
-    assert.calledWith(mqttClient.subscribe, 'zigbee2mqtt/#');
+    assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
   });
 
   it('it should receive mqtt error message', async () => {
@@ -108,11 +131,21 @@ describe('zigbee2mqtt connect', () => {
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('error', error);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
-      payload: error,
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: true,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
     });
-    expect(zigbee2mqttManager.gladysConnected).to.equal(false);
   });
 
   it('it should receive mqtt offline message', async () => {
@@ -122,11 +155,21 @@ describe('zigbee2mqtt connect', () => {
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('offline');
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
-      payload: 'DISCONNECTED',
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: true,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
     });
-    expect(zigbee2mqttManager.gladysConnected).to.equal(false);
   });
 
   it('it should receive mqtt normal message', async () => {
@@ -137,6 +180,6 @@ describe('zigbee2mqtt connect', () => {
     await zigbee2mqttManager.connect(configuration);
     zigbee2mqttManager.mqttClient.emit('message', 'topic', 'message');
     // ASSERT
-    assert.calledWithExactly(zigbee2mqttManager.handleMqttMessage, 'topic', 'message');
+    assert.calledOnceWithExactly(zigbee2mqttManager.handleMqttMessage, 'topic', 'message');
   });
 });

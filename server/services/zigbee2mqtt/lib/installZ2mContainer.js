@@ -2,7 +2,6 @@ const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
@@ -11,10 +10,11 @@ const sleep = promisify(setTimeout);
 /**
  * @description Install and starts Zigbee2mqtt container.
  * @param {object} config - Service configuration properties.
+ * @param {boolean} setupMode - In setup mode.
  * @example
  * await z2m.installZ2mContainer(config);
  */
-async function installZ2mContainer(config) {
+async function installZ2mContainer(config, setupMode = false) {
   const { z2mDriverPath } = config;
   let creationNeeded = false;
 
@@ -64,14 +64,13 @@ async function installZ2mContainer(config) {
     } catch (e) {
       this.zigbee2mqttExist = false;
       logger.error('Zigbee2mqtt failed to install as Docker container:', e);
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
       throw e;
+    } finally {
+      this.emitStatusEvent();
     }
   }
 
-  const configChanged = await this.configureContainer(basePathOnContainer, config);
+  const configChanged = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({
@@ -89,18 +88,14 @@ async function installZ2mContainer(config) {
     }
 
     logger.info('Zigbee2mqtt container successfully started');
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
     this.zigbee2mqttRunning = true;
     this.zigbee2mqttExist = true;
   } catch (e) {
     logger.error('Zigbee2mqtt container failed to start:', e);
     this.zigbee2mqttRunning = false;
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
     throw e;
+  } finally {
+    this.emitStatusEvent();
   }
 }
 

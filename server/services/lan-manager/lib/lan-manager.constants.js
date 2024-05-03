@@ -17,7 +17,7 @@ const PRESENCE_STATUS = {
 
 const TIMERS = {
   PRESENCE: 120000,
-  SCAN: 30000,
+  SCAN: 60000,
 };
 
 const SCAN_OPTIONS = {
