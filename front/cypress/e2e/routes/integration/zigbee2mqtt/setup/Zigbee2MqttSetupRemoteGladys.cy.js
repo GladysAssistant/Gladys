@@ -94,8 +94,8 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
         body: {
           Z2M_MQTT_MODE: 'external',
           Z2M_MQTT_URL: 'mqtt://localhost',
-          Z2M_MQTT_USERNAME: 'admin',
-          Z2M_MQTT_PASSWORD: 'test'
+          GLADYS_MQTT_USERNAME: 'admin',
+          GLADYS_MQTT_PASSWORD: 'test'
         }
       }
     ).as('setup');
@@ -107,8 +107,8 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
       .should('deep.eq', {
         Z2M_MQTT_MODE: 'external',
         Z2M_MQTT_URL: 'mqtt://localhost',
-        Z2M_MQTT_USERNAME: 'admin',
-        Z2M_MQTT_PASSWORD: 'test'
+        GLADYS_MQTT_USERNAME: 'admin',
+        GLADYS_MQTT_PASSWORD: 'test'
       });
 
     // Check error panel
