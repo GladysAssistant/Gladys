@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const { EVENTS } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { MockedMqttClient } = require('../mocks.test');
 
 const gladys = {
@@ -31,6 +31,7 @@ describe('Mqtt handle message', () => {
 
   afterEach(() => {
     mqttHandler.disconnect();
+    mqttHandler.debugMode = false;
   });
 
   it('should not do anything, topic not found', () => {
@@ -86,7 +87,19 @@ describe('Mqtt handle message', () => {
 
     assert.notCalled(gladys.event.emit);
   });
+  it('handle device with custom topic and debug mode', () => {
+    mqttHandler.debugMode = true;
+    mqttHandler.deviceFeatureCustomMqttTopics = [];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '12');
 
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MQTT.DEBUG_NEW_MQTT_MESSAGE,
+      payload: {
+        topic: 'custom_mqtt_topic/test/test',
+        message: '12',
+      },
+    });
+  });
   it('handle device with custom topic', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
