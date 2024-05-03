@@ -51,6 +51,33 @@ describe('Device', () => {
     });
     assert.calledOnce(mqttService.device.listenToCustomMqttTopicIfNeeded);
   });
+  it('should create device then update device and handle custom MQTT topic', async () => {
+    const stateManager = new StateManager(event);
+    const mqttService = {
+      device: {
+        listenToCustomMqttTopicIfNeeded: fake.returns(null),
+        unListenToCustomMqttTopic: fake.returns(null),
+      },
+    };
+    const serviceManager = {
+      getService: fake.returns(mqttService),
+    };
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Philips Hue 1',
+      external_id: 'philips-hue-new',
+      params: [],
+    });
+    await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Philips Hue 1',
+      external_id: 'philips-hue-new',
+      params: [],
+    });
+    assert.calledTwice(mqttService.device.listenToCustomMqttTopicIfNeeded);
+    assert.calledOnce(mqttService.device.unListenToCustomMqttTopic);
+  });
   it('should update device which already exist', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceByExternalId', 'test-device-external', {
