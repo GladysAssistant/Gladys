@@ -17,6 +17,7 @@
     "jszip": "^3.10.1",
     "lodash.clonedeep": "^4.5.0",
     "mqtt": "^4.2.6",
+    "portfinder": "^1.0.32",
     "yaml": "^2.2.2"
   }
 }

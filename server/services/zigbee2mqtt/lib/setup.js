@@ -1,20 +1,18 @@
-const { CONFIGURATION } = require('./constants');
+const logger = require('../../../utils/logger');
+const { SETUP_VARIABLES } = require('./constants');
 
 /**
- * @description Setup Zigbee2mqtt USB device.
- * @param {object} usbConfig - Configuration about USB Zigbee dongle.
+ * @description Setup Zigbee2mqtt properties.
+ * @param {object} config - Configuration about Zigbee2Mqtt service.
  * @example
  * await this.setup({ ZIGBEE2MQTT_DRIVER_PATH: '/dev/tty0', ZIGBEE_DONGLE_NAME: 'zzh' });
  */
-async function setup(usbConfig) {
-  const z2mDriverPath = usbConfig[CONFIGURATION.Z2M_DRIVER_PATH];
-  const z2mDongleName = usbConfig[CONFIGURATION.ZIGBEE_DONGLE_NAME];
-
-  await this.gladys.variable.setValue(CONFIGURATION.Z2M_DRIVER_PATH, z2mDriverPath, this.serviceId);
-  await this.gladys.variable.setValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, z2mDongleName, this.serviceId);
+async function setup(config) {
+  logger.debug('Zigbee2mqtt: storing setp...', config);
+  await Promise.all(SETUP_VARIABLES.map((key) => this.saveOrDestroyVariable(key, config[key])));
 
   // Reload z2m container with new USB configuration
-  await this.init();
+  await this.init(true);
 }
 
 module.exports = {

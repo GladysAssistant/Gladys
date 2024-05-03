@@ -5,7 +5,7 @@
  * z2m.isEnabled();
  */
 function isEnabled() {
-  return this.mqttRunning && this.zigbee2mqttRunning && this.usbConfigured;
+  return this.mqttRunning && this.zigbee2mqttRunning;
 }
 
 module.exports = {
