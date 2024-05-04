@@ -123,17 +123,21 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   if (action.stateUpdate) {
     const promises = [];
-    Object.keys(action.stateUpdate).forEach((featureName) => {
+    action.stateUpdate.forEach((stateUpdate) => {
       const featureId = getDeviceFeatureId(
         zwaveJsNode.id,
         nodeFeature.command_class_name,
         nodeFeature.endpoint,
-        nodeFeature.property_name,
-        nodeFeature.property_key_name || '',
-        featureName,
+        stateUpdate.property_name || nodeFeature.property_name,
+        stateUpdate.property_name ? stateUpdate.property_key_name || '' : nodeFeature.property_key_name || '',
+        stateUpdate.feature_name || '',
       );
-      const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
-      promises.push(this.gladys.device.saveState(gladysUpdatedFeature, action.stateUpdate[featureName]));
+
+      // Only if the device has the expected feature, apply the local change
+      if (getNodeFeature(node, featureId)) {
+        const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
+        promises.push(this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value));
+      }
     });
 
     await Promise.allSettled(promises);

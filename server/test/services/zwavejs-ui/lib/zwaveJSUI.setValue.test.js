@@ -555,16 +555,16 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'restorePrevious' }, true],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [99]],
     };
     assert.calledWith(
       mqttClient.publish,
-      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
       JSON.stringify(mqttPayload),
     );
   });
 
-  it('should set multilevel switch currentValue to 0 and synchronize state on position set to 0', async () => {
+  it('should set multilevel switch currentValue to 0 and synchronize states on position set to 0', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -616,6 +616,26 @@ describe('zwaveJSUIHandler.setValue', () => {
             type: 'dimmer',
             unit: 'percent',
           },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            feature_name: '',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-restorePrevious',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'restorePrevious',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            type: 'binary',
+          },
         ],
         name: 'inter-01',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
@@ -647,6 +667,11 @@ describe('zwaveJSUIHandler.setValue', () => {
           id: 'gladys-device-feature-db-id-002',
           device_id: 'gladys-device-db-id-001',
           external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+        {
+          id: 'gladys-device-feature-db-id-003',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
         },
       ],
     };
@@ -662,11 +687,12 @@ describe('zwaveJSUIHandler.setValue', () => {
       JSON.stringify(mqttPayload),
     );
 
-    // Assert state has been updated
-    assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.OFF);
+    // Assert states have been updated
+    gladys.device.saveState.firstCall.calledWith(gladysDevice.features[0], STATE.OFF);
+    gladys.device.saveState.secondCall.calledWith(gladysDevice.features[2], STATE.OFF);
   });
 
-  it('should set multilevel switch currentValue to value and synchronize state on positive position updated', async () => {
+  it('should set multilevel switch currentValue to value and synchronize states on positive position updated', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -718,6 +744,26 @@ describe('zwaveJSUIHandler.setValue', () => {
             type: 'dimmer',
             unit: 'percent',
           },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            feature_name: '',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-restorePrevious',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'restorePrevious',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            type: 'binary',
+          },
         ],
         name: 'inter-01',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
@@ -750,6 +796,11 @@ describe('zwaveJSUIHandler.setValue', () => {
           device_id: 'gladys-device-db-id-001',
           external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
         },
+        {
+          id: 'gladys-device-feature-db-id-003',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+        },
       ],
     };
     await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[1], 42);
@@ -764,8 +815,264 @@ describe('zwaveJSUIHandler.setValue', () => {
       JSON.stringify(mqttPayload),
     );
 
-    // Assert state has been updated
-    assert.calledWith(gladys.device.saveState, gladysDevice.features[0], STATE.ON);
+    // Assert states have been updated
+    gladys.device.saveState.firstCall.calledWith(gladysDevice.features[0], STATE.ON);
+    gladys.device.saveState.secondCall.calledWith(gladysDevice.features[2], STATE.ON);
+  });
+
+  it('should set restorePrevious on STATE.ON without states synchronisation', async () => {
+    const mqttClient = {
+      publish: fake.returns(null),
+    };
+
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.mqttClient = mqttClient;
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            feature_name: 'state',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-currentValue:state',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            type: 'binary',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            feature_name: 'position',
+            has_feedback: false,
+            keep_history: true,
+            max: 99,
+            min: 0,
+            name: '6-38-0-currentValue:position',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            type: 'dimmer',
+            unit: 'percent',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            feature_name: '',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-restorePrevious',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'restorePrevious',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            type: 'binary',
+          },
+        ],
+        name: 'inter-01',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 1,
+        },
+      },
+    ];
+
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+        {
+          id: 'gladys-device-feature-db-id-003',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[2], STATE.ON);
+
+    // Assert message published
+    const mqttPayload = {
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0, property: 'restorePrevious' }, true],
+    };
+    assert.calledWith(
+      mqttClient.publish,
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+      JSON.stringify(mqttPayload),
+    );
+
+    // Assert state has not been updated
+    assert.notCalled(gladys.device.saveState);
+  });
+
+  it('should turn off dimmer on restorePreivous set to STATE.OFF and synchronize states', async () => {
+    const mqttClient = {
+      publish: fake.returns(null),
+    };
+
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.mqttClient = mqttClient;
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            feature_name: 'state',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-currentValue:state',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+            type: 'binary',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            feature_name: 'position',
+            has_feedback: false,
+            keep_history: true,
+            max: 99,
+            min: 0,
+            name: '6-38-0-currentValue:position',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'currentValue',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+            type: 'dimmer',
+            unit: 'percent',
+          },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            feature_name: '',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-restorePrevious',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'restorePrevious',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            type: 'binary',
+          },
+        ],
+        name: 'inter-01',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 1,
+        },
+      },
+    ];
+
+    // On setValue, Gladys uses its own object (different than the ones on the zwave service)
+    // Gladys doesn't have all properties. Let be sure to reflect this behavior in tests
+    const gladysDevice = {
+      id: 'gladys-device-db-id-001',
+      external_id: 'zwavejs-ui:6',
+      features: [
+        {
+          id: 'gladys-device-feature-db-id-001',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+        },
+        {
+          id: 'gladys-device-feature-db-id-002',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
+        },
+        {
+          id: 'gladys-device-feature-db-id-003',
+          device_id: 'gladys-device-db-id-001',
+          external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+        },
+      ],
+    };
+    await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[2], STATE.OFF);
+
+    // Assert message published
+    const mqttPayload = {
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
+    };
+    assert.calledWith(
+      mqttClient.publish,
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set',
+      JSON.stringify(mqttPayload),
+    );
+
+    // Assert states have been updated
+    gladys.device.saveState.firstCall.calledWith(gladysDevice.features[0], STATE.OFF);
+    gladys.device.saveState.secondCall.calledWith(gladysDevice.features[1], 0);
   });
 
   it('should set curtains multilevel switch currentValue to 99 and synchronize position on state CLOSE', async () => {

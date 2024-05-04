@@ -33,7 +33,7 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  let valueConverters =
+  const valueConverters =
     get(
       STATES,
       `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`,
@@ -43,25 +43,15 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  if (!Array.isArray(valueConverters)) {
-    valueConverters = [
-      {
-        name: '',
-        converter: valueConverters,
-      },
-    ];
-  }
-
   const promises = [];
-  for (let i = 0; i < valueConverters.length; i += 1) {
-    const valueConverter = valueConverters[i];
+  valueConverters.forEach((valueConverter) => {
     const externalId = getDeviceFeatureId(
       messageNode.id,
       commandClassName,
       endpoint,
-      propertyName,
-      propertyKeyName,
-      valueConverter.name,
+      valueConverter.property_name || propertyNameClean,
+      valueConverter.property_name ? valueConverter.property_key_name || '' : propertyKeyNameClean,
+      valueConverter.feature_name || '',
     );
 
     if (node.features.some((f) => f.external_id === externalId)) {
@@ -75,7 +65,7 @@ function onNodeValueUpdated(message) {
         );
       }
     }
-  }
+  });
 
   if (promises.length > 0) {
     return Promise.allSettled(promises);
