@@ -568,6 +568,26 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
             type: 'dimmer',
             unit: 'percent',
           },
+          {
+            category: 'switch',
+            command_class: 38,
+            command_class_name: 'Multilevel Switch',
+            command_class_version: 4,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            feature_name: '',
+            has_feedback: false,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '6-38-0-restorePrevious',
+            node_id: 6,
+            property_key_name: undefined,
+            property_name: 'restorePrevious',
+            read_only: false,
+            selector: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
+            type: 'binary',
+          },
         ],
         name: 'inter-01',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
@@ -606,6 +626,11 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
 
     gladys.event.emit.secondCall.calledWith('device.new-state', {
       device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:state',
+      state: STATE.ON,
+    });
+
+    gladys.event.emit.thirdCall.calledWith('device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:restoreprevious',
       state: STATE.ON,
     });
   });
