@@ -465,7 +465,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
   });
 
-  it('should restore multilevel switch currentValue on state ON', async () => {
+  it('should set multilevel switch currentValue to 99 on state ON', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -820,7 +820,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     gladys.device.saveState.secondCall.calledWith(gladysDevice.features[2], STATE.ON);
   });
 
-  it('should set restorePrevious on STATE.ON without states synchronisation', async () => {
+  it('should turn on dimmer on restoredPrevious set to STATE.ON without states synchronisation', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -947,7 +947,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     assert.notCalled(gladys.device.saveState);
   });
 
-  it('should turn off dimmer on restorePreivous set to STATE.OFF and synchronize states', async () => {
+  it('should turn off dimmer on restorePrevious set to STATE.OFF and synchronize states', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -1075,7 +1075,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     gladys.device.saveState.secondCall.calledWith(gladysDevice.features[1], 0);
   });
 
-  it('should set curtains multilevel switch currentValue to 99 and synchronize position on state CLOSE', async () => {
+  it('should set curtains multilevel switch currentValue to 0 and synchronize position on state CLOSE', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -1165,7 +1165,7 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [99]],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
     };
     assert.calledWith(
       mqttClient.publish,
@@ -1174,10 +1174,10 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 99);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
   });
 
-  it('should set curtains multilevel switch currentValue to 0 and synchronize position on state OPEN', async () => {
+  it('should set curtains multilevel switch currentValue to 99 and synchronize position on state OPEN', async () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -1267,7 +1267,7 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert message published
     const mqttPayload = {
-      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [0]],
+      args: [{ nodeId: 6, commandClass: 38, endpoint: 0 }, 'set', [99]],
     };
     assert.calledWith(
       mqttClient.publish,
@@ -1276,7 +1276,7 @@ describe('zwaveJSUIHandler.setValue', () => {
     );
 
     // Assert position state has been updated
-    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 0);
+    assert.calledWith(gladys.device.saveState, gladysDevice.features[1], 99);
   });
 
   it('should stop curtains multilevel switch on state STOP', async () => {

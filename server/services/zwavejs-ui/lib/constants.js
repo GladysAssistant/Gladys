@@ -133,11 +133,11 @@ const multilevelSwitchCurtainsActionsDefault = {
       if (value === COVER_STATE.OPEN) {
         return buildCommandAction(
           'set',
-          [0],
+          [99],
           [
             {
               feature_name: 'position',
-              value: 0,
+              value: 99,
             },
           ],
         );
@@ -146,11 +146,11 @@ const multilevelSwitchCurtainsActionsDefault = {
       // COVER_STATE.CLOSE
       return buildCommandAction(
         'set',
-        [99],
+        [0],
         [
           {
             feature_name: 'position',
-            value: 99,
+            value: 0,
           },
         ],
       );
