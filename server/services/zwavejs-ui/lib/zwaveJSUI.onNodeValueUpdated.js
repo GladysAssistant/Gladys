@@ -49,8 +49,8 @@ function onNodeValueUpdated(message) {
       messageNode.id,
       commandClassName,
       endpoint,
-      valueConverter.property_name || propertyNameClean,
-      valueConverter.property_name ? valueConverter.property_key_name || '' : propertyKeyNameClean,
+      valueConverter.property_name || propertyName,
+      valueConverter.property_name ? valueConverter.property_key_name || '' : propertyKeyName,
       valueConverter.feature_name || '',
     );
 

@@ -1,6 +1,6 @@
 const get = require('get-value');
 
-const { EXPOSES, PARAMS } = require('../lib/constants');
+const { EXPOSES, PARAMS, COMMANDCLASS } = require('../lib/constants');
 
 const cleanNames = (text) => {
   if (!text || typeof text !== 'string') {
@@ -19,6 +19,35 @@ const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, pr
     propertyKeyNameClean !== '' ? `:${propertyKeyNameClean}` : ''
   }${exposedName !== '' ? `:${exposedName}` : ''}`;
 };
+
+/**
+ * @description Cleanup features.
+ * For example: remove a Binary Switch sent by a device on a
+ * Multilevel Switch (we do manage a virtual one on Gladys).
+ * @param {Array} features - Detected features on the node.
+ * @returns {Array} The cleaned up features.
+ * @example cleanupFeatures(features)
+ */
+function cleanupFeatures(features) {
+  let localFeatures = features;
+  // ------------------------------
+  // Multilevel Switch special case
+  // Some Multilevel Switch device have an explicit Binary Switch
+  // exposed some others not (Qubino vs Fibaro for example). As for
+  // devices that do not expose any Binary Switch value, we manage
+  // a virtual one through the Multilevel Switch. In order to improve
+  // the user experience, we so cleanup any explicit Binary Switch
+  // so the user doesn't see too many options when managing their device
+  // (we keep the virtual one because it is correctly synchronized with
+  // others features and keeps code simpler)
+  if (localFeatures.some((f) => f.command_class === COMMANDCLASS.MULTILEVEL_SWITCH)) {
+    localFeatures = localFeatures.filter((f) => f.command_class !== COMMANDCLASS.BINARY_SWITCH);
+  }
+
+  // Add any other special cleanup necessary... Please, provide an explanation
+
+  return localFeatures;
+}
 
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
@@ -99,7 +128,7 @@ const convertToGladysDevice = (serviceId, device) => {
     selector: `zwavejs-ui:${device.id}`,
     service_id: serviceId,
     should_poll: false,
-    features,
+    features: cleanupFeatures(features),
     params,
   };
 };

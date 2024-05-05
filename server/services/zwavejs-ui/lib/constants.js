@@ -438,10 +438,16 @@ const EXPOSES = {
   },
 };
 
+const COMMANDCLASS = {
+  BINARY_SWITCH: 37,
+  MULTILEVEL_SWITCH: 38,
+};
+
 module.exports = {
   ACTIONS,
   CONFIGURATION,
   EXPOSES,
   STATES,
   PARAMS,
+  COMMANDCLASS,
 };
