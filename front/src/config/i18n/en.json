@@ -2772,6 +2772,15 @@
           "zero": "No",
           "one": "Yes"
         }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "No Risk",
+          "low-risk": "Low",
+          "medium-risk": "Medium",
+          "high-risk": "High",
+          "unknown": "Unknown"
+        }
       }
     }
   },
@@ -3061,6 +3070,10 @@
     "angle-sensor": {
       "shortCategoryName": "Angle sensor",
       "integer": "Angle (integer)"
+    },
+    "risk": {
+      "shortCategoryName": "Risk",
+      "integer": "Risk Level"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
