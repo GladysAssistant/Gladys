@@ -1,5 +1,6 @@
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { LIGHT_EXTERNAL_ID_BASE } = require('../utils/consts');
+const { xyToInt, hsbToRgb, rgbToInt } = require('../../../../utils/colors');
 
 const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/parseExternalId');
@@ -19,15 +20,56 @@ async function poll(device) {
     throw new NotFoundError(`HUE_API_NOT_FOUND`);
   }
   const state = await hueApi.lights.getLightState(lightId);
+
+  // if the binary value is different from the value we have, save new state
   const currentBinaryState = state.on ? 1 : 0;
   const binaryFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
 
-  // if the value is different from the value we have, save new state
   if (binaryFeature && binaryFeature.last_value !== currentBinaryState) {
-    logger.debug(`Polling Philips Hue ${lightId}, new value = ${currentBinaryState}`);
+    logger.debug(`Polling Philips Hue ${lightId}, new binary value = ${currentBinaryState}`);
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
       state: currentBinaryState,
+    });
+  }
+
+  // if the color value is different from the value we have, save new state
+  let currentColorState;
+  switch (state.colormode) {
+    case 'ct':
+      logger.debug(`Polling Philips Hue ${lightId}, colormode "ct" not managed`);
+      break;
+    case 'xy':
+      currentColorState = xyToInt(state.xy[0], state.xy[1]);
+      break;
+    case 'hs':
+      currentColorState = rgbToInt(hsbToRgb([state.hue, state.sat, state.bri]));
+      break;
+    default:
+  }
+  const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
+
+  if (colorFeature && colorFeature.last_value !== currentColorState) {
+    logger.debug(`Polling Philips Hue ${lightId}, new color value = ${currentColorState} from color mode ${state.colormode}`);
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
+      state: currentColorState,
+    });
+  }
+
+  // if the brightness value is different from the value we have, save new state
+  const brightnessColorState = state.bri;
+  const brightnessFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.LIGHT,
+    DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+  );
+
+  if (brightnessFeature && brightnessFeature.last_value !== brightnessColorState) {
+    logger.debug(`Polling Philips Hue ${lightId}, new brightness value = ${brightnessColorState}`);
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
+      state: brightnessColorState,
     });
   }
 }
