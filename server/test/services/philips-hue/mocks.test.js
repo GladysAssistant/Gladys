@@ -29,7 +29,7 @@ const hueApi = {
     setLightState: fake.resolves(null),
     getLightState: fake.resolves({
       on: false,
-      bri: 0,
+      bri: 56,
       hue: 38191,
       sat: 94,
       effect: 'none',
@@ -65,6 +65,23 @@ const hueApi = {
       Promise.resolve({
         bridgeid: '1234',
       }),
+  },
+};
+
+const hueApiHsColorMode = {
+  lights: {
+    getLightState: fake.resolves({
+      on: false,
+      bri: 100,
+      hue: 35000,
+      sat: 94,
+      effect: 'none',
+      hs_color: [0.4, 0.1],
+      alert: 'select',
+      colormode: 'hs',
+      mode: 'homeautomation',
+      reachable: true,
+    }),
   },
 };
 
@@ -123,4 +140,5 @@ module.exports = {
   STATE_OFF,
   fakes,
   hueApi,
+  hueApiHsColorMode,
 };
