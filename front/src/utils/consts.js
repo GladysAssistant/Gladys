@@ -339,5 +339,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.MUSIC.NEXT]: 'fast-forward',
     [DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE]: 'bar-chart-2',
     [DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION]: 'bell'
+  },
+  [DEVICE_FEATURE_CATEGORIES.RISK]: {
+    [DEVICE_FEATURE_TYPES.RISK.INTEGER]: 'alert-circle'
   }
 };

@@ -2772,6 +2772,15 @@
           "zero": "Nein",
           "one": "Ja"
         }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "Kein Risiko",
+          "low-risk": "Niedrig",
+          "medium-risk": "Mittel",
+          "high-risk": "Hoch",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -3061,6 +3070,10 @@
     "angle-sensor": {
       "shortCategoryName": "Winkelsensor",
       "integer": "Winkel (ganze Zahl)"
+    },
+    "risk": {
+      "shortCategoryName": "Risiko",
+      "integer": "Risikostufe"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

@@ -452,6 +452,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
   SIREN: 'siren',
@@ -653,6 +654,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   TEXT: {
     TEXT: 'text',
+  },
+  RISK: {
+    INTEGER: 'integer',
   },
 };
 
