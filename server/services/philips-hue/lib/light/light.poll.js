@@ -5,7 +5,7 @@ const { xyToInt, hsbToRgb, rgbToInt } = require('../../../../utils/colors');
 const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/parseExternalId');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const { getDeviceFeature } = require('../../../../utils/device');
+const { getDeviceFeature, normalize } = require('../../../../utils/device');
 
 /**
  * @description Poll value of a Philips hue.
@@ -37,8 +37,6 @@ async function poll(device) {
   let currentColorState;
   switch (state.colormode) {
     case 'ct':
-      logger.debug(`Polling Philips Hue ${lightId}, colormode "ct" not managed`);
-      break;
     case 'xy':
       currentColorState = xyToInt(state.xy[0], state.xy[1]);
       break;
@@ -50,7 +48,9 @@ async function poll(device) {
   const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
 
   if (colorFeature && colorFeature.last_value !== currentColorState) {
-    logger.debug(`Polling Philips Hue ${lightId}, new color value = ${currentColorState} from color mode ${state.colormode}`);
+    logger.debug(
+      `Polling Philips Hue ${lightId}, new color value = ${currentColorState} from color mode ${state.colormode}`,
+    );
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
       state: currentColorState,
@@ -64,12 +64,12 @@ async function poll(device) {
     DEVICE_FEATURE_CATEGORIES.LIGHT,
     DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
   );
-
-  if (brightnessFeature && brightnessFeature.last_value !== brightnessColorState) {
-    logger.debug(`Polling Philips Hue ${lightId}, new brightness value = ${brightnessColorState}`);
+  const newBrightnessValue = Math.round(normalize(brightnessColorState, 0, 254, 0, 100));
+  if (brightnessFeature && brightnessFeature.last_value !== newBrightnessValue) {
+    logger.debug(`Polling Philips Hue ${lightId}, new brightness value = ${newBrightnessValue}`);
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
-      state: brightnessColorState,
+      state: newBrightnessValue,
     });
   }
 }

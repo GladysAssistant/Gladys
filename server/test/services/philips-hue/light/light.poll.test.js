@@ -1,15 +1,13 @@
 const { expect } = require('chai');
 const { assert, fake } = require('sinon');
-const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient, hueApiHsColorMode } = require('../mocks.test');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { EVENTS } = require('../../../../utils/constants');
+
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
   'node-hue-api': MockedPhilipsHueClient,
 });
 
-
-const event = new EventEmitter();
 const deviceManager = {
   get: fake.resolves([
     {
@@ -58,8 +56,8 @@ const deviceManager = {
 };
 
 describe('PhilipsHueService Poll', () => {
-
   let gladys;
+  let initialApi;
 
   beforeEach(() => {
     gladys = {
@@ -78,6 +76,12 @@ describe('PhilipsHueService Poll', () => {
         get: fake.resolves(true),
       },
     };
+    initialApi = MockedPhilipsHueClient.v3.api;
+  });
+
+  afterEach(() => {
+    // Reset API after each test to avoid bugs
+    MockedPhilipsHueClient.v3.api = initialApi;
   });
 
   it('should poll light', async () => {
@@ -107,7 +111,7 @@ describe('PhilipsHueService Poll', () => {
         ],
       });
       expect.fail();
-    } catch(e){
+    } catch (e) {
       expect(e.message).eq('HUE_API_NOT_FOUND');
     }
   });
@@ -127,7 +131,8 @@ describe('PhilipsHueService Poll', () => {
     });
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: "philips-hue-light:1234:1:binary", state: 0
+      device_feature_external_id: 'philips-hue-light:1234:1:binary',
+      state: 0,
     });
   });
   it('should poll light and update color for color mode xy', async () => {
@@ -147,18 +152,19 @@ describe('PhilipsHueService Poll', () => {
     // ASSERT
     // Color is xy: [0.3321, 0.3605], so 16187362 in Int
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: "philips-hue-light:1234:1:color", state: 16187362
+      device_feature_external_id: 'philips-hue-light:1234:1:color',
+      state: 16187362,
     });
   });
   it('should poll light and update color for color mode hs', async () => {
     // PREPARE
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    await philipsHueService.device.init();
-    /*philipsHueService.device.hueClient.api = {
+    philipsHueService.device.hueClient.api = {
       createLocal: () => ({
         connect: () => hueApiHsColorMode,
       }),
-    };*/
+    };
+    await philipsHueService.device.init();
     // EXECUTE
     await philipsHueService.device.poll({
       external_id: 'light:1234:1',
@@ -171,11 +177,12 @@ describe('PhilipsHueService Poll', () => {
     });
     // ASSERT
     // Color is hsb: 67, so 16187362 in Int
-    //assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-    //  device_feature_external_id: "philips-hue-light:1234:1:color", state: 11534095
-    //});
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'philips-hue-light:1234:1:color',
+      state: 11534095,
+    });
   });
-  it('should poll light and do nothing color mode ct', async () => {
+  it('should poll light with mode ct and use xy', async () => {
     // PREPARE
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await philipsHueService.device.init();
@@ -190,7 +197,10 @@ describe('PhilipsHueService Poll', () => {
       ],
     });
     // ASSERT
-    //assert.notCalled(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'philips-hue-light:1234:1:color',
+      state: 16187362,
+    });
   });
   it('should poll light and update bri', async () => {
     // PREPARE
@@ -208,7 +218,8 @@ describe('PhilipsHueService Poll', () => {
     });
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: "philips-hue-light:1234:1:brightness", state: 56
+      device_feature_external_id: 'philips-hue-light:1234:1:brightness',
+      state: 22,
     });
   });
 });
