@@ -347,7 +347,7 @@ describe('mergeDevice', () => {
 
     const mergedDevice = mergeDevices(newDevice, oldDevice);
 
-    const expectedFeature = { ...newFeature, name: 'feature-old1-name' };
+    const expectedFeature = { ...newFeature, name: 'feature-old1-name', keep_history: 'feature-old1-keep_history' };
     const expectedDevice = { ...newDevice, features: [expectedFeature], updatable: true };
     expect(mergedDevice).to.deep.equal(expectedDevice);
   });
