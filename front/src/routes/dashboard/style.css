@@ -89,3 +89,11 @@
   opacity: 1;
   max-height: 20rem;
 }
+
+.speakWidgetBottomRight {
+  position: fixed;
+  width: 12rem;
+  height: 12rem;
+  bottom: 1rem;
+  right: 1rem;
+}

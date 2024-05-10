@@ -1,4 +1,5 @@
 module.exports.alexa = require('./alexa');
+module.exports['browser-music'] = require('./browser-music');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
 module.exports.enedis = require('./enedis');

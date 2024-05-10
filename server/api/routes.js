@@ -347,6 +347,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.openAIAsk,
     },
+    'post /api/v1/gateway/tts': {
+      authenticated: true,
+      controller: gatewayController.getTTSApiUrl,
+    },
     // room
     'get /api/v1/room': {
       authenticated: true,

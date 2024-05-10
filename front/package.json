@@ -77,6 +77,8 @@
     "react-dnd-touch-backend": "^16.0.1",
     "react-select": "^4.3.1",
     "react-slider": "^2.0.6",
+    "simplex-noise": "^4.0.1",
+    "three": "^0.84.0",
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",
     "uuid": "^3.4.0"

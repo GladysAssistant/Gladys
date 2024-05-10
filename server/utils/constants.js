@@ -1008,6 +1008,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
   },
+  BROWSER_MUSIC: {
+    PLAY_VOICE_NOTIFICATION: 'browser-music.play-voice-notification',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -1029,6 +1032,7 @@ const DASHBOARD_BOX_TYPE = {
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',
+  SPEAK: 'speak',
 };
 
 const ERROR_MESSAGES = {

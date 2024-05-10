@@ -4,6 +4,7 @@ import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
 import SetTabletMode from './SetTabletMode';
+import SpeakWidget from './SpeakWidget';
 
 import style from './style.css';
 
@@ -85,6 +86,7 @@ const DashboardPage = ({ children, ...props }) => (
                 toggleDefineTabletMode={props.toggleDefineTabletMode}
                 defineTabletModeOpened={props.defineTabletModeOpened}
               />
+              <SpeakWidget />
               {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
               {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
             </div>

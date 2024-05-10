@@ -1,0 +1,17 @@
+:root {
+  --bgColor: white; /*hsla(242, 86%, 6%, 1); */
+  --bgColorLight: white; /*hsla(242, 86%, 24%, 1);*/
+}
+
+.background {
+  background: var(--bgColor);
+  background: linear-gradient(135deg, var(--bgColor), var(--bgColorLight));
+}
+
+.bottomRight {
+  position: fixed;
+  width: 12rem;
+  height: 12rem;
+  bottom: 1rem;
+  right: 1rem;
+}

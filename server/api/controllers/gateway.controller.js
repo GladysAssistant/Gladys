@@ -135,6 +135,16 @@ module.exports = function GatewayController(gladys) {
     res.json(response);
   }
 
+  /**
+   * @api {post} /api/v1/gateway/tts
+   * @apiName askOpenAI
+   * @apiGroup Gateway
+   */
+  async function getTTSApiUrl(req, res) {
+    const response = await gladys.gateway.getTTSApiUrl(req.body);
+    res.json(response);
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     login: asyncMiddleware(login),
@@ -148,5 +158,6 @@ module.exports = function GatewayController(gladys) {
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
     openAIAsk: asyncMiddleware(openAIAsk),
+    getTTSApiUrl: asyncMiddleware(getTTSApiUrl),
   });
 };
