@@ -9,6 +9,7 @@ import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
+
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
@@ -104,6 +105,38 @@ class MqttDeviceSetupPage extends Component {
       device
     });
   }
+
+  updateDeviceParam = (paramName, paramValue) => {
+    let device;
+    // Find if this param already exist
+    const paramIndex = this.state.device.params.findIndex(p => p.name === paramName);
+
+    // If no, create it
+    if (paramIndex === -1) {
+      device = update(this.state.device, {
+        params: {
+          $push: [
+            {
+              name: paramName,
+              value: paramValue
+            }
+          ]
+        }
+      });
+    } else {
+      // If yes, update value in the param
+      device = update(this.state.device, {
+        params: {
+          [paramIndex]: {
+            value: {
+              $set: paramValue
+            }
+          }
+        }
+      });
+    }
+    this.setState({ device });
+  };
 
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
@@ -243,7 +276,8 @@ class MqttDeviceSetupPage extends Component {
         should_poll: false,
         external_id: 'mqtt:',
         service_id: this.props.currentIntegration.id,
-        features: []
+        features: [],
+        params: []
       };
     } else {
       const loadedDevice = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`);
@@ -274,6 +308,7 @@ class MqttDeviceSetupPage extends Component {
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}
+          updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
         />
       </MqttPage>

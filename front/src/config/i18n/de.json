@@ -1191,6 +1191,7 @@
       "title": "MQTT",
       "description": "Verbinde dich mit einem lokalen oder entfernten MQTT-Server.",
       "deviceTab": "Meine Geräte",
+      "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
       "documentation": "MQTT-Dokumentation",
       "apiDocumentation": "MQTT-API-Dokumentation ",
@@ -1235,7 +1236,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
         "mqttTopicToListenExampleLabel": "MQTT-Hörensthema",
         "mqttTopicToListenExampleDescription": "Gladys veröffentlicht in diesem Topic, wenn das Gerät in Gladys gesteuert wird. Du musst diesem Topic zuhören. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
+        "mqttCustomTopic": "Benutzerdefiniertes MQTT-Thema",
+        "mqttCustomTopicDescription": "Gladys bietet eine Standard-MQTT-API an, ermöglicht Ihnen jedoch die Verwendung benutzerdefinierter Themen, wenn Sie ein Gerät verwenden, das nativ auf einem bestimmten Thema veröffentlicht.",
+        "mqttCustomTopicPlaceholder": "Geben Sie das MQTT-Thema ein",
         "copyMqttTopic": "MQTT-Thema kopieren",
+        "mqttCustomObjectPath": "MQTT JSON Nachricht",
+        "mqttCustomObjectPathDescription": "Wenn Ihr verbundenes Objekt MQTT-Nachrichten in Form eines JSON sendet, können Sie hier den Pfad der Eigenschaft angeben, der von Gladys verwendet werden soll. Beispiel: Eigenschaft1.Eigenschaft2.Eigenschaft3. Lassen Sie es leer, wenn das Format kein JSON ist.",
+        "mqttCustomObjectPathPlaceholder": "Pfad im JSON folgen",
         "copied": "Kopiert!",
         "copyFailed": "Kopieren fehlgeschlagen",
         "deleteLabel": "Funktion löschen"
@@ -1264,6 +1271,15 @@
         "connectionError": "Die Verbindung ist fehlgeschlagen. Bitte überprüfe deine Konfiguration.",
         "networkError": "Gladys kann nicht erreicht werden. Ist deine Gladys-Instanz verbunden und erreichbar?",
         "disconnected": "Vom MQTT-Broker getrennt."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "Dieses Register ermöglicht es Ihnen, in Echtzeit die MQTT-Nachrichten zu sehen, die auf Ihrer Gladys-Instanz eingehen, und erleichtert so das Debuggen. Nach 2 Minuten auf diesem Register wird der Debug-Modus automatisch deaktiviert. Sie können ihn mit der Aktualisierungsschaltfläche oben rechts wieder aktivieren.",
+        "activateDebugMode": "Aktivieren",
+        "debugModeActivated": "Debug-Modus aktiviert",
+        "date": "Zeit",
+        "topic": "Thema",
+        "message": "Nachrichteninhalt"
       }
     },
     "broadlink": {

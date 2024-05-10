@@ -1191,6 +1191,7 @@
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
+      "debugTab": "MQTT Debug",
       "setupTab": "Setup",
       "documentation": "MQTT documentation",
       "apiDocumentation": "MQTT API documentation ",
@@ -1235,7 +1236,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys is listening to this topic. If you publish a value in this topic, it'll be associated with this device. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
         "mqttTopicToListenExampleLabel": "MQTT Topic to listen",
         "mqttTopicToListenExampleDescription": "Gladys will publish in this topic if the device is controlled in Gladys. You need to listen to this topic. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
+        "mqttCustomTopic": "Custom MQTT Topic",
+        "mqttCustomTopicDescription": "Gladys offers a default MQTT API but allows you to use custom topics if you are using a device that publishes on a particular topic natively.",
+        "mqttCustomTopicPlaceholder": "Enter MQTT topic",
         "copyMqttTopic": "Copy MQTT Topic",
+        "mqttCustomObjectPath": "MQTT JSON Message",
+        "mqttCustomObjectPathDescription": "If your connected object sends MQTT messages in the form of a JSON, Gladys allows you to specify here the path of the property to be used by Gladys. Example: property1.property2.property3. Leave blank if the format is not JSON.",
+        "mqttCustomObjectPathPlaceholder": "Path to follow in the JSON",
         "copied": "Copied!",
         "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
@@ -1264,6 +1271,15 @@
         "connectionError": "Error while connecting, please check your configuration.",
         "networkError": "Unable to contact Gladys, is your Gladys instance connected and accessible?",
         "disconnected": "Disconnected from MQTT broker."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "This tab allows you to see in real-time the MQTT messages arriving on your Gladys instance, enabling you to debug easily. After 2 minutes on this tab, debug mode will automatically deactivate. You can reactivate it with the refresh button at the top right.",
+        "activateDebugMode": "Activate",
+        "debugModeActivated": "Debug mode activated",
+        "date": "Time",
+        "topic": "Topic",
+        "message": "Message Content"
       }
     },
     "broadlink": {
