@@ -1,7 +1,8 @@
-const get = require('get-value');
+const Promise = require('bluebird');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { ACTIONS } = require('./constants');
-const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevice');
+const { getDeviceFeatureId } = require('../utils/convertToGladysDevice');
+const getProperty = require('../utils/getProperty');
 
 /**
  * @description Returns the action wrapper.
@@ -15,23 +16,13 @@ const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevi
  * )
  */
 function getAction(zwaveJsNode, nodeFeature) {
-  let baseCommandPath = cleanNames(nodeFeature.property_name);
-  const propertyKeyNameClean = cleanNames(nodeFeature.property_key_name);
-  if (propertyKeyNameClean !== '') {
-    baseCommandPath += `.${propertyKeyNameClean}`;
-  }
-
-  if (nodeFeature.feature_name) {
-    baseCommandPath += `.${nodeFeature.feature_name}`;
-  }
-
-  return (
-    get(
-      ACTIONS,
-      `${cleanNames(nodeFeature.command_class_name)}.${zwaveJsNode.deviceClass.generic}-${
-        zwaveJsNode.deviceClass.specific
-      }.${baseCommandPath}`,
-    ) || get(ACTIONS, `${cleanNames(nodeFeature.command_class_name)}.${baseCommandPath}`)
+  return getProperty(
+    ACTIONS,
+    nodeFeature.command_class_name,
+    nodeFeature.property_name,
+    nodeFeature.property_key_name,
+    zwaveJsNode.deviceClass,
+    nodeFeature.feature_name,
   );
 }
 
@@ -122,8 +113,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   if (action.stateUpdate) {
-    const promises = [];
-    action.stateUpdate.forEach((stateUpdate) => {
+    await Promise.map(action.stateUpdate, async (stateUpdate) => {
       const featureId = getDeviceFeatureId(
         zwaveJsNode.id,
         nodeFeature.command_class_name,
@@ -136,11 +126,9 @@ async function setValue(gladysDevice, gladysFeature, value) {
       // Only if the device has the expected feature, apply the local change
       if (getNodeFeature(node, featureId)) {
         const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
-        promises.push(this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value));
+        await this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value);
       }
     });
-
-    await Promise.allSettled(promises);
   }
 }
 

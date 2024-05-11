@@ -1,23 +1,13 @@
-const get = require('get-value');
+const cleanNames = require('./cleanNames');
 
 const { EXPOSES, PARAMS, COMMANDCLASS } = require('../lib/constants');
+const getProperty = require('./getProperty');
 
-const cleanNames = (text) => {
-  if (!text || typeof text !== 'string') {
-    return '';
-  }
-  return text
-    .replaceAll(' ', '_')
-    .replaceAll('(', '')
-    .replaceAll(')', '')
-    .toLowerCase();
-};
-
-const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, exposedName) => {
+const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, featureName) => {
   const propertyKeyNameClean = cleanNames(propertyKeyName);
   return `zwavejs-ui:${nodeId}:${endpoint}:${cleanNames(commandClassName)}:${cleanNames(propertyName)}${
     propertyKeyNameClean !== '' ? `:${propertyKeyNameClean}` : ''
-  }${exposedName !== '' ? `:${exposedName}` : ''}`;
+  }${featureName !== '' ? `:${featureName}` : ''}`;
 };
 
 /**
@@ -39,7 +29,7 @@ function cleanupFeatures(features) {
   // the user experience, we so cleanup any explicit Binary Switch
   // so the user doesn't see too many options when managing their device
   // (we keep the virtual one because it is correctly synchronized with
-  // others features and keeps code simpler)
+  // others features - state & position - and keeps code simpler)
   if (localFeatures.some((f) => f.command_class === COMMANDCLASS.MULTILEVEL_SWITCH)) {
     localFeatures = localFeatures.filter((f) => f.command_class !== COMMANDCLASS.BINARY_SWITCH);
   }
@@ -49,34 +39,16 @@ function cleanupFeatures(features) {
   return localFeatures;
 }
 
-const convertToGladysDevice = (serviceId, device) => {
+const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
   const features = [];
   let params = [];
 
   // Foreach value, we check if there is a matching feature in Gladys
-  Object.keys(device.values).forEach((valueKey) => {
-    const value = device.values[valueKey];
+  Object.keys(zwaveJsDevice.values).forEach((valueKey) => {
+    const value = zwaveJsDevice.values[valueKey];
     const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
-    const commandClassNameClean = cleanNames(commandClassName);
-    const propertyClean = cleanNames(propertyName);
-    const propertyKeyClean = cleanNames(propertyKeyName);
 
-    let baseExposePath = propertyClean;
-    if (propertyKeyClean !== '') {
-      baseExposePath += `.${propertyKeyClean}`;
-    }
-
-    // Some devices have the same command class and property. But we need to classify
-    // the device to map to the right CATEGORY. We use for that the deviceClass property.
-    // We try to find an exposed feature specific to the deviceClass first.
-    // For example: Multilevel Switch devices. They might be curtains or light switch.
-    // They use the same command class. Only the deviceClass could provide some hints
-    // about the real intention of the device.
-    let exposes =
-      get(
-        EXPOSES,
-        `${commandClassNameClean}.${device.deviceClass.generic}-${device.deviceClass.specific}.${baseExposePath}`,
-      ) || get(EXPOSES, `${commandClassNameClean}.${baseExposePath}`);
+    let exposes = getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass);
     if (exposes) {
       if (!Array.isArray(exposes)) {
         exposes = [
@@ -92,7 +64,7 @@ const convertToGladysDevice = (serviceId, device) => {
           ...exposeFound.feature,
           name: `${value.id}${exposeFound.name !== '' ? `:${exposeFound.name}` : ''}`,
           external_id: getDeviceFeatureId(
-            device.id,
+            zwaveJsDevice.id,
             commandClassName,
             endpoint,
             propertyName,
@@ -100,14 +72,14 @@ const convertToGladysDevice = (serviceId, device) => {
             exposeFound.name,
           ),
           selector: getDeviceFeatureId(
-            device.id,
+            zwaveJsDevice.id,
             commandClassName,
             endpoint,
             propertyName,
             propertyKeyName,
             exposeFound.name,
           ),
-          node_id: device.id,
+          node_id: zwaveJsDevice.id,
           // These are custom properties only available on the object in memory (not in DB)
           command_class_version: commandClassVersion,
           command_class_name: commandClassName,
@@ -119,13 +91,13 @@ const convertToGladysDevice = (serviceId, device) => {
         });
       });
     }
-    params = [{ name: PARAMS.LOCATION, value: device.loc }];
+    params = [{ name: PARAMS.LOCATION, value: zwaveJsDevice.loc }];
   });
 
   return {
-    name: device.name,
-    external_id: `zwavejs-ui:${device.id}`,
-    selector: `zwavejs-ui:${device.id}`,
+    name: zwaveJsDevice.name,
+    external_id: `zwavejs-ui:${zwaveJsDevice.id}`,
+    selector: `zwavejs-ui:${zwaveJsDevice.id}`,
     service_id: serviceId,
     should_poll: false,
     features: cleanupFeatures(features),
@@ -134,7 +106,6 @@ const convertToGladysDevice = (serviceId, device) => {
 };
 
 module.exports = {
-  cleanNames,
   getDeviceFeatureId,
   convertToGladysDevice,
 };

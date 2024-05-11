@@ -1,7 +1,8 @@
-const get = require('get-value');
+const Promise = require('bluebird');
 const { EVENTS } = require('../../../utils/constants');
 const { STATES } = require('./constants');
-const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevice');
+const { getDeviceFeatureId } = require('../utils/convertToGladysDevice');
+const getProperty = require('../utils/getProperty');
 
 /**
  * @description This will be called when new Z-Wave node value is updated.
@@ -14,13 +15,6 @@ function onNodeValueUpdated(message) {
   const messageNode = message.data[0];
   const updatedValue = message.data[1];
   const { commandClassName, propertyName, propertyKeyName, endpoint, newValue } = updatedValue;
-  const comClassNameClean = cleanNames(commandClassName);
-  const propertyNameClean = cleanNames(propertyName);
-  const propertyKeyNameClean = cleanNames(propertyKeyName);
-  let baseStatePath = propertyNameClean;
-  if (propertyKeyNameClean !== '') {
-    baseStatePath += `.${propertyKeyNameClean}`;
-  }
 
   const nodeId = `zwavejs-ui:${messageNode.id}`;
   const node = this.getDevice(nodeId);
@@ -33,18 +27,13 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  const valueConverters =
-    get(
-      STATES,
-      `${comClassNameClean}.${zwaveJSNode.deviceClass.generic}-${zwaveJSNode.deviceClass.specific}.${baseStatePath}`,
-    ) || get(STATES, `${comClassNameClean}.${baseStatePath}`);
+  const valueConverters = getProperty(STATES, commandClassName, propertyName, propertyKeyName, zwaveJSNode.deviceClass);
 
   if (!valueConverters) {
     return Promise.resolve();
   }
 
-  const promises = [];
-  valueConverters.forEach((valueConverter) => {
+  return Promise.map(valueConverters, async (valueConverter) => {
     const externalId = getDeviceFeatureId(
       messageNode.id,
       commandClassName,
@@ -57,21 +46,13 @@ function onNodeValueUpdated(message) {
     if (node.features.some((f) => f.external_id === externalId)) {
       const convertedValue = valueConverter.converter(newValue);
       if (convertedValue !== null) {
-        promises.push(
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: externalId,
-            state: convertedValue,
-          }),
-        );
+        await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: convertedValue,
+        });
       }
     }
   });
-
-  if (promises.length > 0) {
-    return Promise.allSettled(promises);
-  }
-
-  return Promise.resolve();
 }
 
 module.exports = {
