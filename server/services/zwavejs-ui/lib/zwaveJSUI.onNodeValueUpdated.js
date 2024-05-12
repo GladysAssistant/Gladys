@@ -33,26 +33,30 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  return Promise.map(valueConverters, async (valueConverter) => {
-    const externalId = getDeviceFeatureId(
-      messageNode.id,
-      commandClassName,
-      endpoint,
-      valueConverter.property_name || propertyName,
-      valueConverter.property_name ? valueConverter.property_key_name || '' : propertyKeyName,
-      valueConverter.feature_name || '',
-    );
+  return Promise.map(
+    valueConverters,
+    async (valueConverter) => {
+      const externalId = getDeviceFeatureId(
+        messageNode.id,
+        commandClassName,
+        endpoint,
+        valueConverter.property_name || propertyName,
+        valueConverter.property_name ? valueConverter.property_key_name || '' : propertyKeyName,
+        valueConverter.feature_name || '',
+      );
 
-    if (node.features.some((f) => f.external_id === externalId)) {
-      const convertedValue = valueConverter.converter(newValue);
-      if (convertedValue !== null) {
-        await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: externalId,
-          state: convertedValue,
-        });
+      if (node.features.some((f) => f.external_id === externalId)) {
+        const convertedValue = valueConverter.converter(newValue);
+        if (convertedValue !== null) {
+          await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: externalId,
+            state: convertedValue,
+          });
+        }
       }
-    }
-  });
+    },
+    { concurrency: 2 },
+  );
 }
 
 module.exports = {

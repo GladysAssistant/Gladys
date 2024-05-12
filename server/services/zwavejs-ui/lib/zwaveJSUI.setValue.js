@@ -113,22 +113,26 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   if (action.stateUpdate) {
-    await Promise.map(action.stateUpdate, async (stateUpdate) => {
-      const featureId = getDeviceFeatureId(
-        zwaveJsNode.id,
-        nodeFeature.command_class_name,
-        nodeFeature.endpoint,
-        stateUpdate.property_name || nodeFeature.property_name,
-        stateUpdate.property_name ? stateUpdate.property_key_name || '' : nodeFeature.property_key_name || '',
-        stateUpdate.feature_name || '',
-      );
+    await Promise.map(
+      action.stateUpdate,
+      async (stateUpdate) => {
+        const featureId = getDeviceFeatureId(
+          zwaveJsNode.id,
+          nodeFeature.command_class_name,
+          nodeFeature.endpoint,
+          stateUpdate.property_name || nodeFeature.property_name,
+          stateUpdate.property_name ? stateUpdate.property_key_name || '' : nodeFeature.property_key_name || '',
+          stateUpdate.feature_name || '',
+        );
 
-      // Only if the device has the expected feature, apply the local change
-      if (getNodeFeature(node, featureId)) {
-        const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
-        await this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value);
-      }
-    });
+        // Only if the device has the expected feature, apply the local change
+        if (getNodeFeature(node, featureId)) {
+          const gladysUpdatedFeature = gladysDevice.features.find((f) => f.external_id === featureId);
+          await this.gladys.device.saveState(gladysUpdatedFeature, stateUpdate.value);
+        }
+      },
+      { concurrency: 2 },
+    );
   }
 }
 
