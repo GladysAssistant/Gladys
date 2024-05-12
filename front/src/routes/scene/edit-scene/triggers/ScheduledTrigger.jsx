@@ -27,10 +27,28 @@ class TurnOnLight extends Component {
     this.resetForm();
     if (schedulerType === 'every-month') {
       this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', 1);
+      this.props.updateTriggerProperty(this.props.index, 'time', '12:00');
     } else if (schedulerType === 'every-week') {
-      this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', []);
+      this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday'
+      ]);
+      this.props.updateTriggerProperty(this.props.index, 'time', '12:00');
+    } else if (schedulerType === 'every-day') {
+      this.props.updateTriggerProperty(this.props.index, 'time', '12:00');
+    } else if (schedulerType === 'custom-time') {
+      let tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      this.props.updateTriggerProperty(this.props.index, 'time', '12:00');
+      this.props.updateTriggerProperty(this.props.index, 'date', format(tomorrow, 'yyyy-MM-dd'));
     } else if (schedulerType === 'interval') {
       this.props.updateTriggerProperty(this.props.index, 'unit', 'second');
+      this.props.updateTriggerProperty(this.props.index, 'interval', 30);
     }
   };
   handleDateChange = date => {

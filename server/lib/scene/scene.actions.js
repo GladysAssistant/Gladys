@@ -131,11 +131,18 @@ const actionsFunc = {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
         const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
+        let deviceFeature = getDeviceFeature(
           device,
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
+        if (!deviceFeature) {
+          deviceFeature = getDeviceFeature(
+            device,
+            DEVICE_FEATURE_CATEGORIES.SWITCH,
+            DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          );
+        }
         const oldValue = deviceFeature.last_value;
         let newValue = 0;
         /* eslint-disable no-await-in-loop */
@@ -476,6 +483,31 @@ const actionsFunc = {
       };
       if (ECOWATT_STATUSES[currentHourNetworkStatus.hvalue] !== action.ecowatt_network_status) {
         throw new AbortScene('ECOWATT_DIFFERENT_STATUS');
+      }
+    } catch (e) {
+      throw new AbortScene(e.message);
+    }
+  },
+  [ACTIONS.EDF_TEMPO.CONDITION]: async (self, action) => {
+    try {
+      const edfTempoService = self.service.getService('edf-tempo');
+      const data = await edfTempoService.getEdfTempoStates();
+      let peakDayTypeValid;
+      let peakHourTypeValid;
+      if (action.edf_tempo_day === 'today') {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.today_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid =
+          action.edf_tempo_peak_hour_type === data.current_hour_peak_state ||
+          action.edf_tempo_peak_hour_type === 'no-check';
+      } else {
+        peakDayTypeValid =
+          action.edf_tempo_peak_day_type === data.tomorrow_peak_state || action.edf_tempo_peak_day_type === 'no-check';
+        peakHourTypeValid = true;
+      }
+      const conditionValid = peakDayTypeValid && peakHourTypeValid;
+      if (!conditionValid) {
+        throw new AbortScene('EDF_TEMPO_DIFFERENT_STATE');
       }
     } catch (e) {
       throw new AbortScene(e.message);

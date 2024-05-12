@@ -35,7 +35,8 @@ class CameraBoxComponent extends Component {
   updateDeviceStateWebsocket = payload => {
     if (this.props.box.camera === payload.device) {
       this.setState({
-        image: payload.last_value_string
+        image: payload.last_value_string,
+        error: false
       });
     }
   };

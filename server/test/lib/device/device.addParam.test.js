@@ -5,6 +5,9 @@ const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const service = {
+  getService: () => {},
+};
 
 describe('Device.addParam', () => {
   it('should add one param', async () => {
@@ -22,7 +25,7 @@ describe('Device.addParam', () => {
       ],
     });
     const job = new Job(event);
-    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const newDevice = await device.addParam('test-device', {
       name: 'NEW_VALUE',
       value: '10',
@@ -49,7 +52,7 @@ describe('Device.addParam', () => {
       ],
     });
     const job = new Job(event);
-    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const newDevice = await device.addParam('test-device', {
       name: 'TEST_PARAM',
       value: '1000',

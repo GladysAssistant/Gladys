@@ -4,6 +4,7 @@ module.exports.caldav = require('./caldav');
 module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
 module.exports.ecowatt = require('./ecowatt');
+module.exports['edf-tempo'] = require('./edf-tempo');
 module.exports.mqtt = require('./mqtt');
 module.exports['philips-hue'] = require('./philips-hue');
 module.exports['rtsp-camera'] = require('./rtsp-camera');

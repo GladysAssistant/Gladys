@@ -4,7 +4,6 @@ const path = require('path');
 const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
@@ -58,10 +57,9 @@ async function installMqttContainer(config) {
     } catch (e) {
       logger.error('MQTT broker failed to install as Docker container:', e);
       this.mqttExist = false;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
       throw e;
+    } finally {
+      this.emitStatusEvent();
     }
 
     try {
@@ -91,16 +89,12 @@ async function installMqttContainer(config) {
 
       this.mqttRunning = true;
       this.mqttExist = true;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
     } catch (e) {
       logger.error('MQTT broker container failed to start:', e);
       this.mqttRunning = false;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
       throw e;
+    } finally {
+      this.emitStatusEvent();
     }
   } else {
     this.mqttExist = true;
@@ -118,18 +112,14 @@ async function installMqttContainer(config) {
       }
 
       logger.info('MQTT broker container successfully started');
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
       this.mqttRunning = true;
       this.mqttExist = true;
     } catch (e) {
       logger.error('MQTT broker container failed to start:', e);
       this.mqttRunning = false;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
       throw e;
+    } finally {
+      this.emitStatusEvent();
     }
   }
 }

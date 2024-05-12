@@ -30,6 +30,7 @@ import CheckAlarmMode from './actions/CheckAlarmMode';
 import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
 import PlayNotification from './actions/PlayNotification';
+import EdfTempoCondition from './actions/EdfTempoCondition';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -59,6 +60,7 @@ const ACTION_ICON = {
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
+  [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
@@ -347,6 +349,14 @@ const ActionCard = ({ children, ...props }) => {
           )}
           {props.action.type === ACTIONS.ECOWATT.CONDITION && (
             <EcowattCondition
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.EDF_TEMPO.CONDITION && (
+            <EdfTempoCondition
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}

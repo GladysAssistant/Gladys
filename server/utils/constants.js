@@ -382,6 +382,9 @@ const ACTIONS = {
   ECOWATT: {
     CONDITION: 'ecowatt.condition',
   },
+  EDF_TEMPO: {
+    CONDITION: 'edf-tempo.condition',
+  },
   MQTT: {
     SEND: 'mqtt.send',
   },
@@ -449,6 +452,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
   SIREN: 'siren',
@@ -567,7 +571,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   SIREN: {
     BINARY: 'binary',
-    LMH_VOLUME: 'volume',
+    LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
   },
   CHILD_LOCK: {
@@ -713,6 +717,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   TEXT: {
     TEXT: 'text',
+  },
+  RISK: {
+    INTEGER: 'integer',
   },
 };
 
@@ -946,6 +953,7 @@ const ACTIONS_STATUS = {
 const DEVICE_POLL_FREQUENCIES = {
   EVERY_MINUTES: 60 * 1000,
   EVERY_30_SECONDS: 30 * 1000,
+  EVERY_15_SECONDS: 15 * 1000,
   EVERY_10_SECONDS: 10 * 1000,
   EVERY_2_SECONDS: 2 * 1000,
   EVERY_SECONDS: 1 * 1000,
@@ -1012,6 +1020,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
+    DEBUG_NEW_MQTT_MESSAGE: 'mqtt.debug.new-mqtt-message',
   },
   RFLINK: {
     NEW_MESSAGE: 'rflink.new-message',
@@ -1027,7 +1036,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
   ZIGBEE2MQTT: {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
-    MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
   },
   XIAOMI: {
@@ -1087,6 +1095,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES: 'devices',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
+  EDF_TEMPO: 'edf-tempo',
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',

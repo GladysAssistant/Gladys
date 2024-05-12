@@ -5,6 +5,7 @@ import {
   DEVICE_FEATURE_CATEGORIES
 } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
+import { getDeviceParam } from '../../../../../../utils/device';
 import get from 'get-value';
 
 const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
@@ -168,6 +169,46 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
             </pre>
           </div>
 
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.mqtt.feature.mqttCustomTopic" />
+            </label>
+            <p>
+              <small>
+                <MarkupText id="integration.mqtt.feature.mqttCustomTopicDescription" />
+              </small>
+            </p>
+            <Localizer>
+              <input
+                type="text"
+                value={props.mqttCustomTopic}
+                onInput={props.updateMqttCustomTopic}
+                class="form-control"
+                placeholder={<Text id="integration.mqtt.feature.mqttCustomTopicPlaceholder" />}
+              />
+            </Localizer>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.mqtt.feature.mqttCustomObjectPath" />
+            </label>
+            <p>
+              <small>
+                <MarkupText id="integration.mqtt.feature.mqttCustomObjectPathDescription" />
+              </small>
+            </p>
+            <Localizer>
+              <input
+                type="text"
+                value={props.mqttCustomObjectPath}
+                onInput={props.updateMqttCustomObjectPath}
+                class="form-control"
+                placeholder={<Text id="integration.mqtt.feature.mqttCustomObjectPathPlaceholder" />}
+              />
+            </Localizer>
+          </div>
+
           {feature.read_only === false && (
             <div class="form-group">
               <label class="form-label">
@@ -227,6 +268,24 @@ class MqttFeatureBoxComponent extends Component {
     };
     this.props.updateFeatureProperty(e, 'keep_history', this.props.featureIndex);
   };
+  getCustomMqttTopicParamPrefix = () => {
+    return `mqtt_custom_topic_feature:${this.props.feature.id}`;
+  };
+  getCustomMqttObjectPathParamPrefix = () => {
+    return `mqtt_custom_object_path_feature:${this.props.feature.id}`;
+  };
+  getCustomMqttTopicValue = () => {
+    return getDeviceParam(this.props.device, this.getCustomMqttTopicParamPrefix());
+  };
+  getCustomMqttObjectPathValue = () => {
+    return getDeviceParam(this.props.device, this.getCustomMqttObjectPathParamPrefix());
+  };
+  updateMqttCustomTopic = e => {
+    this.props.updateDeviceParam(this.getCustomMqttTopicParamPrefix(), e.target.value);
+  };
+  updateMqttCustomObjectPath = e => {
+    this.props.updateDeviceParam(this.getCustomMqttObjectPathParamPrefix(), e.target.value);
+  };
   deleteFeature = () => {
     this.props.deleteFeature(this.props.featureIndex);
   };
@@ -256,6 +315,8 @@ class MqttFeatureBoxComponent extends Component {
   };
   render() {
     const { publishMqttTopic, listenMqttTopic } = this.getMqttTopic();
+    const mqttCustomTopic = this.getCustomMqttTopicValue();
+    const mqttCustomObjectPath = this.getCustomMqttObjectPathValue();
     return (
       <MqttFeatureBox
         {...this.props}
@@ -271,6 +332,10 @@ class MqttFeatureBoxComponent extends Component {
         copyMqttTopic={this.copyMqttTopic}
         publishMqttTopic={publishMqttTopic}
         listenMqttTopic={listenMqttTopic}
+        mqttCustomTopic={mqttCustomTopic}
+        mqttCustomObjectPath={mqttCustomObjectPath}
+        updateMqttCustomTopic={this.updateMqttCustomTopic}
+        updateMqttCustomObjectPath={this.updateMqttCustomObjectPath}
       />
     );
   }

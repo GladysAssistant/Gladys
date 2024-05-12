@@ -6,14 +6,20 @@ import Select from 'react-select';
 class BlinkLight extends Component {
   getOptions = async () => {
     try {
-      const devices = await this.props.httpClient.get('/api/v1/device', {
+      const lightDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
-      const deviceOptions = devices.map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
+      const switchDevices = await this.props.httpClient.get('/api/v1/device', {
+        device_feature_category: 'switch',
+        device_feature_type: 'binary'
+      });
+      const deviceOptions = [...lightDevices, ...switchDevices]
+        .map(device => ({
+          value: device.selector,
+          label: device.name
+        }))
+        .sort((d1, d2) => d1.label.localeCompare(d2.label));
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
       return deviceOptions;
@@ -23,8 +29,8 @@ class BlinkLight extends Component {
   };
   handleChange = selectedOptions => {
     if (selectedOptions) {
-      const lights = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
+      const devices = selectedOptions.map(selectedOption => selectedOption.value);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', devices);
     } else {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
@@ -39,13 +45,14 @@ class BlinkLight extends Component {
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
+      nextProps.action.devices.forEach(device => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === device);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
       });
     }
+    selectedOptions.sort((d1, d2) => d1.label.localeCompare(d2.label));
     this.setState({ selectedOptions });
   };
   constructor(props) {
