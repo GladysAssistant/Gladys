@@ -19,8 +19,16 @@ async function init() {
   const scenes = await db.Scene.findAll();
   const plainScenes = scenes.map((scene) => {
     const plainScene = scene.get({ plain: true });
-    this.addScene(plainScene);
-    this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
+    logger.debug(`Loading scene ${plainScene.name}`);
+    try {
+      this.addScene(plainScene);
+      this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
+      logger.debug(`Scene loaded with success`);
+    } catch (e) {
+      logger.warn(`Unable to load scene ${plainScene.name}`);
+      logger.warn(e);
+    }
+
     return plainScene;
   });
 

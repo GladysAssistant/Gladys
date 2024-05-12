@@ -12,7 +12,7 @@ class SettingsGateway extends Component {
     try {
       if (!this.props.session.gatewayClient) {
         this.setState({
-          isFullGladysPlus: false
+          isFullGladysPlus: true
         });
         return;
       }

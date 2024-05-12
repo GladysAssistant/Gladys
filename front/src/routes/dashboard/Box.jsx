@@ -12,6 +12,7 @@ import VacbotBox from '../../components/boxs/vacbot/Vacbot';
 import SceneBox from '../../components/boxs/scene/SceneBox';
 import AlarmBox from '../../components/boxs/alarm/Alarm';
 import MusicBox from '../../components/boxs/music/MusicBox';
+import EdfTempoBox from '../../components/boxs/edf-tempo/EdfTempo';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -43,6 +44,8 @@ const Box = ({ children, ...props }) => {
       return <AlarmBox {...props} />;
     case 'music':
       return <MusicBox {...props} />;
+    case 'edf-tempo':
+      return <EdfTempoBox {...props} />;
   }
 };
 

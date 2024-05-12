@@ -255,6 +255,7 @@
       "devices": "Geräte",
       "chart": "Diagramm",
       "ecowatt": "Ecowatt (Frankreich)",
+      "edf-tempo": "EDF Tempo",
       "vacbot": "Vakuumroboter",
       "clock": "Uhr",
       "scene": "Szene",
@@ -370,6 +371,18 @@
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
       },
+      "edfTempo": {
+        "description": "Dieses Widget ermöglicht es Ihnen, den aktuellen Zustand von EDF Tempo anzuzeigen.",
+        "link": "Mehr über EDF Tempo erfahren",
+        "blueDay": "Blauer Tag",
+        "whiteDay": "Weißer Tag",
+        "redDay": "Roter Tag",
+        "notDefinedDay": "Nicht definiert",
+        "currentHourState": "Aktuell",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde",
+        "dayPeakTitle": "Tempo-Tage"
+      },
       "vacbot": {
         "editVacbotLabel": "Select the vacbot you want to display here.",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
@@ -473,6 +486,8 @@
         "disconnectButton": "Trennen",
         "bridgesOnNetwork": "Bridges im Netzwerk",
         "connectButton": "Verbinden/Erneut verbinden",
+        "syncBridges": "Brücken synchronisieren",
+        "bridgeNotUpToDateInfo": "Wenn Sie gerade eine Glühbirne zur Philips Hue-App hinzugefügt haben und diese Glühbirne nicht direkt von Gladys gesteuert werden kann, müssen Sie hierher kommen und auf die Schaltfläche \"Brücken synchronisieren\" klicken, um alle Informationen über diese neue Glühbirne wieder in Gladys zu bringen.",
         "scanButton": "Suchen",
         "bridgeButtonNotPressed": "Bridge-Taste nicht gedrückt. Bitte drücke die Taste auf deiner Philips Hue Bridge und versuche es erneut.",
         "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community.",
@@ -753,52 +768,78 @@
       "description": "Steuere deine Zigbee-Geräte mit Zigbee2MQTT.",
       "deviceTab": "Meine Geräte",
       "discoverTab": "Geräte in der Nähe",
-      "settingsTab": "Einstellungen",
       "setupTab": "Einrichtung",
       "status": {
         "notConfigured": "Es ist kein Zigbee2MQTT-USB-Dongle konfiguriert. Bitte gehe zu den ",
         "notEnabled": "Zigbee2MQTT ist nicht aktiviert. Bitte gehe zur ",
-        "mqttNotInstalled": "MQTT-Broker konnte nicht installiert werden",
-        "mqttNotRunning": "MQTT-Broker konnte nicht gestartet werden",
-        "zigbee2mqttNotInstalled": "Zigbee2MQTT konnte nicht installiert werden",
-        "zigbee2mqttNotRunning": "Zigbee2MQTT konnte nicht gestartet werden",
-        "gladysNotConnected": "Gladys konnte keine Verbindung zu MQTT herstellen",
-        "zigbee2mqttNotConnected": "Zigbee2MQTT konnte keine Verbindung zu MQTT herstellen",
         "settingsPageLink": "USB-Dongle-Einstellungen.",
         "setupPageLink": "Einrichtungseite."
       },
-      "settings": {
-        "title": "USB-Dongle-Einstellungen",
-        "description": "Um Zigbee2MQTT in Gladys zu verwenden, benötigst du einen mit deiner Gladys-Instanz verbundenen Zigbee2MQTT-USB-Dongle.",
-        "zigbee2mqttUsbDriverPathLabel": "Wähle den USB-Port aus, an dem dein Zigbee2MQTT-Dongle angeschlossen ist",
-        "zigbee2mqttUsbDriverPathPlaceholder": "USB-Port",
-        "zigbee2mqttUsbDongleNameLabel": "Wähle deinen Zigbee-Dongle-Modell aus",
-        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee-Dongle-Modell",
-        "saveButton": "Einstellungen sichern",
-        "refreshButton": "USB-Liste aktualisieren",
-        "notAttached": "Gladys ist mit keinem Zigbee2MQTT-USB-Dongle verbunden.",
-        "attached": "Zigbee2MQTT-USB-Dongle konfiguriert.",
-        "saving": "USB-Dongle-Konfiguration sichern …"
-      },
       "setup": {
-        "title": "Zigbee2MQTT-Konfiguration",
-        "description": "Dieser Dienst verwendet zwei unabhängige Docker-Container (MQTT-Broker und Zigbee2MQTT). Aktiviere Zigbee2MQTT, um diese Container bereitzustellen.\nWeitere Informationen findest du in der Zigbee2MQTT-Dokumentation.",
-        "enableLabel": "Zigbee2MQTT aktivieren",
-        "nonDockerEnv": "Gladys läuft nicht unter Docker. Du kannst von hier aus keinen MQTT-Broker installieren.",
-        "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Broker von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein.",
-        "enableZigbee2mqtt": "Zigbee2MQTT aktivieren",
-        "containersStatus": "Zigbee2MQTT-Container",
-        "serviceStatus": "Status des Zigbee2MQTT-Dienstes",
+        "title": "Konfiguration des Zigbee2mqtt-Dienstes",
+        "modes": {
+          "local": {
+            "title": "Installation von Gladys aus",
+            "description": "Gladys wird zwei Docker-Container konfigurieren: MQTT und Zigbee2mqtt.",
+            "dockerInstallationRequirementLabel": "Gladys muss unter Docker ausgeführt werden",
+            "dockerNetworkHostRequirementLabel": "Der Docker-Container von Gladys muss mit der Option \"network=host\" gestartet werden",
+            "usbDongleRequirementLabel": "Der Zigbee-USB-Dongle muss angeschlossen sein",
+            "detailsDescription": "Um Zigbee2mqtt mit Gladys zu verwenden, muss ein Zigbee-USB-Dongle eingesteckt werden.",
+            "usbDriverPathLabel": "Wählen Sie den USB-Port, an dem der Zigbee-Dongle eingesteckt ist",
+            "usbDriverPathPlaceholder": "USB-Port",
+            "usbDongleNameLabel": "Wählen Sie das Modell des verwendeten Zigbee-Dongles",
+            "usbDongleNamePlaceholder": "Modell des Zigbee-Dongles",
+            "z2mTcpPortLabel": "Geben Sie den vom Zigbee2Mqtt-Webanwendungsport freigegebenen TCP-Port ein",
+            "z2mTcpPortDescription": "Wenn leer gelassen, wird ein zufälliger Port verwendet.",
+            "summary": {
+              "title": "Konfiguration",
+              "usbPort": "USB-Port",
+              "dongleName": "Dongle",
+              "unknownDongle": "Nicht definiert",
+              "tcpPort": "TCP-Port"
+            }
+          },
+          "remote": {
+            "title": "Verbindung zu einer vorhandenen Installation",
+            "description": "Gladys wird über MQTT mit einer vorhandenen externen Installation verbunden.",
+            "z2mInstallationRequirementLabel": "Eine eigenständige Zigbee2Mqtt-Anwendung",
+            "mqttBrokerRequirementLabel": "Ein MQTT-Broker, der mit der Zigbee2Mqtt-Anwendung verbunden ist",
+            "detailsDescription": "Mit diesem Konfigurationsmodus ist es möglich, sich mit einer externen Zigbee2Mqtt-Installation mit ihrem MQTT-Broker zu verbinden.",
+            "mqttModeLabel": "Wählen Sie den MQTT-Broker aus",
+            "external": {
+              "modeLabel": "Externer MQTT"
+            },
+            "summary": {
+              "title": "Konfiguration",
+              "mqttMode": "Broker MQTT"
+            }
+          }
+        },
+        "requirementsLabel": "<u>Bedingungen</u>:",
+        "selectInstallationMode": "Auswählen",
+        "changeButtonLabel": "Ändern",
+        "resetLabel": "Abbrechen",
+        "errorLoadingStatesLabel": "Beim Laden der Informationen des Gladys-Dienstes ist ein Fehler aufgetreten. Stellen Sie sicher, dass Gladys auf dem neuesten Stand ist, andernfalls überprüfen Sie die Protokolle.",
+        "saveError": "Die Konfiguration hat den Dienst nicht gestartet, bitte überprüfen Sie diese.",
+        "enableLabel": "Dienst aktivieren oder deaktivieren",
+        "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
+        "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
+        "serviceStatus": "Dienststatus",
+        "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
+        "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",
+        "invalidDockerNetwork": "Gladys basiert auf einer benutzerdefinierten Installation. Um Zigbee2mqtt von dieser Seite aus zu installieren, muss der Docker-Container von Gladys mit der Option \"network=host\" gestartet werden.",
+        "enableZigbee2mqtt": "Zigbee2mqtt aktivieren",
+        "containersStatus": "Mit Zigbee2mqtt verbundene Container",
         "link": "Link",
-        "connected": "Zigbee2MQTT wurde erfolgreich gestartet.",
-        "error": "Beim Starten von Zigbee2MQTT ist ein Fehler aufgetreten.",
+        "connected": "Zigbee2mqtt erfolgreich gestartet.",
+        "error": "Beim Starten des Zigbee2mqtt-Dienstes ist ein Fehler aufgetreten.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
-        "zigbee2Mqtt": "Zigbee2MQTT",
+        "zigbee2Mqtt": "Zigbee2mqtt",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
-        "connectionUrl": "URL der Zigbee2MQTT-Oberfläche: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL der Zigbee2mqtt-Schnittstelle: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
       },
       "device": {
         "title": "Meine Geräte",
@@ -1215,6 +1256,7 @@
       "title": "MQTT",
       "description": "Verbinde dich mit einem lokalen oder entfernten MQTT-Server.",
       "deviceTab": "Meine Geräte",
+      "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
       "documentation": "MQTT-Dokumentation",
       "apiDocumentation": "MQTT-API-Dokumentation ",
@@ -1259,7 +1301,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
         "mqttTopicToListenExampleLabel": "MQTT-Hörensthema",
         "mqttTopicToListenExampleDescription": "Gladys veröffentlicht in diesem Topic, wenn das Gerät in Gladys gesteuert wird. Du musst diesem Topic zuhören. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
+        "mqttCustomTopic": "Benutzerdefiniertes MQTT-Thema",
+        "mqttCustomTopicDescription": "Gladys bietet eine Standard-MQTT-API an, ermöglicht Ihnen jedoch die Verwendung benutzerdefinierter Themen, wenn Sie ein Gerät verwenden, das nativ auf einem bestimmten Thema veröffentlicht.",
+        "mqttCustomTopicPlaceholder": "Geben Sie das MQTT-Thema ein",
         "copyMqttTopic": "MQTT-Thema kopieren",
+        "mqttCustomObjectPath": "MQTT JSON Nachricht",
+        "mqttCustomObjectPathDescription": "Wenn Ihr verbundenes Objekt MQTT-Nachrichten in Form eines JSON sendet, können Sie hier den Pfad der Eigenschaft angeben, der von Gladys verwendet werden soll. Beispiel: Eigenschaft1.Eigenschaft2.Eigenschaft3. Lassen Sie es leer, wenn das Format kein JSON ist.",
+        "mqttCustomObjectPathPlaceholder": "Pfad im JSON folgen",
         "copied": "Kopiert!",
         "copyFailed": "Kopieren fehlgeschlagen",
         "deleteLabel": "Funktion löschen"
@@ -1271,7 +1319,7 @@
         "nonDockerEnv": "Gladys läuft nicht in Docker. Du kannst von hier aus keinen MQTT-Broker installieren.",
         "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Broker von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein.",
         "installBrokerContainer": "Verwende den Broker in einem Docker-Container.",
-        "brokerDockerNotInstalled": "In der aktuellen Docker-Umgebung ist noch kein Broker verfügbar. Fahre fort, um den <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a>-Broker in einem Docker-Container zu installieren und zu konfigurieren.",
+        "brokerDockerNotInstalled": "In der aktuellen Docker-Umgebung ist noch kein Broker verfügbar. Fahre fort, um den <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a>-Broker in einem Docker-Container zu installieren und zu konfigurieren.  Achtung, diese Option wird einen Mosquitto-Container auf Port 1883 starten. Wenn Sie bereits einen MQTTT-Server auf diesem Rechner auf Port 1883 haben, wird dies nicht funktionieren.",
         "installBrokerButton": "Broker in Docker installieren",
         "installingBrokerButton": "Installieren …",
         "installBrokerError": "Ein Fehler ist beim Installieren des Docker-Containers aufgetreten. Bitte prüfe die Gladys-Protokolle.",
@@ -1288,6 +1336,15 @@
         "connectionError": "Die Verbindung ist fehlgeschlagen. Bitte überprüfe deine Konfiguration.",
         "networkError": "Gladys kann nicht erreicht werden. Ist deine Gladys-Instanz verbunden und erreichbar?",
         "disconnected": "Vom MQTT-Broker getrennt."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "Dieses Register ermöglicht es Ihnen, in Echtzeit die MQTT-Nachrichten zu sehen, die auf Ihrer Gladys-Instanz eingehen, und erleichtert so das Debuggen. Nach 2 Minuten auf diesem Register wird der Debug-Modus automatisch deaktiviert. Sie können ihn mit der Aktualisierungsschaltfläche oben rechts wieder aktivieren.",
+        "activateDebugMode": "Aktivieren",
+        "debugModeActivated": "Debug-Modus aktiviert",
+        "date": "Zeit",
+        "topic": "Thema",
+        "message": "Nachrichteninhalt"
       }
     },
     "broadlink": {
@@ -1876,6 +1933,21 @@
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
       },
+      "edfTempoCondition": {
+        "description": "Die Szene wird fortgesetzt, wenn die untenstehenden Bedingungen für EDF Tempo erfüllt sind.",
+        "selectDay": "Für den Tag",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "selectPeakDayType": "Wenn der Tag im",
+        "blueDay": "Blauen Tag",
+        "whiteDay": "Weißen Tag",
+        "redDay": "Roten Tag",
+        "noPeakDayCheck": "Beliebig",
+        "noPeakHourCheck": "Beliebig",
+        "selectPeakHourType": "Und wenn es",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde"
+      },
       "alarmCheckMode": {
         "description": "Die Szene wird fortgesetzt, wenn die Alarmanlage im ausgewählten Modus ist.",
         "houseLabel": "Zuhause",
@@ -1950,6 +2022,9 @@
       },
       "ecowatt": {
         "condition": "Bedingung für Ecowatt (Frankreich)"
+      },
+      "edf-tempo": {
+        "condition": "Bedingung für EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
@@ -2686,7 +2761,7 @@
         }
       },
       "siren": {
-        "volume": {
+        "lmh_volume": {
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
@@ -2793,6 +2868,15 @@
           "zero": "Nein",
           "one": "Ja"
         }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "Kein Risiko",
+          "low-risk": "Niedrig",
+          "medium-risk": "Mittel",
+          "high-risk": "Hoch",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -2886,7 +2970,7 @@
     "siren": {
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
-      "volume": "Lautstärke der Sirene",
+      "lmh_volume": "Lautstärke der Sirene",
       "melody": "Melodie"
     },
     "cube": {
@@ -3094,6 +3178,10 @@
     "angle-sensor": {
       "shortCategoryName": "Winkelsensor",
       "integer": "Winkel (ganze Zahl)"
+    },
+    "risk": {
+      "shortCategoryName": "Risiko",
+      "integer": "Risikostufe"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

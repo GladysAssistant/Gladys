@@ -15,6 +15,8 @@ import SelectBoxType from '../../../components/boxs/SelectBoxType';
 import EditSceneBox from '../../../components/boxs/scene/EditSceneBox';
 import EditAlarmBox from '../../../components/boxs/alarm/EditAlarm';
 
+import EditEdfTempoBox from '../../../components/boxs/edf-tempo/EditEdfTempo';
+
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
@@ -45,6 +47,8 @@ const Box = ({ children, ...props }) => {
       return <EditAlarmBox {...props} />;
     case 'music':
       return <EditMusicBox {...props} />;
+    case 'edf-tempo':
+      return <EditEdfTempoBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

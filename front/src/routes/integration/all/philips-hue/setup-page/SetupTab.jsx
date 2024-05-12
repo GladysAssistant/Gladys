@@ -26,11 +26,16 @@ class SetupTab extends Component {
               <h1 class="card-title">
                 <Text id="integration.philipsHue.setup.connectedBridgesTitle" />
               </h1>
+              <div class="page-options d-flex">
+                <button class="btn btn-secondary" onClick={props.syncWithBridge}>
+                  <Text id="integration.philipsHue.setup.syncBridges" />
+                </button>
+              </div>
             </div>
             <div class="card-body">
               <div
                 class={cx('dimmer', {
-                  active: props.philipsHueGetDevicesStatus === RequestStatus.Getting
+                  active: props.loading
                 })}
               >
                 <div class="loader" />
@@ -40,6 +45,10 @@ class SetupTab extends Component {
                       <MarkupText id="integration.philipsHue.setup.unknownError" />
                     </p>
                   )}
+                  <p class="alert alert-primary">
+                    <MarkupText id="integration.philipsHue.setup.bridgeNotUpToDateInfo" />
+                  </p>
+                  {props.syncWithBridgeError && <p class="alert alert-danger">{props.syncWithBridgeError}</p>}
                   {props.philipsHueGetDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
                   <div class="row">
                     {props.philipsHueBridgesDevices &&
