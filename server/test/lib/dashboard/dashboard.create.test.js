@@ -1,5 +1,5 @@
 const { expect, assert } = require('chai');
-const { DASHBOARD_BOX_TYPE, DASHBOARD_TYPE } = require('../../../utils/constants');
+const { DASHBOARD_BOX_TYPE, DASHBOARD_TYPE, DASHBOARD_VISIBILITY } = require('../../../utils/constants');
 
 const Dashboard = require('../../../lib/dashboard');
 
@@ -10,6 +10,7 @@ describe('dashboard.create', () => {
       name: 'My new dashboard',
       type: DASHBOARD_TYPE.MAIN,
       position: 0,
+      visibility: DASHBOARD_VISIBILITY.PRIVATE,
       boxes: [
         [
           {
