@@ -237,6 +237,13 @@
     "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "editDashboardNameLabel": "Name",
+    "editDashboardVisibility": "Sichtbarkeit",
+    "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",
+    "editDashboardVisibilityNotEditableNotCreator": "Sie können die Freigabe nicht bearbeiten, da Sie nicht der Ersteller dieses Dashboards sind.",
+    "visibilities": {
+      "private": "privat",
+      "public": "öffentlich"
+    },
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",

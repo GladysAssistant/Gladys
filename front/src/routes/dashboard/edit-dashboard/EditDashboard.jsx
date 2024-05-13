@@ -46,9 +46,11 @@ const EditDashboard = ({ children, ...props }) => (
                     <div class="card-body">
                       {props.currentDashboard && (
                         <EditBoxColumns
+                          user={props.user}
                           isTouchDevice={props.isTouchDevice}
                           dashboards={props.dashboards}
                           updateCurrentDashboardName={props.updateCurrentDashboardName}
+                          updateCurrentDashboardVisibility={props.updateCurrentDashboardVisibility}
                           editDashboardDragEnable={props.editDashboardDragEnable}
                           moveCard={props.moveCard}
                           moveBoxUp={props.moveBoxUp}
