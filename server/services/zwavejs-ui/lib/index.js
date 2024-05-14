@@ -9,6 +9,8 @@ const { publish } = require('./zwaveJSUI.publish');
 const { scan } = require('./zwaveJSUI.scan');
 const { saveConfiguration } = require('./zwaveJSUI.saveConfiguration');
 const { setValue } = require('./zwaveJSUI.setValue');
+const { getZwaveJsDevice } = require('./zwaveJSUI.getZwaveJsDevice');
+const { getDevice } = require('./zwaveJSUI.getDevice');
 
 /**
  * @description Z-Wave JS UI handler.
@@ -26,12 +28,15 @@ const ZwaveJSUIHandler = function ZwaveJSUIHandler(gladys, mqttLibrary, serviceI
   this.configured = false;
   this.connected = false;
   this.devices = [];
+  this.zwaveJSDevices = [];
 };
 
 ZwaveJSUIHandler.prototype.init = init;
 ZwaveJSUIHandler.prototype.connect = connect;
 ZwaveJSUIHandler.prototype.disconnect = disconnect;
 ZwaveJSUIHandler.prototype.getConfiguration = getConfiguration;
+ZwaveJSUIHandler.prototype.getDevice = getDevice;
+ZwaveJSUIHandler.prototype.getZwaveJsDevice = getZwaveJsDevice;
 ZwaveJSUIHandler.prototype.handleNewMessage = handleNewMessage;
 ZwaveJSUIHandler.prototype.onNewDeviceDiscover = onNewDeviceDiscover;
 ZwaveJSUIHandler.prototype.onNodeValueUpdated = onNodeValueUpdated;
