@@ -21,7 +21,6 @@ function onMessage(type, device, value) {
       });
       break;
     case 'CleanReport':
-      logger.trace(`CleanReport: ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `${device.features[CLEAN_REPORT_FEATURE_INDEX].external_id}`,
         text: value,
