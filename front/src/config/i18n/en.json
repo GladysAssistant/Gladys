@@ -21,12 +21,16 @@
     "selectPlaceholder": "Select..."
   },
   "color": {
-    "blue": "Blue",
-    "red": "Red",
-    "green": "Green",
+    "aqua": "Aqua",
     "black": "Black",
-    "yellow": "Yellow",
-    "purple": "Purple"
+    "blue": "Blue",
+    "green": "Green",
+    "grey": "Grey",
+    "orange": "Orange",
+    "pink": "Pink",
+    "purple": "Purple",
+    "red": "Red",
+    "yellow": "Yellow"
   },
   "calendar": {
     "allDay": "All Day",
@@ -251,6 +255,7 @@
       "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
+      "edf-tempo": "Tempo EDF",
       "clock": "Clock",
       "scene": "Scene",
       "music": "Music"
@@ -280,7 +285,8 @@
         "noRecentValue": "No recent value",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
-        "substractButton": "-"
+        "substractButton": "-",
+        "motionDetected": "Motion detected"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
@@ -315,7 +321,7 @@
         "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
         "upgradeGladysPlusPlanError": "Camera streaming is not included in your Gladys Plus plan. You need to update it in Settings -> Billing.",
         "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
-        "notNotSupportedBrowser": "This browser is not supported. In order to enable end-to-end encryption of this video stream, we use the MediaSource API, which is unfortunately not available on Safari iPhone. Strangely, this feature is available on Safari iPad and MacOS... We'll have to be patient, let's hope the API will be available on iPhone soon!",
+        "notNotSupportedBrowser": "This browser is not supported. To enable end-to-end encryption of this video stream, we use the MediaSource API, which may not be supported on this browser. We recommend Firefox, Safari, or any Chromium-based browser.",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
         "liveAutoStartLabel": "Start automatically the live streaming",
         "liveAutoStartDescription": "Warning: This can increase the load on your machine/network.",
@@ -341,6 +347,8 @@
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "chartType": "Select the type of chart to display",
+        "chartColor": "Select the color of chart",
+        "dataColor": "Select color for {{featureLabel}}",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
@@ -361,6 +369,18 @@
         "ok": "Network ok",
         "warning": "Network warning",
         "critical": "Network critical"
+      },
+      "edfTempo": {
+        "description": "This widget allows you to display the current EDF Tempo state.",
+        "link": "Learn more about EDF Tempo",
+        "blueDay": "Blue Day",
+        "whiteDay": "White Day",
+        "redDay": "Red Day",
+        "notDefinedDay": "Not Defined",
+        "currentHourState": "Currently",
+        "peakHour": "Peak Hour",
+        "offPeakHour": "Off-Peak Hour",
+        "dayPeakTitle": "Tempo days"
       },
       "clock": {
         "analog": "Analog",
@@ -459,6 +479,8 @@
         "disconnectButton": "Disconnect",
         "bridgesOnNetwork": "Bridges on network",
         "connectButton": "Connect/Reconnect",
+        "syncBridges": "Sync bridges",
+        "bridgeNotUpToDateInfo": "If you've just added a bulb to the Philips Hue app and that bulb isn't directly controllable by Gladys, you need to come here and click the \"Sync Bridges\" button, which will bring back all the information about this new bulb into Gladys.",
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
@@ -532,7 +554,9 @@
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
           "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices."
       },
       "device": {
         "title": "Netatmo Devices in Gladys",
@@ -547,15 +571,16 @@
         "roomNetatmoApiLabel": "Room in Netatmo API",
         "featuresLabel": "Features",
         "saveButton": "Save",
+        "saveNotAllowButton": "Save not possible",
         "deleteButton": "Delete",
         "noValueReceived": "No value received."
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
-        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats and the valves associated with their Plug (API Energy) as well as weather stations and their modules (API Weather). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
-        "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
+        "noDeviceFound": "No Netatmo devices were found. If you are certain that you have a Netatmo device supported by Gladys, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
         "unmanagedModelButton": "Unsupported model",
         "updateButton": "Update",
@@ -569,13 +594,17 @@
         "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
         "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
-        "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
-        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "titleAdditionalInformationEnergyApi": "Additional Information on the Operation of the \"Energy\" API:",
+        "descriptionAdditionalInformationEnergyApi": "You must select the \"Energy\" API at the bottom of the page to access the corresponding devices. Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "titleAdditionalInformationWeatherApi": "Additional Information on the Operation of the \"Weather\" API:",
+        "descriptionAdditionalInformationWeatherApi": "You must select the \"Weather\" API at the bottom of the page to access the corresponding devices. If you also have devices belonging to the \"Energy\" API (Plug, thermostat or valve) you will have access to an additional functionality on indoor hygrometer devices to obtain the average temperature of the corresponding room. So don't forget to select the \"Energy\" API to access this functionality.",
         "clientIdLabel": "Client ID",
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",
         "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
         "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
+        "energyApiLabel": "Enable \"Energy\" API (retrieve Netatmo Plug, Thermostat, and Valve devices)",
+        "weatherApiLabel": "Enable \"Weather\" API (retrieve Netatmo Weather Station devices)",
         "saveLabel": "Save and connect",
         "disconnectLabel": "Disconnect"
       },
@@ -674,45 +703,71 @@
       "description": "Control your Zigbee devices with Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
-      "settingsTab": "Settings",
       "setupTab": "Setup",
       "status": {
         "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
         "notEnabled": "Zigbee2mqtt is not activated, please go to ",
-        "mqttNotInstalled": "MQTT broker failed to install",
-        "mqttNotRunning": "MQTT broker failed to start",
-        "zigbee2mqttNotInstalled": "Zigbee2mqtt failed to install",
-        "zigbee2mqttNotRunning": "Zigbee2mqtt failed to start",
-        "gladysNotConnected": "Gladys failed to connect to MQTT",
-        "zigbee2mqttNotConnected": "Zigbee2mqtt failed to connect to MQTT",
         "settingsPageLink": "USB dongle configuration page",
         "setupPageLink": "Zigbee2mqtt configuration page"
       },
-      "settings": {
-        "title": "Zigbee2mqtt USB dongle Settings",
-        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
-        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
-        "zigbee2mqttUsbDriverPathPlaceholder": "USB port",
-        "zigbee2mqttUsbDongleNameLabel": "Select your Zigbee Dongle model",
-        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee Dongle model",
-        "saveButton": "Save Settings",
-        "refreshButton": "Refresh USB list",
-        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
-        "attached": "Zigbee2mqtt USB Dongle configured.",
-        "saving": "Saving USB Dongle configuration..."
-      },
       "setup": {
-        "title": "Zigbee2mqtt configuration",
-        "description": "This service uses two independent Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
-        "enableLabel": "Zigbee2mqtt activation",
-        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
-        "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
+        "title": "Zigbee2mqtt Service Configuration",
+        "modes": {
+          "local": {
+            "title": "Installation from Gladys",
+            "description": "Gladys will configure two Docker containers: MQTT and Zigbee2mqtt.",
+            "dockerInstallationRequirementLabel": "Gladys must run under Docker",
+            "dockerNetworkHostRequirementLabel": "Gladys Docker container must be started with the option \"network=host\"",
+            "usbDongleRequirementLabel": "Zigbee USB dongle must be connected",
+            "detailsDescription": "To use Zigbee2mqtt with Gladys, a Zigbee USB dongle must be inserted.",
+            "usbDriverPathLabel": "Select the USB port where the Zigbee dongle is inserted",
+            "usbDriverPathPlaceholder": "USB Port",
+            "usbDongleNameLabel": "Select the model of the Zigbee dongle used",
+            "usbDongleNamePlaceholder": "Zigbee Dongle Model",
+            "z2mTcpPortLabel": "Enter the TCP port exposed by the Zigbee2Mqtt web application",
+            "z2mTcpPortDescription": "If left empty, a random port will be used.",
+            "summary": {
+              "title": "Configuration",
+              "usbPort": "USB Port",
+              "dongleName": "Dongle",
+              "unknownDongle": "Not defined",
+              "tcpPort": "TCP Port"
+            }
+          },
+          "remote": {
+            "title": "Connect to an Existing Installation",
+            "description": "Gladys will connect to an existing external installation through MQTT.",
+            "z2mInstallationRequirementLabel": "A standalone Zigbee2Mqtt application",
+            "mqttBrokerRequirementLabel": "An MQTT broker connected to the Zigbee2Mqtt application",
+            "detailsDescription": "With this configuration mode, it is possible to connect to an external Zigbee2Mqtt installation with its MQTT broker.",
+            "mqttModeLabel": "Choose MQTT broker",
+            "external": {
+              "modeLabel": "External MQTT"
+            },
+            "summary": {
+              "title": "Configuration",
+              "mqttMode": "MQTT Broker"
+            }
+          }
+        },
+        "requirementsLabel": "<u>Conditions</u>:",
+        "selectInstallationMode": "Choose",
+        "changeButtonLabel": "Change",
+        "resetLabel": "Cancel",
+        "errorLoadingStatesLabel": "An error occurred while loading Gladys service information. Make sure Gladys is up to date, otherwise check the logs.",
+        "saveError": "The configuration did not allow the service to start, please verify it.",
+        "enableLabel": "Enable or disable the service",
+        "enableDescription": "At the next restart of Gladys, the service will start again. Depending on the power of your machine and the speed of your network, starting this service in \"Installation from Gladys\" mode can take between 2 minutes and 1 hour. It is possible to permanently disable the service from this page: <a href=\"/dashboard/settings/service\">Settings > Services</a>.",
+        "toggleError": "An error occurred. Please check the service configuration.",
+        "serviceStatus": "Service Status",
+        "description": "This service uses two Docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt to deploy these containers. For more information, visit the Zigbee2mqtt documentation page.",
+        "nonDockerEnv": "Gladys is currently not running in Docker, it is impossible to enable Zigbee2mqtt from Gladys.",
+        "invalidDockerNetwork": "Gladys is based on a custom installation, to install Zigbee2mqtt from this page, the Gladys Docker container must be started with the \"network=host\" option.",
         "enableZigbee2mqtt": "Enable Zigbee2mqtt",
-        "containersStatus": "Zigbee2mqtt Containers",
-        "serviceStatus": "Zigbee2mqtt Service Status",
+        "containersStatus": "Containers related to Zigbee2mqtt",
         "link": "Link",
-        "connected": "Zigbee2mqtt was started with success.",
-        "error": "An error occurred while starting Zigbee2mqtt.",
+        "connected": "Zigbee2mqtt started successfully.",
+        "error": "An error occurred while starting the Zigbee2mqtt service.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
         "zigbee2Mqtt": "Zigbee2mqtt",
@@ -754,7 +809,6 @@
       "description": "Control your devices with Node-RED.",
       "setupTab": "Setup",
       "documentation": "Node-RED documentation",
-
       "status": {
         "notInstalled": "Node-RED server failed to install.",
         "notRunning": "Node-RED server failed to start.",
@@ -784,7 +838,6 @@
         "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
-
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google Home documentation",
@@ -1031,6 +1084,7 @@
       "discoverDeviceDescr": "Automatically scan for Z-Wave JS UI devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter your device name",
+      "locationLabel": "Device Location",
       "noFeaturesHandled": "This device is not yet supported by Gladys; feel free to submit it for inclusion!",
       "featuresLabel": "Features",
       "roomLabel": "Room",
@@ -1137,6 +1191,7 @@
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
+      "debugTab": "MQTT Debug",
       "setupTab": "Setup",
       "documentation": "MQTT documentation",
       "apiDocumentation": "MQTT API documentation ",
@@ -1181,7 +1236,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys is listening to this topic. If you publish a value in this topic, it'll be associated with this device. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
         "mqttTopicToListenExampleLabel": "MQTT Topic to listen",
         "mqttTopicToListenExampleDescription": "Gladys will publish in this topic if the device is controlled in Gladys. You need to listen to this topic. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
+        "mqttCustomTopic": "Custom MQTT Topic",
+        "mqttCustomTopicDescription": "Gladys offers a default MQTT API but allows you to use custom topics if you are using a device that publishes on a particular topic natively.",
+        "mqttCustomTopicPlaceholder": "Enter MQTT topic",
         "copyMqttTopic": "Copy MQTT Topic",
+        "mqttCustomObjectPath": "MQTT JSON Message",
+        "mqttCustomObjectPathDescription": "If your connected object sends MQTT messages in the form of a JSON, Gladys allows you to specify here the path of the property to be used by Gladys. Example: property1.property2.property3. Leave blank if the format is not JSON.",
+        "mqttCustomObjectPathPlaceholder": "Path to follow in the JSON",
         "copied": "Copied!",
         "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature"
@@ -1193,7 +1254,7 @@
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
         "installBrokerContainer": "Use broker in a Docker container.",
-        "brokerDockerNotInstalled": "No broker is available yet on current Docker environment, continue to install and configure <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> broker inside a Docker container.",
+        "brokerDockerNotInstalled": "No broker is available yet on current Docker environment, continue to install and configure <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> broker inside a Docker container.  Warning: this option will launch a Mosquitto container on port 1883. If you already have an MQTT server on this machine on port 1883, this won't work.",
         "installBrokerButton": "Install broker on Docker",
         "installingBrokerButton": "Installation in progress...",
         "installBrokerError": "An error occured while installing Docker container, please consult Gladys logs.",
@@ -1210,6 +1271,15 @@
         "connectionError": "Error while connecting, please check your configuration.",
         "networkError": "Unable to contact Gladys, is your Gladys instance connected and accessible?",
         "disconnected": "Disconnected from MQTT broker."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "This tab allows you to see in real-time the MQTT messages arriving on your Gladys instance, enabling you to debug easily. After 2 minutes on this tab, debug mode will automatically deactivate. You can reactivate it with the refresh button at the top right.",
+        "activateDebugMode": "Activate",
+        "debugModeActivated": "Debug mode activated",
+        "date": "Time",
+        "topic": "Topic",
+        "message": "Message Content"
       }
     },
     "broadlink": {
@@ -1729,6 +1799,20 @@
         "label": "Select the lights you want to toggle",
         "description": "This action turn on the light if state is off or turn off the light if state is on"
       },
+      "blinkLights": {
+        "label": "Select the lights you want to make blink",
+        "description": "Configure blinking duration and speed",
+        "blinkingTime": {
+          "label": "Duration (in seconds)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
+        }
+      },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
       },
@@ -1829,6 +1913,21 @@
         "warning": "Network warning",
         "critical": "Network critical"
       },
+      "edfTempoCondition": {
+        "description": "The scene will continue if the following conditions on EDF Tempo are met.",
+        "selectDay": "For the day",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "selectPeakDayType": "If the day is",
+        "blueDay": "Blue Day",
+        "whiteDay": "White Day",
+        "redDay": "Red Day",
+        "noPeakDayCheck": "Any",
+        "noPeakHourCheck": "Any",
+        "selectPeakHourType": "And if it's",
+        "peakHour": "Peak Hour",
+        "offPeakHour": "Off-Peak Hour"
+      },
       "alarmCheckMode": {
         "description": "The scene will continue if the alarm is in the selected mode.",
         "houseLabel": "House",
@@ -1870,7 +1969,8 @@
       "light": {
         "turn-on": "Turn On the Lights",
         "turn-off": "Turn Off the Lights",
-        "toggle": "Toggle the Lights"
+        "toggle": "Toggle the Lights",
+        "blink": "Make the Lights blink"
       },
       "switch": {
         "turn-on": "Turn On the Switches",
@@ -1902,6 +2002,9 @@
       },
       "ecowatt": {
         "condition": "Condition on Ecowatt (France)"
+      },
+      "edf-tempo": {
+        "condition": "Condition on EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
@@ -2459,6 +2562,7 @@
     "hPa": "Hectopascal (hPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
@@ -2524,7 +2628,8 @@
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
-    "square-kilometer": "Square kilometer (km²)"
+    "square-kilometer": "Square kilometer (km²)",
+    "decibel": "Decibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2534,6 +2639,7 @@
     "pascal": "Pa",
     "hPa": "hPa",
     "bar": "bar",
+    "milli-bar": "mbar",
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
@@ -2600,7 +2706,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2623,6 +2730,13 @@
           "auto": "Auto",
           "cooling": "Cool",
           "heating": "Heat"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
         }
       }
     }
@@ -2684,7 +2798,12 @@
           "43": "Down press",
           "44": "Down hold",
           "45": "Off press",
-          "46": "Off hold"
+          "46": "Off hold",
+          "47": "Single press",
+          "48": "Long press",
+          "49": "Short release",
+          "50": "Long release",
+          "51": "Double press"
         }
       },
       "opening-sensor": {
@@ -2720,6 +2839,15 @@
           "other": "No value received",
           "zero": "No",
           "one": "Yes"
+        }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "No Risk",
+          "low-risk": "Low",
+          "medium-risk": "Medium",
+          "high-risk": "High",
+          "unknown": "Unknown"
         }
       }
     }
@@ -2798,7 +2926,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "Co2 Sensor",
-      "decimal": "Co2 (decimal)"
+      "decimal": "Co2 (decimal)",
+      "integer": "Co2 (integer)"
     },
     "switch": {
       "shortCategoryName": "Switch",
@@ -2812,7 +2941,9 @@
     },
     "siren": {
       "shortCategoryName": "Siren",
-      "binary": "Siren"
+      "binary": "Siren",
+      "lmh_volume": "Siren volume",
+      "melody": "Melody"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -2825,7 +2956,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Pressure sensor",
-      "decimal": "Pressure (decimal)"
+      "decimal": "Pressure (decimal)",
+      "integer": "Pressure (integer)"
     },
     "leak-sensor": {
       "shortCategoryName": "Leak sensor",
@@ -2931,7 +3063,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Speed sensor",
-      "decimal": "Speed"
+      "decimal": "Speed (decimal)",
+      "integer": "Speed (integer)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Precipitation sensor",
@@ -3001,6 +3134,18 @@
     "lock": {
       "binary": "Locking",
       "state": "State"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Sound sensor",
+      "integer": "Noise (integer)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Angle sensor",
+      "integer": "Angle (integer)"
+    },
+    "risk": {
+      "shortCategoryName": "Risk",
+      "integer": "Risk Level"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

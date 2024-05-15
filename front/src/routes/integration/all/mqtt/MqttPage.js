@@ -26,6 +26,17 @@ const MqttPage = ({ children, user }) => (
                   </Link>
 
                   <Link
+                    href="/dashboard/integration/device/mqtt/debug"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-code" />
+                    </span>
+                    <Text id="integration.mqtt.debugTab" />
+                  </Link>
+
+                  <Link
                     href="/dashboard/integration/device/mqtt/setup"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"

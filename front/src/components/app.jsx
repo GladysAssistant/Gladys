@@ -103,11 +103,11 @@ import LANManagerSettingsPage from '../routes/integration/all/lan-manager/settin
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
+import MqttDebugPage from '../routes/integration/all/mqtt/debug-page/Debug';
 
 // Zigbee2mqtt
 import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
 import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
-import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/settings-page';
 import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
 import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
 
@@ -268,9 +268,9 @@ const AppRouter = connect(
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
+        <MqttDebugPage path="/dashboard/integration/device/mqtt/debug" />
         <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
         <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
-        <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
         <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 

@@ -85,6 +85,7 @@ function buildFeatures(deviceName, expose, parentType) {
   // Add missing properties
   const typeFeaturesIndexes = getFeatureIndexes(values);
   const featureIndexes = typeFeaturesIndexes.length === 0 ? [0] : typeFeaturesIndexes;
+
   return featureIndexes.map((suffixIndex) => completeFeature(deviceName, definedFeature, property, suffixIndex));
 }
 

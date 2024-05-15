@@ -1,0 +1,12 @@
+[
+  {
+    "comPath": "/dev/ttyUSB0",
+    "comVID": "0658",
+    "comName": "0200"
+  },
+  {
+    "comPath": "/dev/ttyUSB1",
+    "comVID": "0478",
+    "comName": "0910"
+  }
+]

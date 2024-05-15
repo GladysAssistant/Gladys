@@ -43,6 +43,9 @@ const actionSchema = Joi.array().items(
       stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
       ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
+      edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
+      edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
+      edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),
@@ -60,6 +63,8 @@ const actionSchema = Joi.array().items(
       alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
       topic: Joi.string(),
       message: Joi.string().allow(''),
+      blinking_time: Joi.number(),
+      blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
     }),
   ),
 );

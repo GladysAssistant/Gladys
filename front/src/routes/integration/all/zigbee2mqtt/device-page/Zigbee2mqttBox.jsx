@@ -5,7 +5,9 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -79,10 +81,33 @@ class Zigbee2mqttBox extends Component {
     });
   };
 
+  getDeviceProperty = () => {
+    if (!this.props.device.features) {
+      return null;
+    }
+    const batteryLevelDeviceFeature = this.props.device.features.find(
+      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+    );
+    const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
+
+    return {
+      batteryLevel
+    };
+  };
+
   render(props, { loading, saveError, tooMuchStatesError, statesNumber }) {
+    const { batteryLevel } = this.getDeviceProperty();
     return (
       <div class="col-md-6">
         <div class="card">
+          <div class="card-header">
+            {props.device.name}{' '}
+            {batteryLevel && (
+              <div class="page-options d-flex">
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
+              </div>
+            )}
+          </div>
           <div
             class={cx('dimmer', {
               active: loading

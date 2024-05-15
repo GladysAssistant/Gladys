@@ -15,6 +15,16 @@ module.exports = function MqttController(mqttManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/mqtt/debug_mode Get MQTT connection status.
+   * @apiName status
+   * @apiGroup Mqtt
+   */
+  async function setDebugMode(req, res) {
+    const debugMode = mqttManager.setDebugMode(req.body.debug_mode);
+    res.json({ debug_mode: debugMode });
+  }
+
+  /**
    * @api {get} /api/v1/service/mqtt/status Get MQTT connection status.
    * @apiName status
    * @apiGroup Mqtt
@@ -53,6 +63,11 @@ module.exports = function MqttController(mqttManager) {
     'get /api/v1/service/mqtt/status': {
       authenticated: true,
       controller: status,
+    },
+    'post /api/v1/service/mqtt/debug_mode': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(setDebugMode),
     },
     'get /api/v1/service/mqtt/config': {
       authenticated: true,

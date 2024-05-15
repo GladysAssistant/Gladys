@@ -21,12 +21,16 @@
     "selectPlaceholder": "Auswählen …"
   },
   "color": {
-    "blue": "Blau",
-    "red": "Rot",
-    "green": "Grün",
+    "aqua": "Aqua",
     "black": "Schwarz",
-    "yellow": "Gelb",
-    "purple": "Lila"
+    "blue": "Blau",
+    "green": "Grün",
+    "grey": "Grau",
+    "orange": "Orange",
+    "pink": "Rosa",
+    "purple": "Lila",
+    "red": "Rot",
+    "yellow": "Gelb"
   },
   "calendar": {
     "allDay": "Ganztägig",
@@ -251,6 +255,7 @@
       "devices": "Geräte",
       "chart": "Diagramm",
       "ecowatt": "Ecowatt (Frankreich)",
+      "edf-tempo": "EDF Tempo",
       "clock": "Uhr",
       "scene": "Szene",
       "music": "Musik"
@@ -280,7 +285,8 @@
         "noRecentValue": "Kein aktueller Wert",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
-        "substractButton": "-"
+        "substractButton": "-",
+        "motionDetected": "Bewegung erkannt"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
@@ -315,7 +321,7 @@
         "latencyBoxDescription": "Je niedriger die Latenz, die du auswählst, desto schneller wird der Livestream starten. Um jedoch eine niedrige Latenz zu haben, benötigst du eine sehr schnelle Internetverbindung mit einem Mindest-Ping, da das Video sonst ruckelig wird. Wir empfehlen mittlere oder niedrige Latenz.",
         "upgradeGladysPlusPlanError": "Die Kameraübertragung ist in deinem Gladys-Plus-Plan nicht enthalten. Du musst ihn in unter Einstellungen -> Abrechnung aktualisieren.",
         "liveStartError": "Beim Starten dieses Livestreams ist ein Fehler aufgetreten. Bist du sicher, dass die URL deiner Kamera ein Video-Feed und kein Bild ist?",
-        "notNotSupportedBrowser": "Dieser Browser wird nicht unterstützt. Um die Ende-zu-Ende-Verschlüsselung dieses Videostreams zu ermöglichen, verwenden wir die MediaSource-API, die leider auf dem Safari iPhone nicht verfügbar ist. Seltsamerweise ist diese Funktion auf Safari iPad und MacOS verfügbar … Wir müssen also geduldig sein. Lass uns hoffen, dass die API bald auf dem iPhone verfügbar sein wird!",
+        "notNotSupportedBrowser": "Dieser Browser wird nicht unterstützt. Um eine End-to-End-Verschlüsselung dieses Videostreams zu ermöglichen, verwenden wir die MediaSource-API, die in diesem Browser möglicherweise nicht unterstützt wird. Wir empfehlen Ihnen Firefox, Safari oder einen auf Chromium basierenden Browser.",
         "tooManyRequests": "Du hast dein monatliches Videobandbreitenlimit erreicht. Kontaktiere uns per E-Mail oder im Forum, um mehr Bandbreite zu erhalten!",
         "liveAutoStartLabel": "Starte den Livestream automatisch",
         "liveAutoStartDescription": "Warnung: Dies kann die Belastung deines Gerätes sowie Netzwerks erhöhen.",
@@ -341,6 +347,8 @@
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
+        "chartColor": "Wählen Sie die Farbe des Diagramms aus",
+        "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",
@@ -361,6 +369,18 @@
         "ok": "Netz in Ordnung",
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
+      },
+      "edfTempo": {
+        "description": "Dieses Widget ermöglicht es Ihnen, den aktuellen Zustand von EDF Tempo anzuzeigen.",
+        "link": "Mehr über EDF Tempo erfahren",
+        "blueDay": "Blauer Tag",
+        "whiteDay": "Weißer Tag",
+        "redDay": "Roter Tag",
+        "notDefinedDay": "Nicht definiert",
+        "currentHourState": "Aktuell",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde",
+        "dayPeakTitle": "Tempo-Tage"
       },
       "clock": {
         "analog": "Analog",
@@ -459,6 +479,8 @@
         "disconnectButton": "Trennen",
         "bridgesOnNetwork": "Bridges im Netzwerk",
         "connectButton": "Verbinden/Erneut verbinden",
+        "syncBridges": "Brücken synchronisieren",
+        "bridgeNotUpToDateInfo": "Wenn Sie gerade eine Glühbirne zur Philips Hue-App hinzugefügt haben und diese Glühbirne nicht direkt von Gladys gesteuert werden kann, müssen Sie hierher kommen und auf die Schaltfläche \"Brücken synchronisieren\" klicken, um alle Informationen über diese neue Glühbirne wieder in Gladys zu bringen.",
         "scanButton": "Suchen",
         "bridgeButtonNotPressed": "Bridge-Taste nicht gedrückt. Bitte drücke die Taste auf deiner Philips Hue Bridge und versuche es erneut.",
         "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut oder kontaktiere die Gladys-Community.",
@@ -532,7 +554,9 @@
           "access_denied": "Autorisierung abgelehnt, bitte versuchen Sie es erneut und akzeptieren Sie den Zugriff auf Ihre Daten.",
           "invalid_client": "Ungültige Kunden-ID. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>.",
           "get_access_token_fail": "Falsche Informationen eingegeben oder Konto deaktiviert. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>."
-        }
+        },
+        "weatherApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Weather\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Station zu erhalten.",
+        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten."
       },
       "device": {
         "title": "Netatmo-Geräte in Gladys",
@@ -547,15 +571,16 @@
         "roomNetatmoApiLabel": "Raum in der Netatmo-API",
         "featuresLabel": "Funktionen",
         "saveButton": "Speichern",
+        "saveNotAllowButton": "Speichern nicht möglich",
         "deleteButton": "Löschen",
         "noValueReceived": "Kein Wert empfangen."
       },
       "discover": {
         "title": "Ihre mit Gladys kompatiblen Netatmo-Geräte",
-        "description": "Ihre Netatmo-Geräte müssen zuerst zu Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate unterstützt, die mit ihrem Plug verbunden sind. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie die neuen Funktionen Ihrer Geräte abrufen möchten.",
+        "description": "Ihre Netatmo-Geräte müssen Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate und die damit verbundenen Ventile ihres Steckers (API Energy) sowie Wetterstationen und deren Module (API Weather) unterstützt. Wenn Ihnen Geräte fehlen, überprüfen Sie bitte, ob Sie die richtigen APIs auf der Konfigurationsseite ausgewählt haben. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie neue Funktionen Ihrer Geräte abrufen möchten.",
         "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
         "descriptionInformation": "Der Statusabruf erfolgt derzeit alle 2 Minuten (Einschränkung der Netatmo-API).",
-        "noDeviceFound": "Keine Netatmo-Geräte gefunden. Haben Sie alle Schritte der Dokumentation befolgt, um Ihre Geräte in der Netatmo-API zu registrieren?",
+        "noDeviceFound": "Keine Netatmo-Geräte gefunden. Wenn Sie sicher sind, dass Sie über ein von Gladys unterstütztes Netatmo-Gerät verfügen, um Ihre Geräte in der Netatmo-API zu registrieren?",
         "alreadyCreatedButton": "Bereits erstellt",
         "updateButton": "Aktualisieren",
         "unmanagedModelButton": "Nicht unterstütztes Modell",
@@ -569,13 +594,17 @@
         "descriptionCreateProject": "Danach müssen Sie eine \"Anwendung\" in Ihrem Netatmo-Entwicklerkonto über das Menü <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a> erstellen.",
         "descriptionGetKeys": "Dann haben Sie Zugriff auf zwei Schlüssel: \"Kunden-ID\" und \"Kundengeheimnis\", die Sie unten kopieren können.",
         "descriptionScopeInformation": "Wenn Sie Gladys mit Ihrer dedizierten Netatmo-App verbinden, erteilen Sie ihr die Berechtigung, auf Ihre Daten zum Lesen und Schreiben zuzugreifen (genannt Scopes \"read\" und \"write\"). Sie müssen nichts konfigurieren, diese Scopes sind automatisch integriert und werden Ihnen bei der Verbindungsanfrage angezeigt (siehe Dokumentation bei Bedarf). Da Gladys lokal installiert ist, werden keine dieser Daten preisgegeben.",
-        "titleAdditionalInformation": "Weitere Informationen über die Funktionsweise der \"Energy\"-API:",
-        "descriptionAdditionalInformation": "Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
+        "titleAdditionalInformationEnergyApi": "Weitere Informationen über die Funktionsweise der \"Energy\"-API:",
+        "descriptionAdditionalInformationEnergyApi": "Sie müssen unten auf der Seite die API \"Energy\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
+        "titleAdditionalInformationWeatherApi": "Weitere Informationen über die Funktionsweise der \"Weather\"-API:",
+        "descriptionAdditionalInformationWeatherApi": "Sie müssen unten auf der Seite die API \"Weather\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Wenn Sie auch über Geräte verfügen, die zur API \"Energy\" gehören (Stecker, Thermostat oder Ventil), haben Sie Zugriff auf eine zusätzliche Funktionalität bei Innenhygrometergeräten, um die Durchschnittstemperatur des entsprechenden Raums zu ermitteln. Vergessen Sie also nicht, die API \"Energy\" auszuwählen, um auf diese Funktionalität zuzugreifen.",
         "clientIdLabel": "Kunden-ID",
         "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
         "clientSecretLabel": "Kundengeheimnis",
         "clientSecretPlaceholder": "Kundengeheimnis von My Apps in Netatmo Connect",
         "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
+        "energyApiLabel": "Aktiviere \"Energy\" API (Netatmo Stecker, Thermostat und Ventile abrufen)",
+        "weatherApiLabel": "Aktiviere \"Weather\" API (Netatmo Wetterstation Geräte abrufen)",
         "saveLabel": "Speichern und verbinden",
         "disconnectLabel": "Trennen"
       },
@@ -674,52 +703,78 @@
       "description": "Steuere deine Zigbee-Geräte mit Zigbee2MQTT.",
       "deviceTab": "Meine Geräte",
       "discoverTab": "Geräte in der Nähe",
-      "settingsTab": "Einstellungen",
       "setupTab": "Einrichtung",
       "status": {
         "notConfigured": "Es ist kein Zigbee2MQTT-USB-Dongle konfiguriert. Bitte gehe zu den ",
         "notEnabled": "Zigbee2MQTT ist nicht aktiviert. Bitte gehe zur ",
-        "mqttNotInstalled": "MQTT-Broker konnte nicht installiert werden",
-        "mqttNotRunning": "MQTT-Broker konnte nicht gestartet werden",
-        "zigbee2mqttNotInstalled": "Zigbee2MQTT konnte nicht installiert werden",
-        "zigbee2mqttNotRunning": "Zigbee2MQTT konnte nicht gestartet werden",
-        "gladysNotConnected": "Gladys konnte keine Verbindung zu MQTT herstellen",
-        "zigbee2mqttNotConnected": "Zigbee2MQTT konnte keine Verbindung zu MQTT herstellen",
         "settingsPageLink": "USB-Dongle-Einstellungen.",
         "setupPageLink": "Einrichtungseite."
       },
-      "settings": {
-        "title": "USB-Dongle-Einstellungen",
-        "description": "Um Zigbee2MQTT in Gladys zu verwenden, benötigst du einen mit deiner Gladys-Instanz verbundenen Zigbee2MQTT-USB-Dongle.",
-        "zigbee2mqttUsbDriverPathLabel": "Wähle den USB-Port aus, an dem dein Zigbee2MQTT-Dongle angeschlossen ist",
-        "zigbee2mqttUsbDriverPathPlaceholder": "USB-Port",
-        "zigbee2mqttUsbDongleNameLabel": "Wähle deinen Zigbee-Dongle-Modell aus",
-        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee-Dongle-Modell",
-        "saveButton": "Einstellungen sichern",
-        "refreshButton": "USB-Liste aktualisieren",
-        "notAttached": "Gladys ist mit keinem Zigbee2MQTT-USB-Dongle verbunden.",
-        "attached": "Zigbee2MQTT-USB-Dongle konfiguriert.",
-        "saving": "USB-Dongle-Konfiguration sichern …"
-      },
       "setup": {
-        "title": "Zigbee2MQTT-Konfiguration",
-        "description": "Dieser Dienst verwendet zwei unabhängige Docker-Container (MQTT-Broker und Zigbee2MQTT). Aktiviere Zigbee2MQTT, um diese Container bereitzustellen.\nWeitere Informationen findest du in der Zigbee2MQTT-Dokumentation.",
-        "enableLabel": "Zigbee2MQTT aktivieren",
-        "nonDockerEnv": "Gladys läuft nicht unter Docker. Du kannst von hier aus keinen MQTT-Broker installieren.",
-        "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Broker von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein.",
-        "enableZigbee2mqtt": "Zigbee2MQTT aktivieren",
-        "containersStatus": "Zigbee2MQTT-Container",
-        "serviceStatus": "Status des Zigbee2MQTT-Dienstes",
+        "title": "Konfiguration des Zigbee2mqtt-Dienstes",
+        "modes": {
+          "local": {
+            "title": "Installation von Gladys aus",
+            "description": "Gladys wird zwei Docker-Container konfigurieren: MQTT und Zigbee2mqtt.",
+            "dockerInstallationRequirementLabel": "Gladys muss unter Docker ausgeführt werden",
+            "dockerNetworkHostRequirementLabel": "Der Docker-Container von Gladys muss mit der Option \"network=host\" gestartet werden",
+            "usbDongleRequirementLabel": "Der Zigbee-USB-Dongle muss angeschlossen sein",
+            "detailsDescription": "Um Zigbee2mqtt mit Gladys zu verwenden, muss ein Zigbee-USB-Dongle eingesteckt werden.",
+            "usbDriverPathLabel": "Wählen Sie den USB-Port, an dem der Zigbee-Dongle eingesteckt ist",
+            "usbDriverPathPlaceholder": "USB-Port",
+            "usbDongleNameLabel": "Wählen Sie das Modell des verwendeten Zigbee-Dongles",
+            "usbDongleNamePlaceholder": "Modell des Zigbee-Dongles",
+            "z2mTcpPortLabel": "Geben Sie den vom Zigbee2Mqtt-Webanwendungsport freigegebenen TCP-Port ein",
+            "z2mTcpPortDescription": "Wenn leer gelassen, wird ein zufälliger Port verwendet.",
+            "summary": {
+              "title": "Konfiguration",
+              "usbPort": "USB-Port",
+              "dongleName": "Dongle",
+              "unknownDongle": "Nicht definiert",
+              "tcpPort": "TCP-Port"
+            }
+          },
+          "remote": {
+            "title": "Verbindung zu einer vorhandenen Installation",
+            "description": "Gladys wird über MQTT mit einer vorhandenen externen Installation verbunden.",
+            "z2mInstallationRequirementLabel": "Eine eigenständige Zigbee2Mqtt-Anwendung",
+            "mqttBrokerRequirementLabel": "Ein MQTT-Broker, der mit der Zigbee2Mqtt-Anwendung verbunden ist",
+            "detailsDescription": "Mit diesem Konfigurationsmodus ist es möglich, sich mit einer externen Zigbee2Mqtt-Installation mit ihrem MQTT-Broker zu verbinden.",
+            "mqttModeLabel": "Wählen Sie den MQTT-Broker aus",
+            "external": {
+              "modeLabel": "Externer MQTT"
+            },
+            "summary": {
+              "title": "Konfiguration",
+              "mqttMode": "Broker MQTT"
+            }
+          }
+        },
+        "requirementsLabel": "<u>Bedingungen</u>:",
+        "selectInstallationMode": "Auswählen",
+        "changeButtonLabel": "Ändern",
+        "resetLabel": "Abbrechen",
+        "errorLoadingStatesLabel": "Beim Laden der Informationen des Gladys-Dienstes ist ein Fehler aufgetreten. Stellen Sie sicher, dass Gladys auf dem neuesten Stand ist, andernfalls überprüfen Sie die Protokolle.",
+        "saveError": "Die Konfiguration hat den Dienst nicht gestartet, bitte überprüfen Sie diese.",
+        "enableLabel": "Dienst aktivieren oder deaktivieren",
+        "enableDescription": "Beim nächsten Neustart von Gladys wird der Dienst wieder gestartet. Abhängig von der Leistung Ihres Computers und der Geschwindigkeit Ihres Netzwerks kann das Starten dieses Dienstes im Modus \"Installation von Gladys aus\" zwischen 2 Minuten und 1 Stunde dauern. Sie können den Dienst dauerhaft von dieser Seite deaktivieren: <a href=\"/dashboard/settings/service\">Einstellungen > Dienste</a>.",
+        "toggleError": "Ein Fehler ist aufgetreten. Bitte überprüfen Sie die Konfiguration des Dienstes.",
+        "serviceStatus": "Dienststatus",
+        "description": "Dieser Dienst verwendet zwei Docker-Container (MQTT-Broker und Zigbee2mqtt). Aktivieren Sie Zigbee2mqtt, um diese Container bereitzustellen. Weitere Informationen finden Sie auf der Zigbee2mqtt-Dokumentationsseite.",
+        "nonDockerEnv": "Gladys wird derzeit nicht in Docker ausgeführt. Es ist unmöglich, Zigbee2mqtt von Gladys aus zu aktivieren.",
+        "invalidDockerNetwork": "Gladys basiert auf einer benutzerdefinierten Installation. Um Zigbee2mqtt von dieser Seite aus zu installieren, muss der Docker-Container von Gladys mit der Option \"network=host\" gestartet werden.",
+        "enableZigbee2mqtt": "Zigbee2mqtt aktivieren",
+        "containersStatus": "Mit Zigbee2mqtt verbundene Container",
         "link": "Link",
-        "connected": "Zigbee2MQTT wurde erfolgreich gestartet.",
-        "error": "Beim Starten von Zigbee2MQTT ist ein Fehler aufgetreten.",
+        "connected": "Zigbee2mqtt erfolgreich gestartet.",
+        "error": "Beim Starten des Zigbee2mqtt-Dienstes ist ein Fehler aufgetreten.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
-        "zigbee2Mqtt": "Zigbee2MQTT",
+        "zigbee2Mqtt": "Zigbee2mqtt",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
-        "connectionUrl": "URL der Zigbee2MQTT-Oberfläche: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL der Zigbee2mqtt-Schnittstelle: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
       },
       "device": {
         "title": "Meine Geräte",
@@ -1029,6 +1084,7 @@
       "discoverDeviceDescr": "Automatisches Scannen der Z-Wave JS UI Geräte",
       "nameLabel": "Gerätename",
       "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+      "locationLabel": "Gerätestandort",
       "noFeaturesHandled": "Dieses Gerät wird noch nicht von Gladys unterstützt. Bitte reichen Sie es ein, damit es hinzugefügt werden kann!",
       "featuresLabel": "Funktionen",
       "roomLabel": "Raum",
@@ -1135,6 +1191,7 @@
       "title": "MQTT",
       "description": "Verbinde dich mit einem lokalen oder entfernten MQTT-Server.",
       "deviceTab": "Meine Geräte",
+      "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
       "documentation": "MQTT-Dokumentation",
       "apiDocumentation": "MQTT-API-Dokumentation ",
@@ -1179,7 +1236,13 @@
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
         "mqttTopicToListenExampleLabel": "MQTT-Hörensthema",
         "mqttTopicToListenExampleDescription": "Gladys veröffentlicht in diesem Topic, wenn das Gerät in Gladys gesteuert wird. Du musst diesem Topic zuhören. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
+        "mqttCustomTopic": "Benutzerdefiniertes MQTT-Thema",
+        "mqttCustomTopicDescription": "Gladys bietet eine Standard-MQTT-API an, ermöglicht Ihnen jedoch die Verwendung benutzerdefinierter Themen, wenn Sie ein Gerät verwenden, das nativ auf einem bestimmten Thema veröffentlicht.",
+        "mqttCustomTopicPlaceholder": "Geben Sie das MQTT-Thema ein",
         "copyMqttTopic": "MQTT-Thema kopieren",
+        "mqttCustomObjectPath": "MQTT JSON Nachricht",
+        "mqttCustomObjectPathDescription": "Wenn Ihr verbundenes Objekt MQTT-Nachrichten in Form eines JSON sendet, können Sie hier den Pfad der Eigenschaft angeben, der von Gladys verwendet werden soll. Beispiel: Eigenschaft1.Eigenschaft2.Eigenschaft3. Lassen Sie es leer, wenn das Format kein JSON ist.",
+        "mqttCustomObjectPathPlaceholder": "Pfad im JSON folgen",
         "copied": "Kopiert!",
         "copyFailed": "Kopieren fehlgeschlagen",
         "deleteLabel": "Funktion löschen"
@@ -1191,7 +1254,7 @@
         "nonDockerEnv": "Gladys läuft nicht in Docker. Du kannst von hier aus keinen MQTT-Broker installieren.",
         "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Broker von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein.",
         "installBrokerContainer": "Verwende den Broker in einem Docker-Container.",
-        "brokerDockerNotInstalled": "In der aktuellen Docker-Umgebung ist noch kein Broker verfügbar. Fahre fort, um den <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a>-Broker in einem Docker-Container zu installieren und zu konfigurieren.",
+        "brokerDockerNotInstalled": "In der aktuellen Docker-Umgebung ist noch kein Broker verfügbar. Fahre fort, um den <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a>-Broker in einem Docker-Container zu installieren und zu konfigurieren.  Achtung, diese Option wird einen Mosquitto-Container auf Port 1883 starten. Wenn Sie bereits einen MQTTT-Server auf diesem Rechner auf Port 1883 haben, wird dies nicht funktionieren.",
         "installBrokerButton": "Broker in Docker installieren",
         "installingBrokerButton": "Installieren …",
         "installBrokerError": "Ein Fehler ist beim Installieren des Docker-Containers aufgetreten. Bitte prüfe die Gladys-Protokolle.",
@@ -1208,6 +1271,15 @@
         "connectionError": "Die Verbindung ist fehlgeschlagen. Bitte überprüfe deine Konfiguration.",
         "networkError": "Gladys kann nicht erreicht werden. Ist deine Gladys-Instanz verbunden und erreichbar?",
         "disconnected": "Vom MQTT-Broker getrennt."
+      },
+      "debug": {
+        "title": "Debug MQTT",
+        "description": "Dieses Register ermöglicht es Ihnen, in Echtzeit die MQTT-Nachrichten zu sehen, die auf Ihrer Gladys-Instanz eingehen, und erleichtert so das Debuggen. Nach 2 Minuten auf diesem Register wird der Debug-Modus automatisch deaktiviert. Sie können ihn mit der Aktualisierungsschaltfläche oben rechts wieder aktivieren.",
+        "activateDebugMode": "Aktivieren",
+        "debugModeActivated": "Debug-Modus aktiviert",
+        "date": "Zeit",
+        "topic": "Thema",
+        "message": "Nachrichteninhalt"
       }
     },
     "broadlink": {
@@ -1675,6 +1747,20 @@
         "label": "Wähle die Lichter aus, die umgeschaltet werden sollen",
         "description": "Diese Aktion schaltet das Licht ein, wenn es ausgeschaltet ist bzw. schaltet es aus, wenn es eingeschaltet ist"
       },
+      "blinkLights": {
+        "label": "Wählen Sie die Lichter aus, die Sie zum Blinken bringen möchten",
+        "description": "Stellen Sie die Dauer und die Geschwindigkeit des Blinkens ein",
+        "blinkingTime": {
+          "label": "Dauer (in Sekunden)",
+          "placeholder": "3"
+        },
+        "blinkingSpeed": {
+          "label": "Modus",
+          "slow": "Langsam",
+          "medium": "Mittel",
+          "fast": "Schnell"
+        }
+      },
       "turnOnSwitches": {
         "label": "Wähle die Schalter aus, die eingeschaltet werden sollen"
       },
@@ -1775,6 +1861,21 @@
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
       },
+      "edfTempoCondition": {
+        "description": "Die Szene wird fortgesetzt, wenn die untenstehenden Bedingungen für EDF Tempo erfüllt sind.",
+        "selectDay": "Für den Tag",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "selectPeakDayType": "Wenn der Tag im",
+        "blueDay": "Blauen Tag",
+        "whiteDay": "Weißen Tag",
+        "redDay": "Roten Tag",
+        "noPeakDayCheck": "Beliebig",
+        "noPeakHourCheck": "Beliebig",
+        "selectPeakHourType": "Und wenn es",
+        "peakHour": "Hochtarifstunde",
+        "offPeakHour": "Niedrigtarifstunde"
+      },
       "alarmCheckMode": {
         "description": "Die Szene wird fortgesetzt, wenn die Alarmanlage im ausgewählten Modus ist.",
         "houseLabel": "Zuhause",
@@ -1816,7 +1917,8 @@
       "light": {
         "turn-on": "Licht einschalten",
         "turn-off": "Licht ausschalten",
-        "toggle": "Lichter umschalten"
+        "toggle": "Lichter umschalten",
+        "blink": "Lichter blinken lassen"
       },
       "switch": {
         "turn-on": "Schalter einschalten",
@@ -1848,6 +1950,9 @@
       },
       "ecowatt": {
         "condition": "Bedingung für Ecowatt (Frankreich)"
+      },
+      "edf-tempo": {
+        "condition": "Bedingung für EDF-Tempo"
       },
       "alarm": {
         "check-alarm-mode": "Wenn der Alarm im Modus ist",
@@ -2405,6 +2510,7 @@
     "hPa": "Hektopascal (hPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
@@ -2470,7 +2576,8 @@
     "microgram-per-cubic-meter": "Mikrogramm pro Kubikmeter (µg/m³)",
     "square-centimeter": "Quadratzentimeter (cm²)",
     "square-meter": "Quadratmeter (m²)",
-    "square-kilometer": "Quadratkilometer (km²)"
+    "square-kilometer": "Quadratkilometer (km²)",
+    "decibel": "Dezibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2480,6 +2587,7 @@
     "pascal": "Pa",
     "hPa": "hPa",
     "bar": "bar",
+    "milli-bar": "mbar",
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
@@ -2546,7 +2654,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2569,6 +2678,13 @@
           "auto": "Automatisch",
           "cooling": "Kühlen",
           "heating": "Heizen"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch"
         }
       }
     }
@@ -2630,7 +2746,12 @@
           "43": "Ab-Taste gedrückt",
           "44": "Ab-Taste gehalten",
           "45": "Aus-Taste gedrückt",
-          "46": "Aus-Taste gehalten"
+          "46": "Aus-Taste gehalten",
+          "47": "Einmaliges Drücken",
+          "48": "Langer Druck",
+          "49": "Kurzes Loslassen",
+          "50": "Langes Loslassen",
+          "51": "Doppeltes Drücken"
         }
       },
       "opening-sensor": {
@@ -2666,6 +2787,15 @@
           "other": "Kein Wert empfangen",
           "zero": "Nein",
           "one": "Ja"
+        }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "Kein Risiko",
+          "low-risk": "Niedrig",
+          "medium-risk": "Mittel",
+          "high-risk": "Hoch",
+          "unknown": "Unbekannt"
         }
       }
     }
@@ -2744,7 +2874,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "CO2-Sensor",
-      "decimal": "CO2 (Dezimal)"
+      "decimal": "CO2 (Dezimal)",
+      "integer": "CO2 (Ganzzahl)"
     },
     "switch": {
       "shortCategoryName": "Schalter",
@@ -2758,7 +2889,9 @@
     },
     "siren": {
       "shortCategoryName": "Sirene",
-      "binary": "Sirene"
+      "binary": "Sirene",
+      "lmh_volume": "Lautstärke der Sirene",
+      "melody": "Melodie"
     },
     "cube": {
       "shortCategoryName": "Würfel",
@@ -2771,7 +2904,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Drucksensor",
-      "decimal": "Druck (dezimal)"
+      "decimal": "Druck (dezimal)",
+      "integer": "Druck (Ganzzahl)"
     },
     "leak-sensor": {
       "shortCategoryName": "Wasserlecksensor",
@@ -2877,7 +3011,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Geschwindigkeitssensor",
-      "decimal": "Geschwindigkeit"
+      "decimal": "Geschwindigkeit (dezimal)",
+      "integer": "Geschwindigkeit (ganze Zahl)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Niederschlagssensor",
@@ -2947,6 +3082,18 @@
     "lock": {
       "binary": "Verriegelung",
       "state": "Zustand"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Schallsensor",
+      "integer": "Rauschen (ganze Zahl)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Winkelsensor",
+      "integer": "Winkel (ganze Zahl)"
+    },
+    "risk": {
+      "shortCategoryName": "Risiko",
+      "integer": "Risikostufe"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

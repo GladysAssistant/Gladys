@@ -49,7 +49,7 @@ describe('Netatmo Set Value', () => {
   });
 
   it('should throw an error if not home ID parameter', async () => {
-    const deviceMockFake = JSON.parse(JSON.stringify(deviceMock));
+    const deviceMockFake = { ...JSON.parse(JSON.stringify(deviceMock)) };
     const deviceFeatureMock = deviceMockFake.features.filter((feature) =>
       feature.external_id.includes('therm_setpoint_temperature'),
     )[0];
@@ -69,7 +69,7 @@ describe('Netatmo Set Value', () => {
   });
 
   it('should throw an error if bad externalId prefix', async () => {
-    const deviceMockFake = JSON.parse(JSON.stringify(deviceMock));
+    const deviceMockFake = { ...JSON.parse(JSON.stringify(deviceMock)) };
     const deviceFeatureMock = deviceMockFake.features.filter((feature) =>
       feature.external_id.includes('therm_setpoint_temperature'),
     )[0];
@@ -89,7 +89,7 @@ describe('Netatmo Set Value', () => {
   });
 
   it('should throw an error if no externalId topic', async () => {
-    const deviceMockFake = JSON.parse(JSON.stringify(deviceMock));
+    const deviceMockFake = { ...JSON.parse(JSON.stringify(deviceMock)) };
     const deviceFeatureMock = deviceMockFake.features.filter((feature) =>
       feature.external_id.includes('therm_setpoint_temperature'),
     )[0];

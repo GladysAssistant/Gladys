@@ -16,6 +16,8 @@ const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { configureContainer } = require('./configureContainer');
 const { setup } = require('./setup');
+const { getSetup } = require('./getSetup');
+const { saveOrDestroyVariable } = require('./saveOrDestroyVariable');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
@@ -23,6 +25,9 @@ const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { JOB_TYPES } = require('../../../utils/constants');
+
+// EVENTS
+const { emitStatusEvent } = require('./events/emitStatusEvent');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -49,8 +54,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
   this.z2mPermitJoin = false;
-  this.networkModeValid = true;
-  this.dockerBased = true;
+  this.networkModeValid = false;
+  this.dockerBased = false;
 
   this.containerRestartWaitTimeInMs = 5 * 1000;
 
@@ -77,11 +82,16 @@ Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
 Zigbee2mqttManager.prototype.configureContainer = configureContainer;
 Zigbee2mqttManager.prototype.setup = setup;
+Zigbee2mqttManager.prototype.getSetup = getSetup;
+Zigbee2mqttManager.prototype.saveOrDestroyVariable = saveOrDestroyVariable;
 Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
+
+// EVENTS
+Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;
 
 module.exports = Zigbee2mqttManager;
