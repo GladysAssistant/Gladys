@@ -66,8 +66,8 @@ const INDEXATMO_COLORS = {
   'bad-indexatmo': 'danger',
   'verypoor-indexatmo': 'darkred',
   'extremelybad-indexatmo': 'purple',
-  'event-indexatmo': 'grey',
-  'unavailable-indexatmo': 'lightgrey',
+  'event-indexatmo': 'gray',
+  'unavailable-indexatmo': 'gray',
   unknown: 'secondary'
 };
 
