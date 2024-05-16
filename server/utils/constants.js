@@ -453,6 +453,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
   RISK: 'risk',
+  INDEXATMO: 'indexatmo',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
   SIREN: 'siren',
@@ -656,6 +657,9 @@ const DEVICE_FEATURE_TYPES = {
     TEXT: 'text',
   },
   RISK: {
+    INTEGER: 'integer',
+  },
+  INDEXATMO: {
     INTEGER: 'integer',
   },
 };

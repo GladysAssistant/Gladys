@@ -2797,6 +2797,19 @@
           "high-risk": "High",
           "unknown": "Unknown"
         }
+      },
+      "indexatmo": {
+        "integer": {
+          "unavailable-indexatmo": "Unavailable",
+          "good-indexatmo": "Good",
+          "medium-indexatmo": "Medium",
+          "degraded-indexatmo": "Degraded",
+          "bad-indexatmo": "Bad",
+          "verypoor-indexatmo": "Very poor",
+          "extremelybad-indexatmo": "Extremely bad",
+          "event-indexatmo": "Event",
+          "unknown": "Unknown"
+        }
       }
     }
   },
@@ -3090,6 +3103,10 @@
     "risk": {
       "shortCategoryName": "Risk",
       "integer": "Risk Level"
+    },
+    "indexatmo": {
+      "shortCategoryName": "Atmo",
+      "integer": "Index Atmo"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

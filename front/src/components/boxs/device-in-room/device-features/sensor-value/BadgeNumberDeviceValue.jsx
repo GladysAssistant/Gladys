@@ -59,6 +59,23 @@ const getRiskColor = value => {
   return RISK_COLORS[value];
 };
 
+const INDEXATMO_COLORS = {
+  'good-indexatmo': 'blue',
+  'medium-indexatmo': 'success',
+  'degraded-indexatmo': 'warning',
+  'bad-indexatmo': 'danger',
+  'verypoor-indexatmo': 'darkred',
+  'extremelybad-indexatmo': 'purple',
+  'event-indexatmo': 'grey',
+  'unavailable-indexatmo': 'lightgrey',
+  unknown: 'secondary'
+};
+
+const getIndiceaAtmoColor = value => {
+  return INDICEATMO_COLORS[value];
+};
+
+
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
@@ -66,7 +83,8 @@ const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 12, 35),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
-  [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
+  [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value),
+  [DEVICE_FEATURE_CATEGORIES.INDEXATMO]: value => getIndiceaAtmoColor(value)
 };
 
 const BADGE_VALUE_CONVERTERS = {
@@ -75,6 +93,17 @@ const BADGE_VALUE_CONVERTERS = {
     1: 'low-risk',
     2: 'medium-risk',
     3: 'high-risk'
+  },
+
+  [DEVICE_FEATURE_CATEGORIES.INDEXATMO]: {
+    0: 'unavailable-indexatmo',
+    1: 'good-indexatmo',
+    2: 'medium-indexatmo',
+    3: 'degraded-indexatmo',
+    4: 'bad-indexatmo',
+    5: 'verypoor-indexatmo',
+    6: 'extremelybad-indexatmo',
+    7: 'event-indexatmo'
   }
 };
 

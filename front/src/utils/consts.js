@@ -342,5 +342,8 @@ export const DeviceFeatureCategoriesIcon = {
   },
   [DEVICE_FEATURE_CATEGORIES.RISK]: {
     [DEVICE_FEATURE_TYPES.RISK.INTEGER]: 'alert-circle'
+  },
+  [DEVICE_FEATURE_CATEGORIES.INDEXATMO]: {
+    [DEVICE_FEATURE_TYPES.INDEXATMO.INTEGER]: 'wind'
   }
 };

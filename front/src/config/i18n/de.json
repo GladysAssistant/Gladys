@@ -2797,6 +2797,19 @@
           "high-risk": "Hoch",
           "unknown": "Unbekannt"
         }
+      },
+      "indexatmo": {
+        "integer": {
+          "unavailable-indexatmo": "Nicht verfügbar",
+          "good-indexatmo": "Gut",
+          "medium-indexatmo": "Mittel",
+          "degraded-indexatmo": "Farbverlauf",
+          "bad-indexatmo": "Schlecht",
+          "verypoor-indexatmo": "Sehr schlecht",
+          "extremelybad-indexatmo": "Extrem schlecht",
+          "event-indexatmo": "Ereignis",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -3090,6 +3103,10 @@
     "risk": {
       "shortCategoryName": "Risiko",
       "integer": "Risikostufe"
+    },
+    "indexatmo": {
+      "shortCategoryName": "Atmo",
+      "integer": "Anzeichen Atmo"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",
