@@ -72,7 +72,7 @@ const INDEXATMO_COLORS = {
 };
 
 const getIndiceaAtmoColor = value => {
-  return INDICEATMO_COLORS[value];
+  return INDEXATMO_COLORS[value];
 };
 
 
