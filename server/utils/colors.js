@@ -139,12 +139,6 @@ function kelvinToRGB(kelvin) {
   } else {
     green = temperature - 60;
     green = 288.1221695283 * green ** -0.0755148492;
-    if (green < 0) {
-      green = 0;
-    }
-    if (green > 255) {
-      green = 255;
-    }
   }
 
   // Calculate Blue
@@ -157,9 +151,6 @@ function kelvinToRGB(kelvin) {
     blue = 138.5177312231 * Math.log(blue) - 305.0447927307;
     if (blue < 0) {
       blue = 0;
-    }
-    if (blue > 255) {
-      blue = 255;
     }
   }
 
