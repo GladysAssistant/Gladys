@@ -79,9 +79,11 @@ describe('colors', () => {
 
 describe('ColorTemperature', () => {
   const kelvinInRgb = [
+    { kelvin: 0, rgb: [255, 0, 0] },
     { kelvin: 2000, rgb: [255, 137, 14] },
     { kelvin: 5000, rgb: [255, 228, 206] },
     { kelvin: 8000, rgb: [221, 230, 255] },
+    { kelvin: 6600, rgb: [255, 255, 255] },
   ];
   kelvinInRgb.forEach((color) => {
     it(`color ${color.kelvin}K should equal ${color.rgb} in RGB`, () => {

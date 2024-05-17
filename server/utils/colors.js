@@ -121,9 +121,6 @@ function kelvinToRGB(kelvin) {
   } else {
     red = temperature - 60;
     red = 329.698727446 * red ** -0.1332047592;
-    if (red < 0) {
-      red = 0;
-    }
     if (red > 255) {
       red = 255;
     }
