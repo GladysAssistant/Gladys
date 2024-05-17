@@ -1,5 +1,14 @@
 const { expect } = require('chai');
-const { intToHex, hexToInt, intToRgb, rgbToInt, xyToInt, hsbToRgb, rgbToHsb } = require('../../utils/colors');
+const {
+  intToHex,
+  hexToInt,
+  intToRgb,
+  rgbToInt,
+  xyToInt,
+  hsbToRgb,
+  rgbToHsb,
+  kelvinToRGB,
+} = require('../../utils/colors');
 
 describe('colors', () => {
   const matchingTable = {
@@ -65,5 +74,19 @@ describe('colors', () => {
         expect(value).to.equal(int);
       });
     }
+  });
+});
+
+describe('ColorTemperature', () => {
+  const kelvinInRgb = [
+    { kelvin: 2000, rgb: [255, 137, 14] },
+    { kelvin: 5000, rgb: [255, 228, 206] },
+    { kelvin: 8000, rgb: [221, 230, 255] },
+  ];
+  kelvinInRgb.forEach((color) => {
+    it(`color ${color.kelvin}K should equal ${color.rgb} in RGB`, () => {
+      const value = kelvinToRGB(color.kelvin);
+      expect(value).to.deep.equal(color.rgb);
+    });
   });
 });

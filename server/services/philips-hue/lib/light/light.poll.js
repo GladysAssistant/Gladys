@@ -1,6 +1,6 @@
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { LIGHT_EXTERNAL_ID_BASE } = require('../utils/consts');
-const { xyToInt, hsbToRgb, rgbToInt } = require('../../../../utils/colors');
+const { xyToInt, hsbToRgb, rgbToInt, kelvinToRGB, miredToKelvin } = require('../../../../utils/colors');
 
 const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/parseExternalId');
@@ -37,6 +37,8 @@ async function poll(device) {
   let currentColorState;
   switch (state.colormode) {
     case 'ct':
+      currentColorState = rgbToInt(kelvinToRGB(miredToKelvin(state.ct)));
+      break;
     case 'xy':
       currentColorState = xyToInt(state.xy[0], state.xy[1]);
       break;
@@ -70,6 +72,19 @@ async function poll(device) {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
       state: newBrightnessValue,
+    });
+  }
+
+  const colorTemperatureFeature = getDeviceFeature(
+    device,
+    DEVICE_FEATURE_CATEGORIES.LIGHT,
+    DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+  );
+  if (colorTemperatureFeature && colorTemperatureFeature.last_value !== state.ct) {
+    logger.debug(`Polling Philips Hue ${lightId}, new color temperature value = ${state.ct}`);
+    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
+      state: state.ct,
     });
   }
 }
