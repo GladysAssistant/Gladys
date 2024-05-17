@@ -95,7 +95,7 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
   });
 
   return {
-    name: zwaveJsDevice.name,
+    name: zwaveJsDevice.name || '',
     external_id: `zwavejs-ui:${zwaveJsDevice.id}`,
     selector: `zwavejs-ui:${zwaveJsDevice.id}`,
     service_id: serviceId,

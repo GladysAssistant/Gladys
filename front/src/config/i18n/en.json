@@ -1100,7 +1100,7 @@
       },
       "discover": {
         "title": "Devices detected on your Z-Wave JS UI instance",
-        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name are displayed here.",
+        "description": "Z-Wave JS UI devices are automatically discovered.",
         "error": "Error discovering Z-Wave JS UI devices. Is your MQTT broker available and accessible?",
         "noDeviceFound": "No Z-Wave JS UI devices were discovered.",
         "errorWhileScanning": "An error occurred during discovery.",

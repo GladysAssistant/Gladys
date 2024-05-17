@@ -10,10 +10,8 @@ async function onNewDeviceDiscover(data) {
   const devices = [];
   const zwaveDevices = [];
   data.result.forEach((zwaveJSDevice) => {
-    if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0) {
-      zwaveDevices.push(zwaveJSDevice);
-      devices.push(convertToGladysDevice(this.serviceId, zwaveJSDevice));
-    }
+    zwaveDevices.push(zwaveJSDevice);
+    devices.push(convertToGladysDevice(this.serviceId, zwaveJSDevice));
   });
   this.devices = devices;
   this.zwaveJSDevices = zwaveDevices;
