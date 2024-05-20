@@ -98,8 +98,25 @@ class EditScene extends Component {
     }
     this.setState({ saving: false });
   };
-  addAction = columnIndex => {
-    this.setState(prevState => {
+  addEmptyActionGroupIfNeeded = async () => {
+    const { actions } = this.state.scene;
+    const lastActionGroup = actions[actions.length - 1];
+    if (lastActionGroup.length > 0) {
+      const newState = update(this.state, {
+        scene: {
+          actions: {
+            $push: [[]]
+          }
+        },
+        variables: {
+          $push: [[]]
+        }
+      });
+      await this.setState(newState);
+    }
+  };
+  addAction = async columnIndex => {
+    await this.setState(prevState => {
       let newState = update(prevState, {
         scene: {
           actions: {
@@ -118,20 +135,9 @@ class EditScene extends Component {
           }
         }
       });
-      if (columnIndex + 1 === newState.scene.actions.length && newState.scene.actions[columnIndex].length === 1) {
-        newState = update(newState, {
-          scene: {
-            actions: {
-              $push: [[]]
-            }
-          },
-          variables: {
-            $push: [[]]
-          }
-        });
-      }
       return newState;
     });
+    await this.addEmptyActionGroupIfNeeded();
   };
   deleteActionGroup = columnIndex => {
     let newState = update(this.state, {
@@ -392,6 +398,7 @@ class EditScene extends Component {
       }
     });
     await this.setState(newState);
+    await this.addEmptyActionGroupIfNeeded();
   };
 
   moveCardGroup = async (index, destIndex) => {
@@ -428,6 +435,7 @@ class EditScene extends Component {
       }
     });
     await this.setState(newState);
+    await this.addEmptyActionGroupIfNeeded();
   };
 
   setTags = tags => {

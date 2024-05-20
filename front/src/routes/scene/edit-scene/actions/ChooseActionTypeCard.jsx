@@ -49,10 +49,8 @@ class ChooseActionType extends Component {
     this.setState({
       currentAction: selectedOption
     });
-  };
-  changeBoxType = () => {
-    if (this.state.currentAction) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'type', this.state.currentAction.value);
+    if (selectedOption) {
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'type', selectedOption.value);
     }
   };
   render(props, { currentAction }) {
@@ -73,11 +71,6 @@ class ChooseActionType extends Component {
             value={currentAction}
             options={options}
           />
-        </div>
-        <div class="form-group">
-          <button onClick={this.changeBoxType} class="btn btn-success">
-            <Text id="editScene.addActionButton" />
-          </button>
         </div>
       </div>
     );
