@@ -32,6 +32,15 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
     await zwaveJSUIHandler.onNewDeviceDiscover(exampleData);
     expect(zwaveJSUIHandler.devices).to.deep.equal([
       {
+        name: '',
+        external_id: 'zwavejs-ui:1',
+        selector: 'zwavejs-ui:1',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+        should_poll: false,
+        features: [],
+        params: [{ name: 'location', value: '' }],
+      },
+      {
         name: 'capteur-ouverture',
         external_id: 'zwavejs-ui:2',
         selector: `zwavejs-ui:2`,

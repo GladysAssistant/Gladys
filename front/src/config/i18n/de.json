@@ -1100,7 +1100,7 @@
       },
       "discover": {
         "title": "Auf Ihrer Z-Wave JS UI Instanz erkannte Geräte",
-        "description": "Z-Wave JS UI Geräte werden automatisch erkannt. Achtung, hier werden nur Geräte mit einem Namen und einem \"Standort\" angezeigt. Wenn Sie diese Einstellungen bearbeiten, müssen Sie das Gerät in Gladys erneut verbinden.",
+        "description": "Z-Wave JS UI-Geräte werden automatisch erkannt.",
         "error": "Fehler beim Erkennen von Z-Wave JS UI Geräten. Ist Ihr MQTT-Broker gut erreichbar und verfügbar?",
         "noDeviceFound": "Kein Z-Wave JS UI Gerät wurde erkannt.",
         "errorWhileScanning": "Fehler bei der Erkennung aufgetreten.",
