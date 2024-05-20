@@ -265,4 +265,35 @@ describe('mqttHandler.getConfiguration', () => {
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
   });
+  it('should not crash, even if docker based but not with docker socket mounted', async () => {
+    const gladys = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        getContainers: fake.rejects(new Error('SYSTEM_NOT_RUNNING_DOCKER')),
+        getNetworkMode: fake.rejects(new Error('SYSTEM_NOT_RUNNING_DOCKER')),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    const expectedConfig = {
+      mqttUrl: null,
+      mqttUsername: null,
+      mqttPassword: null,
+      useEmbeddedBroker: false,
+      dockerBased: true,
+      brokerContainerAvailable: false,
+      networkModeValid: false,
+      mosquittoVersion: null,
+    };
+    expect(config).to.deep.eq(expectedConfig);
+
+    assert.callCount(gladys.variable.getValue, 5);
+    assert.calledOnce(gladys.system.isDocker);
+    assert.calledOnce(gladys.system.getNetworkMode);
+  });
 });
