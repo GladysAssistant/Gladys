@@ -2660,6 +2660,11 @@
   "deviceFeatureAction": {
     "category": {
       "shutter": {
+        "stateLiveFinished": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Closed"
+        },
         "state": {
           "zero": "Stop",
           "one": "Open",
@@ -2667,6 +2672,11 @@
         }
       },
       "curtain": {
+        "stateLiveFinished": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Closed"
+        },
         "state": {
           "zero": "Stop",
           "one": "Open",

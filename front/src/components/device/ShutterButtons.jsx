@@ -17,7 +17,7 @@ class ShutterButtons extends Component {
     this.props.updateValue(COVER_STATE.STOP);
   };
 
-  render({ value, category, type }, {}) {
+  render({ value, category, type, isLive = false }, {}) {
     return (
       <div class="btn-group" role="group">
         <button
@@ -26,7 +26,11 @@ class ShutterButtons extends Component {
           })}
           onClick={this.open}
         >
-          <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
+          {value === COVER_STATE.OPEN && isLive ? (
+            <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.OPEN} />
+          ) : (
+            <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
+          )}
         </button>
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
@@ -40,7 +44,11 @@ class ShutterButtons extends Component {
           })}
           onClick={this.close}
         >
-          <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
+          {value === COVER_STATE.CLOSE && isLive ? (
+            <Text id={`deviceFeatureAction.category.${category}.stateLiveFinished`} plural={COVER_STATE.CLOSE} />
+          ) : (
+            <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
+          )}
         </button>
       </div>
     );

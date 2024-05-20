@@ -19,7 +19,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
 
       <td class="py-0">
         <div class="d-flex justify-content-end">
-          <ShutterButtons category={category} type={type} updateValue={updateValue} value={lastValue} />
+          <ShutterButtons category={category} type={type} updateValue={updateValue} value={lastValue} isLive />
         </div>
       </td>
     </tr>
