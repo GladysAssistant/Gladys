@@ -27,7 +27,7 @@ describe('Dashboard', () => {
   it('Should add new boxes', () => {
     cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
     cy.get('select').then(inputs => {
-      cy.wrap(inputs[0]).select('user-presence');
+      cy.wrap(inputs[1]).select('user-presence');
     });
     cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
   });
