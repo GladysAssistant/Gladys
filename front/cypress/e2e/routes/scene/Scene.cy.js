@@ -66,12 +66,6 @@ describe('Scene view', () => {
         .click(0, 0, { force: true });
     });
 
-    // I don't know why, but I'm unable to get this button with
-    // the text. Using the class but it's not recommended otherwise!!
-    cy.get('.btn-success').then(buttons => {
-      cy.wrap(buttons[1]).click();
-    });
-
     cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1])
         .click(0, 0, { force: true })
@@ -138,12 +132,6 @@ describe('Scene view', () => {
         .click(0, 0, { force: true });
     });
 
-    // I don't know why, but I'm unable to get this button with
-    // the text. Using the class but it's not recommended otherwise!!
-    cy.get('.btn-success').then(buttons => {
-      cy.wrap(buttons[1]).click();
-    });
-
     cy.wait('@loadDevices');
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
@@ -174,12 +162,6 @@ describe('Scene view', () => {
         .find('[class*="-option"]')
         .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
         .click(0, 0, { force: true });
-    });
-
-    // I don't know why, but I'm unable to get this button with
-    // the text. Using the class but it's not recommended otherwise!!
-    cy.get('.btn-success').then(buttons => {
-      cy.wrap(buttons[1]).click();
     });
 
     cy.get('select').then(selects => {
