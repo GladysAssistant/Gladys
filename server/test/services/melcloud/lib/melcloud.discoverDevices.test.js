@@ -94,6 +94,15 @@ describe('MELCloudHandler.discoverDevices', () => {
                   ],
                 },
               },
+              {
+                DeviceID: 'uuid',
+                DeviceName: 'name',
+                BuildingID: 'building_uuid',
+                Device: {
+                  DeviceType: 1,
+                  Units: [],
+                },
+              },
             ],
             Areas: [],
             Floors: [
@@ -113,6 +122,22 @@ describe('MELCloudHandler.discoverDevices', () => {
         external_id: 'melcloud:uuid',
         features: [],
         model: 'model',
+        name: 'name',
+        params: [
+          {
+            name: 'buildingID',
+            value: 'building_uuid',
+          },
+        ],
+        poll_frequency: 10000,
+        selector: 'melcloud:uuid',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+        should_poll: true,
+      },
+      {
+        external_id: 'melcloud:uuid',
+        features: [],
+        model: null,
         name: 'name',
         params: [
           {

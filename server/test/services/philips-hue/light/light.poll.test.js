@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { assert, fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { MockedPhilipsHueClient, hueApiHsColorMode } = require('../mocks.test');
+const { MockedPhilipsHueClient, hueApiHsColorMode, hueApiCtColorMode } = require('../mocks.test');
 const { EVENTS } = require('../../../../utils/constants');
 
 const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
@@ -182,9 +182,14 @@ describe('PhilipsHueService Poll', () => {
       state: 11534095,
     });
   });
-  it('should poll light with mode ct and use xy', async () => {
+  it('should poll light with mode ct and update color temperature', async () => {
     // PREPARE
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    philipsHueService.device.hueClient.api = {
+      createLocal: () => ({
+        connect: () => hueApiCtColorMode,
+      }),
+    };
     await philipsHueService.device.init();
     // EXECUTE
     await philipsHueService.device.poll({
@@ -194,12 +199,20 @@ describe('PhilipsHueService Poll', () => {
           category: 'light',
           type: 'color',
         },
+        {
+          category: 'light',
+          type: 'temperature',
+        },
       ],
     });
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'philips-hue-light:1234:1:color',
-      state: 16187362,
+      state: 16759424,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'philips-hue-light:1234:1:temperature',
+      state: 305,
     });
   });
   it('should poll light and update bri', async () => {

@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -15,7 +17,15 @@ const { NotFoundError } = require('../../utils/coreErrors');
 async function update(userId, selector, newDashboard) {
   const dashboard = await db.Dashboard.findOne({
     where: {
-      user_id: userId,
+      // I can edit dashboard I created or public dashboard
+      [Op.or]: [
+        {
+          user_id: userId,
+        },
+        {
+          visibility: 'public',
+        },
+      ],
       selector,
     },
   });
