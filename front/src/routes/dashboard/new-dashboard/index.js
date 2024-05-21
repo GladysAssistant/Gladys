@@ -4,7 +4,7 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import { DASHBOARD_TYPE } from '../../../../../server/utils/constants';
+import { DASHBOARD_TYPE, DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 import style from './style.css';
 
 const NewDashboardPage = ({ children, ...props }) => (
@@ -64,6 +64,23 @@ const NewDashboardPage = ({ children, ...props }) => (
                     />
                   </Localizer>
                 </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="dashboard.editDashboardVisibility" />
+                  </label>
+                  <small>
+                    <Text id="dashboard.editDashboardVisibilityDescription" />
+                  </small>
+                  <Localizer>
+                    <select value={props.visibility} onChange={props.updateVisibility} class="form-control">
+                      {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
+                        <option value={dashboardVisibility}>
+                          <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
+                        </option>
+                      ))}
+                    </select>
+                  </Localizer>
+                </div>
 
                 <div class="form-footer">
                   <button onClick={props.createDashboard} class="btn btn-primary btn-block">
@@ -83,6 +100,9 @@ class Dashboard extends Component {
   updateName = e => {
     this.setState({ name: e.target.value });
   };
+  updateVisibility = e => {
+    this.setState({ visibility: e.target.value });
+  };
   goBack = () => {
     this.props.history.go(-1);
   };
@@ -96,6 +116,7 @@ class Dashboard extends Component {
     try {
       const newDashboard = {
         name: this.state.name,
+        visibility: this.state.visibility,
         type: DASHBOARD_TYPE.MAIN,
         boxes: [[], [], []]
       };
@@ -117,17 +138,20 @@ class Dashboard extends Component {
     this.props = props;
     this.state = {
       name: '',
+      visibility: 'private',
       loading: false
     };
   }
-  render(props, { name, loading, dashboardAlreadyExistError, unknownError }) {
+  render(props, { name, visibility, loading, dashboardAlreadyExistError, unknownError }) {
     return (
       <NewDashboardPage
         name={name}
+        visibility={visibility}
         loading={loading}
         dashboardAlreadyExistError={dashboardAlreadyExistError}
         unknownError={unknownError}
         updateName={this.updateName}
+        updateVisibility={this.updateVisibility}
         createDashboard={this.createDashboard}
         goBack={this.goBack}
         prev={props.prev}

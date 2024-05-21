@@ -8,6 +8,7 @@ const {
   hsbToRgb,
   rgbToHsb,
   rgbToMilightHue,
+  kelvinToRGB,
 } = require('../../utils/colors');
 
 describe('colors', () => {
@@ -93,5 +94,34 @@ describe('colors', () => {
       const value = rgbToMilightHue(rgb);
       expect(value).to.equal(milighthue);
     });
+  });
+});
+
+describe('ColorTemperature', () => {
+  const kelvinInRgb = [
+    { kelvin: 0, rgb: [255, 0, 0] },
+    { kelvin: 1901, rgb: [255, 132, 0] },
+    { kelvin: 2000, rgb: [255, 137, 14] },
+    { kelvin: 5000, rgb: [255, 228, 206] },
+    { kelvin: 8000, rgb: [221, 230, 255] },
+    { kelvin: 6600, rgb: [255, 255, 255] },
+  ];
+  kelvinInRgb.forEach((color) => {
+    it(`color ${color.kelvin}K should equal ${color.rgb} in RGB`, () => {
+      const value = kelvinToRGB(color.kelvin);
+      expect(value).to.deep.equal(color.rgb);
+    });
+  });
+  it('should try all Kelvin from 0 to 50k', function Test() {
+    this.timeout(10000);
+    for (let i = 0; i < 50000; i += 1) {
+      const [r, g, b] = kelvinToRGB(i);
+      expect(r).to.be.greaterThanOrEqual(0);
+      expect(g).to.be.greaterThanOrEqual(0);
+      expect(b).to.be.greaterThanOrEqual(0);
+      expect(r).to.be.lessThanOrEqual(255);
+      expect(g).to.be.lessThanOrEqual(255);
+      expect(b).to.be.lessThanOrEqual(255);
+    }
   });
 });

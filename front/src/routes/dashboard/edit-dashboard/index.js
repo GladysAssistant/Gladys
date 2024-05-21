@@ -141,6 +141,17 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
+  updateCurrentDashboardVisibility = e => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        visibility: {
+          $set: e.target.value
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
   updateBoxConfig = (x, y, data) => {
     const newState = update(this.state, {
       currentDashboard: {
@@ -332,6 +343,7 @@ class EditDashboard extends Component {
   ) {
     return (
       <EditDashboardPage
+        user={props.user}
         isTouchDevice={this.isTouchDevice}
         dashboards={dashboards}
         currentDashboard={currentDashboard}
@@ -352,6 +364,7 @@ class EditDashboard extends Component {
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
+        updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}
