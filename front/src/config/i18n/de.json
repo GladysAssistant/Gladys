@@ -237,6 +237,13 @@
     "noDashboardSentenceBottom": "Klicke auf \"Hinzufügen\", um ein neues Dashboard zu erstellen.",
     "gatewayInstanceNotFoundError": "Dein Gladys ist nicht mit dem Gladys Gateway verbunden",
     "editDashboardNameLabel": "Name",
+    "editDashboardVisibility": "Sichtbarkeit",
+    "editDashboardVisibilityDescription": "Öffentliche Dashboards sind für alle Mitglieder der Gladys-Installation sichtbar.",
+    "editDashboardVisibilityNotEditableNotCreator": "Sie können die Freigabe nicht bearbeiten, da Sie nicht der Ersteller dieses Dashboards sind.",
+    "visibilities": {
+      "private": "privat",
+      "public": "öffentlich"
+    },
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",
@@ -1165,7 +1172,7 @@
       },
       "discover": {
         "title": "Auf Ihrer Z-Wave JS UI Instanz erkannte Geräte",
-        "description": "Z-Wave JS UI Geräte werden automatisch erkannt. Achtung, hier werden nur Geräte mit einem Namen und einem \"Standort\" angezeigt. Wenn Sie diese Einstellungen bearbeiten, müssen Sie das Gerät in Gladys erneut verbinden.",
+        "description": "Z-Wave JS UI-Geräte werden automatisch erkannt.",
         "error": "Fehler beim Erkennen von Z-Wave JS UI Geräten. Ist Ihr MQTT-Broker gut erreichbar und verfügbar?",
         "noDeviceFound": "Kein Z-Wave JS UI Gerät wurde erkannt.",
         "errorWhileScanning": "Fehler bei der Erkennung aufgetreten.",
@@ -2732,6 +2739,11 @@
   "deviceFeatureAction": {
     "category": {
       "shutter": {
+        "stateLiveFinished": {
+          "zero": "Stoppen",
+          "one": "Offen",
+          "other": "Geschlossen"
+        },
         "state": {
           "zero": "Stopp",
           "one": "Öffnen",
@@ -2739,6 +2751,11 @@
         }
       },
       "curtain": {
+        "stateLiveFinished": {
+          "zero": "Stoppen",
+          "one": "Offen",
+          "other": "Geschlossen"
+        },
         "state": {
           "zero": "Stopp",
           "one": "Öffnen",
