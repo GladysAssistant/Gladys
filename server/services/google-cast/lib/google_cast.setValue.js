@@ -44,7 +44,7 @@ async function setValue(device, deviceFeature, value) {
 
         logger.debug('app "%s" launched, loading media %s ...', player.session.displayName, media.contentId);
 
-        player.load(media, { autoplay: true }, (err, status) => {
+        player.load(media, { autoplay: true }, (loadError, status) => {
           logger.debug('media loaded playerState=%s', status.playerState);
         });
       });
