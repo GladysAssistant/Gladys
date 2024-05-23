@@ -1081,6 +1081,41 @@
         "conflictError": "The current device is already in Gladys."
       }
     },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Control Google Cast devices on your local network",
+      "deviceTab": "Devices",
+      "discoverTab": "Google Cast Discovery",
+      "setupTab": "Setup",
+      "documentation": "Google Cast Documentation",
+      "discoverDeviceDescr": "Automatically scan for Google Cast devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Google Cast Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Google Cast device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Google Cast devices are automatically discovered.",
+        "error": "Error discovering Google Cast devices. Is your Google Cast speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Google Cast devices have been discovered.",
+        "errorWhileScanning": "An error occurred while scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Control your devices in Z-Wave JS UI",

@@ -2,12 +2,14 @@ const { init } = require('./google_cast.init');
 const { scan } = require('./google_cast.scan');
 const { setValue } = require('./google_cast.setValue');
 
-const GoogleCastHandler = function GoogleCastHandler(gladys, googleCastLib, serviceId) {
+const GoogleCastHandler = function GoogleCastHandler(gladys, googleCastLib, mdnsLib, serviceId) {
   this.gladys = gladys;
   this.googleCastLib = googleCastLib;
+  this.mdnsLib = mdnsLib;
   this.serviceId = serviceId;
   this.devices = [];
   this.deviceIpAddresses = new Map();
+  this.scanTimeout = 5000;
 };
 
 GoogleCastHandler.prototype.init = init;

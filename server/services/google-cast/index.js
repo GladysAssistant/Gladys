@@ -5,7 +5,8 @@ const googleCastController = require('./api/google_cast.controller');
 module.exports = function GoogleCastService(gladys, serviceId) {
   // @ts-ignore
   const googleCastv2Lib = require('castv2-client');
-  const googleCastHandler = new GoogleCastHandler(gladys, googleCastv2Lib, serviceId);
+  const mdnsLib = require('mdns');
+  const googleCastHandler = new GoogleCastHandler(gladys, googleCastv2Lib, mdnsLib, serviceId);
 
   /**
    * @public

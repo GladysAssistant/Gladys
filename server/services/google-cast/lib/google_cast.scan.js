@@ -1,4 +1,3 @@
-const mdns = require('mdns');
 const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 const logger = require('../../../utils/logger');
 
@@ -9,7 +8,7 @@ const logger = require('../../../utils/logger');
  */
 async function scan() {
   return new Promise((resolve, reject) => {
-    const browser = mdns.createBrowser(mdns.tcp('googlecast'));
+    const browser = this.mdnsLib.createBrowser(this.mdnsLib.tcp('googlecast'));
     const devices = [];
     const deviceIpAddresses = new Map();
 
@@ -31,7 +30,7 @@ async function scan() {
       this.devices = devices;
       this.deviceIpAddresses = deviceIpAddresses;
       resolve(devices);
-    }, 5000);
+    }, this.scanTimeout);
 
     browser.start();
   });

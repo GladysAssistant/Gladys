@@ -9,7 +9,7 @@ const convertToGladysDevice = (serviceId, device) => {
     features: [
       {
         name: `${device.name} - Play Notification`,
-        external_id: `sonos:${device.name}:play-notification`,
+        external_id: `google-cast:${device.name}:play-notification`,
         category: DEVICE_FEATURE_CATEGORIES.MUSIC,
         type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
         min: 1,
