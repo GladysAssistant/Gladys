@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const sinon = require('sinon');
 
 const { fake } = sinon;
@@ -65,5 +65,25 @@ describe('GoogleCastHandler.scan', () => {
         ],
       },
     ]);
+  });
+  it('should can network and reject', async () => {
+    const fakeBrowserWithError = {
+      start: () => {},
+      stop: () => {},
+      on: (event, cb) => {
+        if (event === 'error') {
+          cb({});
+        }
+      },
+    };
+
+    const mdnsLibWithError = {
+      createBrowser: fake.returns(fakeBrowserWithError),
+      tcp: fake.returns(null),
+    };
+    const googleCastHandlerWithError = new GoogleCastHandler(gladys, googleCastLib, mdnsLibWithError, serviceId);
+    googleCastHandlerWithError.scanTimeout = 1;
+    const promise = googleCastHandlerWithError.scan();
+    await assert.isRejected(promise);
   });
 });
