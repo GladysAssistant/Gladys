@@ -11,7 +11,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev avahi-dev
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev avahi-dev 
 
 WORKDIR /tmp
 
@@ -24,7 +24,7 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git libffi-dev linux-headers \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git libffi-dev linux-headers \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
