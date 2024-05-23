@@ -21,7 +21,8 @@ RUN apk add --no-cache \
          openssl \
          gzip \
          eudev \
-         bluez
+         bluez \
+         avahi-dev
 
 COPY --from=json-files /json-files/server /src/server
 
