@@ -2702,6 +2702,11 @@
   "deviceFeatureAction": {
     "category": {
       "shutter": {
+        "stateLiveFinished": {
+          "zero": "Arrêter",
+          "one": "Ouvert",
+          "other": "Fermé"
+        },
         "state": {
           "zero": "Arrêter",
           "one": "Ouvrir",
@@ -2709,6 +2714,11 @@
         }
       },
       "curtain": {
+        "stateLiveFinished": {
+          "zero": "Arrêter",
+          "one": "Ouvert",
+          "other": "Fermé"
+        },
         "state": {
           "zero": "Arrêter",
           "one": "Ouvrir",
