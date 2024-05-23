@@ -55,7 +55,7 @@ jobs:
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3 libavahi-compat-libdnssd-dev
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
