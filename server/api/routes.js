@@ -219,6 +219,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.setValueFeature,
     },
+    'get /api/v1/device_feature/states': {
+      authenticated: true,
+      controller: deviceController.getDeviceFeaturesStates,
+    },
     'get /api/v1/device_feature/aggregated_states': {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,

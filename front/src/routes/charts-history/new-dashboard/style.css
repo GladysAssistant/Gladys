@@ -1,0 +1,10 @@
+.containerWithMargin {
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .backButtonDiv {
+    margin-bottom: 1rem;
+    max-width: 24rem;
+  }
+}

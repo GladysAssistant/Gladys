@@ -1013,6 +1013,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
 
 const DASHBOARD_TYPE = {
   MAIN: 'main',
+  CHARTS_HISTORY: 'charts-history',
 };
 
 const DASHBOARD_VISIBILITY = {
@@ -1030,6 +1031,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES_IN_ROOM: 'devices-in-room',
   DEVICES: 'devices',
   CHART: 'chart',
+  CHART_HISTORY: 'chart-history',
   ECOWATT: 'ecowatt',
   EDF_TEMPO: 'edf-tempo',
   CLOCK: 'clock',
