@@ -25,7 +25,7 @@ const NewChartsHistoryPage = ({ children, ...props }) => (
     </div>
     <div class="row">
       <div class="col col-login mx-auto">
-        <form onSubmit={props.createScene} class="card">
+        <form onSubmit={props.createDashboard} class="card">
           <div class={props.loading ? 'dimmer active' : 'dimmer'}>
             <div class="loader" />
             <div class="dimmer-content">
@@ -84,7 +84,7 @@ const NewChartsHistoryPage = ({ children, ...props }) => (
 
                 <div class="form-footer">
                   <button onClick={props.createDashboard} class="btn btn-primary btn-block">
-                    <Text id="newDashboard.createDashboardButton" />
+                    <Text id="charts-history.newChartsHistory.createChartsHistoryButton" />
                   </button>
                 </div>
               </div>

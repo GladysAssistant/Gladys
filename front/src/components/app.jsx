@@ -53,6 +53,12 @@ import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
 import DuplicateScenePage from '../routes/scene/duplicate-scene';
 import EditScenePage from '../routes/scene/edit-scene';
+
+// Charts
+import ChartsHistoryPage from '../routes/charts-history';
+import NewChartsHistory from '../routes/charts-history/new-dashboard';
+import EditChartsHistory from '../routes/charts-history/edit-dashboard';
+
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
@@ -338,6 +344,12 @@ const AppRouter = connect(
         <NewScenePage path="/dashboard/scene/new" />
         <DuplicateScenePage path="/dashboard/scene/:scene_selector/duplicate" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
+
+        <ChartsHistoryPage path="/dashboard/charts-history" />
+        <ChartsHistoryPage path="/dashboard/charts-history/:dashboardSelector" />
+        <EditChartsHistory path="/dashboard/charts-history/:dashboardSelector/edit" />
+        <NewChartsHistory path="/dashboard/charts-history/create/new" />
+
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
