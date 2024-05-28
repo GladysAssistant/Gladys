@@ -2768,7 +2768,15 @@
           "48": "Langer Druck",
           "49": "Kurzes Loslassen",
           "50": "Langes Loslassen",
-          "51": "Doppeltes Drücken"
+          "51": "Doppeltes Drücken",
+          "52": "Umschalten",
+          "53": "Umschalten Gehalten",
+          "54": "Helligkeit Auf-Taste gedrückt",
+          "55": "Helligkeit Auf-Taste gehalten",
+          "56": "Helligkeit Auf-Taste Loslassen",
+          "57": "Helligkeit Ab-Taste gedrückt",
+          "58": "Helligkeit Ab-Taste gehalten",
+          "59": "Helligkeit Ab-Taste Loslassen",
         }
       },
       "opening-sensor": {
