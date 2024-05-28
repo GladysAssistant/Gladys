@@ -2768,7 +2768,15 @@
           "48": "Long press",
           "49": "Short release",
           "50": "Long release",
-          "51": "Double press"
+          "51": "Double press",
+          "52": "Toggle",
+          "53": "Toggle Hold",
+          "54": "Brightness Up Click",
+          "55": "Brightness Up Hold",
+          "56": "Brightness Up Release",
+          "57": "Brightness Down Click",
+          "58": "Brightness Down Hold",
+          "59": "Brightness Down Release",
         }
       },
       "opening-sensor": {
