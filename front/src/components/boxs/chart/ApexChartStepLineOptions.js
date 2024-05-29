@@ -32,52 +32,52 @@ const getApexChartStepLineOptions = ({
         show: activeToolbar,
         tools: activeToolbar
           ? {
-            selection: true,
-            zoom: true,
-            zoomin: true,
-            zoomout: true,
-            pan: true,
-            reset: true,
-            download: true,
-            customIcons: [
-              {
-                icon: '<i class="fe fe-download" />',
-                index: 0,
-                title: chartDictionary.downloadDescription,
-                class: cx(style.customCsvDownload),
-                click: function (chart, options, e) {
-                  Swal.fire({
-                    title: chartDictionary.downloadOptionsDescription,
-                    input: 'select',
-                    inputOptions: {
-                      csv: `CSV: ${fileName}.csv`,
-                      xlsx: `XLSX: ${fileName}.xlsx`
-                    },
-                    inputPlaceholder: 'Sélectionnez un format',
-                    showCancelButton: true,
-                    customClass: {
-                      popup: cx(style.swal2Popup),
-                      confirmButton: cx(style.swal2Styled, style.swal2Confirm),
-                      cancelButton: cx(style.swal2Styled, style.swal2Cancel),
-                      title: cx(style.swal2Title),
-                      select: cx(style.swal2Select)
-                    }
-                  }).then(result => {
-                    if (result.isConfirmed) {
-                      const exportType = result.value;
-                      if (exportType === 'csv') {
-                        prepareAndDownloadCSV(chart, fileName);
-                      } else if (exportType === 'xlsx') {
-                        prepareAndDownloadXLSX(chart, fileName);
-                      } else {
-                        Swal.fire(chartDictionary.downloadFormatOptionsError);
+              selection: true,
+              zoom: true,
+              zoomin: true,
+              zoomout: true,
+              pan: true,
+              reset: true,
+              download: true,
+              customIcons: [
+                {
+                  icon: '<i class="fe fe-download" />',
+                  index: 0,
+                  title: chartDictionary.downloadDescription,
+                  class: cx(style.customCsvDownload),
+                  click: function(chart) {
+                    Swal.fire({
+                      title: chartDictionary.downloadOptionsDescription,
+                      input: 'select',
+                      inputOptions: {
+                        csv: `CSV: ${fileName}.csv`,
+                        xlsx: `XLSX: ${fileName}.xlsx`
+                      },
+                      inputPlaceholder: 'Sélectionnez un format',
+                      showCancelButton: true,
+                      customClass: {
+                        popup: cx(style.swal2Popup),
+                        confirmButton: cx(style.swal2Styled, style.swal2Confirm),
+                        cancelButton: cx(style.swal2Styled, style.swal2Cancel),
+                        title: cx(style.swal2Title),
+                        select: cx(style.swal2Select)
                       }
-                    }
-                  });
+                    }).then(result => {
+                      if (result.isConfirmed) {
+                        const exportType = result.value;
+                        if (exportType === 'csv') {
+                          prepareAndDownloadCSV(chart, fileName);
+                        } else if (exportType === 'xlsx') {
+                          prepareAndDownloadXLSX(chart, fileName);
+                        } else {
+                          Swal.fire(chartDictionary.downloadFormatOptionsError);
+                        }
+                      }
+                    });
+                  }
                 }
-              }
-            ]
-          }
+              ]
+            }
           : {},
         export: {
           svg: {
@@ -100,7 +100,7 @@ const getApexChartStepLineOptions = ({
         enabled: false
       },
       events: {
-        zoomed: function (chartContext, { xaxis }) {
+        zoomed: function(chartContext, { xaxis }) {
           const { min, max } = xaxis;
           if (min !== undefined && max !== undefined) {
             eventZoomed(min, max);

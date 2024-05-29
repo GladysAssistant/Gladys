@@ -1,5 +1,6 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
+import cx from 'classnames';
 
 import fr from 'apexcharts/dist/locales/fr.json';
 import en from 'apexcharts/dist/locales/en.json';
@@ -240,13 +241,7 @@ class ApexChartComponent extends Component {
     }
   }
   render() {
-    return (
-      <div
-        ref={this.chartRef}
-        class="chart-auto-height"
-        style={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}
-      />
-    );
+    return <div ref={this.chartRef} class={cx(style.chartContainer, 'chart-auto-height')} />;
   }
 }
 

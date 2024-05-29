@@ -3,8 +3,8 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 
 import ChartsHistoryPage from './ChartsHistoryPage';
-// import actions from '../../actions/charts-history.js';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import get from 'get-value';
 
 class ChartsHistory extends Component {
   toggleDashboardDropdown = () => {
@@ -110,16 +110,12 @@ class ChartsHistory extends Component {
   componentDidMount() {
     this.init();
     document.addEventListener('click', this.closeDashboardDropdown, true);
-    // this.props.getDevicesByService(this.props.intl);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.init();
     }
-    // if (prevProps.user !== this.props.user) {
-    //   this.props.getDevicesByService(this.props.intl, this.props.service, null);
-    // }
   }
 
   componentWillUnmount() {

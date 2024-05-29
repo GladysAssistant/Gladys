@@ -29,7 +29,7 @@ const intervalByName = {
   'last-year': ONE_YEAR_IN_MINUTES
 };
 
-const getTypeByInterval = (interval, chart_type) => {
+const getTypeByInterval = interval => {
   if (interval >= SEVEN_DAYS_IN_MINUTES) return 'hourly';
   if (interval >= THIRTY_DAYS_IN_MINUTES) return 'daily';
   if (interval >= ONE_YEAR_IN_MINUTES) return 'monthly';
@@ -299,7 +299,7 @@ class ChartHistorybox extends Component {
           let previousValue = null;
           let lastChangeTime = null;
 
-          values.forEach((value, index) => {
+          values.forEach(value => {
             emptySeries = false;
             if (previousValue === null) {
               lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
@@ -615,11 +615,11 @@ class ChartHistorybox extends Component {
 
             <div class={cx(style.displacementRaftersChart)}>
               <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handlePreviousDate}>
-                <i class="fe fe-chevron-left"></i>
+                <i class="fe fe-chevron-left" />
               </button>
 
               <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handleNextDate}>
-                <i class="fe fe-chevron-right"></i>
+                <i class="fe fe-chevron-right" />
               </button>
             </div>
           </div>

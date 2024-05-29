@@ -76,7 +76,6 @@ async function getDeviceFeaturesAggregates(
     type = 'live';
   }
 
-
   const whereClause = {
     device_feature_id: deviceFeature.id,
     created_at: {

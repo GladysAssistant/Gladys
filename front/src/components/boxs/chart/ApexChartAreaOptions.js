@@ -45,7 +45,7 @@ const getApexChartAreaOptions = ({
                   index: 0,
                   title: chartDictionary.downloadDescription,
                   class: cx(style.customCsvDownload),
-                  click: function(chart, options, e) {
+                  click: function(chart) {
                     Swal.fire({
                       title: chartDictionary.downloadOptionsDescription,
                       input: 'select',
