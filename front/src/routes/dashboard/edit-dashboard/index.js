@@ -12,8 +12,9 @@ class EditDashboard extends Component {
         getDashboardsError: false,
         loading: true
       });
-      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard'))
-        .filter(dashboard => dashboard.type !== 'charts-history');
+      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard')).filter(
+        dashboard => dashboard.type !== 'charts-history'
+      );
       let currentDashboardSelector;
       if (this.props.dashboardSelector) {
         currentDashboardSelector = this.props.dashboardSelector;

@@ -10,7 +10,13 @@ const Promise = require('bluebird');
  * @example
  * device.getDeviceFeaturesAggregates('test-device');
  */
-async function getDeviceFeaturesAggregatesMulti(selectors, intervalInMinutes, maxStates = 100, startDate = null, endDate = null) {
+async function getDeviceFeaturesAggregatesMulti(
+  selectors,
+  intervalInMinutes,
+  maxStates = 100,
+  startDate = null,
+  endDate = null,
+) {
   return Promise.map(
     selectors,
     async (selector) => {

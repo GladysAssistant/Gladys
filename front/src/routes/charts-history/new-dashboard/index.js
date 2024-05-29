@@ -118,9 +118,12 @@ class ChartsHistory extends Component {
         name: this.state.name,
         visibility: this.state.visibility,
         type: DASHBOARD_TYPE.CHARTS_HISTORY,
-        boxes: [[]], //TODO: laisser le choix entre [[], []] ou [[], [], []] également ?
+        boxes: [[]] //TODO: laisser le choix entre [[], []] ou [[], [], []] également ?
       };
-      const createDashboardChartsHistory = await this.props.httpClient.post('/api/v1/dashboard', newDashboardChartsHistory);
+      const createDashboardChartsHistory = await this.props.httpClient.post(
+        '/api/v1/dashboard',
+        newDashboardChartsHistory
+      );
       this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });
       route(`/dashboard/charts-history/${createDashboardChartsHistory.selector}/edit`);
     } catch (e) {

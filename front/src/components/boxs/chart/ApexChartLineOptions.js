@@ -1,4 +1,22 @@
-const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale }) => {
+import style from './style.css';
+import cx from 'classnames';
+import Swal from 'sweetalert2';
+import { prepareAndDownloadXLSX, prepareAndDownloadCSV } from '../../../utils/ExportUtils';
+
+const getApexChartLineOptions = ({
+  height,
+  displayAxes,
+  series,
+  colors,
+  locales,
+  defaultLocale,
+  activeToolbar = false,
+  dictionary = null,
+  chartType = null,
+  eventZoomed = null
+}) => {
+  const chartDictionary = dictionary ? dictionary.dashboard.boxes.chart : {};
+  const fileName = dictionary ? `chart-${chartDictionary[chartType].toLowerCase()}` : null;
   const options = {
     chart: {
       locales,
@@ -11,10 +29,85 @@ const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales,
         enabled: !displayAxes
       },
       toolbar: {
-        show: false
+        show: activeToolbar,
+        tools: activeToolbar
+          ? {
+              selection: true,
+              zoom: true,
+              zoomin: true,
+              zoomout: true,
+              pan: true,
+              reset: true,
+              download: true,
+              customIcons: [
+                {
+                  icon: '<i class="fe fe-download" />',
+                  index: 0,
+                  title: chartDictionary.downloadDescription,
+                  class: cx(style.customCsvDownload),
+                  click: function(chart, options, e) {
+                    Swal.fire({
+                      title: chartDictionary.downloadOptionsDescription,
+                      input: 'select',
+                      inputOptions: {
+                        csv: `CSV: ${fileName}.csv`,
+                        xlsx: `XLSX: ${fileName}.xlsx`
+                      },
+                      inputPlaceholder: 'Sélectionnez un format',
+                      showCancelButton: true,
+                      customClass: {
+                        popup: cx(style.swal2Popup),
+                        confirmButton: cx(style.swal2Styled, style.swal2Confirm),
+                        cancelButton: cx(style.swal2Styled, style.swal2Cancel),
+                        title: cx(style.swal2Title),
+                        select: cx(style.swal2Select)
+                      }
+                    }).then(result => {
+                      if (result.isConfirmed) {
+                        const exportType = result.value;
+                        if (exportType === 'csv') {
+                          prepareAndDownloadCSV(chart, fileName);
+                        } else if (exportType === 'xlsx') {
+                          prepareAndDownloadXLSX(chart, fileName);
+                        } else {
+                          Swal.fire(chartDictionary.downloadFormatOptionsError);
+                        }
+                      }
+                    });
+                  }
+                }
+              ]
+            }
+          : {},
+        export: {
+          svg: {
+            filename: `${fileName}-${new Date()
+              .toISOString()
+              .replace(/T/, ' ')
+              .replace(/\..+/, '')
+              .replace(/:/g, '-')}`
+          },
+          png: {
+            filename: `${fileName}-${new Date()
+              .toISOString()
+              .replace(/T/, ' ')
+              .replace(/\..+/, '')
+              .replace(/:/g, '-')}`
+          }
+        }
       },
       animations: {
         enabled: false
+      },
+      events: {
+        zoomed: function(chartContext, { xaxis }) {
+          const { min, max } = xaxis;
+          if (min !== undefined && max !== undefined) {
+            eventZoomed(min, max);
+          } else {
+            eventZoomed(null, null);
+          }
+        }
       }
     },
     dataLabels: {
@@ -22,6 +115,12 @@ const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales,
     },
     fill: {
       opacity: 1
+    },
+    forecastDataPoints: {
+      count: 0,
+      fillOpacity: 0.5,
+      strokeWidth: undefined,
+      dashArray: 4
     },
     stroke: {
       width: 2,

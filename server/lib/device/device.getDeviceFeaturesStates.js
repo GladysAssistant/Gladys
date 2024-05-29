@@ -1,4 +1,4 @@
-const { Op, fn, col, literal } = require('sequelize');
+const { Op } = require('sequelize');
 const { LTTB } = require('downsample');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -19,7 +19,13 @@ dayjs.extend(utc);
  * @example
  * device.getDeviceFeaturesStates('test-device');
  */
-async function getDeviceFeaturesStates(selector, intervalInMinutes, maxStates = 10000, startDate = null, endDate = null) {
+async function getDeviceFeaturesStates(
+  selector,
+  intervalInMinutes,
+  maxStates = 10000,
+  startDate = null,
+  endDate = null,
+) {
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -28,33 +34,33 @@ async function getDeviceFeaturesStates(selector, intervalInMinutes, maxStates = 
 
   const now = new Date();
   let intervalDate;
+  let newStartDate = startDate;
+  let newEndDate = endDate;
   if (startDate === null && endDate === null) {
     intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
   } else if (startDate !== null && endDate === null) {
     intervalDate = new Date(new Date(startDate).getTime() + intervalInMinutes * 60 * 1000);
-    endDate = intervalDate;
+    newEndDate = intervalDate;
   } else if (startDate === null && endDate !== null) {
     intervalDate = new Date(new Date(endDate).getTime() - intervalInMinutes * 60 * 1000);
-    startDate = intervalDate;
+    newStartDate = intervalDate;
     intervalDate = new Date(endDate);
   } else {
     intervalDate = new Date(startDate);
   }
 
-  let rows;
-
   const whereClause = {
     device_feature_id: deviceFeature.id,
     created_at: {
-      [Op.gte]: startDate ? new Date(startDate) : intervalDate,
+      [Op.gte]: newStartDate ? new Date(newStartDate) : intervalDate,
     },
   };
 
-  if (endDate) {
-    whereClause.created_at[Op.lte] = new Date(endDate);
+  if (newEndDate) {
+    whereClause.created_at[Op.lte] = new Date(newEndDate);
   }
 
-  rows = await db.DeviceFeatureState.findAll({
+  const rows = await db.DeviceFeatureState.findAll({
     raw: true,
     attributes: ['created_at', 'value'],
     where: whereClause,

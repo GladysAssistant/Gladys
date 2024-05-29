@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 
 import ChartsHistoryPage from './ChartsHistoryPage';
-import actions from '../../actions/charts-history';
+// import actions from '../../actions/charts-history.js';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
 class ChartsHistory extends Component {
@@ -27,8 +27,9 @@ class ChartsHistory extends Component {
         getDashboardsError: false,
         loading: true
       });
-      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard'))
-        .filter(dashboard => dashboard.type === 'charts-history');
+      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard')).filter(
+        dashboard => dashboard.type === 'charts-history'
+      );
       let currentDashboardSelector;
       if (this.props.dashboardSelector) {
         currentDashboardSelector = this.props.dashboardSelector;
@@ -109,35 +110,25 @@ class ChartsHistory extends Component {
   componentDidMount() {
     this.init();
     document.addEventListener('click', this.closeDashboardDropdown, true);
-    this.props.getDevicesByService(this.props.intl);
+    // this.props.getDevicesByService(this.props.intl);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.init();
     }
-    if (prevProps.user !== this.props.user) {
-      this.props.getDevicesByService(this.props.intl, this.props.service, null);
-    }
+    // if (prevProps.user !== this.props.user) {
+    //   this.props.getDevicesByService(this.props.intl, this.props.service, null);
+    // }
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeDashboardDropdown, true);
   }
 
-  render(
-    props,
-    {
-      dashboardDropdownOpened,
-      dashboards,
-      currentDashboard,
-      loading,
-    }
-  ) {
+  render(props, { dashboardDropdownOpened, dashboards, currentDashboard, loading }) {
     const dashboardConfigured =
-      currentDashboard &&
-      currentDashboard.boxes &&
-      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0));
+      currentDashboard && currentDashboard.boxes && currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0;
     const dashboardListEmpty = !(dashboards && dashboards.length > 0);
     const dashboardNotConfigured = !dashboardConfigured;
     return (
@@ -157,6 +148,4 @@ class ChartsHistory extends Component {
   }
 }
 
-export default withIntlAsProp(
-  connect('user,session,devices,currentUrl,httpClient', actions)(ChartsHistory)
-);
+export default withIntlAsProp(connect('user,session,devices,currentUrl,httpClient')(ChartsHistory));

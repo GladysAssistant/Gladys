@@ -12,8 +12,9 @@ class EditChartsHistory extends Component {
         getDashboardsError: false,
         loading: true
       });
-      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard'))
-        .filter(dashboard => dashboard.type === 'charts-history');
+      const dashboards = (await this.props.httpClient.get('/api/v1/dashboard')).filter(
+        dashboard => dashboard.type === 'charts-history'
+      );
       let currentDashboardSelector;
       if (this.props.dashboardSelector) {
         currentDashboardSelector = this.props.dashboardSelector;
@@ -154,9 +155,6 @@ class EditChartsHistory extends Component {
   };
 
   updateBoxConfig = (x, y, data) => {
-    console.log('data', data);
-    console.log('x', x);
-    console.log('y', y);
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
@@ -169,7 +167,6 @@ class EditChartsHistory extends Component {
       }
     });
     this.setState(newState);
-    console.log('newState', newState);
   };
 
   updateNewSelectedBox = (x, y, type) => {
@@ -190,7 +187,6 @@ class EditChartsHistory extends Component {
   };
 
   removeEmptyBoxes = async () => {
-    console.log('removeEmptyBoxes this.state', this.state);
     const { currentDashboard } = this.state;
     // new boxes without empty boxes
     const newBoxes = currentDashboard.boxes.map(column => {
@@ -198,13 +194,11 @@ class EditChartsHistory extends Component {
         return box.type !== undefined;
       });
     });
-    console.log('removeEmptyBoxes newBoxes', newBoxes);
     const newDashboard = update(currentDashboard, {
       boxes: {
         $set: newBoxes
       }
     });
-    console.log('removeEmptyBoxes newDashboard', newDashboard);
     await this.setState({
       currentDashboard: newDashboard
     });
@@ -219,29 +213,21 @@ class EditChartsHistory extends Component {
     });
     try {
       // We purge all empty boxes
-      console.log('this.state', this.state);
       await this.removeEmptyBoxes();
-      console.log('this.state', this.state);
       const { currentDashboard: selectedDashboard, dashboards } = this.state;
 
       const { selector } = selectedDashboard;
-      console.log('dashboards', dashboards);
-      console.log('selectedDashboard', selectedDashboard);
-      console.log('selector', selector);
       const currentDashboard = await this.props.httpClient.patch(
         `/api/v1/dashboard/${selector}`,
         this.state.currentDashboard
       );
-      console.log('currentDashboard', currentDashboard);
 
       const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
-      console.log('currentDashboardIndex', currentDashboardIndex);
       const updatedDashboards = update(dashboards, {
         [currentDashboardIndex]: {
           $set: currentDashboard
         }
       });
-      console.log('updatedDashboards', updatedDashboards);
 
       await this.setState({
         currentDashboard,

@@ -103,7 +103,7 @@ module.exports = function DeviceController(gladys) {
       req.query.interval,
       req.query.max_states,
       req.query.start_date,
-      req.query.end_date
+      req.query.end_date,
     );
     res.json(states);
   }
@@ -114,13 +114,12 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeaturesStates(req, res) {
-    console.log('getDeviceFeaturesStates', req.query);
     const states = await gladys.device.getDeviceFeaturesStatesMulti(
       req.query.device_features.split(','),
       req.query.interval,
       req.query.max_states,
       req.query.start_date,
-      req.query.end_date
+      req.query.end_date,
     );
     res.json(states);
   }

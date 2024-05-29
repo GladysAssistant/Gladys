@@ -10,8 +10,13 @@ const Promise = require('bluebird');
  * @example
  * device.getDeviceFeaturesStatesMulti('test-device');
  */
-async function getDeviceFeaturesStatesMulti(selectors, intervalInMinutes, maxStates = 10000, startDate = null, endDate = null) {
-  console.log('getDeviceFeaturesStatesMulti', selectors, intervalInMinutes, maxStates, startDate, endDate);
+async function getDeviceFeaturesStatesMulti(
+  selectors,
+  intervalInMinutes,
+  maxStates = 10000,
+  startDate = null,
+  endDate = null,
+) {
   return Promise.map(
     selectors,
     async (selector) => {

@@ -5,7 +5,6 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import EditBox from './EditBox';
-import EditChartHistoric from '../../../components/boxs/chart/EditChartHistoric';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';

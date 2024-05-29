@@ -375,7 +375,11 @@
         "on": "An",
         "off": "Aus",
         "startDate": "Startdatum:",
-        "endDate": "Enddatum:"
+        "endDate": "Enddatum:",
+        "downloadDescription": "Daten herunterladen",
+        "downloadOptionsDescription": "Exporttyp auswählen",
+        "downloadFormatOptionsDescription": "Dateiformat auswählen",
+        "downloadFormatOptionsError": "Ungültiger Exporttyp"
       },
       "ecowatt": {
         "title": "Ecowatt France",

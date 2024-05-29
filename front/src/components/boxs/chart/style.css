@@ -6,6 +6,69 @@
   line-height: 1 !important;
 }
 
+.swal2Popup {
+  font-size: 1rem;
+}
+
+.swal2Styled.swal2Confirm {
+  background-color: #467fcf;
+  border: none;
+}
+
+.swal2Styled.swal2Cancel {
+  background-color: #868e96;
+  border: none;
+}
+
+.swal2Title {
+  color: #467fcf;
+}
+
+.swal2Select {
+  color: #467fcf;
+}
+
+.datePicker {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.datePickerChart {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0;
+}
+
+.datePickerLabel {
+  margin: 0 1rem;
+  font-size: 0.75rem;
+}
+
+.datePickerInput {
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.625rem;
+}
+
+.displacementRaftersChart {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.customBtn {
+  height: calc(1.5em + 0.75rem + 2px);
+
+  line-height: 1.5;
+  padding: 0.375rem 0.75rem;
+  margin-left: 1rem;
+}
+
+.customCsvDownload img {
+  filter: grayscale(100%);
+}
+
 .subheader {
   font-size: 0.625rem;
   font-weight: 600;
@@ -24,7 +87,7 @@
 }
 
 .minSizeChartLoading {
-  min-height: 8rem;
+  min-height: 30rem;
 }
 
 .meAuto {
