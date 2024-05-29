@@ -79,7 +79,6 @@
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",
     "uuid": "^3.4.0",
-    "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"
   },
   "browserslist": [
