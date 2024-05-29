@@ -1,6 +1,7 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
 import cx from 'classnames';
+import style from './style.css';
 
 import fr from 'apexcharts/dist/locales/fr.json';
 import en from 'apexcharts/dist/locales/en.json';
