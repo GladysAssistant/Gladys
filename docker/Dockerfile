@@ -24,10 +24,17 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git libffi-dev linux-headers \
-    && npm ci --unsafe-perm --production \
-    && npm cache clean --force \
-    && apk del .build-deps
+# Installer les dépendances de construction
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git libffi-dev linux-headers
+
+# Installer les dépendances de l'application
+RUN npm ci --unsafe-perm --production || (cat /root/.npm/_logs/* && false) 
+
+# Nettoyer le cache npm
+RUN npm cache clean --force
+
+# Supprimer les dépendances de construction
+RUN apk del .build-deps
 
 ENV NODE_ENV production
 ENV SERVER_PORT 80
