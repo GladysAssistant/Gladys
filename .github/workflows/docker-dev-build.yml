@@ -82,5 +82,5 @@ jobs:
           push: true
           pull: true
           tags: ${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }},ignore-error=true
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
           cache-to: type=inline
