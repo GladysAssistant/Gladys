@@ -75,9 +75,11 @@
     "react-dnd-touch-backend": "^16.0.1",
     "react-select": "^4.3.1",
     "react-slider": "^2.0.6",
+    "sweetalert2": "^11.11.0",
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "xlsx-js-style": "^1.2.0"
   },
   "browserslist": [
     "defaults",
