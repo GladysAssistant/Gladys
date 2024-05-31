@@ -10,13 +10,14 @@ const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 const gladys = {};
 
 const fakeBrowser = {
-  start: () => {},
-  stop: () => {},
+  stop: fake.returns(null),
   on: (event, cb) => {
-    if (event === 'serviceUp') {
+    if (event === 'up') {
       cb({
         name: 'nest-mini',
-        addresses: ['192.168.1.1'],
+        referer: {
+          address: '192.168.1.1',
+        },
         port: 8999,
       });
     }
@@ -25,13 +26,12 @@ const fakeBrowser = {
 
 const googleCastLib = {};
 
-const mdnsLib = {
-  createBrowser: fake.returns(fakeBrowser),
-  tcp: fake.returns(null),
+const bonjourLib = {
+  find: fake.returns(fakeBrowser),
 };
 
 describe('GoogleCastHandler.init', () => {
-  const googleCastHandler = new GoogleCastHandler(gladys, googleCastLib, mdnsLib, serviceId);
+  const googleCastHandler = new GoogleCastHandler(gladys, googleCastLib, bonjourLib, serviceId);
 
   beforeEach(() => {
     sinon.reset();
