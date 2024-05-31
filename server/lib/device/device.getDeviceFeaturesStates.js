@@ -1,4 +1,4 @@
-const { Op, fn, col, literal } = require('sequelize');
+const { Op } = require('sequelize');
 const { LTTB } = require('downsample');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -9,7 +9,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 dayjs.extend(utc);
 
 /**
- * @description Get all features states aggregates.
+ * @description Get all features states.
  * @param {string} selector - Device selector.
  * @param {number} intervalInMinutes - Interval.
  * @param {number} maxStates - Number of elements to return max.
@@ -17,12 +17,12 @@ dayjs.extend(utc);
  * @param {Date} endDate - End date.
  * @returns {Promise<object>} - Resolve with an array of data.
  * @example
- * device.getDeviceFeaturesAggregates('test-device');
+ * device.getDeviceFeaturesStates('test-device');
  */
-async function getDeviceFeaturesAggregates(
+async function getDeviceFeaturesStates(
   selector,
   intervalInMinutes,
-  maxStates = 100,
+  maxStates = 10000,
   startDate = null,
   endDate = null,
 ) {
@@ -41,39 +41,12 @@ async function getDeviceFeaturesAggregates(
   } else if (startDate !== null && endDate === null) {
     intervalDate = new Date(new Date(startDate).getTime() + intervalInMinutes * 60 * 1000);
     newEndDate = intervalDate;
-    intervalDate = new Date(startDate);
   } else if (startDate === null && endDate !== null) {
     intervalDate = new Date(new Date(endDate).getTime() - intervalInMinutes * 60 * 1000);
     newStartDate = intervalDate;
     intervalDate = new Date(endDate);
   } else {
     intervalDate = new Date(startDate);
-  }
-
-  const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
-  const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
-  const tenHoursAgo = new Date(now.getTime() - 10 * 60 * 60 * 1000);
-  const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
-
-  let type;
-  let groupByFunction;
-
-  if (intervalDate < sixMonthsAgo) {
-    type = 'monthly';
-    groupByFunction = fn('date', col('created_at'));
-  } else if (intervalDate < fiveDaysAgo) {
-    type = 'daily';
-    groupByFunction = fn('date', col('created_at'));
-  } else if (intervalDate < thirthyHoursAgo) {
-    type = 'hourly';
-    groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
-  } else if (intervalDate < tenHoursAgo) {
-    type = 'hourly';
-    // this will extract date rounded to the 5 minutes
-    // So if the user queries 24h, he'll get 24 * 12 = 288 items
-    groupByFunction = literal(`datetime(strftime('%s', created_at) - strftime('%s', created_at) % 300, 'unixepoch')`);
-  } else {
-    type = 'live';
   }
 
   const whereClause = {
@@ -87,27 +60,11 @@ async function getDeviceFeaturesAggregates(
     whereClause.created_at[Op.lte] = new Date(newEndDate);
   }
 
-  let rows;
-  if (type === 'live') {
-    rows = await db.DeviceFeatureState.findAll({
-      raw: true,
-      attributes: ['created_at', 'value'],
-      where: whereClause,
-    });
-  } else {
-    rows = await db.DeviceFeatureStateAggregate.findAll({
-      raw: true,
-      attributes: [
-        [groupByFunction, 'created_at'],
-        [fn('round', fn('avg', col('value')), 2), 'value'],
-      ],
-      group: [groupByFunction],
-      where: {
-        ...whereClause,
-        type,
-      },
-    });
-  }
+  const rows = await db.DeviceFeatureState.findAll({
+    raw: true,
+    attributes: ['created_at', 'value'],
+    where: whereClause,
+  });
 
   const dataForDownsampling = rows.map((deviceFeatureState) => {
     return [dayjs.utc(deviceFeatureState.created_at), deviceFeatureState.value];
@@ -135,5 +92,5 @@ async function getDeviceFeaturesAggregates(
 }
 
 module.exports = {
-  getDeviceFeaturesAggregates,
+  getDeviceFeaturesStates,
 };

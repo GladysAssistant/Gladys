@@ -1,16 +1,18 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
-
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
-import ChartHistorybox from './ChartHistory';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 const ONE_HOUR_IN_MINUTES = 60;
+const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
@@ -19,11 +21,19 @@ const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
+  'last-12-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES
+};
+
+const getTypeByInterval = interval => {
+  if (interval >= SEVEN_DAYS_IN_MINUTES) return 'hourly';
+  if (interval >= THIRTY_DAYS_IN_MINUTES) return 'daily';
+  if (interval >= ONE_YEAR_IN_MINUTES) return 'monthly';
+  return 'live';
 };
 
 const UNITS_WHEN_DOWN_IS_POSITIVE = [DEVICE_FEATURE_UNITS.WATT_HOUR];
@@ -63,16 +73,110 @@ const calculateVariation = (firstValue, lastValue) => {
 
 const allEqual = arr => arr.every(val => val === arr[0]);
 
-class Chartbox extends Component {
+class ChartHistorybox extends Component {
   toggleDropdown = () => {
     this.setState({
       dropdown: !this.state.dropdown
     });
   };
+
+  handleStartDateChange = date => {
+    this.setState(prevState => {
+      if (prevState.endDate) {
+        const newEndDate = prevState.endDate || new Date(date.getTime() + prevState.interval * 60000);
+        return {
+          startDate: date,
+          endDate: newEndDate < date ? date : newEndDate
+        };
+      }
+      return {
+        startDate: date,
+        endDate: new Date()
+      };
+    }, this.getData);
+  };
+
+  handleEndDateChange = date => {
+    this.setState(prevState => {
+      if (prevState.startDate) {
+        const newStartDate = prevState.startDate || new Date(date.getTime() - prevState.interval * 60000);
+        return {
+          endDate: date,
+          startDate: newStartDate > date ? date : newStartDate
+        };
+      }
+      return {
+        endDate: date
+      };
+    }, this.getData);
+  };
+
+  handlePreviousDate = () => {
+    const { startDate, endDate, interval } = this.state;
+    let newStartDate, newEndDate;
+    if (startDate && !endDate) {
+      newStartDate = new Date(startDate.getTime() - interval * 60000);
+      newEndDate = new Date(startDate.getTime());
+    } else if (!startDate && endDate) {
+      newStartDate = new Date(endDate.getTime() - interval * 60000);
+      newEndDate = new Date(endDate.getTime());
+    } else if (!startDate && !endDate) {
+      newStartDate = new Date(Date.now() - interval * 60000 * 2);
+      newEndDate = new Date(Date.now() - interval * 60000);
+    } else {
+      newStartDate = new Date(startDate.getTime() - (endDate.getTime() - startDate.getTime()));
+      newEndDate = new Date(endDate.getTime() - (endDate.getTime() - startDate.getTime()));
+    }
+    this.setState(
+      {
+        startDate: newStartDate,
+        endDate: newEndDate
+      },
+      this.getData
+    );
+  };
+
+  handleNextDate = () => {
+    const { startDate, endDate, interval } = this.state;
+    let newStartDate, newEndDate;
+    if (startDate && !endDate) {
+      newStartDate = new Date(startDate.getTime() + interval * 60000);
+      newEndDate = new Date(startDate.getTime());
+    } else if (!startDate && endDate) {
+      newStartDate = new Date(endDate.getTime() + interval * 60000);
+      newEndDate = new Date(endDate.getTime());
+    } else if (!startDate && !endDate) {
+      newStartDate = new Date(Date.now() + interval * 60000);
+      newEndDate = new Date(Date.now());
+    } else {
+      newStartDate = new Date(startDate.getTime() + (endDate.getTime() - startDate.getTime()));
+      newEndDate = new Date(endDate.getTime() + (endDate.getTime() - startDate.getTime()));
+    }
+    this.setState(
+      {
+        startDate: newStartDate,
+        endDate: newEndDate
+      },
+      this.getData
+    );
+  };
+
   switchToLastHourView = async e => {
     e.preventDefault();
     await this.setState({
       interval: ONE_HOUR_IN_MINUTES,
+      startDate: null,
+      endDate: null,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchToLast12HoursView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: TWELVE_HOURS_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
@@ -81,6 +185,8 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_DAY_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
@@ -89,6 +195,8 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: SEVEN_DAYS_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
@@ -96,6 +204,8 @@ class Chartbox extends Component {
   switchTo30DaysView = async () => {
     await this.setState({
       interval: THIRTY_DAYS_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
@@ -103,6 +213,8 @@ class Chartbox extends Component {
   switchTo3monthsView = async () => {
     await this.setState({
       interval: THREE_MONTHS_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
@@ -110,10 +222,13 @@ class Chartbox extends Component {
   switchToYearlyView = async () => {
     await this.setState({
       interval: ONE_YEAR_IN_MINUTES,
+      startDate: null,
+      endDate: null,
       dropdown: false
     });
     this.getData();
   };
+
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     if (!deviceFeatures) {
@@ -133,33 +248,111 @@ class Chartbox extends Component {
       return;
     }
     await this.setState({ loading: true });
-    try {
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
-        interval: this.state.interval,
-        max_states: 100,
-        device_features: deviceFeatures.join(',')
-      });
 
+    let type;
+    if (this.state.startDate && this.state.endDate) {
+      const intervalDate = (this.state.endDate - this.state.startDate) / 60000;
+      if (intervalDate < SEVEN_DAYS_IN_MINUTES) {
+        type = 'live';
+      } else {
+        type = getTypeByInterval(intervalDate, this.props.box.chart_type);
+      }
+    } else {
+      type = getTypeByInterval(this.state.interval, this.props.box.chart_type);
+    }
+
+    try {
+      let data;
+      if (type === 'live') {
+        data = await this.props.httpClient.get(`/api/v1/device_feature/states`, {
+          interval: this.state.interval,
+          max_states: 100000,
+          device_features: deviceFeatures.join(','),
+          start_date: this.state.startDate ? this.state.startDate.toISOString() : null,
+          end_date: this.state.endDate ? this.state.endDate.toISOString() : null
+        });
+      } else {
+        data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+          interval: this.state.interval,
+          max_states: 100000,
+          device_features: deviceFeatures.join(','),
+          start_date: this.state.startDate ? this.state.startDate.toISOString() : undefined,
+          end_date: this.state.endDate ? this.state.endDate.toISOString() : undefined
+        });
+      }
       let emptySeries = true;
 
-      const series = data.map((oneFeature, index) => {
-        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const { values, deviceFeature } = oneFeature;
-        const deviceName = deviceFeature.name;
-        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
-        return {
-          name,
-          data: values.map(value => {
-            emptySeries = false;
-            return {
-              x: value.created_at,
-              y: value.value
-            };
-          })
-        };
-      });
+      let series = [];
 
+      if (this.props.box.chart_type === 'timeline') {
+        const serie0 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.off'),
+          data: []
+        };
+        const serie1 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
+          data: []
+        };
+
+        data.forEach(oneFeature => {
+          const { values, deviceFeature, device } = oneFeature;
+          let previousValue = null;
+          let lastChangeTime = null;
+
+          values.forEach(value => {
+            emptySeries = false;
+            if (previousValue === null) {
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+              return;
+            }
+
+            if (value.value !== previousValue) {
+              const newData = {
+                x: `${device.name} (${deviceFeature.name})`,
+                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+              };
+              if (previousValue === 0) {
+                serie0.data.push(newData);
+              } else {
+                serie1.data.push(newData);
+              }
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+            }
+          });
+
+          // Add the last value if it is different from the previous one
+          if (previousValue !== null) {
+            const newData = {
+              x: `${device.name} (${deviceFeature.name})`,
+              y: [lastChangeTime, Math.round(new Date(values[values.length - 1].created_at).getTime() / 1000) * 1000]
+            };
+            if (previousValue === 0) {
+              serie0.data.push(newData);
+            } else {
+              serie1.data.push(newData);
+            }
+          }
+        });
+        series.push(serie1);
+        series.push(serie0);
+      } else {
+        series = data.map((oneFeature, index) => {
+          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          const { values, deviceFeature } = oneFeature;
+          const deviceName = deviceFeature.name;
+          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          return {
+            name,
+            data: values.map(value => {
+              emptySeries = false;
+              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+            })
+          };
+        });
+      }
       const newState = {
         series,
         loading: false,
@@ -215,6 +408,7 @@ class Chartbox extends Component {
       console.error(e);
     }
   };
+
   updateDeviceStateWebsocket = payload => {
     if (
       this.state.interval === intervalByName['last-hour'] &&
@@ -224,25 +418,43 @@ class Chartbox extends Component {
       this.getData();
     }
   };
+
   updateInterval = async () => {
     await this.setState({
       interval: intervalByName[this.props.box.interval]
     });
   };
+
+  handleZoom = async (min, max) => {
+    if (min === null || max === null) {
+      await this.setState({
+        startDate: null,
+        endDate: null
+      });
+      this.getData();
+    } else {
+      await this.setState({
+        startDate: new Date(min),
+        endDate: new Date(max)
+      });
+      this.getData();
+    }
+  };
+
   constructor(props) {
     super(props);
-    console.log('props', props);
-    console.log('this', this);
+    console.log('ChartHistorybox props', props);
     this.props = props;
     this.state = {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
       initialized: false,
       height: 'small',
-      showModal: false,
-      showHistory: false
+      startDate: null,
+      endDate: null
     };
   }
+
   componentDidMount() {
     this.getData();
     this.props.session.dispatcher.addListener(
@@ -250,6 +462,7 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
+
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
     const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
@@ -262,7 +475,6 @@ class Chartbox extends Component {
       this.getData();
     }
   }
-
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
@@ -270,8 +482,7 @@ class Chartbox extends Component {
     );
   }
   render(
-    { children, ...props },
-    // props,
+    props,
     {
       initialized,
       loading,
@@ -282,25 +493,31 @@ class Chartbox extends Component {
       lastValueRounded,
       interval,
       emptySeries,
-      unit
+      unit,
+      startDate,
+      endDate
     }
   ) {
-    const { x, y, box } = props;
-    console.log('props.box2', props);
-
-    console.log('this2', this);
-    // const ref = useRef(null);
-
+    const { showCloseButton } = this.props;
     const displayVariation = props.box.display_variation;
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
+        {showCloseButton && (
+          <div class={cx(style.closeButtonContainer)}>
+            <button class={cx('btn btn-secondary btn-center btn-sm', style.closeButton)} onClick={() => this.props.onClose()}>
+              <i class="fe fe-x" />
+            </button>
+          </div>
+        )}
+
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class={cx(style.subheader)}>{props.box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
-                <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
+                <a className="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                  {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.last12Hours" />}
                   {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                   {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
                   {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
@@ -313,23 +530,25 @@ class Chartbox extends Component {
                   })}
                 >
                   <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_HOUR_IN_MINUTES
-                    })}
+                    className={cx(style.dropdownItemChart, { [style.active]: interval === ONE_HOUR_IN_MINUTES })}
                     onClick={this.switchToLastHourView}
                   >
                     <Text id="dashboard.boxes.chart.lastHour" />
                   </a>
                   <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_DAY_IN_MINUTES
-                    })}
+                    className={cx(style.dropdownItemChart, { [style.active]: interval === TWELVE_HOURS_IN_MINUTES })}
+                    onClick={this.switchToLast12HoursView}
+                  >
+                    <Text id="dashboard.boxes.chart.last12Hours" />
+                  </a>
+                  <a
+                    className={cx(style.dropdownItemChart, { [style.active]: interval === ONE_DAY_IN_MINUTES })}
                     onClick={this.switchToOneDayView}
                   >
                     <Text id="dashboard.boxes.chart.lastDay" />
                   </a>
                   <a
-                    class={cx(style.dropdownItemChart, {
+                    className={cx(style.dropdownItemChart, {
                       [style.active]: interval === SEVEN_DAYS_IN_MINUTES
                     })}
                     onClick={this.switchTo7DaysView}
@@ -337,7 +556,7 @@ class Chartbox extends Component {
                     <Text id="dashboard.boxes.chart.lastSevenDays" />
                   </a>
                   <a
-                    class={cx(style.dropdownItemChart, {
+                    className={cx(style.dropdownItemChart, {
                       [style.active]: interval === THIRTY_DAYS_IN_MINUTES
                     })}
                     onClick={this.switchTo30DaysView}
@@ -345,7 +564,7 @@ class Chartbox extends Component {
                     <Text id="dashboard.boxes.chart.lastThirtyDays" />
                   </a>
                   <a
-                    class={cx(style.dropdownItemChart, {
+                    className={cx(style.dropdownItemChart, {
                       [style.active]: interval === THREE_MONTHS_IN_MINUTES
                     })}
                     onClick={this.switchTo3monthsView}
@@ -353,7 +572,7 @@ class Chartbox extends Component {
                     <Text id="dashboard.boxes.chart.lastThreeMonths" />
                   </a>
                   <a
-                    class={cx(style.dropdownItemChart, {
+                    className={cx(style.dropdownItemChart, {
                       [style.active]: interval === ONE_YEAR_IN_MINUTES
                     })}
                     onClick={this.switchToYearlyView}
@@ -365,8 +584,57 @@ class Chartbox extends Component {
             </div>
           </div>
 
-          {displayVariation && emptySeries === false && (
-            <div class="d-flex align-items-baseline">
+          <div class={cx(style.datePickerChart)}>
+            <div class={cx(style.datePicker, 'mr-2')}>
+              <span class={style.datePickerLabel}>
+                <Text id="dashboard.boxes.chart.startDate" />
+              </span>
+              <DatePicker
+                selected={startDate}
+                onChange={this.handleStartDateChange}
+                className={cx('form-control', style.datePickerInput)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={30}
+                dateFormat="yyyy-MM-dd HH:mm"
+                timeCaption="time"
+                maxDate={endDate || new Date()}
+                minDate={new Date('1970-01-01T00:00:00Z')}
+              />
+            </div>
+
+            <div class={cx(style.datePicker, 'mr-2')}>
+              <span class={style.datePickerLabel}>
+                <Text id="dashboard.boxes.chart.endDate" />
+              </span>
+              <DatePicker
+                selected={endDate}
+                onChange={this.handleEndDateChange}
+                className={cx('form-control', style.datePickerInput)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={30}
+                dateFormat="yyyy-MM-dd HH:mm"
+                timeCaption="time"
+                minDate={startDate ? startDate : undefined}
+                maxDate={new Date()}
+                minTime={startDate ? startDate : new Date()}
+                maxTime={new Date()}
+              />
+            </div>
+
+            <div class={cx(style.displacementRaftersChart)}>
+              <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handlePreviousDate}>
+                <i class="fe fe-chevron-left" />
+              </button>
+
+              <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handleNextDate}>
+                <i class="fe fe-chevron-right" />
+              </button>
+            </div>
+          </div>
+          {displayVariation && props.box.chart_type !== 'timeline' && emptySeries === false && (
+            <div class="d-flex align-items-baseline mt-3">
               {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">
                   {lastValueRounded}
@@ -444,16 +712,22 @@ class Chartbox extends Component {
               </div>
             </div>
           )}
+
           {emptySeries === false && props.box.display_axes && (
             <div class="mt-4">
               <ApexChartComponent
                 series={series}
                 interval={interval}
+                startDate={startDate}
+                endDate={endDate}
                 user={props.user}
                 size="big"
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                detailed_view={true}
+                dictionary={props.intl.dictionary}
+                onZoom={this.handleZoom}
               />
             </div>
           )}
@@ -491,25 +765,14 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                onZoom={this.handleZoom}
               />
             )}
           </div>
         </div>
-        <div class={cx(style.buttonBottom)}>
-          <button class={cx('btn btn-secondary btn-sm', style.buttonBottomRight)} onClick={() => this.setState({ showHistory: true })}>
-            <i class="fe fe-airplay"></i>
-          </button>
-        </div>
-        {this.state.showHistory && (
-          <div class={cx(style.modalOverlay)}>
-            <div class="card-body">
-              <ChartHistorybox {...props} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
-            </div>
-          </div>
-        )}
       </div>
     );
   }
 }
 
-export default withIntlAsProp(connect('httpClient,session,user')(Chartbox));
+export default withIntlAsProp(connect('httpClient,session,user')(ChartHistorybox));

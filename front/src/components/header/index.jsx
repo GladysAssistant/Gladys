@@ -167,6 +167,17 @@ const Header = ({ ...props }) => {
                     </Link>
                   </li>
                 )}
+                <li class="nav-item">
+                  <Link
+                    activeClassName="active"
+                    href="/dashboard/charts-history"
+                    class={cx('nav-link', {
+                      active: props.currentUrl === '/dashboard/charts-history'
+                    })}
+                  >
+                    <i class="fe fe-activity" /> <Text id="header.charts-history" />
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

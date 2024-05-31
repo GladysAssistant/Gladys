@@ -2,10 +2,10 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import update from 'immutability-helper';
-import EditDashboardPage from './EditDashboard';
+import EditChartsHistoryPage from './EditChartsHistory';
 import get from 'get-value';
 
-class EditDashboard extends Component {
+class EditChartsHistory extends Component {
   getDashboards = async () => {
     try {
       await this.setState({
@@ -13,7 +13,7 @@ class EditDashboard extends Component {
         loading: true
       });
       const dashboards = (await this.props.httpClient.get('/api/v1/dashboard')).filter(
-        dashboard => dashboard.type !== 'charts-history'
+        dashboard => dashboard.type === 'charts-history'
       );
       let currentDashboardSelector;
       if (this.props.dashboardSelector) {
@@ -71,7 +71,7 @@ class EditDashboard extends Component {
   };
 
   cancelDashboardEdit = async () => {
-    route(`/dashboard/${this.state.currentDashboardSelector}`);
+    route(`/dashboard/charts-history/${this.state.currentDashboardSelector}`);
   };
 
   moveCard = async (originalX, originalY, destX, destY) => {
@@ -214,10 +214,9 @@ class EditDashboard extends Component {
     try {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
-
       const { currentDashboard: selectedDashboard, dashboards } = this.state;
-      const { selector } = selectedDashboard;
 
+      const { selector } = selectedDashboard;
       const currentDashboard = await this.props.httpClient.patch(
         `/api/v1/dashboard/${selector}`,
         this.state.currentDashboard
@@ -235,7 +234,7 @@ class EditDashboard extends Component {
         loading: false,
         dashboards: updatedDashboards
       });
-      route(`/dashboard/${currentDashboard.selector}`);
+      route(`/dashboard/charts-history/${currentDashboard.selector}`);
     } catch (e) {
       console.error(e);
       if (e.response && e.response.status === 422) {
@@ -278,9 +277,9 @@ class EditDashboard extends Component {
         askDeleteDashboard: false
       });
       if (currentDashboard === null) {
-        route('/dashboard');
+        route('/dashboard/charts-history');
       } else {
-        route(`/dashboard/${currentDashboard.selector}/edit`);
+        route(`/dashboard/charts-history/${currentDashboard.selector}/edit`);
       }
     } catch (e) {
       console.error(e);
@@ -344,7 +343,7 @@ class EditDashboard extends Component {
     }
   ) {
     return (
-      <EditDashboardPage
+      <EditChartsHistoryPage
         user={props.user}
         isTouchDevice={this.isTouchDevice}
         dashboards={dashboards}
@@ -380,4 +379,4 @@ class EditDashboard extends Component {
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(EditDashboard);
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(EditChartsHistory);
