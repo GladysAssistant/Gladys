@@ -8,18 +8,19 @@ const logger = require('../../../utils/logger');
  */
 async function scan() {
   return new Promise((resolve, reject) => {
-    const browser = this.mdnsLib.createBrowser(this.mdnsLib.tcp('googlecast'));
     const devices = [];
     const deviceIpAddresses = new Map();
 
-    browser.on('serviceUp', (service) => {
-      logger.debug('Google Cast: Found device "%s" at %s:%d', service.name, service.addresses[0], service.port);
+    const browser = this.bonjourLib.find({ type: 'googlecast' });
+
+    browser.on('up', (service) => {
+      logger.debug('Google Cast: Found device "%s" at %s:%d', service.name, service.referer.address, service.port);
       devices.push(convertToGladysDevice(this.serviceId, service));
-      deviceIpAddresses.set(service.name, service.addresses[0]);
+      deviceIpAddresses.set(service.name, service.referer.address);
     });
 
     browser.on('error', (err) => {
-      logger.error('Google Cast: Error during mDNS scan', err);
+      logger.error('Google Cast: Error during bonjour scan', err);
       browser.stop();
       reject(err);
     });
@@ -32,7 +33,7 @@ async function scan() {
       resolve(devices);
     }, this.scanTimeout);
 
-    browser.start();
+    // Start the browser immediately as bonjour automatically starts
   });
 }
 

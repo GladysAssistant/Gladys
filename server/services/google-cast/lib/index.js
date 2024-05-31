@@ -2,10 +2,10 @@ const { init } = require('./google_cast.init');
 const { scan } = require('./google_cast.scan');
 const { setValue } = require('./google_cast.setValue');
 
-const GoogleCastHandler = function GoogleCastHandler(gladys, googleCastLib, mdnsLib, serviceId) {
+const GoogleCastHandler = function GoogleCastHandler(gladys, googleCastLib, bonjourLib, serviceId) {
   this.gladys = gladys;
   this.googleCastLib = googleCastLib;
-  this.mdnsLib = mdnsLib;
+  this.bonjourLib = bonjourLib;
   this.serviceId = serviceId;
   this.devices = [];
   this.deviceIpAddresses = new Map();
