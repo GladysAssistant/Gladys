@@ -94,7 +94,7 @@ const getApexChartTimelineOptions = ({
                 enabled: true
             },
             events: {
-                zoomed: function (chartContext, { xaxis }) {
+                zoomed:  eventZoomed && function (chartContext, { xaxis }) {
                     const { min, max } = xaxis;
                     if (min !== undefined && max !== undefined) {
                         eventZoomed(min, max);

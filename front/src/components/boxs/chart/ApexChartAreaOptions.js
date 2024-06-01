@@ -100,7 +100,7 @@ const getApexChartAreaOptions = ({
         enabled: false
       },
       events: {
-        zoomed: function (chartContext, { xaxis }) {
+        zoomed: eventZoomed && function (chartContext, { xaxis }) {
           const { min, max } = xaxis;
           if (min !== undefined && max !== undefined) {
             eventZoomed(min, max);

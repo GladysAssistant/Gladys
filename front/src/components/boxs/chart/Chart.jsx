@@ -270,8 +270,7 @@ class Chartbox extends Component {
     );
   }
   render(
-    { children, ...props },
-    // props,
+    props,
     {
       initialized,
       loading,
@@ -285,19 +284,15 @@ class Chartbox extends Component {
       unit
     }
   ) {
-    const { x, y, box } = props;
-    console.log('props.box2', props);
 
-    console.log('this2', this);
-    // const ref = useRef(null);
-
-    const displayVariation = props.box.display_variation;
+    const { box, displayPreview } = props;
+    const displayVariation = box.display_variation;
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
-            <div class={cx(style.msAuto, style.lh1)}>
+            <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
@@ -362,6 +357,19 @@ class Chartbox extends Component {
                   </a>
                 </div>
               </div>
+              {!displayPreview && (
+
+                <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)} onClick={() => this.setState({ showHistory: true })}>
+                  <i class="fe fe-airplay"></i>
+                </button>
+              )}
+              {this.state.showHistory && (
+                <div class={cx(style.modalOverlay)}>
+                  <div class="card-body">
+                    <ChartHistorybox {...props} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -495,18 +503,6 @@ class Chartbox extends Component {
             )}
           </div>
         </div>
-        <div class={cx(style.buttonBottom)}>
-          <button class={cx('btn btn-secondary btn-sm', style.buttonBottomRight)} onClick={() => this.setState({ showHistory: true })}>
-            <i class="fe fe-airplay"></i>
-          </button>
-        </div>
-        {this.state.showHistory && (
-          <div class={cx(style.modalOverlay)}>
-            <div class="card-body">
-              <ChartHistorybox {...props} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
-            </div>
-          </div>
-        )}
       </div>
     );
   }

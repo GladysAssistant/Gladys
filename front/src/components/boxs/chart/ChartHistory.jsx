@@ -502,18 +502,10 @@ class ChartHistorybox extends Component {
     const displayVariation = props.box.display_variation;
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
-        {showCloseButton && (
-          <div class={cx(style.closeButtonContainer)}>
-            <button class={cx('btn btn-secondary btn-center btn-sm', style.closeButton)} onClick={() => this.props.onClose()}>
-              <i class="fe fe-x" />
-            </button>
-          </div>
-        )}
-
         <div class="card-body">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
-            <div class={cx(style.msAuto, style.lh1)}>
+            <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
                 <a className="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
@@ -524,11 +516,7 @@ class ChartHistorybox extends Component {
                   {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
                   {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
                 </a>
-                <div
-                  class={cx(style.dropdownMenuChart, {
-                    [style.show]: dropdown
-                  })}
-                >
+                <div class={cx(style.dropdownMenuChart, { [style.show]: dropdown })}>
                   <a
                     className={cx(style.dropdownItemChart, { [style.active]: interval === ONE_HOUR_IN_MINUTES })}
                     onClick={this.switchToLastHourView}
@@ -581,6 +569,11 @@ class ChartHistorybox extends Component {
                   </a>
                 </div>
               </div>
+              {showCloseButton && (
+                <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)} onClick={() => this.props.onClose()}>
+                  <i class="fe fe-x" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -624,11 +617,11 @@ class ChartHistorybox extends Component {
             </div>
 
             <div class={cx(style.displacementRaftersChart)}>
-              <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handlePreviousDate}>
+              <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)} onClick={this.handlePreviousDate}>
                 <i class="fe fe-chevron-left" />
               </button>
 
-              <button class={cx('btn btn-outline-secondary', style.customBtn)} onClick={this.handleNextDate}>
+              <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)} onClick={this.handleNextDate}>
                 <i class="fe fe-chevron-right" />
               </button>
             </div>
