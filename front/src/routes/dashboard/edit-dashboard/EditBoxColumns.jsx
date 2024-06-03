@@ -14,9 +14,9 @@ import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => {
-  const nbColumns = props.homeDashboard.boxes.length;
-  const columnClass = `col-lg-${12 / nbColumns}`;
-  
+  const lengthBoxes = props.homeDashboard.boxes.length;
+  const columnClass = `col-lg-${12 / lengthBoxes}`;
+
   return (
     <div class="pb-6">
       <h3>
@@ -124,15 +124,15 @@ const EditBoxColumns = ({ children, ...props }) => {
                   <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                 </h3>
                 <div class="d-flex flex-row justify-content-center">
-                  {x === nbColumns - 1 && (
+                  {x === lengthBoxes - 1 && (
                     <div class="d-flex justify-content-center align-item-center mb-2">
-                      {!props.askDeleteColumn && nbColumns > 1 && (
+                      {!props.askDeleteColumn && lengthBoxes > 1 && (
                         <button onClick={props.askDeleteCurrentColumn} className="btn btn-outline-danger btn-sm">
                           <Text id="dashboard.editDashboardDeleteColumnButton" /> <i class="fe fe-trash" />
                         </button>
                       )}
                       <div class="mr-2" />
-                      {!props.askDeleteColumn && nbColumns < 3 && (
+                      {!props.askDeleteColumn && lengthBoxes < 3 && (
                         <button class="btn btn-outline-primary btn-sm" onClick={() => props.addColumn(x)}>
                           <Text id="dashboard.editDashboardAddColumnButton" /> <i class="fe fe-plus" />
                         </button>
@@ -143,7 +143,10 @@ const EditBoxColumns = ({ children, ...props }) => {
                           <button onClick={props.deleteCurrentColumn} className="btn btn-outline-danger btn-sm ml-2">
                             <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
                           </button>
-                          <button onClick={props.cancelDeleteCurrentColumn} className="btn btn-outline-secondary btn-sm ml-2">
+                          <button
+                            onClick={props.cancelDeleteCurrentColumn}
+                            className="btn btn-outline-secondary btn-sm ml-2"
+                          >
                             <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
                           </button>
                         </div>
@@ -151,7 +154,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                     </div>
                   )}
                 </div>
-                {x === nbColumns - 1 && props.boxNotEmptyError && (
+                {x === lengthBoxes - 1 && props.boxNotEmptyError && (
                   <div class="alert alert-danger">
                     <Text id="dashboard.editDashboardBoxNotEmpty" />
                   </div>

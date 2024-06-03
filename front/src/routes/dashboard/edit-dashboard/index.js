@@ -164,7 +164,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState({...newState, boxNotEmptyError: false});
+    this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateNewSelectedBox = (x, y, type) => {
@@ -262,7 +262,7 @@ class EditDashboard extends Component {
     });
     this.setState(newState);
   };
-  
+
   askDeleteCurrentColumn = async () => {
     await this.setState({
       askDeleteColumn: true
@@ -276,7 +276,7 @@ class EditDashboard extends Component {
   };
 
   deleteCurrentColumn = async () => {
-    const lengthBoxes = this.state.currentDashboard.boxes.length - 1
+    const lengthBoxes = this.state.currentDashboard.boxes.length - 1;
     if (this.state.currentDashboard.boxes[lengthBoxes].length === 0) {
       const newState = update(this.state, {
         currentDashboard: {
@@ -285,7 +285,7 @@ class EditDashboard extends Component {
           }
         }
       });
-      await this.setState({...newState, askDeleteColumn: false});
+      await this.setState({ ...newState, askDeleteColumn: false });
     } else {
       this.setState({
         boxNotEmptyError: true,
