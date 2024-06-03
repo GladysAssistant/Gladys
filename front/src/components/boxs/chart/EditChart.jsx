@@ -12,10 +12,13 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
-  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
-  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
   [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
+};
+
+const FEATURE_BINARY = {
+  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
+  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true
 };
 
 const square = (color = 'transparent') => ({

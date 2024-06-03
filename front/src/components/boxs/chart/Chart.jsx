@@ -365,7 +365,7 @@ class Chartbox extends Component {
               )}
               {this.state.showHistory && (
                 <div class={cx(style.modalOverlay)}>
-                  <div class="card-body">
+                  <div class={cx('card-body', style.cardBody)}>
                     <ChartHistorybox {...props} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
                   </div>
                 </div>

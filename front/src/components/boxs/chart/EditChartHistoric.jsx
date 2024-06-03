@@ -467,39 +467,45 @@ class EditChartHistoric extends Component {
                 </select>
               </div>
             )}
-            {props.box.chart_type !== 'timeline' && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.chart.defaultInterval" />
-                </label>
-                <select onChange={this.updateDefaultInterval} className="form-control" value={props.box.interval}>
-                  <option>
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  <option value="last-hour">
-                    <Text id="dashboard.boxes.chart.lastHour" />
-                  </option>
-                  <option value="last-12-hours">
-                    <Text id="dashboard.boxes.chart.last12Hours" />
-                  </option>
-                  <option value="last-day">
-                    <Text id="dashboard.boxes.chart.lastDay" />
-                  </option>
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.chart.defaultInterval" />
+              </label>
+              <select onChange={this.updateDefaultInterval} className="form-control" value={props.box.interval}>
+                <option>
+                  <Text id="global.emptySelectOption" />
+                </option>
+                <option value="last-hour">
+                  <Text id="dashboard.boxes.chart.lastHour" />
+                </option>
+                <option value="last-12-hours">
+                  <Text id="dashboard.boxes.chart.last12Hours" />
+                </option>
+                <option value="last-day">
+                  <Text id="dashboard.boxes.chart.lastDay" />
+                </option>
+                {props.box.chart_type !== 'timeline' && (
                   <option value="last-week">
                     <Text id="dashboard.boxes.chart.lastSevenDays" />
                   </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
                   <option value="last-month">
                     <Text id="dashboard.boxes.chart.lastThirtyDays" />
                   </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
                   <option value="last-three-months">
                     <Text id="dashboard.boxes.chart.lastThreeMonths" />
                   </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
                   <option value="last-year">
                     <Text id="dashboard.boxes.chart.lastYear" />
                   </option>
-                </select>
-              </div>
-            )}
+                )}
+              </select>
+            </div>
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.preview" />

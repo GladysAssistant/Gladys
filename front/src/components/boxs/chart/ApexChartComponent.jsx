@@ -55,6 +55,79 @@ class ApexChartComponent extends Component {
       }
     };
   }
+  addDateFormatterRangeBar(options) {
+    let formatter_custom;
+    const intervalDate = (this.props.endDate - this.props.startDate) / 60000;
+    if (this.props.interval <= 24 * 60 || intervalDate <= 7 * 24 * 60) {
+      formatter_custom = (opts) => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LLL');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LLL');
+        const w = opts.ctx.w
+        let seriesName = w.config.series[opts.seriesIndex].name
+          ? w.config.series[opts.seriesIndex].name
+          : ''
+        let ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex]
+        const color = w.globals.colors[opts.seriesIndex]
+
+        return (
+          '<div class="apexcharts-tooltip-rangebar">' +
+          '<div> <span class="series-name" style="color: ' +
+          color +
+          '">' +
+          (seriesName ? seriesName : '') +
+          '</span></div>' +
+          '<div> <span class="category">' +
+          `${ylabel}: ` +
+          ' </span> <span class="value start-value"></br>&nbsp;&nbsp;' +
+          `Début le: ${startDate} ` +
+          '</span> <span class="value end-value"></br>&nbsp;&nbsp;' +
+          `Fin le: ${endDate} ` +
+          '</span></div>' +
+          '</div>'
+        )
+      };
+    } else {
+      formatter_custom = (opts) => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LL');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LL');
+
+        const w = opts.ctx.w
+        const seriesName = w.config.series[opts.seriesIndex].name
+          ? w.config.series[opts.seriesIndex].name
+          : ''
+        const ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex]
+        const color = w.globals.colors[opts.seriesIndex]
+
+        return (
+          '<div class="apexcharts-tooltip-rangebar">' +
+          '<div> <span class="series-name" style="color: ' +
+          color +
+          '">' +
+          (seriesName ? seriesName : '') +
+          '</span></div>' +
+          '<div> <span class="category">' +
+          `${ylabel} ` +
+          ' </span> <span class="value start-value"></br>&nbsp;&nbsp;' +
+          `Début le: ${startDate} ` +
+          '</span> <span class="value end-value"></br>&nbsp;&nbsp;' +
+          `Fin le: ${endDate} ` +
+          '</span></div>' +
+          '</div>'
+        )
+      };
+    }
+    options.tooltip.custom = function (opts) {
+      return formatter_custom(opts)
+    }
+  }
   getBarChartOptions = () => {
     const options = getApexChartBarOptions({
       displayAxes: this.props.display_axes,
@@ -186,8 +259,7 @@ class ApexChartComponent extends Component {
       chartType: this.props.detailed_view ? this.props.chart_type : null,
       eventZoomed: this.props.detailed_view ? this.handleZoom : null
     });
-    this.addDateFormatter(options);
-
+    this.addDateFormatterRangeBar(options);
     return options;
   };
   handleZoom = (min, max) => {

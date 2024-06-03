@@ -87,14 +87,14 @@ const getApexChartTimelineOptions = ({
                             .replace(/T/, ' ')
                             .replace(/\..+/, '')
                             .replace(/:/g, '-')}`
-                    }
+                    },
                 }
             },
             animations: {
                 enabled: true
             },
             events: {
-                zoomed:  eventZoomed && function (chartContext, { xaxis }) {
+                zoomed: eventZoomed && function (chartContext, { xaxis }) {
                     const { min, max } = xaxis;
                     if (min !== undefined && max !== undefined) {
                         eventZoomed(min, max);
@@ -113,8 +113,8 @@ const getApexChartTimelineOptions = ({
         plotOptions: {
             bar: {
                 horizontal: true,
-                barHeight: '75%',
-                rangeBarGroupRows: false
+                barHeight: '40%',
+                rangeBarGroupRows: true
             }
         },
         colors: DEFAULT_COLORS,
@@ -126,17 +126,38 @@ const getApexChartTimelineOptions = ({
                 padding: 0,
                 datetimeUTC: false
             },
-            tooltip: {
-                enabled: false
-            },
             axisBorder: {
                 show: false
             },
             type: 'datetime'
         },
+        yaxis: {
+            axisBorder: {
+                show: true
+            },
+        },
         legend: {
             show: displayAxes,
-            position: 'bottom'
+            position: 'bottom',
+            itemMargin: {
+                horizontal: 20
+            },
+        },
+        tooltip: {
+            // theme: 'dark',
+            marker: {
+                show: true
+            },
+            onDatasetHover: {
+                highlightDataSeries: true,
+            },
+            items: {
+                display: 'flex',
+            },
+            fillSeriesColor: false,
+            fixed: {
+                enabled: false,
+            }
         }
     };
     return options;

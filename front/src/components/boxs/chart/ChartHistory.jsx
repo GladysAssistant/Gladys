@@ -535,38 +535,46 @@ class ChartHistorybox extends Component {
                   >
                     <Text id="dashboard.boxes.chart.lastDay" />
                   </a>
-                  <a
-                    className={cx(style.dropdownItemChart, {
-                      [style.active]: interval === SEVEN_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo7DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastSevenDays" />
-                  </a>
-                  <a
-                    className={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo30DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                  </a>
-                  <a
-                    className={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo3monthsView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                  </a>
-                  <a
-                    className={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_YEAR_IN_MINUTES
-                    })}
-                    onClick={this.switchToYearlyView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastYear" />
-                  </a>
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo7DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastSevenDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo30DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo3monthsView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_YEAR_IN_MINUTES
+                      })}
+                      onClick={this.switchToYearlyView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastYear" />
+                    </a>
+                  )}
                 </div>
               </div>
               {showCloseButton && (

@@ -50,6 +50,28 @@
   z-index: 1000;
 }
 
+.cardBody {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 1280px) {
+  .modalOverlay {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+
+  .card-body {
+    width: 90%;
+    /* Réduire la largeur de la carte pour les petits écrans */
+    max-height: 80vh;
+    /* Limiter la hauteur de la carte */
+    overflow-y: auto;
+    /* Ajouter un défilement vertical si nécessaire */
+  }
+}
+
 .chartContainer {
   width: 100%;
   max-width: 100%;
