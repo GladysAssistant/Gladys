@@ -2,12 +2,13 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
+import ChartBoxZoomed from './Chart';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -332,13 +333,14 @@ class Chartbox extends Component {
       unit
     }
   ) {
-    const displayVariation = props.box.display_variation;
+    const { box, displayPreview, showCloseButton, showHistoryZoom } = this.props;
+    const displayVariation = box.display_variation;
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
-            <div class={cx(style.msAuto, style.lh1)}>
+            <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
@@ -411,6 +413,30 @@ class Chartbox extends Component {
                   )}
                 </div>
               </div>
+              {this.state.showHistory && (
+                <div class={cx(style.modalOverlay)}>
+                  <div class={cx('card-body', style.cardBody)}>
+                    <ChartBoxZoomed {...props} showHistoryZoom={this.state.showHistory} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
+                  </div>
+                </div>
+              )}
+              {showCloseButton && (
+                <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)} onClick={() => this.props.onClose()}>
+                  <i class="fe fe-x" />
+                </button>
+              )}
+              {!displayPreview && !showHistoryZoom && (
+                <Localizer>
+                  <button
+                    class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)}
+                    onClick={() => this.setState({ showHistory: true })}
+                    title={<Text id="dashboard.boxes.chart.expandChartButtonDescription" />}
+                  >
+                    <i class="fe fe-airplay"></i>
+
+                  </button>
+                </Localizer>
+              )}
             </div>
           </div>
 
