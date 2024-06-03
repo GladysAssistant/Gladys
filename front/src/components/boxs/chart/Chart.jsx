@@ -8,7 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../se
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
-import ChartBoxZoomed from './Chart';
+import ChartBoxExpanded from './Chart';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -416,12 +416,20 @@ class Chartbox extends Component {
               {this.state.showHistory && (
                 <div class={cx(style.modalOverlay)}>
                   <div class={cx('card-body', style.cardBody)}>
-                    <ChartBoxZoomed {...props} showHistoryZoom={this.state.showHistory} showCloseButton={true} onClose={() => this.setState({ showHistory: false })} />
+                    <ChartBoxExpanded
+                      {...props}
+                      showHistoryZoom={this.state.showHistory}
+                      showCloseButton={true}
+                      onClose={() => this.setState({ showHistory: false })}
+                    />
                   </div>
                 </div>
               )}
               {showCloseButton && (
-                <button class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)} onClick={() => this.props.onClose()}>
+                <button
+                  class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)}
+                  onClick={() => this.props.onClose()}
+                >
                   <i class="fe fe-x" />
                 </button>
               )}
@@ -432,8 +440,7 @@ class Chartbox extends Component {
                     onClick={() => this.setState({ showHistory: true })}
                     title={<Text id="dashboard.boxes.chart.expandChartButtonDescription" />}
                   >
-                    <i class="fe fe-airplay"></i>
-
+                    <i class="fe fe-airplay" />
                   </button>
                 </Localizer>
               )}
