@@ -141,24 +141,77 @@ class Chartbox extends Component {
 
       let emptySeries = true;
 
-      const series = data.map((oneFeature, index) => {
-        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const { values, deviceFeature } = oneFeature;
-        const deviceName = deviceFeature.name;
-        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
-        return {
-          name,
-          data: values.map(value => {
-            emptySeries = false;
-            return {
-              x: value.created_at,
-              y: value.value
-            };
-          })
-        };
-      });
+      let series = [];
 
+      if (this.props.box.chart_type === 'timeline') {
+        const serie0 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.off'),
+          data: []
+        };
+        const serie1 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
+          data: []
+        };
+
+        data.forEach(oneFeature => {
+          const { values, deviceFeature, device } = oneFeature;
+          let previousValue = null;
+          let lastChangeTime = null;
+
+          values.forEach(value => {
+            emptySeries = false;
+            if (previousValue === null) {
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+              return;
+            }
+
+            if (value.value !== previousValue) {
+              const newData = {
+                x: `${device.name} (${deviceFeature.name})`,
+                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+              };
+              if (previousValue === 0) {
+                serie0.data.push(newData);
+              } else {
+                serie1.data.push(newData);
+              }
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+            }
+          });
+
+          // Add the last value if it is different from the previous one
+          if (previousValue !== null) {
+            const newData = {
+              x: `${device.name} (${deviceFeature.name})`,
+              y: [lastChangeTime, Math.round(new Date(values[values.length - 1].created_at).getTime() / 1000) * 1000]
+            };
+            if (previousValue === 0) {
+              serie0.data.push(newData);
+            } else {
+              serie1.data.push(newData);
+            }
+          }
+        });
+        series.push(serie1);
+        series.push(serie0);
+      } else {
+        series = data.map((oneFeature, index) => {
+          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          const { values, deviceFeature } = oneFeature;
+          const deviceName = deviceFeature.name;
+          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          return {
+            name,
+            data: values.map(value => {
+              emptySeries = false;
+              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+            })
+          };
+        });
+      }
       const newState = {
         series,
         loading: false,
@@ -316,44 +369,52 @@ class Chartbox extends Component {
                   >
                     <Text id="dashboard.boxes.chart.lastDay" />
                   </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === SEVEN_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo7DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastSevenDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo30DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo3monthsView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_YEAR_IN_MINUTES
-                    })}
-                    onClick={this.switchToYearlyView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastYear" />
-                  </a>
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo7DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastSevenDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo30DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo3monthsView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_YEAR_IN_MINUTES
+                      })}
+                      onClick={this.switchToYearlyView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastYear" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {displayVariation && emptySeries === false && (
+          {displayVariation && props.box.chart_type !== 'timeline' && emptySeries === false && (
             <div class="d-flex align-items-baseline">
               {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">

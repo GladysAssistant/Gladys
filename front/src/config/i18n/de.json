@@ -356,16 +356,20 @@
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
         "chartColor": "Wählen Sie die Farbe des Diagramms aus",
         "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
+        "timelineColor": "Farbe für Position auswählen",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",
+        "timeline": "Binär",
         "stepline": "Schrittleitung",
         "displayAxes": "Achsen anzeigen?",
         "displayVariation": "Variation anzeigen?",
         "yes": "Ja",
         "no": "Nein",
         "preview": "Vorschau",
-        "showPreviewButton": "Vorschau anzeigen"
+        "showPreviewButton": "Vorschau anzeigen",
+        "on": "An",
+        "off": "Aus"
       },
       "ecowatt": {
         "title": "Ecowatt France",

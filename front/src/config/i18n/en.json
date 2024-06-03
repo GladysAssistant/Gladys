@@ -356,16 +356,20 @@
         "chartType": "Select the type of chart to display",
         "chartColor": "Select the color of chart",
         "dataColor": "Select color for {{featureLabel}}",
+        "timelineColor": "Select color for position",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
+        "timeline": "Binary",
         "stepline": "Step Line",
         "displayAxes": "Display axes?",
         "displayVariation": "Display variation?",
         "yes": "Yes",
         "no": "No",
         "preview": "Preview",
-        "showPreviewButton": "Show preview"
+        "showPreviewButton": "Show preview",
+        "on": "On",
+        "off": "Off"
       },
       "ecowatt": {
         "title": "Ecowatt France",
