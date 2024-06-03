@@ -66,6 +66,12 @@ const EditDashboard = ({ children, ...props }) => (
                           savingNewDashboardList={props.savingNewDashboardList}
                           isMobileReordering={props.isMobileReordering}
                           toggleMobileReorder={props.toggleMobileReorder}
+                          askDeleteColumn={props.askDeleteColumn}
+                          askDeleteCurrentColumn={props.askDeleteCurrentColumn}
+                          cancelDeleteCurrentColumn={props.cancelDeleteCurrentColumn}
+                          deleteCurrentColumn={props.deleteCurrentColumn}
+                          addColumn={props.addColumn}
+                          boxNotEmptyError={props.boxNotEmptyError}
                         />
                       )}
                     </div>
