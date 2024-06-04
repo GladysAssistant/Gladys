@@ -5,6 +5,12 @@
   height: 60px;
   margin-bottom: 1rem;
 }
+
+.btnContainer {
+  display: flex;
+  gap: 10px;
+}
+
 @media (max-width: 992px) {
   .columnBoxesHeader {
     height: auto;
@@ -20,10 +26,6 @@
     justify-content: center;
     gap: 10px;
   }
-}
-.btnContainer {
-  display: flex;
-  gap: 10px;
 }
 
 .dropZone {

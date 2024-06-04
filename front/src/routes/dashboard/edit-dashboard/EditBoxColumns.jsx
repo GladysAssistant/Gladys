@@ -120,9 +120,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                   [style.removePaddingLastCol]: x === 2
                 })}
               >
-                <div
-                  class={cx('d-flex flex-column align-items-center', style.columnBoxesHeader)}
-                >
+                <div class={cx('d-flex flex-column align-items-center', style.columnBoxesHeader)}>
                   <h3 class="text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                   </h3>
@@ -165,7 +163,9 @@ const EditBoxColumns = ({ children, ...props }) => {
 
                   {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
 
-                  {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
+                  {props.isMobileReordering && (
+                    <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />
+                  )}
                   <div class="d-flex justify-content-center mb-4">
                     <button class="btn btn-primary" onClick={() => props.addBox(x)}>
                       <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
