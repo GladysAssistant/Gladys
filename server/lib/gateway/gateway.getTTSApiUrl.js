@@ -16,7 +16,7 @@ async function getTTSApiUrl(body) {
     const response = await this.gladysGatewayClient.ttsGetToken(body);
     return response;
   } catch (e) {
-    logger.debug(e);
+    logger.warn(e);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {
