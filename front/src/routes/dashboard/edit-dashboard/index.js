@@ -263,18 +263,6 @@ class EditDashboard extends Component {
     this.setState({ ...newState, boxNotEmptyError: false });
   };
 
-  askDeleteCurrentColumn = async () => {
-    await this.setState({
-      askDeleteColumn: true
-    });
-  };
-
-  cancelDeleteCurrentColumn = async () => {
-    await this.setState({
-      askDeleteColumn: false
-    });
-  };
-
   deleteCurrentColumn = async () => {
     const lengthBoxes = this.state.currentDashboard.boxes.length - 1;
     if (this.state.currentDashboard.boxes[lengthBoxes].length === 0) {
@@ -285,11 +273,10 @@ class EditDashboard extends Component {
           }
         }
       });
-      await this.setState({ ...newState, askDeleteColumn: false });
+      await this.setState(newState);
     } else {
       this.setState({
-        boxNotEmptyError: true,
-        askDeleteColumn: false
+        boxNotEmptyError: true
       });
     }
   };
@@ -355,7 +342,6 @@ class EditDashboard extends Component {
       dashboards: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false,
-      askDeleteColumn: false,
       boxNotEmptyError: false,
       isMobileReordering: false
     };
@@ -381,7 +367,6 @@ class EditDashboard extends Component {
       dashboardAlreadyExistError,
       unknownError,
       askDeleteDashboard,
-      askDeleteColumn,
       boxNotEmptyError,
       savingNewDashboardList,
       isMobileReordering
@@ -420,9 +405,6 @@ class EditDashboard extends Component {
         toggleMobileReorder={this.toggleMobileReorder}
         isMobileReordering={isMobileReordering}
         addColumn={this.addColumn}
-        askDeleteColumn={askDeleteColumn}
-        askDeleteCurrentColumn={this.askDeleteCurrentColumn}
-        cancelDeleteCurrentColumn={this.cancelDeleteCurrentColumn}
         deleteCurrentColumn={this.deleteCurrentColumn}
         boxNotEmptyError={boxNotEmptyError}
       />

@@ -132,7 +132,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                             <Text id="dashboard.editDashboardDeleteColumnButton" /> <i class="fe fe-trash" />
                           </button>
                         )}
-                        {!props.askDeleteColumn && lengthBoxes < 3 && (
+                        {lengthBoxes < 3 && (
                           <button class="btn btn-outline-primary btn-sm" onClick={() => props.addColumn(x)}>
                             <Text id="dashboard.editDashboardAddColumnButton" /> <i class="fe fe-plus" />
                           </button>
