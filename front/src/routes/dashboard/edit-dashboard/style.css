@@ -2,29 +2,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 60px;
   margin-bottom: 1rem;
-}
-
-.btnContainer {
-  display: flex;
-  gap: 10px;
 }
 
 @media (max-width: 992px) {
   .columnBoxesHeader {
     height: auto;
     margin-bottom: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
+
   .borderColumn {
     border-top: 1px dashed #bdbdbd;
     padding-top: 10px;
   }
-  .btnContainer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+
+  .displayTextMobile {
+    display: inline !important;
   }
 }
 

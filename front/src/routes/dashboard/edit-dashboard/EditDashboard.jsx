@@ -69,6 +69,7 @@ const EditDashboard = ({ children, ...props }) => (
                           deleteCurrentColumn={props.deleteCurrentColumn}
                           addColumn={props.addColumn}
                           boxNotEmptyError={props.boxNotEmptyError}
+                          columnBoxNotEmptyError={props.columnBoxNotEmptyError}
                         />
                       )}
                     </div>

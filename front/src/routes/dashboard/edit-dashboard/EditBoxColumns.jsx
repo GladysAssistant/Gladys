@@ -15,7 +15,7 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => {
   const lengthBoxes = props.homeDashboard.boxes.length;
-  const columnClass = `col-lg-${12 / lengthBoxes}`;
+  const columnClass = `col-lg-${lengthBoxes < 3 ? 10 / lengthBoxes : 12 / lengthBoxes}`;
 
   return (
     <div class="pb-6">
@@ -93,7 +93,7 @@ const EditBoxColumns = ({ children, ...props }) => {
           <Text id="dashboard.editDashboardExplanation" />
         </div>
       </div>
-      <div class="row mb-6">
+      <div class="row mb-4">
         <div class="col-md-4 d-lg-none d-xl-none">
           <button
             class={cx('btn', {
@@ -110,7 +110,7 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class="d-flex flex-row flex-wrap justify-content-center">
+        <div class="d-flex flex-row flex-wrap justify-content-center mt-2">
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
@@ -120,32 +120,21 @@ const EditBoxColumns = ({ children, ...props }) => {
                   [style.removePaddingLastCol]: x === 2
                 })}
               >
-                <div class={cx('d-flex flex-column align-items-center', style.columnBoxesHeader)}>
+                <div class={cx(style.columnBoxesHeader)}>
                   <h3 class="text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
-                  </h3>
-                  <div class="d-flex justify-content-center mb-2">
-                    {x === lengthBoxes - 1 && (
-                      <div class={cx(style.btnContainer)}>
-                        {!props.boxNotEmptyError && lengthBoxes > 1 && (
-                          <button class="btn btn-outline-danger btn-sm" onClick={props.deleteCurrentColumn}>
-                            <Text id="dashboard.editDashboardDeleteColumnButton" /> <i class="fe fe-trash" />
-                          </button>
-                        )}
-                        {lengthBoxes < 3 && (
-                          <button class="btn btn-outline-primary btn-sm" onClick={() => props.addColumn(x)}>
-                            <Text id="dashboard.editDashboardAddColumnButton" /> <i class="fe fe-plus" />
-                          </button>
-                        )}
-                      </div>
+                    {lengthBoxes > 1 && (
+                      <button class="btn btn-outline-danger btn-sm ml-2" onClick={() => props.deleteCurrentColumn(x)}>
+                        <i class="fe fe-trash" />
+                      </button>
                     )}
-                  </div>
+                  </h3>
+                  {props.boxNotEmptyError && props.columnBoxNotEmptyError === x && (
+                    <div class="alert alert-danger d-flex justify-content-center mb-4">
+                      <Text id="dashboard.editDashboardBoxNotEmpty" />
+                    </div>
+                  )}
                 </div>
-                {x === lengthBoxes - 1 && props.boxNotEmptyError && (
-                  <div class="d-flex justify-content-center alert alert-danger mb-2">
-                    <Text id="dashboard.editDashboardBoxNotEmpty" />
-                  </div>
-                )}
                 <div class="d-flex flex-column mt-1">
                   {column.length > 0 && (
                     <div>
@@ -174,6 +163,20 @@ const EditBoxColumns = ({ children, ...props }) => {
                 </div>
               </div>
             ))}
+          {lengthBoxes < 3 && (
+            <div class="d-flex flex-column col-lg-1">
+              <button
+                class="btn btn-outline-primary btn-xl"
+                style={{ position: 'sticky', top: '24px' }}
+                onClick={() => props.addColumn(lengthBoxes)}
+              >
+                <div class={cx('d-none', style.displayTextMobile)}>
+                  <Text id="dashboard.editDashboardAddColumnButton" />
+                </div>
+                <i class="fe fe-plus" />
+              </button>
+            </div>
+          )}
         </div>
       </DndProvider>
     </div>
