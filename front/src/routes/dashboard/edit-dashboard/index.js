@@ -127,7 +127,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState(newState);
+    await this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateCurrentDashboardName = e => {
@@ -260,7 +260,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   askDeleteCurrentColumn = async () => {
