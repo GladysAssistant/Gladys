@@ -84,7 +84,7 @@ describe('gateway.init', () => {
     expect(gateway.connected).to.equal(true);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({
-      rule: { tz: 'Europe/Paris', hour: 0, minute: 0, second: 0 },
+      rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
     });
   });
 
@@ -101,7 +101,7 @@ describe('gateway.init', () => {
     expect(gateway.connected).to.equal(false);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({
-      rule: { tz: 'Europe/Paris', hour: 0, minute: 0, second: 0 },
+      rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
     });
   });
 
