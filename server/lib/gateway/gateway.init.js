@@ -44,7 +44,7 @@ async function init() {
   // schedule backup at midnight
   const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
-  const rule = { tz: timezone, hour: 0, minute: 0, second: 0 };
+  const rule = { tz: timezone, hour: 2, minute: 0, second: 0 };
   this.backupSchedule = this.scheduler.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
 
   // Get latest Gladys version in 5 minutes

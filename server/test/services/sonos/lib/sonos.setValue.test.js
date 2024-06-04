@@ -191,9 +191,10 @@ describe('SonosHandler.setValue', () => {
     await sonosHandler.setValue(device, deviceFeature, 'http://test.com');
     assert.calledWith(devicePlayNotification, {
       onlyWhenPlaying: false,
-      timeout: 10,
+      timeout: 20,
       trackUri: 'http://test.com',
       volume: 45,
+      delayMs: 700,
     });
   });
 });
