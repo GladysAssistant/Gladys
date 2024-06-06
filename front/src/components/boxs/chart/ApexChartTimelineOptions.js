@@ -10,7 +10,7 @@ const addYAxisStyles = () => {
       lines.forEach((line, index) => {
         const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
         if (line.length > 15) {
-          line = line.substring(0, 15) + '...';
+          line = `${line.substring(0, 15)}...`;
         }
         tspan.setAttribute('x', text.getAttribute('x'));
         tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
