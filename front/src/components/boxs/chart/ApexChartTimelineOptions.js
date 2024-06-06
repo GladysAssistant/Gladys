@@ -1,3 +1,31 @@
+const addYAxisStyles = () => {
+  const yAxisLabel = document.querySelectorAll('.apexcharts-yaxis-label');
+  let fontSize = '12px';
+  yAxisLabel.forEach(text => {
+    const title = text.querySelector('title');
+    if (title) {
+      const textContent = title.textContent;
+      let lines = textContent.split('\n');
+      text.innerHTML = '';
+      lines.forEach((line, index) => {
+        const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        if (line.length > 15) {
+          line = line.substring(0, 15) + '...';
+        }
+        tspan.setAttribute('x', text.getAttribute('x'));
+        tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
+        tspan.setAttribute('font-size', fontSize);
+        tspan.textContent = line;
+        tspan.title = line;
+        text.appendChild(tspan);
+      });
+      const newTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      newTitle.textContent = textContent;
+      text.appendChild(newTitle);
+    }
+  });
+};
+
 const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, locales, defaultLocale }) => {
   const options = {
     series,
@@ -16,6 +44,10 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       animations: {
         enabled: true
+      },
+      events: {
+        mounted: addYAxisStyles,
+        updated: addYAxisStyles
       }
     },
     grid: {
@@ -46,13 +78,30 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       type: 'datetime'
     },
     yaxis: {
+      showAlways: false,
+      dataLabels: {
+        enabled: false,
+        textAnchor: 'start'
+      },
       axisBorder: {
         show: true
       },
       labels: {
-        // formatter: function (value) {
-        //     return value.split('-').join('<br/>');
-        // }
+        align: 'left',
+        maxWidth: 100,
+        width: 80,
+        margin: 0,
+        formatter: function(value) {
+          if (value.length > 10) {
+            const deviceName = value.split(' (')[0];
+            const featureName = value.split(' (')[1].replace(')', '');
+            const newValue = `${deviceName}\n(${featureName})`;
+            return newValue;
+          }
+          return value;
+        },
+        offsetX: -20,
+        offsetY: 0
       }
     },
     legend: {
