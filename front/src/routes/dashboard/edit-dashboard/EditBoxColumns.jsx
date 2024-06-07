@@ -15,7 +15,7 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => {
   const lengthBoxes = props.homeDashboard.boxes.length;
-  const columnClass = `col-lg-${lengthBoxes < 3 ? 10 / lengthBoxes : 12 / lengthBoxes}`;
+  const columnClass = `col-lg-${lengthBoxes < 2 ? 8 : 4}`;
 
   return (
     <div class="pb-6">
@@ -110,7 +110,7 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class="d-flex flex-row flex-wrap justify-content-center mt-2">
+        <div class="d-flex flex-row flex-wrap justify-content-center mt-2 align-items-start" style={{ position: 'relative' }}>
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
@@ -161,6 +161,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                       <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
                     </button>
                   </div>
+
                 </div>
               </div>
             ))}
