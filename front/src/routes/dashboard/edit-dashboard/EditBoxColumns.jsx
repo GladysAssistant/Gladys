@@ -120,11 +120,12 @@ const EditBoxColumns = ({ children, ...props }) => {
                   [style.removePaddingLastCol]: x === 2
                 })}
               >
-                <div class={cx(style.columnBoxesHeader)}>
-                  <h3 class="text-center">
+                {/* <div class={cx('d-flex flex-column', columnClass)}> */}
+                <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}>
+                  <h3 class="d-flex justify-content-center align-items-center text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {lengthBoxes > 1 && (
-                      <button class="btn btn-outline-danger btn-sm ml-2" onClick={() => props.deleteCurrentColumn(x)}>
+                      <button class={cx('btn p-0 ml-2', style.btnLink)} onClick={() => props.deleteCurrentColumn(x)}>
                         <i class="fe fe-trash" />
                       </button>
                     )}
@@ -164,16 +165,9 @@ const EditBoxColumns = ({ children, ...props }) => {
               </div>
             ))}
           {lengthBoxes < 3 && (
-            <div class="d-flex flex-column col-lg-1">
-              <button
-                class="btn btn-outline-primary btn-xl"
-                style={{ position: 'sticky', top: '24px' }}
-                onClick={() => props.addColumn(lengthBoxes)}
-              >
-                <div class={cx('d-none', style.displayTextMobile)}>
-                  <Text id="dashboard.editDashboardAddColumnButton" />
-                </div>
-                <i class="fe fe-plus" />
+            <div class={cx('d-flex flex-column col-lg-1 align-items-center', style.columnBox)}>
+              <button class="btn btn-link p-0 ml-2" onClick={() => props.addColumn(lengthBoxes)}>
+                <i class="fe fe-plus-circle" style={{ fontSize: '1.5rem' }} />
               </button>
             </div>
           )}
