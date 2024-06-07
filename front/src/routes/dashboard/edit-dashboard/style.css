@@ -13,14 +13,22 @@
   background-color: #fff;
   /* box-shadow: 0 1px 3px rgba(27, 31, 35, 0.12), 0 1px 2px rgba(27, 31, 35, 0.24); */
 }
+
 .btnLink {
   text-decoration: none;
-  color: #343a40;
-  background-color: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
 }
+.btnLinkDelete {
+  color: #343a40;
+  background-color: transparent;
+}
+.btnLinkAdd {
+  color: #467fcf;
+  background-color: transparent;
+}
+
 @media (max-width: 992px) {
   .columnBoxesHeader {
     height: auto;

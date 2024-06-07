@@ -15,7 +15,7 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => {
   const lengthBoxes = props.homeDashboard.boxes.length;
-  const columnClass = `col-lg-${lengthBoxes < 2 ? 8 : 4}`;
+  const columnClass = `col-lg-${lengthBoxes <= 2 ? 10 / lengthBoxes : 4}`;
 
   return (
     <div class="pb-6">
@@ -125,7 +125,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                   <h3 class="d-flex justify-content-center align-items-center text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {lengthBoxes > 1 && (
-                      <button class={cx('btn p-0 ml-2', style.btnLink)} onClick={() => props.deleteCurrentColumn(x)}>
+                      <button class={cx('btn p-0 ml-2', style.btnLink, style.btnLinkDelete)} onClick={() => props.deleteCurrentColumn(x)}>
                         <i class="fe fe-trash" />
                       </button>
                     )}
@@ -167,7 +167,7 @@ const EditBoxColumns = ({ children, ...props }) => {
             ))}
           {lengthBoxes < 3 && (
             <div class={cx('d-flex flex-column col-lg-1 align-items-center', style.columnBox)}>
-              <button class="btn btn-link p-0 ml-2" onClick={() => props.addColumn(lengthBoxes)}>
+              <button class={cx('btn p-0', style.btnLink, style.btnLinkAdd)} onClick={() => props.addColumn(lengthBoxes)}>
                 <i class="fe fe-plus-circle" style={{ fontSize: '1.5rem' }} />
               </button>
             </div>
