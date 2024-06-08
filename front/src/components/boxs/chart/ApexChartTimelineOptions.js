@@ -59,7 +59,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
     plotOptions: {
       bar: {
         horizontal: true,
-        barHeight: '40%',
+        barHeight: '50%',
         rangeBarGroupRows: true
       }
     },
@@ -75,7 +75,9 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       axisBorder: {
         show: false
       },
-      type: 'datetime'
+      type: 'datetime',
+      min: Math.min(...series.flatMap(s => s.data.map(d => d.y[0]))),
+      max: Math.max(...series.flatMap(s => s.data.map(d => d.y[1])))
     },
     yaxis: {
       showAlways: false,
@@ -89,7 +91,6 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       labels: {
         align: 'left',
         maxWidth: 100,
-        width: 80,
         margin: 0,
         formatter: function(value) {
           if (value.length > 10) {
