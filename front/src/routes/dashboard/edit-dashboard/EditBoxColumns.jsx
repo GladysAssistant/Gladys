@@ -9,6 +9,7 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import style from './style.css';
+import stylePrimary from '../style.css';
 import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
@@ -110,19 +111,18 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class="d-flex flex-row flex-wrap justify-content-center mt-2 align-items-start" style={{ position: 'relative' }}>
+        <div class={cx('d-flex flex-row align-items-start', style.columnCard)}>
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
               <div
-                class={cx('d-flex flex-column', columnClass, style.borderColumn, style.removePadding, {
-                  [style.removePaddingFirstCol]: x === 0,
-                  [style.removePaddingLastCol]: x === 2
+                class={cx('d-flex flex-column', columnClass, stylePrimary.removePadding, {
+                  [stylePrimary.removePaddingFirstCol]: x === 0,
+                  [stylePrimary.removePaddingLastCol]: x === 2
                 })}
               >
-                {/* <div class={cx('d-flex flex-column', columnClass)}> */}
-                <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}>
-                  <h3 class="d-flex justify-content-center align-items-center text-center">
+                <div class={cx('d-flex', 'justify-content-center', style.columnBoxesHeader)}>
+                  <h3 class="d-flex justify-content-center text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {lengthBoxes > 1 && (
                       <button class={cx('btn p-0 ml-2', style.btnLink, style.btnLinkDelete)} onClick={() => props.deleteCurrentColumn(x)}>
@@ -130,13 +130,13 @@ const EditBoxColumns = ({ children, ...props }) => {
                       </button>
                     )}
                   </h3>
-                  {props.boxNotEmptyError && props.columnBoxNotEmptyError === x && (
-                    <div class="alert alert-danger d-flex justify-content-center mb-4">
-                      <Text id="dashboard.editDashboardBoxNotEmpty" />
-                    </div>
-                  )}
                 </div>
-                <div class="d-flex flex-column mt-1">
+                {props.boxNotEmptyError && props.columnBoxNotEmptyError === x && (
+                  <div class="alert alert-danger d-flex justify-content-center mb-4">
+                    <Text id="dashboard.editDashboardBoxNotEmpty" />
+                  </div>
+                )}
+                <div class="d-flex flex-column m-0">
                   {column.length > 0 && (
                     <div>
                       {column.map((box, y) => (
@@ -164,12 +164,24 @@ const EditBoxColumns = ({ children, ...props }) => {
 
                 </div>
               </div>
-            ))}
+            ))
+          }
           {lengthBoxes < 3 && (
-            <div class={cx('d-flex flex-column col-lg-1 align-items-center', style.columnBox)}>
-              <button class={cx('btn p-0', style.btnLink, style.btnLinkAdd)} onClick={() => props.addColumn(lengthBoxes)}>
-                <i class="fe fe-plus-circle" style={{ fontSize: '1.5rem' }} />
-              </button>
+            <div class={cx('d-flex flex-column col-lg-2 justify-content-center pr-0')}>
+              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}>
+              </div>
+              <Localizer>
+                <button
+                  class={cx('btn btn-outline-primary', style.btnAddColumn)}
+                  onClick={() => props.addColumn(lengthBoxes)}
+                  data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
+                >
+                  <i class="fe fe-plus" />
+                  <div class={cx('d-none', style.displayTextMobile)}>
+                    <Text id="dashboard.editDashboardAddColumnButton" />
+                  </div>
+                </button>
+              </Localizer>
             </div>
           )}
         </div>

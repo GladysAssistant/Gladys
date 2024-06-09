@@ -1,17 +1,14 @@
+.columnCard {
+  flex-wrap: nowrap;
+  padding-right: 0;
+}
+
 .columnBoxesHeader {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
-}
-
-.columnBox {
-  /* border: 1px solid #e1e4e8; */
-  /* border-radius: 6px; */
-  /* padding: 16px; */
-  margin: 2px;
-  background-color: #fff;
-  /* box-shadow: 0 1px 3px rgba(27, 31, 35, 0.12), 0 1px 2px rgba(27, 31, 35, 0.24); */
+  min-height: 48px;
+  height: auto;
 }
 
 .btnLink {
@@ -20,50 +17,28 @@
   padding: 0;
   cursor: pointer;
 }
+
 .btnLinkDelete {
   color: #343a40;
   background-color: transparent;
 }
-.btnLinkAdd {
-  color: #467fcf;
-  background-color: transparent;
+
+.btnAddColumn {
+  padding: 0;
 }
 
-@media (max-width: 992px) {
-  .columnBoxesHeader {
-    height: auto;
-    margin-bottom: 2px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .borderColumn {
-    border-top: 1px dashed #bdbdbd;
-    padding-top: 10px;
-  }
-
-  .displayTextMobile {
-    display: inline !important;
-  }
-
-  .displayTextDesktop {
-    display: none !important;
-  }
-}
 
 @media (min-width: 992px) {
-  .btnOutlinePrimary[data-title]:hover:after {
+  .btnAddColumn[data-title]:hover:after {
     content: attr(data-title);
     position: absolute;
-    top: 45px;
+    top: 48px;
     left: 0;
-    /* right: 5px; */
-    /* align-items: end; */
-    transform: translateX(-95%);
+    transform: translateX(-100%);
     white-space: normal;
     color: #467fcf;
     background-color: #fff;
-    padding: 4px 8px;
+    padding: 4px 4px;
     border: 1px solid #467fcf;
     border-radius: 4px;
     font-size: 12px;
@@ -104,5 +79,25 @@
   .bottomDropZone {
     min-height: 5rem;
     height: 5rem;
+  }
+
+  .columnCard {
+    height: 100%;
+    flex-wrap: wrap;
+  }
+
+  .columnBoxesHeader {
+    height: auto;
+    padding-top: 1.5rem;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-top: 1px dashed #bdbdbd;
+  }
+
+  .displayTextMobile {
+    display: inline !important;
+    margin-left: 0.5rem;
+    text-wrap: wrap;
   }
 }
