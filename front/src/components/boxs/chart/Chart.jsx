@@ -157,8 +157,9 @@ class Chartbox extends Component {
           const { values, deviceFeature, device } = oneFeature;
           let previousValue = null;
           let lastChangeTime = null;
+          const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
 
-          if (values.length > 1) {
+          // if (values.length > 1) {
             values.forEach(value => {
               emptySeries = false;
               if (previousValue === null) {
@@ -185,7 +186,7 @@ class Chartbox extends Component {
             if (previousValue !== null) {
               const newData = {
                 x: `${device.name} (${deviceFeature.name})`,
-                y: [lastChangeTime, Math.round(new Date(values[values.length - 1].created_at).getTime() / 1000) * 1000]
+                y: [lastChangeTime, lastValueTime]
               };
               if (previousValue === 0) {
                 serie0.data.push(newData);
@@ -193,7 +194,7 @@ class Chartbox extends Component {
                 serie1.data.push(newData);
               }
             }
-          }
+          // }
         });
         series.push(serie1);
         series.push(serie0);
@@ -333,7 +334,13 @@ class Chartbox extends Component {
       unit
     }
   ) {
-    const displayVariation = props.box.display_variation;
+    const { box } = this.props;
+    const displayVariation = box.display_variation;
+    const nbDeviceFeatures = box.device_features.length;
+    let heightAdditional = 0;
+    if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
+      heightAdditional = 38 * (nbDeviceFeatures - 3);
+    }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
@@ -504,6 +511,7 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                heightAdditional={heightAdditional}
               />
             </div>
           )}
@@ -541,6 +549,7 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                heightAdditional={heightAdditional}
               />
             )}
           </div>
