@@ -158,7 +158,7 @@ class Chartbox extends Component {
           let previousValue = null;
           let lastChangeTime = null;
 
-          if (values.length > 2) {
+          if (values.length > 1) {
             values.forEach(value => {
               emptySeries = false;
               if (previousValue === null) {
