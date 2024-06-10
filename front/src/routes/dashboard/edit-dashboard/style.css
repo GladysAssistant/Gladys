@@ -11,14 +11,11 @@
   height: auto;
 }
 
-.btnLink {
+.btnLinkDelete {
   text-decoration: none;
   border: none;
   padding: 0;
   cursor: pointer;
-}
-
-.btnLinkDelete {
   color: #343a40;
   background-color: transparent;
 }

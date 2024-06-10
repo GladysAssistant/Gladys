@@ -126,7 +126,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {lengthBoxes > 1 && (
                       <button
-                        class={cx('btn p-0 ml-2', style.btnLink, style.btnLinkDelete)}
+                        class={cx('btn p-0 ml-2', style.btnLinkDelete)}
                         onClick={() => props.deleteCurrentColumn(x)}
                       >
                         <i class="fe fe-trash" />
