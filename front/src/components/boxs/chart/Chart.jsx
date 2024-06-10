@@ -159,39 +159,40 @@ class Chartbox extends Component {
           let previousValue = null;
           let lastChangeTime = null;
 
-          values.forEach(value => {
-            emptySeries = false;
-            if (previousValue === null) {
-              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-              previousValue = value.value;
-              return;
-            }
+          if (values.length > 1) {
+            values.forEach(value => {
+              emptySeries = false;
+              if (previousValue === null) {
+                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+                previousValue = value.value;
+                return;
+              }
 
-            if (value.value !== previousValue) {
+              if (value.value !== previousValue) {
+                const newData = {
+                  x: `${device.name} (${deviceFeature.name})`,
+                  y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+                };
+                if (previousValue === 0) {
+                  serie0.data.push(newData);
+                } else {
+                  serie1.data.push(newData);
+                }
+                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+                previousValue = value.value;
+              }
+            });
+
+            if (previousValue !== null) {
               const newData = {
                 x: `${device.name} (${deviceFeature.name})`,
-                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+                y: [lastChangeTime, Math.round(new Date(values[values.length - 1].created_at).getTime() / 1000) * 1000]
               };
               if (previousValue === 0) {
                 serie0.data.push(newData);
               } else {
                 serie1.data.push(newData);
               }
-              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-              previousValue = value.value;
-            }
-          });
-
-          // Add the last value if it is different from the previous one
-          if (previousValue !== null) {
-            const newData = {
-              x: `${device.name} (${deviceFeature.name})`,
-              y: [lastChangeTime, Math.round(new Date(values[values.length - 1].created_at).getTime() / 1000) * 1000]
-            };
-            if (previousValue === 0) {
-              serie0.data.push(newData);
-            } else {
-              serie1.data.push(newData);
             }
           }
         });
@@ -220,7 +221,7 @@ class Chartbox extends Component {
         emptySeries
       };
 
-      if (data.length > 0) {
+      if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
         // Before now, there was a "unit" attribute in this box instead of "units",
         // so we need to support "unit" as some users may already have the box with that param
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;

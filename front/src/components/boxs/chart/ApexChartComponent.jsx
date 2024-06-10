@@ -58,10 +58,10 @@ class ApexChartComponent extends Component {
       formatter_custom = opts => {
         const startDate = dayjs(opts.y1)
           .locale(this.props.user.language)
-          .format('LLL');
+          .format('LLL:ss');
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
-          .format('LLL');
+          .format('LLL:ss');
         const w = opts.ctx.w;
         let seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
         let ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
@@ -195,9 +195,9 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartTimelineOptions({
       height,
-      series: this.props.series,
-      displayAxes: this.props.display_axes,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
+      displayAxes: this.props.display_axes,
+      series: this.props.series,
       locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });

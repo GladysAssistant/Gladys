@@ -385,7 +385,7 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.chart.defaultInterval" />
               </label>
-              <select onChange={this.updateDefaultInterval} className="form-control" value={props.box.interval}>
+              <select onChange={this.updateDefaultInterval} class="form-control" value={props.box.interval}>
                 <option>
                   <Text id="global.emptySelectOption" />
                 </option>
