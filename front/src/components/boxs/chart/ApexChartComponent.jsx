@@ -195,9 +195,9 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartTimelineOptions({
       height,
-      series: this.props.series,
-      displayAxes: this.props.display_axes,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
+      displayAxes: this.props.display_axes,
+      series: this.props.series,
       locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });

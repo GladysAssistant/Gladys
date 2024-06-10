@@ -182,7 +182,6 @@ class Chartbox extends Component {
               }
             });
 
-            // Add the last value if it is different from the previous one
             if (previousValue !== null) {
               const newData = {
                 x: `${device.name} (${deviceFeature.name})`,

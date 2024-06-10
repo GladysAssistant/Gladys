@@ -16,7 +16,6 @@ const addYAxisStyles = () => {
         tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
         tspan.setAttribute('font-size', fontSize);
         tspan.textContent = line;
-        tspan.title = line;
         text.appendChild(tspan);
       });
       const newTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
