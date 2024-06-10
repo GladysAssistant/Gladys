@@ -1,0 +1,19 @@
+{
+  "name": "gladys-google-cast",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "bonjour": "^3.5.0",
+    "castv2-client": "^1.2.0"
+  }
+}
