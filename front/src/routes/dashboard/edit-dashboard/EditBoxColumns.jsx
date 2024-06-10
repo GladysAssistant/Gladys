@@ -125,7 +125,10 @@ const EditBoxColumns = ({ children, ...props }) => {
                   <h3 class="d-flex justify-content-center text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {lengthBoxes > 1 && (
-                      <button class={cx('btn p-0 ml-2', style.btnLink, style.btnLinkDelete)} onClick={() => props.deleteCurrentColumn(x)}>
+                      <button
+                        class={cx('btn p-0 ml-2', style.btnLink, style.btnLinkDelete)}
+                        onClick={() => props.deleteCurrentColumn(x)}
+                      >
                         <i class="fe fe-trash" />
                       </button>
                     )}
@@ -161,15 +164,12 @@ const EditBoxColumns = ({ children, ...props }) => {
                       <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
                     </button>
                   </div>
-
                 </div>
               </div>
-            ))
-          }
+            ))}
           {lengthBoxes < 3 && (
             <div class={cx('d-flex flex-column col-lg-2 justify-content-center pr-0')}>
-              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}>
-              </div>
+              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}/>
               <Localizer>
                 <button
                   class={cx('btn btn-outline-primary', style.btnAddColumn)}
