@@ -169,7 +169,7 @@ const EditBoxColumns = ({ children, ...props }) => {
             ))}
           {lengthBoxes < 3 && (
             <div class={cx('d-flex flex-column col-lg-2 justify-content-center pr-0')}>
-              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')}/>
+              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')} />
               <Localizer>
                 <button
                   class={cx('btn btn-outline-primary', style.btnAddColumn)}
