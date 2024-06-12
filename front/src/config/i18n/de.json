@@ -1083,6 +1083,41 @@
         "conflictError": "Das aktuelle Gerät ist bereits in Gladys vorhanden."
       }
     },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Steuern Sie Google Cast-Geräte in Ihrem lokalen Netzwerk",
+      "deviceTab": "Geräte",
+      "discoverTab": "Google Cast Entdeckung",
+      "setupTab": "Einrichtung",
+      "documentation": "Google Cast Dokumentation",
+      "discoverDeviceDescr": "Google Cast-Geräte automatisch scannen",
+      "nameLabel": "Gerätename",
+      "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+      "hostLabel": "IP-Adresse",
+      "roomLabel": "Zimmer",
+      "saveButton": "Speichern",
+      "alreadyCreatedButton": "Bereits erstellt",
+      "deleteButton": "Löschen",
+      "device": {
+        "title": "Google Cast-Geräte in Gladys",
+        "editButton": "Bearbeiten",
+        "noDeviceFound": "Kein Google Cast-Gerät gefunden.",
+        "featuresLabel": "Funktionen"
+      },
+      "discover": {
+        "title": "Geräte in Ihrem lokalen Netzwerk erkannt",
+        "description": "Google Cast-Geräte werden automatisch erkannt.",
+        "error": "Fehler beim Entdecken der Google Cast-Geräte. Ist Ihr Google Cast-Lautsprecher eingeschaltet und im lokalen Netzwerk erreichbar?",
+        "noDeviceFound": "Keine Google Cast-Geräte gefunden.",
+        "errorWhileScanning": "Beim Scannen ist ein Fehler aufgetreten.",
+        "scan": "Scannen"
+      },
+      "error": {
+        "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten.",
+        "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten.",
+        "conflictError": "Das aktuelle Gerät ist bereits in Gladys vorhanden."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Steuern Sie Ihre Geräte in Z-Wave JS UI",

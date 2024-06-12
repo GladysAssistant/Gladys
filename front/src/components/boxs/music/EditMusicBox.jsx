@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { connect } from 'unistore/preact';
 
 import BaseEditBox from '../baseEditBox';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 class EditMusicBoxComponent extends Component {
   updateDevice = option => {
@@ -18,9 +18,12 @@ class EditMusicBoxComponent extends Component {
       await this.setState({
         error: false
       });
-      const musicDevices = await this.props.httpClient.get('/api/v1/device', {
+      let musicDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: DEVICE_FEATURE_CATEGORIES.MUSIC
       });
+      // We only keep music player with at least the "play" capability
+      // Some music devices like the Nest Mini only exposes the "notification" for now
+      musicDevices = musicDevices.filter(d => d.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY));
       const musicDevicesOptions = musicDevices.map(d => ({
         label: d.name,
         value: d.selector
