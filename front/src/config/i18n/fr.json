@@ -1214,6 +1214,41 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Contrôler les appareils Google Cast sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Google Cast",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Google Cast",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Google Cast",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Google Cast dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Google Cast trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Google Cast sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Google Cast. Est-ce que votre enceinte Google Cast est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Google Cast n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Contrôler vos appareils dans Z-Wave JS UI",
