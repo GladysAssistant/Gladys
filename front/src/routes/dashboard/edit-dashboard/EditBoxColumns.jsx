@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'preact/hooks';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { DndProvider } from 'react-dnd';
@@ -15,9 +16,54 @@ import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => {
+  const columnCardRef = useRef(null);
+  const maxBoxes = 3;
   const lengthBoxes = props.homeDashboard.boxes.length;
-  const columnClass = `col-lg-${lengthBoxes <= 2 ? 10 / lengthBoxes : 4}`;
+  const [parentHeight, setParentHeight] = useState(0);
 
+  useEffect(() => {
+    const currentColumnCardRef = columnCardRef.current;
+    const updateHeight = () => {
+      if (lengthBoxes < maxBoxes && currentColumnCardRef) {
+        const children = currentColumnCardRef.children;
+        let maxHeight = 0;
+        for (let i = 0; i < children.length - 1; i++) {
+          const childHeight = children[i].offsetHeight;
+          if (childHeight > maxHeight) {
+            maxHeight = childHeight;
+          }
+        }
+        setParentHeight(maxHeight);
+      }
+    };
+
+    const mutationObserver = new MutationObserver(() => {
+      updateHeight();
+    });
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeight();
+    });
+
+    if (currentColumnCardRef) {
+      mutationObserver.observe(currentColumnCardRef, { childList: true, subtree: true });
+      resizeObserver.observe(currentColumnCardRef);
+    }
+
+    return () => {
+      if (currentColumnCardRef) {
+        mutationObserver.disconnect();
+        resizeObserver.unobserve(currentColumnCardRef);
+      }
+    };
+  }, [lengthBoxes, columnCardRef]);
+
+  const columnStyle = {
+    '--column-width': lengthBoxes === maxBoxes ? `calc(100% / ${maxBoxes})` : `calc(93% / ${lengthBoxes})`
+  };
+  const addButtonStyle = {
+    '--add-button-width': lengthBoxes < maxBoxes ? 'calc(7%)' : '0',
+    '--add-button-height': `${parentHeight}px`
+  };
   return (
     <div class="pb-6">
       <h3>
@@ -111,15 +157,17 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class={cx('d-flex flex-row align-items-start', style.columnCard)}>
+        <div ref={columnCardRef} class={cx('d-flex flex-row align-items-start', style.columnCard)}>
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
               <div
-                class={cx('d-flex flex-column', columnClass, stylePrimary.removePadding, {
+                class={cx('d-flex flex-column pl-2 pr-2 ', style.columnDynamic, stylePrimary.removePadding, {
                   [stylePrimary.removePaddingFirstCol]: x === 0,
-                  [stylePrimary.removePaddingLastCol]: x === 2
+                  [stylePrimary.removePaddingLastCol]: x === maxBoxes - 1,
+                  [style.removePadding]: true // it will remove padding when in mobile view
                 })}
+                style={columnStyle}
               >
                 <div class={cx('d-flex', 'justify-content-center', style.columnBoxesHeader)}>
                   <h3 class="d-flex justify-content-center text-center">
@@ -167,9 +215,9 @@ const EditBoxColumns = ({ children, ...props }) => {
                 </div>
               </div>
             ))}
-          {lengthBoxes < 3 && (
-            <div class={cx('d-flex flex-column col-lg-2 justify-content-center pr-0')}>
-              <div class={cx(style.columnBoxesHeader, 'd-flex', 'justify-content-center', 'align-items-center')} />
+          {lengthBoxes < maxBoxes && (
+            <div class={cx('d-flex flex-column pl-2', style.addButton)} style={addButtonStyle}>
+              <div class={cx(style.columnBoxesHeader)} />
               <Localizer>
                 <button
                   class={cx('btn btn-outline-primary', style.btnAddColumn)}

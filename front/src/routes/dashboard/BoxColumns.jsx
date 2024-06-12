@@ -3,7 +3,8 @@ import cx from 'classnames';
 import style from './style.css';
 
 const BoxColumns = ({ children, ...props }) => {
-  const columnClass = `col-lg-${12 / props.homeDashboard.boxes.length}`;
+  const lengthBoxes = props.homeDashboard.boxes.length;
+  const columnClass = `col-lg-${12 / lengthBoxes}`;
 
   return (
     <div class="d-flex flex-row flex-wrap justify-content-center">
@@ -12,7 +13,7 @@ const BoxColumns = ({ children, ...props }) => {
           <div
             class={cx('d-flex flex-column', columnClass, style.removePadding, {
               [style.removePaddingFirstCol]: x === 0,
-              [style.removePaddingLastCol]: x === 2,
+              [style.removePaddingLastCol]: x === lengthBoxes - 1,
               [style.removePadding]: true // it will remove padding when in mobile view
             })}
           >

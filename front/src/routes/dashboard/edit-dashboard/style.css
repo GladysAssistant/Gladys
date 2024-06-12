@@ -54,16 +54,36 @@
 }
 
 @media (min-width: 992px) {
+  .columnDynamic {
+    flex: 0 0 var(--column-width);
+    max-width: var(--column-width);
+  }
+
+  .addButton {
+    flex: 0 0 var(--add-button-width);
+    max-width: var(--add-button-width);
+    display: flex;
+    height: var(--add-button-height);
+  }
+
+  .btnAddColumn {
+    position: sticky;
+    width: 31px;
+    padding: 0;
+    top: 2vh;
+  }
+
   .btnAddColumn[data-title]:hover:after {
     content: attr(data-title);
     position: absolute;
-    top: 48px;
-    left: 0;
+    top: 29px;
+    left: 36px;
+    width: 150px;
     transform: translateX(-100%);
     white-space: normal;
     color: #467fcf;
     background-color: #fff;
-    padding: 4px 4px;
+    padding: 2px 4px;
     border: 1px solid #467fcf;
     border-radius: 4px;
     font-size: 12px;
@@ -82,13 +102,23 @@
     flex-wrap: wrap;
   }
 
+  .columnDynamic {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .addButton {
+    width: 100% !important;
+    flex: none !important;
+  }
+
   .columnBoxesHeader {
-    height: auto;
     padding-top: 1.5rem;
     margin-bottom: 2px;
     flex-wrap: wrap;
     justify-content: center;
     border-top: 1px dashed #bdbdbd;
+    min-height: 0px;
   }
 
   .displayTextMobile {

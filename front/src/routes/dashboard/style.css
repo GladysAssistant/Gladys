@@ -25,18 +25,18 @@
 
 @media (min-width: 992px) {
   .removePaddingFirstCol {
-    padding-left: 0;
+    padding-left: 0 !important;
   }
 
   .removePaddingLastCol {
-    padding-right: 0;
+    padding-right: 0 !important;
   }
 }
 
 @media (max-width: 992px) {
   .removePadding {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 
