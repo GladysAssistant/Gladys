@@ -236,7 +236,14 @@ class ApexChartComponent extends Component {
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
     const heightAdditionalDifferent = nextProps.heightAdditional !== this.props.heightAdditional;
-    if (seriesDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent || heightAdditionalDifferent) {
+    if (
+      seriesDifferent ||
+      chartTypeDifferent ||
+      displayAxesDifferent ||
+      intervalDifferent ||
+      sizeDifferent ||
+      heightAdditionalDifferent
+    ) {
       this.displayChart();
     }
   }

@@ -160,40 +160,40 @@ class Chartbox extends Component {
           const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
 
           // if (values.length > 1) {
-            values.forEach(value => {
-              emptySeries = false;
-              if (previousValue === null) {
-                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-                previousValue = value.value;
-                return;
-              }
+          values.forEach(value => {
+            emptySeries = false;
+            if (previousValue === null) {
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+              return;
+            }
 
-              if (value.value !== previousValue) {
-                const newData = {
-                  x: `${device.name} (${deviceFeature.name})`,
-                  y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
-                };
-                if (previousValue === 0) {
-                  serie0.data.push(newData);
-                } else {
-                  serie1.data.push(newData);
-                }
-                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-                previousValue = value.value;
-              }
-            });
-
-            if (previousValue !== null) {
+            if (value.value !== previousValue) {
               const newData = {
                 x: `${device.name} (${deviceFeature.name})`,
-                y: [lastChangeTime, lastValueTime]
+                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
               };
               if (previousValue === 0) {
                 serie0.data.push(newData);
               } else {
                 serie1.data.push(newData);
               }
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
             }
+          });
+
+          if (previousValue !== null) {
+            const newData = {
+              x: `${device.name} (${deviceFeature.name})`,
+              y: [lastChangeTime, lastValueTime]
+            };
+            if (previousValue === 0) {
+              serie0.data.push(newData);
+            } else {
+              serie1.data.push(newData);
+            }
+          }
           // }
         });
         series.push(serie1);
