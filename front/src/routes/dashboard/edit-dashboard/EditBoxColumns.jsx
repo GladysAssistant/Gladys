@@ -26,27 +26,22 @@ class EditBoxColumns extends Component {
   }
   componentDidMount() {
     this.updateHeight();
-    this.mutationObserver = new MutationObserver(() => {
-      this.updateHeight();
-    });
-    this.mutationObserver.observe(this.columnCardRef.current, { childList: true, subtree: true });
-
-    this.resizeObserver = new ResizeObserver(() => {
-      this.updateHeight();
-    });
-    this.resizeObserver.observe(this.columnCardRef.current);
-  }
-
-  componentWillUnmount() {
-    if (this.columnCardRef.current) {
-      this.mutationObserver.disconnect();
-      this.resizeObserver.unobserve(this.columnCardRef.current);
-    }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.homeDashboard.boxes.length !== this.props.homeDashboard.boxes.length) {
+    const prevBoxes = prevProps.homeDashboard.boxes;
+    const currentBoxes = this.props.homeDashboard.boxes;
+
+    if (prevBoxes.length !== currentBoxes.length) {
       this.updateHeight();
+      return;
+    }
+
+    for (let i = 0; i < currentBoxes.length; i++) {
+      if (prevBoxes[i].length !== currentBoxes[i].length) {
+        this.updateHeight();
+        return;
+      }
     }
   }
 
@@ -62,11 +57,6 @@ class EditBoxColumns extends Component {
       }
       this.setState({ parentHeight: maxHeight });
     }
-  };
-
-  handleAddBox = x => {
-    this.props.addBox(x);
-    this.updateHeight();
   };
 
   render() {
