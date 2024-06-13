@@ -113,7 +113,14 @@ class ApexChartComponent extends Component {
     };
   }
   getBarChartOptions = () => {
+    let height;
+    if (this.props.size === 'big' && !this.props.display_axes) {
+      height = 100 + this.props.heightAdditional;
+    } else {
+      height = 200 + this.props.heightAdditional;
+    }
     const options = getApexChartBarOptions({
+      height,
       displayAxes: this.props.display_axes,
       series: this.props.series,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
@@ -126,11 +133,11 @@ class ApexChartComponent extends Component {
   getAreaChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartAreaOptions({
       height,
@@ -147,11 +154,11 @@ class ApexChartComponent extends Component {
   getLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartLineOptions({
       height,
@@ -167,11 +174,11 @@ class ApexChartComponent extends Component {
   getStepLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartStepLineOptions({
       height,
@@ -187,9 +194,9 @@ class ApexChartComponent extends Component {
   getTimelineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
       height = 200 + this.props.heightAdditional;
     }

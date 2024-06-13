@@ -339,7 +339,13 @@ class Chartbox extends Component {
     const displayVariation = box.display_variation;
     const nbDeviceFeatures = box.device_features.length;
     let heightAdditional = 0;
-    if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
+    if (showHistoryZoom) {
+      if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 2) {
+        heightAdditional = 56 * (nbDeviceFeatures - 2);
+      } else {
+        heightAdditional = 200;
+      }
+    } else if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
       heightAdditional = 38 * (nbDeviceFeatures - 3);
     }
     return (
