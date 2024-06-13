@@ -1,0 +1,8 @@
+[
+  {
+    "label": "backup.fail",
+    "answers": [
+      "The Gladys Plus backup failed. For more information, go to the \"Settings\" => \"Tasks\" tab. The error message is {{ errorMessage }}"
+    ]
+  }
+]

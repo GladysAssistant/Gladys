@@ -17,6 +17,9 @@ describe('gateway.backup', async function describe() {
 
   const variable = {};
   const event = {};
+  const user = {};
+  const brain = {};
+  const message = {};
 
   let gateway;
 
@@ -63,7 +66,15 @@ describe('gateway.backup', async function describe() {
       shutdown: fake.resolves(true),
     };
 
-    gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job, scheduler);
+    user.getByRole = fake.resolves([
+      { language: 'fr', selector: 'toto-fr' },
+      { language: 'en', selector: 'toto-en' },
+    ]);
+
+    message.sendToUser = fake.returns(null);
+    brain.getReply = fake.returns('Backup failed!');
+
+    gateway = new Gateway(variable, event, system, sequelize, config, user, {}, {}, job, scheduler, message, brain);
   });
 
   afterEach(() => {
@@ -92,6 +103,15 @@ describe('gateway.backup', async function describe() {
 
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
+    assert.calledOnce(user.getByRole);
+    assert.calledWith(brain.getReply, 'fr', 'backup.fail', {
+      errorMessage: 'Error: error',
+    });
+    assert.calledWith(brain.getReply, 'en', 'backup.fail', {
+      errorMessage: 'Error: error',
+    });
+    assert.calledWith(message.sendToUser, 'toto-fr', 'Backup failed!');
+    assert.calledWith(message.sendToUser, 'toto-en', 'Backup failed!');
   });
 
   it('should backup gladys with lots of insert at the same time', async () => {
