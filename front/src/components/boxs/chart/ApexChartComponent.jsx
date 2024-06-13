@@ -191,7 +191,7 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartTimelineOptions({
       height,
@@ -235,7 +235,15 @@ class ApexChartComponent extends Component {
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    if (seriesDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent) {
+    const heightAdditionalDifferent = nextProps.heightAdditional !== this.props.heightAdditional;
+    if (
+      seriesDifferent ||
+      chartTypeDifferent ||
+      displayAxesDifferent ||
+      intervalDifferent ||
+      sizeDifferent ||
+      heightAdditionalDifferent
+    ) {
       this.displayChart();
     }
   }

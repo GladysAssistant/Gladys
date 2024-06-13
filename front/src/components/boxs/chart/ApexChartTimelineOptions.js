@@ -9,8 +9,8 @@ const addYAxisStyles = () => {
       text.innerHTML = '';
       lines.forEach((line, index) => {
         const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        if (line.length > 15) {
-          line = `${line.substring(0, 15)}...`;
+        if (line.length > 12) {
+          line = `${line.substring(0, 12)}...`;
         }
         tspan.setAttribute('x', text.getAttribute('x'));
         tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
@@ -89,10 +89,10 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       labels: {
         align: 'left',
-        maxWidth: 100,
+        maxWidth: 80,
         margin: 0,
         formatter: function(value) {
-          if (value.length > 10) {
+          if (value.length > 12) {
             const deviceName = value.split(' (')[0];
             const featureName = value.split(' (')[1].replace(')', '');
             const newValue = `${deviceName}\n(${featureName})`;
