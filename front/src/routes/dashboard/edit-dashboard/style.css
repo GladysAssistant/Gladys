@@ -64,11 +64,9 @@
     flex: 0 0 var(--add-button-width);
     max-width: var(--add-button-width);
     display: flex;
-    height: var(--add-button-height);
   }
 
   .btnAddColumn {
-    position: sticky;
     width: 31px;
     padding: 0;
     top: 2vh;
