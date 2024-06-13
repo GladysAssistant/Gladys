@@ -4,6 +4,7 @@ const GLADYS_VARIABLES = {
 
   ENERGY_API: 'NETATMO_ENERGY_API',
   WEATHER_API: 'NETATMO_WEATHER_API',
+  SECURITY_API: 'NETATMO_SECURITY_API',
 
   ACCESS_TOKEN: 'NETATMO_ACCESS_TOKEN',
   REFRESH_TOKEN: 'NETATMO_REFRESH_TOKEN',
@@ -17,7 +18,13 @@ const SCOPES = {
   },
   HOME_SECURITY: {
     read_camera: 'read_camera',
+    write_camera: 'write_camera',
+    access_camera: 'access_camera',
     read_presence: 'read_presence',
+    write_presence: 'write_presence',
+    access_presence: 'access_presence',
+    read_doorbell: 'read_doorbell',
+    access_doorbell: 'access_doorbell',
     read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
     read_smokedetector: 'read_smokedetector',
   },
@@ -58,6 +65,7 @@ const API = {
   },
   OAUTH2: `${BASE_API}/oauth2/authorize`,
   TOKEN: `${BASE_API}/oauth2/token`,
+  GET_CAMERAS: `${BASE_API}/api/gethomedata`,
   GET_THERMOSTATS: `${BASE_API}/api/getthermostatsdata`,
   GET_WEATHER_STATIONS: `${BASE_API}/api/getstationsdata?get_favorites=false`,
   POST_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
@@ -72,6 +80,7 @@ const API = {
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
   WEATHER: 'Weather',
+  SECURITY: 'Security',
   UNKNOWN: 'unknown',
 };
 
@@ -84,6 +93,7 @@ const SUPPORTED_MODULE_TYPE = {
   NAMODULE2: 'NAModule2',
   NAMODULE3: 'NAModule3',
   NAMODULE4: 'NAModule4',
+  NACAMERA: 'NACamera',
 };
 
 const PARAMS = {
@@ -93,6 +103,8 @@ const PARAMS = {
   PLUG_ID: 'plug_id',
   PLUG_NAME: 'plug_name',
   MODULES_BRIDGE_ID: 'modules_bridge_id',
+  CAMERA_URL: 'CAMERA_URL',
+  CAMERA_ROTATION: 'CAMERA_ROTATION',
 };
 
 module.exports = {

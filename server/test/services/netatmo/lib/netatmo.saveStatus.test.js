@@ -5,6 +5,7 @@ const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { STATUS } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -14,7 +15,7 @@ const gladys = {
 };
 const serviceId = 'serviceId';
 
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo saveStatus', () => {
   let clock;

@@ -11,11 +11,14 @@ const { getStatus } = require('./netatmo.getStatus');
 const { saveStatus } = require('./netatmo.saveStatus');
 const { saveConfiguration } = require('./netatmo.saveConfiguration');
 const { convertDeviceEnergy } = require('./device/netatmo.convertDeviceEnergy');
+const { convertDeviceSecurity } = require('./device/netatmo.convertDeviceSecurity');
 const { convertDeviceWeather } = require('./device/netatmo.convertDeviceWeather');
 const { convertDeviceNotSupported } = require('./device/netatmo.convertDeviceNotSupported');
+const { mergeDeviceDetails } = require('./netatmo.deviceDetailsMerger');
 const { discoverDevices } = require('./netatmo.discoverDevices');
 const { loadDevices } = require('./netatmo.loadDevices');
 const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
+const { loadCameraDetails } = require('./netatmo.loadCameraDetails');
 const { loadThermostatDetails } = require('./netatmo.loadThermostatDetails');
 const { loadWeatherStationDetails } = require('./netatmo.loadWeatherStationDetails');
 const { pollRefreshingToken } = require('./netatmo.pollRefreshingToken');
@@ -30,18 +33,33 @@ const { updateNAModule1 } = require('./update/netatmo.updateNAModule1');
 const { updateNAModule2 } = require('./update/netatmo.updateNAModule2');
 const { updateNAModule3 } = require('./update/netatmo.updateNAModule3');
 const { updateNAModule4 } = require('./update/netatmo.updateNAModule4');
+const { updateNACamera } = require('./update/netatmo.updateNACamera');
+/* rtsp-camera service */
+const { getImage } = require('../../rtsp-camera/lib/getImage');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
 
-const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
+/**
+ * @description Add ability to connect to Netatmo API.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} ffmpeg - Ffmpeg library.
+ * @param {object} childProcess - ChildProcess library.
+ * @param {string} serviceId - UUID of the service in DB.
+ * @example
+ * const netatmoHandler = new NetatmoHandler(gladys, ffmpeg, childProcess, serviceId);
+ */
+const NetatmoHandler = function NetatmoHandler(gladys, ffmpeg, childProcess, serviceId) {
   this.gladys = gladys;
+  this.ffmpeg = ffmpeg;
+  this.childProcess = childProcess;
   this.serviceId = serviceId;
   this.configuration = {
     clientId: null,
     clientSecret: null,
     energyApi: null,
     weatherApi: null,
+    securityApi: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
@@ -69,11 +87,14 @@ NetatmoHandler.prototype.refreshingTokens = refreshingTokens;
 NetatmoHandler.prototype.getConfiguration = getConfiguration;
 NetatmoHandler.prototype.saveConfiguration = saveConfiguration;
 NetatmoHandler.prototype.convertDeviceEnergy = convertDeviceEnergy;
+NetatmoHandler.prototype.convertDeviceSecurity = convertDeviceSecurity;
 NetatmoHandler.prototype.convertDeviceWeather = convertDeviceWeather;
 NetatmoHandler.prototype.convertDeviceNotSupported = convertDeviceNotSupported;
+NetatmoHandler.prototype.mergeDeviceDetails = mergeDeviceDetails;
 NetatmoHandler.prototype.discoverDevices = discoverDevices;
 NetatmoHandler.prototype.loadDevices = loadDevices;
 NetatmoHandler.prototype.loadDeviceDetails = loadDeviceDetails;
+NetatmoHandler.prototype.loadCameraDetails = loadCameraDetails;
 NetatmoHandler.prototype.loadThermostatDetails = loadThermostatDetails;
 NetatmoHandler.prototype.loadWeatherStationDetails = loadWeatherStationDetails;
 NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
@@ -89,5 +110,8 @@ NetatmoHandler.prototype.updateNAModule1 = updateNAModule1;
 NetatmoHandler.prototype.updateNAModule2 = updateNAModule2;
 NetatmoHandler.prototype.updateNAModule3 = updateNAModule3;
 NetatmoHandler.prototype.updateNAModule4 = updateNAModule4;
+NetatmoHandler.prototype.updateNACamera = updateNACamera;
+/* rtsp-camera service */
+NetatmoHandler.prototype.getImage = getImage;
 
 module.exports = NetatmoHandler;

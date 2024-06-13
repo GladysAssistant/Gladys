@@ -105,7 +105,8 @@ function buildFeaturePressure(name, externalId, featureName) {
  * @description Transforms Netatmo feature as Gladys feature. Speed of wind.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
- * @param {string} featureName - Gladys external ID.
+ * @param {string} featureName - Gladys feature constructor.
+ * @param {string} unit - Gladys unit.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeatureWindStrength(device_name, 'netatmo:device_id', 'wind_strength');
