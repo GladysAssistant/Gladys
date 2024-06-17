@@ -119,7 +119,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                 class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
                   [stylePrimary.removePaddingFirstCol]: x === 0,
                   [stylePrimary.removePaddingLastCol]: x === maxBoxes,
-                  [style.removePadding]: true, // it will remove padding when in mobile view
+                  [style.removePadding]: true // it will remove padding when in mobile view
                 })}
               >
                 <div class={cx('d-flex', 'justify-content-center', style.columnBoxHeader)}>
