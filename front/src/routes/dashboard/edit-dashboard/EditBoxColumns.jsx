@@ -17,12 +17,7 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const EditBoxColumns = ({ children, ...props }) => {
   const maxBoxes = 3;
   const boxesLength = props.homeDashboard.boxes.length;
-  const columnStyle = {
-    '--column-width': boxesLength === maxBoxes ? `calc(100% / ${maxBoxes})` : `calc(93% / ${boxesLength})`
-  };
-  const addButtonStyle = {
-    '--add-button-width': boxesLength < maxBoxes ? 'calc(7%)' : '0'
-  };
+
   return (
     <div class="pb-6">
       <h3>
@@ -116,19 +111,18 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class={cx('d-flex flex-row align-items-start', style.columnCard)}>
+        <div class={cx('d-flex flex-row align-items-start', style.columnsCard)}>
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
               <div
-                class={cx('d-flex flex-column pl-2 pr-2 ', style.columnDynamic, stylePrimary.removePadding, {
+                class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
                   [stylePrimary.removePaddingFirstCol]: x === 0,
-                  [stylePrimary.removePaddingLastCol]: x === maxBoxes - 1,
-                  [style.removePadding]: true // it will remove padding when in mobile view
+                  [stylePrimary.removePaddingLastCol]: x === maxBoxes,
+                  [style.removePadding]: true, // it will remove padding when in mobile view
                 })}
-                style={columnStyle}
               >
-                <div class={cx('d-flex', 'justify-content-center', style.columnBoxesHeader)}>
+                <div class={cx('d-flex', 'justify-content-center', style.columnBoxHeader)}>
                   <h3 class="d-flex justify-content-center text-center">
                     <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
                     {boxesLength > 1 && (
@@ -175,8 +169,8 @@ const EditBoxColumns = ({ children, ...props }) => {
               </div>
             ))}
           {boxesLength < maxBoxes && (
-            <div class={cx('d-flex flex-column pl-2', style.addButton)} style={addButtonStyle}>
-              <div class={cx(style.columnBoxesHeader)} />
+            <div class={cx('d-flex flex-column', style.columnAddButton)}>
+              <div class={cx(style.columnBoxHeader)} />
               <Localizer>
                 <button
                   class={cx('btn btn-outline-primary', style.btnAddColumn)}

@@ -1,10 +1,19 @@
-.columnCard {
-  height: 100%;
+.columnsCard {
+  display: flex;
   flex-wrap: nowrap;
+  width: 100%;
   padding-right: 0;
 }
 
-.columnBoxesHeader {
+.column {
+  flex-grow: 1;
+  flex-basis: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.columnBoxHeader {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,30 +64,25 @@
 }
 
 @media (min-width: 992px) {
-  .columnDynamic {
-    flex: 0 0 var(--column-width);
-    max-width: var(--column-width);
-  }
-
-  .addButton {
-    flex: 0 0 var(--add-button-width);
-    max-width: var(--add-button-width);
+  .columnAddButton {
+    position: relative;
+    flex: 0 0 46px;
+    max-width: 46px;
+    padding-left: 8px;
     display: flex;
+    align-items: center;
   }
 
   .btnAddColumn {
     width: 31px;
-    padding: 0;
-    top: 2vh;
   }
 
   .btnAddColumn[data-title]:hover:after {
     content: attr(data-title);
     position: absolute;
-    top: 29px;
-    left: 36px;
-    width: 150px;
-    transform: translateX(-100%);
+    top: 100%;
+    left: 100%;
+    transform: translateX(-100%) translateY(5px);
     white-space: normal;
     color: #467fcf;
     background-color: #fff;
@@ -87,6 +91,7 @@
     border-radius: 4px;
     font-size: 12px;
     z-index: 1000;
+    width: 150px;
   }
 }
 
@@ -96,27 +101,29 @@
     height: 5rem;
   }
 
-  .columnCard {
+  .columnsCard {
     flex-wrap: wrap;
+    width: 100%;
   }
 
-  .columnDynamic {
-    width: 100% !important;
-    flex: none !important;
+  .column {
+    flex-grow: 1;
+    flex-basis: 100%;
+    padding: 0 0px;
   }
 
-  .addButton {
-    width: 100% !important;
-    flex: none !important;
-  }
-
-  .columnBoxesHeader {
+  .columnBoxHeader {
     padding-top: 1.5rem;
     margin-bottom: 2px;
     flex-wrap: wrap;
     justify-content: center;
     border-top: 1px dashed #bdbdbd;
     min-height: 0px;
+  }
+
+  .columnAddButton {
+    width: 100%;
+    flex: none;
   }
 
   .displayTextMobile {
