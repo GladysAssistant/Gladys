@@ -1,0 +1,8 @@
+[
+  {
+    "label": "backup.fail",
+    "answers": [
+      "La sauvegarde Gladys Plus a échoué. Pour en savoir plus, rendez-vous sur l'onglet \"Paramètres\" => \"Tâches\". Le message d'erreur est {{ errorMessage }}"
+    ]
+  }
+]

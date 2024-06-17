@@ -123,6 +123,7 @@ class SelectDeviceFeature extends Component {
         value={selectedOption}
         onChange={this.handleChange}
         options={deviceOptions}
+        styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
       />
     );
   }
