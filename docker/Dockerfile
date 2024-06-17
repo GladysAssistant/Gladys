@@ -24,7 +24,7 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git libffi-dev linux-headers \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git libffi-dev linux-headers \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
@@ -35,4 +35,4 @@ ENV SERVER_PORT 80
 # Export listening port
 EXPOSE 80
 
-CMD ["npm" ,"run", "start:prod"]
+CMD ["node", "index.js"]

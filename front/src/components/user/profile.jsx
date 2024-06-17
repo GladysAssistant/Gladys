@@ -138,6 +138,9 @@ const Profile = ({ children, ...props }) => {
           <option value="fr">
             <Text id="profile.french" />
           </option>
+          <option value="de">
+            <Text id="profile.german" />
+          </option>
         </select>
       </div>
       {!props.disableRole && (

@@ -35,7 +35,8 @@ class CameraBoxComponent extends Component {
   updateDeviceStateWebsocket = payload => {
     if (this.props.box.camera === payload.device) {
       this.setState({
-        image: payload.last_value_string
+        image: payload.last_value_string,
+        error: false
       });
     }
   };
@@ -55,7 +56,12 @@ class CameraBoxComponent extends Component {
       this.setState({ liveNotSupportedBrowser: true });
       return;
     }
-    await this.setState({ streaming: true, loading: true, liveStartError: false });
+    await this.setState({
+      streaming: true,
+      loading: true,
+      liveStartError: false,
+      upgradeGladysPlusPlanRequired: false
+    });
     try {
       const isGladysPlus = this.props.session.gatewayClient !== undefined;
 
@@ -132,9 +138,6 @@ class CameraBoxComponent extends Component {
         }
       });
       this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {});
-      this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        console.log(`manifest loaded, found ${data.levels.length} quality level`);
-      });
       this.hls.on(Hls.Events.ERROR, (event, data) => {
         console.error(event, data);
         const errorType = data.type;
@@ -172,7 +175,13 @@ class CameraBoxComponent extends Component {
       // bind them together
       this.hls.attachMedia(this.videoRef.current);
     } catch (e) {
-      this.setState({ liveStartError: true });
+      const status = get(e, 'response.status');
+      if (status === 402) {
+        this.setState({ upgradeGladysPlusPlanRequired: true });
+      } else {
+        this.setState({ liveStartError: true });
+      }
+
       console.error(e);
       await this.stopStreaming();
     }
@@ -240,7 +249,16 @@ class CameraBoxComponent extends Component {
 
   render(
     props,
-    { image, error, streaming, loading, liveStartError, liveNotSupportedBrowser, liveTooManyRequestsError }
+    {
+      image,
+      error,
+      streaming,
+      loading,
+      liveStartError,
+      liveNotSupportedBrowser,
+      liveTooManyRequestsError,
+      upgradeGladysPlusPlanRequired
+    }
   ) {
     if (streaming) {
       return (
@@ -290,6 +308,16 @@ class CameraBoxComponent extends Component {
               <i class="fe fe-bell" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.liveStartError" />
+              </span>
+            </p>
+          </div>
+        )}
+        {upgradeGladysPlusPlanRequired && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-bell" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.upgradeGladysPlusPlanError" />
               </span>
             </p>
           </div>

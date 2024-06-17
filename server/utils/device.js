@@ -69,6 +69,31 @@ function getDeviceFeature(device, category, type) {
   return null;
 }
 
+/**
+ * @description Add or update a param to a device.
+ * @param {object} device - Device to add parameter.
+ * @param {object} feature - The feature to add.
+ * @returns {object} The device.
+ * @example
+ * setDeviceFeature({ features: [] }, { selector: 'feature' })
+ */
+function setDeviceFeature(device, feature) {
+  let { features } = device;
+  if (!features) {
+    features = [];
+    device.features = features;
+  }
+
+  const featureIndex = features.findIndex((p) => p.selector === feature.selector);
+  if (featureIndex >= 0) {
+    features[featureIndex] = feature;
+  } else {
+    features.push(feature);
+  }
+
+  return device;
+}
+
 const matchFeature = (features, feature) => {
   return features.findIndex((f) => f.external_id === feature.external_id);
 };
@@ -110,7 +135,7 @@ function hasDeviceChanged(newDevice, existingDevice = {}) {
 
 /**
  * @description Merge feature attributes from existing with the new one.
- * It keeps 'name' attribute from existing.
+ * It keeps 'name' and 'keep_history' attribute from existing.
  * @param {object} newFeature - Newly created feature.
  * @param {object} existingFeature - Already existing feature.
  * @returns {object} A new feature merged with existing one.
@@ -118,13 +143,17 @@ function hasDeviceChanged(newDevice, existingDevice = {}) {
  * mergeFeatures({ name: 'Default name' }, { name: 'Overriden name' })
  */
 function mergeFeatures(newFeature, existingFeature = {}) {
-  const { name } = existingFeature || {};
+  const featureToReturn = { ...newFeature };
 
-  if (name) {
-    return { ...newFeature, name };
+  if (existingFeature && existingFeature.name) {
+    featureToReturn.name = existingFeature.name;
   }
 
-  return newFeature;
+  if (existingFeature && existingFeature.keep_history !== undefined) {
+    featureToReturn.keep_history = existingFeature.keep_history;
+  }
+
+  return featureToReturn;
 }
 
 /**
@@ -204,6 +233,7 @@ module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
+  setDeviceFeature,
   hasDeviceChanged,
   mergeFeatures,
   mergeDevices,

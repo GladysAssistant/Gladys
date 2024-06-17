@@ -9,7 +9,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function getDiscoveredDevices(req, res) {
     logger.debug('Get discovered devices');
-    const devices = zigbee2mqttManager.getDiscoveredDevices();
+    const { query = {} } = req;
+    const devices = zigbee2mqttManager.getDiscoveredDevices(query);
     res.json(devices);
   }
 
@@ -36,6 +37,17 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {get} /api/v1/service/zigbee2mqtt/setup Get current configuration
+   * @apiName setup
+   * @apiGroup Zigbee2mqtt
+   */
+  async function getCurrentSetup(req, res) {
+    logger.debug('Getting current setup');
+    const configuration = await zigbee2mqttManager.getSetup();
+    res.json(configuration);
+  }
+
+  /**
    * @api {post} /api/v1/service/zigbee2mqtt/setup Setup
    * @apiName setup
    * @apiGroup Zigbee2mqtt
@@ -43,9 +55,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   async function setup(req, res) {
     logger.debug('Entering setup step');
     await zigbee2mqttManager.setup(req.body);
-    res.json({
-      success: true,
-    });
+    const configuration = await zigbee2mqttManager.getSetup();
+    res.json(configuration);
   }
 
   /**
@@ -136,6 +147,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/status': {
       authenticated: true,
       controller: asyncMiddleware(status),
+    },
+    'get /api/v1/service/zigbee2mqtt/setup': {
+      authenticated: true,
+      controller: asyncMiddleware(getCurrentSetup),
     },
     'post /api/v1/service/zigbee2mqtt/setup': {
       authenticated: true,

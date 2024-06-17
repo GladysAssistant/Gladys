@@ -2,7 +2,6 @@ import get from 'get-value';
 import SettingsLayout from '../SettingsLayout';
 import GatewayBackupList from './GatewayBackupList';
 import GatewayRestoreInProgress from './GatewayRestoreInProgress';
-import GatewayNotConfigured from './GatewayNotConfigured';
 
 const GatewayPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -14,7 +13,6 @@ const GatewayPage = ({ children, ...props }) => (
         {props.gatewayRestoreInProgress && get(props, 'gatewayStatus.configured') === true && (
           <GatewayRestoreInProgress gatewayGladysRestarting={props.gatewayGladysRestarting} />
         )}
-        {get(props, 'gatewayStatus.configured') === false && <GatewayNotConfigured />}
       </div>
     </div>
   </SettingsLayout>

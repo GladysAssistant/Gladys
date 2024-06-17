@@ -3,6 +3,7 @@ import ApexCharts from 'apexcharts';
 
 import fr from 'apexcharts/dist/locales/fr.json';
 import en from 'apexcharts/dist/locales/en.json';
+import de from 'apexcharts/dist/locales/de.json';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -10,10 +11,22 @@ import { getApexChartBarOptions } from './ApexChartBarOptions';
 import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
+import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
 
-const COLORS = ['#206bc4', '#FF7878', '#E0C097', '#F7D59C'];
+const DEFAULT_COLORS = [
+  '#316cbe',
+  '#d63031',
+  '#00b894',
+  '#fdcb6e',
+  '#6c5ce7',
+  '#00cec9',
+  '#e84393',
+  '#e17055',
+  '#636e72'
+];
+const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua', 'pink', 'orange', 'grey'];
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
@@ -42,8 +55,8 @@ class ApexChartComponent extends Component {
     const options = getApexChartBarOptions({
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      COLORS,
-      locales: [fr, en],
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -62,8 +75,8 @@ class ApexChartComponent extends Component {
       height,
       series: this.props.series,
       displayAxes: this.props.display_axes,
-      COLORS,
-      locales: [fr, en],
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -81,10 +94,10 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartLineOptions({
       height,
-      COLORS,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -101,10 +114,10 @@ class ApexChartComponent extends Component {
     }
     const options = getApexChartStepLineOptions({
       height,
-      COLORS,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -154,3 +167,5 @@ class ApexChartComponent extends Component {
 }
 
 export default ApexChartComponent;
+
+export { DEFAULT_COLORS, DEFAULT_COLORS_NAME };

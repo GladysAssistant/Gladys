@@ -36,52 +36,75 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     };
 
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
-    zigbee2mqttManager.zigbee2mqttConnected = false;
+    zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.dockerBased = true;
+    zigbee2mqttManager.networkModeValid = true;
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('it should receive devices', async () => {
+  it('should set at connected / exist / running', async () => {
+    // PREPARE
+    zigbee2mqttManager.zigbee2mqttConnected = false;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unkown', JSON.stringify({}));
+    // ASSERT
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: false,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: true,
+        zigbee2mqttExist: true,
+        zigbee2mqttRunning: true,
+      },
+    });
+  });
+
+  it('should receive devices', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub
       .onFirstCall()
-      .returns({ room_id: 'room_id', name: 'device-name' })
+      .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
-      .returns(null)
+      .returns(expectedDevicesPayload[1])
       .onThirdCall()
       .returns(null);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
       payload: expectedDevicesPayload,
     });
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get permit join from config', async () => {
+  it('should get permit join from config', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config', `{"permit_join": true}`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
-  it('it should get permit join from response/permit_join', async () => {
+  it('should get permit join from response/permit_join', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"data": {"value": true}}`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
@@ -92,7 +115,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config/permit_join', `true`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
@@ -103,10 +126,11 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic', ``);
     // ASSERT
-    assert.calledOnce(gladys.event.emit);
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should log error when bad message but not crash service', async () => {
+  it('should log error when bad message but not crash service', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -121,19 +145,19 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"battery":"LOCK"}`);
     // ASSERT
-    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get bad topic', async () => {
+  it('should get bad topic', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic/wrongtopic', `anymessage`);
     // ASSERT
-    assert.calledOnce(gladys.event.emit);
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic', async () => {
+  it('should get good topic', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -153,13 +177,14 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d5', `{"humidity":86, "battery":59}`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
       state: 59,
     });
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic with sub-feature', async () => {
+  it('should get good topic with sub-feature', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -179,13 +204,14 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d1', `{"action": "2_double"}`);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d1:button:click:action:2',
       state: 2,
     });
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic but device not managed', async () => {
+  it('should get good topic but device not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns(null);
@@ -193,10 +219,11 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
     // ASSERT
-    assert.calledOnce(gladys.event.emit);
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should get good topic but feature not managed', async () => {
+  it('should get good topic but feature not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub.onFirstCall().returns({
@@ -211,10 +238,11 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86}`);
     // ASSERT
-    assert.calledOnce(gladys.event.emit);
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
-  it('it should store backup', async () => {
+  it('should store backup', async () => {
     zigbee2mqttManager.saveZ2mBackup = fake.resolves(true);
 
     // PREPARE
@@ -225,5 +253,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/backup', JSON.stringify(payload));
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.saveZ2mBackup, payload);
+    assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 });

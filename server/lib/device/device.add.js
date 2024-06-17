@@ -13,6 +13,7 @@ function add(device) {
   this.stateManager.setState('deviceById', device.id, device);
   device.features.forEach((feature) => {
     this.stateManager.setState('deviceFeature', feature.selector, feature);
+    this.stateManager.setState('deviceFeatureById', feature.id, feature);
     this.stateManager.setState('deviceFeatureByExternalId', feature.external_id, feature);
   });
   if (device.should_poll === true && device.poll_frequency) {
@@ -44,6 +45,12 @@ function add(device) {
       }
     });
   }
+  // Handle MQTT custom topic
+  const mqttService = this.serviceManager.getService('mqtt');
+  if (mqttService) {
+    mqttService.device.listenToCustomMqttTopicIfNeeded(device);
+  }
+
   return null;
 }
 

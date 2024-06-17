@@ -17,7 +17,23 @@ module.exports = {
     max: 10000,
   },
   names: {
+    duration: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.SECONDS,
+      },
+    },
     battery: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    },
+    battpercentage: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.BATTERY,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
@@ -138,6 +154,14 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.LUX,
+        min: 0,
+        max: 100000,
+      },
+    },
+    illuminance: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         min: 0,
         max: 100000,
       },
@@ -700,6 +724,14 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.PPB,
         min: 0,
         max: 5500,
+      },
+    },
+    voc_index: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR.INTEGER,
+        min: 1,
+        max: 500,
       },
     },
     soil_moisture: {

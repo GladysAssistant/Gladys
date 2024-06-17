@@ -3,6 +3,7 @@ const {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
+  setDeviceFeature,
   hasDeviceChanged,
   mergeFeatures,
   mergeDevices,
@@ -135,6 +136,54 @@ describe('getDeviceFeature', () => {
   });
 });
 
+describe('setDeviceFeature', () => {
+  it('should create array and add feature', () => {
+    const device = {};
+    const feature = {
+      selector: 'selector',
+    };
+
+    setDeviceFeature(device, feature);
+
+    expect(device).deep.eq({
+      features: [feature],
+    });
+  });
+
+  it('should add feature to array', () => {
+    const device = { features: [{ selector: 'no-match' }] };
+    const feature = {
+      selector: 'selector',
+    };
+
+    setDeviceFeature(device, feature);
+
+    expect(device).deep.eq({
+      features: [{ selector: 'no-match' }, feature],
+    });
+  });
+
+  it('should replace feature into array', () => {
+    const device = {
+      features: [
+        {
+          selector: 'selector',
+        },
+      ],
+    };
+    const feature = {
+      name: 'name',
+      selector: 'selector',
+    };
+
+    setDeviceFeature(device, feature);
+
+    expect(device).deep.eq({
+      features: [feature],
+    });
+  });
+});
+
 describe('hasDeviceChanged', () => {
   it('should be same device', () => {
     const feature1 = buildFeature('test-1');
@@ -204,8 +253,48 @@ describe('mergeFeature', () => {
     const oldFeature = buildFeature('old');
     const mergedFeature = mergeFeatures(newFeature, oldFeature);
 
-    const expectedFeature = { ...newFeature, name: 'feature-old-name' };
+    const expectedFeature = { ...newFeature, name: 'feature-old-name', keep_history: 'feature-old-keep_history' };
     expect(mergedFeature).to.deep.equal(expectedFeature);
+  });
+  it('should keep keep_history from old feature', () => {
+    const newFeature = {
+      name: 'Temp sensor',
+      category: 'humidity-sensor',
+      type: 'decimal',
+      external_id: 'second-humidity',
+      selector: 'second-humidity',
+      read_only: true,
+      keep_history: true,
+      has_feedback: false,
+      min: -50,
+      max: 150,
+    };
+    const oldFeature = {
+      name: 'My custom name',
+      category: 'humidity-sensor',
+      type: 'decimal',
+      external_id: 'second-humidity',
+      selector: 'second-humidity',
+      read_only: true,
+      keep_history: false,
+      has_feedback: false,
+      min: -50,
+      max: 100,
+    };
+    const mergedFeature = mergeFeatures(newFeature, oldFeature);
+
+    expect(mergedFeature).to.deep.equal({
+      name: 'My custom name',
+      category: 'humidity-sensor',
+      type: 'decimal',
+      external_id: 'second-humidity',
+      selector: 'second-humidity',
+      read_only: true,
+      keep_history: false,
+      has_feedback: false,
+      min: -50,
+      max: 150,
+    });
   });
 });
 
@@ -258,7 +347,7 @@ describe('mergeDevice', () => {
 
     const mergedDevice = mergeDevices(newDevice, oldDevice);
 
-    const expectedFeature = { ...newFeature, name: 'feature-old1-name' };
+    const expectedFeature = { ...newFeature, name: 'feature-old1-name', keep_history: 'feature-old1-keep_history' };
     const expectedDevice = { ...newDevice, features: [expectedFeature], updatable: true };
     expect(mergedDevice).to.deep.equal(expectedDevice);
   });

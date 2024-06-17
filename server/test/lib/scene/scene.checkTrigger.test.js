@@ -10,6 +10,9 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
+// We are slowly moving this file to
+// the "triggers" folder to have smaller test files
+
 describe('scene.checkTrigger', () => {
   let sceneManager;
 
@@ -18,6 +21,14 @@ describe('scene.checkTrigger', () => {
   };
 
   const brain = {};
+
+  const service = {
+    getService: fake.returns({
+      device: {
+        subscribe: fake.returns(null),
+      },
+    }),
+  };
 
   beforeEach(() => {
     const house = {
@@ -39,7 +50,7 @@ describe('scene.checkTrigger', () => {
 
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {

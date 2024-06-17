@@ -18,7 +18,7 @@ class AccountPage extends Component {
       props.caldavCleanUpStatus === RequestStatus.Getting ||
       props.caldavSyncStatus === RequestStatus.Getting;
     return (
-      <CalDAVPage>
+      <CalDAVPage user={props.user}>
         <AccountTab {...props} loading={loading} dictionary={this.props.intl.dictionary.integration.caldav} />
       </CalDAVPage>
     );

@@ -8,6 +8,7 @@ const { poll } = require('./light.poll');
 const { getLights } = require('./light.getLights');
 const { getScenes } = require('./light.getScenes');
 const { setValue } = require('./light.setValue');
+const { syncWithBridge } = require('./light.syncWithBridge');
 
 // we rate-limit the number of request per seconds to poll lights
 const pollLimiter = new Bottleneck({
@@ -35,7 +36,7 @@ const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient
   this.serviceId = serviceId;
   this.bridges = [];
   this.connnectedBridges = [];
-  this.bridgesBySerialNumber = new Map();
+  this.bridgesByIP = new Map();
   this.hueApisBySerialNumber = new Map();
   this.lights = [];
 };
@@ -48,5 +49,6 @@ PhilipsHueLightHandler.prototype.poll = pollLimiter.wrap(poll);
 PhilipsHueLightHandler.prototype.getLights = getLights;
 PhilipsHueLightHandler.prototype.getScenes = getScenes;
 PhilipsHueLightHandler.prototype.setValue = setValueLimiter.wrap(setValue);
+PhilipsHueLightHandler.prototype.syncWithBridge = syncWithBridge;
 
 module.exports = PhilipsHueLightHandler;

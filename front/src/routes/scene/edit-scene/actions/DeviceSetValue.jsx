@@ -7,11 +7,12 @@ import ColorPicker from '../../../../components/device/ColorPicker';
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
+import ShutterButtons from '../../../../components/device/ShutterButtons';
 
 class DeviceSetValue extends Component {
   constructor(props) {
@@ -50,9 +51,9 @@ class DeviceSetValue extends Component {
     this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
   };
 
-  handleNewColorValue = color => {
+  handleNewPureValue = value => {
     const { columnIndex, index } = this.props;
-    this.props.updateActionProperty(columnIndex, index, 'value', color);
+    this.props.updateActionProperty(columnIndex, index, 'value', value);
     this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
   };
 
@@ -124,7 +125,23 @@ class DeviceSetValue extends Component {
     }
 
     if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR) {
-      return <ColorPicker value={this.props.action.value} updateValue={this.handleNewColorValue} />;
+      return <ColorPicker value={this.props.action.value} updateValue={this.handleNewPureValue} />;
+    }
+
+    if (
+      [DEVICE_FEATURE_TYPES.SHUTTER.STATE, DEVICE_FEATURE_TYPES.CURTAIN.STATE].includes(
+        this.state.deviceFeature.type
+      ) &&
+      [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN].includes(this.state.deviceFeature.category)
+    ) {
+      return (
+        <ShutterButtons
+          value={this.props.action.value}
+          category={this.state.deviceFeature.category}
+          type={this.state.deviceFeature.type}
+          updateValue={this.handleNewPureValue}
+        />
+      );
     }
 
     return (

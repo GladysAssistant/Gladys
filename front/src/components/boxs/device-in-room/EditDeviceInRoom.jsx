@@ -26,7 +26,7 @@ class EditDeviceInRoom extends Component {
     try {
       this.setState({ loading: true });
       // we get the rooms with the devices
-      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}?expand=devices`);
+      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}`, { expand: 'devices' });
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
 

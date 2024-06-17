@@ -1,0 +1,19 @@
+{
+  "name": "gladys-zwavejs-ui",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "get-value": "^3.0.1",
+    "mqtt": "^4.0.0"
+  }
+}

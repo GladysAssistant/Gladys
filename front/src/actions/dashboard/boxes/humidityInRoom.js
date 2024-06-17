@@ -12,7 +12,7 @@ function createActions(store) {
     async getHumidityInRoom(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const room = await state.httpClient.get(`/api/v1/room/${box.room}?expand=humidity,devices`);
+        const room = await state.httpClient.get(`/api/v1/room/${box.room}`, { expand: 'humidity,devices' });
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           room
         });

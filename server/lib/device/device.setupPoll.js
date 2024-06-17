@@ -10,6 +10,8 @@ function setupPoll() {
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES), DEVICE_POLL_FREQUENCIES.EVERY_MINUTES);
   // poll devices who need to be polled every 30 seconds
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS), DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS);
+  // poll devices who need to be polled every 15 seconds
+  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_15_SECONDS), DEVICE_POLL_FREQUENCIES.EVERY_15_SECONDS);
   // poll devices who need to be polled every 10 seconds
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS), DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
   // poll devices who need to be polled every 2 seconds

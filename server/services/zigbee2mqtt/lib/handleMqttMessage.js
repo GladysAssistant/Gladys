@@ -6,15 +6,18 @@ const { convertFeature } = require('../utils/convertFeature');
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
  * @param {object} message - The message sent.
- * @returns {object} Null.
+ * @returns {Promise} Null.
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
 async function handleMqttMessage(topic, message) {
-  this.zigbee2mqttConnected = true;
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-  });
+  // Limit events only on status changes
+  if (!this.zigbee2mqttConnected) {
+    this.zigbee2mqttConnected = true;
+    this.zigbee2mqttRunning = true;
+    this.zigbee2mqttExist = true;
+    this.emitStatusEvent();
+  }
 
   switch (topic) {
     case 'zigbee2mqtt/bridge/devices': {
@@ -103,7 +106,7 @@ async function handleMqttMessage(topic, message) {
                 logger.error(`Failed to convert value for device ${deviceName}:`, e);
               }
             } else {
-              logger.warn(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
+              logger.debug(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
             }
           });
         } else {

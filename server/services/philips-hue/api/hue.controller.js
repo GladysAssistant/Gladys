@@ -14,12 +14,22 @@ module.exports = function HueController(philipsHueLightHandler) {
   /**
    * @api {post} /api/v1/service/philips-hue/bridge/configure Configure Philips Hue Bridge
    * @apiName ConfigureBridge
-   * @apiParam {String} serial Serial number of the bridge
+   * @apiParam {String} ipAddress IP Address of the bridge
    * @apiGroup PhilipsHue
    */
   async function configureBridge(req, res) {
-    const bridge = await philipsHueLightHandler.configureBridge(req.body.serial);
+    const bridge = await philipsHueLightHandler.configureBridge(req.body.ipAddress);
     res.json(bridge);
+  }
+
+  /**
+   * @api {post} /api/v1/service/philips-hue/bridge/sync Sync Philips Hue Bridge
+   * @apiName SyncWithBridge
+   * @apiGroup PhilipsHue
+   */
+  async function syncWithBridge(req, res) {
+    await philipsHueLightHandler.syncWithBridge();
+    res.json({ success: true });
   }
 
   /**
@@ -63,6 +73,11 @@ module.exports = function HueController(philipsHueLightHandler) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(configureBridge),
+    },
+    'post /api/v1/service/philips-hue/bridge/sync': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(syncWithBridge),
     },
     'get /api/v1/service/philips-hue/light': {
       authenticated: true,

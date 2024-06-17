@@ -1,18 +1,15 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import cx from 'classnames';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-
-import style from './SelectDeviceFeature.css';
 
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
       // we get the rooms with the devices
-      const rooms = await this.props.httpClient.get('/api/v1/room?expand=devices');
+      const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
       const deviceOptions = [];
 
       const deviceDictionnary = {};
@@ -121,11 +118,12 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
-        className={cx('select-device-feature', style.deviceSelector)}
+        class="select-device-feature"
         defaultValue={''}
         value={selectedOption}
         onChange={this.handleChange}
         options={deviceOptions}
+        styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
       />
     );
   }

@@ -57,8 +57,8 @@ const names = {
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       },
       lock: {
-        category: DEVICE_FEATURE_CATEGORIES.ACCESS_CONTROL,
-        type: DEVICE_FEATURE_TYPES.ACCESS_CONTROL.MODE,
+        category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+        type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
       },
       switch: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -75,6 +75,18 @@ const names = {
   water_leak: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
+  battery_low: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
+  tamper: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.TAMPER,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },

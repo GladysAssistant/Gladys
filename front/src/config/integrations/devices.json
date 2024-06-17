@@ -68,5 +68,30 @@
     "key": "melcloud",
     "link": "melcloud",
     "img": "/assets/integrations/cover/melcloud.jpg"
+  },
+  {
+    "key": "nodeRed",
+    "link": "node-red",
+    "img": "/assets/integrations/cover/node-red.jpg"
+  },
+  {
+    "key": "netatmo",
+    "link": "netatmo",
+    "img": "/assets/integrations/cover/netatmo.jpg"
+  },
+  {
+    "key": "sonos",
+    "link": "sonos",
+    "img": "/assets/integrations/cover/sonos.jpg"
+  },
+  {
+    "key": "zwavejs-ui",
+    "link": "zwavejs-ui",
+    "img": "/assets/integrations/cover/zwave-js-ui.jpg"
+  },
+  {
+    "key": "google-cast",
+    "link": "google-cast",
+    "img": "/assets/integrations/cover/google-cast.jpg"
   }
 ]

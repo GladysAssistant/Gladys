@@ -104,11 +104,11 @@ class EditDashboard extends Component {
     await this.setState(newState);
   };
 
-  addBox = () => {
+  addBox = x => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
-          0: {
+          [x]: {
             $push: [{}]
           }
         }
@@ -134,6 +134,17 @@ class EditDashboard extends Component {
     const newState = update(this.state, {
       currentDashboard: {
         name: {
+          $set: e.target.value
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
+  updateCurrentDashboardVisibility = e => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        visibility: {
           $set: e.target.value
         }
       }
@@ -332,6 +343,7 @@ class EditDashboard extends Component {
   ) {
     return (
       <EditDashboardPage
+        user={props.user}
         isTouchDevice={this.isTouchDevice}
         dashboards={dashboards}
         currentDashboard={currentDashboard}
@@ -352,6 +364,7 @@ class EditDashboard extends Component {
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
+        updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}

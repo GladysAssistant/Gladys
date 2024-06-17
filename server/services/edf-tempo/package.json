@@ -1,0 +1,19 @@
+{
+  "name": "gladys-edf-tempo",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dayjs": "^1.11.7"
+  }
+}

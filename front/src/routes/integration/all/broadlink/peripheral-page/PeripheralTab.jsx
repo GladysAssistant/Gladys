@@ -10,9 +10,9 @@ import style from '../style.css';
 const PeripheralTab = ({ broadlinkPeripherals = [], housesWithRooms = [], ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">
+      <h1 class="card-title">
         <Text id="integration.broadlink.peripheral.title" />
-      </h3>
+      </h1>
     </div>
     <div class="card-body">
       {broadlinkPeripherals.length > 0 && (

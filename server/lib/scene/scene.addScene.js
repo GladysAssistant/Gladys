@@ -48,6 +48,17 @@ function addScene(sceneRaw) {
             break;
           case 'every-week':
             rule.dayOfWeek = trigger.days_of_the_week.map((day) => nodeScheduleDaysOfWeek[day]);
+            if (rule.dayOfWeek.length === 0) {
+              rule.dayOfWeek = [
+                nodeScheduleDaysOfWeek.monday,
+                nodeScheduleDaysOfWeek.tuesday,
+                nodeScheduleDaysOfWeek.wednesday,
+                nodeScheduleDaysOfWeek.thursday,
+                nodeScheduleDaysOfWeek.friday,
+                nodeScheduleDaysOfWeek.saturday,
+                nodeScheduleDaysOfWeek.sunday,
+              ];
+            }
             rule.hour = parseInt(trigger.time.substr(0, 2), 10);
             rule.minute = parseInt(trigger.time.substr(3, 2), 10);
             rule.second = 0;
@@ -90,6 +101,22 @@ function addScene(sceneRaw) {
           throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
         }
         trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
+      }
+
+      if (trigger.type === EVENTS.MQTT.RECEIVED) {
+        const mqttService = this.service.getService('mqtt');
+
+        if (mqttService) {
+          trigger.mqttCallback = (topic, message) => {
+            this.event.emit(EVENTS.TRIGGERS.CHECK, {
+              type: EVENTS.MQTT.RECEIVED,
+              topic,
+              message,
+            });
+          };
+
+          mqttService.device.subscribe(trigger.topic, trigger.mqttCallback);
+        }
       }
     });
   }

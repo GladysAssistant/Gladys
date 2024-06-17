@@ -1,9 +1,21 @@
-const { HttpError, Error400, Error403, Error404, Error409, Error422, Error500 } = require('../../utils/httpErrors');
+const {
+  HttpError,
+  Error400,
+  Error403,
+  Error404,
+  Error409,
+  Error422,
+  Error500,
+  Error429,
+} = require('../../utils/httpErrors');
 const {
   PasswordNotMatchingError,
   NotFoundError,
   ServiceNotConfiguredError,
   BadParameters,
+  ConflictError,
+  ForbiddenError,
+  TooManyRequests,
 } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -45,6 +57,12 @@ module.exports = function errorMiddleware(error, req, res, next) {
     responseError = new Error404(error.message);
   } else if (error instanceof HttpError) {
     responseError = error;
+  } else if (error instanceof ConflictError) {
+    responseError = new Error409(error.message);
+  } else if (error instanceof ForbiddenError) {
+    responseError = new Error403(error.message);
+  } else if (error instanceof TooManyRequests) {
+    responseError = new Error429({ time_before_next: error.timeBeforeNext });
   } else {
     logger.trace(error);
     responseError = new Error500(error);

@@ -71,6 +71,7 @@ const StateManager = function StateManager(event) {
     deviceByExternalId: {},
     deviceById: {},
     deviceFeature: {},
+    deviceFeatureById: {},
     deviceFeatureByExternalId: {},
     service: {},
     serviceById: {},

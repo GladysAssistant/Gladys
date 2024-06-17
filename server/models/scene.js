@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, EVENT_LIST } = require('../utils/constants');
+const { ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
 const { addSelector } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -43,6 +43,9 @@ const actionSchema = Joi.array().items(
       stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
       ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
+      edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
+      edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
+      edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),
@@ -57,6 +60,11 @@ const actionSchema = Joi.array().items(
         value: Joi.number(),
         evaluate_value: Joi.string(),
       }),
+      alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
+      topic: Joi.string(),
+      message: Joi.string().allow(''),
+      blinking_time: Joi.number(),
+      blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
     }),
   ),
 );
@@ -98,6 +106,8 @@ const triggersSchema = Joi.array().items(
       .min(1)
       .max(31),
     threshold_only: Joi.boolean(),
+    topic: Joi.string(),
+    message: Joi.string().allow(''),
   }),
 );
 
@@ -167,6 +177,14 @@ module.exports = (sequelize, DataTypes) => {
 
   // add slug if needed
   scene.beforeValidate(addSelector);
+
+  scene.associate = (models) => {
+    scene.hasMany(models.TagScene, {
+      foreignKey: 'scene_id',
+      sourceKey: 'id',
+      as: 'tags',
+    });
+  };
 
   return scene;
 };

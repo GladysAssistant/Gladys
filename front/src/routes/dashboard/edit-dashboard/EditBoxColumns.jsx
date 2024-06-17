@@ -9,6 +9,7 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import style from '../style.css';
+import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
@@ -46,6 +47,39 @@ const EditBoxColumns = ({ children, ...props }) => (
               value={props.homeDashboard.name}
               onInput={props.updateCurrentDashboardName}
             />
+          </Localizer>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardVisibility" />
+          </label>
+          <small>
+            <Text id="dashboard.editDashboardVisibilityDescription" />
+          </small>
+          {props.user.id !== props.homeDashboard.user_id && (
+            <div>
+              <small>
+                <Text id="dashboard.editDashboardVisibilityNotEditableNotCreator" />
+              </small>
+            </div>
+          )}
+          <Localizer>
+            <select
+              value={props.homeDashboard.visibility}
+              onChange={props.updateCurrentDashboardVisibility}
+              disabled={props.user.id !== props.homeDashboard.user_id}
+              class="form-control"
+            >
+              {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
+                <option value={dashboardVisibility}>
+                  <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
+                </option>
+              ))}
+            </select>
           </Localizer>
         </div>
       </div>
@@ -101,14 +135,15 @@ const EditBoxColumns = ({ children, ...props }) => (
               )}
 
               {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
+
+              {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
+              <div class="d-flex justify-content-center mb-4">
+                <button class="btn btn-primary" onClick={() => props.addBox(x)}>
+                  <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
+                </button>
+              </div>
             </div>
           ))}
-      </div>
-      {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-      <div class="d-flex justify-content-center">
-        <button class="btn btn-primary" onClick={props.addBox}>
-          <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
-        </button>
       </div>
     </DndProvider>
   </div>
