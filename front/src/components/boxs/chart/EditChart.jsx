@@ -81,6 +81,8 @@ class EditChart extends Component {
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, { chart_type: undefined });
     }
+    this.setState({ chart_type: e.target.value });
+    this.getDeviceFeatures(e.target.value);
   };
 
   updateChartColor = (i, value) => {
@@ -134,13 +136,14 @@ class EditChart extends Component {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: [],
         units: [],
-        unit: undefined
+        unit: undefined,
+        chart_type: ''
       });
     }
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
-  getDeviceFeatures = async () => {
+  getDeviceFeatures = async (chartType = this.state.chart_type) => {
     try {
       this.setState({ loading: true });
       const devices = await this.props.httpClient.get('/api/v1/device');
@@ -157,7 +160,17 @@ class EditChart extends Component {
           this.deviceFeatureBySelector.set(feature.selector, feature);
           // We don't support all devices for this view
           if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
-            deviceFeaturesOptions.push(featureOption);
+            if (chartType.includes(CHART_TYPE_BINARY)) {
+              if (FEATURE_BINARY[feature.type]) {
+                deviceFeaturesOptions.push(featureOption);
+              }
+            } else if (chartType === '') {
+              deviceFeaturesOptions.push(featureOption);
+            } else {
+              if (!FEATURE_BINARY[feature.type]) {
+                deviceFeaturesOptions.push(featureOption);
+              }
+            }
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
@@ -212,6 +225,9 @@ class EditChart extends Component {
     super(props);
     this.props = props;
     this.deviceFeatureBySelector = new Map();
+    this.state = {
+      chart_type: ''
+    };
   }
 
   componentDidMount() {
@@ -272,7 +288,7 @@ class EditChart extends Component {
                 <Text id="dashboard.boxes.chart.chartType" />
               </label>
               <select onChange={this.updateChartType} class="form-control" value={props.box.chart_type}>
-                <option>
+                <option value="">
                   <Text id="global.emptySelectOption" />
                 </option>
                 {chartTypeList &&
