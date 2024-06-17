@@ -140,6 +140,7 @@ class EditChart extends Component {
         unit: undefined,
         chart_type: ''
       });
+      this.setState({ chart_type: '' });
     }
     this.setState({ selectedDeviceFeaturesOptions });
   };
@@ -167,10 +168,8 @@ class EditChart extends Component {
               }
             } else if (chartType === '') {
               deviceFeaturesOptions.push(featureOption);
-            } else {
-              if (!FEATURE_BINARY[feature.type]) {
-                deviceFeaturesOptions.push(featureOption);
-              }
+            } else if (!FEATURE_BINARY[feature.type]) {
+              deviceFeaturesOptions.push(featureOption);
             }
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {

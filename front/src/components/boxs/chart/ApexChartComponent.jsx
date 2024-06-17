@@ -54,7 +54,7 @@ class ApexChartComponent extends Component {
   }
   addDateFormatterRangeBar(options) {
     let formatter_custom;
-    const dictionnary = this.props.dictionary.dashboard.boxes.chart
+    const dictionnary = this.props.dictionary.dashboard.boxes.chart;
     if (this.props.interval <= 24 * 60) {
       formatter_custom = opts => {
         const startDate = dayjs(opts.y1)
