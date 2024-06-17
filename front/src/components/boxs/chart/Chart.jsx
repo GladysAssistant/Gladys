@@ -512,6 +512,7 @@ class Chartbox extends Component {
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
                 heightAdditional={heightAdditional}
+                dictionary={props.intl.dictionary}
               />
             </div>
           )}
@@ -550,6 +551,7 @@ class Chartbox extends Component {
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
                 heightAdditional={heightAdditional}
+                dictionary={props.intl.dictionary}
               />
             )}
           </div>

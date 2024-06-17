@@ -369,7 +369,9 @@
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "start_date": "Début le : ",
+        "end_date": "Fin le : "
       },
       "ecowatt": {
         "title": "Ecowatt France",

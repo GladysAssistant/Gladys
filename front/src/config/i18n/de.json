@@ -369,7 +369,9 @@
         "preview": "Vorschau",
         "showPreviewButton": "Vorschau anzeigen",
         "on": "An",
-        "off": "Aus"
+        "off": "Aus",
+        "start_date": "Startdatum: ",
+        "end_date": "Enddatum: "
       },
       "ecowatt": {
         "title": "Ecowatt France",

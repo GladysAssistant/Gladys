@@ -124,7 +124,10 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       fillSeriesColor: false,
       fixed: {
-        enabled: false
+        enabled: true,
+        position: 'topLeft',
+        offsetX: 0,
+        offsetY: -70
       }
     }
   };
