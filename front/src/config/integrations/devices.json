@@ -51,6 +51,10 @@
     "img": "/assets/integrations/cover/broadlink.jpg"
   },
   {
+    "key": "ecovacs",
+    "img": "/assets/integrations/cover/ecovacs.jpg"
+  },
+  {
     "key": "enedis",
     "img": "/assets/integrations/cover/enedis.jpg"
   },
