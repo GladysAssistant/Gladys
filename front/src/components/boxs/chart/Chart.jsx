@@ -2,12 +2,13 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
+import ChartBoxExpanded from './Chart';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -141,24 +142,79 @@ class Chartbox extends Component {
 
       let emptySeries = true;
 
-      const series = data.map((oneFeature, index) => {
-        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const { values, deviceFeature } = oneFeature;
-        const deviceName = deviceFeature.name;
-        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
-        return {
-          name,
-          data: values.map(value => {
-            emptySeries = false;
-            return {
-              x: value.created_at,
-              y: value.value
-            };
-          })
-        };
-      });
+      let series = [];
 
+      if (this.props.box.chart_type === 'timeline') {
+        const serie0 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.off'),
+          data: []
+        };
+        const serie1 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
+          data: []
+        };
+
+        data.forEach(oneFeature => {
+          const { values, deviceFeature, device } = oneFeature;
+          let previousValue = null;
+          let lastChangeTime = null;
+          const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
+
+          // if (values.length > 1) {
+          values.forEach(value => {
+            emptySeries = false;
+            if (previousValue === null) {
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+              return;
+            }
+
+            if (value.value !== previousValue) {
+              const newData = {
+                x: `${device.name} (${deviceFeature.name})`,
+                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+              };
+              if (previousValue === 0) {
+                serie0.data.push(newData);
+              } else {
+                serie1.data.push(newData);
+              }
+              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              previousValue = value.value;
+            }
+          });
+
+          if (previousValue !== null) {
+            const newData = {
+              x: `${device.name} (${deviceFeature.name})`,
+              y: [lastChangeTime, lastValueTime]
+            };
+            if (previousValue === 0) {
+              serie0.data.push(newData);
+            } else {
+              serie1.data.push(newData);
+            }
+          }
+          // }
+        });
+        series.push(serie1);
+        series.push(serie0);
+      } else {
+        series = data.map((oneFeature, index) => {
+          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          const { values, deviceFeature } = oneFeature;
+          const deviceName = deviceFeature.name;
+          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          return {
+            name,
+            data: values.map(value => {
+              emptySeries = false;
+              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+            })
+          };
+        });
+      }
       const newState = {
         series,
         loading: false,
@@ -166,7 +222,7 @@ class Chartbox extends Component {
         emptySeries
       };
 
-      if (data.length > 0) {
+      if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
         // Before now, there was a "unit" attribute in this box instead of "units",
         // so we need to support "unit" as some users may already have the box with that param
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
@@ -279,13 +335,25 @@ class Chartbox extends Component {
       unit
     }
   ) {
-    const displayVariation = props.box.display_variation;
+    const { box, displayPreview, showCloseButton, showHistoryZoom } = this.props;
+    const displayVariation = box.display_variation;
+    const nbDeviceFeatures = box.device_features.length;
+    let heightAdditional = 0;
+    if (showHistoryZoom) {
+      if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 2) {
+        heightAdditional = 56 * (nbDeviceFeatures - 2);
+      } else {
+        heightAdditional = 200;
+      }
+    } else if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
+      heightAdditional = 38 * (nbDeviceFeatures - 3);
+    }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
-            <div class={cx(style.msAuto, style.lh1)}>
+            <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
@@ -316,44 +384,83 @@ class Chartbox extends Component {
                   >
                     <Text id="dashboard.boxes.chart.lastDay" />
                   </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === SEVEN_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo7DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastSevenDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo30DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo3monthsView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_YEAR_IN_MINUTES
-                    })}
-                    onClick={this.switchToYearlyView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastYear" />
-                  </a>
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo7DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastSevenDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo30DaysView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                      })}
+                      onClick={this.switchTo3monthsView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                    </a>
+                  )}
+                  {props.box.chart_type !== 'timeline' && (
+                    <a
+                      className={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_YEAR_IN_MINUTES
+                      })}
+                      onClick={this.switchToYearlyView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastYear" />
+                    </a>
+                  )}
                 </div>
               </div>
+              {this.state.showHistory && (
+                <div class={cx(style.modalOverlay)}>
+                  <div class={cx('card-body', style.cardBody)}>
+                    <ChartBoxExpanded
+                      {...props}
+                      showHistoryZoom={this.state.showHistory}
+                      showCloseButton={true}
+                      onClose={() => this.setState({ showHistory: false })}
+                    />
+                  </div>
+                </div>
+              )}
+              {showCloseButton && (
+                <button
+                  class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)}
+                  onClick={() => this.props.onClose()}
+                >
+                  <i class="fe fe-x" />
+                </button>
+              )}
+              {!displayPreview && !showHistoryZoom && (
+                <Localizer>
+                  <button
+                    class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)}
+                    onClick={() => this.setState({ showHistory: true })}
+                    title={<Text id="dashboard.boxes.chart.expandChartButtonDescription" />}
+                  >
+                    <i class="fe fe-airplay" />
+                  </button>
+                </Localizer>
+              )}
             </div>
           </div>
 
-          {displayVariation && emptySeries === false && (
+          {displayVariation && props.box.chart_type !== 'timeline' && emptySeries === false && (
             <div class="d-flex align-items-baseline">
               {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">
@@ -442,6 +549,7 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                heightAdditional={heightAdditional}
               />
             </div>
           )}
@@ -479,6 +587,7 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
+                heightAdditional={heightAdditional}
               />
             )}
           </div>

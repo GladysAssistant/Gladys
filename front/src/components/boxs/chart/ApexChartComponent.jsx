@@ -11,6 +11,7 @@ import { getApexChartBarOptions } from './ApexChartBarOptions';
 import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
+import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
 import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
@@ -51,8 +52,75 @@ class ApexChartComponent extends Component {
       }
     };
   }
+  addDateFormatterRangeBar(options) {
+    let formatter_custom;
+    if (this.props.interval <= 24 * 60) {
+      formatter_custom = opts => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LLL:ss');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LLL:ss');
+        const w = opts.ctx.w;
+        let seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
+        let ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
+        const color = w.globals.colors[opts.seriesIndex];
+
+        return `<div class="apexcharts-tooltip-rangebar">
+            <div> <span class="series-name" style="color: ${color}">
+              ${seriesName ? seriesName : ''}
+            </span></div>
+            <div> <span class="category">
+              ${ylabel}: 
+            </span> <span class="value start-value"></br>&nbsp;&nbsp;
+              Début le: ${startDate} 
+            </span> <span class="value end-value"></br>&nbsp;&nbsp;
+              Fin le: ${endDate} 
+            </span></div>
+          </div>`;
+      };
+    } else {
+      formatter_custom = opts => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LL');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LL');
+
+        const w = opts.ctx.w;
+        const seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
+        const ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
+        const color = w.globals.colors[opts.seriesIndex];
+
+        return `<div class="apexcharts-tooltip-rangebar">
+            <div> <span class="series-name" style="color: ${color}">
+              ${seriesName ? seriesName : ''}
+            </span></div>
+            <div> <span class="category">
+              ${ylabel}: 
+            </span> <span class="value start-value"></br>&nbsp;&nbsp;
+              Début le: ${startDate} 
+            </span> <span class="value end-value"></br>&nbsp;&nbsp;
+              Fin le: ${endDate} 
+            </span></div>
+          </div>`;
+      };
+    }
+    options.tooltip.custom = function(opts) {
+      return formatter_custom(opts);
+    };
+  }
   getBarChartOptions = () => {
+    let height;
+    if (this.props.size === 'big' && !this.props.display_axes) {
+      height = 100 + this.props.heightAdditional;
+    } else {
+      height = 200 + this.props.heightAdditional;
+    }
     const options = getApexChartBarOptions({
+      height,
       displayAxes: this.props.display_axes,
       series: this.props.series,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
@@ -65,11 +133,11 @@ class ApexChartComponent extends Component {
   getAreaChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartAreaOptions({
       height,
@@ -86,11 +154,11 @@ class ApexChartComponent extends Component {
   getLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartLineOptions({
       height,
@@ -106,11 +174,11 @@ class ApexChartComponent extends Component {
   getStepLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40;
+      height = 40 + this.props.heightAdditional;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80;
+      height = 80 + this.props.heightAdditional;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartStepLineOptions({
       height,
@@ -123,9 +191,31 @@ class ApexChartComponent extends Component {
     this.addDateFormatter(options);
     return options;
   };
+  getTimelineChartOptions = () => {
+    let height;
+    if (this.props.size === 'small' && !this.props.display_axes) {
+      height = 40 + this.props.heightAdditional;
+    } else if (this.props.size === 'big' && !this.props.display_axes) {
+      height = 80 + this.props.heightAdditional;
+    } else {
+      height = 200 + this.props.heightAdditional;
+    }
+    const options = getApexChartTimelineOptions({
+      height,
+      colors: mergeArray(this.props.colors, DEFAULT_COLORS),
+      displayAxes: this.props.display_axes,
+      series: this.props.series,
+      locales: [fr, en, de],
+      defaultLocale: this.props.user.language
+    });
+    this.addDateFormatterRangeBar(options);
+    return options;
+  };
   displayChart = () => {
     let options;
-    if (this.props.chart_type === 'area') {
+    if (this.props.chart_type === 'timeline') {
+      options = this.getTimelineChartOptions();
+    } else if (this.props.chart_type === 'area') {
       options = this.getAreaChartOptions();
     } else if (this.props.chart_type === 'line') {
       options = this.getLineChartOptions();
@@ -152,7 +242,15 @@ class ApexChartComponent extends Component {
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    if (seriesDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent) {
+    const heightAdditionalDifferent = nextProps.heightAdditional !== this.props.heightAdditional;
+    if (
+      seriesDifferent ||
+      chartTypeDifferent ||
+      displayAxesDifferent ||
+      intervalDifferent ||
+      sizeDifferent ||
+      heightAdditionalDifferent
+    ) {
       this.displayChart();
     }
   }
