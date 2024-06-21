@@ -131,6 +131,9 @@ function Gladys(params = {}) {
       // Execute DB migrations
       await db.umzug.up();
 
+      // Execute DuckDB DB migration
+      await db.duckDbCreateTableIfNotExist();
+
       await system.init();
 
       // this should be before device.init

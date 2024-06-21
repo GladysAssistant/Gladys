@@ -1,8 +1,11 @@
 const Sequelize = require('sequelize');
+const duckdb = require('duckdb');
 const Umzug = require('umzug');
 const path = require('path');
+const util = require('util');
 const getConfig = require('../utils/getConfig');
 const logger = require('../utils/logger');
+const { formatDateInUTC } = require('../utils/date');
 
 const config = getConfig();
 
@@ -79,10 +82,44 @@ Object.values(models)
   .filter((model) => typeof model.associate === 'function')
   .forEach((model) => model.associate(models));
 
+// DuckDB
+const duckDbFilePath = `${config.storage.replace('.db', '')}.duckdb`;
+const duckDb = new duckdb.Database(duckDbFilePath);
+const duckDbWriteConnection = duckDb.connect();
+const duckDbReadConnection = duckDb.connect();
+const duckDbWriteConnectionAllAsync = util.promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
+const duckDbReadConnectionAllAsync = util.promisify(duckDbReadConnection.all).bind(duckDbReadConnection);
+
+const duckDbCreateTableIfNotExist = async () => {
+  logger.info(`DuckDB - Creating database table if not exist`);
+  await duckDbWriteConnectionAllAsync(`
+    CREATE TABLE IF NOT EXISTS t_device_feature_state (
+        device_feature_id UUID,
+        value DOUBLE,
+        created_at TIMESTAMPTZ
+    );
+  `);
+};
+
+const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
+  const createdAtInString = formatDateInUTC(createdAt);
+  await duckDbWriteConnectionAllAsync(
+    'INSERT INTO t_device_feature_state VALUES (?, ?, ?)',
+    deviceFeatureId,
+    value,
+    createdAtInString,
+  );
+};
+
 const db = {
   ...models,
   sequelize,
   umzug,
+  duckDb,
+  duckDbWriteConnectionAllAsync,
+  duckDbReadConnectionAllAsync,
+  duckDbCreateTableIfNotExist,
+  duckDbInsertState,
 };
 
 module.exports = db;

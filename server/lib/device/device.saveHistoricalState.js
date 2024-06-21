@@ -88,12 +88,7 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       logger.debug('device.saveHistoricalState: Not saving value in history, value already exists');
       return;
     }
-    await db.DeviceFeatureState.create({
-      device_feature_id: deviceFeature.id,
-      value: newValue,
-      created_at: newValueCreatedAtDate,
-      updated_at: newValueCreatedAtDate,
-    });
+    await db.duckDbInsertState(deviceFeature.id, newValue, newValueCreatedAtDate);
     // We need to update last aggregate value
     // So that aggregate is calculated again
     const lastDayOfPreviousMonth = new Date(

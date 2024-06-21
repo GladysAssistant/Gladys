@@ -1,5 +1,6 @@
 node_modules
 *.db
+*.duckdb
 *.db-shm
 *.db-wal
 *.dbfile-shm
