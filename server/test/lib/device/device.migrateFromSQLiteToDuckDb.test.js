@@ -5,7 +5,6 @@ const uuid = require('uuid');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
-const Job = require('../../../lib/job');
 
 const event = {
   emit: fake.returns(null),
@@ -46,7 +45,10 @@ describe('Device.migrateFromSQLiteToDuckDb', () => {
   });
   it('should migrate with success', async () => {
     const stateManager = new StateManager(event);
-    const job = new Job(event);
+    const job = {
+      updateProgress: fake.resolves(null),
+      wrapper: (jobType, func) => func,
+    };
     const device = new Device(event, {}, stateManager, service, {}, variable, job, brain);
     await device.migrateFromSQLiteToDuckDb('2997ec9f-7a3e-4083-a183-f8b9b15d5bec', 500);
     const res = await db.duckDbReadConnectionAllAsync(
