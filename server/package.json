@@ -96,6 +96,7 @@
     "handlebars": "^4.7.7",
     "joi": "^17.7.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.intersection": "^4.4.0",
     "mathjs": "^11.8.0",

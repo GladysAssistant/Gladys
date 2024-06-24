@@ -44,6 +44,7 @@ async function init(startDeviceStateAggregate = true) {
   }
   // setup polling for device who need polling
   this.setupPoll();
+  this.migrateFromSQLiteToDuckDb();
   return plainDevices;
 }
 

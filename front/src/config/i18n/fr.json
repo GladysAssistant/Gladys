@@ -2362,7 +2362,8 @@
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
       "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de données",
-      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
+      "migrate-sqlite-to-duckdb": "Migration vers DuckDb"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."

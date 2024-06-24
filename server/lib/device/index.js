@@ -35,6 +35,7 @@ const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
 const { checkBatteries } = require('./device.checkBatteries');
+const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -73,6 +74,12 @@ const DeviceManager = function DeviceManager(
   );
 
   this.devicesByPollFrequency = {};
+
+  this.migrateFromSQLiteToDuckDb = this.job.wrapper(
+    JOB_TYPES.MIGRATE_SQLITE_TO_DUCKDB,
+    this.migrateFromSQLiteToDuckDb.bind(this),
+  );
+
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
   this.eventManager.on(EVENTS.DEVICE.NEW, eventFunctionWrapper(this.create.bind(this)));
@@ -117,5 +124,6 @@ DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
 DeviceManager.prototype.notify = notify;
 DeviceManager.prototype.checkBatteries = checkBatteries;
+DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 
 module.exports = DeviceManager;
