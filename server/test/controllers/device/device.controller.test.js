@@ -1,15 +1,9 @@
 const { expect } = require('chai');
-const uuid = require('uuid');
-const EventEmitter = require('events');
-const { fake } = require('sinon');
 const db = require('../../../models');
-const Device = require('../../../lib/device');
-const Job = require('../../../lib/job');
 
 const { authenticatedRequest } = require('../request.test');
 
 const insertStates = async (intervalInMinutes) => {
-  const queryInterface = db.sequelize.getQueryInterface();
   const deviceFeatureStateToInsert = [];
   const now = new Date();
   const statesToInsert = 2000;
@@ -17,14 +11,11 @@ const insertStates = async (intervalInMinutes) => {
     const startAt = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
     const date = new Date(startAt.getTime() + ((intervalInMinutes * 60 * 1000) / statesToInsert) * i);
     deviceFeatureStateToInsert.push({
-      id: uuid.v4(),
-      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
       value: i,
       created_at: date,
-      updated_at: date,
     });
   }
-  await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
+  await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', deviceFeatureStateToInsert);
 };
 
 describe('POST /api/v1/device', () => {
