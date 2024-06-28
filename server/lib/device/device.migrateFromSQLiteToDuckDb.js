@@ -1,9 +1,7 @@
 const Promise = require('bluebird');
 const { Op } = require('sequelize');
-const chunk = require('lodash.chunk');
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { formatDateInUTC } = require('../../utils/date');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 const migrateStateRecursive = async (deviceFeatureId, condition) => {
@@ -13,23 +11,7 @@ const migrateStateRecursive = async (deviceFeatureId, condition) => {
   if (states.length === 0) {
     return null;
   }
-  const chunks = chunk(states, 10000);
-  await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
-    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
-    const queryParams = [];
-    oneStatesChunk.forEach((state, index) => {
-      if (index > 0) {
-        queryString += `,`;
-      }
-      queryString += '(?, ?, ?)';
-      queryParams.push(deviceFeatureId);
-      queryParams.push(state.value);
-      queryParams.push(formatDateInUTC(state.created_at));
-    });
-    logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
-    await db.duckDbWriteConnectionAllAsync(queryString, ...queryParams);
-  });
-
+  await db.duckDbBatchInsertState(deviceFeatureId, states);
   const newCondition = {
     ...condition,
     offset: condition.offset + condition.limit,

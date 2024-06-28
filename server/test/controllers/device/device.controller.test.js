@@ -64,15 +64,6 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
     await insertStates(365 * 24 * 60);
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const event = new EventEmitter();
-    const job = new Job(event);
-    const device = new Device(event, {}, {}, {}, {}, variable, job);
-    await device.calculateAggregate('hourly');
-    await device.calculateAggregate('daily');
-    await device.calculateAggregate('monthly');
   });
   it('should get device aggregated state by selector', async () => {
     await authenticatedRequest

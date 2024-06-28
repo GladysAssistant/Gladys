@@ -12,14 +12,12 @@ const { add } = require('./device.add');
 const { addFeature } = require('./device.addFeature');
 const { addParam } = require('./device.addParam');
 const { create } = require('./device.create');
-const { calculateAggregate } = require('./device.calculateAggregate');
 const { destroy } = require('./device.destroy');
 const { init } = require('./device.init');
 const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
 const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggregates');
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
-const { onHourlyDeviceAggregateEvent } = require('./device.onHourlyDeviceAggregateEvent');
 const { onPurgeStatesEvent } = require('./device.onPurgeStatesEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { purgeAggregateStates } = require('./device.purgeAggregateStates');
@@ -87,10 +85,6 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.PURGE_STATES, eventFunctionWrapper(this.onPurgeStatesEvent.bind(this)));
   this.eventManager.on(
-    EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
-    eventFunctionWrapper(this.onHourlyDeviceAggregateEvent.bind(this)),
-  );
-  this.eventManager.on(
     EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
     eventFunctionWrapper(this.purgeStatesByFeatureId.bind(this)),
   );
@@ -101,14 +95,12 @@ DeviceManager.prototype.add = add;
 DeviceManager.prototype.addFeature = addFeature;
 DeviceManager.prototype.addParam = addParam;
 DeviceManager.prototype.create = create;
-DeviceManager.prototype.calculateAggregate = calculateAggregate;
 DeviceManager.prototype.destroy = destroy;
 DeviceManager.prototype.init = init;
 DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;
 DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregates;
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
-DeviceManager.prototype.onHourlyDeviceAggregateEvent = onHourlyDeviceAggregateEvent;
 DeviceManager.prototype.onPurgeStatesEvent = onPurgeStatesEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.purgeAggregateStates = purgeAggregateStates;

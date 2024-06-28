@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const duckdb = require('duckdb');
 const Umzug = require('umzug');
+const Promise = require('bluebird');
+const chunk = require('lodash.chunk');
 const path = require('path');
 const util = require('util');
 const getConfig = require('../utils/getConfig');
@@ -111,6 +113,25 @@ const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const duckDbBatchInsertState = async (deviceFeatureId, states) => {
+  const chunks = chunk(states, 10000);
+  await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
+    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
+    const queryParams = [];
+    oneStatesChunk.forEach((state, index) => {
+      if (index > 0) {
+        queryString += `,`;
+      }
+      queryString += '(?, ?, ?)';
+      queryParams.push(deviceFeatureId);
+      queryParams.push(state.value);
+      queryParams.push(formatDateInUTC(state.created_at));
+    });
+    logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
+    await duckDbWriteConnectionAllAsync(queryString, ...queryParams);
+  });
+};
+
 const db = {
   ...models,
   sequelize,
@@ -120,6 +141,7 @@ const db = {
   duckDbReadConnectionAllAsync,
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
+  duckDbBatchInsertState,
 };
 
 module.exports = db;
