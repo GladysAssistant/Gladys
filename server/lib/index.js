@@ -40,7 +40,7 @@ const { EVENTS } = require('../utils/constants');
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
- * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration
+ * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
