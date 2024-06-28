@@ -8,6 +8,7 @@ const migrateStateRecursive = async (deviceFeatureId, condition) => {
   logger.info(`DuckDB : Migrating device feature = ${deviceFeatureId}, offset = ${condition.offset}`);
   // Get all device feature state in SQLite that match the condition
   const states = await db.DeviceFeatureState.findAll(condition);
+  logger.info(`DuckDB : Device feature = ${deviceFeatureId} has ${states.length} states to migrate.`);
   if (states.length === 0) {
     return null;
   }
@@ -71,6 +72,8 @@ async function migrateFromSQLiteToDuckDb(jobId, duckDbMigrationPageLimit = 40000
     const newProgressPercent = Math.round((deviceFeatureIndex * 100) / deviceFeatures.length);
     await this.job.updateProgress(jobId, newProgressPercent);
   });
+
+  logger.info(`DuckDB: Finished migrating DuckDB.`);
 
   // Save that the migration was executed
   await this.variable.setValue(SYSTEM_VARIABLE_NAMES.DUCKDB_MIGRATED, 'true');

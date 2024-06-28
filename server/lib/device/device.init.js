@@ -3,11 +3,12 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Init devices in local RAM.
+ * @param {boolean} startDuckDbMigration - Should start DuckDB migration.
  * @returns {Promise} Resolve with inserted devices.
  * @example
  * gladys.device.init();
  */
-async function init() {
+async function init(startDuckDbMigration = true) {
   // load all devices in RAM
   const devices = await db.Device.findAll({
     include: [
@@ -38,7 +39,9 @@ async function init() {
   });
   // setup polling for device who need polling
   this.setupPoll();
-  this.migrateFromSQLiteToDuckDb();
+  if (startDuckDbMigration) {
+    this.migrateFromSQLiteToDuckDb();
+  }
   return plainDevices;
 }
 

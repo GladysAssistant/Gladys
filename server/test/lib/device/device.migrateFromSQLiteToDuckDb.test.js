@@ -5,6 +5,8 @@ const uuid = require('uuid');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const Variable = require('../../../lib/variable');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 const event = {
   emit: fake.returns(null),
@@ -13,10 +15,6 @@ const event = {
 
 const brain = {
   addNamedEntity: fake.returns(null),
-};
-const variable = {
-  getValue: fake.resolves(null),
-  setValue: fake.resolves(null),
 };
 const service = {
   getService: () => {},
@@ -40,8 +38,10 @@ const insertStates = async () => {
 };
 
 describe('Device.migrateFromSQLiteToDuckDb', () => {
+  const variable = new Variable(event);
   beforeEach(async () => {
     await insertStates();
+    await variable.destroy(SYSTEM_VARIABLE_NAMES.DUCKDB_MIGRATED);
   });
   it('should migrate with success', async () => {
     const stateManager = new StateManager(event);
@@ -50,6 +50,24 @@ describe('Device.migrateFromSQLiteToDuckDb', () => {
       wrapper: (jobType, func) => func,
     };
     const device = new Device(event, {}, stateManager, service, {}, variable, job, brain);
+    await device.migrateFromSQLiteToDuckDb('2997ec9f-7a3e-4083-a183-f8b9b15d5bec', 500);
+    const res = await db.duckDbReadConnectionAllAsync(
+      'SELECT COUNT(*) as nb_states FROM t_device_feature_state WHERE device_feature_id = $1;',
+      ['ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4'],
+    );
+    expect(res).to.deep.equal([{ nb_states: 1000n }]);
+    // Second call will not migrate (already migrated)
+    await device.migrateFromSQLiteToDuckDb('2997ec9f-7a3e-4083-a183-f8b9b15d5bec', 500);
+  });
+  it('should migrate 2 times if the first time was interrupted', async () => {
+    const stateManager = new StateManager(event);
+    const job = {
+      updateProgress: fake.resolves(null),
+      wrapper: (jobType, func) => func,
+    };
+    const device = new Device(event, {}, stateManager, service, {}, variable, job, brain);
+    await device.migrateFromSQLiteToDuckDb('2997ec9f-7a3e-4083-a183-f8b9b15d5bec', 500);
+    await variable.destroy(SYSTEM_VARIABLE_NAMES.DUCKDB_MIGRATED);
     await device.migrateFromSQLiteToDuckDb('2997ec9f-7a3e-4083-a183-f8b9b15d5bec', 500);
     const res = await db.duckDbReadConnectionAllAsync(
       'SELECT COUNT(*) as nb_states FROM t_device_feature_state WHERE device_feature_id = $1;',
