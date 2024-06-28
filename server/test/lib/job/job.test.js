@@ -81,6 +81,15 @@ describe('Job', () => {
         expect(oneJob).to.have.property('type');
       });
     });
+    it('should get gateway backup job only', async () => {
+      await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      await job.start(JOB_TYPES.VACUUM);
+      const jobs = await job.get({ type: JOB_TYPES.GLADYS_GATEWAY_BACKUP });
+      expect(jobs).to.be.instanceOf(Array);
+      jobs.forEach((oneJob) => {
+        expect(oneJob).to.have.property('type', JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      });
+    });
     it('should get 0 job', async () => {
       await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const jobs = await job.get({
