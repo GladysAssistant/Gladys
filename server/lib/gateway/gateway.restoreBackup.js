@@ -44,7 +44,7 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
   if (duckDbBackupFolderPath) {
     // Closing DuckDB current database
     logger.info(`Restoring DuckDB folder ${duckDbBackupFolderPath}`);
-    const duckDbCurrentCloseAsync = promisify(db.duckDb.close.bind(db.duckDb));
+    const duckDbCurrentCloseAsync = promisify(db.duckDb.close).bind(db.duckDb);
     await duckDbCurrentCloseAsync();
     // Delete current DuckDB file
     const duckDbFilePath = `${this.config.storage.replace('.db', '')}.duckdb`;
@@ -54,7 +54,7 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
     const duckDbWriteConnectionAllAsync = promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
     await duckDbWriteConnectionAllAsync(`IMPORT DATABASE '${duckDbBackupFolderPath}'`);
     logger.info(`DuckDB restored with success`);
-    const duckDbNewCloseAsync = promisify(duckDb.close.bind(duckDb));
+    const duckDbNewCloseAsync = promisify(duckDb.close).bind(duckDb);
     await duckDbNewCloseAsync();
   }
 }
