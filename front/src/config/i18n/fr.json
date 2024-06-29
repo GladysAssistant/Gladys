@@ -229,7 +229,7 @@
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
-    "duckDbMigrationInProgress": "Votre instance Gladys est entrain de migrer sa base de donnée à DuckDB, un nouveau système de base de donnée plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
+    "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
