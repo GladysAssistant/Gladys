@@ -1,7 +1,6 @@
 const { assert, fake } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
-const { EVENTS } = require('../../../utils/constants');
 const Job = require('../../../lib/job');
 
 const event = {
@@ -21,8 +20,9 @@ describe('Device.init', () => {
     const stateManager = new StateManager(event);
     const job = new Job(event);
     const device = new Device(event, {}, stateManager, service, {}, {}, job, brain);
+    device.migrateFromSQLiteToDuckDb = fake.returns(null);
 
-    await device.init(true);
-    assert.calledWith(event.emit, EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE);
+    await device.init();
+    assert.called(device.migrateFromSQLiteToDuckDb);
   });
 });

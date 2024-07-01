@@ -1,7 +1,6 @@
 const EventEmitter = require('events');
 const { expect, assert } = require('chai');
 const sinon = require('sinon');
-const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
@@ -11,7 +10,6 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 const insertStates = async (intervalInMinutes) => {
-  const queryInterface = db.sequelize.getQueryInterface();
   const deviceFeatureStateToInsert = [];
   const now = new Date();
   const statesToInsert = 2000;
@@ -19,14 +17,11 @@ const insertStates = async (intervalInMinutes) => {
     const startAt = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
     const date = new Date(startAt.getTime() + ((intervalInMinutes * 60 * 1000) / statesToInsert) * i);
     deviceFeatureStateToInsert.push({
-      id: uuid.v4(),
-      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
       value: i,
       created_at: date,
-      updated_at: date,
     });
   }
-  await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
+  await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', deviceFeatureStateToInsert);
 };
 
 describe('Device.getDeviceFeaturesAggregates', function Describe() {
@@ -34,17 +29,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
 
   let clock;
   beforeEach(async () => {
-    const queryInterface = db.sequelize.getQueryInterface();
-    await queryInterface.bulkDelete('t_device_feature_state');
-    await queryInterface.bulkDelete('t_device_feature_state_aggregate');
-    await db.DeviceFeature.update(
-      {
-        last_monthly_aggregate: null,
-        last_daily_aggregate: null,
-        last_hourly_aggregate: null,
-      },
-      { where: {} },
-    );
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
 
     clock = sinon.useFakeTimers({
       now: 1635131280000,
@@ -65,7 +50,6 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       }),
     };
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await deviceInstance.calculateAggregate('hourly');
     const { values, device, deviceFeature } = await deviceInstance.getDeviceFeaturesAggregates(
       'test-device-feature',
       60,
@@ -87,7 +71,6 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       }),
     };
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
   });
@@ -103,9 +86,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       }),
     };
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
-    expect(values).to.have.lengthOf(72);
+    expect(values).to.have.lengthOf(100);
   });
   it('should return last month states', async () => {
     await insertStates(2 * 30 * 24 * 60);
@@ -119,10 +101,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       }),
     };
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await device.calculateAggregate('hourly');
-    await device.calculateAggregate('daily');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 30 * 24 * 60, 100);
-    expect(values).to.have.lengthOf(30);
+    expect(values).to.have.lengthOf(100);
   });
   it('should return last year states', async () => {
     await insertStates(2 * 365 * 24 * 60);
@@ -136,9 +116,6 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       }),
     };
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
-    await device.calculateAggregate('hourly');
-    await device.calculateAggregate('daily');
-    await device.calculateAggregate('monthly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 365 * 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
   });

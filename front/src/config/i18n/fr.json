@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Sélectionnez..."
+    "selectPlaceholder": "Sélectionnez...",
+    "yes": "Oui",
+    "no": "Non"
   },
   "color": {
     "aqua": "Aqua",
@@ -229,6 +231,7 @@
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
+    "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
@@ -2362,7 +2365,9 @@
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
       "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de données",
-      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
+      "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2415,7 +2420,18 @@
       "dead": "Mort"
     },
     "batteryLevel": "Alerte sur le niveau de batterie",
-    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi."
+    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi.",
+    "duckDbMigrationTitle": "Migration vers DuckDB",
+    "duckDbMigrationDescription": "Nous migrons vers un nouveau système de base de donnée pour les données de capteurs. Gladys va effectuer une migration de vos données automatiquement, mais ne supprimera pas vos données de votre base SQLite afin d'éviter les pertes de données.",
+    "duckDbMigrationProgressTitle": "Avancement de la migration",
+    "duckDbMigrationMigrationDone": "Migration effectuée :",
+    "duckDbNumberOfStatesinSQlite": "Nombre d'états dans SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Nombre d'états dans DuckDB",
+    "restartMigrationTitle": "Relancer la migration",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "purgeSQliteTitle": "Purger les états SQLite",
+    "purgeSQliteDescription": "Une fois que tous les états seront supprimés de SQLite, vous devrez faire un \"nettoyage de la base de données\" sur l'onglet à droite afin de relâcher l'espace disque. Cette étape peut prendre un certain temps."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
