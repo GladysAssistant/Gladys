@@ -119,6 +119,49 @@ describe('GET /api/v1/device', () => {
   });
 });
 
+describe('GET /api/v1/device/duckdb_migration_state', () => {
+  it('should get duck db migration state', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device/duckdb_migration_state')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          duck_db_device_count: 0,
+          is_duck_db_migrated: false,
+          sqlite_db_device_state_count: 0,
+        });
+      });
+  });
+});
+
+describe('POST /api/v1/device/purge_all_sqlite_state', () => {
+  it('should delete all sqlite states', async () => {
+    await authenticatedRequest
+      .post('/api/v1/device/purge_all_sqlite_state')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          success: true,
+        });
+      });
+  });
+});
+describe('POST /api/v1/device/migrate_from_sqlite_to_duckdb', () => {
+  it('should migrate to duckdb', async () => {
+    await authenticatedRequest
+      .post('/api/v1/device/migrate_from_sqlite_to_duckdb')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          success: true,
+        });
+      });
+  });
+});
+
 describe('GET /api/v1/service/:service_name/device', () => {
   it('should return devices in service test-service', async () => {
     await authenticatedRequest

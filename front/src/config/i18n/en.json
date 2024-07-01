@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Select..."
+    "selectPlaceholder": "Select...",
+    "yes": "Yes",
+    "no": "No"
   },
   "color": {
     "aqua": "Aqua",
@@ -2417,7 +2419,18 @@
       "dead": "Dead"
     },
     "batteryLevel": "Battery level alert",
-    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold."
+    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold.",
+    "duckDbMigrationTitle": "Migration to DuckDB",
+    "duckDbMigrationDescription": "We are migrating to a new database system for sensor data. Gladys will automatically migrate your data, but will not delete your data from your SQLite database to prevent data loss.",
+    "duckDbMigrationProgressTitle": "Migration Progress",
+    "duckDbMigrationMigrationDone": "Migration completed:",
+    "duckDbNumberOfStatesinSQlite": "Number of states in SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Number of states in DuckDB",
+    "restartMigrationTitle": "Restart Migration",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "purgeSQliteTitle": "Purge SQLite states",
+    "purgeSQliteDescription": "Once all states are deleted from SQLite, you will need to perform a \"database cleanup\" on the tab to the right to free up disk space. This step may take some time."
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",

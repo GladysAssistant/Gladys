@@ -34,6 +34,8 @@ const { newStateEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
 const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
+const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
+const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -71,6 +73,11 @@ const DeviceManager = function DeviceManager(
     this.purgeStatesByFeatureId.bind(this),
   );
 
+  this.purgeAllSqliteStates = this.job.wrapper(
+    JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES,
+    this.purgeAllSqliteStates.bind(this),
+  );
+
   this.devicesByPollFrequency = {};
 
   this.migrateFromSQLiteToDuckDb = this.job.wrapper(
@@ -89,6 +96,10 @@ const DeviceManager = function DeviceManager(
     eventFunctionWrapper(this.purgeStatesByFeatureId.bind(this)),
   );
   this.eventManager.on(EVENTS.DEVICE.CHECK_BATTERIES, eventFunctionWrapper(this.checkBatteries.bind(this)));
+  this.eventManager.on(
+    EVENTS.DEVICE.MIGRATE_FROM_SQLITE_TO_DUCKDB,
+    eventFunctionWrapper(this.migrateFromSQLiteToDuckDb.bind(this)),
+  );
 };
 
 DeviceManager.prototype.add = add;
@@ -117,5 +128,7 @@ DeviceManager.prototype.setValue = setValue;
 DeviceManager.prototype.notify = notify;
 DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
+DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
+DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 
 module.exports = DeviceManager;
