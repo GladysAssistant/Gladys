@@ -2366,7 +2366,8 @@
       "device-state-purge-single-feature": "Zustände einzelner Gerätemerkmale aufräumen",
       "vacuum": "Datenbank reinigen",
       "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
-      "migrate-sqlite-to-duckdb": "DuckDB migration"
+      "migrate-sqlite-to-duckdb": "DuckDB migration",
+      "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
