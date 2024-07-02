@@ -356,16 +356,22 @@
         "chartType": "Sélectionner le type de graphique",
         "chartColor": "Sélectionner la couleur du graphique",
         "dataColor": "Sélectionner la couleur pour {{featureLabel}}",
+        "timelineColor": "Sélectionner la couleur pour la position ",
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
+        "timeline": "Binaire",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
         "yes": "Oui",
         "no": "Non",
         "preview": "Prévisualisation",
-        "showPreviewButton": "Afficher une prévisualisation"
+        "showPreviewButton": "Afficher une prévisualisation",
+        "on": "On",
+        "off": "Off",
+        "start_date": "Début le : ",
+        "end_date": "Fin le : "
       },
       "ecowatt": {
         "title": "Ecowatt France",

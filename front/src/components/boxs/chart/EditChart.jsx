@@ -12,11 +12,18 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
-  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
-  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
   [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
 };
+
+const FEATURE_BINARY = {
+  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
+  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true
+};
+
+const CHART_TYPE_OTHERS = ['line', 'stepline', 'area', 'bar'];
+
+const CHART_TYPE_BINARY = ['timeline'];
 
 const square = (color = 'transparent') => ({
   alignItems: 'center',
@@ -74,6 +81,8 @@ class EditChart extends Component {
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, { chart_type: undefined });
     }
+    this.setState({ chart_type: e.target.value });
+    this.getDeviceFeatures(e.target.value);
   };
 
   updateChartColor = (i, value) => {
@@ -116,6 +125,7 @@ class EditChart extends Component {
       );
       const units = selectedDeviceFeaturesOptions.map(selectedDeviceFeaturesOption => {
         const deviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
+        console.log(deviceFeature);
         return deviceFeature.unit;
       });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -127,13 +137,15 @@ class EditChart extends Component {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: [],
         units: [],
-        unit: undefined
+        unit: undefined,
+        chart_type: ''
       });
+      this.setState({ chart_type: '' });
     }
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
-  getDeviceFeatures = async () => {
+  getDeviceFeatures = async (chartType = this.state.chart_type) => {
     try {
       this.setState({ loading: true });
       const devices = await this.props.httpClient.get('/api/v1/device');
@@ -150,7 +162,15 @@ class EditChart extends Component {
           this.deviceFeatureBySelector.set(feature.selector, feature);
           // We don't support all devices for this view
           if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
-            deviceFeaturesOptions.push(featureOption);
+            if (chartType.includes(CHART_TYPE_BINARY)) {
+              if (FEATURE_BINARY[feature.type]) {
+                deviceFeaturesOptions.push(featureOption);
+              }
+            } else if (chartType === '') {
+              deviceFeaturesOptions.push(featureOption);
+            } else if (!FEATURE_BINARY[feature.type]) {
+              deviceFeaturesOptions.push(featureOption);
+            }
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
@@ -171,7 +191,30 @@ class EditChart extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+
+      let chartTypeList = [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS];
+
+      //Filter
+      if (selectedDeviceFeaturesOptions.length > 0) {
+        const firstDeviceSelector = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOptions[0].value);
+        if (FEATURE_BINARY[firstDeviceSelector.type]) {
+          deviceOptions.forEach(deviceOption => {
+            deviceOption.options = deviceOption.options.filter(featureOption => {
+              return FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
+            });
+          });
+          chartTypeList = CHART_TYPE_BINARY;
+        } else {
+          deviceOptions.forEach(deviceOption => {
+            deviceOption.options = deviceOption.options.filter(featureOption => {
+              return !FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
+            });
+          });
+          chartTypeList = CHART_TYPE_OTHERS;
+        }
+      }
+
+      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false, chartTypeList });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -182,6 +225,9 @@ class EditChart extends Component {
     super(props);
     this.props = props;
     this.deviceFeatureBySelector = new Map();
+    this.state = {
+      chart_type: ''
+    };
   }
 
   componentDidMount() {
@@ -196,7 +242,7 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, chartTypeList }) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
@@ -242,24 +288,20 @@ class EditChart extends Component {
                 <Text id="dashboard.boxes.chart.chartType" />
               </label>
               <select onChange={this.updateChartType} class="form-control" value={props.box.chart_type}>
-                <option>
+                <option value="">
                   <Text id="global.emptySelectOption" />
                 </option>
-                <option value="line">
-                  <Text id="dashboard.boxes.chart.line" />
-                </option>
-                <option value="stepline">
-                  <Text id="dashboard.boxes.chart.stepline" />
-                </option>
-                <option value="area">
-                  <Text id="dashboard.boxes.chart.area" />
-                </option>
-                <option value="bar">
-                  <Text id="dashboard.boxes.chart.bar" />
-                </option>
+                {chartTypeList &&
+                  chartTypeList.map(chartType => (
+                    <option value={chartType}>
+                      <Text id={`dashboard.boxes.chart.${chartType}`} />
+                    </option>
+                  ))}
               </select>
             </div>
-            {selectedDeviceFeaturesOptions &&
+
+            {props.box.chart_type !== 'timeline' &&
+              selectedDeviceFeaturesOptions &&
               selectedDeviceFeaturesOptions.map((feature, i) => (
                 <div class="form-group">
                   <label>
@@ -281,6 +323,44 @@ class EditChart extends Component {
                   />
                 </div>
               ))}
+            {props.box.chart_type === 'timeline' && (
+              <>
+                <div class="form-group">
+                  <label>
+                    <Text id={`dashboard.boxes.chart.dataColor`} />
+                    <Text id="dashboard.boxes.chart.on" />
+                  </label>
+                  <Select
+                    defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[0])}
+                    value={
+                      props.box.colors &&
+                      props.box.colors.length &&
+                      colorOptions.find(({ value }) => value === props.box.colors[0])
+                    }
+                    onChange={({ value }) => this.updateChartColor(0, value)}
+                    options={colorOptions}
+                    styles={colorSelectorStyles}
+                  />
+                </div>
+                <div class="form-group">
+                  <label>
+                    <Text id={`dashboard.boxes.chart.dataColor`} />
+                    <Text id="dashboard.boxes.chart.off" />
+                  </label>
+                  <Select
+                    defaultValue={colorOptions.find(({ value }) => value === DEFAULT_COLORS[1])}
+                    value={
+                      props.box.colors &&
+                      props.box.colors.length &&
+                      colorOptions.find(({ value }) => value === props.box.colors[1])
+                    }
+                    onChange={({ value }) => this.updateChartColor(1, value)}
+                    options={colorOptions}
+                    styles={colorSelectorStyles}
+                  />
+                </div>
+              </>
+            )}
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.displayAxes" />
@@ -298,23 +378,25 @@ class EditChart extends Component {
                 </option>
               </select>
             </div>
-            <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.displayVariation" />
-              </label>
-              <select
-                onChange={this.updateDisplayVariation}
-                class="form-control"
-                value={props.box.display_variation ? 'yes' : 'no'}
-              >
-                <option value="yes">
-                  <Text id="dashboard.boxes.chart.yes" />
-                </option>
-                <option value="no">
-                  <Text id="dashboard.boxes.chart.no" />
-                </option>
-              </select>
-            </div>
+            {props.box.chart_type !== 'timeline' && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.displayVariation" />
+                </label>
+                <select
+                  onChange={this.updateDisplayVariation}
+                  className="form-control"
+                  value={props.box.display_variation ? 'yes' : 'no'}
+                >
+                  <option value="yes">
+                    <Text id="dashboard.boxes.chart.yes" />
+                  </option>
+                  <option value="no">
+                    <Text id="dashboard.boxes.chart.no" />
+                  </option>
+                </select>
+              </div>
+            )}
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.defaultInterval" />
@@ -329,18 +411,26 @@ class EditChart extends Component {
                 <option value="last-day">
                   <Text id="dashboard.boxes.chart.lastDay" />
                 </option>
-                <option value="last-week">
-                  <Text id="dashboard.boxes.chart.lastSevenDays" />
-                </option>
-                <option value="last-month">
-                  <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                </option>
-                <option value="last-three-months">
-                  <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                </option>
-                <option value="last-year">
-                  <Text id="dashboard.boxes.chart.lastYear" />
-                </option>
+                {props.box.chart_type !== 'timeline' && (
+                  <option value="last-week">
+                    <Text id="dashboard.boxes.chart.lastSevenDays" />
+                  </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
+                  <option value="last-month">
+                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                  </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
+                  <option value="last-three-months">
+                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                  </option>
+                )}
+                {props.box.chart_type !== 'timeline' && (
+                  <option value="last-year">
+                    <Text id="dashboard.boxes.chart.lastYear" />
+                  </option>
+                )}
               </select>
             </div>
             <div class="form-group">
