@@ -92,5 +92,10 @@
     "key": "zwavejs-ui",
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg"
+  },
+  {
+    "key": "google-cast",
+    "link": "google-cast",
+    "img": "/assets/integrations/cover/google-cast.jpg"
   }
 ]

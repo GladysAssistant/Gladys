@@ -28,3 +28,4 @@ module.exports['node-red'] = require('./node-red');
 module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
+module.exports['google-cast'] = require('./google-cast');

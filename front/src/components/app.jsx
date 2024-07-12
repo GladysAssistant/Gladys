@@ -153,6 +153,10 @@ import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page
 import SonosDevicePage from '../routes/integration/all/sonos/device-page';
 import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
 
+// Google Cast integration
+import GoogleCastDevicePage from '../routes/integration/all/google-cast/device-page';
+import GoogleCastDiscoveryPage from '../routes/integration/all/google-cast/discover-page';
+
 // ZWaveJS-UI integration
 import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
 import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
@@ -306,6 +310,9 @@ const AppRouter = connect(
 
         <SonosDevicePage path="/dashboard/integration/device/sonos" />
         <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
+
+        <GoogleCastDevicePage path="/dashboard/integration/device/google-cast" />
+        <GoogleCastDiscoveryPage path="/dashboard/integration/device/google-cast/discover" />
 
         <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
         <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
