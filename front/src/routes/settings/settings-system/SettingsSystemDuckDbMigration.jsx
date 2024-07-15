@@ -158,7 +158,11 @@ class SettingsSystemDuckDbMigration extends Component {
               </h5>
               <p>
                 {!confirmPurgingSQlite ? (
-                  <button onClick={this.togglePurgeConfirmation} class="btn btn-danger">
+                  <button
+                    onClick={this.togglePurgeConfirmation}
+                    class="btn btn-danger"
+                    disabled={migrationState && !migrationState.is_duck_db_migrated}
+                  >
                     <Text id="systemSettings.purgeSQliteTitle" />
                   </button>
                 ) : (
