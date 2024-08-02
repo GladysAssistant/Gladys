@@ -11,7 +11,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev libc6-compat gcompat
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev gcompat
 
 WORKDIR /tmp
 

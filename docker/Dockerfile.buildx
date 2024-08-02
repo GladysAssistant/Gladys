@@ -21,7 +21,6 @@ RUN apk add --no-cache \
          openssl \
          gzip \
          eudev \
-         libc6-compat \
          gcompat \
          bluez
 
