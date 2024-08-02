@@ -21,6 +21,8 @@ RUN apk add --no-cache \
          openssl \
          gzip \
          eudev \
+         libc6-compat \
+         gcompat \
          bluez
 
 COPY --from=json-files /json-files/server /src/server
@@ -29,7 +31,7 @@ ENV LD_LIBRARY_PATH /lib
 
 WORKDIR /src/server
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git libffi-dev linux-headers libc6-compat \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git libffi-dev linux-headers \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps
