@@ -11,7 +11,7 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
          tzdata \
          nmap \
          ffmpeg \
@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y \
          libffi-dev \
          && npm ci --unsafe-perm --production \
          && npm cache clean --force \
+         && apt-get autoremove -y build-essential python3 python3-pip git libffi-dev \
          && apt-get purge -y --auto-remove \
          && rm -rf /var/lib/apt/lists/*
 
