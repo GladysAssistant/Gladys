@@ -62,8 +62,8 @@ async function downloadBackup(fileUrl) {
   } catch (e) {
     logger.info(`Extracting failed using new strategy (Error: ${e})`);
     logger.info(`Restoring using old backup strategy (SQLite only)`);
-    await exec(`gzip -d ${compressedBackupFilePath}`);
     sqliteBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.db`);
+    await exec(`gzip -dc ${compressedBackupFilePath} > ${sqliteBackupFilePath}`);
   }
   // done!
   logger.info(`Gladys backup downloaded with success.`);
