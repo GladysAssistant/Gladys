@@ -28,13 +28,9 @@ async function downloadBackup(fileUrl) {
   // we empty the restore backup folder
   await fse.emptyDir(restoreFolderPath);
 
-  const isBackupWithDuckDb = fileWithoutSignedParams.includes('.tar.gz');
   const encryptedBackupName = path.basename(fileWithoutSignedParams, '.enc');
   const encryptedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.enc`);
-  const compressedBackupFilePath = path.join(
-    restoreFolderPath,
-    isBackupWithDuckDb ? encryptedBackupName : `${encryptedBackupName}.db.gz`,
-  );
+  const compressedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.gz`);
 
   let duckDbBackupFolderPath = null;
   let sqliteBackupFilePath = null;
@@ -49,11 +45,11 @@ async function downloadBackup(fileUrl) {
   await exec(
     `openssl enc -aes-256-cbc -pass pass:${encryptKey} -d -in ${encryptedBackupFilePath} -out ${compressedBackupFilePath}`,
   );
-  // Decompress backup using either tar (in case it's a new style backup)
-  // or with GZIP (if it's just a SQLite file)
-  if (isBackupWithDuckDb) {
-    logger.info(`Restoring backup with DuckDB database. Extracting ${compressedBackupFilePath}`);
-    await exec(`cd ${restoreFolderPath} && tar -xzvf ${encryptedBackupName}`);
+
+  try {
+    logger.info(`Trying to restore the backup new style (DuckDB)`);
+    await exec(`tar -xzvf ${compressedBackupFilePath} -C ${restoreFolderPath}`);
+    logger.info("Extracting worked. It's a DuckDB export.");
     const itemsInFolder = await fse.readdir(restoreFolderPath);
     sqliteBackupFilePath = path.join(
       restoreFolderPath,
@@ -63,8 +59,9 @@ async function downloadBackup(fileUrl) {
       restoreFolderPath,
       itemsInFolder.find((i) => i.endsWith('_parquet_folder')),
     );
-  } else {
-    logger.info(`Restoring old backup (SQLite only)`);
+  } catch (e) {
+    logger.info(`Extracting failed using new strategy (Error: ${e})`);
+    logger.info(`Restoring using old backup strategy (SQLite only)`);
     await exec(`gzip -d ${compressedBackupFilePath}`);
     sqliteBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.db`);
   }
