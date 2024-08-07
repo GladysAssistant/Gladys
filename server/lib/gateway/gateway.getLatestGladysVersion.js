@@ -18,7 +18,7 @@ async function getLatestGladysVersion() {
     node_version: systemInfos.nodejs_version,
     is_docker: systemInfos.is_docker,
     client_id: clientId,
-    device_state_count: deviceStateCount,
+    device_state_count: Number(deviceStateCount),
     integrations: serviceUsage,
   };
   const latestGladysVersion = await this.gladysGatewayClient.getLatestGladysVersion(systemInfos.gladys_version, params);
