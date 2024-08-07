@@ -2732,6 +2732,14 @@
           "heating": "Chauffage"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Conf.",
+          "eco": "Eco",
+          "off": "Off",
+          "frost_protection": "Anti Gel"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Faible",
@@ -3005,6 +3013,10 @@
       "binary": "Commutateur",
       "mode": "Mode",
       "target-temperature": "Température"
+    },
+    "heater": {
+      "shortCategoryName": "Chauffage",
+      "pilot-wire-mode": "Mode"
     },
     "tamper": {
       "shortCategoryName": "Détecteur de sabotage",

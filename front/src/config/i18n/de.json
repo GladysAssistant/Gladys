@@ -2732,6 +2732,14 @@
           "heating": "Heizen"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Komf.",
+          "eco": "Öko",
+          "off": "Aus",
+          "frost_protection": "Frostschutzmittel"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Niedrig",
@@ -3005,6 +3013,10 @@
       "binary": "Schalter ein/aus",
       "mode": "Modus",
       "target-temperature": "Temperatur"
+    },
+    "heater": {
+      "shortCategoryName": "Heizung",
+      "pilot-wire-mode": "Mode"
     },
     "tamper": {
       "shortCategoryName": "Manipulation",

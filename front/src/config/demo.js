@@ -161,7 +161,8 @@ const data = {
             'main-presence-sensor',
             'main-signal-sensor',
             'air-conditioning',
-            'button-click'
+            'button-click',
+            'pilot-wire-mode'
           ]
         }
       ],
@@ -2642,7 +2643,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=main-tv-binary,main-tv-volume,main-tv-channel,main-presence-sensor,main-signal-sensor,air-conditioning,button-click': [
+  'get /api/v1/device?device_feature_selectors=main-tv-binary,main-tv-volume,main-tv-channel,main-presence-sensor,main-signal-sensor,air-conditioning,button-click,pilot-wire-mode': [
     {
       id: '20deebe6-57df-4940-afd1-11c189a407c2',
       name: 'TV',
@@ -2883,6 +2884,22 @@ const data = {
           last_value: 24,
           last_value_changed: '2022-10-10 07:49:07.556 +00:00',
           unit: 'celsius'
+        }
+      ]
+    },
+    {
+      id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
+      name: 'Heater',
+      selector: 'pilot-wire-mode',
+      features: [
+        {
+          name: 'Pilot Wire mode',
+          selector: 'pilot-wire-mode',
+          category: 'heater',
+          type: 'pilot-wire-mode',
+          read_only: false,
+          last_value: 'off',
+          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
         }
       ]
     }
