@@ -5,7 +5,6 @@ import SettingsSystemContainers from './SettingsSystemContainers';
 import SettingsSystemOperations from './SettingsSystemOperations';
 import SettingsSystemTimezone from './SettingsSystemTimezone';
 import SettingsSystemKeepDeviceHistory from './SettingsSystemKeepDeviceHistory';
-import SettingsSystemKeepAggregatedStates from './SettingsSystemKeepAggregatedStates';
 import SettingsSystemTimeExpiryState from './SettingsSystemTimeExpiryState';
 import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
 import SettingsSystemDuckDbMigration from './SettingsSystemDuckDbMigration';
@@ -89,7 +88,6 @@ const SystemPage = ({ children, ...props }) => (
         <SettingsSystemOperations />
         <SettingsSystemDuckDbMigration />
         <SettingsSystemKeepDeviceHistory />
-        <SettingsSystemKeepAggregatedStates />
         <SettingsSystemTimeExpiryState />
       </div>
       <div class="col-lg-6">
