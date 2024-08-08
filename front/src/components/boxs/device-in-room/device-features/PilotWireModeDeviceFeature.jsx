@@ -1,32 +1,15 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
-import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { PILOT_WIRE_MODE } from '../../../../../../server/utils/constants';
 
 const PilotWireModeDeviceFeature = ({ children, ...props }) => {
   const { deviceFeature } = props;
-  const { category, type, last_value: lastValue } = deviceFeature;
+  const { category, type } = deviceFeature;
 
-  function updateValue(value) {
-    props.updateValueWithDebounce(deviceFeature, value);
-  }
-
-  function comfort() {
-    updateValue(PILOT_WIRE_MODE.COMFORT);
-  }
-
-  function eco() {
-    updateValue(PILOT_WIRE_MODE.ECO);
-  }
-
-  function frost_protection() {
-    updateValue(PILOT_WIRE_MODE.FROST_PROTECTION);
-  }
-
-  function off() {
-    updateValue(PILOT_WIRE_MODE.OFF);
+  function updateValue(e) {
+    props.updateValueWithDebounce(deviceFeature, e.currentTarget.value);
   }
 
   return (
@@ -37,43 +20,22 @@ const PilotWireModeDeviceFeature = ({ children, ...props }) => {
       <td>{props.rowName}</td>
 
       <td class="py-0">
-        <div class="d-flex justify-content-end">
-          <div class="btn-group" role="group">
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === PILOT_WIRE_MODE.COMFORT
-              })}
-              onClick={comfort}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.comfort`} plural={PILOT_WIRE_MODE.COMFORT} />
-            </button>
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === PILOT_WIRE_MODE.ECO
-              })}
-              onClick={eco}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.eco`} plural={PILOT_WIRE_MODE.ECO} />
-            </button>
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === PILOT_WIRE_MODE.FROST_PROTECTION
-              })}
-              onClick={frost_protection}
-            >
-              <Text
-                id={`deviceFeatureAction.category.${category}.${type}.frost_protection`}
-                plural={PILOT_WIRE_MODE.FROST_PROTECTION}
-              />
-            </button>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === PILOT_WIRE_MODE.OFF
-              })}
-              onClick={off}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.off`} plural={PILOT_WIRE_MODE.OFF} />
-            </button>
+        <div class="justify-content-end">
+          <div class="form-group mb-0">
+            <select value={props.deviceFeature.last_value} onChange={updateValue} class="form-control">
+              <option value={PILOT_WIRE_MODE.COMFORT}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.comfort`} />
+              </option>
+              <option value={PILOT_WIRE_MODE.ECO}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.eco`} />
+              </option>
+              <option value={PILOT_WIRE_MODE.FROST_PROTECTION}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.frost-protection`} />
+              </option>
+              <option value={PILOT_WIRE_MODE.OFF}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.off`} />
+              </option>
+            </select>
           </div>
         </div>
       </td>

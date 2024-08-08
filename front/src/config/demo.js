@@ -161,8 +161,7 @@ const data = {
             'main-presence-sensor',
             'main-signal-sensor',
             'air-conditioning',
-            'button-click',
-            'pilot-wire-mode'
+            'button-click'
           ]
         }
       ],
@@ -188,7 +187,8 @@ const data = {
             'thermostat',
             'water-leak',
             'smoke-sensor',
-            'light-sensor'
+            'light-sensor',
+            'pilot-wire-mode'
           ]
         }
       ]
@@ -2643,7 +2643,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=main-tv-binary,main-tv-volume,main-tv-channel,main-presence-sensor,main-signal-sensor,air-conditioning,button-click,pilot-wire-mode': [
+  'get /api/v1/device?device_feature_selectors=main-tv-binary,main-tv-volume,main-tv-channel,main-presence-sensor,main-signal-sensor,air-conditioning,button-click': [
     {
       id: '20deebe6-57df-4940-afd1-11c189a407c2',
       name: 'TV',
@@ -2886,25 +2886,9 @@ const data = {
           unit: 'celsius'
         }
       ]
-    },
-    {
-      id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
-      name: 'Heater',
-      selector: 'pilot-wire-mode',
-      features: [
-        {
-          name: 'Pilot Wire mode',
-          selector: 'pilot-wire-mode',
-          category: 'heater',
-          type: 'pilot-wire-mode',
-          read_only: false,
-          last_value: 'off',
-          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
-        }
-      ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=curtain-actions,shutter-actions,shutter-position,thermostat,water-leak,smoke-sensor,light-sensor': [
+  'get /api/v1/device?device_feature_selectors=curtain-actions,shutter-actions,shutter-position,thermostat,water-leak,smoke-sensor,light-sensor,pilot-wire-mode': [
     {
       id: 'f131fbf2-445a-4c2c-9426-83abaf534662',
       name: 'Room sensors',
@@ -3020,6 +3004,22 @@ const data = {
           last_value: 19.5,
           last_value_changed: '2022-10-10 07:49:07.556 +00:00',
           unit: 'celsius'
+        }
+      ]
+    },
+    {
+      id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
+      name: 'Chauffage Salon',
+      selector: 'pilot-wire-mode',
+      features: [
+        {
+          name: 'Pilot Wire mode',
+          selector: 'pilot-wire-mode',
+          category: 'heater',
+          type: 'pilot-wire-mode',
+          read_only: false,
+          last_value: 'frost-protection',
+          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
         }
       ]
     }

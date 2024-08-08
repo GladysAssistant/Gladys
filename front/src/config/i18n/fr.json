@@ -2734,10 +2734,10 @@
       },
       "heater": {
         "pilot-wire-mode": {
-          "comfort": "Conf.",
+          "comfort": "Confort",
           "eco": "Eco",
           "off": "Off",
-          "frost_protection": "Anti Gel"
+          "frost-protection": "Anti Gel"
         }
       },
       "siren": {
