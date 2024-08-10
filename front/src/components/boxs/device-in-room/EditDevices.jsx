@@ -45,8 +45,10 @@ class EditDevices extends Component {
     if (!this.state.deviceOptions) {
       return;
     }
-    const { selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(this.state.devices);
-    await this.setState({ selectedDeviceFeaturesOptions });
+    const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
+      this.state.devices
+    );
+    await this.setState({ deviceOptions, selectedDeviceFeaturesOptions });
   };
 
   updateDeviceFeatureName = async (index, name) => {
@@ -100,10 +102,15 @@ class EditDevices extends Component {
           }
           return 0;
         });
-        deviceOptions.push({
-          label: device.name,
-          options: deviceFeatures
-        });
+        const filteredDeviceFeatures = deviceFeatures.filter(
+          feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
+        );
+        if (filteredDeviceFeatures.length > 0) {
+          deviceOptions.push({
+            label: device.name,
+            options: filteredDeviceFeatures
+          });
+        }
       }
     });
     if (this.props.box.device_features) {

@@ -850,7 +850,7 @@
         "modes": {
           "local": {
             "title": "Installation depuis Gladys",
-            "description": "Gladys va configurer deux containers Docker : MQTT and Zigbee2mqtt.",
+            "description": "Gladys va configurer deux containers Docker : MQTT et Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys doit s'exécuter sous Docker",
             "dockerNetworkHostRequirementLabel": "Le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"",
             "usbDongleRequirementLabel": "Le dongle USB Zigbee doit être connecté",
@@ -872,7 +872,7 @@
           "remote": {
             "title": "Connexion à une installation existante",
             "description": "Gladys va se connecter à une installation externe existante à travers MQTT.",
-            "z2mInstallationRequirementLabel": "Une application Zigbe2Mqtt autonome",
+            "z2mInstallationRequirementLabel": "Une application Zigbee2Mqtt autonome",
             "mqttBrokerRequirementLabel": "Un broker MQTT connecté à l'application Zigbee2Mqtt",
             "detailsDescription": "Avec ce mode de configuration, il est possible de se connecter à une installation Zigbee2Mqtt externe avec son broker MQTT.",
             "mqttModeLabel": "Choix du broker MQTT",
@@ -1200,6 +1200,41 @@
         "description": "Les appareils Sonos sont automatiquement découverts.",
         "error": "Erreur de découverte des appareils Sonos. Est-ce que votre enceinte Sonos est sous tension et accessible sur le réseau local ?",
         "noDeviceFound": "Aucun appareil Sonos n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Contrôler les appareils Google Cast sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Google Cast",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Google Cast",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Google Cast",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Google Cast dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Google Cast trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Google Cast sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Google Cast. Est-ce que votre enceinte Google Cast est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Google Cast n'a été découvert.",
         "errorWhileScanning": "Une erreur est survenue lors du scan.",
         "scan": "Scanner"
       },
