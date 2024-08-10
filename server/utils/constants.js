@@ -160,6 +160,7 @@ const EVENTS = {
     PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
     CHECK_BATTERIES: 'device.check-batteries',
     MIGRATE_FROM_SQLITE_TO_DUCKDB: 'device.migrate-from-sqlite-to-duckdb',
+    PURGE_ALL_SQLITE_STATES: 'device.purge-all-sqlite-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',

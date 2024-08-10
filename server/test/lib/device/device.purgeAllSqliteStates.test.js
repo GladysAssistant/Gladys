@@ -52,10 +52,14 @@ describe('Device', () => {
       wrapper: (type, func) => func,
     };
     const device = new Device(event, {}, stateManager, service, {}, variable, job);
-    const devicePurged = await device.purgeAllSqliteStates('632c6d92-a79a-4a38-bf5b-a2024721c101');
+    const devicePurgedPromise = device.purgeAllSqliteStates('632c6d92-a79a-4a38-bf5b-a2024721c101');
+    const emptyRes = await device.purgeAllSqliteStates('632c6d92-a79a-4a38-bf5b-a2024721c101');
+    const devicePurged = await devicePurgedPromise;
     expect(devicePurged).to.deep.equal({
       numberOfDeviceFeatureStateAggregateToDelete: 3,
       numberOfDeviceFeatureStateToDelete: 110,
     });
+    // should not start a new purge when a purge is running
+    expect(emptyRes).to.equal(null);
   });
 });

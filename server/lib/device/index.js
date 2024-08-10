@@ -99,6 +99,10 @@ const DeviceManager = function DeviceManager(
     EVENTS.DEVICE.MIGRATE_FROM_SQLITE_TO_DUCKDB,
     eventFunctionWrapper(this.migrateFromSQLiteToDuckDb.bind(this)),
   );
+  this.eventManager.on(
+    EVENTS.DEVICE.PURGE_ALL_SQLITE_STATES,
+    eventFunctionWrapper(this.purgeAllSqliteStates.bind(this)),
+  );
 };
 
 DeviceManager.prototype.add = add;

@@ -112,7 +112,7 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function purgeAllSqliteStates(req, res) {
-    await gladys.device.purgeAllSqliteStates();
+    gladys.event.emit(EVENTS.DEVICE.PURGE_ALL_SQLITE_STATES);
     res.json({ success: true });
   }
 
