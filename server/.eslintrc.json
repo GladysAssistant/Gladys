@@ -2,7 +2,7 @@
   "plugins": ["jsdoc", "require-jsdoc", "no-call", "mocha", "promise"],
   "extends": ["airbnb-base", "plugin:jsdoc/recommended", "prettier"],
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2023
   },
   "env": {
     "node": true

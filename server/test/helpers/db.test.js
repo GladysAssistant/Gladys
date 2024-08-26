@@ -17,10 +17,13 @@ const seedDb = async () => {
 };
 
 const cleanDb = async () => {
+  // Clean SQLite database
   const queryInterface = db.sequelize.getQueryInterface();
   await Promise.each(reversedSeed, async (seed) => {
     await seed.down(queryInterface);
   });
+  // Clean DuckDB database
+  await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
 };
 
 module.exports = {

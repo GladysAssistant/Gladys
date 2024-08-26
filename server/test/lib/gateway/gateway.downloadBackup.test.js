@@ -71,13 +71,26 @@ describe('gateway.downloadBackup', () => {
     assert.notCalled(event.emit);
   });
 
-  it('should download a backup', async () => {
-    const encryptedBackupFilePath = path.join(__dirname, 'encoded-gladys-db-backup.db.gz.enc');
-    const { backupFilePath } = await gateway.downloadBackup(encryptedBackupFilePath);
+  it('should download a backup (new style, sqlite + parquet)', async () => {
+    const encryptedBackupFilePath = path.join(__dirname, 'encoded-gladys-db-and-duckdb-backup.tar.gz.enc');
+    await gateway.downloadBackup(encryptedBackupFilePath);
     assert.calledOnceWithExactly(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BACKUP.DOWNLOADED,
       payload: {
-        backupFilePath,
+        duckDbBackupFolderPath: 'gladys-backups/restore/gladys-db-backup_2024-6-29-13-47-50_parquet_folder',
+        sqliteBackupFilePath: 'gladys-backups/restore/gladys-db-backup-2024-6-29-13-47-50.db',
+      },
+    });
+  });
+
+  it('should download a backup (old style, sqlite)', async () => {
+    const encryptedBackupFilePath = path.join(__dirname, 'encoded-old-gladys-db-backup.db.gz.enc');
+    await gateway.downloadBackup(encryptedBackupFilePath);
+    assert.calledOnceWithExactly(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.BACKUP.DOWNLOADED,
+      payload: {
+        duckDbBackupFolderPath: null,
+        sqliteBackupFilePath: 'gladys-backups/restore/encoded-old-gladys-db-backup.db.gz.db',
       },
     });
   });
