@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Auswählen …"
+    "selectPlaceholder": "Auswählen …",
+    "yes": "Ja",
+    "no": "Nein"
   },
   "color": {
     "aqua": "Aqua",
@@ -231,6 +233,7 @@
       "houseLabel": "Zuhause",
       "tabletModeDisabled": "Tablet-Modus deaktiviert"
     },
+    "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
     "editDashboardSaveButton": "Sichern",
     "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
     "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
@@ -2362,7 +2365,9 @@
       "gladys-gateway-backup": "Gladys-Plus-Backup",
       "device-state-purge-single-feature": "Zustände einzelner Gerätemerkmale aufräumen",
       "vacuum": "Datenbank reinigen",
-      "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup"
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
+      "migrate-sqlite-to-duckdb": "DuckDB migration",
+      "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
@@ -2415,7 +2420,18 @@
       "dead": "Beendet"
     },
     "batteryLevel": "Batteriestandswarnung",
-    "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt."
+    "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "duckDbMigrationTitle": "Migration zu DuckDB",
+    "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
+    "duckDbMigrationProgressTitle": "Migrationsfortschritt",
+    "duckDbMigrationMigrationDone": "Migration abgeschlossen:",
+    "duckDbNumberOfStatesinSQlite": "Anzahl der Zustände in SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Anzahl der Zustände in DuckDB",
+    "restartMigrationTitle": "Migration neu starten",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "purgeSQliteTitle": "SQLite-Zustände löschen",
+    "purgeSQliteDescription": "Sobald alle Zustände aus SQLite gelöscht wurden, müssen Sie auf der rechten Registerkarte eine \"Datenbankbereinigung\" durchführen, um Speicherplatz freizugeben. Dieser Schritt kann einige Zeit in Anspruch nehmen."
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",

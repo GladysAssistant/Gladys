@@ -40,7 +40,7 @@ const { EVENTS } = require('../utils/constants');
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
- * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
+ * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
@@ -131,6 +131,9 @@ function Gladys(params = {}) {
       // Execute DB migrations
       await db.umzug.up();
 
+      // Execute DuckDB DB migration
+      await db.duckDbCreateTableIfNotExist();
+
       await system.init();
 
       // this should be before device.init
@@ -150,7 +153,7 @@ function Gladys(params = {}) {
         await scene.init();
       }
       if (!params.disableDeviceLoading) {
-        await device.init(!params.disableDeviceStateAggregation);
+        await device.init(!params.disableDuckDbMigration);
       }
       if (!params.disableUserLoading) {
         await user.init();
