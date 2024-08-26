@@ -233,7 +233,7 @@
       "houseLabel": "House",
       "tabletModeDisabled": "Tablet Mode Disabled"
     },
-    "duckDbMigrationInProgress": "Votre instance Gladys est entrain de migrer sa base de donnée à DuckDB, un nouveau système de base de donnée plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
+    "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
