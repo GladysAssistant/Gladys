@@ -10,7 +10,7 @@ on:
       platforms:
         description: 'Docker platform to build'
         required: true
-        default: 'linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8'
+        default: 'linux/amd64,linux/arm/v7,linux/arm64/v8'
 
 jobs:
   build-front:
