@@ -33,7 +33,7 @@ describe('gateway.backup', async function describe() {
       updateProgress: fake.resolves({}),
     };
 
-    variable.getValue = fake.resolves('variable');
+    variable.getValue = fake.resolves('key');
     variable.setValue = fake.resolves(null);
 
     event.on = fake.returns(null);
@@ -125,6 +125,7 @@ describe('gateway.backup', async function describe() {
           value: 1,
         }),
       );
+      promisesDevices.push(db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1));
     }
     // start backup
     promises.push(gateway.backup());
@@ -136,6 +137,7 @@ describe('gateway.backup', async function describe() {
           value: 1,
         }),
       );
+      promisesDevices.push(db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1));
     }
     await Promise.all(promisesDevices);
     await Promise.all(promises);
