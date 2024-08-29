@@ -13,8 +13,8 @@ async function restoreBackupEvent(event) {
     this.restoreErrored = false;
     this.restoreInProgress = true;
     logger.info(`Receiving restore backup event. File url = ${event.file_url}`);
-    const { backupFilePath } = await this.downloadBackup(event.file_url);
-    await this.restoreBackup(backupFilePath);
+    const { sqliteBackupFilePath, duckDbBackupFolderPath } = await this.downloadBackup(event.file_url);
+    await this.restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath);
     await this.system.shutdown();
   } catch (e) {
     logger.warn(e);

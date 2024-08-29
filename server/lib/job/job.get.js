@@ -15,6 +15,7 @@ const DEFAULT_OPTIONS = {
  * @param {number} [options.skip] - Number of elements to skip.
  * @param {string} [options.order_by] - Order by.
  * @param {string} [options.order_dir] - Order dir (asc/desc).
+ * @param {string} [options.type] - Job type to return.
  * @returns {Promise} Resolve with array of jobs.
  * @example
  * const jobs = await gladys.jobs.get();
@@ -26,9 +27,13 @@ async function get(options) {
     include: [],
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
+    where: {},
   };
   if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
+  }
+  if (optionsWithDefault.type !== undefined) {
+    queryParams.where.type = optionsWithDefault.type;
   }
   const jobs = await db.Job.findAll(queryParams);
   jobs.forEach((job) => {

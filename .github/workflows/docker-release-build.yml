@@ -168,7 +168,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile.buildx
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           push: true
           pull: true
           tags: ${{ steps.docker_meta.outputs.tags }}
@@ -176,10 +176,6 @@ jobs:
           cache-to: type=inline
       - name: 🐳 Legacy Tags
         run: |
-          export DIGESTARM=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm" and .value.platform.variant == "v6").value | .digest')
-          docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM
-          docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM ${{ env.DOCKERHUB_REPO }}:v4-arm
-          docker push ${{ env.DOCKERHUB_REPO }}:v4-arm
           export DIGESTARM64=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm64").value | .digest')
           docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64
           docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM64 ${{ env.DOCKERHUB_REPO }}:v4-arm64v8

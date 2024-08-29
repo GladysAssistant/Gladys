@@ -1,8 +1,13 @@
 const Sequelize = require('sequelize');
+const duckdb = require('duckdb');
 const Umzug = require('umzug');
+const Promise = require('bluebird');
+const chunk = require('lodash.chunk');
 const path = require('path');
+const util = require('util');
 const getConfig = require('../utils/getConfig');
 const logger = require('../utils/logger');
+const { formatDateInUTC } = require('../utils/date');
 
 const config = getConfig();
 
@@ -79,10 +84,64 @@ Object.values(models)
   .filter((model) => typeof model.associate === 'function')
   .forEach((model) => model.associate(models));
 
+// DuckDB
+const duckDbFilePath = `${config.storage.replace('.db', '')}.duckdb`;
+const duckDb = new duckdb.Database(duckDbFilePath);
+const duckDbWriteConnection = duckDb.connect();
+const duckDbReadConnection = duckDb.connect();
+const duckDbWriteConnectionAllAsync = util.promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
+const duckDbReadConnectionAllAsync = util.promisify(duckDbReadConnection.all).bind(duckDbReadConnection);
+
+const duckDbCreateTableIfNotExist = async () => {
+  logger.info(`DuckDB - Creating database table if not exist`);
+  await duckDbWriteConnectionAllAsync(`
+    CREATE TABLE IF NOT EXISTS t_device_feature_state (
+        device_feature_id UUID,
+        value DOUBLE,
+        created_at TIMESTAMPTZ
+    );
+  `);
+};
+
+const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
+  const createdAtInString = formatDateInUTC(createdAt);
+  await duckDbWriteConnectionAllAsync(
+    'INSERT INTO t_device_feature_state VALUES (?, ?, ?)',
+    deviceFeatureId,
+    value,
+    createdAtInString,
+  );
+};
+
+const duckDbBatchInsertState = async (deviceFeatureId, states) => {
+  const chunks = chunk(states, 10000);
+  await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
+    let queryString = `INSERT INTO t_device_feature_state (device_feature_id, value, created_at) VALUES `;
+    const queryParams = [];
+    oneStatesChunk.forEach((state, index) => {
+      if (index > 0) {
+        queryString += `,`;
+      }
+      queryString += '(?, ?, ?)';
+      queryParams.push(deviceFeatureId);
+      queryParams.push(state.value);
+      queryParams.push(formatDateInUTC(state.created_at));
+    });
+    logger.info(`DuckDB : Inserting chunk ${chunkIndex} for deviceFeature = ${deviceFeatureId}.`);
+    await duckDbWriteConnectionAllAsync(queryString, ...queryParams);
+  });
+};
+
 const db = {
   ...models,
   sequelize,
   umzug,
+  duckDb,
+  duckDbWriteConnectionAllAsync,
+  duckDbReadConnectionAllAsync,
+  duckDbCreateTableIfNotExist,
+  duckDbInsertState,
+  duckDbBatchInsertState,
 };
 
 module.exports = db;
