@@ -111,15 +111,14 @@ const EditBoxColumns = ({ children, ...props }) => {
       </div>
       <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
         {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-        <div class={cx('d-flex flex-row align-items-start', style.columnsCard)}>
+        <div class={cx('d-flex align-items-start', style.columnsCard)}>
           {props.homeDashboard &&
             props.homeDashboard.boxes &&
             props.homeDashboard.boxes.map((column, x) => (
               <div
                 class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
                   [stylePrimary.removePaddingFirstCol]: x === 0,
-                  [stylePrimary.removePaddingLastCol]: x === maxBoxes,
-                  [style.removePadding]: true // it will remove padding when in mobile view
+                  [stylePrimary.removePaddingLastCol]: x === maxBoxes-1
                 })}
               >
                 <div class={cx('d-flex', 'justify-content-center', style.columnBoxHeader)}>
@@ -140,7 +139,7 @@ const EditBoxColumns = ({ children, ...props }) => {
                     <Text id="dashboard.editDashboardBoxNotEmpty" />
                   </div>
                 )}
-                <div class="d-flex flex-column m-0">
+                <div class>
                   {column.length > 0 && (
                     <div>
                       {column.map((box, y) => (
