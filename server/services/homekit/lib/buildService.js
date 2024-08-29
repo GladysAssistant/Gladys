@@ -31,6 +31,7 @@ function buildService(device, features, categoryMapping) {
     switch (`${feature.category}:${feature.type}`) {
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
+      case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
         const characteristic = service.getCharacteristic(
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],

@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 const { fake, assert: sinonAssert } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -12,16 +12,22 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 describe('Device.destroy', () => {
-  it('should destroy device', async () => {
+  it('should destroy device and states', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
     const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1);
     device.devicesByPollFrequency[60000] = [
       {
         selector: 'test-device',
       },
     ];
     await device.destroy('test-device');
+    const res = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ?',
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
+    expect(res).to.have.lengthOf(0);
   });
   it('should destroy device that has too much states', async () => {
     const eventFake = {
