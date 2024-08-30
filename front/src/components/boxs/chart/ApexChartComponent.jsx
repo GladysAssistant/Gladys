@@ -79,10 +79,10 @@ class ApexChartComponent extends Component {
       formatter_custom = opts => {
         const startDate = dayjs(opts.y1)
           .locale(this.props.user.language)
-          .format('LLL:ss');
+          .format('LL - LTS');
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
-          .format('LLL:ss');
+          .format('LL - LTS');
 
         return createTooltipContent(opts, startDate, endDate);
       };
