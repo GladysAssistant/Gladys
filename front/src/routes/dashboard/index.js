@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
 import actions from '../../actions/dashboard';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
+import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 
 class Dashboard extends Component {
@@ -66,6 +66,29 @@ class Dashboard extends Component {
     }
   };
 
+  getDuckDbMigrationJob = async () => {
+    try {
+      const jobs = await this.props.httpClient.get(`/api/v1/job`, {
+        type: JOB_TYPES.MIGRATE_SQLITE_TO_DUCKDB,
+        take: 1
+      });
+      if (jobs.length > 0) {
+        this.setState({
+          duckDbMigrationJob: jobs[0]
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  jobUpdated = payload => {
+    const { duckDbMigrationJob } = this.state;
+    if (payload.id === duckDbMigrationJob.id) {
+      this.setState({ duckDbMigrationJob: payload });
+    }
+  };
+
   getCurrentDashboard = async () => {
     try {
       await this.setState({ loading: true });
@@ -99,6 +122,7 @@ class Dashboard extends Component {
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
     }
+    await this.getDuckDbMigrationJob();
   };
 
   redirectToDashboard = () => {
@@ -202,6 +226,7 @@ class Dashboard extends Component {
     document.addEventListener('click', this.closeDashboardDropdown, true);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
     this.checkIfFullScreenParameterIsHere();
   }
 
@@ -218,6 +243,7 @@ class Dashboard extends Component {
     document.removeEventListener('click', this.closeDashboardDropdown, true);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
   }
 
   render(
@@ -231,7 +257,8 @@ class Dashboard extends Component {
       dashboardEditMode,
       gatewayInstanceNotFound,
       loading,
-      browserFullScreenCompatible
+      browserFullScreenCompatible,
+      duckDbMigrationJob
     }
   ) {
     const dashboardConfigured =
@@ -266,6 +293,7 @@ class Dashboard extends Component {
         fullScreen={props.fullScreen}
         hideExitFullScreenButton={props.fullscreen === 'force'}
         isGladysPlus={isGladysPlus}
+        duckDbMigrationJob={duckDbMigrationJob}
       />
     );
   }
