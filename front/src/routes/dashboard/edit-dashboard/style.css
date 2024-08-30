@@ -10,7 +10,6 @@
   flex-basis: 0;
   padding: 0 8px;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 .columnBoxHeader {
@@ -63,7 +62,7 @@
   margin-bottom: 1.5rem;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1280px) {
   .columnAddButton {
     position: relative;
     flex: 0 0 46px;
@@ -95,7 +94,7 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1280px) {
   .bottomDropZone {
     min-height: 5rem;
     height: 5rem;
