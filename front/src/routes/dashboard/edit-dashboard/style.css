@@ -10,6 +10,7 @@
   flex-basis: 0;
   padding: 0 8px;
   box-sizing: border-box;
+  min-width: 0px;
 }
 
 .columnBoxHeader {
