@@ -111,7 +111,7 @@ const EditBoxColumns = ({ children, ...props }) => (
     </div>
     <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
       {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-      <div class={cx('d-flex', style.columnsCard)}>
+      <div class={cx('d-flex align-items-start', style.columnsCard)}>
         {props.homeDashboard &&
           props.homeDashboard.boxes &&
           props.homeDashboard.boxes.map((column, x) => (
