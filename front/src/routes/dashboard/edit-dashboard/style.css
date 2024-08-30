@@ -3,10 +3,6 @@
   flex-wrap: nowrap;
   width: 100%;
   padding-right: 0;
-  /* position: relative; */
-  /* position: relative; */
-  /* overflow-y: visible; */
-  /* overflow-x: hidden; */
 }
 
 .column {
@@ -14,11 +10,7 @@
   flex-basis: 0;
   padding: 0 8px;
   box-sizing: border-box;
-  /* overflow: hidden; */
-  /* position: relative; */
-  /* overflow: auto; */
-  /* overflow-x: hidden !important;
-  overflow-y: visible !important; */
+  overflow: hidden;
 }
 
 .columnBoxHeader {
