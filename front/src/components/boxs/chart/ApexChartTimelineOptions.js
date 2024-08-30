@@ -91,7 +91,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
         align: 'left',
         maxWidth: 80,
         margin: 0,
-        formatter: function (value) {
+        formatter: function(value) {
           if (value.length > 10) {
             const deviceName = value.split(' (')[0];
             const featureName = value.split(' (')[1].replace(')', '');

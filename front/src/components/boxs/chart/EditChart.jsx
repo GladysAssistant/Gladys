@@ -125,7 +125,6 @@ class EditChart extends Component {
       );
       const units = selectedDeviceFeaturesOptions.map(selectedDeviceFeaturesOption => {
         const deviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
-        console.log(deviceFeature);
         return deviceFeature.unit;
       });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
