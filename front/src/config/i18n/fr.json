@@ -373,7 +373,48 @@
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation",
         "on": "On",
-        "off": "Off"
+        "off": "Off",
+        "startDate": "Date de début :",
+        "endDate": "Date de fin :",
+        "historyExpandedWarningStateLive": "Données réelles sur l'intervalle",
+        "historyExpandedWarningStateAggregated": "ATTENTION: Données aggrégées sur l'intervalle, vous pouvez zoomer sur un intervalle plus petit pour voir les données réelles",
+        "criteria": {
+          "criteriaDateExpendOptionsTitle": "Critère de date",
+          "criteriaAggregateExpendOptionsTitle": "Critère d'agrégation",
+          "applyAndClose": "Appliquer les modifications",
+          "date": {
+            "all": "Toutes les données",
+            "previous": "Période précédente",
+            "current": "Période actuelle",
+            "next": "Période suivante",
+            "before": "Avant le",
+            "after": "Après le",
+            "between": "Entre",
+            "custom": "Personnalisé"
+          },
+          "intervalUnit": {
+            "days": "Jours",
+            "weeks": "Semaines",
+            "months": "Mois",
+            "quarter": "Trimestre",
+            "years": "Années",
+            "thisDays": "Aujourd'hui",
+            "thisWeeks": "Cette semaine",
+            "thisMonths": "Ce mois",
+            "thisQuarter": "Ce trimestre",
+            "thisYears": "Cette année"
+          },
+          "aggregate": {
+            "minute": "Minute",
+            "hour": "Heure",
+            "day": "Jour",
+            "week": "Semaine",
+            "month": "Mois",
+            "quarter": "Trimestre",
+            "year": "Année",
+            "notAggregate": "Non aggrégé"
+          }
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",

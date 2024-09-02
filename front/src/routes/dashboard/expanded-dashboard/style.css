@@ -1,0 +1,70 @@
+.containerWithMargin {
+  margin-top: 1rem;
+}
+
+.dropdownMenuUp {
+  top: auto;
+  bottom: 100%;
+  transform: translateY(-1%);
+  z-index: 300;
+}
+.dropdownMenuDown {
+  width: auto;
+  min-width: 150px;
+}
+.dropdownItem {
+  cursor: pointer;
+}
+
+.flexContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardFooter {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.datePicker {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.datePickerChart {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0;
+}
+
+.datePickerLabel {
+  margin: 0 1rem;
+  font-size: 0.75rem;
+}
+
+.datePickerInput {
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.625rem;
+}
+
+.displacementRaftersChart {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* .backButtonDiv {
+  margin-bottom: 1rem;
+  /* max-width: 24rem; */
+/*}
+@media (max-width: 768px) {
+  .backButtonDiv {
+    /* margin-bottom: 1rem; */
+/* max-width: 24rem; */
+/*  }
+} */

@@ -1,14 +1,13 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
-
+import { Link } from 'preact-router/match';
 import { Text, Localizer } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
-import ChartBoxExpanded from './Chart';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -24,6 +23,13 @@ const intervalByName = {
   'last-month': THIRTY_DAYS_IN_MINUTES,
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES
+};
+
+const getTypeByInterval = interval => {
+  if (interval >= ONE_DAY_IN_MINUTES) return 'hourly';
+  if (interval >= THIRTY_DAYS_IN_MINUTES) return 'daily';
+  if (interval >= ONE_YEAR_IN_MINUTES) return 'monthly';
+  return 'live';
 };
 
 const UNITS_WHEN_DOWN_IS_POSITIVE = [DEVICE_FEATURE_UNITS.WATT_HOUR];
@@ -114,6 +120,7 @@ class Chartbox extends Component {
     });
     this.getData();
   };
+
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     if (!deviceFeatures) {
@@ -133,12 +140,42 @@ class Chartbox extends Component {
       return;
     }
     await this.setState({ loading: true });
+
+    let type;
+    if (this.props.showHistoryExpanded) {
+      let intervalDate;
+      if (this.state.startDate && this.state.endDate) {
+        intervalDate = (this.state.endDate - this.state.startDate) / 60000;
+      } else {
+        intervalDate = this.state.interval;
+      }
+      if (intervalDate <= ONE_DAY_IN_MINUTES) {
+        type = 'live';
+      } else {
+        type = getTypeByInterval(intervalDate, this.props.box.chart_type);
+      }
+    } else {
+      type = getTypeByInterval(this.state.interval, this.props.box.chart_type);
+    }
     try {
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
-        interval: this.state.interval,
-        max_states: 100,
-        device_features: deviceFeatures.join(',')
-      });
+      let data;
+      if (type === 'live') {
+        data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+          interval: this.state.interval,
+          max_states: this.state.maxStatesLive,
+          device_features: deviceFeatures.join(','),
+          start_date: this.state.startDate ? this.state.startDate.toISOString() : null,
+          end_date: this.state.endDate ? this.state.endDate.toISOString() : null
+        });
+      } else {
+        data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+          interval: this.state.interval,
+          max_states: this.state.maxStatesNoLive,
+          device_features: deviceFeatures.join(','),
+          start_date: this.state.startDate ? this.state.startDate.toISOString() : undefined,
+          end_date: this.state.endDate ? this.state.endDate.toISOString() : undefined
+        });
+      }
 
       let emptySeries = true;
 
@@ -284,14 +321,38 @@ class Chartbox extends Component {
       interval: intervalByName[this.props.box.interval]
     });
   };
+
+  handleZoom = async (min, max) => {
+    if (min === null || max === null) {
+      await this.setState({
+        startDate: null,
+        endDate: null
+      });
+      this.getData();
+    } else {
+      await this.setState({
+        startDate: new Date(min),
+        endDate: new Date(max)
+      });
+      this.getData();
+    }
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
+    console.log('props constructor Chart', props);
     this.state = {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
       initialized: false,
-      height: 'small'
+      height: 'small',
+      startDate: null,
+      endDate: null,
+      dropdownOpen: false,
+      selectedCriteria: 'before',
+      maxStatesLive: 10000,
+      maxStatesNoLive: 1000
     };
   }
   componentDidMount() {
@@ -320,6 +381,7 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
+
   render(
     props,
     {
@@ -332,18 +394,26 @@ class Chartbox extends Component {
       lastValueRounded,
       interval,
       emptySeries,
-      unit
+      unit,
+      startDate,
+      endDate
     }
   ) {
-    const { box, displayPreview, showCloseButton, showHistoryZoom } = this.props;
+    const { box, displayPreview, showHistoryExpanded } = this.props;
+
     const displayVariation = box.display_variation;
     const nbDeviceFeatures = box.device_features.length;
     let heightAdditional = 0;
-    if (showHistoryZoom) {
+    if (showHistoryExpanded === true) {
+      console.log('props render Chart', props);
+      console.log('this render Chart', this);
+    }
+    const showAggregatedDataWarning = this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
+    if (showHistoryExpanded) {
       if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 2) {
         heightAdditional = 56 * (nbDeviceFeatures - 2);
       } else {
-        heightAdditional = 200;
+        heightAdditional = 300;
       }
     } else if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
       heightAdditional = 38 * (nbDeviceFeatures - 3);
@@ -353,6 +423,14 @@ class Chartbox extends Component {
         <div class="card-body">
           <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
+            {showHistoryExpanded && !showAggregatedDataWarning && (
+              <div class={cx("ml-5 mr-5", style.subheader)}>
+                <Text id="dashboard.boxes.chart.historyExpandedWarningStateLive" />
+              </div>
+            )}
+            {showHistoryExpanded && showAggregatedDataWarning && (
+              <div class={cx("ml-5 mr-5", style.subheader)}>{"(ATTENTION: Données aggrégées sur l'intervalle, vous pouvez zoomer sur un intervalle plus petit pour voir les données réelles)"}</div>
+            )}
             <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
@@ -384,7 +462,7 @@ class Chartbox extends Component {
                   >
                     <Text id="dashboard.boxes.chart.lastDay" />
                   </a>
-                  {props.box.chart_type !== 'timeline' && (
+                  {(props.box.chart_type !== 'timeline' || showHistoryExpanded) && (
                     <a
                       className={cx(style.dropdownItemChart, {
                         [style.active]: interval === SEVEN_DAYS_IN_MINUTES
@@ -394,7 +472,7 @@ class Chartbox extends Component {
                       <Text id="dashboard.boxes.chart.lastSevenDays" />
                     </a>
                   )}
-                  {props.box.chart_type !== 'timeline' && (
+                  {(props.box.chart_type !== 'timeline' || showHistoryExpanded) && (
                     <a
                       className={cx(style.dropdownItemChart, {
                         [style.active]: interval === THIRTY_DAYS_IN_MINUTES
@@ -404,7 +482,7 @@ class Chartbox extends Component {
                       <Text id="dashboard.boxes.chart.lastThirtyDays" />
                     </a>
                   )}
-                  {props.box.chart_type !== 'timeline' && (
+                  {(props.box.chart_type !== 'timeline' || showHistoryExpanded) && (
                     <a
                       className={cx(style.dropdownItemChart, {
                         [style.active]: interval === THREE_MONTHS_IN_MINUTES
@@ -414,7 +492,7 @@ class Chartbox extends Component {
                       <Text id="dashboard.boxes.chart.lastThreeMonths" />
                     </a>
                   )}
-                  {props.box.chart_type !== 'timeline' && (
+                  {(props.box.chart_type !== 'timeline' || showHistoryExpanded) && (
                     <a
                       className={cx(style.dropdownItemChart, {
                         [style.active]: interval === ONE_YEAR_IN_MINUTES
@@ -426,35 +504,16 @@ class Chartbox extends Component {
                   )}
                 </div>
               </div>
-              {this.state.showHistory && (
-                <div class={cx(style.modalOverlay)}>
-                  <div class={cx('card-body', style.cardBody)}>
-                    <ChartBoxExpanded
-                      {...props}
-                      showHistoryZoom={this.state.showHistory}
-                      showCloseButton={true}
-                      onClose={() => this.setState({ showHistory: false })}
-                    />
-                  </div>
-                </div>
-              )}
-              {showCloseButton && (
-                <button
-                  class={cx('btn btn-outline-secondary', style.customBtnCommon, style.closeButton)}
-                  onClick={() => this.props.onClose()}
-                >
-                  <i class="fe fe-x" />
-                </button>
-              )}
-              {!displayPreview && !showHistoryZoom && (
+              {!displayPreview && !showHistoryExpanded && (
                 <Localizer>
-                  <button
+
+                  <Link
                     class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)}
-                    onClick={() => this.setState({ showHistory: true })}
+                    href={`/dashboard/${props.dashboardSelector}/expanded/${props.x}/${props.y}`}
                     title={<Text id="dashboard.boxes.chart.expandChartButtonDescription" />}
                   >
                     <i class="fe fe-airplay" />
-                  </button>
+                  </Link>
                 </Localizer>
               )}
             </div>
