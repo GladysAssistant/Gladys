@@ -338,8 +338,8 @@ class Chartbox extends Component {
     const displayVariation = box.display_variation;
     const nbDeviceFeatures = box.device_features.length;
     let heightAdditional = 0;
-    if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
-      heightAdditional = 38 * (nbDeviceFeatures - 3);
+    if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 1) {
+      heightAdditional = 40 * (nbDeviceFeatures - 1);
     }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>

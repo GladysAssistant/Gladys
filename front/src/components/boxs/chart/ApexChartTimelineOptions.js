@@ -6,14 +6,20 @@ const addYAxisStyles = () => {
     if (title) {
       const textContent = title.textContent;
       let lines = textContent.split('\n');
+      let countLineBreak = (textContent.match(/\n/g) || []).length;
+      let marginDy;
+      if (countLineBreak === 2) {
+        marginDy = '-1.2em';
+      } else if (countLineBreak === 1) {
+        marginDy = '-0.6em';
+      } else if (countLineBreak === 0) {
+        marginDy = '-0.4em';
+      }
       text.innerHTML = '';
       lines.forEach((line, index) => {
         const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        if (line.length > 10) {
-          line = `${line.substring(0, 10)}...`;
-        }
         tspan.setAttribute('x', text.getAttribute('x'));
-        tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
+        tspan.setAttribute('dy', index === 0 ? marginDy : '1.2em');
         tspan.setAttribute('font-size', fontSize);
         tspan.textContent = line;
         text.appendChild(tspan);
@@ -89,18 +95,47 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       labels: {
         align: 'left',
-        maxWidth: 80,
-        margin: 0,
-        formatter: function(value) {
-          if (value.length > 10) {
-            const deviceName = value.split(' (')[0];
-            const featureName = value.split(' (')[1].replace(')', '');
-            const newValue = `${deviceName}\n(${featureName})`;
-            return newValue;
+        minWidth: 50,
+        maxWidth: 100,
+        margin: 5,
+        formatter: function (value) {
+          const nbLines = 2;
+          if (value.length > 13) {
+            let [deviceName, featureName] = value.split(' (');
+            if (featureName) {
+              featureName = featureName.replace(')', '');
+            }
+
+            let result = [];
+            let currentLine = '';
+
+            for (let i = 0; i < deviceName.length; i++) {
+              currentLine += deviceName[i].replace('-', ' ').replace('_', ' ');
+              if (currentLine.length >= 10 && /[\s\-_.]/.test(deviceName[i])) {
+                result.push(currentLine.trim());
+                currentLine = '';
+              }
+            }
+
+            if (currentLine.length > 0) {
+              result.push(currentLine.trim());
+            }
+            if (result.length > nbLines) {
+              result = result.slice(0, nbLines);
+              result[nbLines - 1] += '...';
+            }
+            deviceName = result.join('\n');
+
+            if (featureName) {
+              return `${deviceName}\n(${featureName})`;
+            }
+
+            return deviceName;
           }
+
           return value;
         },
-        offsetX: -20,
+        offsetX: -10,
         offsetY: 0
       }
     },
