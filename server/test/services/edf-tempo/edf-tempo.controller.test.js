@@ -1,10 +1,16 @@
 const { expect } = require('chai');
-const nock = require('nock');
 const { fake, useFakeTimers } = require('sinon');
 const EdfTempoService = require('../../../services/edf-tempo');
 const EdfTempoController = require('../../../services/edf-tempo/controllers/edf-tempo.controller');
 
-const gladys = {};
+const gladys = {
+  gateway: {
+    getEdfTempo: fake.resolves({
+      today: 'blue',
+      tomorrow: 'unknown',
+    }),
+  },
+};
 
 describe('EdfTempoController', () => {
   let clock;
@@ -19,12 +25,6 @@ describe('EdfTempoController', () => {
     const res = {
       json: fake.returns(null),
     };
-    nock('https://api.gladysgateway.com')
-      .get('/edf/tempo/today')
-      .reply(200, {
-        today: 'blue',
-        tomorrow: 'unknown',
-      });
     const edfTempoService = EdfTempoService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     const edfTempoController = EdfTempoController(edfTempoService.getEdfTempoStates);
     await edfTempoController['get /api/v1/service/edf-tempo/state'].controller(req, res);
