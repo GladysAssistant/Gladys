@@ -19,9 +19,12 @@ describe('EdfTempoController', () => {
     const res = {
       json: fake.returns(null),
     };
-    nock('https://particulier.edf.fr')
-      .get('/services/rest/referentiel/searchTempoStore?dateRelevant=2022-12-09')
-      .reply(200, { couleurJourJ: 'TEMPO_BLEU', couleurJourJ1: 'NON_DEFINI' });
+    nock('https://api.gladysgateway.com')
+      .get('/edf/tempo/today')
+      .reply(200, {
+        today: 'blue',
+        tomorrow: 'unknown',
+      });
     const edfTempoService = EdfTempoService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     const edfTempoController = EdfTempoController(edfTempoService.getEdfTempoStates);
     await edfTempoController['get /api/v1/service/edf-tempo/state'].controller(req, res);
