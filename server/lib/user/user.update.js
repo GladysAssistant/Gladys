@@ -27,6 +27,7 @@ async function update(userId, newUser) {
     newUser.password = await passwordUtils.hash(newUser.password);
   }
 
+  delete newUser.role;
   await user.update(newUser);
 
   const plainUser = user.get({ plain: true });
