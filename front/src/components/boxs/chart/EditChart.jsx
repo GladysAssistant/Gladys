@@ -351,7 +351,12 @@ class EditChart extends Component {
     this.props = props;
     this.deviceFeatureBySelector = new Map();
     this.state = {
-      chart_type: ''
+      chart_type: '',
+      selectedDeviceFeaturesOptions: [],
+      deviceOptions: [],
+      loading: false,
+      displayPreview: false,
+      chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS]
     };
   }
 
@@ -360,7 +365,7 @@ class EditChart extends Component {
   }
 
   componentDidUpdate(previousProps) {
-    const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
+    const deviceFeatureChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
     const unitsChanged = get(previousProps, 'box.units') !== get(this.props, 'box.units');
     if (deviceFeatureChanged || unitsChanged) {
       this.refreshDisplayForNewProps();
