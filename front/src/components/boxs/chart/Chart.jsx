@@ -8,6 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../se
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
+import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -115,6 +116,8 @@ class Chartbox extends Component {
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let deviceFeatureNames = this.props.box.device_feature_names;
+
     if (!deviceFeatures) {
       // migrate all box (one device feature)
       if (this.props.box.device_feature) {
@@ -153,13 +156,13 @@ class Chartbox extends Component {
           data: []
         };
 
-        data.forEach(oneFeature => {
+        data.forEach((oneFeature, index) => {
           const { values, deviceFeature, device } = oneFeature;
+          const deviceFeatureName = deviceFeatureNames ? deviceFeatureNames[index] : null;
           let previousValue = null;
           let lastChangeTime = null;
           const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
 
-          // if (values.length > 1) {
           values.forEach(value => {
             emptySeries = false;
             if (previousValue === null) {
@@ -170,7 +173,7 @@ class Chartbox extends Component {
 
             if (value.value !== previousValue) {
               const newData = {
-                x: `${device.name} (${deviceFeature.name})`,
+                x: deviceFeatureName || getDeviceName(device, deviceFeature),
                 y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
               };
               if (previousValue === 0) {
@@ -185,7 +188,7 @@ class Chartbox extends Component {
 
           if (previousValue !== null) {
             const newData = {
-              x: `${device.name} (${deviceFeature.name})`,
+              x: deviceFeatureName || getDeviceName(device, deviceFeature),
               y: [lastChangeTime, lastValueTime]
             };
             if (previousValue === 0) {
@@ -194,7 +197,6 @@ class Chartbox extends Component {
               serie1.data.push(newData);
             }
           }
-          // }
         });
         series.push(serie1);
         series.push(serie0);
@@ -339,7 +341,7 @@ class Chartbox extends Component {
     const nbDeviceFeatures = box.device_features.length;
     let heightAdditional = 0;
     if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 1) {
-      heightAdditional = 40 * (nbDeviceFeatures - 1);
+      heightAdditional = 40 * nbDeviceFeatures + 10;
     }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
