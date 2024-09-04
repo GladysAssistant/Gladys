@@ -557,42 +557,49 @@ class Chartbox extends Component {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
-                        <Text id="dashboard.boxes.chart.lastSevenDays" />
-                      </a>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <polyline points="3 17 9 11 13 15 21 7" />
+                        <polyline points="14 7 21 7 21 14" />
+                      </svg>
                     )}
-                    {props.box.chart_type !== 'timeline' && (
-                      <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                        })}
-                        onClick={this.switchTo30DaysView}
+                    {variation === 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class={cx(style.variationIcon)}
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                       >
-                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                      </a>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
                     )}
-                    {props.box.chart_type !== 'timeline' && (
-                      <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                        })}
-                        onClick={this.switchTo3monthsView}
+                    {variation < 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class={cx(style.variationIcon)}
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                       >
-                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                      </a>
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <polyline points="3 7 9 13 13 9 21 17" />
+                        <polyline points="21 10 21 17 14 17" />
+                      </svg>
                     )}
-                    {props.box.chart_type !== 'timeline' && (
-                      <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === ONE_YEAR_IN_MINUTES
-                        })}
-                        onClick={this.switchToYearlyView}
-                      >
-                        <Text id="dashboard.boxes.chart.lastYear" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
+                  </span>
+                )}
+              </div>
             </div>
           )}
           {emptySeries === false && props.box.display_axes && (
@@ -606,11 +613,11 @@ class Chartbox extends Component {
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
                 heightAdditional={heightAdditional}
+                dictionary={props.intl.dictionary}
               />
             </div>
           )}
         </div>
-
         <div
           class={cx('dimmer', {
             active: loading && !initialized
@@ -622,15 +629,15 @@ class Chartbox extends Component {
               [style.minSizeChartLoading]: loading && !initialized
             })}
           >
-            {!props.box.chart_type && (
+            {emptySeries === true && (
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
                   <i class="fe fe-alert-circle mr-2" />
-                  <Text id="dashboard.boxes.chart.noChartType" />
+                  <Text id="dashboard.boxes.chart.noValue" />
                 </div>
                 <div class={style.smallTextEmptyState}>
-                  <Text id="dashboard.boxes.chart.noChartTypeWarning" />
+                  <Text id="dashboard.boxes.chart.noValueWarning" />
                 </div>
               </div>
             )}
@@ -644,6 +651,7 @@ class Chartbox extends Component {
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
                 heightAdditional={heightAdditional}
+                dictionary={props.intl.dictionary}
               />
             )}
           </div>
