@@ -9,9 +9,9 @@ const addYAxisStyles = () => {
       let countLineBreak = (textContent.match(/\n/g) || []).length;
       let marginDy;
       if (countLineBreak === 2) {
-        marginDy = '-1.5em';
+        marginDy = '-1.0em';
       } else if (countLineBreak === 1) {
-        marginDy = '-0.6em';
+        marginDy = '-0.4em';
       } else if (countLineBreak === 0) {
         marginDy = '0em';
       }
@@ -19,7 +19,7 @@ const addYAxisStyles = () => {
       lines.forEach((line, index) => {
         const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
         tspan.setAttribute('x', text.getAttribute('x'));
-        tspan.setAttribute('dy', index === 0 ? marginDy : '1.3em');
+        tspan.setAttribute('dy', index === 0 ? marginDy : '1.2em');
         tspan.setAttribute('font-size', fontSize);
         tspan.textContent = line;
         text.appendChild(tspan);
@@ -100,7 +100,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
         margin: 5,
         formatter: function(value) {
           const nbLines = 3;
-          if (value.length > 13) {
+          if (value.length > 15) {
             let [deviceName, featureName] = value.split(' (');
             if (featureName) {
               featureName = featureName.replace(')', '');
@@ -111,7 +111,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
 
             for (let i = 0; i < deviceName.length; i++) {
               currentLine += deviceName[i].replace('-', ' ').replace('_', ' ');
-              if (currentLine.length >= 13) {
+              if (currentLine.length >= 15) {
                 let lastSpaceIndex = currentLine.lastIndexOf(' ');
                 if (lastSpaceIndex > -1) {
                   result.push(currentLine.slice(0, lastSpaceIndex).trim());
@@ -157,12 +157,12 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       }
     },
     tooltip: {
-      // theme: 'dark',
+      //theme: 'dark',
       marker: {
         show: true
       },
       onDatasetHover: {
-        highlightDataSeries: true
+        highlightDataSeries: false
       },
       items: {
         display: 'flex'
