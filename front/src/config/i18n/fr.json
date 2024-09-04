@@ -247,6 +247,8 @@
       "private": "privé",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
