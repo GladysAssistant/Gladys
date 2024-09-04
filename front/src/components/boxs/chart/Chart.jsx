@@ -8,6 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../se
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
+import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -123,6 +124,9 @@ class Chartbox extends Component {
 
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let deviceFeatureNames = this.props.box.device_feature_names;
+    let nbFeaturesDisplayed = deviceFeatures.length;
+
     if (!deviceFeatures) {
       // migrate all box (one device feature)
       if (this.props.box.device_feature) {
@@ -190,40 +194,42 @@ class Chartbox extends Component {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
           data: []
         };
-
-        data.forEach(oneFeature => {
+        data.forEach((oneFeature, index) => {
           const { values, deviceFeature, device } = oneFeature;
+          const deviceFeatureName = deviceFeatureNames ? deviceFeatureNames[index] : null;
           let previousValue = null;
           let lastChangeTime = null;
           const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
-
-          // if (values.length > 1) {
-          values.forEach(value => {
-            emptySeries = false;
-            if (previousValue === null) {
-              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-              previousValue = value.value;
-              return;
-            }
-
-            if (value.value !== previousValue) {
-              const newData = {
-                x: `${device.name} (${deviceFeature.name})`,
-                y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
-              };
-              if (previousValue === 0) {
-                serie0.data.push(newData);
-              } else {
-                serie1.data.push(newData);
+          if (values.length === 0) {
+            nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
+          } else {
+            values.forEach(value => {
+              emptySeries = false;
+              if (previousValue === null) {
+                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+                previousValue = value.value;
+                return;
               }
-              lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-              previousValue = value.value;
-            }
-          });
+
+              if (value.value !== previousValue) {
+                const newData = {
+                  x: deviceFeatureName || getDeviceName(device, deviceFeature),
+                  y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
+                };
+                if (previousValue === 0) {
+                  serie0.data.push(newData);
+                } else {
+                  serie1.data.push(newData);
+                }
+                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+                previousValue = value.value;
+              }
+            });
+          }
 
           if (previousValue !== null) {
             const newData = {
-              x: `${device.name} (${deviceFeature.name})`,
+              x: deviceFeatureName || getDeviceName(device, deviceFeature),
               y: [lastChangeTime, lastValueTime]
             };
             if (previousValue === 0) {
@@ -232,7 +238,6 @@ class Chartbox extends Component {
               serie1.data.push(newData);
             }
           }
-          // }
         });
         series.push(serie1);
         series.push(serie0);
@@ -256,7 +261,8 @@ class Chartbox extends Component {
         series,
         loading: false,
         initialized: true,
-        emptySeries
+        emptySeries,
+        nbFeaturesDisplayed
       };
 
       if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
@@ -347,6 +353,7 @@ class Chartbox extends Component {
       loading: true,
       initialized: false,
       height: 'small',
+      nbFeaturesDisplayed: 0,
       startDate: null,
       endDate: null,
       dropdownOpen: false,
@@ -395,6 +402,7 @@ class Chartbox extends Component {
       interval,
       emptySeries,
       unit,
+      nbFeaturesDisplayed,
       startDate,
       endDate
     }
@@ -403,20 +411,16 @@ class Chartbox extends Component {
 
     const displayVariation = box.display_variation;
     const nbDeviceFeatures = box.device_features.length;
-    let heightAdditional = 0;
-    if (showHistoryExpanded === true) {
-      console.log('props render Chart', props);
-      console.log('this render Chart', this);
-    }
     const showAggregatedDataWarning = this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
+    let heightAdditional = 0;
     if (showHistoryExpanded) {
-      if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 2) {
-        heightAdditional = 56 * (nbDeviceFeatures - 2);
+      if (props.box.chart_type === 'timeline' && 55 * nbFeaturesDisplayed > 300) {
+        heightAdditional = 55 * nbFeaturesDisplayed;
       } else {
         heightAdditional = 300;
       }
-    } else if (props.box.chart_type === 'timeline' && nbDeviceFeatures > 3) {
-      heightAdditional = 38 * (nbDeviceFeatures - 3);
+    } else if (props.box.chart_type === 'timeline') {
+      heightAdditional = 55 * nbFeaturesDisplayed;
     }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
@@ -553,49 +557,42 @@ class Chartbox extends Component {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 17 9 11 13 15 21 7" />
-                        <polyline points="14 7 21 7 21 14" />
-                      </svg>
+                        <Text id="dashboard.boxes.chart.lastSevenDays" />
+                      </a>
                     )}
-                    {variation === 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo30DaysView}
                       >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
+                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                      </a>
                     )}
-                    {variation < 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo3monthsView}
                       >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 7 9 13 13 9 21 17" />
-                        <polyline points="21 10 21 17 14 17" />
-                      </svg>
+                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                      </a>
                     )}
-                  </span>
-                )}
-              </div>
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === ONE_YEAR_IN_MINUTES
+                        })}
+                        onClick={this.switchToYearlyView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastYear" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           {emptySeries === false && props.box.display_axes && (
@@ -625,15 +622,15 @@ class Chartbox extends Component {
               [style.minSizeChartLoading]: loading && !initialized
             })}
           >
-            {emptySeries === true && (
+            {!props.box.chart_type && (
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
                   <i class="fe fe-alert-circle mr-2" />
-                  <Text id="dashboard.boxes.chart.noValue" />
+                  <Text id="dashboard.boxes.chart.noChartType" />
                 </div>
                 <div class={style.smallTextEmptyState}>
-                  <Text id="dashboard.boxes.chart.noValueWarning" />
+                  <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
               </div>
             )}

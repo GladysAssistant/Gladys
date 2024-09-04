@@ -53,32 +53,38 @@ class ApexChartComponent extends Component {
     };
   }
   addDateFormatterRangeBar(options) {
+    const createTooltipContent = (opts, startDate, endDate) => {
+      const w = opts.ctx.w;
+      const seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
+      const ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
+      const color = w.globals.colors[opts.seriesIndex];
+
+      return `<div class="apexcharts-tooltip-rangebar">
+          <div> <span class="series-name" style="color: ${color}">
+            ${seriesName ? seriesName : ''}
+          </span></div>
+          <div> <span class="category">
+            ${ylabel}: 
+          </span> <span class="value start-value"></br>&nbsp;&nbsp;
+              ${dictionnary.start_date}${startDate}
+          </span> <span class="value end-value"></br>&nbsp;&nbsp;
+              ${dictionnary.end_date}${endDate}
+          </span></div>
+        </div>`;
+    };
+
     let formatter_custom;
+    const dictionnary = this.props.dictionary.dashboard.boxes.chart;
     if (this.props.interval <= 24 * 60) {
       formatter_custom = opts => {
         const startDate = dayjs(opts.y1)
           .locale(this.props.user.language)
-          .format('LLL:ss');
+          .format('LL - LTS');
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
-          .format('LLL:ss');
-        const w = opts.ctx.w;
-        let seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
-        let ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
-        const color = w.globals.colors[opts.seriesIndex];
+          .format('LL - LTS');
 
-        return `<div class="apexcharts-tooltip-rangebar">
-            <div> <span class="series-name" style="color: ${color}">
-              ${seriesName ? seriesName : ''}
-            </span></div>
-            <div> <span class="category">
-              ${ylabel}: 
-            </span> <span class="value start-value"></br>&nbsp;&nbsp;
-              Début le: ${startDate} 
-            </span> <span class="value end-value"></br>&nbsp;&nbsp;
-              Fin le: ${endDate} 
-            </span></div>
-          </div>`;
+        return createTooltipContent(opts, startDate, endDate);
       };
     } else {
       formatter_custom = opts => {
@@ -88,24 +94,8 @@ class ApexChartComponent extends Component {
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
           .format('LL');
-
-        const w = opts.ctx.w;
-        const seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
-        const ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
-        const color = w.globals.colors[opts.seriesIndex];
-
-        return `<div class="apexcharts-tooltip-rangebar">
-            <div> <span class="series-name" style="color: ${color}">
-              ${seriesName ? seriesName : ''}
-            </span></div>
-            <div> <span class="category">
-              ${ylabel}: 
-            </span> <span class="value start-value"></br>&nbsp;&nbsp;
-              Début le: ${startDate} 
-            </span> <span class="value end-value"></br>&nbsp;&nbsp;
-              Fin le: ${endDate} 
-            </span></div>
-          </div>`;
+        
+        return createTooltipContent(opts, startDate, endDate);
       };
     }
     options.tooltip.custom = function(opts) {
@@ -198,7 +188,8 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80 + this.props.heightAdditional;
     } else {
-      height = 200 + this.props.heightAdditional;
+      // 95 is the height display of the timeline chart when there is no additional height
+      height = 95 + this.props.heightAdditional;
     }
     const options = getApexChartTimelineOptions({
       height,

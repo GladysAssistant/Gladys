@@ -6,14 +6,20 @@ const addYAxisStyles = () => {
     if (title) {
       const textContent = title.textContent;
       let lines = textContent.split('\n');
+      let countLineBreak = (textContent.match(/\n/g) || []).length;
+      let marginDy;
+      if (countLineBreak === 2) {
+        marginDy = '-1.0em';
+      } else if (countLineBreak === 1) {
+        marginDy = '-0.4em';
+      } else if (countLineBreak === 0) {
+        marginDy = '0em';
+      }
       text.innerHTML = '';
       lines.forEach((line, index) => {
         const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        if (line.length > 12) {
-          line = `${line.substring(0, 12)}...`;
-        }
         tspan.setAttribute('x', text.getAttribute('x'));
-        tspan.setAttribute('dy', index === 0 ? '-0.4em' : '1.2em');
+        tspan.setAttribute('dy', index === 0 ? marginDy : '1.2em');
         tspan.setAttribute('font-size', fontSize);
         tspan.textContent = line;
         text.appendChild(tspan);
@@ -89,18 +95,57 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       labels: {
         align: 'left',
-        maxWidth: 80,
-        margin: 0,
+        minWidth: 50,
+        maxWidth: 100,
+        margin: 5,
         formatter: function(value) {
-          if (value.length > 12) {
-            const deviceName = value.split(' (')[0];
-            const featureName = value.split(' (')[1].replace(')', '');
-            const newValue = `${deviceName}\n(${featureName})`;
-            return newValue;
+          const nbLines = 3;
+          if (value.length > 15) {
+            let [deviceName, featureName] = value.split(' (');
+            if (featureName) {
+              featureName = featureName.replace(')', '');
+            }
+
+            let result = [];
+            let currentLine = '';
+
+            for (let i = 0; i < deviceName.length; i++) {
+              currentLine += deviceName[i].replace('-', ' ').replace('_', ' ');
+              if (currentLine.length >= 15) {
+                let lastSpaceIndex = currentLine.lastIndexOf(' ');
+                if (lastSpaceIndex > -1) {
+                  result.push(currentLine.slice(0, lastSpaceIndex).trim());
+                  currentLine = currentLine.slice(lastSpaceIndex + 1);
+                } else {
+                  result.push(currentLine.trim());
+                  currentLine = '';
+                }
+              }
+            }
+
+            if (currentLine.length > 0) {
+              result.push(currentLine.trim());
+            }
+            if (result.length > nbLines && !featureName) {
+              result = result.slice(0, nbLines);
+              result[nbLines - 1] += '...';
+            }
+            if (result.length > nbLines - 1 && featureName) {
+              result = result.slice(0, nbLines - 1);
+              result[nbLines - 2] += '...';
+            }
+            deviceName = result.join('\n');
+
+            if (featureName) {
+              return `${deviceName}\n(${featureName})`;
+            }
+
+            return deviceName;
           }
+
           return value;
         },
-        offsetX: -20,
+        offsetX: -10,
         offsetY: 0
       }
     },
@@ -112,19 +157,22 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       }
     },
     tooltip: {
-      // theme: 'dark',
+      //theme: 'dark',
       marker: {
         show: true
       },
       onDatasetHover: {
-        highlightDataSeries: true
+        highlightDataSeries: false
       },
       items: {
         display: 'flex'
       },
       fillSeriesColor: false,
       fixed: {
-        enabled: false
+        enabled: true,
+        position: 'topLeft',
+        offsetX: 0,
+        offsetY: -70
       }
     }
   };
