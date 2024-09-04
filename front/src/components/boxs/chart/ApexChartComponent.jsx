@@ -181,7 +181,8 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
-      height = 200 + this.props.heightAdditional;
+      // 95 is the height display of the timeline chart when there is no additional height
+      height = 95 + this.props.heightAdditional;
     }
     const options = getApexChartTimelineOptions({
       height,
