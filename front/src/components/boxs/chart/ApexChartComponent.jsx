@@ -53,29 +53,13 @@ class ApexChartComponent extends Component {
     };
   }
   addDateFormatterRangeBar(options) {
-    const createTooltipContent = (
-      opts,
-      startDate,
-      endDate,
-      startDateZoomDay,
-      endDateZoomDay,
-      startTimeZoom,
-      endTimeZoom
-    ) => {
+    const createTooltipContent = (opts, startDate, endDate) => {
       const w = opts.ctx.w;
-      const zoomed = w.globals.zoomed;
       const seriesName = w.config.series[opts.seriesIndex].name ? w.config.series[opts.seriesIndex].name : '';
       const ylabel = w.globals.seriesX[opts.seriesIndex][opts.dataPointIndex];
       const color = w.globals.colors[opts.seriesIndex];
 
-      const sameDay = startDateZoomDay === endDateZoomDay;
-
-      const dateDisplay = sameDay
-        ? `le ${startDateZoomDay} de ${startTimeZoom} à ${endTimeZoom}`
-        : `du ${startDateZoomDay} à ${startTimeZoom} au ${endDateZoomDay} à ${endTimeZoom}`;
-
-      if (!zoomed) {
-        return `<div class="apexcharts-tooltip-rangebar">
+      return `<div class="apexcharts-tooltip-rangebar">
           <div> <span class="series-name" style="color: ${color}">
             ${seriesName ? seriesName : ''}
           </span></div>
@@ -87,62 +71,20 @@ class ApexChartComponent extends Component {
               ${dictionnary.end_date}${endDate}
           </span></div>
         </div>`;
-      } else {
-        return `<div class="apexcharts-tooltip-rangebar">
-          <div> <span class="series-name" style="color: ${color}">
-            ${seriesName ? seriesName : ''}
-          </span></div>
-          <div> <span class="category">
-            ${ylabel}: 
-          </span> <span class="value start-value"></br>&nbsp;&nbsp;
-              ${dictionnary.start_date}${startDate}
-          </span> <span class="value end-value"></br>&nbsp;&nbsp;
-              ${dictionnary.end_date}${endDate}
-          </span></div>
-          <div> <span class="value start-value"></br>&nbsp;&nbsp;
-              ${dateDisplay}
-          </span></div>
-        </div>`;
-      }
     };
 
     let formatter_custom;
     const dictionnary = this.props.dictionary.dashboard.boxes.chart;
     if (this.props.interval <= 24 * 60) {
       formatter_custom = opts => {
-        const minY = opts.ctx.w.globals.minY;
-        const maxY = opts.ctx.w.globals.maxY;
-        const dateFormatZoomed = this.props.user.language === 'en' ? 'MM/DD/YYYY' : 'DD/MM/YYYY';
-
         const startDate = dayjs(opts.y1)
           .locale(this.props.user.language)
           .format('LL - LTS');
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
           .format('LL - LTS');
-        const startDateZoomDay = dayjs(minY > opts.y1 ? minY : opts.y1)
-          .locale(this.props.user.language)
-          .format(dateFormatZoomed);
-        const endDateZoomDay = dayjs(maxY < opts.y2 ? maxY : opts.y2)
-          .locale(this.props.user.language)
-          .format(dateFormatZoomed);
 
-        const startTimeZoom = dayjs(minY > opts.y1 ? minY : opts.y1)
-          .locale(this.props.user.language)
-          .format('LTS');
-        const endTimeZoom = dayjs(maxY < opts.y2 ? maxY : opts.y2)
-          .locale(this.props.user.language)
-          .format('LTS');
-
-        return createTooltipContent(
-          opts,
-          startDate,
-          endDate,
-          startDateZoomDay,
-          endDateZoomDay,
-          startTimeZoom,
-          endTimeZoom
-        );
+        return createTooltipContent(opts, startDate, endDate);
       };
     } else {
       formatter_custom = opts => {
@@ -152,14 +94,8 @@ class ApexChartComponent extends Component {
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
           .format('LL');
-        const startDateZoom = dayjs(opts.ctx.w.globals.minY)
-          .locale(this.props.user.language)
-          .format('LL');
-        const endDateZoom = dayjs(opts.ctx.w.globals.maxY)
-          .locale(this.props.user.language)
-          .format('LL');
 
-        return createTooltipContent(opts, startDate, endDate, startDateZoom, endDateZoom);
+        return createTooltipContent(opts, startDate, endDate);
       };
     }
     options.tooltip.custom = function(opts) {
