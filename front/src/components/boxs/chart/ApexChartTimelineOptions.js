@@ -30,6 +30,26 @@ const addYAxisStyles = () => {
     }
   });
 };
+const limitZoom = chartContext => {
+  const minZoomRange = 10000;
+  const globals = chartContext.w.globals;
+
+  const maxY = globals.maxY;
+  const minY = globals.minY;
+  const currentRange = maxY - minY;
+  if (currentRange < minZoomRange) {
+    chartContext.updateOptions(
+      {
+        xaxis: {
+          min: globals.minY,
+          max: globals.minY + minZoomRange
+        }
+      },
+      false,
+      false
+    );
+  }
+};
 
 const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, locales, defaultLocale }) => {
   const options = {
@@ -52,7 +72,10 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       },
       events: {
         mounted: addYAxisStyles,
-        updated: addYAxisStyles
+        updated: addYAxisStyles,
+        zoomed: function(chartContext) {
+          limitZoom(chartContext);
+        }
       }
     },
     grid: {
@@ -75,14 +98,24 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
     xaxis: {
       labels: {
         padding: 0,
-        datetimeUTC: false
+        hideOverlappingLabels: true,
+        datetimeUTC: false,
+        trim: true,
+        datetimeFormatter: {
+          year: 'yyyy',
+          month: "MMM 'yy",
+          day: 'dd MMM',
+          hour: 'HH:mm',
+          minute: 'HH:mm:ss',
+          second: 'HH:mm:ss'
+        }
       },
       axisBorder: {
-        show: false
+        show: true
       },
       type: 'datetime',
-      min: Math.min(...series.flatMap(s => s.data.map(d => d.y[0]))),
-      max: Math.max(...series.flatMap(s => s.data.map(d => d.y[1])))
+      min: Math.floor(Math.min(...series.flatMap(s => s.data.map(d => d.y[0])))),
+      max: Math.floor(Math.max(...series.flatMap(s => s.data.map(d => d.y[1]))))
     },
     yaxis: {
       showAlways: false,
@@ -145,7 +178,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
 
           return value;
         },
-        offsetX: -10,
+        offsetX: -15,
         offsetY: 0
       }
     },

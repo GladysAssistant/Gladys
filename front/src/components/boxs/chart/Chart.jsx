@@ -139,7 +139,7 @@ class Chartbox extends Component {
     try {
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: 100,
+        max_states: 3000,
         device_features: deviceFeatures.join(',')
       });
 
@@ -159,7 +159,9 @@ class Chartbox extends Component {
 
         data.forEach((oneFeature, index) => {
           const { values, deviceFeature, device } = oneFeature;
-          const deviceFeatureName = deviceFeatureNames ? deviceFeatureNames[index] : null;
+          const deviceFeatureName = deviceFeatureNames
+            ? deviceFeatureNames[index]
+            : getDeviceName(device, deviceFeature);
           let previousValue = null;
           let lastChangeTime = null;
           const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
@@ -176,7 +178,7 @@ class Chartbox extends Component {
 
               if (value.value !== previousValue) {
                 const newData = {
-                  x: deviceFeatureName || getDeviceName(device, deviceFeature),
+                  x: deviceFeatureName,
                   y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
                 };
                 if (previousValue === 0) {
@@ -192,7 +194,7 @@ class Chartbox extends Component {
 
           if (previousValue !== null) {
             const newData = {
-              x: deviceFeatureName || getDeviceName(device, deviceFeature),
+              x: deviceFeatureName,
               y: [lastChangeTime, lastValueTime]
             };
             if (previousValue === 0) {
