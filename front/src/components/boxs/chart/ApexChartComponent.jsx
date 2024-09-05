@@ -69,7 +69,7 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartAreaOptions({
       height,
@@ -90,7 +90,7 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartLineOptions({
       height,
@@ -110,7 +110,7 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
-      height = 200;
+      height = 200 + this.props.heightAdditional;
     }
     const options = getApexChartStepLineOptions({
       height,

@@ -115,6 +115,7 @@ class Chartbox extends Component {
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let nbFeaturesDisplayed = deviceFeatures.length;
     if (!deviceFeatures) {
       // migrate all box (one device feature)
       if (this.props.box.device_feature) {
@@ -145,6 +146,9 @@ class Chartbox extends Component {
         const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
         const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
         const { values, deviceFeature } = oneFeature;
+        if (values.length === 0) {
+          nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
+        }
         const deviceName = deviceFeature.name;
         const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
         return {
@@ -163,7 +167,8 @@ class Chartbox extends Component {
         series,
         loading: false,
         initialized: true,
-        emptySeries
+        emptySeries,
+        nbFeaturesDisplayed
       };
 
       if (data.length > 0) {
@@ -235,7 +240,8 @@ class Chartbox extends Component {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
       initialized: false,
-      height: 'small'
+      height: 'small',
+      nbFeaturesDisplayed: 0
     };
   }
   componentDidMount() {
@@ -276,15 +282,19 @@ class Chartbox extends Component {
       lastValueRounded,
       interval,
       emptySeries,
-      unit
+      unit,
+      nbFeaturesDisplayed
     }
   ) {
-    const displayVariation = props.box.display_variation;
+    const { box } = this.props;
+    const displayVariation = box.display_variation;
+    let heightAdditional = 0;
+    heightAdditional = 20 * (nbFeaturesDisplayed - 1);
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
           <div class="d-flex align-items-center">
-            <div class={cx(style.subheader)}>{props.box.title}</div>
+            <div class={cx(style.subheader)}>{box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
@@ -432,16 +442,17 @@ class Chartbox extends Component {
               </div>
             </div>
           )}
-          {emptySeries === false && props.box.display_axes && (
+          {emptySeries === false && box.display_axes && (
             <div class="mt-4">
               <ApexChartComponent
                 series={series}
                 interval={interval}
                 user={props.user}
                 size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
+                chart_type={box.chart_type}
+                display_axes={box.display_axes}
+                colors={box.colors}
+                heightAdditional={heightAdditional}
               />
             </div>
           )}
@@ -470,15 +481,16 @@ class Chartbox extends Component {
                 </div>
               </div>
             )}
-            {emptySeries === false && !props.box.display_axes && (
+            {emptySeries === false && !box.display_axes && (
               <ApexChartComponent
                 series={series}
                 interval={interval}
                 user={props.user}
                 size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
+                chart_type={box.chart_type}
+                display_axes={box.display_axes}
+                colors={box.colors}
+                heightAdditional={heightAdditional}
               />
             )}
           </div>
