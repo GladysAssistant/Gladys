@@ -139,7 +139,7 @@ class Chartbox extends Component {
     try {
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: 3000,
+        max_states: this.props.box.chart_type === 'timeline' ? 3000 : null,
         device_features: deviceFeatures.join(',')
       });
 
