@@ -105,6 +105,8 @@ const ChartBoxExpanded = ({ children, ...props }) => (
                   {...props}
                   showHistoryExpanded={true}
                   showCloseButton={true}
+                  startDate={props.boxOptions.startDate}
+                  endDate={props.boxOptions.endDate}
                 />
                 {/* Future options / Boutons */}
                 {/* <div class="form-footer">
@@ -177,14 +179,13 @@ const ChartBoxExpanded = ({ children, ...props }) => (
                           }
                           {(props.selectedCriteriaDate === 'current') &&
                             <div class="d-flex flex-grow-1 min-width-200">
-                              <select class="form-control" value={props.boxOptions.intervalUnit} onChange={props.handleIntervalUnitChange}>
+                              <select class="form-control" value={props.tempBoxOptions.intervalUnit} onChange={props.handleIntervalUnitChange}>
                                 {intervalUnit.map(unit => (
                                   <option key={unit.value} value={unit.value}>{unit.label}</option>
                                 ))}
                               </select>
                             </div>
                           }
-                          {console.log('props.boxOptions.startDate', props.boxOptions)}
                           {(props.selectedCriteriaDate === 'before') &&
                             <>
                               <div class="d-flex flex-column align-items-start">
@@ -196,7 +197,7 @@ const ChartBoxExpanded = ({ children, ...props }) => (
                                     type="date"
                                     id="endDate"
                                     class="form-control"
-                                    value={props.boxOptions.endDate}
+                                    value={props.tempBoxOptions.endDate}
                                     onInput={props.handleEndDateChange}
                                   />
                                 </div>
@@ -206,10 +207,10 @@ const ChartBoxExpanded = ({ children, ...props }) => (
                                     <Text id="dashboard.boxes.chart.date" />
                                   </label>
                                   <DatePicker
-                                    selected={props.boxOptions.endDate}
+                                    selected={props.tempBoxOptions.endDate}
                                     onChange={props.handleEndDateChange}
                                     className={cx('form-control')}
-                                  inline
+                                    inline
                                     // showTimeSelect
                                     timeFormat="HH:mm"
                                     timeIntervals={30}
@@ -225,45 +226,45 @@ const ChartBoxExpanded = ({ children, ...props }) => (
                           {(props.selectedCriteriaDate === 'between') &&
                             <>
                               <div class="d-flex flex-grow-1 min-width-200">
-                                <input type="date" class="form-control mr-2" placeholder="date de début" value={props.boxOptions.startDate} onChange={props.handleStartDateChange} />
-                                <input type="date" class="form-control mr-2" placeholder="date de fin" value={props.boxOptions.endDate} onChange={props.handleEndDateChange} />
+                                <input type="date" class="form-control mr-2" placeholder="date de début" value={props.tempBoxOptions.startDate} onChange={props.handleStartDateChange} />
+                                <input type="date" class="form-control mr-2" placeholder="date de fin" value={props.tempBoxOptions.endDate} onChange={props.handleEndDateChange} />
                               </div>
                               <div class="d-flex flex-grow-1 min-width-200">
-                              <div class={cx(style.datePicker, 'mr-2')}>
-                                <span class={style.datePickerLabel}>
-                                  <Text id="dashboard.boxes.chart.date" />
-                                </span>
-                                <DatePicker
-                                  selected={props.boxOptions.startDate}
-                                  onChange={props.handleStartDateChange}
-                                  className={cx('form-control', style.datePickerInput)}
-                                  showTimeSelect
-                                  timeFormat="HH:mm"
-                                  timeIntervals={30}
-                                  dateFormat="yyyy-MM-dd HH:mm"
-                                  timeCaption="time"
-                                  maxDate={new Date()}
-                                  minDate={new Date('1970-01-01T00:00:00Z')}
-                                />
+                                <div class={cx(style.datePicker, 'mr-2')}>
+                                  <span class={style.datePickerLabel}>
+                                    <Text id="dashboard.boxes.chart.date" />
+                                  </span>
+                                  <DatePicker
+                                    selected={props.tempBoxOptions.startDate}
+                                    onChange={props.handleStartDateChange}
+                                    className={cx('form-control', style.datePickerInput)}
+                                    showTimeSelect
+                                    timeFormat="HH:mm"
+                                    timeIntervals={30}
+                                    dateFormat="yyyy-MM-dd HH:mm"
+                                    timeCaption="time"
+                                    maxDate={new Date()}
+                                    minDate={new Date('1970-01-01T00:00:00Z')}
+                                  />
+                                </div>
+                                <div class={cx(style.datePicker, 'mr-2')}>
+                                  <span class={style.datePickerLabel}>
+                                    <Text id="dashboard.boxes.chart.date" />
+                                  </span>
+                                  <DatePicker
+                                    selected={props.tempBoxOptions.startDate}
+                                    onChange={props.handleStartDateChange}
+                                    className={cx('form-control', style.datePickerInput)}
+                                    showTimeSelect
+                                    timeFormat="HH:mm"
+                                    timeIntervals={30}
+                                    dateFormat="yyyy-MM-dd HH:mm"
+                                    timeCaption="time"
+                                    maxDate={new Date()}
+                                    minDate={new Date('1970-01-01T00:00:00Z')}
+                                  />
+                                </div>
                               </div>
-                              <div class={cx(style.datePicker, 'mr-2')}>
-                                <span class={style.datePickerLabel}>
-                                  <Text id="dashboard.boxes.chart.date" />
-                                </span>
-                                <DatePicker
-                                  selected={props.boxOptions.startDate}
-                                  onChange={props.handleStartDateChange}
-                                  className={cx('form-control', style.datePickerInput)}
-                                  showTimeSelect
-                                  timeFormat="HH:mm"
-                                  timeIntervals={30}
-                                  dateFormat="yyyy-MM-dd HH:mm"
-                                  timeCaption="time"
-                                  maxDate={new Date()}
-                                  minDate={new Date('1970-01-01T00:00:00Z')}
-                                />
-                              </div>
-                            </div>
                             </>
                           }
 
@@ -323,7 +324,16 @@ class ExpandedDashboardPage extends Component {
   };
   applyAndClose = () => {
     console.log('applyAndClose');
-    this.setState({ dropdownOpenGlobal: false });
+    this.setState(prevState => ({
+      dropdownOpenGlobal: false,
+      boxOptions: {
+        ...prevState.boxOptions,
+        startDate: prevState.tempBoxOptions.startDate,
+        endDate: prevState.tempBoxOptions.endDate,
+        interval: prevState.tempBoxOptions.interval,
+        intervalUnit: prevState.tempBoxOptions.intervalUnit
+      },
+    }));
     // Logique supplémentaire si besoin, comme l'appel à une fonction pour appliquer les critères sélectionnés.
   };
   toggleDropdownCriteriaDate = () => {
@@ -357,8 +367,11 @@ class ExpandedDashboardPage extends Component {
     }
     console.log('handleStartDateChange', date);
     this.setState(prevState => {
-      if (prevState.boxOptions.endDate) {
-        const newEndDate = prevState.boxOptions.endDate || new Date(date.getTime() + prevState.boxOptions.interval * 60000);
+      const tempBoxOptions = prevState.tempBoxOptions;
+      tempBoxOptions.startDate = new Date(date);
+      return tempBoxOptions;
+      if (prevState.tempBoxOptions.endDate) {
+        const newEndDate = prevState.tempBoxOptions.endDate || new Date(date.getTime() + prevState.tempBoxOptions.interval * 60000);
         return {
           startDate: date,
           endDate: newEndDate < date ? date : newEndDate
@@ -380,10 +393,9 @@ class ExpandedDashboardPage extends Component {
     }
     console.log('handleEndDateChange', date);
     this.setState(prevState => {
-      const boxOptions = prevState.boxOptions;
-      console.log('handleEndDateChange prevState', prevState);
-      boxOptions.endDate = new Date(date);
-      return boxOptions;
+      const tempBoxOptions = prevState.tempBoxOptions;
+      tempBoxOptions.endDate = new Date(date);
+      return tempBoxOptions;
       if (boxOptions.startDate) {
         const newStartDate = boxOptions.startDate || new Date(date.getTime() - boxOptions.interval * 60000);
 
@@ -456,11 +468,17 @@ class ExpandedDashboardPage extends Component {
         interval: 30,
         intervalUnit: 'days'
       },
+      tempBoxOptions: {
+        startDate: null,
+        endDate: null,
+        interval: 30,
+        intervalUnit: 'days'
+      },
       dropdownOpenCriteriaDate: false,
       dropdownOpenCriteriaAggregate: false,
       selectedGlobalOption: false,
       selectedCriteriaDate: 'before',
-      selectedCriteriaAggregate: 'notAggregate',
+      selectedCriteriaAggregate: 'notAggregate'
     };
     console.log('this.state', this.state);
   }
@@ -476,6 +494,7 @@ class ExpandedDashboardPage extends Component {
   }
   render(props, { loading,
     boxOptions,
+    tempBoxOptions,
     dropdownOpenGlobal,
     dropdownOpenCriteriaDate,
     dropdownOpenCriteriaAggregate,
@@ -488,6 +507,7 @@ class ExpandedDashboardPage extends Component {
           {...props}
           loading={loading}
           boxOptions={boxOptions}
+          tempBoxOptions={tempBoxOptions}
           dropdownOpenGlobal={dropdownOpenGlobal}
           dropdownOpenCriteriaDate={dropdownOpenCriteriaDate}
           dropdownOpenCriteriaAggregate={dropdownOpenCriteriaAggregate}

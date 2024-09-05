@@ -354,8 +354,8 @@ class Chartbox extends Component {
       initialized: false,
       height: 'small',
       nbFeaturesDisplayed: 0,
-      startDate: null,
-      endDate: null,
+      startDate: props.boxOptions.startDate || null,
+      endDate: props.boxOptions.endDate || null,
       dropdownOpen: false,
       selectedCriteria: 'before',
       maxStatesLive: 10000,
@@ -409,8 +409,8 @@ class Chartbox extends Component {
   ) {
     const { box, displayPreview, showHistoryExpanded } = this.props;
 
+    console.log('props constructor Chart', props);
     const displayVariation = box.display_variation;
-    const nbDeviceFeatures = box.device_features.length;
     const showAggregatedDataWarning = this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
     let heightAdditional = 0;
     if (showHistoryExpanded) {
@@ -652,6 +652,8 @@ class Chartbox extends Component {
                 colors={props.box.colors}
                 heightAdditional={heightAdditional}
                 dictionary={props.intl.dictionary}
+                startDate={startDate}
+                endDate={endDate}
               />
             )}
           </div>
