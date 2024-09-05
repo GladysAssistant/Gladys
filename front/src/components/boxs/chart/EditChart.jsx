@@ -133,17 +133,48 @@ class EditChart extends Component {
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
+  updateDeviceFeaturesTreshold = selectedDeviceFeaturesTresholdOptions => {
+    if (selectedDeviceFeaturesTresholdOptions && selectedDeviceFeaturesTresholdOptions.length > 0) {
+      const deviceFeaturesSelectors = selectedDeviceFeaturesTresholdOptions.map(
+        selectedDeviceFeaturesOption => selectedDeviceFeaturesOption.value
+      );
+      const units = selectedDeviceFeaturesTresholdOptions.map(selectedDeviceFeaturesOption => {
+        const deviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
+        return deviceFeature.unit;
+      });
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        device_features_treshold: deviceFeaturesSelectors,
+        units,
+        unit: undefined
+      });
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        device_features_treshold: [],
+        units: [],
+        unit: undefined
+      });
+    }
+    this.setState({ selectedDeviceFeaturesTresholdOptions });
+  };
+
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
       const devices = await this.props.httpClient.get('/api/v1/device');
       const deviceOptions = [];
+      const deviceThresholdOptions = [];
       const selectedDeviceFeaturesOptions = [];
+      const selectedDeviceFeaturesTresholdOptions = [];
 
       devices.forEach(device => {
         const deviceFeaturesOptions = [];
+        const deviceFeaturesTresholdOptions = [];
         device.features.forEach(feature => {
           const featureOption = {
+            value: feature.selector,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+          };
+          const featureOptionTreshold = {
             value: feature.selector,
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
@@ -151,9 +182,13 @@ class EditChart extends Component {
           // We don't support all devices for this view
           if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
             deviceFeaturesOptions.push(featureOption);
+            deviceFeaturesTresholdOptions.push(featureOptionTreshold);
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
+          }
+          if (this.props.box.device_features_treshold && this.props.box.device_features_treshold.indexOf(feature.selector) !== -1) {
+            selectedDeviceFeaturesTresholdOptions.push(featureOptionTreshold);
           }
         });
         if (deviceFeaturesOptions.length > 0) {
@@ -170,8 +205,22 @@ class EditChart extends Component {
             options: deviceFeaturesOptions
           });
         }
+        if (deviceFeaturesTresholdOptions.length > 0) {
+          deviceFeaturesTresholdOptions.sort((a, b) => {
+            if (a.label < b.label) {
+              return -1;
+            } else if (a.label > b.label) {
+              return 1;
+            }
+            return 0;
+          });
+          deviceThresholdOptions.push({
+            label: device.name,
+            options: deviceFeaturesTresholdOptions
+          });
+        }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, deviceThresholdOptions, selectedDeviceFeaturesTresholdOptions, loading: false });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -196,12 +245,16 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
+  render(props, { selectedDeviceFeaturesOptions, selectedDeviceFeaturesTresholdOptions, deviceOptions, deviceThresholdOptions, loading, displayPreview }) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
       label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i]
     }));
+    console.log(deviceThresholdOptions);
+    console.log(selectedDeviceFeaturesTresholdOptions);
+    console.log("this", this);
+    console.log("props", props);
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -259,6 +312,20 @@ class EditChart extends Component {
                 </option>
               </select>
             </div>
+            {deviceThresholdOptions && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.editDeviceFeaturesTresholdLabel" />
+                </label>
+                <Select
+                  defaultValue={null}
+                  value={selectedDeviceFeaturesTresholdOptions}
+                  isMulti
+                  onChange={this.updateDeviceFeaturesTreshold}
+                  options={[...deviceThresholdOptions, { label: 'Valeur manuelle', value: 'manual' }]}
+                />
+              </div>
+            )}
             {selectedDeviceFeaturesOptions &&
               selectedDeviceFeaturesOptions.map((feature, i) => (
                 <div class="form-group">
