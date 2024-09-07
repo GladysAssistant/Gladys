@@ -355,6 +355,15 @@
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
+        "editDeviceFeaturesTresholdLabel": "Sélectionnez les valeurs seuils que vous souhaitez afficher sur la courbe",
+        "editDeviceFeaturesTresholdManualLabel": "Ajouter une valeur seuil manuelle",
+        "editTreshold": {
+          "nameLabel": "Nom",
+          "valueLabel": "Valeur",
+          "unitLabel": "Unité",
+          "colorLabel": "Couleur",
+          "deleteButton": "Supprimer"
+        },
         "editRoomLabel": "Sélectionnez une pièce",
         "chartType": "Sélectionner le type de graphique",
         "chartColor": "Sélectionner la couleur du graphique",

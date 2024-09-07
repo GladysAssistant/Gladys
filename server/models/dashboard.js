@@ -16,9 +16,19 @@ const boxesSchema = Joi.array().items(
       device: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
       device_feature_names: Joi.array().items(Joi.string()),
+      device_features_treshold: Joi.array().items(Joi.string()),
+      manual_features_treshold_details: Joi.array().items(
+        Joi.object().keys({
+          name: Joi.string().allow(null),
+          value: Joi.number().allow(null),
+          unit: Joi.string().allow(''),
+          color: Joi.string().allow('')
+        }),
+      ),
       device_feature: Joi.string(),
       unit: Joi.string(),
       units: Joi.array().items(Joi.string().allow(null)),
+      manual_units: Joi.array().items(Joi.string().allow(null)),
       title: Joi.string(),
       interval: Joi.string(),
       display_axes: Joi.boolean(),
