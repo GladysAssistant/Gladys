@@ -92,14 +92,101 @@ class ApexChartComponent extends Component {
     } else {
       height = 200;
     }
+    let seriesAnnotationsYaxis = [];
+    let seriesPoints = [];
+    console.log('this.props', this.props);
+    if (this.props.seriesAnnotationsYaxis) {
+      // console.log('seriesAnnotationsYaxis', this.props.seriesAnnotationsYaxis);
+      seriesAnnotationsYaxis = this.props.seriesAnnotationsYaxis.flatMap(annotation => {
+        const annotationY = {
+          y: annotation.y, // Valeur de la ligne min
+          borderColor: annotation.color, // Couleur de la ligne
+          // strokeDashArray: 2,
+          // fillColor: annotation.color,
+
+          fillColor: annotation.color,
+          marker: {
+            size: 4,
+            fillColor: "#fff",
+            strokeWidth: 2,
+            strokeColor: "#333",
+          },
+          // opacity: 0.5,
+          width: '200%',
+        };
+        if (annotation.y2) {
+          annotationY.y2 = annotation.y2;
+        }
+        if (annotation.more_or_less === 'moreOrLess') {
+          const { y2, ...annotationYWithoutY2 } = annotationY;
+          const additionalAnnotationY = {
+              // Copy the existing properties except y2
+            ...annotationYWithoutY2,
+            y: annotation.value, // Set 'y' to 'annotation.value'
+
+            label: {
+              borderColor: annotation.color,
+              style: {
+                color: '#fff',
+                background: annotation.color
+              },
+              text: annotation.name
+            }
+          };
+          return [annotationY, additionalAnnotationY]
+        } else {
+          annotationY.label = {
+            borderColor: annotation.color,
+            style: {
+              color: '#fff',
+              background: annotation.color
+            },
+            text: annotation.name
+          };
+        }
+        return annotationY;
+      });
+    }
+    if (this.props.seriesPoints) {
+      console.log('seriesAnnotationsXaxis', this.props.seriesAnnotationsXaxis);
+      seriesPoints = this.props.seriesPoints.map(point => {
+        console.log('point', point);
+        const data = point.data.map(p => {
+          return {
+            y: p.y,
+            // y2: 24,
+            x: new Date(p.x).getTime(),
+            borderColor: '#FF4560',
+            label: {
+              text: point.name
+            },
+            // marker: {
+            //   size: 4,
+            //   fillColor: '#fff',
+            //   strokeWidth: 2,
+            //   strokeColor: "#333",  // A visible stroke color
+            //   shape: "circle",
+            // },
+            // position: 'front'
+          };
+        });
+        console.log('data', data);
+        return data;
+      });
+      seriesPoints = mergeArray(...seriesPoints);
+    }
+    console.log('getLineChartOptions seriesPoints', seriesPoints);
     const options = getApexChartLineOptions({
       height,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language
+      defaultLocale: this.props.user.language,
+      seriesPoints,
+      seriesAnnotationsYaxis
     });
+    console.log('getLineChartOptions options', options);
     this.addDateFormatter(options);
     return options;
   };
@@ -148,11 +235,13 @@ class ApexChartComponent extends Component {
   }
   componentDidUpdate(nextProps) {
     const seriesDifferent = nextProps.series !== this.props.series;
+    const seriesPointsDifferent = nextProps.seriesPoints !== this.props.seriesPoints;
+    const seriesAnnotationsYaxisDifferent = nextProps.seriesAnnotationsYaxis !== this.props.seriesAnnotationsYaxis;
     const chartTypeDifferent = nextProps.chart_type !== this.props.chart_type;
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    if (seriesDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent) {
+    if (seriesDifferent || seriesPointsDifferent || seriesAnnotationsYaxisDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent) {
       this.displayChart();
     }
   }

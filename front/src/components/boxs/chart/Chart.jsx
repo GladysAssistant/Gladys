@@ -115,6 +115,8 @@ class Chartbox extends Component {
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let deviceFeaturesTreshold = this.props.box.device_features_treshold;
+    let manualFeaturesTreshold = this.props.box.manual_features_treshold_details;
     if (!deviceFeatures) {
       // migrate all box (one device feature)
       if (this.props.box.device_feature) {
@@ -161,7 +163,6 @@ class Chartbox extends Component {
 
       const newState = {
         series,
-        loading: false,
         initialized: true,
         emptySeries
       };
@@ -212,6 +213,63 @@ class Chartbox extends Component {
       await this.setState(newState);
     } catch (e) {
       console.error(e);
+    }
+
+    if (deviceFeaturesTreshold.length === 0) {
+      await this.setState({ loading: false });
+      return;
+    }
+    try {
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+        interval: this.state.interval,
+        max_states: 10,
+        device_features: deviceFeaturesTreshold.join(',')
+      });
+
+      const seriesPoints = data.map((oneFeature, index) => {
+        const unit = this.props.box.units[index];
+        const deviceFeatureUnitShort = this.props.intl.dictionary.deviceFeatureUnitShort[unit];
+        const { values, deviceFeature } = oneFeature;
+        const deviceName = deviceFeature.name;
+        const name = `${deviceName} (${deviceFeatureUnitShort})`;
+        return {
+          name,
+          data: values.map(value => {
+            return {
+              x: value.created_at,
+              y: value.value
+            };
+          })
+        };
+      });
+      await this.setState({ seriesPoints });
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (manualFeaturesTreshold.length === 0) {
+      await this.setState({ loading: false });
+      return;
+    }
+
+    if (manualFeaturesTreshold.length > 0) {
+      const seriesAnnotationsYaxis = manualFeaturesTreshold.map((oneFeature, index) => {
+        const unit = oneFeature.unit;
+        const deviceFeatureUnitShort = this.props.intl.dictionary.deviceFeatureUnitShort[unit];
+        const deviceName = oneFeature.name;
+        const value = oneFeature.more_or_less && oneFeature.more_or_less !== 'without' ?
+          `${oneFeature.min}/${oneFeature.max}` : `${oneFeature.value}`;
+        const name = `${deviceName} ${value}${deviceFeatureUnitShort}`;
+        return {
+          name,
+          value: oneFeature.value,
+          y: oneFeature.min ? oneFeature.min : oneFeature.value,
+          y2: oneFeature.max ? oneFeature.max : oneFeature.value_more_or_less,
+          color: oneFeature.color,
+          more_or_less: oneFeature.more_or_less
+        };
+      });
+      await this.setState({ seriesAnnotationsYaxis });
     }
   };
   updateDeviceStateWebsocket = payload => {
@@ -270,6 +328,8 @@ class Chartbox extends Component {
       initialized,
       loading,
       series,
+      seriesPoints,
+      seriesAnnotationsYaxis,
       dropdown,
       variation,
       variationDownIsPositive,
@@ -436,6 +496,8 @@ class Chartbox extends Component {
             <div class="mt-4">
               <ApexChartComponent
                 series={series}
+                seriesPoints={seriesPoints}
+                seriesAnnotationsYaxis={seriesAnnotationsYaxis}
                 interval={interval}
                 user={props.user}
                 size="big"
@@ -473,6 +535,8 @@ class Chartbox extends Component {
             {emptySeries === false && !props.box.display_axes && (
               <ApexChartComponent
                 series={series}
+                seriesPoints={seriesPoints}
+                seriesAnnotationsYaxis={seriesAnnotationsYaxis}
                 interval={interval}
                 user={props.user}
                 size="big"

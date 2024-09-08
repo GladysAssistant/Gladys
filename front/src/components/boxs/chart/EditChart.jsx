@@ -3,6 +3,8 @@ import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 import get from 'get-value';
+import cx from 'classnames';
+import style from './style.css';
 
 import BaseEditBox from '../baseEditBox';
 import Chart from './Chart';
@@ -112,8 +114,10 @@ class EditChart extends Component {
 
   addManualThreshold = () => {
     const { manualThresholdDetails } = this.state;
-    manualThresholdDetails.push({ name: '', value: '', unit: '', color: '' });
+    manualThresholdDetails.push({ name: '', value: '', unit: '', color: '', more_or_less: 'without' });
+    const index = manualThresholdDetails.length - 1;
     this.setState({ manualThresholdDetails });
+    this.openEditForm(index);
   };
   deleteManualThreshold = index => {
     const { manualThresholdDetails } = this.state;
@@ -126,7 +130,32 @@ class EditChart extends Component {
 
   updateManualThresholdDetail = (index, field, value) => {
     const { manualThresholdDetails } = this.state;
-    manualThresholdDetails[index][field] = value;
+    const detail = manualThresholdDetails[index];
+    const isNumber = !isNaN(value);
+    detail[field] = isNumber ? Number(value) : value;
+    if (field === 'value' || field === 'value_more_or_less' || field === 'more_or_less') {
+
+      if (detail.more_or_less === 'moreOrLess') {
+        detail.min = detail.value - detail.value_more_or_less;
+        detail.max = detail.value + detail.value_more_or_less;
+      }
+      if (detail.more_or_less === 'more') {
+        detail.min = detail.value;
+        detail.max = detail.value + detail.value_more_or_less;
+      }
+      if (detail.more_or_less === 'less') {
+        detail.min = detail.value - detail.value_more_or_less;
+        detail.max = detail.value;
+      }
+      if (detail.more_or_less === 'manual') {
+        detail.min = detail.value;
+        detail.max = detail.value_more_or_less;
+      }
+    }
+    if (field === 'value' && detail.more_or_less === 'manual') {
+      detail.min = value;
+    }
+
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       manual_features_treshold_details: manualThresholdDetails
     });
@@ -138,20 +167,12 @@ class EditChart extends Component {
       const deviceFeaturesSelectors = newSelectedTresholdOptions.map(
         selectedDeviceFeaturesOption => selectedDeviceFeaturesOption.value
       );
-      const units = newSelectedTresholdOptions.map(selectedTresholdOption => {
-        const deviceFeature = this.deviceFeatureBySelector.get(selectedTresholdOption.value);
-        return deviceFeature.unit;
-      });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features_treshold: deviceFeaturesSelectors,
-        manual_units: units,
-        unit: undefined
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features_treshold: [],
-        manual_units: [],
-        unit: undefined
       });
     }
     this.setState({ selectedTresholdOptions: newSelectedTresholdOptions });
@@ -267,9 +288,25 @@ class EditChart extends Component {
     this.deviceFeatureBySelector = new Map();
     this.state = {
       selectedTresholdOptions: [],
-      manualThresholdDetails: box.manual_features_treshold_details || []
+      manualThresholdDetails: box.manual_features_treshold_details || [],
+      editingIndex: null
     };
   }
+
+  openEditForm = index => {
+    this.setState({ editingIndex: index });
+  };
+
+  closeEditForm = () => {
+    // TODO: check if the detail is valid and error
+    const { manualThresholdDetails, editingIndex } = this.state;
+    const detail = manualThresholdDetails[editingIndex];
+    if (detail.name && detail.value && !isNaN(detail.value) && detail.color && detail.unit) {
+      this.setState({ editingIndex: null });
+    } else {
+      alert('Please fill in all fields correctly before closing.');
+    }
+  };
 
   componentDidMount() {
     this.getDeviceFeatures();
@@ -292,7 +329,8 @@ class EditChart extends Component {
       deviceOptions,
       deviceThresholdOptions,
       loading,
-      displayPreview
+      displayPreview,
+      editingIndex
     }
   ) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
@@ -455,16 +493,44 @@ class EditChart extends Component {
                     options={deviceThresholdOptions}
                   />
 
+
                   {manualThresholdDetails.map((detail, index) => (
-                    <ManualThresholdForm
-                      key={index}
-                      index={index}
-                      manualThresholdDetail={detail}
-                      colorOptions={colorOptions}
-                      colorSelectorStyles={colorSelectorStyles}
-                      updateManualThresholdDetail={this.updateManualThresholdDetail}
-                      deleteManualThreshold={this.deleteManualThreshold}
-                    />
+                    <div key={index} className="mt-3 mb-3">
+                      {editingIndex === index ? (
+                        <ManualThresholdForm
+                          key={index}
+                          index={index}
+                          manualThresholdDetail={detail}
+                          colorOptions={colorOptions}
+                          colorSelectorStyles={colorSelectorStyles}
+                          updateManualThresholdDetail={this.updateManualThresholdDetail}
+                          deleteManualThreshold={this.deleteManualThreshold}
+                          closeFlyout={this.closeEditForm}
+                        />
+                      ) : (
+                        <div class={cx('row align-items-center', style.detailItem)}>
+                          <div class="col-8 text-left">
+                            <span>
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  width: '10px',
+                                  height: '10px',
+                                  backgroundColor: detail.color,
+                                  marginRight: '5px'
+                                }}
+                              ></span>
+                              {detail.name}: {detail.value} {detail.unit}
+                            </span>
+                          </div>
+                          <div class="col-4 text-right">
+                            <button className="btn btn-secondary btn-sm" onClick={() => this.openEditForm(index)}>
+                              <Text id="dashboard.boxes.chart.editTreshold.configureButton" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                   <button class="btn btn-secondary w-100" onClick={this.addManualThreshold}>
                     <Text id="dashboard.boxes.chart.editDeviceFeaturesTresholdManualLabel" className="w-100" />

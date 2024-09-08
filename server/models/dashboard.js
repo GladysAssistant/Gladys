@@ -19,10 +19,15 @@ const boxesSchema = Joi.array().items(
       device_features_treshold: Joi.array().items(Joi.string()),
       manual_features_treshold_details: Joi.array().items(
         Joi.object().keys({
-          name: Joi.string().allow(null),
-          value: Joi.number().allow(null),
+          name: Joi.string(),
+          value: Joi.number(),
+          value_more_or_less: Joi.number().allow(null),
+          min: Joi.number().allow(null),
+          max: Joi.number().allow(null),
           unit: Joi.string().allow(''),
-          color: Joi.string().allow('')
+          color: Joi.string().allow(''),
+          fill_color: Joi.string().allow(null),
+          more_or_less: Joi.string().valid('without', 'more', 'less', 'moreOrLess', 'manual'),
         }),
       ),
       device_feature: Joi.string(),
