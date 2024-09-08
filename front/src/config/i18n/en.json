@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Select..."
+    "selectPlaceholder": "Select...",
+    "yes": "Yes",
+    "no": "No"
   },
   "color": {
     "aqua": "Aqua",
@@ -231,6 +233,7 @@
       "houseLabel": "House",
       "tabletModeDisabled": "Tablet Mode Disabled"
     },
+    "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
@@ -2362,7 +2365,9 @@
       "gladys-gateway-backup": "Gladys Plus backup",
       "device-state-purge-single-feature": "Single device feature states clean",
       "vacuum": "Database cleaning",
-      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup"
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
+      "migrate-sqlite-to-duckdb": "DuckDB migration",
+      "device-state-purge-all-sqlite-states": "Purge all SQLite states"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -2415,7 +2420,18 @@
       "dead": "Dead"
     },
     "batteryLevel": "Battery level alert",
-    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold."
+    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold.",
+    "duckDbMigrationTitle": "Migration to DuckDB",
+    "duckDbMigrationDescription": "We are migrating to a new database system for sensor data. Gladys will automatically migrate your data, but will not delete your data from your SQLite database to prevent data loss.",
+    "duckDbMigrationProgressTitle": "Migration Progress",
+    "duckDbMigrationMigrationDone": "Migration completed:",
+    "duckDbNumberOfStatesinSQlite": "Number of states in SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Number of states in DuckDB",
+    "restartMigrationTitle": "Restart Migration",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "purgeSQliteTitle": "Purge SQLite states",
+    "purgeSQliteDescription": "Once all states are deleted from SQLite, you will need to perform a \"database cleanup\" on the tab to the right to free up disk space. This step may take some time."
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",

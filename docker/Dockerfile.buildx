@@ -1,27 +1,27 @@
 # STEP 1
 # Prepare server package*.json files
-FROM node:18-alpine as json-files
+FROM node:18-slim as json-files
 COPY ./server /json-files/server
 WORKDIR /json-files/server/
 RUN find . -type f \! -name "package*.json" -exec rm -r {} \;
 COPY ./server/cli /json-files/server/cli
 COPY ./server/utils /json-files/server/utils
 
-
 # STEP 3
 # Gladys Bundle
-FROM node:18-alpine as gladys
+FROM node:18-slim as gladys
 
 # System dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
          tzdata \
          nmap \
          ffmpeg \
-         sqlite \
+         sqlite3 \
          openssl \
          gzip \
-         eudev \
-         bluez
+         udev \
+         bluez \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=json-files /json-files/server /src/server
 
@@ -29,10 +29,18 @@ ENV LD_LIBRARY_PATH /lib
 
 WORKDIR /src/server
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools git libffi-dev linux-headers \
-    && npm ci --unsafe-perm --production \
-    && npm cache clean --force \
-    && apk del .build-deps
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+         build-essential \
+         python3 \
+         python3-pip \
+         git \
+         libffi-dev \
+         && npm ci --unsafe-perm --production \
+         && npm cache clean --force \
+         && apt-get autoremove -y build-essential python3 python3-pip git libffi-dev \
+         && apt-get purge -y --auto-remove \
+         && rm -rf /var/lib/apt/lists/*
 
 # Copy builded front
 COPY ./static /src/server/static
