@@ -157,18 +157,7 @@ class Chartbox extends Component {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
           data: []
         };
-        const serie2 = {
-          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.missingDataOnInterval'),
-          data: []
-        };
         const now = new Date();
-        const firstChartTime = data.reduce((minTime, oneFeature) => {
-          if (oneFeature.values.length > 0) {
-            const featureTime = new Date(oneFeature.values[0].created_at).getTime();
-            return Math.min(minTime, featureTime);
-          }
-          return minTime;
-        }, (Math.round(now.getTime() / 1000) - this.state.interval * 60) * 1000);
 
         const lastValueTime = Math.round(now.getTime() / 1000) * 1000;
         data.forEach((oneFeature, index) => {
@@ -176,13 +165,9 @@ class Chartbox extends Component {
           const deviceFeatureName = deviceFeatureNames
             ? deviceFeatureNames[index]
             : getDeviceName(device, deviceFeature);
-          let previousValue = null;
-          let lastChangeTime = null;
-          let firstValueTime;
           if (values.length === 0) {
             nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
           } else {
-            firstValueTime = Math.round(new Date(values[0].created_at).getTime() / 1000) * 1000;
             values.forEach(value => {
               emptySeries = false;
               const beginTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
@@ -200,31 +185,9 @@ class Chartbox extends Component {
               }
             });
           }
-
-          if (previousValue !== null) {
-            const newData = {
-              x: deviceFeatureName,
-              y: [lastChangeTime, lastValueTime]
-            };
-            if (previousValue === 0) {
-              serie0.data.push(newData);
-            } else {
-              serie1.data.push(newData);
-            }
-          }
-          if (values.length === maxStates) {
-            serie2.data.push({
-              x: deviceFeatureName,
-              y: [firstChartTime, firstValueTime]
-            });
-          }
         });
         series.push(serie1);
         series.push(serie0);
-        if (serie2.data.length > 0) {
-          series.push(serie2);
-          this.props.box.colors.push('#fd6a6a');
-        }
       } else {
         series = data.map((oneFeature, index) => {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
@@ -291,7 +254,6 @@ class Chartbox extends Component {
           }
         }
       }
-      console.log('newState', newState);
       await this.setState(newState);
     } catch (e) {
       console.error(e);

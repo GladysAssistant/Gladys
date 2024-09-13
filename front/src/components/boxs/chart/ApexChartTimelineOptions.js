@@ -68,7 +68,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
         show: false
       },
       animations: {
-        enabled: true
+        enabled: false
       },
       events: {
         mounted: addYAxisStyles,
@@ -118,7 +118,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       max: Math.floor(Math.max(...series.flatMap(s => s.data.map(d => d.y[1]))))
     },
     yaxis: {
-      showAlways: false,
+      showAlways: true,
       dataLabels: {
         enabled: false,
         textAnchor: 'start'

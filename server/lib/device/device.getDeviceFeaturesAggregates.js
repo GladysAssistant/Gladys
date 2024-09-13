@@ -79,7 +79,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
       intervalDate,
       maxStates,
     );
-    // values.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   } else {
     values = await db.duckDbReadConnectionAllAsync(
       `
