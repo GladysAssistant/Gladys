@@ -248,6 +248,7 @@ const EVENTS = {
   MESSAGE: {
     NEW: 'message.new',
     NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
+    PURGE_OLD_MESSAGES: 'message.purge-old-messages',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
