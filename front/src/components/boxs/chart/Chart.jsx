@@ -137,7 +137,7 @@ class Chartbox extends Component {
     }
     await this.setState({ loading: true });
     try {
-      const maxStates = 3000;
+      const maxStates = 300;
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
         max_states: this.props.box.chart_type === 'timeline' ? maxStates : 3000,
