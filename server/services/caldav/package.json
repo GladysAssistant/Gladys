@@ -16,6 +16,7 @@
     "bluebird": "^3.7.0",
     "dav-request": "^1.8.0",
     "dayjs": "^1.11.10",
+    "get-value": "^3.0.1",
     "ical": "^0.8.0",
     "xmldom": "^0.6.0"
   }

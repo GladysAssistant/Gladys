@@ -28,6 +28,7 @@ const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
+const { getEdfTempo } = require('./gateway.getEdfTempo');
 const { openAIAsk } = require('./gateway.openAIAsk');
 const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
 const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
@@ -117,6 +118,7 @@ Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
+Gateway.prototype.getEdfTempo = getEdfTempo;
 Gateway.prototype.openAIAsk = openAIAsk;
 Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
 
