@@ -354,6 +354,7 @@
         "noValueWarning": "Warnung: Wenn du dieses Gerät gerade konfiguriert hast, kann es einige Zeit dauern, bis hier etwas angezeigt wird: Gladys benötigt etwas Zeit, um genügend Daten zu sammeln. Bei Intervallen über 24 Stunden kann es bis zu 24 Stunden dauern, bis hier etwas angezeigt wird.",
         "noChartType": "Kein Diagrammtyp ausgewählt",
         "noChartTypeWarning": "Wenn du dieses Gerät gerade konfiguriert hast, bitte gehe zurück zur Seite der Box-Bearbeitung und wähle einen Diagrammtyp aus.",
+        "missingDataOnInterval": "Daten fehlen in diesem Intervall \n(zoomen, um die verfügbaren Daten zu sehen)",
         "editNameLabel": "Gib den Namen dieser Box ein",
         "editDeviceFeaturesLabel": "Wähle das Gerät aus, das hier angezeigt werden soll",
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
