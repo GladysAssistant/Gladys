@@ -17,6 +17,11 @@ const jobs = [
     event: EVENTS.JOB.PURGE_OLD_JOBS,
   },
   {
+    name: 'daily-purge-of-old-messages',
+    rule: '0 0 23 * * *', // every day at 23:00
+    event: EVENTS.MESSAGE.PURGE_OLD_MESSAGES,
+  },
+  {
     name: 'check-device-batteries',
     rule: '0 0 9 * * 6', // At 09:00 AM, only on Saturday
     event: EVENTS.DEVICE.CHECK_BATTERIES,
