@@ -186,8 +186,8 @@ class Chartbox extends Component {
             values.forEach(value => {
               emptySeries = false;
               const beginTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-              const endTime = value.end_time ?
-                Math.round(new Date(value.end_time).getTime() / 1000) * 1000
+              const endTime = value.end_time
+                ? Math.round(new Date(value.end_time).getTime() / 1000) * 1000
                 : lastValueTime;
               const newData = {
                 x: deviceFeatureName,
@@ -197,9 +197,6 @@ class Chartbox extends Component {
                 serie0.data.push(newData);
               } else {
                 serie1.data.push(newData);
-              }
-              if (deviceFeatureName === "Pompe de filtration (Piscine)") {
-                console.log('newData values', newData);
               }
             });
           }
