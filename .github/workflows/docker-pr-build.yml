@@ -144,7 +144,7 @@ jobs:
         run: |
           npm run build-with-stats
       - name: ↗️ Upload webpack stats artifact
-        uses: relative-ci/agent-upload-artifact-action@v1
+        uses: relative-ci/agent-upload-artifact-action@v2
         with:
           webpackStatsFile: ./front/stats.json
       - name: ↗️ Upload build artifact
