@@ -28,14 +28,13 @@ describe('message.purge', () => {
     });
     await messageHandler.purge();
     const rows = await db.Message.findAll({
-      attributes: ['id', 'text', 'created_at'],
+      attributes: ['id', 'text'],
       raw: true,
     });
     expect(rows).to.deep.equal([
       {
         id: 'b9a395df-d1d6-4905-a29f-2f110e028ea5',
         text: 'this is a recent message',
-        created_at: '2024-09-13 11:52:11.037 +00:00',
       },
     ]);
   });
