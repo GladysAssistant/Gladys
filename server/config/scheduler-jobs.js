@@ -12,14 +12,14 @@ const jobs = [
     event: EVENTS.DEVICE.PURGE_STATES,
   },
   {
-    name: 'hourly-device-state-aggregate',
-    rule: '0 0 * * * *', // every hour
-    event: EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
-  },
-  {
     name: 'daily-purge-of-old-jobs',
     rule: '0 0 22 * * *', // every day at 22:00
     event: EVENTS.JOB.PURGE_OLD_JOBS,
+  },
+  {
+    name: 'daily-purge-of-old-messages',
+    rule: '0 0 23 * * *', // every day at 23:00
+    event: EVENTS.MESSAGE.PURGE_OLD_MESSAGES,
   },
   {
     name: 'check-device-batteries',
