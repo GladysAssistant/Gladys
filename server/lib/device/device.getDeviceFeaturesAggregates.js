@@ -97,19 +97,9 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   let values;
 
   if (isBinary) {
-    values = await db.duckDbReadConnectionAllAsync(
-      BINARY_QUERY,
-      deviceFeature.id,
-      intervalDate,
-      maxStates,
-    );
+    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, intervalDate, maxStates);
   } else {
-    values = await db.duckDbReadConnectionAllAsync(
-      NON_BINARY_QUERY,
-      maxStates,
-      deviceFeature.id,
-      intervalDate,
-    );
+    values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, intervalDate);
   }
 
   return {
