@@ -369,7 +369,7 @@ class MainApp extends Component {
     this.props.checkSession();
   }
 
-  render({ user }, { }) {
+  render({ user }, {}) {
     const translationDefinition = get(translations, user.language, { default: translations.en });
     return (
       <IntlProvider definition={translationDefinition}>

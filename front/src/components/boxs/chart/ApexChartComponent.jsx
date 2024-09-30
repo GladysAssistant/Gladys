@@ -94,7 +94,7 @@ class ApexChartComponent extends Component {
         const endDate = dayjs(opts.y2)
           .locale(this.props.user.language)
           .format('LL');
-        
+
         return createTooltipContent(opts, startDate, endDate);
       };
     }

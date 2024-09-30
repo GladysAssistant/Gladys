@@ -26,24 +26,21 @@ async function getDeviceFeaturesAggregates(
   const device = this.stateManager.get('deviceById', deviceFeature.device_id);
 
   const now = new Date();
-  // const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
   let intervalDate;
-  let newStartDate = startDate;
-  let newEndDate = endDate;
+  let effectiveStartDate = new Date(startDate);
+  let effectiveEndDate = new Date(endDate);
   if (startDate === null && endDate === null) {
     intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
   } else if (startDate !== null && endDate === null) {
-    intervalDate = new Date(new Date(startDate).getTime() + intervalInMinutes * 60 * 1000);
-    newEndDate = intervalDate;
-    intervalDate = new Date(startDate);
+    intervalDate = new Date(effectiveStartDate.getTime() + intervalInMinutes * 60 * 1000);
+    effectiveEndDate = intervalDate;
   } else if (startDate === null && endDate !== null) {
-    intervalDate = new Date(new Date(endDate).getTime() - intervalInMinutes * 60 * 1000);
-    newStartDate = intervalDate;
-    intervalDate = new Date(endDate);
+    intervalDate = new Date(effectiveEndDate.getTime() - intervalInMinutes * 60 * 1000);
+    effectiveStartDate = intervalDate;
   } else {
     intervalDate = new Date(startDate);
   }
-
+  const isDateRangeSpecified = startDate || endDate;
   const values = await db.duckDbReadConnectionAllAsync(
     `
   WITH intervals AS (
@@ -54,7 +51,7 @@ async function getDeviceFeaturesAggregates(
         FROM
             t_device_feature_state
         WHERE device_feature_id = ?
-        AND created_at > ?
+        ${!isDateRangeSpecified ? 'AND created_at > ?' : ''}
         ${startDate ? 'AND created_at >= ?' : ''}
         ${endDate ? 'AND created_at <= ?' : ''}
     )
@@ -71,12 +68,11 @@ async function getDeviceFeaturesAggregates(
     ...[
       maxStates,
       deviceFeature.id,
-      intervalDate,
-      ...(startDate ? [new Date(startDate)] : []),
-      ...(endDate ? [new Date(endDate)] : [])
-    ]
+      ...(!isDateRangeSpecified ? [intervalDate] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveStartDate)] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveEndDate)] : []),
+    ],
   );
-
   return {
     device: {
       name: device.name,

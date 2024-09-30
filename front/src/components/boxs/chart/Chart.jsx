@@ -82,6 +82,9 @@ class Chartbox extends Component {
       interval: ONE_HOUR_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(ONE_HOUR_IN_MINUTES, 'hours');
+    }
     this.getData();
   };
   switchToOneDayView = async e => {
@@ -90,6 +93,9 @@ class Chartbox extends Component {
       interval: ONE_DAY_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(ONE_DAY_IN_MINUTES, 'days');
+    }
     this.getData();
   };
   switchTo7DaysView = async e => {
@@ -98,6 +104,9 @@ class Chartbox extends Component {
       interval: SEVEN_DAYS_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(SEVEN_DAYS_IN_MINUTES, 'days');
+    }
     this.getData();
   };
   switchTo30DaysView = async () => {
@@ -105,6 +114,9 @@ class Chartbox extends Component {
       interval: THIRTY_DAYS_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(THIRTY_DAYS_IN_MINUTES, 'days');
+    }
     this.getData();
   };
   switchTo3monthsView = async () => {
@@ -112,6 +124,9 @@ class Chartbox extends Component {
       interval: THREE_MONTHS_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(THREE_MONTHS_IN_MINUTES, 'months');
+    }
     this.getData();
   };
   switchToYearlyView = async () => {
@@ -119,6 +134,9 @@ class Chartbox extends Component {
       interval: ONE_YEAR_IN_MINUTES,
       dropdown: false
     });
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(ONE_YEAR_IN_MINUTES, 'years');
+    }
     this.getData();
   };
 
@@ -164,12 +182,13 @@ class Chartbox extends Component {
     try {
       let data;
       if (type === 'live') {
+        const boxOptions = this.props.boxOptions;
         data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
           interval: this.state.interval,
           max_states: this.state.maxStatesLive,
           device_features: deviceFeatures.join(','),
-          start_date: this.state.startDate ? this.state.startDate.toISOString() : null,
-          end_date: this.state.endDate ? this.state.endDate.toISOString() : null
+          start_date: boxOptions.startDate ? boxOptions.startDate.toISOString() : null,
+          end_date: boxOptions.endDate ? boxOptions.endDate.toISOString() : null
         });
       } else {
         data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
@@ -347,20 +366,23 @@ class Chartbox extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    console.log('props constructor Chart', props);
     this.state = {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
       initialized: false,
       height: 'small',
       nbFeaturesDisplayed: 0,
-      startDate: props.boxOptions.startDate || null,
-      endDate: props.boxOptions.endDate || null,
+      startDate: props.boxOptions ? props.boxOptions.startDate : null,
+      endDate: props.boxOptions ? props.boxOptions.endDate : null,
       dropdownOpen: false,
       selectedCriteria: 'before',
-      maxStatesLive: 10000,
-      maxStatesNoLive: 1000
+      maxStatesLive: 2000,
+      maxStatesNoLive: 300
     };
+
+    if (this.props.onIntervalChange) {
+      this.props.onIntervalChange(this.state.interval, null);
+    }
   }
   componentDidMount() {
     this.getData();
@@ -374,10 +396,11 @@ class Chartbox extends Component {
     const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
     const titleChanged = get(previousProps, 'box.title') !== get(this.props, 'box.title');
     const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
+    const boxOptionsChanged = get(previousProps, 'boxOptions') !== get(this.props, 'boxOptions');
     if (intervalChanged) {
       await this.updateInterval(this.props.box.interval);
     }
-    if (intervalChanged || deviceFeaturesChanged || titleChanged || unitChanged) {
+    if (intervalChanged || deviceFeaturesChanged || titleChanged || unitChanged || boxOptionsChanged) {
       this.getData();
     }
   }
@@ -409,9 +432,9 @@ class Chartbox extends Component {
   ) {
     const { box, displayPreview, showHistoryExpanded } = this.props;
 
-    console.log('props constructor Chart', props);
     const displayVariation = box.display_variation;
-    const showAggregatedDataWarning = this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
+    const showAggregatedDataWarning =
+      this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
     let heightAdditional = 0;
     if (showHistoryExpanded) {
       if (props.box.chart_type === 'timeline' && 55 * nbFeaturesDisplayed > 300) {
@@ -428,12 +451,16 @@ class Chartbox extends Component {
           <div class="d-flex align-items-center justify-content-between">
             <div class={cx(style.subheader)}>{props.box.title}</div>
             {showHistoryExpanded && !showAggregatedDataWarning && (
-              <div class={cx("ml-5 mr-5", style.subheader)}>
+              <div class={cx('ml-5 mr-5', style.subheader)}>
                 <Text id="dashboard.boxes.chart.historyExpandedWarningStateLive" />
               </div>
             )}
             {showHistoryExpanded && showAggregatedDataWarning && (
-              <div class={cx("ml-5 mr-5", style.subheader)}>{"(ATTENTION: Données aggrégées sur l'intervalle, vous pouvez zoomer sur un intervalle plus petit pour voir les données réelles)"}</div>
+              <div class={cx('ml-5 mr-5', style.subheader)}>
+                {
+                  "(ATTENTION: Données aggrégées sur l'intervalle, vous pouvez zoomer sur un intervalle plus petit pour voir les données réelles)"
+                }
+              </div>
             )}
             <div class={cx(style.msAuto, style.lh1, 'd-flex', 'align-items-center')}>
               <div class="dropdown">
@@ -510,7 +537,6 @@ class Chartbox extends Component {
               </div>
               {!displayPreview && !showHistoryExpanded && (
                 <Localizer>
-
                   <Link
                     class={cx('btn btn-outline-secondary', style.customBtnCommon, style.customBtn)}
                     href={`/dashboard/${props.dashboardSelector}/expanded/${props.x}/${props.y}`}

@@ -18,7 +18,13 @@ const BoxColumns = ({ children, ...props }) => {
             })}
           >
             {column.map((box, y) => (
-            <Box key={`${props.homeDashboard.id}-${x}-${y}`} box={box} x={x} y={y} dashboardSelector={props.homeDashboard.selector} />
+              <Box
+                key={`${props.homeDashboard.id}-${x}-${y}`}
+                box={box}
+                x={x}
+                y={y}
+                dashboardSelector={props.homeDashboard.selector}
+              />
             ))}
           </div>
         ))}
