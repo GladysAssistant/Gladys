@@ -36,13 +36,17 @@ async function discoverDevices() {
           discoveredDevice = this.convertDeviceWeather(device);
           break;
         }
+        case SUPPORTED_CATEGORY_TYPE.SECURITY: {
+          discoveredDevice = this.convertDeviceSecurity(device);
+          break;
+        }
         default:
           discoveredDevice = this.convertDeviceNotSupported(device);
           break;
       }
       return {
         ...discoveredDevice,
-        service_id: this.serviceId,
+        service_id: serviceId,
         deviceNetatmo: device,
       };
     });

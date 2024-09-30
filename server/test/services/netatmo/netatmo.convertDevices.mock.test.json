@@ -979,6 +979,78 @@
     ]
   },
   {
+    "name": "Living room camera",
+    "external_id": "netatmo:70:ee:01:xx:xx:xx",
+    "selector": "netatmo:70:ee:01:xx:xx:xx",
+    "model": "NACamera",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Link Wifi quality - Living room camera",
+        "external_id": "netatmo:70:ee:01:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:01:xx:xx:xx:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Living room camera",
+        "selector": "netatmo:70:ee:01:xx:xx:xx:camera",
+        "external_id": "netatmo:70:ee:01:xx:xx:xx:camera",
+        "category": "camera",
+        "type": "image",
+        "read_only": true,
+        "keep_history": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 0
+      },
+      {
+        "name": "Status power - Living room camera",
+        "selector": "netatmo:70:ee:01:xx:xx:xx:status",
+        "external_id": "netatmo:70:ee:01:xx:xx:xx:status",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[]"
+      },
+      {
+        "name": "CAMERA_URL",
+        "value": "https://prodvpn-eu-2.netatmo.net/10.255.0.1/d257xxxxxxxxxxxxx/MTU4NDDr-aMZIkmaaLLg,,/live/files/high/index_local.m3u8"
+      },
+      {
+        "name": "CAMERA_ROTATION",
+        "value": 0
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "3939900879"
+      },
+      {
+        "name": "room_name",
+        "value": "Living room"
+      }
+    ]
+  },
+  {
     "name": "Outdoor Parking Camera",
     "external_id": "netatmo:70:ee:00:xx:xx:xx",
     "selector": "netatmo:70:ee:00:xx:xx:xx",
