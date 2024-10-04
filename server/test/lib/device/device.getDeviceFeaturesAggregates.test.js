@@ -244,7 +244,10 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
     expect(values).to.have.lengthOf(300);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
-    // Vérifier que les valeurs sont bien des changements d'état
+    // Check that the values are state changes
+    for (let i = 1; i < values.length; i += 1) {
+      expect(values[i].value).to.not.equal(values[i - 1].value);
+    }
     for (let i = 1; i < values.length; i += 1) {
       expect(values[i].value).to.not.equal(values[i - 1].value);
     }

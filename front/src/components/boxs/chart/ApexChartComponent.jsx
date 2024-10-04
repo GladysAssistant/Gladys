@@ -98,7 +98,7 @@ class ApexChartComponent extends Component {
         return createTooltipContent(opts, startDate, endDate);
       };
     }
-    options.tooltip.custom = function(opts) {
+    options.tooltip.custom = function (opts) {
       return formatter_custom(opts);
     };
   }
@@ -182,7 +182,7 @@ class ApexChartComponent extends Component {
       height = 80;
     } else {
       // 95 is the height display of the timeline chart when there is no additional height
-      height = 95 + this.props.heightAdditional;
+      height = 95 + this.props.additionalHeight;
     }
     const options = getApexChartTimelineOptions({
       height,
@@ -227,14 +227,14 @@ class ApexChartComponent extends Component {
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    const heightAdditionalDifferent = nextProps.heightAdditional !== this.props.heightAdditional;
+    const additionalHeightDifferent = nextProps.additionalHeight !== this.props.additionalHeight;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
       displayAxesDifferent ||
       intervalDifferent ||
       sizeDifferent ||
-      heightAdditionalDifferent
+      additionalHeightDifferent
     ) {
       this.displayChart();
     }

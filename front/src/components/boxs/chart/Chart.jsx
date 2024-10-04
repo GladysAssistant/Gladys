@@ -328,9 +328,9 @@ class Chartbox extends Component {
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
-    let heightAdditional = 0;
+    let additionalHeight = 0;
     if (props.box.chart_type === 'timeline') {
-      heightAdditional = 55 * nbFeaturesDisplayed;
+      additionalHeight = 55 * nbFeaturesDisplayed;
     }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
@@ -506,7 +506,7 @@ class Chartbox extends Component {
                     chart_type={props.box.chart_type}
                     display_axes={props.box.display_axes}
                     colors={props.box.colors}
-                    heightAdditional={heightAdditional}
+                    additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
                   />
                 </div>
@@ -561,7 +561,7 @@ class Chartbox extends Component {
                     chart_type={props.box.chart_type}
                     display_axes={props.box.display_axes}
                     colors={props.box.colors}
-                    heightAdditional={heightAdditional}
+                    additionalHeight={additionalHeight}
                     dictionary={props.intl.dictionary}
                   />
                 )}
