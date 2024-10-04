@@ -247,6 +247,8 @@
       "private": "private",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Add a column on dashboard",
+    "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
     "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
     "reorderDashboardButton": "Re-order dashboards",
