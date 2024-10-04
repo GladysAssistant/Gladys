@@ -288,8 +288,8 @@ class Chartbox extends Component {
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
-    let heightAdditional = 0;
-    heightAdditional = 20 * (nbFeaturesDisplayed - 1);
+    let additionalHeight = 0;
+    additionalHeight = 20 * (nbFeaturesDisplayed - 1);
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
@@ -452,7 +452,7 @@ class Chartbox extends Component {
                 chart_type={box.chart_type}
                 display_axes={box.display_axes}
                 colors={box.colors}
-                heightAdditional={heightAdditional}
+                additionalHeight={additionalHeight}
               />
             </div>
           )}
@@ -490,7 +490,7 @@ class Chartbox extends Component {
                 chart_type={box.chart_type}
                 display_axes={box.display_axes}
                 colors={box.colors}
-                heightAdditional={heightAdditional}
+                additionalHeight={additionalHeight}
               />
             )}
           </div>
