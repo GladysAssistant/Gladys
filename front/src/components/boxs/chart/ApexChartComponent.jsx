@@ -98,7 +98,7 @@ class ApexChartComponent extends Component {
         return createTooltipContent(opts, startDate, endDate);
       };
     }
-    options.tooltip.custom = function (opts) {
+    options.tooltip.custom = function(opts) {
       return formatter_custom(opts);
     };
   }
