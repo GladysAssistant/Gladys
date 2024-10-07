@@ -573,7 +573,7 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.chart.preview" />
               </label>
-              {displayPreview && <Chart box={props.box} />}
+              {displayPreview && <Chart box={props.box} displayPreview />}
               {!displayPreview && (
                 <div>
                   <button class="btn btn-secondary" onClick={this.showPreview}>

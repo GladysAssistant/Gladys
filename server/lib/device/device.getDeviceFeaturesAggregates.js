@@ -1,7 +1,7 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
-const NON_BINARY_QUERY = `
+const NON_BINARY_QUERY = (isDateRangeSpecified, startDate, endDate) => `
   WITH intervals AS (
         SELECT
             created_at,
@@ -10,7 +10,9 @@ const NON_BINARY_QUERY = `
         FROM
             t_device_feature_state
         WHERE device_feature_id = ?
-        AND created_at > ?
+          ${!isDateRangeSpecified ? 'AND created_at > ?' : ''}
+          ${startDate ? 'AND created_at >= ?' : ''}
+          ${endDate ? 'AND created_at <= ?' : ''}
     )
     SELECT
         MIN(created_at) AS created_at,
@@ -23,7 +25,7 @@ const NON_BINARY_QUERY = `
         created_at;
 `;
 
-const BINARY_QUERY = `
+const BINARY_QUERY = (isDateRangeSpecified, startDate, endDate) => `
   WITH value_changes AS (
       SELECT
           created_at,
@@ -33,7 +35,9 @@ const BINARY_QUERY = `
           t_device_feature_state
       WHERE
           device_feature_id = ?
-          AND created_at > ?
+          ${!isDateRangeSpecified ? 'AND created_at > ?' : ''}
+          ${startDate ? 'AND created_at >= ?' : ''}
+          ${endDate ? 'AND created_at <= ?' : ''}
       ORDER BY
           created_at DESC
   ),
@@ -78,11 +82,19 @@ const BINARY_QUERY = `
  * @param {string} selector - Device selector.
  * @param {number} intervalInMinutes - Interval.
  * @param {number} maxStates - Number of elements to return max.
+ * @param {Date} startDate - Start date.
+ * @param {Date} endDate - End date.
  * @returns {Promise<object>} - Resolve with an array of data.
  * @example
- * device.getDeviceFeaturesAggregates('test-devivce');
+ * device.getDeviceFeaturesAggregates('test-device');
  */
-async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates = 100) {
+async function getDeviceFeaturesAggregates(
+  selector,
+  intervalInMinutes,
+  maxStates = 100,
+  startDate = null,
+  endDate = null,
+) {
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -92,17 +104,45 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   const isBinary = ['binary', 'push'].includes(deviceFeature.type);
 
   const now = new Date();
-  const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
+  let intervalDate;
+  let effectiveStartDate = new Date(startDate);
+  let effectiveEndDate = new Date(endDate);
+  if (startDate === null && endDate === null) {
+    intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
+  } else if (startDate !== null && endDate === null) {
+    intervalDate = new Date(effectiveStartDate.getTime() + intervalInMinutes * 60 * 1000);
+    effectiveEndDate = intervalDate;
+  } else if (startDate === null && endDate !== null) {
+    intervalDate = new Date(effectiveEndDate.getTime() - intervalInMinutes * 60 * 1000);
+    effectiveStartDate = intervalDate;
+  } else {
+    intervalDate = new Date(startDate);
+  }
+  const isDateRangeSpecified = startDate || endDate;
 
   let values;
-
   if (isBinary) {
-    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, intervalDate, maxStates);
+    values = await db.duckDbReadConnectionAllAsync(
+      BINARY_QUERY(isDateRangeSpecified, startDate, endDate),
+      deviceFeature.id,
+      ...(!isDateRangeSpecified ? [intervalDate] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveStartDate)] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveEndDate)] : []),
+      maxStates
+      
+    );
   } else {
-    values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, intervalDate);
+    values = await db.duckDbReadConnectionAllAsync(
+      NON_BINARY_QUERY(isDateRangeSpecified, startDate, endDate),
+      maxStates,
+      deviceFeature.id,
+      ...(!isDateRangeSpecified ? [intervalDate] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveStartDate)] : []),
+      ...(isDateRangeSpecified ? [new Date(effectiveEndDate)] : []),   
+    );
   }
 
-  return {
+return {
     device: {
       name: device.name,
     },

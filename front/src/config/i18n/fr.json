@@ -347,6 +347,7 @@
       "chart": {
         "defaultInterval": "Intervalle par défaut",
         "lastHour": "Dernière heure",
+        "expandChartButtonDescription": "Agrandir le graphique",
         "lastDay": "Dernières 24h",
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
@@ -378,7 +379,48 @@
         "on": "On",
         "off": "Off",
         "start_date": "Début le : ",
-        "end_date": "Fin le : "
+        "end_date": "Fin le : ",
+        "startDate": "Date de début :",
+        "endDate": "Date de fin :",
+        "historyExpandedWarningStateLive": "Données réelles sur l'intervalle",
+        "historyExpandedWarningStateAggregated": "ATTENTION: Données aggrégées sur l'intervalle, vous pouvez zoomer sur un intervalle plus petit pour voir les données réelles",
+        "criteria": {
+          "criteriaDateExpendOptionsTitle": "Critère de date",
+          "criteriaAggregateExpendOptionsTitle": "Critère d'agrégation",
+          "applyAndClose": "Appliquer les modifications",
+          "date": {
+            "all": "Toutes les données",
+            "previous": "Période précédente",
+            "current": "Période actuelle",
+            "next": "Période suivante",
+            "before": "Avant le",
+            "after": "Après le",
+            "between": "Entre",
+            "custom": "Personnalisé"
+          },
+          "intervalUnit": {
+            "days": "Jours",
+            "weeks": "Semaines",
+            "months": "Mois",
+            "quarter": "Trimestre",
+            "years": "Années",
+            "thisDays": "Aujourd'hui",
+            "thisWeeks": "Cette semaine",
+            "thisMonths": "Ce mois",
+            "thisQuarter": "Ce trimestre",
+            "thisYears": "Cette année"
+          },
+          "aggregate": {
+            "minute": "Minute",
+            "hour": "Heure",
+            "day": "Jour",
+            "week": "Semaine",
+            "month": "Mois",
+            "quarter": "Trimestre",
+            "year": "Année",
+            "notAggregate": "Non aggrégé"
+          }
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",

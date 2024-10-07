@@ -6,6 +6,62 @@
   line-height: 1 !important;
 }
 
+.closeButton {
+  border: none;
+}
+
+.customBtn {
+  border: 1px solid #868e96;
+}
+
+.customBtnCommon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border-radius: 10%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #868e96;
+  height: 25px;
+  width: 25px;
+  line-height: 1.5;
+  padding: 0.375rem 0.75rem;
+  margin-left: 10px;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.cardBody {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 1280px) {
+  .modalOverlay {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+
+  .card-body {
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
 .subheader {
   font-size: 0.625rem;
   font-weight: 600;
