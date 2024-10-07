@@ -8,7 +8,7 @@ import get from 'get-value';
 import BaseEditBox from '../baseEditBox';
 import Chart from './Chart';
 import { getDeviceFeatureName } from '../../../utils/device';
-import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
+import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';

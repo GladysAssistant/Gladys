@@ -5,7 +5,7 @@ import Select from 'react-select';
 import update from 'immutability-helper';
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
-import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
+import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
