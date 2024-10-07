@@ -187,8 +187,8 @@ class Chartbox extends Component {
           interval: this.state.interval,
           max_states: this.state.maxStatesLive,
           device_features: deviceFeatures.join(','),
-          start_date: boxOptions.startDate ? boxOptions.startDate.toISOString() : null,
-          end_date: boxOptions.endDate ? boxOptions.endDate.toISOString() : null
+          start_date: boxOptions && boxOptions.startDate ? boxOptions.startDate.toISOString() : null,
+          end_date: boxOptions && boxOptions.endDate ? boxOptions.endDate.toISOString() : null
         });
       } else {
         data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
@@ -213,49 +213,33 @@ class Chartbox extends Component {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
           data: []
         };
+        const now = new Date();
+
+        const lastValueTime = Math.round(now.getTime() / 1000) * 1000;
         data.forEach((oneFeature, index) => {
           const { values, deviceFeature, device } = oneFeature;
-          const deviceFeatureName = deviceFeatureNames ? deviceFeatureNames[index] : null;
-          let previousValue = null;
-          let lastChangeTime = null;
-          const lastValueTime = Math.round(new Date().getTime() / 1000) * 1000;
+          const deviceFeatureName = deviceFeatureNames
+            ? deviceFeatureNames[index]
+            : getDeviceName(device, deviceFeature);
           if (values.length === 0) {
             nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
           } else {
             values.forEach(value => {
               emptySeries = false;
-              if (previousValue === null) {
-                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-                previousValue = value.value;
-                return;
-              }
-
-              if (value.value !== previousValue) {
-                const newData = {
-                  x: deviceFeatureName || getDeviceName(device, deviceFeature),
-                  y: [lastChangeTime, Math.round(new Date(value.created_at).getTime() / 1000) * 1000]
-                };
-                if (previousValue === 0) {
-                  serie0.data.push(newData);
-                } else {
-                  serie1.data.push(newData);
-                }
-                lastChangeTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
-                previousValue = value.value;
+              const beginTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              const endTime = value.end_time
+                ? Math.round(new Date(value.end_time).getTime() / 1000) * 1000
+                : lastValueTime;
+              const newData = {
+                x: deviceFeatureName,
+                y: [beginTime, endTime]
+              };
+              if (value.value === 0) {
+                serie0.data.push(newData);
+              } else {
+                serie1.data.push(newData);
               }
             });
-          }
-
-          if (previousValue !== null) {
-            const newData = {
-              x: deviceFeatureName || getDeviceName(device, deviceFeature),
-              y: [lastChangeTime, lastValueTime]
-            };
-            if (previousValue === 0) {
-              serie0.data.push(newData);
-            } else {
-              serie1.data.push(newData);
-            }
           }
         });
         series.push(serie1);
@@ -326,7 +310,6 @@ class Chartbox extends Component {
           }
         }
       }
-
       await this.setState(newState);
     } catch (e) {
       console.error(e);
@@ -435,15 +418,15 @@ class Chartbox extends Component {
     const displayVariation = box.display_variation;
     const showAggregatedDataWarning =
       this.state.series && this.state.series.some(serie => serie.data.length === this.state.maxStatesNoLive);
-    let heightAdditional = 0;
+    let additionalHeight = 30 * (nbFeaturesDisplayed - 1);
     if (showHistoryExpanded) {
       if (props.box.chart_type === 'timeline' && 55 * nbFeaturesDisplayed > 300) {
-        heightAdditional = 55 * nbFeaturesDisplayed;
+        additionalHeight = 55 * nbFeaturesDisplayed;
       } else {
-        heightAdditional = 300;
+        additionalHeight = 300;
       }
     } else if (props.box.chart_type === 'timeline') {
-      heightAdditional = 55 * nbFeaturesDisplayed;
+      additionalHeight = 55 * nbFeaturesDisplayed;
     }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
@@ -638,7 +621,7 @@ class Chartbox extends Component {
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
                 colors={props.box.colors}
-                heightAdditional={heightAdditional}
+                additionalHeight={additionalHeight}
                 dictionary={props.intl.dictionary}
               />
             </div>
@@ -655,32 +638,48 @@ class Chartbox extends Component {
               [style.minSizeChartLoading]: loading && !initialized
             })}
           >
-            {emptySeries === true && (
+            {!props.box.chart_type && (
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
                   <i class="fe fe-alert-circle mr-2" />
-                  <Text id="dashboard.boxes.chart.noValue" />
+                  <Text id="dashboard.boxes.chart.noChartType" />
                 </div>
                 <div class={style.smallTextEmptyState}>
-                  <Text id="dashboard.boxes.chart.noValueWarning" />
+                  <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
               </div>
             )}
-            {emptySeries === false && !props.box.display_axes && (
-              <ApexChartComponent
-                series={series}
-                interval={interval}
-                user={props.user}
-                size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
-                heightAdditional={heightAdditional}
-                dictionary={props.intl.dictionary}
-                startDate={startDate}
-                endDate={endDate}
-              />
+            {props.box.chart_type && (
+              <div>
+                {emptySeries === true && (
+                  <div class={cx('text-center', style.bigEmptyState)}>
+                    <div />
+                    <div>
+                      <i class="fe fe-alert-circle mr-2" />
+                      <Text id="dashboard.boxes.chart.noValue" />
+                    </div>
+                    <div class={style.smallTextEmptyState}>
+                      <Text id="dashboard.boxes.chart.noValueWarning" />
+                    </div>
+                  </div>
+                )}
+                {emptySeries === false && !props.box.display_axes && (
+                  <ApexChartComponent
+                    series={series}
+                    interval={interval}
+                    user={props.user}
+                    size="big"
+                    chart_type={props.box.chart_type}
+                    display_axes={props.box.display_axes}
+                    colors={props.box.colors}
+                    additionalHeight={additionalHeight}
+                    dictionary={props.intl.dictionary}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>

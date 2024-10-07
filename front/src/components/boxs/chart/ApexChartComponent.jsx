@@ -98,16 +98,16 @@ class ApexChartComponent extends Component {
         return createTooltipContent(opts, startDate, endDate);
       };
     }
-    options.tooltip.custom = function(opts) {
+    options.tooltip.custom = function (opts) {
       return formatter_custom(opts);
     };
   }
   getBarChartOptions = () => {
     let height;
     if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 100 + this.props.heightAdditional;
+      height = 100 + this.props.additionalHeight;
     } else {
-      height = 200 + this.props.heightAdditional;
+      height = 200 + this.props.additionalHeight;
     }
     const options = getApexChartBarOptions({
       height,
@@ -123,11 +123,11 @@ class ApexChartComponent extends Component {
   getAreaChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40 + this.props.heightAdditional;
+      height = 40 + this.props.additionalHeight;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80 + this.props.heightAdditional;
+      height = 80 + this.props.additionalHeight;
     } else {
-      height = 200 + this.props.heightAdditional;
+      height = 200 + this.props.additionalHeight;
     }
     const options = getApexChartAreaOptions({
       height,
@@ -144,11 +144,11 @@ class ApexChartComponent extends Component {
   getLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40 + this.props.heightAdditional;
+      height = 40 + this.props.additionalHeight;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80 + this.props.heightAdditional;
+      height = 80 + this.props.additionalHeight;
     } else {
-      height = 200 + this.props.heightAdditional;
+      height = 200 + this.props.additionalHeight;
     }
     const options = getApexChartLineOptions({
       height,
@@ -164,11 +164,11 @@ class ApexChartComponent extends Component {
   getStepLineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40 + this.props.heightAdditional;
+      height = 40 + this.props.additionalHeight;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80 + this.props.heightAdditional;
+      height = 80 + this.props.additionalHeight;
     } else {
-      height = 200 + this.props.heightAdditional;
+      height = 200 + this.props.additionalHeight;
     }
     const options = getApexChartStepLineOptions({
       height,
@@ -184,12 +184,12 @@ class ApexChartComponent extends Component {
   getTimelineChartOptions = () => {
     let height;
     if (this.props.size === 'small' && !this.props.display_axes) {
-      height = 40 + this.props.heightAdditional;
+      height = 40;
     } else if (this.props.size === 'big' && !this.props.display_axes) {
-      height = 80 + this.props.heightAdditional;
+      height = 80;
     } else {
       // 95 is the height display of the timeline chart when there is no additional height
-      height = 95 + this.props.heightAdditional;
+      height = 95 + this.props.additionalHeight;
     }
     const options = getApexChartTimelineOptions({
       height,
@@ -233,14 +233,14 @@ class ApexChartComponent extends Component {
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    const heightAdditionalDifferent = nextProps.heightAdditional !== this.props.heightAdditional;
+    const additionalHeightDifferent = nextProps.additionalHeight !== this.props.additionalHeight;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
       displayAxesDifferent ||
       intervalDifferent ||
       sizeDifferent ||
-      heightAdditionalDifferent
+      additionalHeightDifferent
     ) {
       this.displayChart();
     }
