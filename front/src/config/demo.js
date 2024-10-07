@@ -187,7 +187,8 @@ const data = {
             'thermostat',
             'water-leak',
             'smoke-sensor',
-            'light-sensor'
+            'light-sensor',
+            'pilot-wire-mode'
           ]
         }
       ]
@@ -2887,7 +2888,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=curtain-actions,shutter-actions,shutter-position,thermostat,water-leak,smoke-sensor,light-sensor': [
+  'get /api/v1/device?device_feature_selectors=curtain-actions,shutter-actions,shutter-position,thermostat,water-leak,smoke-sensor,light-sensor,pilot-wire-mode': [
     {
       id: 'f131fbf2-445a-4c2c-9426-83abaf534662',
       name: 'Room sensors',
@@ -3003,6 +3004,22 @@ const data = {
           last_value: 19.5,
           last_value_changed: '2022-10-10 07:49:07.556 +00:00',
           unit: 'celsius'
+        }
+      ]
+    },
+    {
+      id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
+      name: 'Chauffage Salon',
+      selector: 'pilot-wire-mode',
+      features: [
+        {
+          name: 'Pilot Wire mode',
+          selector: 'pilot-wire-mode',
+          category: 'heater',
+          type: 'pilot-wire-mode',
+          read_only: false,
+          last_value: 'frost-protection',
+          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
         }
       ]
     }
