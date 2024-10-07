@@ -8,6 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../se
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
+import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -115,6 +116,9 @@ class Chartbox extends Component {
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let deviceFeatureNames = this.props.box.device_feature_names;
+    let nbFeaturesDisplayed = deviceFeatures.length;
+
     if (!deviceFeatures) {
       // migrate all box (one device feature)
       if (this.props.box.device_feature) {
@@ -133,40 +137,82 @@ class Chartbox extends Component {
     }
     await this.setState({ loading: true });
     try {
+      const maxStates = 300;
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: 100,
+        max_states: maxStates,
         device_features: deviceFeatures.join(',')
       });
 
       let emptySeries = true;
 
-      const series = data.map((oneFeature, index) => {
-        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const { values, deviceFeature } = oneFeature;
-        const deviceName = deviceFeature.name;
-        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
-        return {
-          name,
-          data: values.map(value => {
-            emptySeries = false;
-            return {
-              x: value.created_at,
-              y: value.value
-            };
-          })
-        };
-      });
+      let series = [];
 
+      if (this.props.box.chart_type === 'timeline') {
+        const serie0 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.off'),
+          data: []
+        };
+        const serie1 = {
+          name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
+          data: []
+        };
+        const now = new Date();
+
+        const lastValueTime = Math.round(now.getTime() / 1000) * 1000;
+        data.forEach((oneFeature, index) => {
+          const { values, deviceFeature, device } = oneFeature;
+          const deviceFeatureName = deviceFeatureNames
+            ? deviceFeatureNames[index]
+            : getDeviceName(device, deviceFeature);
+          if (values.length === 0) {
+            nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
+          } else {
+            values.forEach(value => {
+              emptySeries = false;
+              const beginTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
+              const endTime = value.end_time
+                ? Math.round(new Date(value.end_time).getTime() / 1000) * 1000
+                : lastValueTime;
+              const newData = {
+                x: deviceFeatureName,
+                y: [beginTime, endTime]
+              };
+              if (value.value === 0) {
+                serie0.data.push(newData);
+              } else {
+                serie1.data.push(newData);
+              }
+            });
+          }
+        });
+        series.push(serie1);
+        series.push(serie0);
+      } else {
+        series = data.map((oneFeature, index) => {
+          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          const { values, deviceFeature } = oneFeature;
+          const deviceName = deviceFeature.name;
+          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          return {
+            name,
+            data: values.map(value => {
+              emptySeries = false;
+              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+            })
+          };
+        });
+      }
       const newState = {
         series,
         loading: false,
         initialized: true,
-        emptySeries
+        emptySeries,
+        nbFeaturesDisplayed
       };
 
-      if (data.length > 0) {
+      if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
         // Before now, there was a "unit" attribute in this box instead of "units",
         // so we need to support "unit" as some users may already have the box with that param
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
@@ -208,7 +254,6 @@ class Chartbox extends Component {
           }
         }
       }
-
       await this.setState(newState);
     } catch (e) {
       console.error(e);
@@ -235,7 +280,8 @@ class Chartbox extends Component {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
       initialized: false,
-      height: 'small'
+      height: 'small',
+      nbFeaturesDisplayed: 0
     };
   }
   componentDidMount() {
@@ -276,173 +322,195 @@ class Chartbox extends Component {
       lastValueRounded,
       interval,
       emptySeries,
-      unit
+      unit,
+      nbFeaturesDisplayed
     }
   ) {
-    const displayVariation = props.box.display_variation;
+    const { box } = this.props;
+    const displayVariation = box.display_variation;
+    let additionalHeight = 0;
+    if (props.box.chart_type === 'timeline') {
+      additionalHeight = 55 * nbFeaturesDisplayed;
+    }
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class={cx(style.subheader)}>{props.box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
-              <div class="dropdown">
-                <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
-                  {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
-                  {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
-                  {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
-                  {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
-                  {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
-                  {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
-                </a>
-                <div
-                  class={cx(style.dropdownMenuChart, {
-                    [style.show]: dropdown
-                  })}
-                >
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_HOUR_IN_MINUTES
-                    })}
-                    onClick={this.switchToLastHourView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastHour" />
+              {props.box.chart_type && (
+                <div class="dropdown">
+                  <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
+                    {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                    {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
+                    {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
+                    {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
+                    {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
+                    {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
                   </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_DAY_IN_MINUTES
+                  <div
+                    class={cx(style.dropdownMenuChart, {
+                      [style.show]: dropdown
                     })}
-                    onClick={this.switchToOneDayView}
                   >
-                    <Text id="dashboard.boxes.chart.lastDay" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === SEVEN_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo7DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastSevenDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo30DaysView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                    })}
-                    onClick={this.switchTo3monthsView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                  </a>
-                  <a
-                    class={cx(style.dropdownItemChart, {
-                      [style.active]: interval === ONE_YEAR_IN_MINUTES
-                    })}
-                    onClick={this.switchToYearlyView}
-                  >
-                    <Text id="dashboard.boxes.chart.lastYear" />
-                  </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_HOUR_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastHour" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_DAY_IN_MINUTES
+                      })}
+                      onClick={this.switchToOneDayView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastDay" />
+                    </a>
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo7DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastSevenDays" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo30DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo3monthsView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === ONE_YEAR_IN_MINUTES
+                        })}
+                        onClick={this.switchToYearlyView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastYear" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {displayVariation && emptySeries === false && (
-            <div class="d-flex align-items-baseline">
-              {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
-                <div class="h1 mb-0 mr-2">
-                  {lastValueRounded}
-                  {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+          {props.box.chart_type && (
+            <div>
+              {displayVariation && props.box.chart_type !== 'timeline' && emptySeries === false && (
+                <div class="d-flex align-items-baseline">
+                  {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
+                    <div class="h1 mb-0 mr-2">
+                      {lastValueRounded}
+                      {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+                    </div>
+                  )}
+                  <div
+                    class={cx(style.meAuto, {
+                      [style.textGreen]:
+                        (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
+                      [style.textYellow]: variation === 0,
+                      [style.textRed]:
+                        (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
+                    })}
+                  >
+                    {variation !== undefined && (
+                      <span class="d-inline-flex align-items-center lh-1">
+                        {roundWith2DecimalIfNeeded(variation)}
+                        <Text id="global.percent" />
+                        {variation > 0 && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class={cx(style.variationIcon)}
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="3 17 9 11 13 15 21 7" />
+                            <polyline points="14 7 21 7 21 14" />
+                          </svg>
+                        )}
+                        {variation === 0 && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class={cx(style.variationIcon)}
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        )}
+                        {variation < 0 && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class={cx(style.variationIcon)}
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="3 7 9 13 13 9 21 17" />
+                            <polyline points="21 10 21 17 14 17" />
+                          </svg>
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
-              <div
-                class={cx(style.meAuto, {
-                  [style.textGreen]:
-                    (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
-                  [style.textYellow]: variation === 0,
-                  [style.textRed]:
-                    (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
-                })}
-              >
-                {variation !== undefined && (
-                  <span class="d-inline-flex align-items-center lh-1">
-                    {roundWith2DecimalIfNeeded(variation)}
-                    <Text id="global.percent" />
-                    {variation > 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 17 9 11 13 15 21 7" />
-                        <polyline points="14 7 21 7 21 14" />
-                      </svg>
-                    )}
-                    {variation === 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    )}
-                    {variation < 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 7 9 13 13 9 21 17" />
-                        <polyline points="21 10 21 17 14 17" />
-                      </svg>
-                    )}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-          {emptySeries === false && props.box.display_axes && (
-            <div class="mt-4">
-              <ApexChartComponent
-                series={series}
-                interval={interval}
-                user={props.user}
-                size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
-              />
+              {emptySeries === false && props.box.display_axes && (
+                <div class="mt-4">
+                  <ApexChartComponent
+                    series={series}
+                    interval={interval}
+                    user={props.user}
+                    size="big"
+                    chart_type={props.box.chart_type}
+                    display_axes={props.box.display_axes}
+                    colors={props.box.colors}
+                    additionalHeight={additionalHeight}
+                    dictionary={props.intl.dictionary}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -458,28 +526,46 @@ class Chartbox extends Component {
               [style.minSizeChartLoading]: loading && !initialized
             })}
           >
-            {emptySeries === true && (
+            {!props.box.chart_type && (
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
                   <i class="fe fe-alert-circle mr-2" />
-                  <Text id="dashboard.boxes.chart.noValue" />
+                  <Text id="dashboard.boxes.chart.noChartType" />
                 </div>
                 <div class={style.smallTextEmptyState}>
-                  <Text id="dashboard.boxes.chart.noValueWarning" />
+                  <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
               </div>
             )}
-            {emptySeries === false && !props.box.display_axes && (
-              <ApexChartComponent
-                series={series}
-                interval={interval}
-                user={props.user}
-                size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
-              />
+            {props.box.chart_type && (
+              <div>
+                {emptySeries === true && (
+                  <div class={cx('text-center', style.bigEmptyState)}>
+                    <div />
+                    <div>
+                      <i class="fe fe-alert-circle mr-2" />
+                      <Text id="dashboard.boxes.chart.noValue" />
+                    </div>
+                    <div class={style.smallTextEmptyState}>
+                      <Text id="dashboard.boxes.chart.noValueWarning" />
+                    </div>
+                  </div>
+                )}
+                {emptySeries === false && !props.box.display_axes && (
+                  <ApexChartComponent
+                    series={series}
+                    interval={interval}
+                    user={props.user}
+                    size="big"
+                    chart_type={props.box.chart_type}
+                    display_axes={props.box.display_axes}
+                    colors={props.box.colors}
+                    additionalHeight={additionalHeight}
+                    dictionary={props.intl.dictionary}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>
