@@ -67,12 +67,12 @@ describe('Device.saveHistoricalState', () => {
     // Should not save 2 times the same event
     await device.saveHistoricalState(deviceFeature, 12, newDate);
     await device.saveHistoricalState(deviceFeature, 12, newDate);
-    const deviceStates = await db.DeviceFeatureState.findAll({
-      where: {
-        device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
-      },
-      raw: true,
-    });
+    const deviceStates = await db.duckDbReadConnectionAllAsync(
+      `
+      SELECT * FROM t_device_feature_state WHERE device_feature_id = ?  
+    `,
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
     expect(deviceStates).to.have.lengthOf(1);
   });
   it('should save old state and keep history, and update aggregate', async () => {

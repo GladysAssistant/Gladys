@@ -101,7 +101,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState(newState);
+    await this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   addBox = x => {
@@ -127,7 +127,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    await this.setState(newState);
+    await this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateCurrentDashboardName = e => {
@@ -164,7 +164,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateNewSelectedBox = (x, y, type) => {
@@ -252,6 +252,36 @@ class EditDashboard extends Component {
     }
   };
 
+  addColumn = () => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          $push: [[]]
+        }
+      }
+    });
+    this.setState({ ...newState, boxNotEmptyError: false });
+  };
+
+  deleteCurrentColumn = async x => {
+    const { boxes } = this.state.currentDashboard;
+    if (boxes[x].length === 0) {
+      const newState = update(this.state, {
+        currentDashboard: {
+          boxes: {
+            $splice: [[x, 1]]
+          }
+        }
+      });
+      await this.setState({ ...newState, boxNotEmptyError: false });
+    } else {
+      this.setState({
+        boxNotEmptyError: true,
+        columnBoxNotEmptyError: x
+      });
+    }
+  };
+
   askDeleteCurrentDashboard = async () => {
     await this.setState({
       askDeleteDashboard: true
@@ -313,6 +343,8 @@ class EditDashboard extends Component {
       dashboards: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false,
+      boxNotEmptyError: false,
+      columnBoxNotEmptyError: null,
       isMobileReordering: false
     };
   }
@@ -337,6 +369,8 @@ class EditDashboard extends Component {
       dashboardAlreadyExistError,
       unknownError,
       askDeleteDashboard,
+      boxNotEmptyError,
+      columnBoxNotEmptyError,
       savingNewDashboardList,
       isMobileReordering
     }
@@ -373,6 +407,10 @@ class EditDashboard extends Component {
         savingNewDashboardList={savingNewDashboardList}
         toggleMobileReorder={this.toggleMobileReorder}
         isMobileReordering={isMobileReordering}
+        addColumn={this.addColumn}
+        deleteCurrentColumn={this.deleteCurrentColumn}
+        boxNotEmptyError={boxNotEmptyError}
+        columnBoxNotEmptyError={columnBoxNotEmptyError}
       />
     );
   }

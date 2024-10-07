@@ -1,26 +1,30 @@
 const fse = require('fs-extra');
 const sqlite3 = require('sqlite3');
+const duckdb = require('duckdb');
 const { promisify } = require('util');
+
+const db = require('../../models');
 const logger = require('../../utils/logger');
 const { exec } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @description Replace the local sqlite database with a backup.
- * @param {string} backupFilePath - The path of the backup.
+ * @param {string} sqliteBackupFilePath - The path of the sqlite backup.
+ * @param {string} [duckDbBackupFolderPath] - The path of the DuckDB backup folder.
  * @example
  * restoreBackup('/backup.db');
  */
-async function restoreBackup(backupFilePath) {
-  logger.info(`Restoring back up ${backupFilePath}`);
+async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
+  logger.info(`Restoring back up ${sqliteBackupFilePath} / ${duckDbBackupFolderPath}`);
   // ensure that the file exists
-  const exists = await fse.pathExists(backupFilePath);
-  if (!exists) {
+  const sqliteBackupExists = await fse.pathExists(sqliteBackupFilePath);
+  if (!sqliteBackupExists) {
     throw new NotFoundError('BACKUP_NOT_FOUND');
   }
   logger.info('Testing if backup is a valid Gladys SQLite database.');
   // Testing if the backup is a valid backup
-  const potentialNewDb = new sqlite3.Database(backupFilePath);
+  const potentialNewDb = new sqlite3.Database(sqliteBackupFilePath);
   const getAsync = promisify(potentialNewDb.get.bind(potentialNewDb));
   const closeAsync = promisify(potentialNewDb.close.bind(potentialNewDb));
   // Getting the new user
@@ -34,9 +38,27 @@ async function restoreBackup(backupFilePath) {
   // shutting down the current DB
   await this.sequelize.close();
   // copy the backupFile to the new DB
-  await exec(`sqlite3 ${this.config.storage} ".restore '${backupFilePath}'"`);
+  await exec(`sqlite3 ${this.config.storage} ".restore '${sqliteBackupFilePath}'"`);
   // done!
-  logger.info(`Backup restored. Need reboot now.`);
+  logger.info(`SQLite backup restored`);
+  if (duckDbBackupFolderPath) {
+    // Closing DuckDB current database
+    logger.info(`Restoring DuckDB folder ${duckDbBackupFolderPath}`);
+    await new Promise((resolve) => {
+      db.duckDb.close(() => resolve());
+    });
+    // Delete current DuckDB file
+    const duckDbFilePath = `${this.config.storage.replace('.db', '')}.duckdb`;
+    await fse.remove(duckDbFilePath);
+    const duckDb = new duckdb.Database(duckDbFilePath);
+    const duckDbWriteConnection = duckDb.connect();
+    const duckDbWriteConnectionAllAsync = promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
+    await duckDbWriteConnectionAllAsync(`IMPORT DATABASE '${duckDbBackupFolderPath}'`);
+    logger.info(`DuckDB restored with success`);
+    await new Promise((resolve) => {
+      duckDb.close(() => resolve());
+    });
+  }
 }
 
 module.exports = {

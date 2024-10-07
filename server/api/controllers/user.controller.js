@@ -131,6 +131,7 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function updateMySelf(req, res, next) {
+    delete req.body.role;
     const newUser = await gladys.user.update(req.user.id, req.body);
     res.json(newUser);
   }

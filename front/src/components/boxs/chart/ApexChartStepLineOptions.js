@@ -49,7 +49,14 @@ const getApexChartStepLineOptions = ({ height, displayAxes, series, colors, loca
     },
     yaxis: {
       labels: {
-        padding: 4
+        padding: 4,
+        formatter: function(value) {
+          if (Math.abs(value) < 1) {
+            return value; // For very low values, like crypto prices, use the normal value
+          } else {
+            return value.toFixed(2); // 2 decimal places for other values
+          }
+        }
       }
     },
     colors,

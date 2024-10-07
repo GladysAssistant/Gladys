@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const get = require('get-value');
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
 
@@ -107,6 +108,19 @@ async function syncUserCalendars(userId) {
         logger.error(e);
         throw new NotFoundError('CALDAV_FAILED_REQUEST_EVENTS');
       }
+
+      await Promise.map(
+        jsonEvents,
+        async (jsonEvent) => {
+          if (get(jsonEvent, 'rrule.options.until') && jsonEvent.href) {
+            await this.gladys.calendar.destroyEvents(calendarToUpdate.id, {
+              url: jsonEvent.href,
+              from: get(jsonEvent, 'rrule.options.until'),
+            });
+          }
+        },
+        { concurrency: 5 },
+      );
 
       const formatedEvents = this.formatEvents(jsonEvents, calendarToUpdate);
 

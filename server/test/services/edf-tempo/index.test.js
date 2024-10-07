@@ -1,11 +1,18 @@
 const { expect } = require('chai');
 const nock = require('nock');
-const { useFakeTimers } = require('sinon');
+const { fake, useFakeTimers } = require('sinon');
 const EdfTempoService = require('../../../services/edf-tempo');
 
-const gladys = {};
+const gladys = {
+  gateway: {
+    getEdfTempo: fake.resolves({
+      today: 'blue',
+      tomorrow: 'unknown',
+    }),
+  },
+};
 
-describe('EcowattService', () => {
+describe('EdfTempoService', () => {
   let clock;
   beforeEach(async () => {
     nock.cleanAll();
@@ -24,9 +31,6 @@ describe('EcowattService', () => {
     await edfTempoService.stop();
   });
   it('should get data', async () => {
-    nock('https://particulier.edf.fr')
-      .get('/services/rest/referentiel/searchTempoStore?dateRelevant=2022-12-09')
-      .reply(200, { couleurJourJ: 'TEMPO_BLEU', couleurJourJ1: 'NON_DEFINI' });
     const edfTempoService = EdfTempoService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     const data = await edfTempoService.getEdfTempoStates();
     expect(data).to.deep.equal({

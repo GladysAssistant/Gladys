@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../utils/constants');
+const { EVENTS, ACTIONS, ACTIONS_STATUS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 module.exports = function DeviceController(gladys) {
   /**
@@ -106,6 +106,37 @@ module.exports = function DeviceController(gladys) {
     res.json(states);
   }
 
+  /**
+   * @api {post} /api/v1/device/purge_all_sqlite_state purgeAllSqliteStates
+   * @apiName purgeAllSqliteStates
+   * @apiGroup Device
+   */
+  async function purgeAllSqliteStates(req, res) {
+    gladys.event.emit(EVENTS.DEVICE.PURGE_ALL_SQLITE_STATES);
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/v1/device/migrate_from_sqlite_to_duckdb migrateFromSQLiteToDuckDb
+   * @apiName migrateFromSQLiteToDuckDb
+   * @apiGroup Device
+   */
+  async function migrateFromSQLiteToDuckDb(req, res) {
+    await gladys.variable.destroy(SYSTEM_VARIABLE_NAMES.DUCKDB_MIGRATED);
+    gladys.event.emit(EVENTS.DEVICE.MIGRATE_FROM_SQLITE_TO_DUCKDB);
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {get} /api/v1/device/duckdb_migration_state getDuckDbMigrationState
+   * @apiName getDuckDbMigrationState
+   * @apiGroup Device
+   */
+  async function getDuckDbMigrationState(req, res) {
+    const migrationState = await gladys.device.getDuckDbMigrationState();
+    res.json(migrationState);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
@@ -115,5 +146,8 @@ module.exports = function DeviceController(gladys) {
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
+    purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
+    getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
+    migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
   });
 };

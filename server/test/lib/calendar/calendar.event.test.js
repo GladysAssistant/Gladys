@@ -52,14 +52,36 @@ describe('calendar.destroy', () => {
 });
 
 describe('calendar.destroyEvents', () => {
-  const calendar = new Calendar();
   it("should destroy all calendar's event", async () => {
+    const calendar = new Calendar();
     await calendar.destroyEvents('07ec2599-3221-4d6c-ac56-41443973201b');
     const allCalendarEvents = await calendar.getEvents(
       '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       '07ec2599-3221-4d6c-ac56-41443973201b',
     );
     assert.deepEqual(allCalendarEvents, []);
+  });
+
+  it("should destroy calendar's events by url", async () => {
+    const calendar = new Calendar();
+    await calendar.destroyEvents('07ec2599-3221-4d6c-ac56-41443973201b', {
+      url: '/remote.php/dav/calendars/tony/personal/eee42d70-24f2-4c18-949d-822f3f72594c.ics',
+    });
+    const allCalendarEvents = await calendar.getEvents(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      '07ec2599-3221-4d6c-ac56-41443973201b',
+    );
+    expect(allCalendarEvents.length).eq(1);
+  });
+
+  it("should destroy calendar's events starting after date", async () => {
+    const calendar = new Calendar();
+    await calendar.destroyEvents('07ec2599-3221-4d6c-ac56-41443973201b', { from: '2019-03-10 07:49:07.556 +00:00' });
+    const allCalendarEvents = await calendar.getEvents(
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      '07ec2599-3221-4d6c-ac56-41443973201b',
+    );
+    expect(allCalendarEvents.length).eq(1);
   });
 });
 

@@ -4,7 +4,8 @@ const proxyquire = require('proxyquire').noCallThru();
 const path = require('path');
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
-
+const db = require('../../../models');
+const { cleanDb } = require('../../helpers/db.test');
 const getConfig = require('../../../utils/getConfig');
 
 const { fake, assert } = sinon;
@@ -55,12 +56,28 @@ describe('gateway.restoreBackupEvent', () => {
     gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job, scheduler);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     sinon.reset();
+    await db.umzug.up();
+    await cleanDb();
   });
 
-  it('should download and restore backup, then shutdown', async () => {
-    const encryptedBackupFilePath = path.join(__dirname, 'encoded-gladys-db-backup.db.gz.enc');
+  it('should download and restore new backup (sqlite + parquet), then shutdown', async () => {
+    const encryptedBackupFilePath = path.join(__dirname, 'encoded-gladys-db-and-duckdb-backup.tar.gz.enc');
+    const restoreBackupEvent = {
+      file_url: encryptedBackupFilePath,
+    };
+
+    await gateway.restoreBackupEvent(restoreBackupEvent);
+
+    expect(gateway.restoreErrored).equals(false);
+    expect(gateway.restoreInProgress).equals(true);
+
+    assert.calledOnceWithExactly(system.shutdown);
+  });
+
+  it('should download and restore old sqlite backup, then shutdown', async () => {
+    const encryptedBackupFilePath = path.join(__dirname, 'encoded-old-gladys-db-backup.db.gz.enc');
     const restoreBackupEvent = {
       file_url: encryptedBackupFilePath,
     };

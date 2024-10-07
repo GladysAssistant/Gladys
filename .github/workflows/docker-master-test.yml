@@ -62,7 +62,7 @@ jobs:
         env:
           RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: static
           path: front/build

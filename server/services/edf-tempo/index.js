@@ -3,15 +3,14 @@ const logger = require('../../utils/logger');
 const edfTempoController = require('./controllers/edf-tempo.controller');
 
 const PEAK_STATES = {
-  TEMPO_BLEU: 'blue',
-  TEMPO_BLANC: 'white',
-  TEMPO_ROUGE: 'red',
-  NON_DEFINI: 'not-defined',
+  blue: 'blue',
+  white: 'white',
+  red: 'red',
+  unknown: 'not-defined',
 };
 
 module.exports = function EdfTempoService(gladys, serviceId) {
   const dayjs = require('dayjs');
-  const axios = require('axios').default;
   const utc = require('dayjs/plugin/utc');
   const timezone = require('dayjs/plugin/timezone');
   dayjs.extend(utc);
@@ -43,14 +42,11 @@ module.exports = function EdfTempoService(gladys, serviceId) {
    */
   async function getEdfTempoStates() {
     const today = dayjs();
-    const todayDate = today.tz('Europe/Paris').format('YYYY-MM-DD');
     const todayHour = today.tz('Europe/Paris').hour();
-    const { data } = await axios.get(
-      `https://particulier.edf.fr/services/rest/referentiel/searchTempoStore?dateRelevant=${todayDate}`,
-    );
+    const data = await gladys.gateway.getEdfTempo();
     return {
-      today_peak_state: PEAK_STATES[data.couleurJourJ],
-      tomorrow_peak_state: PEAK_STATES[data.couleurJourJ1],
+      today_peak_state: PEAK_STATES[data.today],
+      tomorrow_peak_state: PEAK_STATES[data.tomorrow],
       current_hour_peak_state: todayHour >= 6 && todayHour < 22 ? 'peak-hour' : 'off-peak-hour',
     };
   }
