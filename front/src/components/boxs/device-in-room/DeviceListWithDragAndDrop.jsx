@@ -58,10 +58,9 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
             [style.deviceListDragAndDropActive]: isActive
           })}
           value={
-            selectedDeviceFeature.new_label !== undefined
-              ? selectedDeviceFeature.new_label
-              : selectedDeviceFeature.label
+            selectedDeviceFeature.new_label || null
           }
+          placeholder={selectedDeviceFeature.label}
           onChange={updateThisDeviceFeatureName}
         />
         <div class="input-group-append">
