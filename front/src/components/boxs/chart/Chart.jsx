@@ -116,6 +116,8 @@ class Chartbox extends Component {
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
+    let deviceFeaturesTreshold = this.props.box.device_features_treshold;
+    let manualFeaturesTreshold = this.props.box.manual_features_treshold_details;
     let deviceFeatureNames = this.props.box.device_feature_names;
     let nbFeaturesDisplayed = deviceFeatures.length;
 
@@ -208,7 +210,6 @@ class Chartbox extends Component {
       }
       const newState = {
         series,
-        loading: false,
         initialized: true,
         emptySeries,
         nbFeaturesDisplayed
@@ -259,6 +260,63 @@ class Chartbox extends Component {
       await this.setState(newState);
     } catch (e) {
       console.error(e);
+    }
+
+    if (deviceFeaturesTreshold.length === 0) {
+      await this.setState({ loading: false });
+      return;
+    }
+    try {
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+        interval: this.state.interval,
+        max_states: 10,
+        device_features: deviceFeaturesTreshold.join(',')
+      });
+
+      const seriesPoints = data.map((oneFeature, index) => {
+        const unit = this.props.box.units[index];
+        const deviceFeatureUnitShort = this.props.intl.dictionary.deviceFeatureUnitShort[unit];
+        const { values, deviceFeature } = oneFeature;
+        const deviceName = deviceFeature.name;
+        const name = `${deviceName} (${deviceFeatureUnitShort})`;
+        return {
+          name,
+          data: values.map(value => {
+            return {
+              x: value.created_at,
+              y: value.value
+            };
+          })
+        };
+      });
+      await this.setState({ seriesPoints });
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (manualFeaturesTreshold.length === 0) {
+      await this.setState({ loading: false });
+      return;
+    }
+
+    if (manualFeaturesTreshold.length > 0) {
+      const seriesAnnotationsYaxis = manualFeaturesTreshold.map((oneFeature, index) => {
+        const unit = oneFeature.unit;
+        const deviceFeatureUnitShort = this.props.intl.dictionary.deviceFeatureUnitShort[unit];
+        const deviceName = oneFeature.name;
+        const value = oneFeature.more_or_less && oneFeature.more_or_less !== 'without' ?
+          `${oneFeature.min}/${oneFeature.max}` : `${oneFeature.value}`;
+        const name = `${deviceName} ${value}${deviceFeatureUnitShort}`;
+        return {
+          name,
+          value: oneFeature.value,
+          y: oneFeature.min ? oneFeature.min : oneFeature.value,
+          y2: oneFeature.max ? oneFeature.max : oneFeature.value_more_or_less,
+          color: oneFeature.color,
+          more_or_less: oneFeature.more_or_less
+        };
+      });
+      await this.setState({ seriesAnnotationsYaxis });
     }
   };
   updateDeviceStateWebsocket = payload => {
@@ -318,6 +376,8 @@ class Chartbox extends Component {
       initialized,
       loading,
       series,
+      seriesPoints,
+      seriesAnnotationsYaxis,
       dropdown,
       variation,
       variationDownIsPositive,
@@ -513,6 +573,90 @@ class Chartbox extends Component {
                   />
                 </div>
               )}
+              <div
+                class={cx(style.meAuto, {
+                  [style.textGreen]:
+                    (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
+                  [style.textYellow]: variation === 0,
+                  [style.textRed]:
+                    (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
+                })}
+              >
+                {variation !== undefined && (
+                  <span class="d-inline-flex align-items-center lh-1">
+                    {roundWith2DecimalIfNeeded(variation)}
+                    <Text id="global.percent" />
+                    {variation > 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class={cx(style.variationIcon)}
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <polyline points="3 17 9 11 13 15 21 7" />
+                        <polyline points="14 7 21 7 21 14" />
+                      </svg>
+                    )}
+                    {variation === 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class={cx(style.variationIcon)}
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    )}
+                    {variation < 0 && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class={cx(style.variationIcon)}
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <polyline points="3 7 9 13 13 9 21 17" />
+                        <polyline points="21 10 21 17 14 17" />
+                      </svg>
+                    )}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+          {emptySeries === false && props.box.display_axes && (
+            <div class="mt-4">
+              <ApexChartComponent
+                series={series}
+                seriesPoints={seriesPoints}
+                seriesAnnotationsYaxis={seriesAnnotationsYaxis}
+                interval={interval}
+                user={props.user}
+                size="big"
+                chart_type={props.box.chart_type}
+                display_axes={props.box.display_axes}
+                colors={props.box.colors}
+              />
             </div>
           )}
         </div>
@@ -557,6 +701,8 @@ class Chartbox extends Component {
                 {emptySeries === false && !props.box.display_axes && (
                   <ApexChartComponent
                     series={series}
+                    seriesPoints={seriesPoints}
+                    seriesAnnotationsYaxis={seriesAnnotationsYaxis}
                     interval={interval}
                     user={props.user}
                     size="big"

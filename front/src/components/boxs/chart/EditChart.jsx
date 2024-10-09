@@ -4,6 +4,8 @@ import { connect } from 'unistore/preact';
 import Select from 'react-select';
 import update from 'immutability-helper';
 import get from 'get-value';
+import cx from 'classnames';
+import style from './style.css';
 
 import BaseEditBox from '../baseEditBox';
 import Chart from './Chart';
@@ -12,6 +14,7 @@ import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
+import ManualThresholdForm from './ManualThresholdForm';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
@@ -120,6 +123,73 @@ class EditChart extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
 
+  addManualThreshold = () => {
+    const { manualThresholdDetails } = this.state;
+    manualThresholdDetails.push({ name: '', value: '', unit: '', color: '', more_or_less: 'without' });
+    const index = manualThresholdDetails.length - 1;
+    this.setState({ manualThresholdDetails });
+    this.openEditForm(index);
+  };
+  deleteManualThreshold = index => {
+    const { manualThresholdDetails } = this.state;
+    manualThresholdDetails.splice(index, 1);
+    this.setState({ manualThresholdDetails });
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      manual_features_treshold_details: manualThresholdDetails
+    });
+  };
+
+  updateManualThresholdDetail = (index, field, value) => {
+    const { manualThresholdDetails } = this.state;
+    const detail = manualThresholdDetails[index];
+    const isNumber = !isNaN(value);
+    detail[field] = isNumber ? Number(value) : value;
+    if (field === 'value' || field === 'value_more_or_less' || field === 'more_or_less') {
+
+      if (detail.more_or_less === 'moreOrLess') {
+        detail.min = detail.value - detail.value_more_or_less;
+        detail.max = detail.value + detail.value_more_or_less;
+      }
+      if (detail.more_or_less === 'more') {
+        detail.min = detail.value;
+        detail.max = detail.value + detail.value_more_or_less;
+      }
+      if (detail.more_or_less === 'less') {
+        detail.min = detail.value - detail.value_more_or_less;
+        detail.max = detail.value;
+      }
+      if (detail.more_or_less === 'manual') {
+        detail.min = detail.value;
+        detail.max = detail.value_more_or_less;
+      }
+    }
+    if (field === 'value' && detail.more_or_less === 'manual') {
+      detail.min = value;
+    }
+
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      manual_features_treshold_details: manualThresholdDetails
+    });
+    this.setState({ manualThresholdDetails });
+  };
+
+  updateDeviceFeaturesTreshold = newSelectedTresholdOptions => {
+    if (newSelectedTresholdOptions && newSelectedTresholdOptions.length > 0) {
+      const deviceFeaturesSelectors = newSelectedTresholdOptions.map(
+        selectedDeviceFeaturesOption => selectedDeviceFeaturesOption.value
+      );
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        device_features_treshold: deviceFeaturesSelectors,
+      });
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        device_features_treshold: [],
+      });
+    }
+    this.setState({ selectedTresholdOptions: newSelectedTresholdOptions });
+  };
+
+  // updateDeviceFeatures = selectedDeviceFeaturesOptions => {
   addDeviceFeature = async selectedDeviceFeatureOption => {
     const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
@@ -219,11 +289,18 @@ class EditChart extends Component {
   getSelectedDeviceFeaturesAndOptions = (devices, chartType = this.state.chart_type) => {
     const deviceOptions = [];
     let selectedDeviceFeaturesOptions = [];
+    const deviceThresholdOptions = [];
+    let selectedTresholdOptions = [];
 
     devices.forEach(device => {
       const deviceFeaturesOptions = [];
+      const deviceFeaturesTresholdOptions = [];
       device.features.forEach(feature => {
         const featureOption = {
+          value: feature.selector,
+          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+        };
+        const featureOptionTreshold = {
           value: feature.selector,
           label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
         };
@@ -238,6 +315,7 @@ class EditChart extends Component {
             deviceFeaturesOptions.push(featureOption);
           } else if (!FEATURE_BINARY[feature.type]) {
             deviceFeaturesOptions.push(featureOption);
+            deviceFeaturesTresholdOptions.push(featureOptionTreshold);
           }
         }
         // If the feature is already selected
@@ -252,8 +330,30 @@ class EditChart extends Component {
             // And we push this to the list of selected feature
             selectedDeviceFeaturesOptions.push(featureOption);
           }
+          console.log('this.props.box', this.props.box);
+          console.log('feature.selector', feature.selector);
+          if (this.props.box.device_features_treshold) {
+            const featureTresholdIndex = this.props.box.device_features_treshold.indexOf(feature.selector);
+            if (featureTresholdIndex !== -1) {
+              selectedTresholdOptions.push(featureOptionTreshold);
+            }
+          }
         }
       });
+      if (deviceFeaturesTresholdOptions.length > 0) {
+        deviceFeaturesTresholdOptions.sort((a, b) => {
+          if (a.label < b.label) {
+            return -1;
+          } else if (a.label > b.label) {
+            return 1;
+          }
+          return 0;
+        });
+        deviceThresholdOptions.push({
+          label: device.name,
+          options: deviceFeaturesTresholdOptions
+        });
+      }
       if (deviceFeaturesOptions.length > 0) {
         deviceFeaturesOptions.sort((a, b) => {
           if (a.label < b.label) {
@@ -298,7 +398,7 @@ class EditChart extends Component {
         (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
       );
     }
-    return { deviceOptions, selectedDeviceFeaturesOptions };
+    return { deviceOptions, selectedDeviceFeaturesOptions, deviceThresholdOptions, selectedTresholdOptions };
   };
 
   getDeviceFeatures = async (chartType = this.state.chart_type) => {
@@ -306,11 +406,11 @@ class EditChart extends Component {
       this.setState({ loading: true });
       // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
-      const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
+      const { deviceOptions, selectedDeviceFeaturesOptions, deviceThresholdOptions, selectedTresholdOptions } = this.getSelectedDeviceFeaturesAndOptions(
         devices,
         chartType
       );
-      await this.setState({ devices, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ devices, deviceOptions, selectedDeviceFeaturesOptions, deviceThresholdOptions, selectedTresholdOptions, loading: false });
       this.refreshDeviceFeaturesNames();
     } catch (e) {
       console.error(e);
@@ -349,6 +449,7 @@ class EditChart extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    const box = this.props.box;
     this.deviceFeatureBySelector = new Map();
     this.state = {
       chart_type: '',
@@ -356,9 +457,27 @@ class EditChart extends Component {
       deviceOptions: [],
       loading: false,
       displayPreview: false,
-      chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS]
+      chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS],
+      selectedTresholdOptions: [],
+      manualThresholdDetails: box.manual_features_treshold_details || [],
+      editingIndex: null
     };
   }
+
+  openEditForm = index => {
+    this.setState({ editingIndex: index });
+  };
+
+  closeEditForm = () => {
+    // TODO: check if the detail is valid and error
+    const { manualThresholdDetails, editingIndex } = this.state;
+    const detail = manualThresholdDetails[editingIndex];
+    if (detail.name && detail.value && !isNaN(detail.value) && detail.color && detail.unit) {
+      this.setState({ editingIndex: null });
+    } else {
+      alert('Please fill in all fields correctly before closing.');
+    }
+  };
 
   componentDidMount() {
     this.getDeviceFeatures();
@@ -372,7 +491,7 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, chartTypeList }) {
+  render(props, { selectedDeviceFeaturesOptions, selectedTresholdOptions, deviceOptions, deviceThresholdOptions, loading, displayPreview, manualThresholdDetails, editingIndex, chartTypeList }) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
@@ -569,6 +688,65 @@ class EditChart extends Component {
                 )}
               </select>
             </div>
+            {deviceThresholdOptions && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.editDeviceFeaturesTresholdLabel" />
+                </label>
+                <div>
+                  <Select
+                    defaultValue={null}
+                    value={selectedTresholdOptions}
+                    isMulti
+                    onChange={this.updateDeviceFeaturesTreshold}
+                    options={deviceThresholdOptions}
+                  />
+
+
+                  {manualThresholdDetails.map((detail, index) => (
+                    <div key={index} className="mt-3 mb-3">
+                      {editingIndex === index ? (
+                        <ManualThresholdForm
+                          key={index}
+                          index={index}
+                          manualThresholdDetail={detail}
+                          colorOptions={colorOptions}
+                          colorSelectorStyles={colorSelectorStyles}
+                          updateManualThresholdDetail={this.updateManualThresholdDetail}
+                          deleteManualThreshold={this.deleteManualThreshold}
+                          closeFlyout={this.closeEditForm}
+                        />
+                      ) : (
+                        <div class={cx('row align-items-center', style.detailItem)}>
+                          <div class="col-8 text-left">
+                            <span>
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  width: '10px',
+                                  height: '10px',
+                                  backgroundColor: detail.color,
+                                  marginRight: '5px'
+                                }}
+                              ></span>
+                              {detail.name}: {detail.value} {detail.unit}
+                            </span>
+                          </div>
+                          <div class="col-4 text-right">
+                            <button className="btn btn-secondary btn-sm" onClick={() => this.openEditForm(index)}>
+                              <Text id="dashboard.boxes.chart.editTreshold.configureButton" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <button class="btn btn-secondary w-100" onClick={this.addManualThreshold}>
+                    <Text id="dashboard.boxes.chart.editDeviceFeaturesTresholdManualLabel" className="w-100" />
+                  </button>
+                </div>
+              </div>
+            )}
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.preview" />
@@ -576,7 +754,7 @@ class EditChart extends Component {
               {displayPreview && <Chart box={props.box} />}
               {!displayPreview && (
                 <div>
-                  <button class="btn btn-secondary" onClick={this.showPreview}>
+                  <button class="btn btn-secondary w-100" onClick={this.showPreview}>
                     <Text id="dashboard.boxes.chart.showPreviewButton" />
                   </button>
                 </div>

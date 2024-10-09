@@ -1,4 +1,4 @@
-const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale }) => {
+const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale, seriesPoints, seriesAnnotationsYaxis }) => {
   const options = {
     chart: {
       locales,
@@ -64,6 +64,72 @@ const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales,
     legend: {
       show: displayAxes,
       position: 'bottom'
+    },
+    annotations: {
+      yaxis: seriesAnnotationsYaxis, 
+      // points: seriesPoints,
+
+      // points: [
+      //   // {
+      //   //   y: 5, // Valeur de la ligne min
+      //   //   borderColor: '#FF0000', // Couleur de la ligne
+      //   //   label: {
+      //   //     borderColor: '#FF0000',
+      //   //     style: {
+      //   //       color: '#fff',
+      //   //       background: '#FF0000'
+      //   //     },
+      //   //     text: 'Min Value'
+      //   //   }
+      //   // },
+      //   // {
+      //   //   y: 20, // Valeur de la ligne max
+      //   //   borderColor: '#00FF00', // Couleur de la ligne
+      //   //   label: {
+      //   //     borderColor: '#00FF00',
+      //   //     style: {
+      //   //       color: '#fff',
+      //   //       background: '#00FF00'
+      //   //     },
+      //   //     text: 'Max Value'
+      //   //   }
+      //   // },
+      //   // {
+      //   //   y: 22,
+      //   //   y2: 24,
+      //   //   borderColor: '#00E396',
+      //   //   label: {
+      //   //     text: 'Consigne 8:00'
+      //   //   }
+      //   // },
+      //   // {
+      //   //   y: 17,
+      //   //   x: 3, // Position sur l'axe X (11:00)
+      //   //   borderColor: '#FEB019',
+      //   //   label: {
+      //   //     text: 'Consigne 11:00'
+      //   //   }
+      //   // },
+      //   {
+      //     y: 20,
+      //     y2: 24,
+      //     x: 1725638947166, // Position sur l'axe X (15:00)
+      //     borderColor: '#FF4560',
+      //     label: {
+      //       text: 'Consigne 15:00'
+      //     }
+      //   },
+      //   {
+      //     y: 20,
+      //     y2: 24,
+      //     x: 1725649979366, // Position sur l'axe X (15:00)
+      //     borderColor: '#FF4560',
+      //     label: {
+      //       text: 'Consigne 15:00'
+      //     }
+      //   }
+
+      // ]
     }
   };
   return options;
