@@ -330,7 +330,7 @@ class Chartbox extends Component {
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
-    let additionalHeight = 0;
+    let additionalHeight = 30 * (nbFeaturesDisplayed - 1);
     if (props.box.chart_type === 'timeline') {
       additionalHeight = 55 * nbFeaturesDisplayed;
     }
@@ -338,7 +338,7 @@ class Chartbox extends Component {
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
           <div class="d-flex align-items-center">
-            <div class={cx(style.subheader)}>{props.box.title}</div>
+            <div class={cx(style.subheader)}>{box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               {props.box.chart_type && (
                 <div class="dropdown">
