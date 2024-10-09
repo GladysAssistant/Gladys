@@ -17,3 +17,20 @@
   height: 20%;
   width: 100%;
 }
+
+.deviceListDragAndDrop {
+  cursor: 'pointer';
+  user-select: 'none';
+}
+
+.deviceListDragAndDropDragging {
+  opacity: 0.5;
+}
+
+.deviceListDragAndDropActive {
+  background-color: #ecf0f1;
+}
+
+.deviceListRemoveButton {
+  z-index: 0;
+}

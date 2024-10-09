@@ -134,19 +134,3 @@
   padding-right: 1.5rem;
   text-align: justify;
 }
-.deviceListDragAndDrop {
-  cursor: 'pointer';
-  user-select: 'none';
-}
-
-.deviceListDragAndDropDragging {
-  opacity: 0.5;
-}
-
-.deviceListDragAndDropActive {
-  background-color: #ecf0f1;
-}
-
-.deviceListRemoveButton {
-  z-index: 0;
-}

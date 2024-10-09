@@ -57,11 +57,8 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
           class={cx('form-control', {
             [style.deviceListDragAndDropActive]: isActive
           })}
-          value={
-            selectedDeviceFeature.new_label !== undefined
-              ? selectedDeviceFeature.new_label
-              : selectedDeviceFeature.label
-          }
+          value={selectedDeviceFeature.new_label || null}
+          placeholder={selectedDeviceFeature.label}
           onChange={updateThisDeviceFeatureName}
         />
         <div class={cx('input-group-append', style.deviceListRemoveButton)}>
