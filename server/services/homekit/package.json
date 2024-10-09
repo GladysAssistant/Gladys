@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "hap-nodejs": "^0.11.1",
+    "hap-nodejs": "^1.1.0",
     "uuid": "^9.0.0"
   }
 }
