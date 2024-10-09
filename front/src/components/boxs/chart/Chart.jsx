@@ -192,9 +192,11 @@ class Chartbox extends Component {
         series = data.map((oneFeature, index) => {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
           const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-          const { values, deviceFeature } = oneFeature;
-          const deviceName = deviceFeature.name;
-          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          const { values, deviceFeature, device } = oneFeature;
+          const deviceFeatureName = deviceFeatureNames
+            ? deviceFeatureNames[index]
+            : getDeviceName(device, deviceFeature);
+          const name = oneUnitTranslated ? `${deviceFeatureName} (${oneUnitTranslated})` : deviceFeatureName;
           return {
             name,
             data: values.map(value => {
