@@ -8,7 +8,7 @@ import get from 'get-value';
 import BaseEditBox from '../baseEditBox';
 import Chart from './Chart';
 import { getDeviceFeatureName } from '../../../utils/device';
-import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
+import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
@@ -129,9 +129,8 @@ class EditChart extends Component {
 
   refreshDeviceFeaturesNames = () => {
     const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
-      return o.new_label !== undefined ? o.new_label : o.label;
+      return o.new_label !== undefined && o.new_label !== '' ? o.new_label : o.label;
     });
-
     const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.value;
     });
@@ -213,7 +212,10 @@ class EditChart extends Component {
       }
     });
     await this.setState(newState);
-    this.refreshDeviceFeaturesNames();
+
+    if (name !== '') {
+      this.refreshDeviceFeaturesNames();
+    }
   };
 
   getSelectedDeviceFeaturesAndOptions = (devices, chartType = this.state.chart_type) => {
@@ -342,7 +344,7 @@ class EditChart extends Component {
       }
     });
     await this.setState(newStateWithoutElement);
-    this.refreshDeviceFeaturesNames();
+    await this.refreshDeviceFeaturesNames();
     this.refreshDeviceUnitAndChartType(this.state.selectedDeviceFeaturesOptions);
   };
 
