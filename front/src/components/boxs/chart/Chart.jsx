@@ -259,8 +259,8 @@ class Chartbox extends Component {
     } catch (e) {
       console.error(e);
     }
-
-    if (deviceFeaturesTreshold.length === 0) {
+    console.log('deviceFeaturesTreshold', deviceFeaturesTreshold);
+    if (!deviceFeaturesTreshold || deviceFeaturesTreshold.length === 0) {
       await this.setState({ loading: false });
       return;
     }
