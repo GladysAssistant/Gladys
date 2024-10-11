@@ -24,7 +24,7 @@ class EditDevices extends Component {
 
   refreshDeviceFeaturesNames = () => {
     const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
-      return o.new_label !== undefined ? o.new_label : o.label;
+      return o.new_label !== undefined && o.new_label !== '' ? o.new_label : o.label;
     });
     const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.value;
@@ -62,7 +62,10 @@ class EditDevices extends Component {
       }
     });
     await this.setState(newState);
-    this.refreshDeviceFeaturesNames();
+
+    if (name !== '') {
+      this.refreshDeviceFeaturesNames();
+    }
   };
 
   getSelectedDeviceFeaturesAndOptions = devices => {
