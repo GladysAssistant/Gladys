@@ -562,6 +562,8 @@ class Chartbox extends Component {
                 <div class="mt-4">
                   <ApexChartComponent
                     series={series}
+                    seriesPoints={seriesPoints}
+                    seriesAnnotationsYaxis={seriesAnnotationsYaxis}
                     interval={interval}
                     user={props.user}
                     size="big"
@@ -573,90 +575,6 @@ class Chartbox extends Component {
                   />
                 </div>
               )}
-              <div
-                class={cx(style.meAuto, {
-                  [style.textGreen]:
-                    (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
-                  [style.textYellow]: variation === 0,
-                  [style.textRed]:
-                    (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
-                })}
-              >
-                {variation !== undefined && (
-                  <span class="d-inline-flex align-items-center lh-1">
-                    {roundWith2DecimalIfNeeded(variation)}
-                    <Text id="global.percent" />
-                    {variation > 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 17 9 11 13 15 21 7" />
-                        <polyline points="14 7 21 7 21 14" />
-                      </svg>
-                    )}
-                    {variation === 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    )}
-                    {variation < 0 && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class={cx(style.variationIcon)}
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="3 7 9 13 13 9 21 17" />
-                        <polyline points="21 10 21 17 14 17" />
-                      </svg>
-                    )}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-          {emptySeries === false && props.box.display_axes && (
-            <div class="mt-4">
-              <ApexChartComponent
-                series={series}
-                seriesPoints={seriesPoints}
-                seriesAnnotationsYaxis={seriesAnnotationsYaxis}
-                interval={interval}
-                user={props.user}
-                size="big"
-                chart_type={props.box.chart_type}
-                display_axes={props.box.display_axes}
-                colors={props.box.colors}
-              />
             </div>
           )}
         </div>
