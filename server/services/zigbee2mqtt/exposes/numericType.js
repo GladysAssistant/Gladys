@@ -716,6 +716,14 @@ module.exports = {
         max: 1000000,
       },
     },
+    EASF03: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        min: 0,
+        max: 1000000,
+      },
+    },
     // End of Lixee TIC device
     voc: {
       feature: {
