@@ -22,7 +22,7 @@ dayjs.extend(LocalizedFormat);
 async function checkCalendarTriggers() {
   // getting a fixed value for now, as soon as possible in the function
   const now = dayjs.tz(dayjs(), this.timezone);
-  logger.info(`Checking calendar triggers at ${now}`);
+  logger.debug(`Checking calendar triggers at ${now}`);
   // First, we try to constitute a list of triggers
   // related to calendars events
   const calendarEventTriggers = [];
