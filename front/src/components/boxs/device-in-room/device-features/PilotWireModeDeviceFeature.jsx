@@ -23,6 +23,15 @@ const PilotWireModeDeviceFeature = ({ children, ...props }) => {
                 <div class="justify-content-end">
                     <div class="form-group mb-0">
                         <select value={props.deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
+                            <option value={PILOT_WIRE_MODE.OFF}>
+                                <Text id={`deviceFeatureAction.category.${category}.${type}.off`} />
+                            </option>
+                            <option value={PILOT_WIRE_MODE.FROST_PROTECTION}>
+                                <Text id={`deviceFeatureAction.category.${category}.${type}.frost-protection`} />
+                            </option>
+                            <option value={PILOT_WIRE_MODE.ECO}>
+                                <Text id={`deviceFeatureAction.category.${category}.${type}.eco`} />
+                            </option>
                             <option value={PILOT_WIRE_MODE.COMFORT_2}>
                                 <Text id={`deviceFeatureAction.category.${category}.${type}.comfort_-2`} />
                             </option>
@@ -31,15 +40,6 @@ const PilotWireModeDeviceFeature = ({ children, ...props }) => {
                             </option>
                             <option value={PILOT_WIRE_MODE.COMFORT}>
                                 <Text id={`deviceFeatureAction.category.${category}.${type}.comfort`} />
-                            </option>
-                            <option value={PILOT_WIRE_MODE.ECO}>
-                                <Text id={`deviceFeatureAction.category.${category}.${type}.eco`} />
-                            </option>
-                            <option value={PILOT_WIRE_MODE.FROST_PROTECTION}>
-                                <Text id={`deviceFeatureAction.category.${category}.${type}.frost-protection`} />
-                            </option>
-                            <option value={PILOT_WIRE_MODE.OFF}>
-                                <Text id={`deviceFeatureAction.category.${category}.${type}.off`} />
                             </option>
                         </select>
                     </div>
