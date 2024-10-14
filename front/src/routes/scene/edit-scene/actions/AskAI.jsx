@@ -83,7 +83,9 @@ class AskAI extends Component {
   render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions }) {
     return (
       <div>
-        <p> <Text id="editScene.actionsCard.askAi.description" /></p>
+        <p>
+          <Text id="editScene.actionsCard.askAi.description" />
+        </p>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.askAi.textLabel" />{' '}
@@ -95,15 +97,15 @@ class AskAI extends Component {
             <Text id="editScene.actionsCard.askAi.explanationText" />
           </div>
           <div className="tags-input">
-             <Localizer>
-            <TextWithVariablesInjected
-              text={props.action.text}
-              triggersVariables={props.triggersVariables}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              updateText={this.updateText}
-              placeholder={<Text id="editScene.actionsCard.askAi.textLabel" />}
-            />
+            <Localizer>
+              <TextWithVariablesInjected
+                text={props.action.text}
+                triggersVariables={props.triggersVariables}
+                actionsGroupsBefore={props.actionsGroupsBefore}
+                variables={props.variables}
+                updateText={this.updateText}
+                placeholder={<Text id="editScene.actionsCard.askAi.textLabel" />}
+              />
             </Localizer>
           </div>
         </div>

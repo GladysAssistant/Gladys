@@ -403,7 +403,7 @@ const ActionCard = ({ children, ...props }) => {
               triggersVariables={props.triggersVariables}
             />
           )}
-           {props.action.type === ACTIONS.AI.ASK && (
+          {props.action.type === ACTIONS.AI.ASK && (
             <AskAI
               action={props.action}
               columnIndex={props.columnIndex}
