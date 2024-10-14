@@ -4,6 +4,7 @@ const {
   BUTTON_STATUS,
   COVER_STATE,
   SIREN_LMH_VOLUME,
+  PILOT_WIRE_MODE,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -85,6 +86,13 @@ addMapping('volume', SIREN_LMH_VOLUME.LOW, 'low');
 addMapping('volume', SIREN_LMH_VOLUME.MEDIUM, 'medium');
 addMapping('volume', SIREN_LMH_VOLUME.HIGH, 'high');
 
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT, 'comfort');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.ECO, 'eco');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.FROST_PROTECTION, 'frost_protection');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.OFF, 'off');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_1, 'comfort_-1');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_2, 'comfort_-2');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -141,6 +149,12 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+      },
+    },
+    pilot_wire_mode: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.HEATER,
+        type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
       },
     },
   },
