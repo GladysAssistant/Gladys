@@ -22,8 +22,8 @@ const PilotWireModeDeviceFeature = ({ children, ...props }) => {
             <td class="py-0">
                 <div class="justify-content-end">
                     <div class="form-group mb-0">
-                        <select value={props.deviceFeature.last_value} onChange={updateValue} class="form-control">
-                        <option value={PILOT_WIRE_MODE.COMFORT_2}>
+                        <select value={props.deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
+                            <option value={PILOT_WIRE_MODE.COMFORT_2}>
                                 <Text id={`deviceFeatureAction.category.${category}.${type}.comfort_-2`} />
                             </option>
                             <option value={PILOT_WIRE_MODE.COMFORT_1}>
