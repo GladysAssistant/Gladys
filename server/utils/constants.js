@@ -78,10 +78,10 @@ const AC_MODE = {
 };
 
 const PILOT_WIRE_MODE = {
-  COMFORT: 'comfort',
-  ECO: 'eco',
-  FROST_PROTECTION: 'frost-protection',
-  OFF: 'off',
+  COMFORT: 3,
+  ECO: 2,
+  FROST_PROTECTION: 1,
+  OFF: 0,
 };
 
 const MUSIC_PLAYBACK_STATE = {
