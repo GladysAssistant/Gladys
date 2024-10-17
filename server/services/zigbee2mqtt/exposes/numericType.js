@@ -396,7 +396,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.VTIC,
-      }
+      },
     },
     CCASN: {
       feature: {
@@ -627,7 +627,7 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
-    },    
+    },
     'SMAXN-1': {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
