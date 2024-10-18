@@ -583,7 +583,7 @@ module.exports = {
     RELAIS: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
-        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.RELAIS,
+        type: DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY,
       },
     },
     SMAXN: {
