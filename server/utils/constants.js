@@ -625,6 +625,7 @@ const DEVICE_FEATURE_TYPES = {
     DAILY_CONSUMPTION: 'daily-consumption',
   },
   TELEINFORMATION: {
+    BINARY: 'binary',
     EAST: 'east',
     EAIT: 'eait',
     EASF01: 'easf01',
@@ -665,7 +666,6 @@ const DEVICE_FEATURE_TYPES = {
     SINSTI: 'sinsti',
     SMAXIN: 'smaxin',
     SMAXIN_1: 'smaxin_1',
-    RELAIS: 'relais',
     SMAXN: 'smaxn',
     SMAXN2: 'smaxn2',
     SMAXN3: 'smaxn3',

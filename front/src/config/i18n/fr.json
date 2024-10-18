@@ -3122,6 +3122,7 @@
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
+      "binary": "Relais",
       "east": "Puissance active totale délivrée (EAST)",
       "eait": "Puissance active totale injectée (EAIT)",
       "easf01": "Puissance active totale délivrée (EASF01)",
@@ -3162,7 +3163,6 @@
       "sinsti": "Puissance apparente instantanée injectée (SINSTI)",
       "smaxin": "Puissance apparente max. injectée n (SMAXIN)",
       "smaxin_1": "Puissance apparente max. injectée n-1 (SMAXIN-1)",
-      "relais": "Relais",
       "smaxn": "Puissance apparente délivrée de crête 1 (SMAXN)",
       "smaxn2": "Puissance apparente délivrée de crête 2 (SMAXN2)",
       "smaxn3": "Puissance apparente délivrée de crête 3 (SMAXN3)",

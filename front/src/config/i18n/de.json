@@ -3122,6 +3122,7 @@
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
+      "binary": "Schalter",
       "east": "Gesamte gelieferte aktive Leistung (EAST)",
       "eait": "Gesamte eingespeiste aktive Leistung (EAIT)",
       "easf01": "Gesamte gelieferte aktive Leistung (EASF01)",
@@ -3162,7 +3163,6 @@
       "sinsti": "Sofortige eingespeiste Scheinleistung (SINSTI)",
       "smaxin": "Max. eingespeiste Scheinleistung n (SMAXIN)",
       "smaxin_1": "Max. eingespeiste Scheinleistung n-1 (SMAXIN-1)",
-      "relais": "Relais",
       "smaxn": "Gipfelgelieferte Scheinleistung 1 (SMAXN)",
       "smaxn2": "Gipfelgelieferte Scheinleistung 2 (SMAXN2)",
       "smaxn3": "Gipfelgelieferte Scheinleistung 3 (SMAXN3)",

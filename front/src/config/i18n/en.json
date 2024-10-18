@@ -3122,6 +3122,7 @@
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
+      "binary": "Switch",
       "east": "Total active power delivered (EAST)",
       "eait": "Total active power injected (EAIT)",
       "easf01": "Total active power delivered (EASF01)",
@@ -3162,7 +3163,6 @@
       "sinsti": "Instantaneous injected apparent power (SINSTI)",
       "smaxin": "Max. injected apparent power n (SMAXIN)",
       "smaxin_1": "Max. injected apparent power n-1 (SMAXIN-1)",
-      "relais": "Relay",
       "smaxn": "Peak delivered apparent power 1 (SMAXN)",
       "smaxn2": "Peak delivered apparent power 2 (SMAXN2)",
       "smaxn3": "Peak delivered apparent power 3 (SMAXN3)",
