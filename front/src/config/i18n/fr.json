@@ -2410,6 +2410,8 @@
     "newUpgradeAvailable": "Mise à jour disponible",
     "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez l'image Raspberry Pi OS Gladys officielle. Pour une installation manuellle, vous devez avoir configuré Watchtower pour que Gladys Assistant se mette à jour.",
     "download": "Télécharger",
+    "manualUpdate": "Mise à jour manuelle de Gladys",
+    "manualUpdateButton": "Lancer la mise à jour",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",
     "containerName": "Nom",

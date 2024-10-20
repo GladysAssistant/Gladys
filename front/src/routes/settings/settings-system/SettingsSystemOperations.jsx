@@ -38,6 +38,18 @@ const SettingsSystemOperations = ({ systemInfos }) => (
         </table>
       </div>
     )}
+    <div class="card-body">
+      <div class="dimmer-content"> 
+        <h5>
+          <Text id="systemSettings.manualUpdate" />
+        </h5>
+        <p>
+          <button class="btn btn-primary">
+            <Text id="systemSettings.manualUpdateButton" />
+          </button>
+        </p>
+      </div>
+    </div>
   </div>
 );
 
