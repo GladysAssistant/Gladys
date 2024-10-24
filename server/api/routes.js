@@ -543,6 +543,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: systemController.getContainers,
     },
+    'post /api/v1/system/updateContainers': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.updateContainers,
+    },
     'post /api/v1/system/shutdown': {
       authenticated: true,
       admin: true,

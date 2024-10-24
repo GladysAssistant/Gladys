@@ -33,6 +33,16 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/system/updateContainers
+   * @apiName updateContainers
+   * @apiGroup System
+   */
+  async function updateContainers(req, res) {
+    const update = await gladys.system.updateContainers();
+    res.json(update);
+  }
+
+  /**
    * @api {post} /api/v1/system/upgrade/download
    * @apiName getContainers
    * @apiGroup System
@@ -89,6 +99,7 @@ module.exports = function SystemController(gladys) {
     getSystemInfos: asyncMiddleware(getSystemInfos),
     getDiskSpace: asyncMiddleware(getDiskSpace),
     getContainers: asyncMiddleware(getContainers),
+    updateContainers: asyncMiddleware(updateContainers),
     shutdown: asyncMiddleware(shutdown),
     getUpgradeDownloadStatus: asyncMiddleware(getUpgradeDownloadStatus),
     vacuum: asyncMiddleware(vacuum),
