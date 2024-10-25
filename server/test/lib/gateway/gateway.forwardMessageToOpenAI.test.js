@@ -162,32 +162,6 @@ describe('gateway.forwardMessageToOpenAI', () => {
     const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     assert.calledWith(gateway.gladysGatewayClient.openAIAsk, {
       question: 'Turn on the light in the living room',
-      devices: [
-        {
-          name: 'Capteur salon',
-          room: 'salon',
-          features: [
-            {
-              name: 'Batterie',
-              selector: 'mqtt-battery',
-              category: 'battery',
-              type: 'integer',
-              last_value: null,
-              last_value_changed: null,
-              unit: 'percent',
-            },
-            {
-              name: 'Niveau de Co2',
-              selector: 'mqtt-co2',
-              category: 'co2-sensor',
-              type: 'integer',
-              last_value: 1200,
-              last_value_changed: '2024-10-18T01:40:12.042Z',
-              unit: 'ppm',
-            },
-          ],
-        },
-      ],
       image: undefined,
       previous_questions: [],
     });

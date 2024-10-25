@@ -27,28 +27,10 @@ const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY']);
  */
 async function forwardMessageToOpenAI({ message, image, previousQuestions, context }) {
   try {
-    const devices = this.stateManager.getAllKeys('device').map((deviceSelector) => {
-      const d = this.stateManager.get('device', deviceSelector);
-      return {
-        name: d.name,
-        room: d.room ? d.room.name : '',
-        features: d.features.map((f) => ({
-          name: f.name,
-          selector: f.selector,
-          category: f.category,
-          type: f.type,
-          last_value: f.last_value,
-          last_value_changed: f.last_value_changed,
-          unit: f.unit,
-        })),
-      };
-    });
-
     const response = await this.openAIAsk({
       question: message.text,
       image,
       previous_questions: previousQuestions,
-      devices,
     });
 
     const classification = {};
