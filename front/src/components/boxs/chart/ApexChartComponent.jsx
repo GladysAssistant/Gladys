@@ -141,8 +141,10 @@ class ApexChartComponent extends Component {
     } else if (this.props.size === 'big' && !this.props.display_axes) {
       height = 80;
     } else {
+      console.log('height this.props', this.props);
       height = 200 + this.props.additionalHeight;
     }
+    console.log('height', height);
     let seriesAnnotationsYaxis = [];
     let seriesPoints = [];
     console.log('this.props', this.props);
