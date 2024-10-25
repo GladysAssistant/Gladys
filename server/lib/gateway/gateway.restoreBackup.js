@@ -47,9 +47,11 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
     await new Promise((resolve) => {
       db.duckDb.close(() => resolve());
     });
-    // Delete current DuckDB file
+    // Delete current DuckDB files
     const duckDbFilePath = `${this.config.storage.replace('.db', '')}.duckdb`;
+    const duckDbWalFilePath = `${this.config.storage.replace('.db', '')}.duckdb.wal`;
     await fse.remove(duckDbFilePath);
+    await fse.remove(duckDbWalFilePath);
     const duckDb = new duckdb.Database(duckDbFilePath);
     const duckDbWriteConnection = duckDb.connect();
     const duckDbWriteConnectionAllAsync = promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
