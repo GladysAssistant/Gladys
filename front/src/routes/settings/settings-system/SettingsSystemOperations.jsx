@@ -7,24 +7,21 @@ class SettingsSystemOperations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      confirmUpdateContainers: false
+      confirmUpdateContainers: false,
+      updateContainersStarted: false
     };
   }
 
   updateContainers = async () => {
     this.setState({
-      loading: true,
-      confirmUpdateContainers: false
+      confirmUpdateContainers: false,
+      updateContainersStarted: true
     });
     try {
       await this.props.httpClient.post('/api/v1/system/updateContainers');
-      // route('/dashboard/settings/jobs');
     } catch (e) {
       console.error(e);
     }
-    this.setState({
-      loading: false
-    });
   };
 
   toggleUpdateConfirmation = () => {
@@ -33,7 +30,7 @@ class SettingsSystemOperations extends Component {
     });
   };
 
-  render(props, {confirmUpdateContainers}) {
+  render(props, {confirmUpdateContainers, updateContainersStarted}) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -78,8 +75,13 @@ class SettingsSystemOperations extends Component {
               <Text id="systemSettings.manualUpdate" />
             </h5>
             <p>
+              {updateContainersStarted && (
+                <div class="alert alert-info">
+                  <Text id="systemSettings.updateContainersStarted" />
+                </div>
+              )}
               {!confirmUpdateContainers ? (
-                <button onClick={this.toggleUpdateConfirmation} class="btn btn-info">
+                <button onClick={this.toggleUpdateConfirmation} class="btn btn-primary">
                   <Text id="systemSettings.manualUpdateButton" />
                 </button>
               ) : (
@@ -101,60 +103,3 @@ class SettingsSystemOperations extends Component {
 }
 
 export default connect('httpClient', null)(SettingsSystemOperations);
-
-
-/*
-const SettingsSystemOperations = ({ systemInfos }) => (
-  <div class="card">
-    <h4 class="card-header">
-      <Text id="systemSettings.operations" />
-    </h4>
-
-    {systemInfos && systemInfos.new_release_available === true && (
-      <div class="card-body">
-        <div>
-          <h4>
-            <Text id="systemSettings.newUpgradeAvailable" />
-          </h4>
-          <p>
-            <Text id="systemSettings.newUpgradeAvailableText" />
-          </p>
-        </div>
-      </div>
-    )}
-
-    {systemInfos && systemInfos.new_release_available === false && (
-      <div class="table-responsive">
-        <table className="table table-hover table-outline table-vcenter text-nowrap card-table">
-          <tbody>
-            <tr>
-              <td>
-                <Text id="systemSettings.upToDate" />
-              </td>
-              <td className="text-right">
-                <span class="badge badge-success">
-                  <Text id="systemSettings.gladysVersionValue" fields={{ version: systemInfos.gladys_version }} />
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    )}
-    <div class="card-body">
-      <div class="dimmer-content"> 
-        <h5>
-          <Text id="systemSettings.manualUpdate" />
-        </h5>
-        <p>
-          <button class="btn btn-primary">
-            <Text id="systemSettings.manualUpdateButton" />
-          </button>
-        </p>
-      </div>
-    </div>
-  </div>
-);
-
-export default connect('systemInfos', null)(SettingsSystemOperations);
-*/

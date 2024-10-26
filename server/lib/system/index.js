@@ -38,8 +38,10 @@ const System = function System(sequelize, event, config, job) {
   this.job = job;
   this.dockerode = null;
   this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
+  this.updateContainers = this.job.wrapper(JOB_TYPES.UPDATE_CONTAINERS, this.updateContainers.bind(this));
   this.event.on(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, eventFunctionWrapper(this.downloadUpgrade.bind(this)));
   this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
+  this.event.on(EVENTS.SYSTEM.UPDATE_CONTAINERS, eventFunctionWrapper(this.updateContainers.bind(this)));
   this.networkMode = null;
 };
 
