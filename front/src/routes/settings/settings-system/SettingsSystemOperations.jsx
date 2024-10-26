@@ -79,7 +79,7 @@ class SettingsSystemOperations extends Component {
             </h5>
             <p>
               {!confirmUpdateContainers ? (
-                <button onClick={this.toggleUpdateConfirmation} class="btn btn-primary">
+                <button onClick={this.toggleUpdateConfirmation} class="btn btn-info">
                   <Text id="systemSettings.manualUpdateButton" />
                 </button>
               ) : (
