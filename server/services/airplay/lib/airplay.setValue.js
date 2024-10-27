@@ -37,12 +37,17 @@ async function setValue(device, deviceFeature, value) {
     airplayDevice.on('status', async (status) => {
       if (status === 'ready') {
         decodeProcess = this.childProcess.spawn('ffmpeg', [
-          '-i', value,
-          '-acodec', 'pcm_s16le',
-          '-f', 's16le',        // PCM 16bits, little-endian
-          '-ar', '44100',       // Sampling rate
-          '-ac', 2,             // Stereo
-          'pipe:1'              // Output on stdout
+          '-i',
+          value,
+          '-acodec',
+          'pcm_s16le',
+          '-f',
+          's16le', // PCM 16bits, little-endian
+          '-ar',
+          '44100', // Sampling rate
+          '-ac',
+          2, // Stereo
+          'pipe:1', // Output on stdout
         ]);
         decodeProcess.stdout.pipe(client);
 

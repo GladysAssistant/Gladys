@@ -1129,6 +1129,41 @@
         "conflictError": "The current device is already in Gladys."
       }
     },
+    "airplay": {
+      "title": "Airplay",
+      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "deviceTab": "Devices",
+      "discoverTab": "Airplay Discovery",
+      "setupTab": "Setup",
+      "documentation": "Airplay Documentation",
+      "discoverDeviceDescr": "Automatically scan for Airplay devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Airplay Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Airplay device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Airplay devices are automatically discovered.",
+        "error": "Error discovering Airplay devices. Is your Airplay speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Airplay devices have been discovered.",
+        "errorWhileScanning": "An error occurred while scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Control your devices in Z-Wave JS UI",
