@@ -17,8 +17,7 @@ async function updateContainers() {
   await this.pull(watchtowerImage);
 
   try {
-    // dockerode.
-    const container = await this.createContainer({
+    const container = await this.dockerode.createContainer({
       Image: watchtowerImage,
       Cmd: ['--run-once', '--cleanup', '--include-restarting'],
       HostConfig: {
