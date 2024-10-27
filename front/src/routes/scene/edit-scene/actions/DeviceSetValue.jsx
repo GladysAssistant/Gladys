@@ -144,6 +144,12 @@ class DeviceSetValue extends Component {
       );
     }
 
+    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE) {
+      return (
+        <label class="custom-switch"></label>
+      );
+    }
+
     return (
       <div>
         <div className={style.explanationText}>
