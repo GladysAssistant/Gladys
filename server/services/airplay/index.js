@@ -4,9 +4,9 @@ const airplayController = require('./api/airplay.controller');
 
 module.exports = function AirplayService(gladys, serviceId) {
   const airtunes = require('airtunes2');
-  const lame = require('@flat/lame');
   const bonjourLib = require('bonjour')();
-  const airplayHandler = new AirplayHandler(gladys, airtunes, lame, bonjourLib, serviceId);
+  const childProcess = require('child_process');
+  const airplayHandler = new AirplayHandler(gladys, airtunes, bonjourLib, childProcess, serviceId);
 
   /**
    * @public

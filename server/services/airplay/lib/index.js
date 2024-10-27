@@ -2,11 +2,11 @@ const { init } = require('./airplay.init');
 const { scan } = require('./airplay.scan');
 const { setValue } = require('./airplay.setValue');
 
-const AirplayHandler = function AirplayHandler(gladys, airtunes, lame, bonjourLib, serviceId) {
+const AirplayHandler = function AirplayHandler(gladys, airtunes, bonjourLib, childProcess, serviceId) {
   this.gladys = gladys;
   this.Airtunes = airtunes;
-  this.lame = lame;
   this.bonjourLib = bonjourLib;
+  this.childProcess = childProcess;
   this.serviceId = serviceId;
   this.devices = [];
   this.deviceIpAddresses = new Map();

@@ -13,9 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "@flat/lame": "^1.2.8",
     "airtunes2": "github:ciderapp/node_airtunes2",
-    "axios": "^1.7.7",
     "bonjour": "^3.5.0"
   }
 }

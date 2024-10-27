@@ -1,4 +1,3 @@
-const axios = require('axios');
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
@@ -20,21 +19,41 @@ async function setValue(device, deviceFeature, value) {
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
     const client = new this.Airtunes();
     const airplayDevice = client.add(ipAddress, {});
+    let decodeProcess;
+
     client.on('buffer', (event) => {
       if (event === 'end') {
         logger.debug('Playback ended, waiting for AirTunes devices');
         setTimeout(() => {
-          client.stopAll(() => { });
+          client.stopAll(() => {
+            if (decodeProcess) {
+              decodeProcess.kill();
+            }
+          });
         }, 5000);
       }
     });
 
     airplayDevice.on('status', async (status) => {
       if (status === 'ready') {
-        const { data } = await axios.get('https://cdn.pixabay.com/audio/2022/03/10/audio_9809d70f8f.mp3', { responseType: 'stream' });
-        data
-          .pipe(this.lame.Decoder())
-          .pipe(client);
+        decodeProcess = this.childProcess.spawn('ffmpeg', [
+          '-i', value,
+          '-acodec', 'pcm_s16le',
+          '-f', 's16le',        // PCM 16bits, little-endian
+          '-ar', '44100',       // Sampling rate
+          '-ac', 2,             // Stereo
+          'pipe:1'              // Output on stdout
+        ]);
+        decodeProcess.stdout.pipe(client);
+
+        // detect if ffmpeg was not spawned correctly
+        decodeProcess.stderr.setEncoding('utf8');
+        decodeProcess.stderr.on('data', (data) => {
+          if (/^execvp\(\)/.test(data)) {
+            logger.debug('Failed to start ffmpeg');
+            logger.debug(`stderr: ${data}`);
+          }
+        });
       }
     });
   }
