@@ -4,16 +4,22 @@ const logger = require('../../utils/logger');
 /**
  * @description Update containers.
  * @example
- * const state = await updateContainers();
+ * await updateContainers();
  */
 async function updateContainers() {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
+  const watchtowerImage = 'containrrr/watchtower';
+
+  logger.info(`Pulling ${watchtowerImage} image...`);
+  await this.pull(watchtowerImage);
+
   try {
-    const container = await this.dockerode.createContainer({
-      Image: 'containrrr/watchtower',
+    // dockerode.
+    const container = await this.createContainer({
+      Image: watchtowerImage,
       Cmd: ['--run-once', '--cleanup', '--include-restarting'],
       HostConfig: {
           AutoRemove: true,
@@ -35,7 +41,6 @@ async function updateContainers() {
     logger.debug('Error running Watchtower:', e);
   }
   
-
 }
 
 module.exports = {

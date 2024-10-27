@@ -38,8 +38,11 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function updateContainers(req, res) {
-    const update = await gladys.system.updateContainers();
-    res.json(update);
+    gladys.event.emit(EVENTS.SYSTEM.UPDATE_CONTAINERS);
+    res.json({
+      success: true,
+      message: 'Update started, the system checks and installs a new image if available'
+    });
   }
 
   /**
