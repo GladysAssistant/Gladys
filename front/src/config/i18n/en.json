@@ -1792,6 +1792,14 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "askAi": {
+        "description": "This action will send a message to the AI (ChatGPT) via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
+        "userLabel": "Gladys will respond to",
+        "cameraLabel": "Attach a camera image (optional)",
+        "textLabel": "My question for the AI",
+        "textPlaceholder": "Message text",
+        "explanationText": "To insert a variable, type '{{'. Be careful, you must have defined a variable beforehand in a 'Retrieve the last state' action placed before this message block."
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -2018,6 +2026,9 @@
       },
       "music": {
         "play-notification": "Talk on a speaker"
+      },
+      "ai": {
+        "ask": "Ask AI"
       }
     },
     "variables": {

@@ -344,6 +344,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  AI: {
+    ASK: 'ai.ask',
+  },
   ALARM: {
     CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
     SET_ALARM_MODE: 'alarm.set-alarm-mode',
