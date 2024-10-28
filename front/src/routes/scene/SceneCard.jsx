@@ -68,7 +68,7 @@ class SceneCard extends Component {
               <div class="mt-auto">
                 <div class="card-footer">
                   <div class="btn-list text-center">
-                    <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
+                    <Link href={`/dashboard/scene/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
                       <i class="fe fe-edit" />
                       <Text id="scene.editButton" />
                     </Link>
