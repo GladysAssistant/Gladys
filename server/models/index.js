@@ -132,6 +132,11 @@ const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   });
 };
 
+const duckDbShowVersion = async () => {
+  const result = await duckDbReadConnectionAllAsync('SELECT version() AS version;');
+  logger.info(`DuckDB version = ${result[0].version}`);
+};
+
 const db = {
   ...models,
   sequelize,
@@ -142,6 +147,7 @@ const db = {
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
   duckDbBatchInsertState,
+  duckDbShowVersion,
 };
 
 module.exports = db;
