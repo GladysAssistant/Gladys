@@ -10,7 +10,7 @@ on:
       platforms:
         description: 'Docker platform to build'
         required: true
-        default: 'linux/amd64,linux/arm/v7,linux/arm64/v8'
+        default: 'linux/amd64,linux/arm64/v8'
 
 jobs:
   build-front:
@@ -34,7 +34,7 @@ jobs:
         run: |
           npm run build
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: static
           path: front/build
@@ -64,7 +64,7 @@ jobs:
         with:
           version: latest
       - name: ↙️ Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: static
           path: static

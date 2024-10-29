@@ -247,6 +247,8 @@
       "private": "privé",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
@@ -352,6 +354,8 @@
         "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "noChartType": "Aucun type de graphique sélectionné",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
@@ -359,16 +363,22 @@
         "chartType": "Sélectionner le type de graphique",
         "chartColor": "Sélectionner la couleur du graphique",
         "dataColor": "Sélectionner la couleur pour {{featureLabel}}",
+        "timelineColor": "Sélectionner la couleur pour la position ",
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
+        "timeline": "Binaire",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
         "yes": "Oui",
         "no": "Non",
         "preview": "Prévisualisation",
-        "showPreviewButton": "Afficher une prévisualisation"
+        "showPreviewButton": "Afficher une prévisualisation",
+        "on": "On",
+        "off": "Off",
+        "start_date": "Début le : ",
+        "end_date": "Fin le : "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -1861,6 +1871,14 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "askAi": {
+        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "userLabel": "Gladys répondra à",
+        "cameraLabel": "Joindre une image de caméra (optionnel)",
+        "textLabel": "Ma question pour l'IA",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -2087,6 +2105,9 @@
       },
       "music": {
         "play-notification": "Parler sur une enceinte"
+      },
+      "ai": {
+        "ask": "Demander à l'IA"
       }
     },
     "variables": {
@@ -2827,6 +2848,16 @@
           "heating": "Chauffage"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Confort",
+          "eco": "Eco",
+          "off": "Off",
+          "frost-protection": "Hors Gel",
+          "comfort_-1": "Confort -1°C",
+          "comfort_-2": "Confort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Faible",
@@ -3100,6 +3131,10 @@
       "binary": "Commutateur",
       "mode": "Mode",
       "target-temperature": "Température"
+    },
+    "heater": {
+      "shortCategoryName": "Chauffage",
+      "pilot-wire-mode": "Mode"
     },
     "tamper": {
       "shortCategoryName": "Détecteur de sabotage",

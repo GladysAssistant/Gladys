@@ -73,7 +73,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.14.0",
+    "@gladysassistant/gladys-gateway-js": "4.15.0",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "@nlpjs/similarity": "^4.26.1",
@@ -86,7 +86,7 @@
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.6",
     "dockerode": "^3.3.4",
-    "duckdb": "^1.0.0",
+    "duckdb": "^1.1.1",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "form-data": "^2.3.3",

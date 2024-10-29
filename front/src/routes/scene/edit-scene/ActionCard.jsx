@@ -31,6 +31,7 @@ import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
 import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
+import AskAI from './actions/AskAI';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -64,7 +65,8 @@ const ACTION_ICON = {
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker'
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
+  [ACTIONS.AI.ASK]: 'fe fe-cpu'
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -392,6 +394,17 @@ const ActionCard = ({ children, ...props }) => {
           )}
           {props.action.type === ACTIONS.MUSIC.PLAY_NOTIFICATION && (
             <PlayNotification
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.AI.ASK && (
+            <AskAI
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}

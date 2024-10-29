@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const fse = require('fs-extra');
 const assertChai = require('chai').assert;
 const { fake, assert } = require('sinon');
-const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
 
@@ -101,6 +100,16 @@ const deviceThatResultInNoImage = {
 };
 
 const childProcessMock = {
+  execFile: (prog, args, options, cb) => {
+    if (args[1] === 'broken') {
+      cb(new Error('broken url'));
+    } else if (args[1] === 'no-image-written') {
+      cb(null, '', '');
+    } else {
+      fse.writeFileSync(args[args.length - 1], 'image');
+      cb(null, '', '');
+    }
+  },
   spawn: (command, args, options) => {
     const writeFile = () => {
       fse.writeFileSync(args[args.length - 1], 'hello');
@@ -120,12 +129,7 @@ const childProcessMock = {
 };
 
 describe('RtspCameraManager commands', () => {
-  const rtspCameraManager = new RtspCameraManager(
-    gladys,
-    FfmpegMock,
-    childProcessMock,
-    'de051f90-f34a-4fd5-be2e-e502339ec9bc',
-  );
+  const rtspCameraManager = new RtspCameraManager(gladys, childProcessMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   before(async () => {
     await fse.ensureDir(gladys.config.tempFolder);
   });
@@ -135,19 +139,19 @@ describe('RtspCameraManager commands', () => {
   });
   it('should getImage', async () => {
     const image = await rtspCameraManager.getImage(device);
-    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+    expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
   });
   it('should getImage 90°', async () => {
     const image = await rtspCameraManager.getImage(deviceRotation90);
-    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+    expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
   });
   it('should getImage 180°', async () => {
     const image = await rtspCameraManager.getImage(deviceRotation180);
-    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+    expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
   });
   it('should getImage 270°', async () => {
     const image = await rtspCameraManager.getImage(deviceRotation270);
-    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+    expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
   });
   it('should return error', async () => {
     const promise = rtspCameraManager.getImage(brokenDevice);
@@ -174,16 +178,15 @@ describe('RtspCameraManager commands', () => {
   });
   it('should poll', async () => {
     await rtspCameraManager.poll(device);
-    assert.calledWith(gladys.device.camera.setImage, 'my-camera', 'image/png;base64,aW1hZ2U=');
+    assert.calledWith(gladys.device.camera.setImage, 'my-camera', 'image/jpg;base64,aW1hZ2U=');
   });
   it('should fail to poll, but not crash', async () => {
     const rtspCameraManagerBroken = new RtspCameraManager(
       gladys,
-      FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKI?NG');
+    rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKING');
     await rtspCameraManagerBroken.poll(device);
   });
   it('should stop service', async () => {

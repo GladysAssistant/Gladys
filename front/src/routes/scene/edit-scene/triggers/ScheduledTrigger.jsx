@@ -91,7 +91,7 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-sm-4">
+          <div class="col-sm-6">
             <div class="form-group">
               <div class="form-label">
                 <Text id="editScene.triggersCard.scheduledTrigger.typeLabel" />
@@ -267,7 +267,7 @@ class TurnOnLight extends Component {
             </div>
           )}
           {this.props.trigger.scheduler_type === 'every-week' && (
-            <div class="col-sm-2">
+            <div class="col-sm-4">
               <div class="form-group">
                 <div class="form-label">
                   <Text id="editScene.triggersCard.scheduledTrigger.timeLabel" />

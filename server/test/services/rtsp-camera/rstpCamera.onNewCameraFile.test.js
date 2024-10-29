@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const fse = require('fs-extra');
 const path = require('path');
 const { fake, assert: fakeAssert } = require('sinon');
-const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 
 const device = {
@@ -51,12 +50,7 @@ describe('Camera.onNewCameraFile', () => {
     await fse.remove(folderPath);
   });
   beforeEach(() => {
-    rtspCameraManager = new RtspCameraManager(
-      gladys,
-      FfmpegMock,
-      childProcessMock,
-      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
-    );
+    rtspCameraManager = new RtspCameraManager(gladys, childProcessMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     rtspCameraManager.sendCameraFileToGatewayLimited = fake.resolves(null);
   });
   it('should return directly, no live stream', async () => {
@@ -111,12 +105,7 @@ describe('Camera.onNewCameraFile', () => {
     fakeAssert.calledWith(eventEmitter.emit, 'gateway-ready');
   });
   it('should upload a file that fail, and return null', async () => {
-    rtspCameraManager = new RtspCameraManager(
-      gladys,
-      FfmpegMock,
-      childProcessMock,
-      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
-    );
+    rtspCameraManager = new RtspCameraManager(gladys, childProcessMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     rtspCameraManager.sendCameraFileToGatewayLimited = fake.rejects(null);
     rtspCameraManager.liveStreams.set('my-camera', {
       isGladysGateway: true,

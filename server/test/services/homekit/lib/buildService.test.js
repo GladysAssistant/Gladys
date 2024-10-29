@@ -115,11 +115,13 @@ describe('Build service', () => {
     const features = [
       {
         name: 'onoff',
+        selector: 'lampe-onoff',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       },
       {
         id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+        selector: 'lampe-brightness',
         name: 'Luminosité',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
@@ -128,12 +130,14 @@ describe('Build service', () => {
       },
       {
         id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
+        selector: 'lampe-color',
         name: 'Couleur',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
       },
       {
         id: '77f26d98-49a5-4338-97c8-ab51fb5d2164',
+        selector: 'lampe-temperature',
         name: 'Température',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
@@ -167,8 +171,7 @@ describe('Build service', () => {
       status: ACTIONS_STATUS.PENDING,
       value: 90,
       device: device.selector,
-      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      device_feature: features[1].selector,
     });
     expect(cb.args[2][1]).to.equal(222);
     expect(homekitHandler.gladys.event.emit.args[1][1]).to.eql({
@@ -176,8 +179,7 @@ describe('Build service', () => {
       status: ACTIONS_STATUS.PENDING,
       value: 14694112,
       device: device.selector,
-      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      feature_type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+      device_feature: features[2].selector,
     });
     expect(cb.args[4][1]).to.equal(76);
     expect(homekitHandler.gladys.event.emit.args[2][1]).to.eql({
@@ -185,8 +187,7 @@ describe('Build service', () => {
       status: ACTIONS_STATUS.PENDING,
       value: 14014944,
       device: device.selector,
-      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      feature_type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+      device_feature: features[2].selector,
     });
     expect(cb.args[6][1]).to.equal(500);
     expect(homekitHandler.gladys.event.emit.args[3][1]).to.eql({
@@ -194,8 +195,7 @@ describe('Build service', () => {
       status: ACTIONS_STATUS.PENDING,
       value: 0,
       device: device.selector,
-      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      feature_type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+      device_feature: features[3].selector,
     });
   });
 
@@ -204,8 +204,7 @@ describe('Build service', () => {
       features: [
         {
           name: 'onoff',
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          device_feature: 'lampe-onoff',
           last_value: 1,
         },
       ],
@@ -242,6 +241,7 @@ describe('Build service', () => {
     const features = [
       {
         name: 'onoff',
+        selector: 'switch-onoff',
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       },
@@ -262,8 +262,7 @@ describe('Build service', () => {
       status: ACTIONS_STATUS.PENDING,
       value: 0,
       device: device.selector,
-      feature_category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      feature_type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      device_feature: features[0].selector,
     });
   });
 

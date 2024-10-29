@@ -34,6 +34,14 @@ describe('state', () => {
     const userSleepState = stateManager.getKey('user', 'tony', 'sleep');
     expect(userSleepState).to.equal('asleep');
   });
+  it('should get all users keys', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('user', 'tony', {
+      sleep: 'asleep',
+    });
+    const keys = stateManager.getAllKeys('user');
+    expect(keys).to.deep.equal(['tony']);
+  });
   it('should return null', async () => {
     const stateManager = new StateManager(event);
     const userSleepState = stateManager.getKey('user', 'tony', 'sleep');
