@@ -55,8 +55,9 @@ async function setValue(device, deviceFeature, value) {
         decodeProcess.stderr.setEncoding('utf8');
         decodeProcess.stderr.on('data', (data) => {
           if (/^execvp\(\)/.test(data)) {
-            logger.debug('Failed to start ffmpeg');
-            logger.debug(`stderr: ${data}`);
+            logger.error('Failed to start ffmpeg');
+            logger.error(`stderr: ${data}`);
+            client.stopAll(() => {});
           }
         });
       }

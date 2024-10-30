@@ -30,20 +30,22 @@ class airtunes {
   }
 }
 
-const kill = sinon.stub().returns(null);
+const pipe = sinon.stub().returns(null);
 const childProcessMock = {
   spawn: (command, args, options) => {
     return {
-      kill,
+      kill: () => {},
       stdout: {
         on: (type, cb) => {
           cb('log log log');
         },
+        pipe,
       },
       stderr: {
         on: (type, cb) => {
-          cb('stderr log log');
+          cb('execvp() stderr log log');
         },
+        setEncoding: () => {}
       },
     };
   },
@@ -84,6 +86,7 @@ describe('AirplayHandler.setValue', () => {
     const devices = await airplayHandler.scan();
     const device = devices[0];
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
+    sinon.assert.calledOnce(pipe);
   });
   it('should return device not found', async () => {
     airplayHandler.scanTimeout = 1;
