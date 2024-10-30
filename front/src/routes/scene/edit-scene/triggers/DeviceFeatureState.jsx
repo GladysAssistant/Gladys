@@ -39,7 +39,8 @@ class TurnOnLight extends Component {
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
     }
 
-    const defaultDevice = selectedDeviceFeature && !binaryDevice && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice;
+    const defaultDevice =
+      selectedDeviceFeature && !binaryDevice && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice;
     const thresholdDevice = selectedDeviceFeature && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice;
 
     return (

@@ -11,19 +11,10 @@ class PilotWireModeDeviceState extends Component {
   };
 
   getOptions = () => {
-    const modeLabels = {
-      0: 'deviceFeatureAction.category.heater.pilot-wire-mode.off',
-      1: 'deviceFeatureAction.category.heater.pilot-wire-mode.frost-protection',
-      2: 'deviceFeatureAction.category.heater.pilot-wire-mode.eco',
-      3: 'deviceFeatureAction.category.heater.pilot-wire-mode.comfort_-1',
-      4: 'deviceFeatureAction.category.heater.pilot-wire-mode.comfort_-2',
-      5: 'deviceFeatureAction.category.heater.pilot-wire-mode.comfort'
-    };
-
     const options = Object.keys(PILOT_WIRE_MODE).map(key => {
       const value = PILOT_WIRE_MODE[key];
       return {
-        label: get(this.props.intl.dictionary, modeLabels[value], {
+        label: get(this.props.intl.dictionary, `deviceFeatureValue.category.heater.pilot-wire-mode.${value}`, {
           default: value
         }),
         value
