@@ -45,7 +45,7 @@ const childProcessMock = {
         on: (type, cb) => {
           cb('execvp() stderr log log');
         },
-        setEncoding: () => {}
+        setEncoding: () => {},
       },
     };
   },
