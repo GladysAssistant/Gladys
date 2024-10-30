@@ -23,6 +23,11 @@ class airtunes {
   on(event, cb) {
     cb('end');
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  stopAll(cb) {
+    cb();
+  }
 }
 
 const kill = sinon.stub().returns(null);
