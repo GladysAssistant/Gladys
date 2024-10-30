@@ -13,7 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "airtunes2": "github:ciderapp/node_airtunes2",
-    "bonjour": "^3.5.0"
+    "bonjour": "^3.5.0",
+    "node-airtunes2": "^2.4.9"
   }
 }
