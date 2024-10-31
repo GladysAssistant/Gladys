@@ -2898,6 +2898,13 @@
           "one": "Yes"
         }
       },
+      "input": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Off",
+          "one": "On"
+        }
+      },
       "risk": {
         "integer": {
           "no-risk": "No Risk",
@@ -3203,6 +3210,10 @@
     "risk": {
       "shortCategoryName": "Risk",
       "integer": "Risk Level"
+    },
+    "input": {
+      "shortCategoryName": "Input",
+      "binary": "State of input"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

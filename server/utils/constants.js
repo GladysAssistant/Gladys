@@ -490,6 +490,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
+  INPUT: 'input',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -677,6 +678,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   RISK: {
     INTEGER: 'integer',
+  },
+  INPUT: {
+    BINARY: 'binary',
   },
 };
 
