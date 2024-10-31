@@ -20,6 +20,21 @@ const device = {
   ],
 };
 
+const deviceWithRtspImage = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'rtsp://test.fr/test',
+    },
+    {
+      name: 'CAMERA_ROTATION',
+      value: '0',
+    },
+  ],
+};
+
 const gladys = {
   config: {
     tempFolder: '/tmp/gladys',
@@ -139,6 +154,10 @@ describe('RtspCameraManager commands', () => {
   });
   it('should getImage', async () => {
     const image = await rtspCameraManager.getImage(device);
+    expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
+  });
+  it('should getImage with RTSP url', async () => {
+    const image = await rtspCameraManager.getImage(deviceWithRtspImage);
     expect(image).to.equal('image/jpg;base64,aW1hZ2U=');
   });
   it('should getImage 90°', async () => {
