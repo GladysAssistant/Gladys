@@ -2853,6 +2853,16 @@
           "51": "Pression double"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Off",
+          "1": "Hors Gel",
+          "2": "Eco",
+          "3": "Confort -1°C",
+          "4": "Confort -2°C",
+          "5": "Confort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
