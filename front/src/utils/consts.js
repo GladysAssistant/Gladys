@@ -349,5 +349,4 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.INPUT]: {
     [DEVICE_FEATURE_TYPES.INPUT.BINARY]: 'arrow-right'
   }
-
 };
