@@ -142,6 +142,8 @@ const db = {
   sequelize,
   umzug,
   duckDb,
+  duckDbWriteConnection,
+  duckDbReadConnection,
   duckDbWriteConnectionAllAsync,
   duckDbReadConnectionAllAsync,
   duckDbCreateTableIfNotExist,
