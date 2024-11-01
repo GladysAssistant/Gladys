@@ -24,53 +24,36 @@ const NON_BINARY_QUERY = `
 `;
 
 const BINARY_QUERY = `
-  WITH value_changes AS (
-      SELECT
-          created_at,
-          value,
-          LAG(value) OVER (ORDER BY created_at) AS prev_value
-      FROM
-          t_device_feature_state
-      WHERE
-          device_feature_id = ?
-          AND created_at > ?
-      ORDER BY
-          created_at DESC
-  ),
-  grouped_changes AS (
-      SELECT
-          created_at,
-          value,
-          CASE
-              WHEN value != LAG(value) OVER (ORDER BY created_at) THEN created_at
-              ELSE NULL
-          END AS change_marker
-      FROM
-          value_changes
-      ORDER BY
-          created_at DESC
-  ),
-  final_grouping AS (
-      SELECT
-          created_at AS start_time,
-          LEAD(created_at) OVER (ORDER BY created_at) AS end_time,
-          value
-      FROM
-          grouped_changes
-      WHERE
-          change_marker IS NOT NULL
-      ORDER BY
-          created_at DESC
-      LIMIT ?
-  )
-  SELECT
-      value,
-      start_time AS created_at,
-      end_time
-  FROM
-      final_grouping
-  ORDER BY
-      created_at ASC
+WITH value_changes AS (
+    SELECT
+        created_at,
+        value,
+        LAG(value) OVER (ORDER BY created_at) AS prev_value
+    FROM
+        t_device_feature_state
+    WHERE
+        device_feature_id = ?
+        AND created_at > ?
+),
+state_transitions AS (
+    SELECT
+        created_at,
+        value,
+        LEAD(created_at) OVER (ORDER BY created_at) AS end_time
+    FROM
+        value_changes
+    WHERE
+        prev_value IS NULL OR value != prev_value
+)
+SELECT
+    value,
+    created_at,
+    end_time
+FROM
+    state_transitions
+ORDER BY
+    created_at ASC
+LIMIT ?
 `;
 
 /**
