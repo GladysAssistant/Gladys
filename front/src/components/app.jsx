@@ -152,6 +152,10 @@ import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
 import GoogleCastDevicePage from '../routes/integration/all/google-cast/device-page';
 import GoogleCastDiscoveryPage from '../routes/integration/all/google-cast/discover-page';
 
+// Airplay integration
+import AirplayDevicePage from '../routes/integration/all/airplay/device-page';
+import AirplayDiscoveryPage from '../routes/integration/all/airplay/discover-page';
+
 // ZWaveJS-UI integration
 import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
 import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
@@ -302,6 +306,9 @@ const AppRouter = connect(
 
         <GoogleCastDevicePage path="/dashboard/integration/device/google-cast" />
         <GoogleCastDiscoveryPage path="/dashboard/integration/device/google-cast/discover" />
+
+        <AirplayDevicePage path="/dashboard/integration/device/airplay" />
+        <AirplayDiscoveryPage path="/dashboard/integration/device/airplay/discover" />
 
         <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
         <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
