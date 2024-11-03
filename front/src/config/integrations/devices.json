@@ -93,5 +93,10 @@
     "key": "google-cast",
     "link": "google-cast",
     "img": "/assets/integrations/cover/google-cast.jpg"
+  },
+  {
+    "key": "free-mobile",
+    "link": "free-mobile",
+    "img": "/assets/integrations/cover/free-mobile.jpg"
   }
 ]
