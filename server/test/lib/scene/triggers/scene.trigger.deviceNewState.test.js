@@ -11,12 +11,9 @@ const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
-describe('scene.triggers.deviceNewState', () => {
+describe.only('scene.triggers.deviceNewState', () => {
   let sceneManager;
-
-  const device = {
-    setValue: fake.resolves(null),
-  };
+  let device;
 
   const brain = {};
 
@@ -31,6 +28,10 @@ describe('scene.triggers.deviceNewState', () => {
   beforeEach(() => {
     const house = {
       get: fake.resolves([]),
+    };
+
+    device = {
+      setValue: fake.resolves(null),
     };
 
     const scheduler = {
@@ -333,7 +334,7 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
-  it('should start timer to check now and condition should still be valid on second call', async () => {
+  it('should start timer to check now and re-send new value still validating the condition', async () => {
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
