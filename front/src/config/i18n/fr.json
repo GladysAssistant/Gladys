@@ -2097,7 +2097,7 @@
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
-        "activateOrDeactivateForDuration": "Exécuter après que la condition ait été valide pendant : "
+        "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
