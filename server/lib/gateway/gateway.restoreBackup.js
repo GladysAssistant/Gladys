@@ -1,6 +1,8 @@
 const fse = require('fs-extra');
 const sqlite3 = require('sqlite3');
 const duckdb = require('duckdb');
+const path = require('path');
+
 const { promisify } = require('util');
 
 const db = require('../../models');
@@ -55,6 +57,12 @@ async function restoreBackup(sqliteBackupFilePath, duckDbBackupFolderPath) {
     const duckDb = new duckdb.Database(duckDbFilePath);
     const duckDbWriteConnection = duckDb.connect();
     const duckDbWriteConnectionAllAsync = promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
+    const schemaFilePath = path.join(duckDbBackupFolderPath, 'schema.sql');
+    const schema = await fse.readFile(schemaFilePath, 'utf-8');
+    const schemaCleaned = schema
+      .replace('CREATE SCHEMA information_schema;', '')
+      .replace('CREATE SCHEMA pg_catalog;', '');
+    await fse.writeFile(schemaFilePath, schemaCleaned);
     await duckDbWriteConnectionAllAsync(`IMPORT DATABASE '${duckDbBackupFolderPath}'`);
     logger.info(`DuckDB restored with success`);
     await new Promise((resolve) => {

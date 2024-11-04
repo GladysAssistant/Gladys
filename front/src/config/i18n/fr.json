@@ -1827,6 +1827,14 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "askAi": {
+        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "userLabel": "Gladys répondra à",
+        "cameraLabel": "Joindre une image de caméra (optionnel)",
+        "textLabel": "Ma question pour l'IA",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -2053,6 +2061,9 @@
       },
       "music": {
         "play-notification": "Parler sur une enceinte"
+      },
+      "ai": {
+        "ask": "Demander à l'IA"
       }
     },
     "variables": {
@@ -2877,6 +2888,16 @@
           "51": "Pression double"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Off",
+          "1": "Hors Gel",
+          "2": "Eco",
+          "3": "Confort -1°C",
+          "4": "Confort -2°C",
+          "5": "Confort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -2910,6 +2931,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Non",
           "one": "Oui"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Off",
+          "one": "On"
         }
       },
       "risk": {
@@ -3217,6 +3245,10 @@
     "risk": {
       "shortCategoryName": "Risque",
       "integer": "Niveau de risque"
+    },
+    "input": {
+      "shortCategoryName": "Entrée",
+      "binary": "Etat de l'entrée"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

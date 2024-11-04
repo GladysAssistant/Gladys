@@ -1827,6 +1827,14 @@
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
+      "askAi": {
+        "description": "Diese Aktion sendet eine Nachricht an die KI (ChatGPT) über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
+        "userLabel": "Gladys wird antworten an",
+        "cameraLabel": "Ein Kamerabild anhängen (optional)",
+        "textLabel": "Meine Frage an die KI",
+        "textPlaceholder": "Nachrichtentext",
+        "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
+      },
       "turnOnLights": {
         "label": "Wähle die Lichter aus, die eingeschaltet werden sollen"
       },
@@ -2053,6 +2061,9 @@
       },
       "music": {
         "play-notification": "Auf einem Lautsprecher sprechen"
+      },
+      "ai": {
+        "ask": "Frage die KI"
       }
     },
     "variables": {
@@ -2877,6 +2888,16 @@
           "51": "Doppeltes Drücken"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Aus",
+          "1": "Frostschutz",
+          "2": "Öko",
+          "3": "Komfort -1°C",
+          "4": "Komfort -2°C",
+          "5": "Komfort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -2910,6 +2931,13 @@
           "other": "Kein Wert empfangen",
           "zero": "Nein",
           "one": "Ja"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Aus",
+          "one": "An"
         }
       },
       "risk": {
@@ -3217,6 +3245,10 @@
     "risk": {
       "shortCategoryName": "Risiko",
       "integer": "Risikostufe"
+    },
+    "input": {
+      "shortCategoryName": "Eingang",
+      "binary": "Status des Eingangs"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

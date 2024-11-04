@@ -131,6 +131,9 @@ function Gladys(params = {}) {
       // Execute DB migrations
       await db.umzug.up();
 
+      // Show DuckDB version
+      await db.duckDbShowVersion();
+
       // Execute DuckDB DB migration
       await db.duckDbCreateTableIfNotExist();
 

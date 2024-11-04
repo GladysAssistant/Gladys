@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 import debounce from 'debounce';
 import update from 'immutability-helper';
 import ScenePage from './ScenePage';
@@ -44,16 +45,29 @@ class Scene extends Component {
       console.error(e);
     }
   };
+  updateURL = () => {
+    const { sceneSearch, sceneTagSearch } = this.state;
+    const urlParams = new URLSearchParams();
+
+    if (sceneSearch) urlParams.set('search', sceneSearch);
+    if (sceneTagSearch.length > 0) {
+      sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
+    }
+    // Use `route` to update the URL without reloading the page
+    route(`/dashboard/scene?${urlParams.toString()}`, true);
+  };
   search = async e => {
     await this.setState({
       sceneSearch: e.target.value
     });
+    this.updateURL();
     await this.getScenes();
   };
   searchTags = async tags => {
     await this.setState({
       sceneTagSearch: tags
     });
+    this.updateURL();
     await this.getScenes();
   };
 
@@ -104,11 +118,13 @@ class Scene extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    // Initialize state from URL parameters if they exist
+    const urlParams = new URLSearchParams(window.location.search);
     this.state = {
       getScenesOrderDir: 'asc',
       scenes: [],
-      sceneSearch: null,
-      sceneTagSearch: null,
+      sceneSearch: urlParams.get('search') || '',
+      sceneTagSearch: urlParams.getAll('tags') || [],
       loading: true
     };
     this.debouncedSearch = debounce(this.search.bind(this), 200);
@@ -119,7 +135,7 @@ class Scene extends Component {
     this.getTags();
   }
 
-  render(props, { scenes, loading, getError, tags, sceneTagSearch }) {
+  render(props, { scenes, loading, getError, tags, sceneTagSearch, sceneSearch }) {
     return (
       <ScenePage
         httpClient={props.httpClient}
@@ -133,6 +149,7 @@ class Scene extends Component {
         tags={tags}
         searchTags={this.searchTags}
         sceneTagSearch={sceneTagSearch}
+        sceneSearch={sceneSearch}
       />
     );
   }
