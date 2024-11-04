@@ -11,7 +11,7 @@ const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
-describe.only('scene.triggers.deviceNewState', () => {
+describe('scene.triggers.deviceNewState', () => {
   let sceneManager;
   let device;
 
