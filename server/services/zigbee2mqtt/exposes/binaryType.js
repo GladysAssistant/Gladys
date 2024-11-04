@@ -90,25 +90,7 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
-  input_l1: {
-    feature: {
-      category: DEVICE_FEATURE_CATEGORIES.INPUT,
-      type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
-    },
-  },
-  input_l2: {
-    feature: {
-      category: DEVICE_FEATURE_CATEGORIES.INPUT,
-      type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
-    },
-  },
-  input_l3: {
-    feature: {
-      category: DEVICE_FEATURE_CATEGORIES.INPUT,
-      type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
-    },
-  },
-  input_l4: {
+  input: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.INPUT,
       type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
