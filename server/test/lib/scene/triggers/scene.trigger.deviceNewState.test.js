@@ -169,6 +169,43 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+  it('should not execute scene, device feature is not the same', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'light-1',
+          value: 12,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'light-2',
+      last_value: 14,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should not execute scene, threshold already passed', async () => {
     sceneManager.addScene({
       selector: 'my-scene',
