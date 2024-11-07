@@ -41,6 +41,12 @@ async function getImage(device) {
 
     const args = ['-i', cameraUrlParam.value, '-f', 'image2', '-vframes', '1', '-qscale:v', '15'];
 
+    // For rtsp protocol, add tcp transport to avoid green band of pixels)
+    if (cameraUrlParam.value.includes('rtsp')) {
+      args.push('-rtsp_transport');
+      args.push('tcp');
+    }
+
     args.push('-vf');
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:

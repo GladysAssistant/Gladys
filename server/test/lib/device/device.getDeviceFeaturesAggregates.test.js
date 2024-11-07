@@ -244,6 +244,14 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
     expect(values).to.have.lengthOf(300);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
+
+    values.forEach((value) => {
+      expect(value).to.have.property('value');
+      // Check that both created_at and end_time are present
+      expect(value).to.have.property('created_at');
+      expect(value).to.have.property('end_time');
+    });
+
     // Check that the values are state changes
     for (let i = 1; i < values.length; i += 1) {
       expect(values[i].value).to.not.equal(values[i - 1].value);

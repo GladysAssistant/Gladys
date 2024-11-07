@@ -31,13 +31,25 @@ const closeSQLite = async () => {
   }
 };
 
+// Close properly all DuckDB connections & database
 const closeDuckDB = async () => {
   try {
-    await db.duckDb.close();
-    logger.info('DuckDB closed.');
+    return new Promise((resolve) => {
+      db.duckDbReadConnection.close((err1) => {
+        db.duckDbWriteConnection.close((err2) => {
+          db.duckDb.close((err3) => {
+            if (err1 || err2 || err3) {
+              logger.error(err1, err2, err3);
+            }
+            logger.info('DuckDB closed.');
+            resolve();
+          });
+        });
+      });
+    });
   } catch (e) {
-    logger.info('DuckDB database is probably already closed');
     logger.warn(e);
+    return null;
   }
 };
 

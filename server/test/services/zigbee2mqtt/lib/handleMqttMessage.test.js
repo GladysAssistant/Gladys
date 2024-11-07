@@ -68,7 +68,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
-  it('should receive devices', async () => {
+  it('should receive devices, exclude unsupported and coordinator', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub
