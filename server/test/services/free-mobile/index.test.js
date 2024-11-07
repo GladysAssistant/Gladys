@@ -11,6 +11,8 @@ const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 describe('free-mobile', () => {
   let gladys;
   let freeMobileService;
+  let axiosPostStub;
+  let loggerErrorStub;
 
   beforeEach(() => {
     gladys = {
@@ -19,6 +21,14 @@ describe('free-mobile', () => {
       },
     };
     freeMobileService = FreeMobileService(gladys, serviceId);
+
+    axiosPostStub = sinon.stub(axios, 'post');
+    loggerErrorStub = sinon.stub(logger, 'error');
+  });
+
+  afterEach(() => {
+    axiosPostStub.restore();
+    loggerErrorStub.restore();
   });
 
   describe('start', () => {
@@ -57,7 +67,7 @@ describe('free-mobile', () => {
         .onSecondCall()
         .resolves('validAccessToken');
 
-      const axiosPostStub = sinon.stub(axios, 'post').resolves({ data: 'success' });
+      axiosPostStub.resolves({ data: 'success' });
 
       await freeMobileService.start();
       await freeMobileService.sms.send('Hello World');
@@ -70,7 +80,6 @@ describe('free-mobile', () => {
         msg: 'Hello World',
       });
 
-      axiosPostStub.restore();
     });
 
     it('should log an error if SMS fails', async () => {
@@ -80,8 +89,7 @@ describe('free-mobile', () => {
         .onSecondCall()
         .resolves('validAccessToken');
 
-      const axiosPostStub = sinon.stub(axios, 'post').rejects(new Error('Network error'));
-      const loggerErrorStub = sinon.stub(logger, 'error');
+      axiosPostStub.rejects(new Error('Network error'));
 
       await freeMobileService.start();
       await freeMobileService.sms.send('Hello World');
@@ -90,8 +98,6 @@ describe('free-mobile', () => {
       expect(errorArgs[0]).to.equal('Error sending SMS:');
       expect(errorArgs[1]).to.be.instanceOf(Error);
 
-      axiosPostStub.restore();
-      loggerErrorStub.restore();
     });
   });
 
