@@ -79,7 +79,6 @@ describe('free-mobile', () => {
         pass: 'validAccessToken',
         msg: 'Hello World',
       });
-
     });
 
     it('should log an error if SMS fails', async () => {
@@ -97,7 +96,6 @@ describe('free-mobile', () => {
       const errorArgs = loggerErrorStub.getCall(0).args;
       expect(errorArgs[0]).to.equal('Error sending SMS:');
       expect(errorArgs[1]).to.be.instanceOf(Error);
-
     });
   });
 
