@@ -28,3 +28,4 @@ module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
 module.exports.nuki = require('./nuki');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
+module.exports['google-cast'] = require('./google-cast');

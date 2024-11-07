@@ -90,6 +90,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  input: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.INPUT,
+      type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
+    },
+  },
 };
 
 module.exports = {

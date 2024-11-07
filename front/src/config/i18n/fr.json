@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Sélectionnez..."
+    "selectPlaceholder": "Sélectionnez...",
+    "yes": "Oui",
+    "no": "Non"
   },
   "color": {
     "aqua": "Aqua",
@@ -229,6 +231,7 @@
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
+    "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
@@ -244,6 +247,8 @@
       "private": "privé",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
@@ -349,6 +354,8 @@
         "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "noChartType": "Aucun type de graphique sélectionné",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
@@ -356,16 +363,22 @@
         "chartType": "Sélectionner le type de graphique",
         "chartColor": "Sélectionner la couleur du graphique",
         "dataColor": "Sélectionner la couleur pour {{featureLabel}}",
+        "timelineColor": "Sélectionner la couleur pour la position ",
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
+        "timeline": "Binaire",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
         "yes": "Oui",
         "no": "Non",
         "preview": "Prévisualisation",
-        "showPreviewButton": "Afficher une prévisualisation"
+        "showPreviewButton": "Afficher une prévisualisation",
+        "on": "On",
+        "off": "Off",
+        "start_date": "Début le : ",
+        "end_date": "Fin le : "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -850,7 +863,7 @@
         "modes": {
           "local": {
             "title": "Installation depuis Gladys",
-            "description": "Gladys va configurer deux containers Docker : MQTT and Zigbee2mqtt.",
+            "description": "Gladys va configurer deux containers Docker : MQTT et Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys doit s'exécuter sous Docker",
             "dockerNetworkHostRequirementLabel": "Le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"",
             "usbDongleRequirementLabel": "Le dongle USB Zigbee doit être connecté",
@@ -872,7 +885,7 @@
           "remote": {
             "title": "Connexion à une installation existante",
             "description": "Gladys va se connecter à une installation externe existante à travers MQTT.",
-            "z2mInstallationRequirementLabel": "Une application Zigbe2Mqtt autonome",
+            "z2mInstallationRequirementLabel": "Une application Zigbee2Mqtt autonome",
             "mqttBrokerRequirementLabel": "Un broker MQTT connecté à l'application Zigbee2Mqtt",
             "detailsDescription": "Avec ce mode de configuration, il est possible de se connecter à une installation Zigbee2Mqtt externe avec son broker MQTT.",
             "mqttModeLabel": "Choix du broker MQTT",
@@ -1200,6 +1213,41 @@
         "description": "Les appareils Sonos sont automatiquement découverts.",
         "error": "Erreur de découverte des appareils Sonos. Est-ce que votre enceinte Sonos est sous tension et accessible sur le réseau local ?",
         "noDeviceFound": "Aucun appareil Sonos n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Contrôler les appareils Google Cast sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Google Cast",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Google Cast",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Google Cast",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Google Cast dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Google Cast trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Google Cast sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Google Cast. Est-ce que votre enceinte Google Cast est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Google Cast n'a été découvert.",
         "errorWhileScanning": "Une erreur est survenue lors du scan.",
         "scan": "Scanner"
       },
@@ -1810,6 +1858,14 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "askAi": {
+        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "userLabel": "Gladys répondra à",
+        "cameraLabel": "Joindre une image de caméra (optionnel)",
+        "textLabel": "Ma question pour l'IA",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -2036,6 +2092,9 @@
       },
       "music": {
         "play-notification": "Parler sur une enceinte"
+      },
+      "ai": {
+        "ask": "Demander à l'IA"
       }
     },
     "variables": {
@@ -2393,7 +2452,9 @@
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
       "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de données",
-      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
+      "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2446,7 +2507,18 @@
       "dead": "Mort"
     },
     "batteryLevel": "Alerte sur le niveau de batterie",
-    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi."
+    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi.",
+    "duckDbMigrationTitle": "Migration vers DuckDB",
+    "duckDbMigrationDescription": "Nous migrons vers un nouveau système de base de donnée pour les données de capteurs. Gladys va effectuer une migration de vos données automatiquement, mais ne supprimera pas vos données de votre base SQLite afin d'éviter les pertes de données.",
+    "duckDbMigrationProgressTitle": "Avancement de la migration",
+    "duckDbMigrationMigrationDone": "Migration effectuée :",
+    "duckDbNumberOfStatesinSQlite": "Nombre d'états dans SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Nombre d'états dans DuckDB",
+    "restartMigrationTitle": "Relancer la migration",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "purgeSQliteTitle": "Purger les états SQLite",
+    "purgeSQliteDescription": "Une fois que tous les états seront supprimés de SQLite, vous devrez faire un \"nettoyage de la base de données\" sur l'onglet à droite afin de relâcher l'espace disque. Cette étape peut prendre un certain temps."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
@@ -2763,6 +2835,16 @@
           "heating": "Chauffage"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Confort",
+          "eco": "Eco",
+          "off": "Off",
+          "frost-protection": "Hors Gel",
+          "comfort_-1": "Confort -1°C",
+          "comfort_-2": "Confort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Faible",
@@ -2837,6 +2919,16 @@
           "51": "Pression double"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Off",
+          "1": "Hors Gel",
+          "2": "Eco",
+          "3": "Confort -1°C",
+          "4": "Confort -2°C",
+          "5": "Confort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -2870,6 +2962,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Non",
           "one": "Oui"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Off",
+          "one": "On"
         }
       },
       "risk": {
@@ -3037,6 +3136,10 @@
       "mode": "Mode",
       "target-temperature": "Température"
     },
+    "heater": {
+      "shortCategoryName": "Chauffage",
+      "pilot-wire-mode": "Mode"
+    },
     "tamper": {
       "shortCategoryName": "Détecteur de sabotage",
       "binary": "Détection sabotage (Oui/Non)"
@@ -3177,6 +3280,10 @@
     "risk": {
       "shortCategoryName": "Risque",
       "integer": "Niveau de risque"
+    },
+    "input": {
+      "shortCategoryName": "Entrée",
+      "binary": "Etat de l'entrée"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

@@ -20,7 +20,7 @@ before(async function before() {
     disableService: true,
     disableBrainLoading: true,
     disableSchedulerLoading: true,
-    disableDeviceStateAggregation: true,
+    disableDuckDbMigration: true,
     jwtSecret: 'secret',
   };
   const gladys = Gladys(config);

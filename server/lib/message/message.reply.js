@@ -27,11 +27,38 @@ async function reply(originalMessage, text, context, file = null) {
       userId: originalMessage.user.id,
       payload: messageCreated,
     });
-    // then, we get the service sending the original message
-    const service = this.service.getService(originalMessage.source);
-    // if the service exist, we send the message
-    if (service) {
-      await service.message.send(originalMessage.source_user_id, messageCreated);
+
+    // If the source is Gladys AI, then we should answer by all means available
+    if (originalMessage.source === 'AI') {
+      const user = this.state.get('user', originalMessage.user.selector);
+      const telegramService = this.service.getService('telegram');
+      // if the service exist and the user had telegram configured
+      if (telegramService && user.telegram_user_id) {
+        // we forward the message to Telegram
+        await telegramService.message.send(user.telegram_user_id, messageCreated);
+      }
+      // We send the message to the nextcloud talk service
+      const nextcloudTalkService = this.service.getService('nextcloud-talk');
+      // if the service exist
+      if (nextcloudTalkService) {
+        const nextcloudTalkToken = await this.variable.getValue(
+          'NEXTCLOUD_TALK_TOKEN',
+          nextcloudTalkService.message.serviceId,
+          user.id,
+        );
+        // if the user had nextcloud talk configured
+        if (nextcloudTalkToken) {
+          // we forward the message to Nextcloud Talk
+          await nextcloudTalkService.message.send(nextcloudTalkToken, messageCreated);
+        }
+      }
+    } else {
+      // then, we get the service sending the original message
+      const service = this.service.getService(originalMessage.source);
+      // if the service exist, we send the message
+      if (service) {
+        await service.message.send(originalMessage.source_user_id, messageCreated);
+      }
     }
   } catch (e) {
     logger.warn(`Unable to reply to user`);

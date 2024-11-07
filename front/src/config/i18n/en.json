@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Select..."
+    "selectPlaceholder": "Select...",
+    "yes": "Yes",
+    "no": "No"
   },
   "color": {
     "aqua": "Aqua",
@@ -231,6 +233,7 @@
       "houseLabel": "House",
       "tabletModeDisabled": "Tablet Mode Disabled"
     },
+    "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
@@ -244,6 +247,8 @@
       "private": "private",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Add a column on dashboard",
+    "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
     "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
     "reorderDashboardButton": "Re-order dashboards",
@@ -349,6 +354,8 @@
         "lastYear": "Last year",
         "noValue": "No values recorded on this interval.",
         "noValueWarning": "Warning: if you just configured this device, it may take some time before you see something here as Gladys needs some time to collect enough data. For interval superior to 24h, it may take up to 24h before you see something here.",
+        "noChartType": "No chart type selected",
+        "noChartTypeWarning": "If you just configured this device, please go back to the box edit page and select a chart type.",
         "editNameLabel": "Enter the name of this box",
         "editDeviceFeaturesLabel": "Select the device you want to display here",
         "editRoomLabel": "Select the room you want to display here",
@@ -356,16 +363,22 @@
         "chartType": "Select the type of chart to display",
         "chartColor": "Select the color of chart",
         "dataColor": "Select color for {{featureLabel}}",
+        "timelineColor": "Select color for position",
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
+        "timeline": "Binary",
         "stepline": "Step Line",
         "displayAxes": "Display axes?",
         "displayVariation": "Display variation?",
         "yes": "Yes",
         "no": "No",
         "preview": "Preview",
-        "showPreviewButton": "Show preview"
+        "showPreviewButton": "Show preview",
+        "on": "On",
+        "off": "Off",
+        "start_date": "Start date: ",
+        "end_date": "End date: "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -1073,6 +1086,41 @@
         "error": "Error discovering Sonos devices. Is your Sonos speaker powered on and accessible on the local network?",
         "noDeviceFound": "No Sonos devices were discovered.",
         "errorWhileScanning": "An error occurred during scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Control Google Cast devices on your local network",
+      "deviceTab": "Devices",
+      "discoverTab": "Google Cast Discovery",
+      "setupTab": "Setup",
+      "documentation": "Google Cast Documentation",
+      "discoverDeviceDescr": "Automatically scan for Google Cast devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Google Cast Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Google Cast device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Google Cast devices are automatically discovered.",
+        "error": "Error discovering Google Cast devices. Is your Google Cast speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Google Cast devices have been discovered.",
+        "errorWhileScanning": "An error occurred while scanning.",
         "scan": "Scan"
       },
       "error": {
@@ -1796,6 +1844,14 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "askAi": {
+        "description": "This action will send a message to the AI (ChatGPT) via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
+        "userLabel": "Gladys will respond to",
+        "cameraLabel": "Attach a camera image (optional)",
+        "textLabel": "My question for the AI",
+        "textPlaceholder": "Message text",
+        "explanationText": "To insert a variable, type '{{'. Be careful, you must have defined a variable beforehand in a 'Retrieve the last state' action placed before this message block."
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -2022,6 +2078,9 @@
       },
       "music": {
         "play-notification": "Talk on a speaker"
+      },
+      "ai": {
+        "ask": "Ask AI"
       }
     },
     "variables": {
@@ -2379,7 +2438,9 @@
       "gladys-gateway-backup": "Gladys Plus backup",
       "device-state-purge-single-feature": "Single device feature states clean",
       "vacuum": "Database cleaning",
-      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup"
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
+      "migrate-sqlite-to-duckdb": "DuckDB migration",
+      "device-state-purge-all-sqlite-states": "Purge all SQLite states"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -2432,7 +2493,18 @@
       "dead": "Dead"
     },
     "batteryLevel": "Battery level alert",
-    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold."
+    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold.",
+    "duckDbMigrationTitle": "Migration to DuckDB",
+    "duckDbMigrationDescription": "We are migrating to a new database system for sensor data. Gladys will automatically migrate your data, but will not delete your data from your SQLite database to prevent data loss.",
+    "duckDbMigrationProgressTitle": "Migration Progress",
+    "duckDbMigrationMigrationDone": "Migration completed:",
+    "duckDbNumberOfStatesinSQlite": "Number of states in SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Number of states in DuckDB",
+    "restartMigrationTitle": "Restart Migration",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "purgeSQliteTitle": "Purge SQLite states",
+    "purgeSQliteDescription": "Once all states are deleted from SQLite, you will need to perform a \"database cleanup\" on the tab to the right to free up disk space. This step may take some time."
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",
@@ -2749,6 +2821,16 @@
           "heating": "Heat"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Comfort",
+          "eco": "Eco",
+          "off": "Off",
+          "frost-protection": "Frost Protection",
+          "comfort_-1": "Comfort -1°C",
+          "comfort_-2": "Comfort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Low",
@@ -2823,6 +2905,16 @@
           "51": "Double press"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Off",
+          "1": "Frost Protection",
+          "2": "Eco",
+          "3": "Comfort -1°C",
+          "4": "Comfort -2°C",
+          "5": "Comfort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
@@ -2856,6 +2948,13 @@
           "other": "No value received",
           "zero": "No",
           "one": "Yes"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Off",
+          "one": "On"
         }
       },
       "risk": {
@@ -3023,6 +3122,10 @@
       "mode": "Mode",
       "target-temperature": "Temperature"
     },
+    "heater": {
+      "shortCategoryName": "Heating",
+      "pilot-wire-mode": "Mode"
+    },
     "tamper": {
       "shortCategoryName": "Tamper",
       "binary": "Tamper (yes/no)"
@@ -3163,6 +3266,10 @@
     "risk": {
       "shortCategoryName": "Risk",
       "integer": "Risk Level"
+    },
+    "input": {
+      "shortCategoryName": "Input",
+      "binary": "State of input"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

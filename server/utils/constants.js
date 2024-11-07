@@ -82,6 +82,15 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const PILOT_WIRE_MODE = {
+  OFF: 0,
+  FROST_PROTECTION: 1,
+  ECO: 2,
+  COMFORT_1: 3,
+  COMFORT_2: 4,
+  COMFORT: 5,
+};
+
 const MUSIC_PLAYBACK_STATE = {
   PLAYING: 1,
   PAUSED: 0,
@@ -136,6 +145,7 @@ const SYSTEM_VARIABLE_NAMES = {
   TIMEZONE: 'TIMEZONE',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
+  DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
 };
 
 const EVENTS = {
@@ -163,6 +173,8 @@ const EVENTS = {
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
     PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
     CHECK_BATTERIES: 'device.check-batteries',
+    MIGRATE_FROM_SQLITE_TO_DUCKDB: 'device.migrate-from-sqlite-to-duckdb',
+    PURGE_ALL_SQLITE_STATES: 'device.purge-all-sqlite-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -243,6 +255,7 @@ const EVENTS = {
   MESSAGE: {
     NEW: 'message.new',
     NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
+    PURGE_OLD_MESSAGES: 'message.purge-old-messages',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
@@ -336,6 +349,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  AI: {
+    ASK: 'ai.ask',
+  },
   ALARM: {
     CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
     SET_ALARM_MODE: 'alarm.set-alarm-mode',
@@ -444,6 +460,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DISTANCE_SENSOR: 'distance-sensor',
   DURATION: 'duration',
   ENERGY_SENSOR: 'energy-sensor',
+  HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
@@ -479,6 +496,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
+  INPUT: 'input',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -558,6 +576,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+  },
+  HEATER: {
+    PILOT_WIRE_MODE: 'pilot-wire-mode',
   },
   SURFACE: {
     DECIMAL: 'decimal',
@@ -669,6 +690,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   RISK: {
     INTEGER: 'integer',
+  },
+  INPUT: {
+    BINARY: 'binary',
   },
 };
 
@@ -1081,9 +1105,11 @@ const JOB_TYPES = {
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   DEVICE_STATES_PURGE: 'device-state-purge',
+  DEVICE_STATES_PURGE_ALL_SQLITE_STATES: 'device-state-purge-all-sqlite-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
+  MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
 };
 
 const JOB_STATUS = {
@@ -1154,6 +1180,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK_STATE = LOCK_STATE;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

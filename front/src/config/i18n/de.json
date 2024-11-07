@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Auswählen …"
+    "selectPlaceholder": "Auswählen …",
+    "yes": "Ja",
+    "no": "Nein"
   },
   "color": {
     "aqua": "Aqua",
@@ -231,6 +233,7 @@
       "houseLabel": "Zuhause",
       "tabletModeDisabled": "Tablet-Modus deaktiviert"
     },
+    "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
     "editDashboardSaveButton": "Sichern",
     "emptyDashboardSentenceTop": "Dein Dashboard wurde noch nicht konfiguriert.",
     "emptyDashboardSentenceBottom": "Klicke auf \"Bearbeiten\", um dein Dashboard zu gestalten.",
@@ -244,6 +247,8 @@
       "private": "privat",
       "public": "öffentlich"
     },
+    "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
+    "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",
@@ -349,6 +354,8 @@
         "lastYear": "Letztes Jahr",
         "noValue": "Keine Werte in diesem Intervall aufgezeichnet.",
         "noValueWarning": "Warnung: Wenn du dieses Gerät gerade konfiguriert hast, kann es einige Zeit dauern, bis hier etwas angezeigt wird: Gladys benötigt etwas Zeit, um genügend Daten zu sammeln. Bei Intervallen über 24 Stunden kann es bis zu 24 Stunden dauern, bis hier etwas angezeigt wird.",
+        "noChartType": "Kein Diagrammtyp ausgewählt",
+        "noChartTypeWarning": "Wenn du dieses Gerät gerade konfiguriert hast, bitte gehe zurück zur Seite der Box-Bearbeitung und wähle einen Diagrammtyp aus.",
         "editNameLabel": "Gib den Namen dieser Box ein",
         "editDeviceFeaturesLabel": "Wähle das Gerät aus, das hier angezeigt werden soll",
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
@@ -356,16 +363,22 @@
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
         "chartColor": "Wählen Sie die Farbe des Diagramms aus",
         "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
+        "timelineColor": "Farbe für Position auswählen",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",
+        "timeline": "Binär",
         "stepline": "Schrittleitung",
         "displayAxes": "Achsen anzeigen?",
         "displayVariation": "Variation anzeigen?",
         "yes": "Ja",
         "no": "Nein",
         "preview": "Vorschau",
-        "showPreviewButton": "Vorschau anzeigen"
+        "showPreviewButton": "Vorschau anzeigen",
+        "on": "An",
+        "off": "Aus",
+        "start_date": "Startdatum: ",
+        "end_date": "Enddatum: "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -1081,6 +1094,41 @@
         "conflictError": "Das aktuelle Gerät ist bereits in Gladys vorhanden."
       }
     },
+    "google-cast": {
+      "title": "Google Cast",
+      "description": "Steuern Sie Google Cast-Geräte in Ihrem lokalen Netzwerk",
+      "deviceTab": "Geräte",
+      "discoverTab": "Google Cast Entdeckung",
+      "setupTab": "Einrichtung",
+      "documentation": "Google Cast Dokumentation",
+      "discoverDeviceDescr": "Google Cast-Geräte automatisch scannen",
+      "nameLabel": "Gerätename",
+      "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+      "hostLabel": "IP-Adresse",
+      "roomLabel": "Zimmer",
+      "saveButton": "Speichern",
+      "alreadyCreatedButton": "Bereits erstellt",
+      "deleteButton": "Löschen",
+      "device": {
+        "title": "Google Cast-Geräte in Gladys",
+        "editButton": "Bearbeiten",
+        "noDeviceFound": "Kein Google Cast-Gerät gefunden.",
+        "featuresLabel": "Funktionen"
+      },
+      "discover": {
+        "title": "Geräte in Ihrem lokalen Netzwerk erkannt",
+        "description": "Google Cast-Geräte werden automatisch erkannt.",
+        "error": "Fehler beim Entdecken der Google Cast-Geräte. Ist Ihr Google Cast-Lautsprecher eingeschaltet und im lokalen Netzwerk erreichbar?",
+        "noDeviceFound": "Keine Google Cast-Geräte gefunden.",
+        "errorWhileScanning": "Beim Scannen ist ein Fehler aufgetreten.",
+        "scan": "Scannen"
+      },
+      "error": {
+        "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten.",
+        "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten.",
+        "conflictError": "Das aktuelle Gerät ist bereits in Gladys vorhanden."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Steuern Sie Ihre Geräte in Z-Wave JS UI",
@@ -1744,6 +1792,14 @@
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
+      "askAi": {
+        "description": "Diese Aktion sendet eine Nachricht an die KI (ChatGPT) über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
+        "userLabel": "Gladys wird antworten an",
+        "cameraLabel": "Ein Kamerabild anhängen (optional)",
+        "textLabel": "Meine Frage an die KI",
+        "textPlaceholder": "Nachrichtentext",
+        "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
+      },
       "turnOnLights": {
         "label": "Wähle die Lichter aus, die eingeschaltet werden sollen"
       },
@@ -1970,6 +2026,9 @@
       },
       "music": {
         "play-notification": "Auf einem Lautsprecher sprechen"
+      },
+      "ai": {
+        "ask": "Frage die KI"
       }
     },
     "variables": {
@@ -2327,7 +2386,9 @@
       "gladys-gateway-backup": "Gladys-Plus-Backup",
       "device-state-purge-single-feature": "Zustände einzelner Gerätemerkmale aufräumen",
       "vacuum": "Datenbank reinigen",
-      "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup"
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
+      "migrate-sqlite-to-duckdb": "DuckDB migration",
+      "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
@@ -2380,7 +2441,18 @@
       "dead": "Beendet"
     },
     "batteryLevel": "Batteriestandswarnung",
-    "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt."
+    "batteryLevelDescription": "Jeden Samstag um 9:00 Uhr wird eine Nachricht an alle Administratoren gesendet, wenn der Batteriestand eines Geräts unter den gewählten Schwellenwert fällt.",
+    "duckDbMigrationTitle": "Migration zu DuckDB",
+    "duckDbMigrationDescription": "Wir migrieren zu einem neuen Datenbanksystem für Sensordaten. Gladys wird Ihre Daten automatisch migrieren, aber Ihre Daten in Ihrer SQLite-Datenbank nicht löschen, um Datenverlust zu vermeiden.",
+    "duckDbMigrationProgressTitle": "Migrationsfortschritt",
+    "duckDbMigrationMigrationDone": "Migration abgeschlossen:",
+    "duckDbNumberOfStatesinSQlite": "Anzahl der Zustände in SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Anzahl der Zustände in DuckDB",
+    "restartMigrationTitle": "Migration neu starten",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "purgeSQliteTitle": "SQLite-Zustände löschen",
+    "purgeSQliteDescription": "Sobald alle Zustände aus SQLite gelöscht wurden, müssen Sie auf der rechten Registerkarte eine \"Datenbankbereinigung\" durchführen, um Speicherplatz freizugeben. Dieser Schritt kann einige Zeit in Anspruch nehmen."
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
@@ -2697,6 +2769,16 @@
           "heating": "Heizen"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Komfort",
+          "eco": "Öko",
+          "off": "Aus",
+          "frost-protection": "Frostschutz",
+          "comfort_-1": "Komfort -1°C",
+          "comfort_-2": "Komfort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Niedrig",
@@ -2771,6 +2853,16 @@
           "51": "Doppeltes Drücken"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Aus",
+          "1": "Frostschutz",
+          "2": "Öko",
+          "3": "Komfort -1°C",
+          "4": "Komfort -2°C",
+          "5": "Komfort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -2804,6 +2896,13 @@
           "other": "Kein Wert empfangen",
           "zero": "Nein",
           "one": "Ja"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Aus",
+          "one": "An"
         }
       },
       "risk": {
@@ -2971,6 +3070,10 @@
       "mode": "Modus",
       "target-temperature": "Temperatur"
     },
+    "heater": {
+      "shortCategoryName": "Heizung",
+      "pilot-wire-mode": "Modus"
+    },
     "tamper": {
       "shortCategoryName": "Manipulation",
       "binary": "Manipulation (ja/nein)"
@@ -3111,6 +3214,10 @@
     "risk": {
       "shortCategoryName": "Risiko",
       "integer": "Risikostufe"
+    },
+    "input": {
+      "shortCategoryName": "Eingang",
+      "binary": "Status des Eingangs"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

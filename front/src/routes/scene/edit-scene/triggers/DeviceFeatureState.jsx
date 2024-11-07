@@ -9,6 +9,7 @@ import PresenceSensorDeviceState from './device-states/PresenceSensorDeviceState
 import ThresholdDeviceState from './device-states/ThresholdDeviceState';
 import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
+import PilotWireModeDeviceState from './device-states/PilotWireModeDeviceState';
 
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
@@ -27,6 +28,7 @@ class TurnOnLight extends Component {
     let binaryDevice = false;
     let presenceDevice = false;
     let buttonClickDevice = false;
+    let pilotWireModeDevice = false;
 
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
@@ -34,10 +36,12 @@ class TurnOnLight extends Component {
       binaryDevice = type === DEVICE_FEATURE_TYPES.SWITCH.BINARY;
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
+      pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
     }
 
-    const defaultDevice = selectedDeviceFeature && !binaryDevice && !presenceDevice && !buttonClickDevice;
-    const thresholdDevice = selectedDeviceFeature && !presenceDevice && !buttonClickDevice;
+    const defaultDevice =
+      selectedDeviceFeature && !binaryDevice && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice;
+    const thresholdDevice = selectedDeviceFeature && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice;
 
     return (
       <div>
@@ -53,6 +57,7 @@ class TurnOnLight extends Component {
           {binaryDevice && <BinaryDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {presenceDevice && <PresenceSensorDeviceState {...props} />}
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
+          {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}

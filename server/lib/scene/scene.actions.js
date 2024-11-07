@@ -245,6 +245,30 @@ const actionsFunc = {
     const image = await self.device.camera.getLiveImage(action.camera);
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
+  [ACTIONS.AI.ASK]: async (self, action, scope) => {
+    const textWithVariables = Handlebars.compile(action.text)(scope);
+    let image;
+    if (action.camera) {
+      image = await self.device.camera.getLiveImage(action.camera);
+      image = `data:${image}`;
+    }
+    const user = self.stateManager.get('user', action.user);
+    const message = {
+      source: 'AI',
+      user: {
+        id: user.id,
+        language: user.language,
+        selector: user.selector,
+      },
+      language: user.language,
+      text: textWithVariables,
+    };
+    await self.gateway.forwardMessageToOpenAI({
+      message,
+      image,
+      context: {},
+    });
+  },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(
