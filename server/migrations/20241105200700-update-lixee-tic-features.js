@@ -31,7 +31,6 @@ module.exports = {
     logger.info(`Zigbee2mqtt migration: Found ${lixeeTicdevices.length} lixee-tic devices`);
 
     await Promise.each(lixeeTicdevices, async (lixeeTicdevice) => {
-
       // Load impacted features
       const features = await db.DeviceFeature.findAll({
         where: {
