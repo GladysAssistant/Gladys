@@ -298,7 +298,8 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Motion detected"
+        "motionDetected": "Motion detected",
+        "pushButton": "Push"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
@@ -3016,7 +3017,8 @@
     },
     "button": {
       "shortCategoryName": "Button",
-      "click": "Button (click)"
+      "click": "Button (click)",
+      "push": "Push button"
     },
     "pressure-sensor": {
       "shortCategoryName": "Pressure sensor",

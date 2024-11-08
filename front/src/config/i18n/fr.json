@@ -298,7 +298,8 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Mouvement détecté"
+        "motionDetected": "Mouvement détecté",
+        "pushButton": "Appuyer"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
@@ -3016,7 +3017,8 @@
     },
     "button": {
       "shortCategoryName": "Bouton",
-      "click": "Clic bouton"
+      "click": "Clic bouton",
+      "push": "Bouton poussoir"
     },
     "pressure-sensor": {
       "shortCategoryName": "Capteur de pression",

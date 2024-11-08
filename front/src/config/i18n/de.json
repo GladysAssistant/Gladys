@@ -298,7 +298,8 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Bewegung erkannt"
+        "motionDetected": "Bewegung erkannt",
+        "pushButton": "Schieben"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
@@ -3016,7 +3017,8 @@
     },
     "button": {
       "shortCategoryName": "Schaltfläche",
-      "click": "Schaltfläche (Klick)"
+      "click": "Schaltfläche (Klick)",
+      "push": "Druckknopf"
     },
     "pressure-sensor": {
       "shortCategoryName": "Drucksensor",
