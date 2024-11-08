@@ -205,6 +205,29 @@ describe('gateway.forwardMessageToOpenAI', () => {
       intent: 'temperature-sensor.get-in-room',
     });
   });
+  it('should get info from OpenAI', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'INFO',
+      answer: 'Jules Verne is a famous writer.',
+      room: null,
+    });
+    const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    expect(classification).to.deep.equal({
+      intent: 'info.get-info',
+    });
+  });
+  it('should do nothing, no-response was sent', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'NO_RESPONSE',
+      answer: '',
+      room: '',
+    });
+    const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    expect(classification).to.deep.equal({
+      intent: undefined,
+    });
+    assert.notCalled(messageManager.reply);
+  });
   it('should start scene from OpenAI', async () => {
     gateway.gladysGatewayClient.openAIAsk = fake.resolves({
       type: 'SCENE_START',
