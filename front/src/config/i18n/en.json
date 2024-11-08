@@ -2055,8 +2055,8 @@
         "sunset": "Every sunset"
       },
       "user": {
-        "back-home": "User left home",
-        "left-home": "User back at home"
+        "back-home": "User back at home",
+        "left-home": "User left home"
       },
       "house": {
         "empty": "House is empty",
