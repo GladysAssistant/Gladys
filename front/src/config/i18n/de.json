@@ -2055,8 +2055,8 @@
         "sunset": "Jeder Sonnenuntergang"
       },
       "user": {
-        "back-home": "Benutzer hat das Zuhause verlassen",
-        "left-home": "Benutzer ist zurück zu Hause"
+        "back-home": "Benutzer ist zurück zu Hause",
+        "left-home": "Benutzer hat das Zuhause verlassen"
       },
       "house": {
         "empty": "Das Zuhause ist leer",
