@@ -105,7 +105,7 @@ const ActionCard = ({ children, ...props }) => {
         'col-lg-6':
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
-          props.action.type === ACTIONS.MQTT.SEND ||
+          props.action.type === ACTIONS.MQTT.SEND || ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
