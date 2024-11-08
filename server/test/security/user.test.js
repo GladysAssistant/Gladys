@@ -1,7 +1,6 @@
 const { expect } = require('chai');
-const { request, authenticatedRequest } = require('../controllers/request.test');
+const { authenticatedRequest } = require('../controllers/request.test');
 
-// updated
 describe('/api/v1/user/', () => {
   it('should return all users without password', async () => {
     await authenticatedRequest
