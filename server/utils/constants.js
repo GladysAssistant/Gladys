@@ -404,6 +404,9 @@ const ACTIONS = {
   MQTT: {
     SEND: 'mqtt.send',
   },
+  ZIGBEE2MQTT: {
+    SEND: 'zigbee2mqtt.send',
+  },
   MUSIC: {
     PLAY_NOTIFICATION: 'music.play-notification',
   },

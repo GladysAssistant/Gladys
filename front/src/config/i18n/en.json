@@ -1956,6 +1956,13 @@
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
+      "zigbee2mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
+      },
       "playNotification": {
         "description": "This action will make Gladys speak on the selected speaker.",
         "needGladysPlus": "Requires Gladys Plus as Text-To-Speech APIs are paid.",
@@ -2023,6 +2030,9 @@
       },
       "mqtt": {
         "send": "Send MQTT Message"
+      },
+      "zigbee2mqtt": {
+        "send": "Send Zigbee2mqtt Message"
       },
       "music": {
         "play-notification": "Talk on a speaker"
