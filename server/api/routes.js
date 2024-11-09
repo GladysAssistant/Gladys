@@ -487,6 +487,7 @@ function getRoutes(gladys) {
     },
     'get /api/v1/session': {
       authenticated: true,
+      admin: true,
       controller: sessionController.get,
     },
     // light
