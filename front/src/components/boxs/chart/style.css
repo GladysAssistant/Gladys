@@ -134,3 +134,15 @@
   padding-right: 1.5rem;
   text-align: justify;
 }
+
+.flyoutStyle {
+  padding: 15px;
+  top: 10px;
+  left: 0px;
+  font-size: smaller;
+}
+.detailItem {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
