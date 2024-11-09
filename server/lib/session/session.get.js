@@ -9,6 +9,7 @@ const DEFAULT_OPTIONS = {
 
 const FIELDS = [
   'id',
+  'user_id',
   'token_type',
   'scope',
   'valid_until',
@@ -37,6 +38,7 @@ async function get(userId, options) {
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
     where: {
       revoked: false,
+      user_id: userId,
     },
   });
 
