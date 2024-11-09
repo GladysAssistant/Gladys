@@ -28,6 +28,8 @@ async function handleMqttMessage(topic, message) {
 
       devices
         // Remove Coordinator
+        .filter((d) => d.type !== 'Coordinator')
+        // Keep only supported devices from zigbee2mqtt library
         .filter((d) => d.supported)
         .forEach((device) => {
           this.discoveredDevices[device.friendly_name] = device;

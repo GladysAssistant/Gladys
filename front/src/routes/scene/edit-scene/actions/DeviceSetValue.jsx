@@ -13,6 +13,7 @@ import TextWithVariablesInjected from '../../../../components/scene/TextWithVari
 import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
 import ShutterButtons from '../../../../components/device/ShutterButtons';
+import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMode';
 
 class DeviceSetValue extends Component {
   constructor(props) {
@@ -140,6 +141,17 @@ class DeviceSetValue extends Component {
           category={this.state.deviceFeature.category}
           type={this.state.deviceFeature.type}
           updateValue={this.handleNewPureValue}
+        />
+      );
+    }
+
+    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE) {
+      return (
+        <SelectPilotWireMode
+          category={this.state.deviceFeature.category}
+          type={this.state.deviceFeature.type}
+          updateValue={this.handleNewPureValue}
+          value={this.props.action.value}
         />
       );
     }

@@ -30,7 +30,7 @@ function checkTrigger(event) {
         if (event.type === trigger.type) {
           logger.debug(`Trigger ${trigger.type} is matching with event`);
           // then we check the condition is verified
-          const conditionVerified = triggersFunc[event.type](event, trigger);
+          const conditionVerified = triggersFunc[event.type](this, sceneSelector, event, trigger);
           logger.debug(`Trigger ${trigger.type}, conditionVerified = ${conditionVerified}...`);
 
           // if yes, we execute the scene

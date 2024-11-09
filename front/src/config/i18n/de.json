@@ -247,6 +247,8 @@
       "private": "privat",
       "public": "öffentlich"
     },
+    "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
+    "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",
@@ -352,6 +354,8 @@
         "lastYear": "Letztes Jahr",
         "noValue": "Keine Werte in diesem Intervall aufgezeichnet.",
         "noValueWarning": "Warnung: Wenn du dieses Gerät gerade konfiguriert hast, kann es einige Zeit dauern, bis hier etwas angezeigt wird: Gladys benötigt etwas Zeit, um genügend Daten zu sammeln. Bei Intervallen über 24 Stunden kann es bis zu 24 Stunden dauern, bis hier etwas angezeigt wird.",
+        "noChartType": "Kein Diagrammtyp ausgewählt",
+        "noChartTypeWarning": "Wenn du dieses Gerät gerade konfiguriert hast, bitte gehe zurück zur Seite der Box-Bearbeitung und wähle einen Diagrammtyp aus.",
         "editNameLabel": "Gib den Namen dieser Box ein",
         "editDeviceFeaturesLabel": "Wähle das Gerät aus, das hier angezeigt werden soll",
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
@@ -359,16 +363,22 @@
         "chartType": "Wähle den Diagrammtyp aus, der angezeigt werden soll",
         "chartColor": "Wählen Sie die Farbe des Diagramms aus",
         "dataColor": "Wählen Sie die Farbe für {{featureLabel}}",
+        "timelineColor": "Farbe für Position auswählen",
         "line": "Linie",
         "area": "Fläche",
         "bar": "Balken",
+        "timeline": "Binär",
         "stepline": "Schrittleitung",
         "displayAxes": "Achsen anzeigen?",
         "displayVariation": "Variation anzeigen?",
         "yes": "Ja",
         "no": "Nein",
         "preview": "Vorschau",
-        "showPreviewButton": "Vorschau anzeigen"
+        "showPreviewButton": "Vorschau anzeigen",
+        "on": "An",
+        "off": "Aus",
+        "start_date": "Startdatum: ",
+        "end_date": "Enddatum: "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -1782,6 +1792,14 @@
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
+      "askAi": {
+        "description": "Diese Aktion sendet eine Nachricht an die KI (ChatGPT) über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
+        "userLabel": "Gladys wird antworten an",
+        "cameraLabel": "Ein Kamerabild anhängen (optional)",
+        "textLabel": "Meine Frage an die KI",
+        "textPlaceholder": "Nachrichtentext",
+        "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
+      },
       "turnOnLights": {
         "label": "Wähle die Lichter aus, die eingeschaltet werden sollen"
       },
@@ -2008,6 +2026,9 @@
       },
       "music": {
         "play-notification": "Auf einem Lautsprecher sprechen"
+      },
+      "ai": {
+        "ask": "Frage die KI"
       }
     },
     "variables": {
@@ -2034,8 +2055,8 @@
         "sunset": "Jeder Sonnenuntergang"
       },
       "user": {
-        "back-home": "Benutzer hat das Zuhause verlassen",
-        "left-home": "Benutzer ist zurück zu Hause"
+        "back-home": "Benutzer ist zurück zu Hause",
+        "left-home": "Benutzer hat das Zuhause verlassen"
       },
       "house": {
         "empty": "Das Zuhause ist leer",
@@ -2075,7 +2096,8 @@
         "on": "Ein",
         "off": "Aus",
         "deviceSeen": "Wenn das Gerät erkannt wird",
-        "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)"
+        "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
+        "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:"
       },
       "scheduledTrigger": {
         "typeLabel": "Typ",
@@ -2748,6 +2770,16 @@
           "heating": "Heizen"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Komfort",
+          "eco": "Öko",
+          "off": "Aus",
+          "frost-protection": "Frostschutz",
+          "comfort_-1": "Komfort -1°C",
+          "comfort_-2": "Komfort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Niedrig",
@@ -2830,6 +2862,16 @@
           "59": "Helligkeit Ab-Taste Loslassen"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Aus",
+          "1": "Frostschutz",
+          "2": "Öko",
+          "3": "Komfort -1°C",
+          "4": "Komfort -2°C",
+          "5": "Komfort"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -2863,6 +2905,13 @@
           "other": "Kein Wert empfangen",
           "zero": "Nein",
           "one": "Ja"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Aus",
+          "one": "An"
         }
       },
       "risk": {
@@ -3030,6 +3079,10 @@
       "mode": "Modus",
       "target-temperature": "Temperatur"
     },
+    "heater": {
+      "shortCategoryName": "Heizung",
+      "pilot-wire-mode": "Modus"
+    },
     "tamper": {
       "shortCategoryName": "Manipulation",
       "binary": "Manipulation (ja/nein)"
@@ -3166,6 +3219,10 @@
     "risk": {
       "shortCategoryName": "Risiko",
       "integer": "Risikostufe"
+    },
+    "input": {
+      "shortCategoryName": "Eingang",
+      "binary": "Status des Eingangs"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",
