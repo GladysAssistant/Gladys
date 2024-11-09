@@ -2055,8 +2055,8 @@
         "sunset": "Every sunset"
       },
       "user": {
-        "back-home": "User left home",
-        "left-home": "User back at home"
+        "back-home": "User back at home",
+        "left-home": "User left home"
       },
       "house": {
         "empty": "House is empty",
@@ -2096,7 +2096,8 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
-        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)"
+        "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
+        "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",

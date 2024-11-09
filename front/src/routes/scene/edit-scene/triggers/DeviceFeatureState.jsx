@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { Text, Localizer } from 'preact-i18n';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
@@ -21,6 +22,24 @@ class TurnOnLight extends Component {
       }
     } else {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
+    }
+  };
+
+  onForDurationChange = e => {
+    e.preventDefault();
+    if (e.target.value) {
+      this.props.updateTriggerProperty(this.props.index, 'for_duration', Number(e.target.value) * 60 * 1000);
+    } else {
+      this.props.updateTriggerProperty(this.props.index, 'for_duration', '');
+    }
+  };
+
+  enableOrDisableForDuration = e => {
+    e.preventDefault();
+    if (e.target.checked) {
+      this.props.updateTriggerProperty(this.props.index, 'for_duration', 60 * 1000);
+    } else {
+      this.props.updateTriggerProperty(this.props.index, 'for_duration', undefined);
     }
   };
 
@@ -55,12 +74,55 @@ class TurnOnLight extends Component {
             </div>
           </div>
           {binaryDevice && <BinaryDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
-          {presenceDevice && <PresenceSensorDeviceState {...props} />}
+          {presenceDevice && <PresenceSensorDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
           {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}
+        <div class="row">
+          <div class="col-12">
+            <label class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                checked={props.trigger.for_duration !== undefined}
+                onChange={this.enableOrDisableForDuration}
+              />
+              <span class="form-check-label">
+                <Text id="editScene.triggersCard.newState.activateOrDeactivateForDuration" />
+              </span>
+            </label>
+          </div>
+        </div>
+        {props.trigger.for_duration !== undefined && (
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <div class="input-group">
+                  <Localizer>
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
+                      value={
+                        Number.isInteger(props.trigger.for_duration)
+                          ? props.trigger.for_duration / 60 / 1000
+                          : props.trigger.for_duration
+                      }
+                      onChange={this.onForDurationChange}
+                    />
+                  </Localizer>
+                  <span class="input-group-append" id="basic-addon2">
+                    <span class="input-group-text">
+                      <Text id="deviceFeatureUnitShort.minutes" />
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
