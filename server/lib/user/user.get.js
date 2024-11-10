@@ -1,11 +1,13 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
+const { RangeError } = require('../../utils/coreErrors');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
   fields: ['id', 'firstname', 'lastname', 'selector', 'email'],
   expand: [],
   skip: 0,
+  limit: 20,
   order_dir: 'ASC',
   order_by: 'firstname',
 };
@@ -40,6 +42,9 @@ async function get(options) {
   };
 
   if (optionsWithDefault.take) {
+    if (optionsWithDefault.take > DEFAULT_OPTIONS.limit) {
+      throw new RangeError('The value of the limit parameter is out of range');
+    }
     queryParams.limit = optionsWithDefault.take;
   }
 

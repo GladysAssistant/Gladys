@@ -70,4 +70,18 @@ describe('GET /api/v1/user', () => {
       .expect('Content-Type', /json/)
       .expect(401);
   });
+
+  it('should return 500 for an out-of-range limit value', async () => {
+    await authenticatedRequest
+      .get('/api/v1/user?take=30')
+      .expect('Content-Type', /json/)
+      .expect(500);
+  });
+
+  it('should return 200 for a limit value within the valid range.', async () => {
+    await authenticatedRequest
+      .get('/api/v1/user?take=15')
+      .expect('Content-Type', /json/)
+      .expect(200);
+  });
 });

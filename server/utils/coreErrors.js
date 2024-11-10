@@ -12,6 +12,13 @@ class NotFoundError extends Error {
   }
 }
 
+class RangeError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 class NoValuesFoundError extends Error {
   constructor(message) {
     super();
@@ -80,4 +87,5 @@ module.exports = {
   ConflictError,
   ForbiddenError,
   TooManyRequests,
+  RangeError,
 };
