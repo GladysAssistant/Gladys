@@ -71,11 +71,16 @@ describe('free-mobile', () => {
       axiosPostStub.resolves({ data: 'success' });
 
       await freeMobileService.start();
+
+      logger.debug('username:', await gladys.variable.getValue.firstCall.returnValue);
+      logger.debug('accessToken:', await gladys.variable.getValue.secondCall.returnValue);
+
       await freeMobileService.sms.send('Hello World');
 
       expect(axiosPostStub.calledOnce).to.equal(true);
 
       const callArgs = axiosPostStub.getCall(0).args;
+      logger.debug('Arguments de l’appel à axios.post:', callArgs);
       expect(callArgs[0]).to.equal('https://smsapi.free-mobile.fr/sendmsg');
       expect(callArgs[1]).to.deep.equal({
         user: 'validUsername',
