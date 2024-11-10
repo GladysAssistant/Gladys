@@ -29,6 +29,7 @@ describe('free-mobile', () => {
   afterEach(() => {
     axiosPostStub.restore();
     loggerErrorStub.restore();
+    sinon.restore();
   });
 
   describe('start', () => {
@@ -72,6 +73,8 @@ describe('free-mobile', () => {
       await freeMobileService.start();
       await freeMobileService.sms.send('Hello World');
 
+      expect(axiosPostStub.calledOnce).to.equal(true);
+
       const callArgs = axiosPostStub.getCall(0).args;
       expect(callArgs[0]).to.equal('https://smsapi.free-mobile.fr/sendmsg');
       expect(callArgs[1]).to.deep.equal({
@@ -92,6 +95,8 @@ describe('free-mobile', () => {
 
       await freeMobileService.start();
       await freeMobileService.sms.send('Hello World');
+
+      expect(loggerErrorStub.calledOnce).to.equal(true);
 
       const errorArgs = loggerErrorStub.getCall(0).args;
       expect(errorArgs[0]).to.equal('Error sending SMS:');
