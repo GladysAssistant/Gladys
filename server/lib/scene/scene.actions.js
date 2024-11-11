@@ -565,6 +565,14 @@ const actionsFunc = {
       mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
+  [ACTIONS.ZIGBEE2MQTT.SEND]: (self, action, scope) => {
+    const zigbee2mqttService = self.service.getService('zigbee2mqtt');
+
+    if (zigbee2mqttService) {
+      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      zigbee2mqttService.device.publish(action.topic, messageWithVariables);
+    }
+  },
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
     // Get device
     const device = self.stateManager.get('device', action.device);
