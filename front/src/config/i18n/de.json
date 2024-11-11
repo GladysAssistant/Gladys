@@ -298,7 +298,8 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Bewegung erkannt"
+        "motionDetected": "Bewegung erkannt",
+        "pushButton": "Schieben"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
@@ -1956,6 +1957,13 @@
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
+      "zigbee2mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/mein-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
+        "messagePlaceholder": "Meine Message"
+      },
       "playNotification": {
         "description": "Diese Aktion lässt Gladys auf dem ausgewählten Lautsprecher sprechen.",
         "needGladysPlus": "Erfordert Gladys Plus, da die Text-to-Speech-APIs kostenpflichtig sind.",
@@ -2023,6 +2031,9 @@
       },
       "mqtt": {
         "send": "MQTT-Message senden"
+      },
+      "zigbee2mqtt": {
+        "send": "Zigbee2mqtt-Message senden"
       },
       "music": {
         "play-notification": "Auf einem Lautsprecher sprechen"
@@ -3025,7 +3036,8 @@
     },
     "button": {
       "shortCategoryName": "Schaltfläche",
-      "click": "Schaltfläche (Klick)"
+      "click": "Schaltfläche (Klick)",
+      "push": "Druckknopf"
     },
     "pressure-sensor": {
       "shortCategoryName": "Drucksensor",
@@ -3128,6 +3140,67 @@
       "energy": "Energie",
       "index": "Index",
       "daily-consumption": "Tagesverbrauch"
+    },
+    "teleinformation": {
+      "shortCategoryName": "Teleinformation",
+      "binary": "Schalter",
+      "east": "Gesamt abgegebene Wirkleistung (EAST)",
+      "eait": "Gesamt eingespeiste Wirkleistung (EAIT)",
+      "easf01": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF01)",
+      "easf02": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF02)",
+      "easf03": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF03)",
+      "easf04": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF04)",
+      "easf05": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF05)",
+      "easf06": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF06)",
+      "easf07": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF07)",
+      "easf08": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF08)",
+      "easf09": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF09)",
+      "easf10": "Gesamt abgegebene Wirkleistung vom Anbieter (EASF10)",
+      "pref": "Referenz-Scheinleistung (PREF)",
+      "pcoup": "Scheinleistungsschwelle (PCOUP)",
+      "vtic": "Protokollversion (VTIC)",
+      "ccasn": "Aktueller Punkt der entnommenen Lastkurve (CCASN)",
+      "ccasn_1": "Vorheriger Punkt der entnommenen Lastkurve (CCASN-1)",
+      "umoy1": "Durchschnittliche Effektivspannung (UMOY1)",
+      "umoy2": "Durchschnittliche Effektivspannung (UMOY2)",
+      "umoy3": "Durchschnittliche Effektivspannung (UMOY3)",
+      "erq1": "Gesamt Blindleistung Q1 (ERQ1)",
+      "erq2": "Gesamt Blindleistung Q2 (ERQ2)",
+      "erq3": "Gesamt Blindleistung Q3 (ERQ3)",
+      "erq4": "Gesamt Blindleistung Q4 (ERQ4)",
+      "irms1": "Effektivstrom (IRMS1)",
+      "irms2": "Effektivstrom (IRMS2)",
+      "irms3": "Effektivstrom (IRMS3)",
+      "urms1": "Effektivspannung (URMS1)",
+      "urms2": "Effektivspannung (URMS2)",
+      "urms3": "Effektivspannung (URMS3)",
+      "easd01": "Entnommene Wirkenergie des Verteilers (EASD01)",
+      "easd02": "Entnommene Wirkenergie des Verteilers (EASD02)",
+      "easd03": "Entnommene Wirkenergie des Verteilers (EASD03)",
+      "easd04": "Entnommene Wirkenergie des Verteilers (EASD04)",
+      "ntarf": "Tarif-Indexnummer (NTARF)",
+      "ccain": "Punkt n der entnommenen Lastkurve (CCAIN)",
+      "ccain_1": "Punkt n-1 der entnommenen Lastkurve (CCAIN-1)",
+      "sinsti": "Momentan eingespeiste Scheinleistung (SINSTI)",
+      "smaxin": "Max. eingespeiste Scheinleistung n (SMAXIN)",
+      "smaxin_1": "Max. eingespeiste Scheinleistung n-1 (SMAXIN-1)",
+      "smaxn": "Max. abgegebene Scheinleistung (SMAXN)",
+      "smaxn2": "Max. abgegebene Scheinleistung (SMAXN2)",
+      "smaxn3": "Max. abgegebene Scheinleistung (SMAXN3)",
+      "sinsts": "Momentane abgegebene Scheinleistung (SINSTS)",
+      "sinsts2": "Momentane abgegebene Scheinleistung (SINSTS2)",
+      "sinsts3": "Momentane abgegebene Scheinleistung (SINSTS3)",
+      "smaxn_1": "Max. entnommene Scheinleistung n-1 (SMAXN-1)",
+      "smaxn2_1": "Max. entnommene Scheinleistung n-1 (SMAXN2-1)",
+      "smaxn3_1": "Max. entnommene Scheinleistung n-1 (SMAXN3-1)",
+      "hhphc": "HPHC-Programm (HHPHC)",
+      "imax": "Spitzenstrom (IMAX)",
+      "adps": "Warnung bei Überschreitung der Vertragsleistung (ADPS)",
+      "imax2": "Spitzenstrom (IMAX2)",
+      "imax3": "Spitzenstrom (IMAX3)",
+      "adir1": "Überstromwarnung (ADIR1)",
+      "adir2": "Überstromwarnung (ADIR2)",
+      "adir3": "Überstromwarnung (ADIR3)"
     },
     "volume-sensor": {
       "shortCategoryName": "Lautstärke-Sensor",

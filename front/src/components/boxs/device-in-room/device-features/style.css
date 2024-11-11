@@ -47,3 +47,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
     display: none;
   }
 }
+
+.btnLoading {
+  &::after {
+    border: 2px solid #5eba00;
+  }
+}
