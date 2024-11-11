@@ -556,6 +556,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+    PUSH: 'push',
   },
   SIGNAL: {
     QUALITY: 'integer',
