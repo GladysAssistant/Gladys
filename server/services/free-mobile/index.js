@@ -35,14 +35,14 @@ module.exports = function FreeMobileService(gladys, serviceId) {
   async function send(message) {
     const url = 'https://smsapi.free-mobile.fr/sendmsg';
 
-    const data = {
+    const params = {
       user: username,
       pass: accessToken,
       msg: message,
     };
 
     try {
-      const response = await axios.post(url, data);
+      const response = await axios.get(url, { params });
       logger.debug('SMS successfully sent:', response.data);
     } catch (e) {
       logger.error('Error sending SMS:', e);

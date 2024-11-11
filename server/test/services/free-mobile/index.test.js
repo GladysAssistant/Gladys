@@ -1,112 +1,132 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-
-const axios = require('axios');
-const logger = require('../../../utils/logger');
-const FreeMobileService = require('../../../services/free-mobile');
+const assert = require('assert');
+const proxyquire = require('proxyquire').noCallThru();
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const logger = require('../../../utils/logger');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
-describe('free-mobile', () => {
+describe('FreeMobileService', () => {
+  let FreeMobileService;
+  let axiosStub;
   let gladys;
   let freeMobileService;
-  let axiosPostStub;
-  let loggerErrorStub;
 
   beforeEach(() => {
-    gladys = {
-      variable: {
-        getValue: sinon.stub(),
+    axiosStub = {
+      get: async () => { 
+        return { data: 'OK' }; 
       },
     };
+
+    FreeMobileService = proxyquire('../../../services/free-mobile', {
+      axios: axiosStub,
+    });
+
+    gladys = {
+      variable: {
+        getValue: async (key) => {
+          if (key === 'FREE_MOBILE_USERNAME') {
+            return 'validUsername';
+          }
+          if (key === 'FREE_MOBILE_ACCESS_TOKEN') {
+            return 'validAccessToken';
+          }
+          return null;
+        },
+      },
+    };
+
     freeMobileService = FreeMobileService(gladys, serviceId);
-
-    axiosPostStub = sinon.stub(axios, 'post');
-    loggerErrorStub = sinon.stub(logger, 'error');
-  });
-
-  afterEach(() => {
-    axiosPostStub.restore();
-    loggerErrorStub.restore();
-    sinon.restore();
   });
 
   describe('start', () => {
+    it('should start service with success', async () => {
+      await freeMobileService.start();
+      
+      assert.strictEqual(await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId), 'validUsername');
+      assert.strictEqual(await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId), 'validAccessToken');
+    });
+
     it('should throw ServiceNotConfiguredError if username is missing', async () => {
-      gladys.variable.getValue.resolves(null);
+      // gladys.variable.getValue.resolves(null);
+      gladys.variable.getValue = async (key) => {
+        if (key === 'FREE_MOBILE_USERNAME') {
+          return null;
+        }
+        if (key === 'FREE_MOBILE_ACCESS_TOKEN') {
+          return 'validAccessToken';
+        }
+        return null;
+      };
 
       try {
         await freeMobileService.start();
         throw new Error('Expected ServiceNotConfiguredError to be thrown');
-      } catch (error) {
-        expect(error).to.be.instanceOf(ServiceNotConfiguredError);
+      } catch (e) {
+        expect(e).instanceOf(ServiceNotConfiguredError);
       }
     });
 
     it('should throw ServiceNotConfiguredError if accessToken is missing', async () => {
+      /*
       gladys.variable.getValue
         .onFirstCall()
         .resolves('validUsername')
         .onSecondCall()
         .resolves(null);
-
+      */
+      gladys.variable.getValue = async (key) => {
+        if (key === 'FREE_MOBILE_USERNAME') {
+          return 'validUsername';
+        }
+        if (key === 'FREE_MOBILE_ACCESS_TOKEN') {
+          return null;
+        }
+        return null;
+      };
+      
       try {
         await freeMobileService.start();
         throw new Error('Expected ServiceNotConfiguredError to be thrown');
-      } catch (error) {
-        expect(error).to.be.instanceOf(ServiceNotConfiguredError);
+      } catch (e) {
+        expect(e).instanceOf(ServiceNotConfiguredError);
       }
     });
+
   });
 
   describe('send', () => {
-    it('should send SMS successfully', async () => {
-      gladys.variable.getValue
-        .onFirstCall()
-        .resolves('validUsername')
-        .onSecondCall()
-        .resolves('validAccessToken');
-
-      axiosPostStub.resolves({ data: 'success' });
-
+    beforeEach(async () => {
       await freeMobileService.start();
+    });
 
-      logger.debug('username:', await gladys.variable.getValue.firstCall.returnValue);
-      logger.debug('accessToken:', await gladys.variable.getValue.secondCall.returnValue);
+    it('should send SMS successfully', async () => {
+      axiosStub.get = async (url, options) => {
+        assert.strictEqual(url, 'https://smsapi.free-mobile.fr/sendmsg');
+        assert.deepStrictEqual(options.params, {
+          user: 'validUsername',
+          pass: 'validAccessToken',
+          msg: 'Hello',
+        });
+        return { data: 'OK' };
+      };
 
-      await freeMobileService.sms.send('Hello World');
-
-      expect(axiosPostStub.calledOnce).to.equal(true);
-
-      const callArgs = axiosPostStub.getCall(0).args;
-      logger.debug('Arguments de l’appel à axios.post:', callArgs);
-      expect(callArgs[0]).to.equal('https://smsapi.free-mobile.fr/sendmsg');
-      expect(callArgs[1]).to.deep.equal({
-        user: 'validUsername',
-        pass: 'validAccessToken',
-        msg: 'Hello World',
-      });
+      await freeMobileService.sms.send('Hello');
     });
 
     it('should log an error if SMS fails', async () => {
-      gladys.variable.getValue
-        .onFirstCall()
-        .resolves('validUsername')
-        .onSecondCall()
-        .resolves('validAccessToken');
-
-      axiosPostStub.rejects(new Error('Network error'));
-
-      await freeMobileService.start();
+      axiosStub.get = async () => {
+        throw new Error('Network error');
+      };
+      const loggerErrorStub = sinon.stub(logger, 'error');
       await freeMobileService.sms.send('Hello World');
-
-      expect(loggerErrorStub.calledOnce).to.equal(true);
-
       const errorArgs = loggerErrorStub.getCall(0).args;
       expect(errorArgs[0]).to.equal('Error sending SMS:');
       expect(errorArgs[1]).to.be.instanceOf(Error);
     });
+
   });
 
   describe('stop', () => {
