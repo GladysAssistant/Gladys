@@ -15,8 +15,8 @@ describe('FreeMobileService', () => {
 
   beforeEach(() => {
     axiosStub = {
-      get: async () => { 
-        return { data: 'OK' }; 
+      get: async () => {
+        return { data: 'OK' };
       },
     };
 
@@ -44,7 +44,7 @@ describe('FreeMobileService', () => {
   describe('start', () => {
     it('should start service with success', async () => {
       await freeMobileService.start();
-      
+
       assert.strictEqual(await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId), 'validUsername');
       assert.strictEqual(await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId), 'validAccessToken');
     });
@@ -86,7 +86,7 @@ describe('FreeMobileService', () => {
         }
         return null;
       };
-      
+
       try {
         await freeMobileService.start();
         throw new Error('Expected ServiceNotConfiguredError to be thrown');
@@ -94,7 +94,6 @@ describe('FreeMobileService', () => {
         expect(e).instanceOf(ServiceNotConfiguredError);
       }
     });
-
   });
 
   describe('send', () => {
@@ -126,7 +125,6 @@ describe('FreeMobileService', () => {
       expect(errorArgs[0]).to.equal('Error sending SMS:');
       expect(errorArgs[1]).to.be.instanceOf(Error);
     });
-
   });
 
   describe('stop', () => {
