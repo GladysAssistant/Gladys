@@ -99,6 +99,7 @@ const triggersSchema = Joi.array().items(
     time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
     interval: Joi.number(),
     unit: Joi.string(),
+    for_duration: Joi.number(),
     days_of_the_week: Joi.array().items(
       Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
     ),

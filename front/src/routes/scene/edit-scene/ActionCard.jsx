@@ -29,6 +29,7 @@ import SendMessageCameraParams from './actions/SendMessageCameraParams';
 import CheckAlarmMode from './actions/CheckAlarmMode';
 import SetAlarmMode from './actions/SetAlarmMode';
 import SendMqttMessage from './actions/SendMqttMessage';
+import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
 import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
@@ -66,6 +67,7 @@ const ACTION_ICON = {
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
+  [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu'
 };
 
@@ -104,6 +106,7 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
           props.action.type === ACTIONS.MQTT.SEND ||
+          props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
@@ -383,6 +386,17 @@ const ActionCard = ({ children, ...props }) => {
           )}
           {props.action.type === ACTIONS.MQTT.SEND && (
             <SendMqttMessage
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.ZIGBEE2MQTT.SEND && (
+            <SendZigbee2MqttMessage
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}
