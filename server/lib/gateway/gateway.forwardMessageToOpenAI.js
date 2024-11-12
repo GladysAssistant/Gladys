@@ -11,7 +11,7 @@ const intentTranslation = {
   INFO: 'info.get-info',
 };
 
-const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY']);
+const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY', 'NO_RESPONSE']);
 
 /**
  * @public

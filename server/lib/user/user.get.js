@@ -65,6 +65,8 @@ async function get(options) {
     if (userPlain.picture && userPlain.picture.toString) {
       userPlain.picture = userPlain.picture.toString('utf8');
     }
+    delete userPlain.password;
+    delete userPlain.telegram_user_id;
     return userPlain;
   });
 

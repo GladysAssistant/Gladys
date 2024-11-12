@@ -298,7 +298,8 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Mouvement détecté"
+        "motionDetected": "Mouvement détecté",
+        "pushButton": "Appuyer"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
@@ -2022,6 +2023,13 @@
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
+      "zigbee2mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
+      },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
@@ -2089,6 +2097,9 @@
       },
       "mqtt": {
         "send": "Envoyer un message MQTT"
+      },
+      "zigbee2mqtt": {
+        "send": "Envoyer un message Zigbee2mqtt"
       },
       "music": {
         "play-notification": "Parler sur une enceinte"
@@ -2162,7 +2173,8 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
-        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
+        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
+        "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -2916,7 +2928,15 @@
           "48": "Pression longue",
           "49": "Relâchement court",
           "50": "Relâchement long",
-          "51": "Pression double"
+          "51": "Pression double",
+          "52": "Bouton Bascule",
+          "53": "Bouton Bascule maintenu",
+          "54": "Luminosité Plus Clic",
+          "55": "Luminosité Plus Maintenu",
+          "56": "Luminosité Plus Relâchée",
+          "57": "Luminosité Moins Clic",
+          "58": "Luminosité Moins Maintenu",
+          "59": "Luminosité Moins Relâchée"
         }
       },
       "heater": {
@@ -3082,7 +3102,8 @@
     },
     "button": {
       "shortCategoryName": "Bouton",
-      "click": "Clic bouton"
+      "click": "Clic bouton",
+      "push": "Bouton poussoir"
     },
     "pressure-sensor": {
       "shortCategoryName": "Capteur de pression",
@@ -3185,6 +3206,67 @@
       "energy": "Energie",
       "index": "Index",
       "daily-consumption": "Consommation journalière"
+    },
+    "teleinformation": {
+      "shortCategoryName": "Téléinformation",
+      "binary": "Relais",
+      "east": "Energie active soutirée totale (EAST)",
+      "eait": "Energie active injectée totale (EAIT)",
+      "easf01": "Energie active soutirée fournisseur (EASF01)",
+      "easf02": "Energie active soutirée fournisseur (EASF02)",
+      "easf03": "Energie active soutirée fournisseur (EASF03)",
+      "easf04": "Energie active soutirée fournisseur (EASF04)",
+      "easf05": "Energie active soutirée fournisseur (EASF05)",
+      "easf06": "Energie active soutirée fournisseur (EASF06)",
+      "easf07": "Energie active soutirée fournisseur (EASF07)",
+      "easf08": "Energie active soutirée fournisseur (EASF08)",
+      "easf09": "Energie active soutirée fournisseur (EASF09)",
+      "easf10": "Energie active soutirée fournisseur (EASF10)",
+      "pref": "Puissance apparente référence (PREF)",
+      "pcoup": "Puissance apparente coupure (PCOUP)",
+      "vtic": "Version du protocole (VTIC)",
+      "ccasn": "Position de la courbe charge active (CCASN)",
+      "ccasn_1": "Position de la courbe charge active (CCASN-1)",
+      "umoy1": "Tension moyenne (UMOY1)",
+      "umoy2": "Tension moyenne (UMOY2)",
+      "umoy3": "Tension moyenne (UMOY3)",
+      "erq1": "Energie réactive Q1 totale (ERQ1)",
+      "erq2": "Energie réactive Q2 totale (ERQ2)",
+      "erq3": "Energie réactive Q3 totale (ERQ3)",
+      "erq4": "Energie réactive Q4 totale (ERQ4)",
+      "irms1": "Courant efficace (IRMS1)",
+      "irms2": "Courant efficace (IRMS2)",
+      "irms3": "Courant efficace (IRMS3)",
+      "urms1": "Tension efficace (URMS1)",
+      "urms2": "Tension efficace (URMS2)",
+      "urms3": "Tension efficace (URMS3)",
+      "easd01": "Energie active soutirée distributeur (EASD01)",
+      "easd02": "Energie active soutirée distributeur (EASD02)",
+      "easd03": "Energie active soutirée distributeur (EASD03)",
+      "easd04": "Energie active soutirée distributeur (EASD04)",
+      "ntarf": "Numéro d'indice tarifaire (NTARF)",
+      "ccain": "Point n de la courbe de charge active injectée (CCAIN)",
+      "ccain_1": "Point n-1 de la courbe de charge active injectée (CCAIN-1)",
+      "sinsti": "Puissance apparente instantanée injectée (SINSTI)",
+      "smaxin": "Puissance apparente max. injectée n (SMAXIN)",
+      "smaxin_1": "Puissance apparente max. injectée n-1 (SMAXIN-1)",
+      "smaxn": "Puissance apparente max. soutirée (SMAXN)",
+      "smaxn2": "Puissance apparente max. soutirée (SMAXN2)",
+      "smaxn3": "Puissance apparente max. soutirée (SMAXN3)",
+      "sinsts": "Puissance apparente instantanée soutirée (SINSTS)",
+      "sinsts2": "Puissance apparente instantanée soutirée (SINSTS2)",
+      "sinsts3": "Puissance apparente instantanée soutirée (SINSTS3)",
+      "smaxn_1": "Puissance apparente max. soutirée n-1 (SMAXN-1)",
+      "smaxn2_1": "Puissance apparente max. soutirée n-1 (SMAXN2-1)",
+      "smaxn3_1": "Puissance apparente max. soutirée n-1 (SMAXN3-1)",
+      "hhphc": "Programme HPHC (HHPHC)",
+      "imax": "Intensité maximale (IMAX)",
+      "adps": "Alerte dépassement puissance souscrite (ADPS)",
+      "imax2": "Intensité maximale (IMAX2)",
+      "imax3": "Intensité maximale (IMAX3)",
+      "adir1": "Alerte de surcourant (ADIR1)",
+      "adir2": "Alerte de surcourant (ADIR2)",
+      "adir3": "Alerte de surcourant (ADIR3)"
     },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",

@@ -8,6 +8,18 @@ class PresenceSensorDeviceState extends Component {
     this.props.updateTriggerProperty(this.props.index, 'threshold_only', false);
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.selectedDeviceFeature &&
+      this.props.selectedDeviceFeature &&
+      prevProps.selectedDeviceFeature.selector !== this.props.selectedDeviceFeature.selector
+    ) {
+      this.props.updateTriggerProperty(this.props.index, 'operator', '=');
+      this.props.updateTriggerProperty(this.props.index, 'value', 1);
+      this.props.updateTriggerProperty(this.props.index, 'threshold_only', false);
+    }
+  }
+
   render() {
     return (
       <div class="col-6">

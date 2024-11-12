@@ -43,6 +43,12 @@ class MqttDeviceSetupPage extends Component {
       defaultValues.keep_history = false;
     }
 
+    if (featureData[1] === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+      defaultValues.min = 1;
+      defaultValues.max = 1;
+      defaultValues.read_only = false;
+    }
+
     const device = update(this.state.device, {
       features: {
         $push: [
