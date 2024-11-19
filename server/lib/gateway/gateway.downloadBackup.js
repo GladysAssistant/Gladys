@@ -21,7 +21,8 @@ async function downloadBackup(fileUrl) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
   // Extract file name
-  const fileWithoutSignedParams = fileUrl.split('?')[0];
+  let fileWithoutSignedParams = fileUrl.split('?')[0];
+  fileWithoutSignedParams = fileUrl.split('#')[0];
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
   await fse.ensureDir(restoreFolderPath);
