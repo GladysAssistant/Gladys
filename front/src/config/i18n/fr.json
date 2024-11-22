@@ -1849,8 +1849,8 @@
       },
       "smsSend": {
         "textLabel": "Message",
-        "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
       },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"

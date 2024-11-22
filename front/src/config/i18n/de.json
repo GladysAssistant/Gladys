@@ -1849,8 +1849,8 @@
       },
       "smsSend": {
         "textLabel": "Nachricht",
-        "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
+        "messagePlaceholder": "Meine Message"
       },
       "turnOnLights": {
         "label": "Wähle die Lichter aus, die eingeschaltet werden sollen"

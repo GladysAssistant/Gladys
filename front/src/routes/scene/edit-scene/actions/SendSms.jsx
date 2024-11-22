@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
@@ -22,15 +22,16 @@ class SendSms extends Component {
           <div class="mb-1 small">
             <Text id="editScene.actionsCard.smsSend.explanationText" />
           </div>
-          <div className="tags-input">
+          <Localizer>
             <TextWithVariablesInjected
               text={props.action.text}
               triggersVariables={props.triggersVariables}
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}
               updateText={this.updateText}
+              placeholder={<Text id="editScene.actionsCard.smsSend.messagePlaceholder" />}
             />
-          </div>
+          </Localizer>
         </div>
       </div>
     );

@@ -1849,8 +1849,8 @@
       },
       "smsSend": {
         "textLabel": "Message",
-        "textPlaceholder": "Message text",
-        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
       },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
