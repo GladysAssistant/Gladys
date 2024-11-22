@@ -1,11 +1,11 @@
 const path = require('path');
 const fse = require('fs-extra');
 const fs = require('fs');
-const Joi = require('joi');
+const { isURL, validateUrl } = require('../../utils/url');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { exec } = require('../../utils/childProcess');
-const { NotFoundError, InvalidURL } = require('../../utils/coreErrors');
+const { NotFoundError } = require('../../utils/coreErrors');
 
 const RESTORE_FOLDER = 'restore';
 
@@ -21,32 +21,7 @@ async function downloadBackup(fileUrl) {
   if (encryptKey === null) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
-  const isURL = (str) => {
-    try {
-      const url = new URL(str);
-      return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch (_) {
-      return false;
-    }
-  };
-  /**
-   * @description Validate the url.
-   * @param {string} url - The url of the backup.
-   * @returns {string} Return a valid url.
-   * @example
-   * validateUrl();
-   */
-  function validateUrl(url) {
-    const schema = Joi.string()
-      .uri()
-      .pattern(/^[^?#]*$/, '');
-    const { error, value } = schema.validate(url);
-    if (error) {
-      throw new InvalidURL('INVALID_URL');
-    } else {
-      return value;
-    }
-  }
+
   const value = isURL(fileUrl) ? validateUrl(fileUrl) : fileUrl;
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
