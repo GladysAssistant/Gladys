@@ -12,8 +12,10 @@ describe('FreeMobileService', () => {
   let axiosStub;
   let gladys;
   let freeMobileService;
+  let sandbox;
 
   beforeEach(() => {
+    sandbox = sinon.createSandbox();
     axiosStub = {
       get: async () => {
         return { data: 'OK' };
@@ -41,6 +43,10 @@ describe('FreeMobileService', () => {
     freeMobileService = FreeMobileService(gladys, serviceId);
   });
 
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   describe('start', () => {
     it('should start service with success', async () => {
       await freeMobileService.start();
@@ -50,7 +56,6 @@ describe('FreeMobileService', () => {
     });
 
     it('should throw ServiceNotConfiguredError if username is missing', async () => {
-      // gladys.variable.getValue.resolves(null);
       gladys.variable.getValue = async (key) => {
         if (key === 'FREE_MOBILE_USERNAME') {
           return null;
@@ -70,13 +75,6 @@ describe('FreeMobileService', () => {
     });
 
     it('should throw ServiceNotConfiguredError if accessToken is missing', async () => {
-      /*
-      gladys.variable.getValue
-        .onFirstCall()
-        .resolves('validUsername')
-        .onSecondCall()
-        .resolves(null);
-      */
       gladys.variable.getValue = async (key) => {
         if (key === 'FREE_MOBILE_USERNAME') {
           return 'validUsername';
@@ -119,7 +117,7 @@ describe('FreeMobileService', () => {
       axiosStub.get = async () => {
         throw new Error('Network error');
       };
-      const loggerErrorStub = sinon.stub(logger, 'error');
+      const loggerErrorStub = sandbox.stub(logger, 'error');
       await freeMobileService.sms.send('Hello World');
       const errorArgs = loggerErrorStub.getCall(0).args;
       expect(errorArgs[0]).to.equal('Error sending SMS:');
