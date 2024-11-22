@@ -95,6 +95,11 @@
     "img": "/assets/integrations/cover/google-cast.jpg"
   },
   {
+    "key": "airplay",
+    "link": "airplay",
+    "img": "/assets/integrations/cover/airplay.jpg"
+  },
+  {
     "key": "free-mobile",
     "link": "free-mobile",
     "img": "/assets/integrations/cover/free-mobile.jpg"

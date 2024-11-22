@@ -39,6 +39,14 @@ async function scanPresence() {
           device_feature_external_id: externalId,
           state: 1,
         });
+      } else {
+        const deviceFeatureInCache = this.gladys.stateManager.get('deviceFeatureByExternalId', externalId);
+        if (deviceFeatureInCache.last_value !== 0) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: externalId,
+            state: 0,
+          });
+        }
       }
     });
   }
