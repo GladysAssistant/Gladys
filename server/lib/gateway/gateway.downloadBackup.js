@@ -21,14 +21,33 @@ async function downloadBackup(fileUrl) {
   if (encryptKey === null) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
-  // Extract and validate the fileUrl
-  const schema = Joi.string()
-    .uri()
-    .pattern(/^[^?#]*$/, '');
-  const { error, value } = schema.validate(fileUrl);
-  if (error) {
-    throw new InvalidURL('INVALID_URL');
+  const isURL = (str) => {
+    try {
+      const url = new URL(str);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (_) {
+      return false;
+    }
+  };
+  /**
+   * @description Validate the url.
+   * @param {string} url - The url of the backup.
+   * @returns {string} Return a valid url.
+   * @example
+   * validateUrl();
+   */
+  function validateUrl(url) {
+    const schema = Joi.string()
+      .uri()
+      .pattern(/^[^?#]*$/, '');
+    const { error, value } = schema.validate(url);
+    if (error) {
+      throw new InvalidURL('INVALID_URL');
+    } else {
+      return value;
+    }
   }
+  const value = isURL(fileUrl) ? validateUrl(fileUrl) : fileUrl;
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
   await fse.ensureDir(restoreFolderPath);
