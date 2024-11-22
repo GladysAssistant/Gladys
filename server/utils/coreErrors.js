@@ -12,6 +12,12 @@ class NotFoundError extends Error {
   }
 }
 
+class InvalidURL extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
 class NoValuesFoundError extends Error {
   constructor(message) {
     super();
@@ -80,4 +86,5 @@ module.exports = {
   ConflictError,
   ForbiddenError,
   TooManyRequests,
+  InvalidURL,
 };

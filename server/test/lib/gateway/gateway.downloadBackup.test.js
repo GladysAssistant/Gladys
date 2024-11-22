@@ -7,7 +7,7 @@ const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 const getConfig = require('../../../utils/getConfig');
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { NotFoundError, InvalidURL } = require('../../../utils/coreErrors');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -93,5 +93,19 @@ describe('gateway.downloadBackup', () => {
         sqliteBackupFilePath: 'gladys-backups/restore/encoded-old-gladys-db-backup.db.gz.db',
       },
     });
+  });
+
+  it('should throw an error for invalid backup url', async () => {
+    const backupUrl = 'https://test.example/path/test.enc#&?`id`';
+    try {
+      await gateway.downloadBackup(backupUrl);
+      assert.fail();
+    } catch (e) {
+      expect(e)
+        .instanceOf(InvalidURL)
+        .haveOwnProperty('message', 'INVALID_URL');
+    }
+
+    assert.notCalled(event.emit);
   });
 });

@@ -1,10 +1,11 @@
 const path = require('path');
 const fse = require('fs-extra');
 const fs = require('fs');
+const Joi = require('joi');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { exec } = require('../../utils/childProcess');
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, InvalidURL } = require('../../utils/coreErrors');
 
 const RESTORE_FOLDER = 'restore';
 
@@ -20,16 +21,21 @@ async function downloadBackup(fileUrl) {
   if (encryptKey === null) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
-  // Extract file name
-  const fileWithoutSignedParams = fileUrl.split('?')[0];
+  // Extract and validate the fileUrl
+  const schema = Joi.string()
+    .uri()
+    .pattern(/^[^?#]*$/, '');
+  const { error, value } = schema.validate(fileUrl);
+  if (error) {
+    throw new InvalidURL('INVALID_URL');
+  }
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
   await fse.ensureDir(restoreFolderPath);
   // we empty the restore backup folder
   await fse.emptyDir(restoreFolderPath);
 
-  // Remove # from fileWithoutSignedParams
-  const encryptedBackupName = path.basename(fileWithoutSignedParams.split('#')[0], '.enc');
+  const encryptedBackupName = path.basename(value, '.enc');
   const encryptedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.enc`);
   const compressedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.gz`);
 
