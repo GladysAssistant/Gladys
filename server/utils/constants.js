@@ -505,6 +505,27 @@ const DEVICE_FEATURE_CATEGORIES = {
   INPUT: 'input',
 };
 
+const DEVICE_MODELS = {
+  TRISTATE: 'Tristate',
+  KAKU: 'Kaku',
+  NEWKAKU: 'Newkaku',
+  HOMEEASY: 'Homeeasy',
+  CONRAD: 'Conrad rsl2',
+  BLYSS: 'Blyss',
+  RTS: 'Rts',
+  AB400D: 'Ab400d',
+  IMPULS: 'Impuls',
+  EURODOMEST: 'Eurodomest',
+  X10: 'X10',
+  HOMECOMFORT: 'Homeconfort',
+  KOPPLA: 'Ikea koppla',
+  CHUANGO: 'Chuango',
+  SELECTPLUS: 'Selectplus',
+  DELTRONIC: 'Deltronic',
+  MERTIK: 'Mertik',
+  EV1527: 'Ev1527',
+};
+
 const DEVICE_FEATURE_TYPES = {
   LIGHT: {
     BINARY: 'binary',
@@ -524,6 +545,51 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  MOTION_SENSOR: {
+    BINARY: 'binary',
+    PUSH: 'push',
+  },
+  LIGHT_SENSOR: {
+    DECIMAL: 'decimal',
+    INTEGER: 'integer',
+  },
+  SMOKE_SENSOR: {
+    DECIMAL: 'decimal',
+    BINARY: 'binary',
+  },
+  SISMIC_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  PRESSURE_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  OPENING_SENSOR: {
+    BINARY: 'binary',
+  },
+  HUMIDITY_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  TEMPERATURE_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  CO2_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  COUNTER_SENSOR: {
+    INTEGER: 'integer',
+  },
+  LEAK_SENSOR: {
+    BINARY: 'binary',
+  },
+  PRESENCE_SENSOR: {
+    PUSH: 'push',
+  },
+  DISTANCE_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  CAMERA: {
+    IMAGE: 'image',
+  },
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
@@ -532,9 +598,6 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
-  },
-  CAMERA: {
-    IMAGE: 'image',
   },
   SIREN: {
     BINARY: 'binary',
@@ -1056,6 +1119,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     INSTALLATION_STATUS: 'mqtt.install-status',
     DEBUG_NEW_MQTT_MESSAGE: 'mqtt.debug.new-mqtt-message',
   },
+  RFLINK: {
+    NEW_MESSAGE: 'rflink.new-message',
+    DRIVER_FAILED: 'rflink.driver-failed',
+    DRIVER_READY: 'rflink.driver-ready',
+    NEW_DEVICE: 'rflink.new-device',
+  },
   ZWAVEJS_UI: {
     CONNECTED: 'zwavejs-ui.connected',
     ERROR: 'zwavejs-ui.error',
@@ -1224,6 +1293,7 @@ const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_MODELS_LIST = createList(DEVICE_MODELS);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
@@ -1248,6 +1318,7 @@ module.exports.ACTIONS_STATUS = ACTIONS_STATUS;
 module.exports.USER_ROLE = USER_ROLE;
 module.exports.AVAILABLE_LANGUAGES = AVAILABLE_LANGUAGES;
 module.exports.SESSION_TOKEN_TYPES = SESSION_TOKEN_TYPES;
+module.exports.DEVICE_MODELS_LIST = DEVICE_MODELS_LIST;
 
 module.exports.EVENT_LIST = EVENT_LIST;
 module.exports.LIFE_EVENT_LIST = LIFE_EVENT_LIST;
