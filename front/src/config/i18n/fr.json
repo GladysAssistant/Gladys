@@ -1258,6 +1258,41 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "airplay": {
+      "title": "Airplay",
+      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Airplay",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Airplay",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Airplay",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Airplay dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Airplay trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Airplay sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Airplay. Est-ce que votre enceinte Airplay est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Airplay n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Contrôler vos appareils dans Z-Wave JS UI",
