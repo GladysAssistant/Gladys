@@ -418,6 +418,9 @@ const ACTIONS = {
   MUSIC: {
     PLAY_NOTIFICATION: 'music.play-notification',
   },
+  SMS: {
+    SEND: 'sms.send',
+  },
 };
 
 const INTENTS = {
