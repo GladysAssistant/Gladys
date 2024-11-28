@@ -282,7 +282,7 @@ const AppRouter = connect(
 
         <NodeRedPage path="/dashboard/integration/device/node-red" />
 
-        <FreeMobilePage path="dashboard/integration/device/free-mobile" />
+        <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
