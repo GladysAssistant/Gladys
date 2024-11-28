@@ -1500,13 +1500,15 @@
     },
     "lanManager": {
       "title": "LAN Manager",
-      "description": "Manage you device through you local network.",
+      "description": "Presence detection via network scan",
       "deviceTab": "Devices",
       "discoverTab": "LAN Discover",
       "setupTab": "Presence scanner",
       "documentation": "Lan Manager documentation",
       "device": {
-        "title": "LAN Devices",
+        "title": "Devices added to the integration",
+        "explanation": "This integration allows you to detect user presence by scanning the network.",
+        "iosWarning": "Warning, this integration does not work with iOS devices.",
         "search": "Search devices",
         "noDevices": "No LAN devices added yet.",
         "manufacturerLabel": "Manufacturer",

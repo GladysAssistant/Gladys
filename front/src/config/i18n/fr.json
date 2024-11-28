@@ -1660,13 +1660,15 @@
     },
     "lanManager": {
       "title": "LAN Manager",
-      "description": "Gérez les appareils sur votre réseau local.",
+      "description": "Détection de présence via scan réseau",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte LAN",
       "setupTab": "Scanner de présence",
       "documentation": "Documentation LAN Manager",
       "device": {
-        "title": "Appareils LAN",
+        "title": "Appareils ajoutés à l'intégration",
+        "explanation": "Cette intégration vous permet de détecter la présence des utilisateurs en scannant le réseau.",
+        "iosWarning": "Attention, cette intégration ne fonctionne pas avec les appareils iOS.",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
         "manufacturerLabel": "Constructeur",
