@@ -1500,13 +1500,15 @@
     },
     "lanManager": {
       "title": "LAN-Manager",
-      "description": "Verwalte deine Geräte über dein lokales Netzwerk.",
+      "description": "Anwesenheitserkennung über Netzwerkscan",
       "deviceTab": "Meine Geräte",
       "discoverTab": "Geräte in der Nähe",
       "setupTab": "Anwesenheitsscanner",
       "documentation": "LAN-Manager-Dokumentation",
       "device": {
-        "title": "Meine Geräte",
+        "title": "Geräte zur Integration hinzugefügt",
+        "explanation": "Diese Integration ermöglicht es Ihnen, die Anwesenheit von Benutzern durch einen Netzwerkscan zu erkennen.",
+        "iosWarning": "Achtung, diese Integration funktioniert nicht mit iOS-Geräten.",
         "search": "Geräte suchen",
         "noDevices": "Du hast noch keine LAN-Geräte hinzugefügt.",
         "manufacturerLabel": "Hersteller",
