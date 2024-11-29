@@ -28,10 +28,20 @@ class SceneCard extends Component {
     return (
       <div class="list-group-item">
         <div class="row align-items-center">
-          <a href={`/dashboard/scene/${props.scene.selector}`} class="col-auto">
+          <a
+            href={`/dashboard/scene/${props.scene.selector}`}
+            class={cx('col-auto', {
+              [style.disabledSceneRow]: !props.scene.active
+            })}
+          >
             <i class={`fe fe-${props.scene.icon}`} />
           </a>
-          <a href={`/dashboard/scene/${props.scene.selector}`} class="col">
+          <a
+            href={`/dashboard/scene/${props.scene.selector}`}
+            class={cx('col', {
+              [style.disabledSceneRow]: !props.scene.active
+            })}
+          >
             <div class="text-reset d-block">{props.scene.name}</div>
             <div class="d-block text-secondary mt-n1">{props.scene.description}</div>
             <div>

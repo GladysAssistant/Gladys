@@ -4,6 +4,10 @@
   }
 }
 
+.disabledSceneRow {
+  color: #868e96 !important;
+}
+
 .scene_icon {
   font-size: 4rem !important;
   margin: 0;
