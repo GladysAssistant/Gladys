@@ -10489,6 +10489,717 @@
       "lastTransmit": 1714901379459,
       "errorReceive": false,
       "errorTransmit": true
+    },
+    {
+      "id": 9,
+      "name": "SceneController",
+      "loc": "Loc1",
+      "values": [
+        {
+          "id": "9-91-0-slowRefresh",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 91,
+          "commandClassName": "Central Scene",
+          "endpoint": 0,
+          "property": "slowRefresh",
+          "propertyName": "slowRefresh",
+          "type": "boolean",
+          "readable": true,
+          "writeable": true,
+          "description": "When this is true, KeyHeldDown notifications are sent every 55s. When this is false, the notifications are sent every 200ms.",
+          "label": "Send held down notifications at a slow rate",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": true,
+          "lastUpdate": 1731769606960,
+          "newValue": true
+        },
+        {
+          "id": "9-91-0-scene-001",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 91,
+          "commandClassName": "Central Scene",
+          "endpoint": 0,
+          "property": "scene",
+          "propertyName": "scene",
+          "propertyKey": "001",
+          "propertyKeyName": "001",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Scene 001",
+          "stateless": true,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            {
+              "text": "KeyPressed",
+              "value": 0
+            },
+            {
+              "text": "KeyReleased",
+              "value": 1
+            },
+            {
+              "text": "KeyHeldDown",
+              "value": 2
+            }
+          ],
+          "lastUpdate": 1733081284002
+        },
+        {
+          "id": "9-91-0-scene-002",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 91,
+          "commandClassName": "Central Scene",
+          "endpoint": 0,
+          "property": "scene",
+          "propertyName": "scene",
+          "propertyKey": "002",
+          "propertyKeyName": "002",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Scene 002",
+          "stateless": true,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            {
+              "text": "KeyPressed",
+              "value": 0
+            },
+            {
+              "text": "KeyReleased",
+              "value": 1
+            },
+            {
+              "text": "KeyHeldDown",
+              "value": 2
+            }
+          ],
+          "lastUpdate": 1733081297253
+        },
+        {
+          "id": "9-91-0-scene-003",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 91,
+          "commandClassName": "Central Scene",
+          "endpoint": 0,
+          "property": "scene",
+          "propertyName": "scene",
+          "propertyKey": "003",
+          "propertyKeyName": "003",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Scene 003",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            {
+              "text": "KeyPressed",
+              "value": 0
+            },
+            {
+              "text": "KeyReleased",
+              "value": 1
+            },
+            {
+              "text": "KeyHeldDown",
+              "value": 2
+            }
+          ],
+          "lastUpdate": 1732307476514
+        },
+        {
+          "id": "9-91-0-scene-004",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 91,
+          "commandClassName": "Central Scene",
+          "endpoint": 0,
+          "property": "scene",
+          "propertyName": "scene",
+          "propertyKey": "004",
+          "propertyKeyName": "004",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Scene 004",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            {
+              "text": "KeyPressed",
+              "value": 0
+            },
+            {
+              "text": "KeyReleased",
+              "value": 1
+            },
+            {
+              "text": "KeyHeldDown",
+              "value": 2
+            }
+          ],
+          "lastUpdate": 1732307476514
+        },
+        {
+          "id": "9-112-0-254",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 254,
+          "propertyName": "Enable Configuration",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Lock/unlock all configuration parameters.",
+          "label": "Enable Configuration",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Unlock",
+              "value": 0
+            },
+            {
+              "text": "Lock",
+              "value": 1
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1731764402393,
+          "newValue": 0
+        },
+        {
+          "id": "9-112-0-255",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 255,
+          "propertyName": "Reset/Remove",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Reset the sensor or remove from the Z-Wave network.",
+          "label": "Reset/Remove",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 1431655765,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Idle",
+              "value": 1
+            },
+            {
+              "text": "Reset configuration",
+              "value": 85
+            },
+            {
+              "text": "Reset configuration and remove",
+              "value": 1431655765
+            }
+          ],
+          "lastUpdate": 1732307476514
+        },
+        {
+          "id": "9-114-0-productId",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productId",
+          "propertyName": "productId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product ID",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 11,
+          "lastUpdate": 1731764400143,
+          "newValue": 11
+        },
+        {
+          "id": "9-114-0-productType",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productType",
+          "propertyName": "productType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 512,
+          "lastUpdate": 1731764400143,
+          "newValue": 512
+        },
+        {
+          "id": "9-114-0-manufacturerId",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "manufacturerId",
+          "propertyName": "manufacturerId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Manufacturer ID",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 520,
+          "lastUpdate": 1731764400144,
+          "newValue": 520
+        },
+        {
+          "id": "9-128-0-isLow",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "isLow",
+          "propertyName": "isLow",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Low battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1733081295360,
+          "newValue": false
+        },
+        {
+          "id": "9-128-0-level",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "level",
+          "propertyName": "level",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1733081295361,
+          "newValue": 100
+        },
+        {
+          "id": "9-132-0-controllerNodeId",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "controllerNodeId",
+          "propertyName": "controllerNodeId",
+          "type": "any",
+          "readable": true,
+          "writeable": false,
+          "label": "Node ID of the controller",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1731769613124,
+          "newValue": 1
+        },
+        {
+          "id": "9-132-0-wakeUpInterval",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "wakeUpInterval",
+          "propertyName": "wakeUpInterval",
+          "type": "number",
+          "readable": false,
+          "writeable": true,
+          "label": "wakeUpInterval (property)",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 0,
+          "step": 0,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1731769613125,
+          "newValue": 0
+        },
+        {
+          "id": "9-134-0-hardwareVersion",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "hardwareVersion",
+          "propertyName": "hardwareVersion",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip hardware version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 2,
+          "lastUpdate": 1731764400217,
+          "newValue": 2
+        },
+        {
+          "id": "9-134-0-firmwareVersions",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "firmwareVersions",
+          "propertyName": "firmwareVersions",
+          "type": "string[]",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip firmware versions",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": ["1.6"],
+          "lastUpdate": 1731764400218,
+          "newValue": ["1.6"]
+        },
+        {
+          "id": "9-134-0-protocolVersion",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "protocolVersion",
+          "propertyName": "protocolVersion",
+          "type": "string",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave protocol version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": "4.34",
+          "lastUpdate": 1731764400219,
+          "newValue": "4.34"
+        },
+        {
+          "id": "9-134-0-libraryType",
+          "nodeId": 9,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "libraryType",
+          "propertyName": "libraryType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Library type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": true,
+          "states": [
+            {
+              "text": "Unknown",
+              "value": 0
+            },
+            {
+              "text": "Static Controller",
+              "value": 1
+            },
+            {
+              "text": "Controller",
+              "value": 2
+            },
+            {
+              "text": "Enhanced Slave",
+              "value": 3
+            },
+            {
+              "text": "Slave",
+              "value": 4
+            },
+            {
+              "text": "Installer",
+              "value": 5
+            },
+            {
+              "text": "Routing Slave",
+              "value": 6
+            },
+            {
+              "text": "Bridge Controller",
+              "value": 7
+            },
+            {
+              "text": "Device under Test",
+              "value": 8
+            },
+            {
+              "text": "N/A",
+              "value": 9
+            },
+            {
+              "text": "AV Remote",
+              "value": 10
+            },
+            {
+              "text": "AV Device",
+              "value": 11
+            }
+          ],
+          "value": 3,
+          "lastUpdate": 1731764400220,
+          "newValue": 3
+        }
+      ],
+      "groups": [
+        {
+          "text": "Lifeline",
+          "endpoint": 0,
+          "value": 1,
+          "maxNodes": 5,
+          "isLifeline": true,
+          "multiChannel": false
+        },
+        {
+          "text": "On/Off control,Button 1",
+          "endpoint": 0,
+          "value": 2,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "Dimming control,Button 1",
+          "endpoint": 0,
+          "value": 3,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "On/Off control,Button 2",
+          "endpoint": 0,
+          "value": 4,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "Dimming control,Button 2",
+          "endpoint": 0,
+          "value": 5,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "On/Off control,Button 3",
+          "endpoint": 0,
+          "value": 6,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "Dimming control,Button 3",
+          "endpoint": 0,
+          "value": 7,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "On/Off control,Button 4",
+          "endpoint": 0,
+          "value": 8,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        },
+        {
+          "text": "Dimming control,Button 4",
+          "endpoint": 0,
+          "value": 9,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": false
+        }
+      ],
+      "neighbors": [],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [],
+      "status": "Asleep",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "prioritySUCReturnRoute": false,
+      "customSUCReturnRoutes": [],
+      "hexId": "0x0208 0x0200-0x000b",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x0208:0x0200:0x000b:1.6",
+      "manufacturerId": 520,
+      "productId": 11,
+      "productType": 512,
+      "deviceConfig": {
+        "filename": "/usr/src/app/store/.config-db/devices/0x0208/hkzw-scn04.json",
+        "isEmbedded": true,
+        "manufacturer": "HANK Electronics Ltd.",
+        "manufacturerId": 520,
+        "label": "SCN04",
+        "description": "Four-Key Scene Controller",
+        "devices": [
+          {
+            "productType": 512,
+            "productId": 11
+          },
+          {
+            "productType": 513,
+            "productId": 11
+          }
+        ],
+        "firmwareVersion": {
+          "min": "0.0",
+          "max": "255.255"
+        },
+        "preferred": false,
+        "paramInformation": {
+          "_map": {}
+        }
+      },
+      "productLabel": "SCN04",
+      "productDescription": "Four-Key Scene Controller",
+      "manufacturer": "HANK Electronics Ltd.",
+      "firmwareVersion": "1.6",
+      "protocolVersion": 3,
+      "zwavePlusVersion": 1,
+      "zwavePlusNodeType": 0,
+      "zwavePlusRoleType": 4,
+      "nodeType": 1,
+      "endpointsCount": 0,
+      "endpoints": [
+        {
+          "index": 0,
+          "label": "Root Endpoint",
+          "deviceClass": {
+            "basic": 4,
+            "generic": 24,
+            "specific": 1
+          }
+        }
+      ],
+      "isSecure": false,
+      "security": "None",
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": false,
+      "isListening": false,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 100000,
+      "deviceClass": {
+        "basic": 4,
+        "generic": 24,
+        "specific": 1
+      },
+      "lastActive": 1733088009919,
+      "firmwareCapabilities": {
+        "firmwareUpgradable": true,
+        "firmwareTargets": [0]
+      },
+      "protocol": 0,
+      "deviceId": "520-11-512",
+      "hasDeviceConfigChanged": false,
+      "batteryLevels": {
+        "0": 100
+      },
+      "minBatteryLevel": 100,
+      "supportsTime": false,
+      "statistics": {
+        "commandsTX": 0,
+        "commandsRX": 57,
+        "commandsDroppedRX": 0,
+        "commandsDroppedTX": 0,
+        "timeoutResponse": 0,
+        "lwr": {
+          "repeaters": [5],
+          "protocolDataRate": 1
+        },
+        "lastSeen": "2024-12-01T21:20:09.919Z"
+      },
+      "_name": "SceneController (Loc1)",
+      "applicationRoute": false,
+      "lastReceive": 1733088009919,
+      "errorReceive": false,
+      "errorTransmit": false
     }
   ],
   "args": [],

@@ -49,18 +49,26 @@ const STATES = {
     ],
   },
   central_scene: {
-    scene: [{converter: (val) => {
-      switch(val) {
-        case 0:
-          return BUTTON_STATUS.CLICK;
-        case 1:
-          return BUTTON_STATUS.RELEASE;
-        case 2:
-          return BUTTON_STATUS.HOLD_CLICK;
-        default:
-          return null;
-      }
-    }}]
+    scene: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case 0:
+              return BUTTON_STATUS.CLICK;
+            case 1:
+              return BUTTON_STATUS.RELEASE;
+            case 2:
+              return BUTTON_STATUS.HOLD_CLICK;
+            case 3:
+              return BUTTON_STATUS.DOUBLE_CLICK;
+            case 4:
+              return BUTTON_STATUS.TRIPLE;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
   },
   multilevel_sensor: {
     air_temperature: [{ converter: (val) => val }],
@@ -283,11 +291,11 @@ const EXPOSES = {
       category: DEVICE_FEATURE_CATEGORIES.BUTTON,
       type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
       min: 0,
-      max: 2,
+      max: 4,
       keep_history: false,
       read_only: true,
-      has_feedback: true
-    }
+      has_feedback: true,
+    },
   },
   multilevel_sensor: {
     air_temperature: {
@@ -461,7 +469,7 @@ const EXPOSES = {
         has_feedback: true,
       },
     },
-  }
+  },
 };
 
 const COMMANDCLASS = {

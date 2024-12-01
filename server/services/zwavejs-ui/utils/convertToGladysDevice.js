@@ -48,8 +48,10 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
     const value = zwaveJsDevice.values[valueKey];
     const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
 
-    let exposes = getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass)
-      || getProperty(EXPOSES, commandClassName, propertyName, '', zwaveJsDevice.deviceClass);
+    let exposes =
+      getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass) ||
+      // We try to get a higher EXPOSEd node (to handle Scene Controllers for example).
+      getProperty(EXPOSES, commandClassName, propertyName, '', zwaveJsDevice.deviceClass);
     if (exposes) {
       if (!Array.isArray(exposes)) {
         exposes = [
@@ -61,6 +63,11 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
       }
 
       exposes.forEach((exposeFound) => {
+        // Let's check we effectively found a valid EXPOSE and not
+        // just a higher node
+        if (!exposeFound.feature.category) {
+          return;
+        }
         const deviceFeatureId = getDeviceFeatureId(
           zwaveJsDevice.id,
           commandClassName,
