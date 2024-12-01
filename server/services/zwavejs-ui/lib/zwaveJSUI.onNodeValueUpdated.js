@@ -27,7 +27,8 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  const valueConverters = getProperty(STATES, commandClassName, propertyName, propertyKeyName, zwaveJSNode.deviceClass);
+  const valueConverters = getProperty(STATES, commandClassName, propertyName, propertyKeyName, zwaveJSNode.deviceClass)
+    || getProperty(STATES, commandClassName, propertyName, '', zwaveJSNode.deviceClass);
 
   if (!valueConverters) {
     return Promise.resolve();

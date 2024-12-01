@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   OPENING_SENSOR_STATE,
   STATE,
+  BUTTON_STATUS,
   COVER_STATE,
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
@@ -46,6 +47,20 @@ const STATES = {
         },
       },
     ],
+  },
+  central_scene: {
+    scene: [{converter: (val) => {
+      switch(val) {
+        case 0:
+          return BUTTON_STATUS.CLICK;
+        case 1:
+          return BUTTON_STATUS.RELEASE;
+        case 2:
+          return BUTTON_STATUS.HOLD_CLICK;
+        default:
+          return null;
+      }
+    }}]
   },
   multilevel_sensor: {
     air_temperature: [{ converter: (val) => val }],
@@ -263,6 +278,17 @@ const EXPOSES = {
       has_feedback: false,
     },
   },
+  central_scene: {
+    scene: {
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      min: 0,
+      max: 2,
+      keep_history: false,
+      read_only: true,
+      has_feedback: true
+    }
+  },
   multilevel_sensor: {
     air_temperature: {
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -435,7 +461,7 @@ const EXPOSES = {
         has_feedback: true,
       },
     },
-  },
+  }
 };
 
 const COMMANDCLASS = {
