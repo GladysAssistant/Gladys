@@ -85,7 +85,7 @@ describe('AirplayHandler.setValue', () => {
     airplayHandler.scanTimeout = 1;
     const devices = await airplayHandler.scan();
     const device = devices[0];
-    await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
+    await airplayHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
     sinon.assert.calledOnce(pipe);
   });
   it('should return device not found', async () => {
@@ -93,7 +93,7 @@ describe('AirplayHandler.setValue', () => {
     const device = {
       external_id: 'airplay:toto',
     };
-    const promise = airplayHandler.setValue(device, {}, 'http://play-url.com');
+    const promise = airplayHandler.setValue(device, {}, 'http://play-url.com', { volume: 30 });
     await assert.isRejected(promise, 'Device not found on network');
   });
 });

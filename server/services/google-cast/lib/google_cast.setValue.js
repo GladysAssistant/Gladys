@@ -5,10 +5,11 @@ const logger = require('../../../utils/logger');
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
+ * @param {object} options - Optional configs.
  * @example
  * setValue(device, deviceFeature, 0);
  */
-async function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value, options) {
   const deviceName = device.external_id.split(':')[1];
   const ipAddress = this.deviceIpAddresses.get(deviceName);
   if (!ipAddress) {
@@ -21,6 +22,15 @@ async function setValue(device, deviceFeature, value) {
 
     client.connect(ipAddress, () => {
       logger.debug('Google Cast Connected, launching app ...');
+
+      if (options.volume) {
+        client.setVolume({ level: options.volume / 100 }, (err, newvol) => {
+          if (err) {
+            logger.debug('there was an error setting the volume');
+          }
+          logger.debug('volume changed to %s', newvol);
+        });
+      }
 
       client.launch(DefaultMediaReceiver, (err, player) => {
         const media = {

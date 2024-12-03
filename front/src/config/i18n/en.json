@@ -2021,6 +2021,7 @@
         "description": "This action will make Gladys speak on the selected speaker.",
         "needGladysPlus": "Requires Gladys Plus as Text-To-Speech APIs are paid.",
         "deviceLabel": "Speaker",
+        "volumeLabel": "Volume",
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{ '. Note: You must have defined a variable beforehand in a 'Retrieve Last State' action placed before this message block."
       }
