@@ -27,8 +27,9 @@ async function setValue(device, deviceFeature, value, options) {
         client.setVolume({ level: options.volume / 100 }, (err, newvol) => {
           if (err) {
             logger.debug('there was an error setting the volume');
+          } else {
+            logger.debug('volume changed to %s', newvol);
           }
-          logger.debug('volume changed to %s', newvol);
         });
       }
 
