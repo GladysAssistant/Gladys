@@ -46,9 +46,19 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(zwaveJsDevice.values).forEach((valueKey) => {
     const value = zwaveJsDevice.values[valueKey];
-    const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
+    const {
+      commandClass,
+      commandClassName,
+      propertyName,
+      propertyKeyName,
+      endpoint = 0,
+      commandClassVersion = 1,
+    } = value;
 
-    let exposes = getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass);
+    let exposes =
+      getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass) ||
+      // We try to get a higher EXPOSEd node (to handle Scene Controllers for example).
+      getProperty(EXPOSES, commandClassName, propertyName, '', zwaveJsDevice.deviceClass);
     if (exposes) {
       if (!Array.isArray(exposes)) {
         exposes = [
@@ -60,25 +70,25 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
       }
 
       exposes.forEach((exposeFound) => {
+        // Let's check we effectively found a valid EXPOSE and not
+        // just a higher node
+        if (!exposeFound.feature.category) {
+          return;
+        }
+        const deviceFeatureId = getDeviceFeatureId(
+          zwaveJsDevice.id,
+          commandClassName,
+          endpoint,
+          propertyName,
+          propertyKeyName,
+          exposeFound.name,
+        );
+
         features.push({
           ...exposeFound.feature,
           name: `${value.id}${exposeFound.name !== '' ? `:${exposeFound.name}` : ''}`,
-          external_id: getDeviceFeatureId(
-            zwaveJsDevice.id,
-            commandClassName,
-            endpoint,
-            propertyName,
-            propertyKeyName,
-            exposeFound.name,
-          ),
-          selector: getDeviceFeatureId(
-            zwaveJsDevice.id,
-            commandClassName,
-            endpoint,
-            propertyName,
-            propertyKeyName,
-            exposeFound.name,
-          ),
+          external_id: deviceFeatureId,
+          selector: deviceFeatureId,
           node_id: zwaveJsDevice.id,
           // These are custom properties only available on the object in memory (not in DB)
           command_class_version: commandClassVersion,

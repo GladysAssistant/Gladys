@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   OPENING_SENSOR_STATE,
   STATE,
+  BUTTON_STATUS,
   COVER_STATE,
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
@@ -40,6 +41,28 @@ const STATES = {
               return STATE.OFF;
             case true:
               return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
+  central_scene: {
+    scene: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case 0:
+              return BUTTON_STATUS.CLICK;
+            case 1:
+              return BUTTON_STATUS.RELEASE;
+            case 2:
+              return BUTTON_STATUS.HOLD_CLICK;
+            case 3:
+              return BUTTON_STATUS.DOUBLE_CLICK;
+            case 4:
+              return BUTTON_STATUS.TRIPLE;
             default:
               return null;
           }
@@ -261,6 +284,17 @@ const EXPOSES = {
       keep_history: true,
       read_only: false,
       has_feedback: false,
+    },
+  },
+  central_scene: {
+    scene: {
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      min: 0,
+      max: 4,
+      keep_history: false,
+      read_only: true,
+      has_feedback: true,
     },
   },
   multilevel_sensor: {

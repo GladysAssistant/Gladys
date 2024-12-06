@@ -14,7 +14,7 @@ function onNodeValueUpdated(message) {
   // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
   const messageNode = message.data[0];
   const updatedValue = message.data[1];
-  const { commandClassName, propertyName, propertyKeyName, endpoint, newValue } = updatedValue;
+  const { commandClassName, propertyName, propertyKeyName, endpoint = 0, newValue } = updatedValue;
 
   const nodeId = `zwavejs-ui:${messageNode.id}`;
   const node = this.getDevice(nodeId);
@@ -27,7 +27,9 @@ function onNodeValueUpdated(message) {
     return Promise.resolve();
   }
 
-  const valueConverters = getProperty(STATES, commandClassName, propertyName, propertyKeyName, zwaveJSNode.deviceClass);
+  const valueConverters =
+    getProperty(STATES, commandClassName, propertyName, propertyKeyName, zwaveJSNode.deviceClass) ||
+    getProperty(STATES, commandClassName, propertyName, '', zwaveJSNode.deviceClass);
 
   if (!valueConverters) {
     return Promise.resolve();
