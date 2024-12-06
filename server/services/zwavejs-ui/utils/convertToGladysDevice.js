@@ -46,7 +46,14 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(zwaveJsDevice.values).forEach((valueKey) => {
     const value = zwaveJsDevice.values[valueKey];
-    const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
+    const {
+      commandClass,
+      commandClassName,
+      propertyName,
+      propertyKeyName,
+      endpoint = 0,
+      commandClassVersion = 1,
+    } = value;
 
     let exposes =
       getProperty(EXPOSES, commandClassName, propertyName, propertyKeyName, zwaveJsDevice.deviceClass) ||
