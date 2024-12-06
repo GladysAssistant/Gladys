@@ -38,6 +38,11 @@ class GoogleCastClient {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  setVolume(volume, cb) {
+    cb(null, 30);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   close() {}
 }
 
@@ -80,14 +85,14 @@ describe('GoogleCastHandler.setValue', () => {
     googleCastHandler.scanTimeout = 1;
     const devices = await googleCastHandler.scan();
     const device = devices[0];
-    await googleCastHandler.setValue(device, device.features[0], 'http://play-url.com');
+    await googleCastHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
   });
   it('should return device not found', async () => {
     googleCastHandler.scanTimeout = 1;
     const device = {
       external_id: 'google_cast:toto',
     };
-    const promise = googleCastHandler.setValue(device, {}, 'http://play-url.com');
+    const promise = googleCastHandler.setValue(device, {}, 'http://play-url.com', { volume: 30 });
     await assert.isRejected(promise, 'Device not found on network');
   });
 });
