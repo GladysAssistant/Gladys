@@ -31,7 +31,7 @@ async function setValue(device, deviceFeature, value, options) {
     await sonosDevice.PlayNotification({
       trackUri: value,
       onlyWhenPlaying: false,
-      volume: options.volume || 45, // Set the volume for the notification (and revert back afterwards)
+      volume: options?.volume || 45, // Set the volume for the notification (and revert back afterwards)
       timeout: 20, // If the events don't work (to see when it stops playing) or if you turned on a stream,
       // it will revert back after this amount of seconds.
       delayMs: 700, // Pause between commands in ms, (when sonos fails to play sort notification sounds).

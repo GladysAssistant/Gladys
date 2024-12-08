@@ -1,3 +1,5 @@
+const { promisify } = require('util');
+
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 /**
@@ -20,17 +22,12 @@ async function setValue(device, deviceFeature, value, options) {
     const { Client, DefaultMediaReceiver } = this.googleCastLib;
     const client = new Client();
 
-    client.connect(ipAddress, () => {
+    client.connect(ipAddress, async () => {
       logger.debug('Google Cast Connected, launching app ...');
+      const setVolume = promisify(client.setVolume.bind(client));
 
       if (options.volume) {
-        client.setVolume({ level: options.volume / 100 }, (err, newvol) => {
-          if (err) {
-            logger.debug('there was an error setting the volume');
-          } else {
-            logger.debug('volume changed to %s', newvol);
-          }
-        });
+        await setVolume({ level: options.volume / 100 });
       }
 
       client.launch(DefaultMediaReceiver, (err, player) => {

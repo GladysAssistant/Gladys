@@ -20,7 +20,7 @@ async function setValue(device, deviceFeature, value, options) {
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
     const client = new this.Airtunes();
     const airplayDevice = client.add(ipAddress, {
-      volume: options.volume || 70,
+      volume: options?.volume || 70,
     });
     let decodeProcess;
 
