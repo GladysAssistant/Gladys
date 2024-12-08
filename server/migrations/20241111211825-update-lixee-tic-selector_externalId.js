@@ -560,7 +560,7 @@ module.exports = {
           const featureExternalId = externalId
             .replace(`${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}`, `${DEVICE_FEATURE_CATEGORIES.TELEINFORMATION}`)
             .replace(`${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT}`, `${DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS1}`);
-            
+
           const currentFields = {
             selector: featureSelector,
             external_id: featureExternalId,
@@ -890,7 +890,7 @@ module.exports = {
           const featureExternalId = externalId
             .replace(`${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}`, `${DEVICE_FEATURE_CATEGORIES.TELEINFORMATION}`)
             .replace(`${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER}`, `${DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN}`);
-            
+
           const currentFields = {
             selector: featureSelector,
             external_id: featureExternalId,
@@ -956,7 +956,7 @@ module.exports = {
           const featureExternalId = externalId
             .replace(`${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}`, `${DEVICE_FEATURE_CATEGORIES.TELEINFORMATION}`)
             .replace(`${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER}`, `${DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS}`);
-            
+
           const currentFields = {
             selector: featureSelector,
             external_id: featureExternalId,
