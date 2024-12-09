@@ -2926,7 +2926,8 @@
           "56": "Helligkeit Auf-Taste Loslassen",
           "57": "Helligkeit Ab-Taste gedrückt",
           "58": "Helligkeit Ab-Taste gehalten",
-          "59": "Helligkeit Ab-Taste Loslassen"
+          "59": "Helligkeit Ab-Taste Loslassen",
+          "60": "Gedrückt"
         }
       },
       "heater": {
