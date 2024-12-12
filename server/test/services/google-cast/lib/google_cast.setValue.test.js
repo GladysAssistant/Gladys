@@ -38,6 +38,11 @@ class GoogleCastClient {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  getVolume(cb) {
+    cb(null, { level: 1 });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   setVolume(volume, cb) {
     cb(null, 30);
   }

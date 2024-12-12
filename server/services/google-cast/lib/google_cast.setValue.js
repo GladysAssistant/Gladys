@@ -51,7 +51,6 @@ async function setValue(device, deviceFeature, value, options) {
 
         player.on('status', async (status) => {
           logger.debug('status broadcast playerState=%s', status.playerState);
-
           if (status.idleReason === 'FINISHED') {
             await setVolume({ level });
           }
