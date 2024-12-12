@@ -24,7 +24,10 @@ async function setValue(device, deviceFeature, value, options) {
 
     client.connect(ipAddress, async () => {
       logger.debug('Google Cast Connected, launching app ...');
+      const getVolume = promisify(client.getVolume.bind(client));
       const setVolume = promisify(client.setVolume.bind(client));
+
+      const { level } = await getVolume();
 
       if (options.volume) {
         await setVolume({ level: options.volume / 100 });
@@ -46,8 +49,12 @@ async function setValue(device, deviceFeature, value, options) {
           },
         };
 
-        player.on('status', (status) => {
+        player.on('status', async (status) => {
           logger.debug('status broadcast playerState=%s', status.playerState);
+
+          if (status.idleReason === 'FINISHED') {
+            await setVolume({ level });
+          }
         });
 
         logger.debug('app "%s" launched, loading media %s ...', player.session.displayName, media.contentId);
