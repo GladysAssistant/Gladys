@@ -217,6 +217,9 @@ class CheckTime extends Component {
                 <option value="contains">
                   <Text id="editScene.triggersCard.calendarEventIsComing.contains" />
                 </option>
+                <option value="does-not-contain">
+                  <Text id="editScene.triggersCard.calendarEventIsComing.doesNotContain" />
+                </option>
                 <option value="starts-with">
                   <Text id="editScene.triggersCard.calendarEventIsComing.startsWith" />
                 </option>
