@@ -440,12 +440,33 @@ const actionsFunc = {
     }
   },
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: async (self, action, scope, columnIndex, rowIndex) => {
-    // find if one event match the condition
-    const events = await self.calendar.findCurrentlyRunningEvent(
-      action.calendars,
-      action.calendar_event_name_comparator,
-      action.calendar_event_name,
-    );
+    let events = [];
+    // manage special does-not-contain condition
+    if (action.calendar_event_name_comparator === 'does-not-contain') {
+      // we want events containing the word from the condition
+      const eventThatContainsEventName = await self.calendar.findCurrentlyRunningEvent(
+        action.calendars,
+        'contains',
+        action.calendar_event_name,
+      );
+      // if at least one event is found containing the word, we want to stop the scene (so events stays empty)
+      // otherwise we need to check if there is at least another event not containing the word from condition
+      if (eventThatContainsEventName.length === 0) {
+        const eventThatDoesNotContainsEventName = await self.calendar.findCurrentlyRunningEvent(
+          action.calendars,
+          'does-not-contain',
+          action.calendar_event_name,
+        );
+        events = eventThatDoesNotContainsEventName;
+      }
+    } else {
+      // find if one event match the condition
+      events = await self.calendar.findCurrentlyRunningEvent(
+        action.calendars,
+        action.calendar_event_name_comparator,
+        action.calendar_event_name,
+      );
+    }
 
     const atLeastOneEventFound = events.length > 0;
     // If one event was found, and the scene should be stopped in that case

@@ -2223,6 +2223,7 @@
         "nameLabel": "If the name",
         "isExactly": "is exactly",
         "contains": "contains",
+        "doesNotContain": "does not contain",
         "startsWith": "starts with",
         "endsWith": "ends with",
         "hasAnyName": "has any name",

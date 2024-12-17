@@ -54,6 +54,12 @@ async function findCurrentlyRunningEvent(calendars, calendarEventNameComparator,
         [Op.like]: `%${calendarEventName}%`,
       };
       break;
+    case 'does-not-contain':
+      // @ts-ignore
+      queryParams.where.name = {
+        [Op.notLike]: `%${calendarEventName}%`,
+      };
+      break;
     case 'starts-with':
       // @ts-ignore
       queryParams.where.name = {

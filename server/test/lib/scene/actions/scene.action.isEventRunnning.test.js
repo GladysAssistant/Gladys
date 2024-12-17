@@ -14,7 +14,7 @@ const Calendar = require('../../../../lib/calendar');
 const event = new EventEmitter();
 
 describe('scene.action.isEventRunning', () => {
-  const calendar = new Calendar();
+  let calendar = new Calendar();
   let clock;
   const now = new Date();
   const startDate = dayjs(now)
@@ -24,6 +24,7 @@ describe('scene.action.isEventRunning', () => {
     .add(45, 'minute')
     .toDate();
   beforeEach(async () => {
+    calendar = new Calendar();
     clock = useFakeTimers(now);
   });
   afterEach(() => {
@@ -221,6 +222,129 @@ describe('scene.action.isEventRunning', () => {
             calendar_event_name_comparator: 'contains',
             calendar_event_name: 'text-not-found',
             stop_scene_if_event_not_found: true,
+          },
+        ],
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'hello',
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene);
+    assert.notCalled(message.sendToUser);
+  });
+  it('should execute condition is-event-running (does-not-contain), and send message because condition is true', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      description: 'my event description',
+      start: startDate,
+      end: endDate,
+    });
+    await executeActions(
+      { stateManager, event, message, calendar },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+            calendars: ['test-calendar'],
+            calendar_event_name_comparator: 'does-not-contain',
+            calendar_event_name: 'red',
+            stop_scene_if_event_not_found: true,
+            stop_scene_if_event_found: false,
+          },
+        ],
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'hello',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', 'hello');
+  });
+  it('should execute condition is-event-running (does-not-contain), and stop because condition is false', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my red event',
+      description: 'my event description',
+      start: startDate,
+      end: endDate,
+    });
+    const promise = executeActions(
+      { stateManager, event, message, calendar },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+            calendars: ['test-calendar'],
+            calendar_event_name_comparator: 'does-not-contain',
+            calendar_event_name: 'red',
+            stop_scene_if_event_not_found: true,
+            stop_scene_if_event_found: false,
+          },
+        ],
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'hello',
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene);
+    assert.notCalled(message.sendToUser);
+  });
+  it('should execute condition is-event-running (does-not-contain), and stop because condition is false', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my red event',
+      description: 'my event description',
+      start: startDate,
+      end: endDate,
+    });
+    await calendar.createEvent('test-calendar', {
+      id: '3cf3f147-96f6-484e-9655-e676fda4d578',
+      name: 'my second event',
+      description: 'my seconde event description',
+      start: startDate,
+      end: endDate,
+    });
+    const promise = executeActions(
+      { stateManager, event, message, calendar },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+            calendars: ['test-calendar'],
+            calendar_event_name_comparator: 'does-not-contain',
+            calendar_event_name: 'red',
+            stop_scene_if_event_not_found: true,
+            stop_scene_if_event_found: false,
           },
         ],
         [

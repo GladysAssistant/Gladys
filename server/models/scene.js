@@ -33,6 +33,7 @@ const actionSchema = Joi.array().items(
       calendar_event_name_comparator: Joi.string().valid(
         'is-exactly',
         'contains',
+        'does-not-contain',
         'starts-with',
         'ends-with',
         'has-any-name',
