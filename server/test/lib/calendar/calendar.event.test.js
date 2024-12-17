@@ -302,6 +302,21 @@ describe('calendar.findCurrentlyRunningEvent', () => {
     const eventsId = events.map((e) => e.id);
     expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
   });
+  it('should find event in calendar - does not contain', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(
+      ['test-calendar', 'test-calendar-random'],
+      'does-not-contain',
+      'random',
+    );
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
   it('should find event in calendar - starts-with', async () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
