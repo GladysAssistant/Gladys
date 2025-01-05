@@ -175,6 +175,9 @@ import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-pa
 // NodeRed integration
 import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
+// Free Mobile integration
+import FreeMobilePage from '../routes/integration/all/free-mobile';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -283,6 +286,8 @@ const AppRouter = connect(
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <NodeRedPage path="/dashboard/integration/device/node-red" />
+
+        <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />

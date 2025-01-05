@@ -24,7 +24,52 @@ class SceneCard extends Component {
     await this.setState({ saving: false });
   };
 
-  render(props, { saving }) {
+  getMobileView = (props, { saving }) => {
+    return (
+      <div class="list-group-item">
+        <div class="row align-items-center">
+          <a
+            href={`/dashboard/scene/${props.scene.selector}`}
+            class={cx('col-auto', {
+              [style.disabledSceneRow]: !props.scene.active
+            })}
+          >
+            <i class={`fe fe-${props.scene.icon}`} />
+          </a>
+          <a
+            href={`/dashboard/scene/${props.scene.selector}`}
+            class={cx('col', {
+              [style.disabledSceneRow]: !props.scene.active
+            })}
+          >
+            <div class="text-reset d-block">{props.scene.name}</div>
+            <div class="d-block text-secondary mt-n1">{props.scene.description}</div>
+            <div>
+              {props.scene.tags &&
+                props.scene.tags.map(tag => (
+                  <span class="badge badge-secondary mr-1">
+                    {tag.name.length > MAX_LENGTH_TAG ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...` : tag.name}
+                  </span>
+                ))}
+            </div>
+          </a>
+          <div class="col-auto">
+            <button
+              onClick={this.startScene}
+              type="button"
+              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+                'btn-loading': saving
+              })}
+            >
+              <i class="fe fe-play" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  getDesktopView = (props, { saving }) => {
     return (
       <div class="col-lg-3 p-2">
         <div
@@ -84,6 +129,13 @@ class SceneCard extends Component {
         </div>
       </div>
     );
+  };
+
+  render(props, state) {
+    if (props.showMobileView) {
+      return this.getMobileView(props, state);
+    }
+    return this.getDesktopView(props, state);
   }
 }
 

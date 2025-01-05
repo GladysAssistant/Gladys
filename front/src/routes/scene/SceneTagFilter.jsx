@@ -93,7 +93,7 @@ class SceneTagFilter extends Component {
           show: tagFilterDropdownOpened
         })}
       >
-        <button className="btn btn-secondary btn-sm dropdown-toggle ml-2" onClick={this.toggleTagFilterDropdown}>
+        <button className="btn btn-secondary btn-sm dropdown-toggle" onClick={this.toggleTagFilterDropdown}>
           <Text id="scene.filterTagsName" />
         </button>
         <div

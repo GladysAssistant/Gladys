@@ -568,6 +568,17 @@
       "configurationSuccess": "Successfully saved configuration.",
       "buttonSave": "Save"
     },
+    "free-mobile": {
+      "title": "Free Mobile",
+      "description": "Send SMS from Gladys using Free Mobile.",
+      "documentation": "Free Mobile Documentation",
+      "introduction": "This plugin allows you to send SMS to your Free cell phone via the notification service provided by Free. Enter your customer ID and the identification key below, which you can find on the <a href=\"https://mobile.free.fr\"> FreeMobile</a> website.",
+      "username": "Free Mobile Customer ID",
+      "key": "Identification key for the service",
+      "configurationError": "We could not save this configuration.",
+      "configurationSuccess": "Account configuration saved successfully.",
+      "saveButton": "Save"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights and plugs with the official hub",
@@ -1579,13 +1590,15 @@
     },
     "lanManager": {
       "title": "LAN Manager",
-      "description": "Manage you device through you local network.",
+      "description": "Presence detection via network scan",
       "deviceTab": "Devices",
       "discoverTab": "LAN Discover",
       "setupTab": "Presence scanner",
       "documentation": "Lan Manager documentation",
       "device": {
-        "title": "LAN Devices",
+        "title": "Devices added to the integration",
+        "explanation": "This integration allows you to detect user presence by scanning the network.",
+        "iosWarning": "Warning, this integration does not work with iOS devices.",
         "search": "Search devices",
         "noDevices": "No LAN devices added yet.",
         "manufacturerLabel": "Manufacturer",
@@ -1915,6 +1928,11 @@
         "textPlaceholder": "Message text",
         "explanationText": "To insert a variable, type '{{'. Be careful, you must have defined a variable beforehand in a 'Retrieve the last state' action placed before this message block."
       },
+      "smsSend": {
+        "textLabel": "Message",
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -2097,6 +2115,9 @@
       "message": {
         "send": "Send Message",
         "send-camera": "Send a camera image"
+      },
+      "sms": {
+        "send": "Send SMS"
       },
       "delay": "Wait",
       "light": {
@@ -2984,7 +3005,8 @@
           "56": "Brightness Up Release",
           "57": "Brightness Down Click",
           "58": "Brightness Down Hold",
-          "59": "Brightness Down Release"
+          "59": "Brightness Down Release",
+          "60": "Pressed"
         }
       },
       "heater": {
