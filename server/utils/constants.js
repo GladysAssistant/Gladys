@@ -63,6 +63,7 @@ const BUTTON_STATUS = {
   BRIGHTNESS_DOWN_CLICK: 57,
   BRIGHTNESS_DOWN_HOLD: 58,
   BRIGHTNESS_DOWN_RELEASE: 59,
+  PRESSED: 60,
 };
 
 const COVER_STATE = {
@@ -422,6 +423,9 @@ const ACTIONS = {
   },
   MUSIC: {
     PLAY_NOTIFICATION: 'music.play-notification',
+  },
+  SMS: {
+    SEND: 'sms.send',
   },
 };
 

@@ -33,6 +33,7 @@ import SendZigbee2MqttMessage from './actions/SendZigbee2MqttMessage';
 import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
+import SendSms from './actions/SendSms';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -68,7 +69,8 @@ const ACTION_ICON = {
   [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.AI.ASK]: 'fe fe-cpu'
+  [ACTIONS.AI.ASK]: 'fe fe-cpu',
+  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -107,11 +109,13 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
           props.action.type === ACTIONS.MQTT.SEND ||
           props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
-          props.action.type === ACTIONS.LIGHT.BLINK,
+          props.action.type === ACTIONS.LIGHT.BLINK ||
+          props.action.type === ACTIONS.SMS.SEND,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
-          props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING
+          props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
+          props.action.type !== ACTIONS.SMS.SEND
       })}
     >
       <div
@@ -419,6 +423,17 @@ const ActionCard = ({ children, ...props }) => {
           )}
           {props.action.type === ACTIONS.AI.ASK && (
             <AskAI
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.SMS.SEND && (
+            <SendSms
               action={props.action}
               columnIndex={props.columnIndex}
               index={props.index}

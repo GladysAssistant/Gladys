@@ -489,6 +489,17 @@
       "configurationSuccess": "Konfiguration erfolgreich gesichert.",
       "buttonSave": "Sichern"
     },
+    "free-mobile": {
+      "title": "Free Mobile",
+      "description": "SMS von Gladys über Free Mobile senden.",
+      "documentation": "Free Mobile Dokumentation",
+      "introduction": "Dieses Plugin ermöglicht es Ihnen, SMS an Ihr Free-Handy über den Benachrichtigungsdienst von Free zu senden. Geben Sie Ihre Kundennummer und den Identifizierungsschlüssel unten ein, den Sie auf der <a href=\"https://mobile.free.fr\"> FreeMobile</a>-Website finden.",
+      "username": "Free Mobile Kundennummer",
+      "key": "Identifizierungsschlüssel für den Dienst",
+      "configurationError": "Wir konnten diese Konfiguration nicht speichern.",
+      "configurationSuccess": "Die Kontokonfiguration wurde erfolgreich gespeichert.",
+      "saveButton": "Sichern"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Steuere Philips-Hue-Lichter und -Steckdosen mit der offiziellen Bridge.",
@@ -1500,13 +1511,15 @@
     },
     "lanManager": {
       "title": "LAN-Manager",
-      "description": "Verwalte deine Geräte über dein lokales Netzwerk.",
+      "description": "Anwesenheitserkennung über Netzwerkscan",
       "deviceTab": "Meine Geräte",
       "discoverTab": "Geräte in der Nähe",
       "setupTab": "Anwesenheitsscanner",
       "documentation": "LAN-Manager-Dokumentation",
       "device": {
-        "title": "Meine Geräte",
+        "title": "Geräte zur Integration hinzugefügt",
+        "explanation": "Diese Integration ermöglicht es Ihnen, die Anwesenheit von Benutzern durch einen Netzwerkscan zu erkennen.",
+        "iosWarning": "Achtung, diese Integration funktioniert nicht mit iOS-Geräten.",
         "search": "Geräte suchen",
         "noDevices": "Du hast noch keine LAN-Geräte hinzugefügt.",
         "manufacturerLabel": "Hersteller",
@@ -1836,6 +1849,11 @@
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
       },
+      "smsSend": {
+        "textLabel": "Nachricht",
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
+        "messagePlaceholder": "Meine Message"
+      },
       "turnOnLights": {
         "label": "Wähle die Lichter aus, die eingeschaltet werden sollen"
       },
@@ -2018,6 +2036,9 @@
       "message": {
         "send": "Nachricht senden",
         "send-camera": "Kameraaufnahme senden"
+      },
+      "sms": {
+        "send": "SMS senden"
       },
       "delay": "Warten",
       "light": {
@@ -2905,7 +2926,8 @@
           "56": "Helligkeit Auf-Taste Loslassen",
           "57": "Helligkeit Ab-Taste gedrückt",
           "58": "Helligkeit Ab-Taste gehalten",
-          "59": "Helligkeit Ab-Taste Loslassen"
+          "59": "Helligkeit Ab-Taste Loslassen",
+          "60": "Gedrückt"
         }
       },
       "heater": {

@@ -225,6 +225,7 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
+
   [ACTIONS.SCENE.START]: async (self, action, scope) => {
     if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
       logger.info(
@@ -587,6 +588,14 @@ const actionsFunc = {
     const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url);
+  },
+  [ACTIONS.SMS.SEND]: async (self, action, scope) => {
+    const freeMobileService = self.service.getService('free-mobile');
+
+    if (freeMobileService) {
+      const textWithVariables = Handlebars.compile(action.text)(scope);
+      freeMobileService.sms.send(textWithVariables);
+    }
   },
 };
 

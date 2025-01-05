@@ -43,8 +43,7 @@ async function getImage(device) {
 
     // For rtsp protocol, add tcp transport to avoid green band of pixels)
     if (cameraUrlParam.value.includes('rtsp')) {
-      args.push('-rtsp_transport');
-      args.push('tcp');
+      args.unshift('-rtsp_transport', 'tcp');
     }
 
     args.push('-vf');
