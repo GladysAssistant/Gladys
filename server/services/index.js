@@ -28,3 +28,5 @@ module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
 module.exports['google-cast'] = require('./google-cast');
+module.exports.airplay = require('./airplay');
+module.exports['free-mobile'] = require('./free-mobile');

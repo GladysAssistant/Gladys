@@ -87,6 +87,8 @@ addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_CLICK, 'brightness_down_click
 addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_HOLD, 'brightness_down_hold');
 addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_RELEASE, 'brightness_down_release');
 
+addMapping('action', BUTTON_STATUS.PRESSED, 'pressed');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

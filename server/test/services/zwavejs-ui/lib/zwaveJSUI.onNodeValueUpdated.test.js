@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
-const { STATE } = require('../../../../utils/constants');
+const { STATE, BUTTON_STATUS } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -806,5 +806,268 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       device_feature_external_id: 'zwavejs-ui:6:0:multilevel_switch:currentvalue:position',
       state: 45,
     });
+  });
+
+  it('should handle a click scene controller value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: 0,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: 0,
+          stateless: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+      state: BUTTON_STATUS.CLICK,
+    });
+  });
+  it('should handle a released button scene controller value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: 1,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: 1,
+          stateless: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+      state: BUTTON_STATUS.RELEASE,
+    });
+  });
+  it('should handle a hold button scene controller value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: 2,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: 2,
+          stateless: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+      state: BUTTON_STATUS.HOLD_CLICK,
+    });
+  });
+  it('should handle a double click scene controller value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: 3,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: 3,
+          stateless: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+      state: BUTTON_STATUS.DOUBLE_CLICK,
+    });
+  });
+  it('should handle a triple click scene controller value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: 4,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: 4,
+          stateless: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+      state: BUTTON_STATUS.TRIPLE,
+    });
+  });
+
+  it('should not fail on unknown value from scene controller', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:central_scene:scene:001',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Central Scene',
+          commandClass: 91,
+          property: 'scene',
+          propertyKey: '001',
+          value: -1,
+          propertyName: 'scene',
+          propertyKeyName: '001',
+          newValue: -1,
+          stateless: true,
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
   });
 });

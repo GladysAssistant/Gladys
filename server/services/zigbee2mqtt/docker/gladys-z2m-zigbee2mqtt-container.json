@@ -1,6 +1,6 @@
 {
   "name": "gladys-z2m-zigbee2mqtt",
-  "Image": "koenkk/zigbee2mqtt:latest",
+  "Image": "koenkk/zigbee2mqtt:1.42.0",
   "ExposedPorts": {},
   "HostConfig": {
     "Binds": [],

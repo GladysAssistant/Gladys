@@ -22,5 +22,10 @@
   {
     "key": "openai",
     "img": "/assets/integrations/cover/openai.jpg"
+  },
+  {
+    "key": "free-mobile",
+    "link": "free-mobile",
+    "img": "/assets/integrations/cover/free-mobile.jpg"
   }
 ]

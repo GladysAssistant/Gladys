@@ -617,6 +617,17 @@
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
       "buttonSave": "Sauvegarder"
     },
+    "free-mobile": {
+      "title": "Free Mobile",
+      "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
+      "documentation": "Documentation Free Mobile",
+      "introduction": "Ce plugin vous permet d’envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
+      "username": "Identifiant client Free Mobile",
+      "key": "Clé d'identification au service",
+      "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
+      "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
+      "saveButton": "Sauvegarder"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Contrôler les lumières Philips Hue.",
@@ -1258,6 +1269,41 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "airplay": {
+      "title": "Airplay",
+      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Airplay",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Airplay",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Airplay",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Airplay dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Airplay trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Airplay sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Airplay. Est-ce que votre enceinte Airplay est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Airplay n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Contrôler vos appareils dans Z-Wave JS UI",
@@ -1625,13 +1671,15 @@
     },
     "lanManager": {
       "title": "LAN Manager",
-      "description": "Gérez les appareils sur votre réseau local.",
+      "description": "Détection de présence via scan réseau",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte LAN",
       "setupTab": "Scanner de présence",
       "documentation": "Documentation LAN Manager",
       "device": {
-        "title": "Appareils LAN",
+        "title": "Appareils ajoutés à l'intégration",
+        "explanation": "Cette intégration vous permet de détecter la présence des utilisateurs en scannant le réseau.",
+        "iosWarning": "Attention, cette intégration ne fonctionne pas avec les appareils iOS.",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
         "manufacturerLabel": "Constructeur",
@@ -1800,6 +1848,11 @@
         "textLabel": "Ma question pour l'IA",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
+      "smsSend": {
+        "textLabel": "Message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
       },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
@@ -1983,6 +2036,9 @@
       "message": {
         "send": "Envoyer un message",
         "send-camera": "Envoyer une image de caméra"
+      },
+      "sms": {
+        "send": "Envoyer un sms"
       },
       "delay": "Attendre",
       "light": {
@@ -2870,7 +2926,8 @@
           "56": "Luminosité Plus Relâchée",
           "57": "Luminosité Moins Clic",
           "58": "Luminosité Moins Maintenu",
-          "59": "Luminosité Moins Relâchée"
+          "59": "Luminosité Moins Relâchée",
+          "60": "Pressé"
         }
       },
       "heater": {
