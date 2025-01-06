@@ -1,6 +1,7 @@
 const path = require('path');
 const fse = require('fs-extra');
 const fs = require('fs');
+const { isURL, validateUrl } = require('../../utils/url');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { exec } = require('../../utils/childProcess');
@@ -20,8 +21,9 @@ async function downloadBackup(fileUrl) {
   if (encryptKey === null) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
-  // Extract file name
-  const fileWithoutSignedParams = fileUrl.split('?')[0];
+
+  // validate url
+  const fileWithoutSignedParams = isURL(fileUrl) ? validateUrl(fileUrl) : fileUrl;
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
   await fse.ensureDir(restoreFolderPath);
