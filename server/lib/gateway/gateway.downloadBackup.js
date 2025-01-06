@@ -22,14 +22,14 @@ async function downloadBackup(fileUrl) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
 
-  const value = isURL(fileUrl) ? validateUrl(fileUrl) : fileUrl;
+  const fileWithoutSignedParams = isURL(fileUrl) ? validateUrl(fileUrl) : fileUrl;
   const restoreFolderPath = path.join(this.config.backupsFolder, RESTORE_FOLDER);
   // we ensure the restore backup folder exists
   await fse.ensureDir(restoreFolderPath);
   // we empty the restore backup folder
   await fse.emptyDir(restoreFolderPath);
 
-  const encryptedBackupName = path.basename(value, '.enc');
+  const encryptedBackupName = path.basename(fileWithoutSignedParams, '.enc');
   const encryptedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.enc`);
   const compressedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.gz`);
 
