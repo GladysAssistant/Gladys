@@ -27,7 +27,7 @@ const defaultConfigFilePath = path.join(configBasePath, 'z2m_default_config.yaml
 const mqttConfigFilePath = path.join(configBasePath, 'z2m_mqtt_config.yaml');
 const mqttOtherConfigFilePath = path.join(configBasePath, 'z2m_mqtt-other_config.yaml');
 const deconzConfigFilePath = path.join(configBasePath, 'z2m_adapter-deconz_config.yaml');
-const ezspConfigFilePath = path.join(configBasePath, 'z2m_adapter-ezsp_config.yaml');
+const emberznetConfigFilePath = path.join(configBasePath, 'z2m_adapter-emberznet_config.yaml');
 const portConfigFilePath = path.join(configBasePath, 'z2m_port_config.yaml');
 
 describe('zigbee2mqtt configureContainer', () => {
@@ -150,20 +150,20 @@ describe('zigbee2mqtt configureContainer', () => {
   it('it should only add serial adapter', async () => {
     // PREPARE
     const config = {
-      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EZSP][0],
+      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0],
     };
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    const expectedContent = fs.readFileSync(ezspConfigFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(emberznetConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.be.eq(true);
   });
 
   it('it should remove serial adapter (adapter is not set)', async () => {
     // PREPARE
-    fs.copyFileSync(ezspConfigFilePath, configFilePath);
+    fs.copyFileSync(emberznetConfigFilePath, configFilePath);
     const config = {};
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
@@ -176,7 +176,7 @@ describe('zigbee2mqtt configureContainer', () => {
 
   it('it should remove serial adapter (adapter is expliclty none)', async () => {
     // PREPARE
-    fs.copyFileSync(ezspConfigFilePath, configFilePath);
+    fs.copyFileSync(emberznetConfigFilePath, configFilePath);
     const config = {
       z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.NONE][0],
     };
@@ -191,22 +191,22 @@ describe('zigbee2mqtt configureContainer', () => {
 
   it('it should keep serial adapter', async () => {
     // PREPARE
-    fs.copyFileSync(ezspConfigFilePath, configFilePath);
+    fs.copyFileSync(emberznetConfigFilePath, configFilePath);
     const config = {
-      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EZSP][0],
+      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0],
     };
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
-    const expectedContent = fs.readFileSync(ezspConfigFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(emberznetConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.be.eq(false);
   });
 
   it('it should override serial adapter', async () => {
     // PREPARE
-    fs.copyFileSync(ezspConfigFilePath, configFilePath);
+    fs.copyFileSync(emberznetConfigFilePath, configFilePath);
     const config = {
       z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.DECONZ][0],
     };
@@ -221,7 +221,7 @@ describe('zigbee2mqtt configureContainer', () => {
 
   it('it should remove serial adapter (unknown adapter)', async () => {
     // PREPARE
-    fs.copyFileSync(ezspConfigFilePath, configFilePath);
+    fs.copyFileSync(emberznetConfigFilePath, configFilePath);
     const config = { z2mDongleName: 'this-is-not-a-real-adapter' };
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
