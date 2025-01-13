@@ -2927,7 +2927,19 @@
           "57": "Luminosité Moins Clic",
           "58": "Luminosité Moins Maintenu",
           "59": "Luminosité Moins Relâchée",
-          "60": "Pressé"
+          "60": "Pressé",
+          "61": "Simple Gauche",
+          "62": "Simple Droit",
+          "63": "Simple sur les deux",
+          "64": "Double Gauche",
+          "65": "Double Droit",
+          "66": "Double sur les deux",
+          "67": "Triple Gauche",
+          "68": "Triple Droit",
+          "69": "Triple sur les deux",
+          "70": "Maintenu Gauche",
+          "71": "Maintenu Droit",
+          "72": "Maintenu sur les deux"
         }
       },
       "heater": {
