@@ -54,7 +54,22 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       payload: err,
     });
 
-    this.disconnect();
+    if (!this.reconnecting) {
+      this.reconnecting = true;
+      logger.warn('Attempting to reconnect to MQTT server...');
+
+      setTimeout(() => {
+        this.connect({
+          mqttUrl: mqttUrl,
+          mqttUsername: mqttUsername,
+          mqttPassword: mqttPassword
+        }).finally(() => {
+          this.reconnecting = false;
+        });
+      }, 500);
+    } else {
+      this.disconnect();
+    }
   });
   this.mqttClient.on('offline', () => {
     logger.warn(`Disconnected from MQTT server`);

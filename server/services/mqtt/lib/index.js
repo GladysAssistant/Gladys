@@ -39,6 +39,7 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
   this.connected = false;
   this.debugMode = false;
   this.debugModeTimeout = 120 * 1000;
+  this.reconnecting = false;
 };
 
 MqttHandler.prototype.init = init;
