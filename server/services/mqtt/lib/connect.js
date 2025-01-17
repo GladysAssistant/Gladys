@@ -53,6 +53,8 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
       payload: err,
     });
+
+    this.disconnect();
   });
   this.mqttClient.on('offline', () => {
     logger.warn(`Disconnected from MQTT server`);
