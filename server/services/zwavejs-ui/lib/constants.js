@@ -49,6 +49,22 @@ const STATES = {
       },
     ],
   },
+  binary_sensor: {
+    any: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
   binary_switch: {
     currentvalue: [
       {
@@ -314,6 +330,17 @@ const EXPOSES = {
       max: 1,
     },
   },
+  binary_sensor: {
+    any: {
+      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      min: 0,
+      max: 1,
+      read_only: true,
+      has_feedback: true,
+      keep_history: true,
+    },
+  },
   binary_switch: {
     currentvalue: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -352,7 +379,7 @@ const EXPOSES = {
       type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       unit: DEVICE_FEATURE_UNITS.LUX,
       min: 0,
-      max: 100_000,
+      max: 100000,
       keep_history: true,
       read_only: true,
       has_feedback: false,
@@ -524,6 +551,7 @@ const EXPOSES = {
 const COMMANDCLASS = {
   BINARY_SWITCH: 37,
   MULTILEVEL_SWITCH: 38,
+  BINARY_SENSOR: 48,
 };
 
 module.exports = {

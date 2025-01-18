@@ -6,6 +6,7 @@ const { fake } = sinon;
 const exampleData = require('./exampleData.json');
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
+const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -626,6 +627,26 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
       {
         external_id: 'zwavejs-ui:41',
         features: [
+          {
+            category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+            command_class: 48,
+            command_class_name: 'Binary Sensor',
+            command_class_version: 1,
+            endpoint: 0,
+            external_id: 'zwavejs-ui:41:0:binary_sensor:any',
+            feature_name: '',
+            has_feedback: true,
+            keep_history: true,
+            max: 1,
+            min: 0,
+            name: '41-48-0-Any',
+            node_id: 41,
+            property_key_name: undefined,
+            property_name: 'Any',
+            read_only: true,
+            selector: 'zwavejs-ui:41:0:binary_sensor:any',
+            type: 'binary',
+          },
           {
             category: 'temperature-sensor',
             command_class: 49,

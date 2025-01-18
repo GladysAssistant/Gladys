@@ -2,6 +2,7 @@ const cleanNames = require('./cleanNames');
 
 const { EXPOSES, PARAMS, COMMANDCLASS } = require('../lib/constants');
 const getProperty = require('./getProperty');
+const { refineCategory } = require('../lib/zwaveJSUI.refineCategory');
 
 const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, featureName) => {
   const propertyKeyNameClean = cleanNames(propertyKeyName);
@@ -83,6 +84,8 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
           propertyKeyName,
           exposeFound.name,
         );
+
+        refineCategory(exposeFound, value);
 
         features.push({
           ...exposeFound.feature,
