@@ -275,6 +275,27 @@ const ACTIONS = {
  * List of supported features.
  */
 const EXPOSES = {
+  battery: {
+    level: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      unit: DEVICE_FEATURE_UNITS.PERCENT,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 100,
+    },
+    islow: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 1,
+    },
+  },
   binary_switch: {
     currentvalue: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
