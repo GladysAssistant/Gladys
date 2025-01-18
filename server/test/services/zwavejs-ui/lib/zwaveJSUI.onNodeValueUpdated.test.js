@@ -478,6 +478,51 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
   });
 
+  it('should save a new illuminance value', async () => {
+    const NEW_LUMINANCE_VALUE = 120;
+
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:multilevel_sensor:illuminance',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Multilevel Sensor',
+          commandClass: 49,
+          property: 'Illuminance',
+          endpoint: 0,
+          newValue: NEW_LUMINANCE_VALUE,
+          prevValue: 0,
+          propertyName: 'Illuminance',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:illuminance',
+      state: NEW_LUMINANCE_VALUE,
+    });
+  });
+
   it('should save a new power value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [

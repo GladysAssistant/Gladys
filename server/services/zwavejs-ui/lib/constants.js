@@ -89,6 +89,7 @@ const STATES = {
   },
   multilevel_sensor: {
     air_temperature: [{ converter: (val) => val }],
+    illuminance: [{ converter: (val) => val }],
     power: [{ converter: (val) => val }],
   },
   multilevel_switch: {
@@ -342,6 +343,16 @@ const EXPOSES = {
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
       min: -100,
       max: 150,
+      keep_history: true,
+      read_only: true,
+      has_feedback: false,
+    },
+    illuminance: {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.LUX,
+      min: 0,
+      max: 100_000,
       keep_history: true,
       read_only: true,
       has_feedback: false,
