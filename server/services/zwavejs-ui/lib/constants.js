@@ -32,6 +32,23 @@ const multilevelSwitchCurtainsStateDefault = {
  * Gladys format.
  */
 const STATES = {
+  battery: {
+    level: [{ converter: (val) => val }],
+    islow: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
   binary_switch: {
     currentvalue: [
       {
@@ -288,7 +305,7 @@ const EXPOSES = {
     },
     islow: {
       category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
-      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
       read_only: true,
       keep_history: true,
       has_feedback: true,

@@ -1070,4 +1070,171 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
     assert.notCalled(gladys.event.emit);
   });
+
+  it('should update battery level on new value received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    const BATTERY_LEVEL_RECEIVED = 2;
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:level',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'level',
+          value: BATTERY_LEVEL_RECEIVED,
+          propertyName: 'level',
+          newValue: BATTERY_LEVEL_RECEIVED,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:level',
+      state: BATTERY_LEVEL_RECEIVED,
+    });
+  });
+
+  it('should set battery not low on false received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          value: false,
+          propertyName: 'isLow',
+          newValue: false,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:islow',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should set battery low on true received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          value: true,
+          propertyName: 'isLow',
+          newValue: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:islow',
+      state: STATE.ON,
+    });
+  });
+
+  it('should not fail on battery unknown value received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          value: -1,
+          propertyName: 'isLow',
+          newValue: -1,
+        },
+      ],
+    });
+
+    assert.notCalled(gladys.event.emit);
+  });
 });
