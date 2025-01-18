@@ -29,7 +29,7 @@ function refineCategory(exposed, zwaveNodeValue) {
         exposed.feature.category = DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR;
         break;
       case 0x06:
-        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR;
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR;
         break;
       case 0x07:
         exposed.feature.category = DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR;
@@ -42,6 +42,32 @@ function refineCategory(exposed, zwaveNodeValue) {
         break;
       case 0x0c:
         exposed.feature.category = DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR;
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (
+    commandClass === COMMANDCLASS.ALARM_SENSOR &&
+    exposed.feature.category === DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR
+  ) {
+    const sensorType = zwaveNodeValue.ccSpecific?.sensorType ?? -1;
+    switch (sensorType) {
+      case 0x01:
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR;
+        break;
+      case 0x02:
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.CO_SENSOR;
+        break;
+      case 0x03:
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.CO2_SENSOR;
+        break;
+      case 0x04:
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR;
+        break;
+      case 0x05:
+        exposed.feature.category = DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR;
         break;
       default:
         break;

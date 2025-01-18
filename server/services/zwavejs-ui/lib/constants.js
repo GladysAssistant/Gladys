@@ -32,6 +32,10 @@ const multilevelSwitchCurtainsStateDefault = {
  * Gladys format.
  */
 const STATES = {
+  alarm_sensor: {
+    state: [{ converter: (val) => (val > 0 ? STATE.ON : STATE.OFF) }],
+    severity: [{ converter: (val) => val }],
+  },
   battery: {
     level: [{ converter: (val) => val }],
     islow: [
@@ -309,6 +313,26 @@ const ACTIONS = {
  * List of supported features.
  */
 const EXPOSES = {
+  alarm_sensor: {
+    state: {
+      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 1,
+    },
+    severity: {
+      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 255,
+    },
+  },
   battery: {
     level: {
       category: DEVICE_FEATURE_CATEGORIES.BATTERY,
@@ -549,9 +573,10 @@ const EXPOSES = {
 };
 
 const COMMANDCLASS = {
+  ALARM_SENSOR: 156,
+  BINARY_SENSOR: 48,
   BINARY_SWITCH: 37,
   MULTILEVEL_SWITCH: 38,
-  BINARY_SENSOR: 48,
 };
 
 module.exports = {
