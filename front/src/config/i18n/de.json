@@ -3026,6 +3026,11 @@
       "shortCategoryName": "Niedriger Batteriestand",
       "binary": "Niedriger Batteriestand (ja/nein)"
     },
+    "general-sensor": {
+      "shortCategoryName": "Sensor",
+      "binary": "Sensor (Ja/Nein)",
+      "integer": "Schweregrad"
+    },
     "temperature-sensor": {
       "shortCategoryName": "Temperatursensor",
       "decimal": "Temperatur"
