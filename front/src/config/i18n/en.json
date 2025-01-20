@@ -3026,11 +3026,6 @@
       "shortCategoryName": "Low Battery",
       "binary": "Low battery (yes/no)"
     },
-    "general-sensor": {
-      "shortCategoryName": "Sensor",
-      "binary": "Sensor (yes/no)",
-      "integer": "Severity"
-    },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
       "decimal": "Temperature"

@@ -482,7 +482,6 @@ const DEVICE_FEATURE_CATEGORIES = {
   DISTANCE_SENSOR: 'distance-sensor',
   DURATION: 'duration',
   ENERGY_SENSOR: 'energy-sensor',
-  GENERAL_SENSOR: 'general-sensor',
   HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',

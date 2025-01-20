@@ -12,7 +12,7 @@ function refineCategory(exposed, zwaveNodeValue) {
 
   if (
     commandClass === COMMANDCLASS.BINARY_SENSOR &&
-    exposed.feature.category === DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR
+    exposed.feature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR
   ) {
     const sensorType = zwaveNodeValue.ccSpecific?.sensorType ?? -1;
     switch (sensorType) {
@@ -50,7 +50,7 @@ function refineCategory(exposed, zwaveNodeValue) {
 
   if (
     commandClass === COMMANDCLASS.ALARM_SENSOR &&
-    exposed.feature.category === DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR
+    exposed.feature.category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR
   ) {
     const sensorType = zwaveNodeValue.ccSpecific?.sensorType ?? -1;
     switch (sensorType) {

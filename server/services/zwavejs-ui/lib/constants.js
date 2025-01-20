@@ -315,7 +315,7 @@ const ACTIONS = {
 const EXPOSES = {
   alarm_sensor: {
     state: {
-      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       read_only: true,
       keep_history: true,
@@ -324,7 +324,7 @@ const EXPOSES = {
       max: 1,
     },
     severity: {
-      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
       type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
       read_only: true,
       keep_history: true,
@@ -356,7 +356,7 @@ const EXPOSES = {
   },
   binary_sensor: {
     any: {
-      category: DEVICE_FEATURE_CATEGORIES.GENERAL_SENSOR,
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       min: 0,
       max: 1,

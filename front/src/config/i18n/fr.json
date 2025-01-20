@@ -3026,11 +3026,6 @@
       "shortCategoryName": "Batterie faible",
       "binary": "Batterie faible (Oui/Non)"
     },
-    "general-sensor": {
-      "shortCategoryName": "Capteur",
-      "binary": "Capteur (Oui/Non)",
-      "integer": "Gravité"
-    },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
       "decimal": "Température"
