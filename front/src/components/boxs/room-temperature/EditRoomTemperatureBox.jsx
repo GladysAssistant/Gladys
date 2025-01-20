@@ -49,7 +49,7 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
             {...props}
             style={{
               ...props.style,
-              transform: `translate(-50%, ${state.index === 0 ? '100%' : '-100%'})`
+              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`
             }}
           >
             <div
