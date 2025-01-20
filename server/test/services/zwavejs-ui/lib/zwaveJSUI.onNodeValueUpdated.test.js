@@ -1409,49 +1409,6 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should update alarm sensor severity on new value received', async () => {
-    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
-    const SEVERITY_RECEIVED = 2;
-    zwaveJSUIHandler.devices = [
-      {
-        external_id: 'zwavejs-ui:13',
-        features: [
-          {
-            external_id: 'zwavejs-ui:13:0:alarm_sensor:severity',
-          },
-        ],
-      },
-    ];
-    zwaveJSUIHandler.zwaveJSDevices = [
-      {
-        id: 13,
-        deviceClass: {
-          basic: 4,
-          generic: 24,
-          specific: 1,
-        },
-      },
-    ];
-
-    await zwaveJSUIHandler.onNodeValueUpdated({
-      data: [
-        { id: 13 },
-        {
-          commandClassName: 'Alarm Sensor',
-          commandClass: 156,
-          property: 'severity',
-          propertyName: 'severity',
-          prevValue: 0,
-          newValue: SEVERITY_RECEIVED,
-        },
-      ],
-    });
-    assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:13:0:alarm_sensor:severity',
-      state: SEVERITY_RECEIVED,
-    });
-  });
-
   it('should set alarm sensor state off on false received', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [

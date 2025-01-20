@@ -34,7 +34,6 @@ const multilevelSwitchCurtainsStateDefault = {
 const STATES = {
   alarm_sensor: {
     state: [{ converter: (val) => (val > 0 ? STATE.ON : STATE.OFF) }],
-    severity: [{ converter: (val) => val }],
   },
   battery: {
     level: [{ converter: (val) => val }],
@@ -322,15 +321,6 @@ const EXPOSES = {
       has_feedback: true,
       min: 0,
       max: 1,
-    },
-    severity: {
-      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-      read_only: true,
-      keep_history: true,
-      has_feedback: true,
-      min: 0,
-      max: 255,
     },
   },
   battery: {
