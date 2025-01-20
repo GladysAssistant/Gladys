@@ -5,11 +5,7 @@
     "1880/tcp": {}
   },
   "HostConfig": {
-    "Binds": [
-      "/var/lib/gladysassistant/node-red:/data",
-      "/dev:/dev",
-      "/run/udev:/run/udev:ro"
-    ],
+    "Binds": ["/var/lib/gladysassistant/node-red:/data", "/dev:/dev", "/run/udev:/run/udev:ro"],
     "LogConfig": {
       "Type": "json-file",
       "Config": {
