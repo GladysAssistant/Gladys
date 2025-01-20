@@ -61,7 +61,7 @@ const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultL
       labels: {
         padding: 4,
         formatter: function(value) {
-          if (Math.abs(value) < 1) {
+          if (Math.abs(value) < 1 || isNaN(value)) {
             return value; // For very low values, like crypto prices, use the normal value
           } else {
             return value.toFixed(2); // 2 decimal places for other values
