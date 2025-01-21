@@ -5,10 +5,7 @@
     "1880/tcp": {}
   },
   "HostConfig": {
-    "Binds": [
-      "/var/lib/gladysassistant/node-red:/data", 
-      "/run/udev:/run/udev:ro"
-    ],
+    "Binds": ["/var/lib/gladysassistant/node-red:/data", "/dev:/dev", "/run/udev:/run/udev:ro"],
     "LogConfig": {
       "Type": "json-file",
       "Config": {
@@ -30,13 +27,7 @@
     "DnsOptions": [],
     "DnsSearch": [],
     "BlkioWeightDevice": [],
-    "Devices": [
-      {
-        "PathOnHost": "/dev",
-        "PathInContainer": "/dev",
-        "CgroupPermissions": "rwm"
-      }
-    ]
+    "Devices": []
   },
   "NetworkDisabled": false,
   "AttachStdin": false,
