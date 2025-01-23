@@ -73,6 +73,7 @@ function setupGateway(gladys, routes) {
       // if not, we contact the error middleware with a not found error
       errorMiddleware(new NotFoundError(`Route ${req.url} not found`), req, res);
     }
+    return null;
   });
 }
 
