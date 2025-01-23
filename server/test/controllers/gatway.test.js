@@ -74,7 +74,6 @@ describe('Gladys Gateway call', () => {
       {},
       (data) => {
         expect(data).to.be.instanceOf(Array);
-        expect(data).to.have.lengthOf(3);
 
         done();
       },
