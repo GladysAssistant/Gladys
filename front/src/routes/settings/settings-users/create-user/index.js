@@ -54,6 +54,7 @@ class SettingsUsers extends Component {
       firstname: '',
       lastname: '',
       selector: '',
+      password: '',
       email: '',
       language: 'en',
       role: 'admin',
