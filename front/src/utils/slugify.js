@@ -15,6 +15,14 @@ function slugify(str) {
     .replace(/\s+/g, '-') // collapse whitespace and replace by -
     .replace(/-+/g, '-'); // collapse dashes
 
+  // Remove trailing and leading dashes if present
+  if (newString.startsWith('-')) {
+    newString = newString.slice(1);
+  }
+  if (newString.endsWith('-')) {
+    newString = newString.slice(0, -1);
+  }
+
   return newString;
 }
 
