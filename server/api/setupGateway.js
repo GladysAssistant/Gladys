@@ -62,6 +62,7 @@ function setupGateway(gladys, routes) {
       if (regexes[i - 1].admin) {
         if (user.role !== USER_ROLE.ADMIN) {
           errorMiddleware(new ForbiddenError('This route is only accessible to admin user.'), req, res);
+          return null;
         }
       }
       // and we call the controller
