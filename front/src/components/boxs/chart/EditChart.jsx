@@ -91,11 +91,20 @@ class EditChart extends Component {
     const colors = this.props.box.colors || [];
     if (value) {
       colors[i] = value;
-    } else {
-      colors[i] = null;
     }
-    const atLeastOneColor = colors.some(Boolean);
-    this.props.updateBoxConfig(this.props.x, this.props.y, { colors: atLeastOneColor ? colors : undefined });
+    // Make sure all colors are filled with a defaut color
+    for (let y = 0; y < this.state.selectedDeviceFeaturesOptions.length; y += 1) {
+      // if no color is filled, pick a default color in array
+      if (colors[y] === null || colors[y] === undefined) {
+        colors[y] = DEFAULT_COLORS[y];
+        // if we are outside of the default color array,
+        // Take the first default color
+        if (!colors[y]) {
+          colors[y] = DEFAULT_COLORS[0];
+        }
+      }
+    }
+    this.props.updateBoxConfig(this.props.x, this.props.y, { colors });
   };
 
   updateDisplayAxes = e => {
@@ -321,6 +330,7 @@ class EditChart extends Component {
   };
 
   moveDevice = async (currentIndex, newIndex) => {
+    // Move element
     const element = this.state.selectedDeviceFeaturesOptions[currentIndex];
 
     const newStateWithoutElement = update(this.state, {
@@ -335,6 +345,19 @@ class EditChart extends Component {
     });
     await this.setState(newState);
     this.refreshDeviceFeaturesNames();
+    // Move color if needed
+    if (this.props.box.colors && this.props.box.colors[currentIndex]) {
+      const currentColor = this.props.box.colors[currentIndex];
+      const newArrayWithoutOldColor = update(this.props.box.colors, {
+        $splice: [[currentIndex, 1]]
+      });
+      const newColorsArray = update(newArrayWithoutOldColor, {
+        $splice: [[newIndex, 0, currentColor]]
+      });
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        colors: newColorsArray
+      });
+    }
   };
 
   removeDevice = async index => {
@@ -343,6 +366,13 @@ class EditChart extends Component {
         $splice: [[index, 1]]
       }
     });
+    // Update color array
+    if (this.props.box.colors) {
+      const newColors = update(this.props.box.colors, {
+        $splice: [[index, 1]]
+      });
+      this.props.updateBoxConfig(this.props.x, this.props.y, { colors: newColors });
+    }
     await this.setState(newStateWithoutElement);
     await this.refreshDeviceFeaturesNames();
     this.refreshDeviceUnitAndChartType(this.state.selectedDeviceFeaturesOptions);
