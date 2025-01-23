@@ -11,10 +11,10 @@ const yAxisFormatter = value => {
     return roundedValue.toExponential(2); // Scientific notation with 2 decimals
   }
 
-  // For normal values, format with up to 4 decimal places
+  // For normal values, format with up to 2 decimal places
   return roundedValue.toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 4
+    maximumFractionDigits: 2
   });
 };
 
