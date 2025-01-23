@@ -1,4 +1,4 @@
-const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale }) => {
+const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale, minY, maxY, step }) => {
   const options = {
     chart: {
       locales,
@@ -49,6 +49,9 @@ const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales,
       type: 'datetime'
     },
     yaxis: {
+      min: minY,
+      max: maxY,
+      tickAmount: (maxY - minY) / step,
       labels: {
         padding: 4,
         formatter: function(value) {

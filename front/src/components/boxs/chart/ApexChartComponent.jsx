@@ -31,6 +31,33 @@ const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua',
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  calculateYAxisRange = () => {
+    const { series } = this.props;
+    // Extract all values from all series
+    const allValues = series.flatMap(serie => serie.data.map(([_, value]) => value));
+
+    const minVal = Math.min(...allValues);
+    const maxVal = Math.max(...allValues);
+
+    const range = maxVal - minVal;
+    const f = Math.pow(10, Math.floor(Math.log10(Math.abs(range)))); // Scaling factor
+
+    const minY = Math.floor(minVal / f) * f;
+    const maxY = Math.ceil(maxVal / f) * f;
+
+    // Optional: Constrain the step size
+    const theoreticalStep = (maxY - minY) / f;
+    let step = f; // Default step size
+
+    // Adjust step size for better visuals
+    if (theoreticalStep < 5) {
+      step = f / 2;
+    } else if (theoreticalStep > 10) {
+      step = f * 2;
+    }
+
+    return { minY, maxY, step };
+  };
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
@@ -143,8 +170,12 @@ class ApexChartComponent extends Component {
     } else {
       height = 200 + this.props.additionalHeight;
     }
+    const { minY, maxY, step } = this.calculateYAxisRange();
     const options = getApexChartLineOptions({
       height,
+      minY,
+      maxY,
+      step,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
@@ -197,6 +228,7 @@ class ApexChartComponent extends Component {
   };
   displayChart = () => {
     let options;
+
     if (this.props.chart_type === 'timeline') {
       options = this.getTimelineChartOptions();
     } else if (this.props.chart_type === 'area') {
