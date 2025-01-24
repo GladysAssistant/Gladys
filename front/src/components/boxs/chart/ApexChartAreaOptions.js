@@ -1,3 +1,5 @@
+import { yAxisFormatter } from './yAxisFormatter';
+
 const getApexChartAreaOptions = ({ displayAxes, height, series, colors, locales, defaultLocale }) => {
   const options = {
     chart: {
@@ -52,13 +54,7 @@ const getApexChartAreaOptions = ({ displayAxes, height, series, colors, locales,
     yaxis: {
       labels: {
         padding: 4,
-        formatter: function(value) {
-          if (Math.abs(value) < 1) {
-            return value; // For very low values, like crypto prices, use the normal value
-          } else {
-            return value.toFixed(2); // 2 decimal places for other values
-          }
-        }
+        formatter: yAxisFormatter
       }
     },
     colors,
