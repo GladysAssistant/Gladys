@@ -1,11 +1,22 @@
+const addRandomCharacter = (inputString) => {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let randomChars = '';
+  for (let i = 0; i < 4; i += 1) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomChars += characters[randomIndex];
+  }
+  return `${inputString}-${randomChars}`;
+};
+
 /**
  * @description Transform a string to a valid slug (useful for selector).
  * @param {string} str - The string to transform.
+ * @param {boolean} addRandomCharacters - If the slugify should add random characters at the end.
  * @returns {string} Return the slug.
  * @example
  * slugify('Living room light');
  */
-function slugify(str) {
+function slugify(str, addRandomCharacters = false) {
   let newString = str;
   newString = newString.replace(/^\s+|\s+$/g, ''); // trim
   newString = newString.toLowerCase();
@@ -28,6 +39,11 @@ function slugify(str) {
   }
   if (newString.endsWith('-')) {
     newString = newString.slice(0, -1);
+  }
+
+  // Add 4 random characters if needed
+  if (addRandomCharacters) {
+    newString = addRandomCharacter(newString);
   }
 
   return newString;

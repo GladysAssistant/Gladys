@@ -28,7 +28,10 @@ describe('SceneManager', () => {
       ],
       tags: [],
     });
-    expect(scene).to.have.property('selector', 'my-living-room');
+    expect(scene).to.have.property('selector');
+    expect(scene.selector).to.contain('my-living-room');
+    // selector should have 4 random characters at the end + dash
+    expect(scene.selector).to.have.lengthOf('my-living-room'.length + 5);
     assertSinon.calledOnce(brain.addNamedEntity);
   });
   it('should create one scene with custom selector', async () => {
