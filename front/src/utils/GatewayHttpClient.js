@@ -4,10 +4,10 @@ export class GatewayHttpClient {
   constructor(session) {
     this.session = session;
     this.session.dispatcher.addListener('GLADYS_GATEWAY_CONNECTED', this.emptyQueue.bind(this));
-    // we only allow max 5 concurrent API call to Gladys Plus
-    // to avoid overloading the user instance
+    // Allow a maximum of 5 concurrent API calls
     this.limiter = pLimit(5);
     this.queue = [];
+    this.pendingRequests = new Map(); // Cache for pending GET requests
   }
 
   async emptyQueue() {
@@ -15,6 +15,12 @@ export class GatewayHttpClient {
       func();
     });
     this.queue = [];
+  }
+
+  getCacheKey(url, query) {
+    // Create a unique key based on the URL and query parameters
+    const queryKey = query ? JSON.stringify(query) : '';
+    return `${url}?${queryKey}`;
   }
 
   async callApi(func, url, data) {
@@ -36,7 +42,7 @@ export class GatewayHttpClient {
     if (this.session.ready) {
       return this.callApi(func, url, data);
     }
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.queue.push(async () => {
         try {
           const response = await this.callApi(func, url, data);
@@ -49,7 +55,24 @@ export class GatewayHttpClient {
   }
 
   async get(url, query) {
-    return this.callApiWhenReady('sendRequestGet', url, query);
+    const cacheKey = this.getCacheKey(url, query);
+
+    // Check if a GET request with the same parameters is already in progress
+    if (this.pendingRequests.has(cacheKey)) {
+      return this.pendingRequests.get(cacheKey);
+    }
+
+    // If no request is in progress, create a new one and cache it
+    const requestPromise = this.callApiWhenReady('sendRequestGet', url, query);
+    this.pendingRequests.set(cacheKey, requestPromise);
+
+    try {
+      const result = await requestPromise;
+      return result;
+    } finally {
+      // Remove the completed request from the cache
+      this.pendingRequests.delete(cacheKey);
+    }
   }
 
   async post(url, body) {
