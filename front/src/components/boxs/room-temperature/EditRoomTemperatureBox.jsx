@@ -24,7 +24,7 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
         updateRoomSelection={updateBoxRoom(props.updateBoxRoom, props.x, props.y)}
       />
     </div>
-    <div className="form-group form-check">
+    <div className="form-group form-check mb-5">
       <label className="form-check-label">
         <input
           type="checkbox"
@@ -36,7 +36,7 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
         <Text id="dashboard.boxes.temperatureInRoom.thresholdsLabel" />
       </label>
     </div>
-    <div class="form-group">
+    <div class="form-group mb-2">
       <ReactSlider
         className={cx('temperature-slider', {
           'opacity-60': !(props.box.temperature_use_custom_value || false)
@@ -45,13 +45,26 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
         trackClassName="temperature-slider-track"
         defaultValue={[props.temperatureMin, props.temperatureMax]}
         renderThumb={(props, state) => (
-          <div {...props}>
-            <Text id="global.degreeValue" fields={{ value: state.valueNow }} />
-            <Text id={`global.${unit}`} />
+          <div
+            {...props}
+            style={{
+              ...props.style,
+              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`
+            }}
+          >
+            <div
+              className={`absolute ${state.index === 0 ? 'bottom-0' : 'top-0'}
+                left-1/2
+                -translate-x-1/2
+                whitespace-nowrap`}
+            >
+              <Text id="global.degreeValue" fields={{ value: state.valueNow }} />
+              <Text id={`global.${unit}`} />
+            </div>
           </div>
         )}
         pearling
-        minDistance={10}
+        minDistance={1}
         max={unit === DEVICE_FEATURE_UNITS.CELSIUS ? 50 : 122}
         min={unit === DEVICE_FEATURE_UNITS.CELSIUS ? -20 : -4}
         onAfterChange={props.updateBoxValue}
