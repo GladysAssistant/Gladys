@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { slugify } = require('../../utils/slugify');
 
 /**
  * @description Duplicate a scene.
@@ -35,6 +36,7 @@ async function duplicate(selector, name, icon) {
 
   const newScene = {
     name,
+    selector: slugify(name, true),
     icon,
     tags: plainExistingScene.tags,
     description: plainExistingScene.description,

@@ -2,17 +2,6 @@ import { RequestStatus } from '../utils/consts';
 import update from 'immutability-helper';
 import get from 'get-value';
 import { route } from 'preact-router';
-import slugify from '../utils/slugify';
-
-const addRandomCharacter = inputString => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomChars = '';
-  for (let i = 0; i < 4; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomChars += characters[randomIndex];
-  }
-  return `${inputString}-${randomChars}`;
-};
 
 function createActions(store) {
   const actions = {
@@ -42,11 +31,7 @@ function createActions(store) {
         createSceneStatus: RequestStatus.Getting
       });
       try {
-        const newSceneWithSelector = {
-          ...state.newScene,
-          selector: addRandomCharacter(slugify(state.newScene.name))
-        };
-        const createdScene = await state.httpClient.post('/api/v1/scene', newSceneWithSelector);
+        const createdScene = await state.httpClient.post('/api/v1/scene', state.newScene);
         store.setState({
           createSceneStatus: RequestStatus.Success
         });
