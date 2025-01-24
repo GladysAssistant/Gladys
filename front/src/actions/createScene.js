@@ -52,7 +52,6 @@ function createActions(store) {
         });
         route(`/dashboard/scene/${createdScene.selector}`);
       } catch (e) {
-        console.log(e);
         const status = get(e, 'response.status');
         if (status === 409) {
           store.setState({
