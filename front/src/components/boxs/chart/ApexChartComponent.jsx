@@ -34,7 +34,7 @@ class ApexChartComponent extends Component {
   calculateYAxisRange = () => {
     const { series } = this.props;
     // Extract all values from all series
-    const allValues = series.flatMap(serie => serie.data.map(([_, value]) => value));
+    const allValues = series.flatMap(serie => serie.data.map(([, value]) => value));
 
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
