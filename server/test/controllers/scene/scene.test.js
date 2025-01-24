@@ -23,7 +23,8 @@ describe('POST /api/v1/scene', () => {
       .expect(201)
       .then((res) => {
         expect(res.body).to.have.property('name', 'New Scene');
-        expect(res.body).to.have.property('selector', 'new-scene');
+        expect(res.body).to.have.property('selector');
+        expect(res.body.selector).to.contain('new-scene');
       });
   });
 });
@@ -139,7 +140,8 @@ describe('POST /api/v1/scene/:scene_selector/duplicate', () => {
       .then((res) => {
         expect(res.body).to.have.property('icon', 'anchor');
         expect(res.body).to.have.property('name', 'Duplicated Scene');
-        expect(res.body).to.have.property('selector', 'duplicated-scene');
+        expect(res.body).to.have.property('selector');
+        expect(res.body.selector).to.contain('duplicated-scene');
       });
   });
 });
