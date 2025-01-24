@@ -1,3 +1,5 @@
+import { yAxisFormatter } from './yAxisFormatter';
+
 const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale, minY, maxY, step }) => {
   const options = {
     chart: {
@@ -54,13 +56,7 @@ const getApexChartLineOptions = ({ height, displayAxes, series, colors, locales,
       tickAmount: (maxY - minY) / step,
       labels: {
         padding: 4,
-        formatter: function(value) {
-          if (Math.abs(value) < 1) {
-            return value; // For very low values, like crypto prices, use the normal value
-          } else {
-            return value.toFixed(2); // 2 decimal places for other values
-          }
-        }
+        formatter: yAxisFormatter
       }
     },
     colors,
