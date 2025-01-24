@@ -46,14 +46,14 @@ class ApexChartComponent extends Component {
     const maxY = Math.ceil(maxVal / f) * f;
 
     // Optional: Constrain the step size
-    const theoreticalStep = (maxY - minY) / f;
+    const nbTheoreticalStep = (maxY - minY) / f;
     let step = f; // Default step size
 
-    // Adjust step size for better visuals
-    if (theoreticalStep < 5) {
-      step = f / 2;
-    } else if (theoreticalStep > 10) {
-      step = f * 2;
+    // Adjust number of steps for better visuals
+    if (nbTheoreticalStep > 5) {
+      step = f * 2; // if too much steps, increase step size
+    } else if (nbTheoreticalStep < 3) {
+      step = f / 2; // if too few steps, reduce step size
     }
 
     return { minY, maxY, step };
