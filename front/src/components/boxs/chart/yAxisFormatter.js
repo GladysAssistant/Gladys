@@ -1,6 +1,11 @@
 const yAxisFormatter = value => {
+  if (Number.isNaN(value)) {
+    return value;
+  }
   // Handle zero as a special case
-  if (value === 0) return '0';
+  if (value === 0) {
+    return '0';
+  }
 
   // Round to 4 significant digits
   const significantDigits = 4;
