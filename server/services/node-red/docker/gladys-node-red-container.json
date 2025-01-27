@@ -5,6 +5,7 @@
     "1880/tcp": {}
   },
   "HostConfig": {
+    "Privileged": true,
     "Binds": ["/var/lib/gladysassistant/node-red:/data"],
     "LogConfig": {
       "Type": "json-file",
