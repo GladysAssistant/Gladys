@@ -1968,7 +1968,8 @@
         "whenFoundLabel": "If an event is found",
         "whenNotFoundLabel": "If no event is found",
         "stopScene": "Stop the scene",
-        "continueScene": "Continue the scene"
+        "continueScene": "Continue the scene",
+        "doesNotContainExplanation": "If at least one event containing the searched name is found, the other events will be ignored."
       },
       "ecowattCondition": {
         "description": "This conditions lets you check the status of the french electricity network",

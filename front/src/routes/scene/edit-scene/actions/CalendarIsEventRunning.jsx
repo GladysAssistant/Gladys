@@ -245,6 +245,13 @@ class CheckTime extends Component {
               </Localizer>
             </div>
           )}
+          {action.calendar_event_name_comparator === 'does-not-contain' && (
+            <div className="col-md-12">
+              <p>
+                <Text id="editScene.actionsCard.calendarEventIsRunning.doesNotContainExplanation" />
+              </p>
+            </div>
+          )}
         </div>
         <div class={cx('row', style.calendarEventIsComingGroupMargin)}>
           <div class="col-sm-6">

@@ -1968,7 +1968,8 @@
         "whenFoundLabel": "Si un évènement est trouvé",
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
-        "continueScene": "Continuer la scène"
+        "continueScene": "Continuer la scène",
+        "doesNotContainExplanation": "Si au moins un évènement contenant le nom recherché est trouvé, les autres évènements seront ignorés."
       },
       "ecowattCondition": {
         "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",

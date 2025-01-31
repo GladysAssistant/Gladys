@@ -449,8 +449,9 @@ const actionsFunc = {
         'contains',
         action.calendar_event_name,
       );
-      // if at least one event is found containing the word, we want to stop the scene (so events stays empty)
-      // otherwise we need to check if there is at least another event not containing the word from condition
+      /* if at least one event is found containing the word, events stays empty
+       and we will follow user choice to continue/stop the scene
+       otherwise we need to check if there is at least another event not containing the word from condition */
       if (eventThatContainsEventName.length === 0) {
         const eventThatDoesNotContainsEventName = await self.calendar.findCurrentlyRunningEvent(
           action.calendars,
