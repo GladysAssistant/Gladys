@@ -1,5 +1,14 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const {
+  EVENTS,
+  ACTIONS,
+  ACTIONS_STATUS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  WEBSOCKET_MESSAGE_TYPES,
+} = require('../../../../utils/constants');
+
+const { LOCK_STATES, TRIGGER } = require('../utils/nuki.constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -36,7 +45,9 @@ function handleMessage(topic, message) {
         break;
       }
       case 'state': {
-        logger.trace(feature, message);
+        // 3.3 Lock States
+        const state = Math.round(message);
+        logger.info(`Lock state has changed : ${LOCK_STATES[state]}`);
         externalId = `${main}:${deviceType}:button`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
@@ -53,6 +64,9 @@ function handleMessage(topic, message) {
         // 0 = Success
         // 1-255 = Error code as described in the BLE API.
         logger.trace(feature, message);
+        if (message != 0) {
+          logger.error(`Error command response : ${message}`);
+        }
         break;
       }
       case 'lockActionEvent': {
@@ -68,7 +82,19 @@ function handleMessage(topic, message) {
          *    E.g. unsuccessful Keypad code entries or lock commands
          *    outside of a time window are not published.
          */
-        logger.trace(feature, message);
+        const [lockAction, trigger, authId, codeId, autoLock] = message.split(',');
+        logger.trace(`Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`);
+        const binaryValue = lockAction === 2 ? 1 : 0;
+        const newState = {
+          device_feature_external_id: `${main}:${deviceType}:button`,
+          state: binaryValue,
+        };
+        gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+        gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${main}:${deviceType}:state`,
+          state: binaryValue,
+        });
+        gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
         break;
       }
       default: {
