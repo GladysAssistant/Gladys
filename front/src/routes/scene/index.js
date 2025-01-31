@@ -61,7 +61,7 @@ class Scene extends Component {
       sceneSearch: e.target.value
     });
     this.updateURL();
-    await this.getScenes();
+    await this.debouncedGetScenes();
   };
   searchTags = async tags => {
     await this.setState({
@@ -127,7 +127,7 @@ class Scene extends Component {
       sceneTagSearch: urlParams.getAll('tags') || [],
       loading: true
     };
-    this.debouncedSearch = debounce(this.search.bind(this), 200);
+    this.debouncedGetScenes = debounce(this.getScenes.bind(this), 200);
   }
 
   componentWillMount() {
@@ -143,7 +143,7 @@ class Scene extends Component {
         scenes={scenes}
         getError={getError}
         loading={loading}
-        debouncedSearch={this.debouncedSearch}
+        search={this.search}
         changeOrderDir={this.changeOrderDir}
         switchActiveScene={this.switchActiveScene}
         tags={tags}
