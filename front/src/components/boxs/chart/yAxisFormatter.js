@@ -17,10 +17,7 @@ const yAxisFormatter = value => {
   }
 
   // For normal values, format with up to 2 decimal places
-  return roundedValue.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  });
+  return value.toFixed(2);
 };
 
 export { yAxisFormatter };
