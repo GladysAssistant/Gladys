@@ -3,7 +3,6 @@ import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { MAX_LENGTH_TAG } from './constant';
 import styles from './style.css';
-import debounce from 'debounce';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -12,32 +11,12 @@ class SceneTagFilter extends Component {
     this.state = {
       tagFilterDropdownOpened: false
     };
+    this.unselectTags = this.unselectTags.bind(this);
   }
 
   setDropdownRef = dropdownRef => {
     this.dropdownRef = dropdownRef;
   };
-
-  componentWillReceiveProps(nextProps) {
-    let tagsStatus = {};
-    if (nextProps.tags) {
-      tagsStatus = nextProps.tags.reduce(
-        (tags, tag) => ({
-          ...tags,
-          [tag.name]: false
-        }),
-        {}
-      );
-    }
-    if (nextProps.sceneTagSearch) {
-      nextProps.sceneTagSearch.forEach(tagName => {
-        tagsStatus[tagName] = true;
-      });
-    }
-    this.setState({
-      tagsStatus
-    });
-  }
 
   toggleTagFilterDropdown = () => {
     this.setState({
@@ -46,34 +25,26 @@ class SceneTagFilter extends Component {
   };
 
   closeTagFilterDropdown = e => {
-    if (this.dropdownRef && this.dropdownRef.contains(e.target)) {
+    if (e && this.dropdownRef && this.dropdownRef.contains(e.target)) {
       return;
     }
     this.setState({ tagFilterDropdownOpened: false });
   };
 
-  selectedTags = async tagName => {
-    await this.setState({
-      tagsStatus: {
-        ...this.state.tagsStatus,
-        [tagName]: !this.state.tagsStatus[tagName]
-      }
-    });
-    const selectedTags = Object.keys(this.state.tagsStatus).filter(tagName => this.state.tagsStatus[tagName]);
-    debounce(this.props.searchTags, 200)(selectedTags);
+  toggleTag = async e => {
+    e.preventDefault();
+    const { sceneTagSearch } = this.props;
+    const tagName = e.currentTarget.getAttribute('data-tag');
+
+    // Check if the tag is already in the array
+    const newTagArray = sceneTagSearch.includes(tagName)
+      ? sceneTagSearch.filter(tag => tag !== tagName) // Remove tag if it exists
+      : [...sceneTagSearch, tagName]; // Add tag if it doesn't exist
+
+    this.props.searchTags(newTagArray);
   };
 
   unselectTags = async () => {
-    const tagsStatus = this.props.tags.reduce(
-      (tags, tag) => ({
-        ...tags,
-        [tag.name]: false
-      }),
-      {}
-    );
-    await this.setState({
-      tagsStatus
-    });
     this.props.searchTags([]);
   };
 
@@ -85,7 +56,7 @@ class SceneTagFilter extends Component {
     document.removeEventListener('click', this.closeTagFilterDropdown, true);
   }
 
-  render(props, { tagFilterDropdownOpened, tagsStatus }) {
+  render(props, { tagFilterDropdownOpened }) {
     return (
       <div
         ref={this.setDropdownRef}
@@ -102,12 +73,7 @@ class SceneTagFilter extends Component {
           })}
         >
           <div>
-            <li
-              class="dropdown-item"
-              onClick={() => {
-                this.unselectTags();
-              }}
-            >
+            <li class="dropdown-item" onClick={this.unselectTags}>
               <i class={cx('fe', 'fe-x-square', styles.iconUnselectAll)} />
               <span class="custom-control">
                 <Text id="scene.unselectTags" />
@@ -117,14 +83,13 @@ class SceneTagFilter extends Component {
           {props.tags &&
             props.tags.map(tag => (
               <div>
-                <li class="dropdown-item" onClick={() => this.selectedTags(tag.name)}>
+                <li class="dropdown-item" onClick={this.toggleTag} data-tag={tag.name}>
                   <div class="custom-checkbox custom-control">
                     <input
                       id={`tags-filter-${tag.name}`}
                       type="checkbox"
                       class="custom-control-input"
-                      onChange={() => this.selectedTags(tag.name)}
-                      checked={tagsStatus[tag.name]}
+                      checked={props.sceneTagSearch.includes(tag.name)}
                     />
                     <label class="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
                       {tag.name.length > MAX_LENGTH_TAG ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...` : tag.name}
