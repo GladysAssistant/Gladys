@@ -58,7 +58,7 @@ async function installContainer(config) {
 
       const configFilepath = path.join(basePathOnHost, path.dirname(DEFAULT.CONFIGURATION_PATH));
 
-      containerDescriptorToMutate.HostConfig.Binds = [`${configFilepath}:/data`];
+      containerDescriptorToMutate.HostConfig.Binds = [`${configFilepath}:/data`, '/dev:/dev', '/run/udev:/run/udev:ro'];
 
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
