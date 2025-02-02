@@ -23,7 +23,7 @@ const DeviceCard = ({ children, ...props }) => {
 
   return (
     <div class="card">
-      {(boxTitle || hasBinaryLightDeviceFeature) && (      
+      {boxTitle && (
         <div class="card-header">
           <h3 class="card-title">{boxTitle}</h3>
           {hasBinaryLightDeviceFeature && (
