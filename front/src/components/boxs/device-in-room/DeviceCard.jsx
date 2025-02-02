@@ -23,24 +23,26 @@ const DeviceCard = ({ children, ...props }) => {
 
   return (
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">{boxTitle}</h3>
-        {hasBinaryLightDeviceFeature && (
-          <div class="card-options">
-            <label class="custom-switch m-0">
-              <input
-                type="checkbox"
-                name={props.boxTitle}
-                value="1"
-                class="custom-switch-input"
-                checked={roomLightStatus === 1}
-                onClick={props.changeAllLightsStatusRoom}
-              />
-              <span class="custom-switch-indicator" />
-            </label>
-          </div>
-        )}
-      </div>
+      {boxTitle && (
+        <div class="card-header">
+          <h3 class="card-title">{boxTitle}</h3>
+          {hasBinaryLightDeviceFeature && (
+            <div class="card-options">
+              <label class="custom-switch m-0">
+                <input
+                  type="checkbox"
+                  name={props.boxTitle}
+                  value="1"
+                  class="custom-switch-input"
+                  checked={roomLightStatus === 1}
+                  onClick={props.changeAllLightsStatusRoom}
+                />
+                <span class="custom-switch-indicator" />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
       <div
         class={cx('dimmer', {
           active: loading

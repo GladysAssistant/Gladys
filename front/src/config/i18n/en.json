@@ -303,7 +303,7 @@
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
-        "editNameLabel": "Widget name",
+        "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Enter the name of the widget",
         "addADeviceLabel": "Add a device:"
       },
@@ -414,7 +414,7 @@
         "no": "No"
       },
       "scene": {
-        "editNameLabel": "Enter the name of this box",
+        "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "editSceneLabel": "Select the scene you want to display here."
       },
