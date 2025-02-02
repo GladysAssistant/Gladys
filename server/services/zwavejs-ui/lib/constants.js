@@ -67,6 +67,20 @@ const STATES = {
         },
       },
     ],
+    general_purpose: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
   },
   binary_switch: {
     currentvalue: [

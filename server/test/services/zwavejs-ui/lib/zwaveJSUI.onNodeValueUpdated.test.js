@@ -435,6 +435,132 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should save a new true binary sensor general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: true,
+          prevValue: false,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+      state: STATE.ON,
+    });
+  });
+
+  it('should save a new false binary general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: false,
+          prevValue: true,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should not fail on unsupported binary sensor general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: -1,
+          prevValue: true,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should save a new true binary switch value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
