@@ -4,7 +4,7 @@ const { COMMANDCLASS } = require('../../../../services/zwavejs-ui/lib/constants'
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
 describe('zwaveJSUIHandler.refineCategory', () => {
-  it('should refine binary general sensors', () => {
+  it('should refine binary sensors', () => {
     const zwavePartialNodeValue = {
       commandClass: COMMANDCLASS.BINARY_SENSOR,
     };
@@ -71,7 +71,7 @@ describe('zwaveJSUIHandler.refineCategory', () => {
     expect(exposed.feature.category).equals(DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR);
   });
 
-  it('should refine alarm general sensors', () => {
+  it('should refine alarm sensors', () => {
     const zwavePartialNodeValue = {
       commandClass: COMMANDCLASS.ALARM_SENSOR,
     };
