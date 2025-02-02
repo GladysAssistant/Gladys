@@ -3758,15 +3758,9 @@
           "stateless": false,
           "commandClassVersion": 2,
           "list": false,
-          "value": [
-            "2.7",
-            "2.7"
-          ],
+          "value": ["2.7", "2.7"],
           "lastUpdate": 1736436681905,
-          "newValue": [
-            "2.7",
-            "2.7"
-          ]
+          "newValue": ["2.7", "2.7"]
         },
         {
           "id": "4-134-0-hardwareVersion",
@@ -3892,17 +3886,7 @@
           "multiChannel": false
         }
       ],
-      "neighbors": [
-        1,
-        9,
-        11,
-        13,
-        23,
-        49,
-        63,
-        67,
-        72
-      ],
+      "neighbors": [1, 9, 11, 13, 23, 49, 63, 67, 72],
       "ready": true,
       "available": true,
       "hassDevices": {},
@@ -15678,15 +15662,9 @@
           "stateless": false,
           "commandClassVersion": 2,
           "list": false,
-          "value": [
-            "2.7",
-            "2.7"
-          ],
+          "value": ["2.7", "2.7"],
           "lastUpdate": 1736421349043,
-          "newValue": [
-            "2.7",
-            "2.7"
-          ]
+          "newValue": ["2.7", "2.7"]
         },
         {
           "id": "50-134-0-hardwareVersion",
@@ -15812,20 +15790,7 @@
           "multiChannel": false
         }
       ],
-      "neighbors": [
-        1,
-        9,
-        10,
-        13,
-        23,
-        25,
-        31,
-        49,
-        63,
-        64,
-        67,
-        72
-      ],
+      "neighbors": [1, 9, 10, 13, 23, 25, 31, 49, 63, 64, 67, 72],
       "ready": true,
       "available": true,
       "hassDevices": {},
@@ -15970,9 +15935,7 @@
         "commandsDroppedTX": 0,
         "timeoutResponse": 0,
         "lwr": {
-          "repeaters": [
-            10
-          ],
+          "repeaters": [10],
           "protocolDataRate": 2
         },
         "lastSeen": "2025-01-22T09:42:28.644Z"

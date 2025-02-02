@@ -354,6 +354,15 @@ const EXPOSES = {
       has_feedback: true,
       keep_history: true,
     },
+    general_purpose: {
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      min: 0,
+      max: 1,
+      read_only: true,
+      has_feedback: true,
+      keep_history: true,
+    },
   },
   binary_switch: {
     currentvalue: {
@@ -569,6 +578,10 @@ const COMMANDCLASS = {
   MULTILEVEL_SWITCH: 38,
 };
 
+const PRODUCTID = {
+  FIBARO_FGMS001: '271-4097-2048',
+};
+
 module.exports = {
   ACTIONS,
   CONFIGURATION,
@@ -576,4 +589,5 @@ module.exports = {
   STATES,
   PARAMS,
   COMMANDCLASS,
+  PRODUCTID,
 };
