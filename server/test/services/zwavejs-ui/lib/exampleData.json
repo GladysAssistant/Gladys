@@ -2507,6 +2507,1539 @@
       }
     },
     {
+      "id": 4,
+      "name": "4 - Fibargroup Motion Sensor FGMS001",
+      "loc": "Entrée",
+      "values": [
+        {
+          "id": "4-32-0-currentValue",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "currentValue",
+          "propertyName": "currentValue",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Current value",
+          "stateless": false,
+          "commandClassVersion": 0,
+          "min": 0,
+          "max": 99,
+          "list": false,
+          "value": 0,
+          "isCurrentValue": true,
+          "lastUpdate": 1737538911140,
+          "newValue": 0
+        },
+        {
+          "id": "4-48-0-Any",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 48,
+          "commandClassName": "Binary Sensor",
+          "endpoint": 0,
+          "property": "Any",
+          "propertyName": "Any",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Sensor state (Any)",
+          "ccSpecific": {
+            "sensorType": 255
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1736673265417,
+          "newValue": false
+        },
+        {
+          "id": "4-48-0-General Purpose",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 48,
+          "commandClassName": "Binary Sensor",
+          "endpoint": 0,
+          "property": "General Purpose",
+          "propertyName": "General Purpose",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Sensor state (General Purpose)",
+          "ccSpecific": {
+            "sensorType": 1
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737538911121,
+          "newValue": false
+        },
+        {
+          "id": "4-49-0-Air temperature",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Air temperature",
+          "propertyName": "Air temperature",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Air temperature",
+          "ccSpecific": {
+            "sensorType": 1,
+            "scale": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "°C",
+          "list": false,
+          "value": 20.1,
+          "lastUpdate": 1737538844015,
+          "newValue": 20.1
+        },
+        {
+          "id": "4-49-0-Illuminance",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Illuminance",
+          "propertyName": "Illuminance",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Illuminance",
+          "ccSpecific": {
+            "sensorType": 3,
+            "scale": 1
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "Lux",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1737401481841,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-1",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 1,
+          "propertyName": "Motion Sensor Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The lower the value, the more sensitive the PIR sensor.",
+          "label": "Motion Sensor Sensitivity",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 8,
+          "max": 255,
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736436684771,
+          "newValue": 10
+        },
+        {
+          "id": "4-112-0-4",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 4,
+          "propertyName": "Motion Window Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The amount of time the movements specified in parameter #3 need to take place in. The higher the value, the more sensitive the PIR sensor.",
+          "label": "Motion Window Time",
+          "default": 2,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "4 seconds",
+              "value": 0
+            },
+            {
+              "text": "8 seconds",
+              "value": 1
+            },
+            {
+              "text": "12 seconds",
+              "value": 2
+            },
+            {
+              "text": "16 seconds",
+              "value": 3
+            }
+          ],
+          "value": 2,
+          "lastUpdate": 1736436687002,
+          "newValue": 2
+        },
+        {
+          "id": "4-112-0-8",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 8,
+          "propertyName": "Motion Day/Night Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the part of day in which the PIR sensor will be active.",
+          "label": "Motion Day/Night Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "PIR sensor always active",
+              "value": 0
+            },
+            {
+              "text": "PIR sensor active during the day only",
+              "value": 1
+            },
+            {
+              "text": "PIR sensor active during the night only",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736436688207,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-9",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 9,
+          "propertyName": "Night/Day Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter defines the difference between night and day.",
+          "label": "Night/Day Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 200,
+          "lastUpdate": 1736436688273,
+          "newValue": 200
+        },
+        {
+          "id": "4-112-0-12",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 12,
+          "propertyName": "Basic Command Class Configuration",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Determines the command frames sent to 1st association group.",
+          "label": "Basic Command Class Configuration",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "On and off",
+              "value": 0
+            },
+            {
+              "text": "Only on",
+              "value": 1
+            },
+            {
+              "text": "Only off",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736436688359,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-14",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 14,
+          "propertyName": "BASIC ON Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 255 allows to turn ON a device.",
+          "label": "BASIC ON Command Frame Value",
+          "default": 255,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 255,
+          "lastUpdate": 1736436688533,
+          "newValue": 255
+        },
+        {
+          "id": "4-112-0-16",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 16,
+          "propertyName": "BASIC OFF Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 0 allows to turn OFF a device.",
+          "label": "BASIC OFF Command Frame Value",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736436688639,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-20",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 20,
+          "propertyName": "Tamper Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the changes in forces.",
+          "label": "Tamper Sensitivity",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 122,
+          "list": false,
+          "value": 15,
+          "lastUpdate": 1736436688735,
+          "newValue": 15
+        },
+        {
+          "id": "4-112-0-22",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 22,
+          "propertyName": "Tamper Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time period after which a tamper alarm will be cancelled.",
+          "label": "Tamper Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 30,
+          "lastUpdate": 1736436688970,
+          "newValue": 30
+        },
+        {
+          "id": "4-112-0-24",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 24,
+          "propertyName": "Tamper Operating Modes",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the behaviour of tamper and how it reports.",
+          "label": "Tamper Operating Modes",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 4,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper report/no cancellation report",
+              "value": 0
+            },
+            {
+              "text": "Tamper and cancellation report",
+              "value": 1
+            },
+            {
+              "text": "Tamper/No cancellation plus orientation in space",
+              "value": 2
+            },
+            {
+              "text": "Tamper/Cancellation plus orientation in space",
+              "value": 3
+            },
+            {
+              "text": "Max level of vibrations recorded (Earthquake)",
+              "value": 4
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736436689089,
+          "newValue": 1
+        },
+        {
+          "id": "4-112-0-26",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 26,
+          "propertyName": "Tamper Alarm Broadcast Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Alarm frame will or will not be sent in broadcast mode.",
+          "label": "Tamper Alarm Broadcast Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper alarm is not sent in broadcast mode",
+              "value": 0
+            },
+            {
+              "text": "Tamper alarm sent in broadcast mode",
+              "value": 1
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736436689129,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-40",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 40,
+          "propertyName": "Illumination Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of light intensity resulting in illumination report.",
+          "label": "Illumination Report Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 20,
+          "lastUpdate": 1736436689168,
+          "newValue": 20
+        },
+        {
+          "id": "4-112-0-42",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 42,
+          "propertyName": "Illumination Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time interval between consecutive illumination reports.",
+          "label": "Illumination Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736436689264,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-60",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 60,
+          "propertyName": "Temperature Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of temperature resulting in temperature report.",
+          "label": "Temperature Report Threshold",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736436689389,
+          "newValue": 10
+        },
+        {
+          "id": "4-112-0-62",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 62,
+          "propertyName": "Temperature Measuring Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines how often the temperature will be measured.",
+          "label": "Temperature Measuring Interval",
+          "default": 900,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 900,
+          "lastUpdate": 1736436689496,
+          "newValue": 900
+        },
+        {
+          "id": "4-112-0-64",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 64,
+          "propertyName": "Temperature Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How often temperature reports will be sent to the main controller.",
+          "label": "Temperature Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 3600,
+          "lastUpdate": 1736436689580,
+          "newValue": 3600
+        },
+        {
+          "id": "4-112-0-66",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 66,
+          "propertyName": "Temperature Offset",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value to be added to the actual measured temperature.",
+          "label": "Temperature Offset",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": -1000,
+          "max": 1000,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736436689845,
+          "newValue": 0
+        },
+        {
+          "id": "4-112-0-81",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 81,
+          "propertyName": "LED Brightness",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Brightness of the LED when it's on.",
+          "label": "LED Brightness",
+          "default": 50,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736436690772,
+          "newValue": 10
+        },
+        {
+          "id": "4-112-0-82",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 82,
+          "propertyName": "Low Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Below which LED brightness is set to 1%",
+          "label": "Low Brightness Illuminance Threshold",
+          "default": 100,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 1000,
+          "lastUpdate": 1736436690813,
+          "newValue": 1000
+        },
+        {
+          "id": "4-112-0-83",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 83,
+          "propertyName": "High Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Above which LED brightness is set to 100%",
+          "label": "High Brightness Illuminance Threshold",
+          "default": 1000,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 2000,
+          "lastUpdate": 1736436691096,
+          "newValue": 2000
+        },
+        {
+          "id": "4-112-0-87",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 87,
+          "propertyName": "High Temperature Threshold for Red",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "High Temperature Threshold for Red",
+          "default": 28,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "value": 28,
+          "lastUpdate": 1736436692117,
+          "newValue": 28
+        },
+        {
+          "id": "4-112-0-2",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "After Motion Blind Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time through which the PIR sensor is \"blind\".",
+          "label": "After Motion Blind Time",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 15,
+          "list": false,
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-112-0-3",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 3,
+          "propertyName": "Motion Pulses Required",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Sets the number of moves required for the PIR sensor to report motion. The more the value is, the less sensitive it is.",
+          "label": "Motion Pulses Required",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "1 move",
+              "value": 0
+            },
+            {
+              "text": "2 moves",
+              "value": 1
+            },
+            {
+              "text": "3 moves",
+              "value": 2
+            },
+            {
+              "text": "4 moves",
+              "value": 3
+            }
+          ],
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-112-0-6",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 6,
+          "propertyName": "Motion Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time after which Motion alarm will be cancelled.",
+          "label": "Motion Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-112-0-80",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 80,
+          "propertyName": "LED Signalling Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How the light behaves after motion has been detected.",
+          "label": "LED Signalling Mode",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 26,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Disabled",
+              "value": 0
+            },
+            {
+              "text": "Depends on the temperature",
+              "value": 1
+            },
+            {
+              "text": "Flashlight mode - LED glows white 10 seconds",
+              "value": 2
+            },
+            {
+              "text": "White",
+              "value": 3
+            },
+            {
+              "text": "Red",
+              "value": 4
+            },
+            {
+              "text": "Green",
+              "value": 5
+            },
+            {
+              "text": "Blue",
+              "value": 6
+            },
+            {
+              "text": "Yellow",
+              "value": 7
+            },
+            {
+              "text": "Cyan",
+              "value": 8
+            },
+            {
+              "text": "Magenta",
+              "value": 9
+            },
+            {
+              "text": "Depends on the temperature (Blink again when motion is detected)",
+              "value": 10
+            },
+            {
+              "text": "Flashlight mode (Motion extends the flashlight)",
+              "value": 11
+            },
+            {
+              "text": "White (Blink again when motion is detected)",
+              "value": 12
+            },
+            {
+              "text": "Red (Blink again when motion is detected)",
+              "value": 13
+            },
+            {
+              "text": "Green (Blink again when motion is detected)",
+              "value": 14
+            },
+            {
+              "text": "Blue (Blink again when motion is detected)",
+              "value": 15
+            },
+            {
+              "text": "Yellow (Blink again when motion is detected)",
+              "value": 16
+            },
+            {
+              "text": "Cyan (Blink again when motion is detected)",
+              "value": 17
+            },
+            {
+              "text": "Magenta (Blink again when motion is detected)",
+              "value": 18
+            },
+            {
+              "text": "LED colour depends on the temperature (Blink twice again when motion is detected)",
+              "value": 19
+            },
+            {
+              "text": "White (Blink twice again when motion is detected)",
+              "value": 20
+            },
+            {
+              "text": "Red (Blink twice again when motion is detected)",
+              "value": 21
+            },
+            {
+              "text": "Green (Blink twice again when motion is detected)",
+              "value": 22
+            },
+            {
+              "text": "Blue (Blink twice again when motion is detected)",
+              "value": 23
+            },
+            {
+              "text": "Yellow (Blink twice again when motion is detected)",
+              "value": 24
+            },
+            {
+              "text": "Cyan (Blink twice again when motion is detected)",
+              "value": 25
+            },
+            {
+              "text": "Magenta (Blink twice again when motion is detected)",
+              "value": 26
+            }
+          ],
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-112-0-86",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 86,
+          "propertyName": "Low Temperature Threshold for Blue",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "Low Temperature Threshold for Blue",
+          "default": 18,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-112-0-89",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 89,
+          "propertyName": "LED Tamper Alarm",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Indicating mode resembles a police car (white, red and blue).",
+          "label": "LED Tamper Alarm",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "LED does not indicate tamper alarm",
+              "value": 0
+            },
+            {
+              "text": "LED indicates tamper alarm",
+              "value": 1
+            }
+          ],
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-114-0-manufacturerId",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "manufacturerId",
+          "propertyName": "manufacturerId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Manufacturer ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 271,
+          "lastUpdate": 1736436681682,
+          "newValue": 271
+        },
+        {
+          "id": "4-114-0-productType",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productType",
+          "propertyName": "productType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product type",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 2048,
+          "lastUpdate": 1736436681683,
+          "newValue": 2048
+        },
+        {
+          "id": "4-114-0-productId",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productId",
+          "propertyName": "productId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 4097,
+          "lastUpdate": 1736436681683,
+          "newValue": 4097
+        },
+        {
+          "id": "4-128-0-level",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "level",
+          "propertyName": "level",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1737050316624,
+          "newValue": 100
+        },
+        {
+          "id": "4-128-0-isLow",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "isLow",
+          "propertyName": "isLow",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Low battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737050316624,
+          "newValue": false
+        },
+        {
+          "id": "4-132-0-wakeUpInterval",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "wakeUpInterval",
+          "propertyName": "wakeUpInterval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Wake Up interval",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 16777215,
+          "list": false,
+          "value": 7200,
+          "lastUpdate": 1736436683441,
+          "newValue": 7200
+        },
+        {
+          "id": "4-132-0-controllerNodeId",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "controllerNodeId",
+          "propertyName": "controllerNodeId",
+          "type": "any",
+          "readable": true,
+          "writeable": false,
+          "label": "Node ID of the controller",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736436683441,
+          "newValue": 1
+        },
+        {
+          "id": "4-134-0-libraryType",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "libraryType",
+          "propertyName": "libraryType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Library type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": true,
+          "states": [
+            {
+              "text": "Unknown",
+              "value": 0
+            },
+            {
+              "text": "Static Controller",
+              "value": 1
+            },
+            {
+              "text": "Controller",
+              "value": 2
+            },
+            {
+              "text": "Enhanced Slave",
+              "value": 3
+            },
+            {
+              "text": "Slave",
+              "value": 4
+            },
+            {
+              "text": "Installer",
+              "value": 5
+            },
+            {
+              "text": "Routing Slave",
+              "value": 6
+            },
+            {
+              "text": "Bridge Controller",
+              "value": 7
+            },
+            {
+              "text": "Device under Test",
+              "value": 8
+            },
+            {
+              "text": "N/A",
+              "value": 9
+            },
+            {
+              "text": "AV Remote",
+              "value": 10
+            },
+            {
+              "text": "AV Device",
+              "value": 11
+            }
+          ],
+          "value": 3,
+          "lastUpdate": 1736436681904,
+          "newValue": 3
+        },
+        {
+          "id": "4-134-0-protocolVersion",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "protocolVersion",
+          "propertyName": "protocolVersion",
+          "type": "string",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave protocol version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": "3.67",
+          "lastUpdate": 1736436681905,
+          "newValue": "3.67"
+        },
+        {
+          "id": "4-134-0-firmwareVersions",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "firmwareVersions",
+          "propertyName": "firmwareVersions",
+          "type": "string[]",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip firmware versions",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": ["2.7", "2.7"],
+          "lastUpdate": 1736436681905,
+          "newValue": ["2.7", "2.7"]
+        },
+        {
+          "id": "4-134-0-hardwareVersion",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "hardwareVersion",
+          "propertyName": "hardwareVersion",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip hardware version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736436681905,
+          "newValue": 1
+        },
+        {
+          "id": "4-156-0-state-0",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "state",
+          "propertyName": "state",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "description": "Whether the alarm is active",
+          "label": "General Purpose state",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737401509546,
+          "newValue": false
+        },
+        {
+          "id": "4-156-0-severity-0",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "severity",
+          "propertyName": "severity",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "General Purpose severity",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "lastUpdate": 1737408216525
+        },
+        {
+          "id": "4-156-0-duration-0",
+          "nodeId": 4,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "duration",
+          "propertyName": "duration",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "description": "For how long the alarm should be active",
+          "label": "General Purpose duration",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "unit": "s",
+          "list": false,
+          "lastUpdate": 1737408216525
+        }
+      ],
+      "groups": [
+        {
+          "text": "Motion Sensor Status",
+          "endpoint": 0,
+          "value": 1,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": true
+        },
+        {
+          "text": "Tamper Alarm",
+          "endpoint": 0,
+          "value": 2,
+          "maxNodes": 5,
+          "isLifeline": true,
+          "multiChannel": true
+        },
+        {
+          "text": "Controller Updates",
+          "endpoint": 0,
+          "value": 3,
+          "maxNodes": 1,
+          "isLifeline": true,
+          "multiChannel": false
+        }
+      ],
+      "neighbors": [1, 9, 11, 13, 23, 49, 63, 67, 72],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [],
+      "status": "Asleep",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "prioritySUCReturnRoute": false,
+      "customSUCReturnRoutes": [],
+      "hexId": "0x010f 0x0800-0x1001",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x010f:0x0800:0x1001:2.7",
+      "manufacturerId": 271,
+      "productId": 4097,
+      "productType": 2048,
+      "deviceConfig": {
+        "filename": "/var/www/html/plugins/zwavejs/resources/zwave-js-ui/node_modules/@zwave-js/config/config/devices/0x010f/fgms001.json",
+        "isEmbedded": true,
+        "manufacturer": "Fibargroup",
+        "manufacturerId": 271,
+        "label": "FGMS001",
+        "description": "Motion Sensor",
+        "devices": [
+          {
+            "productType": 2048,
+            "productId": 4097
+          },
+          {
+            "productType": 2048,
+            "productId": 8193
+          },
+          {
+            "productType": 2048,
+            "productId": 12289
+          },
+          {
+            "productType": 2048,
+            "productId": 16385
+          },
+          {
+            "productType": 2048,
+            "productId": 24577
+          },
+          {
+            "productType": 2049,
+            "productId": 4097
+          },
+          {
+            "productType": 2049,
+            "productId": 4098
+          },
+          {
+            "productType": 2049,
+            "productId": 8193
+          },
+          {
+            "productType": 2049,
+            "productId": 8194
+          },
+          {
+            "productType": 2049,
+            "productId": 12289
+          },
+          {
+            "productType": 2049,
+            "productId": 12290
+          },
+          {
+            "productType": 2049,
+            "productId": 16385
+          },
+          {
+            "productType": 2049,
+            "productId": 16386
+          },
+          {
+            "productType": 34816,
+            "productId": 12289
+          }
+        ],
+        "firmwareVersion": {
+          "min": "0.0",
+          "max": "255.255"
+        },
+        "preferred": false,
+        "associations": {},
+        "paramInformation": {
+          "_map": {}
+        }
+      },
+      "productLabel": "FGMS001",
+      "productDescription": "Motion Sensor",
+      "manufacturer": "Fibargroup",
+      "firmwareVersion": "2.7",
+      "protocolVersion": 3,
+      "nodeType": 1,
+      "endpointsCount": 0,
+      "endpoints": [
+        {
+          "index": 0,
+          "label": "Root Endpoint",
+          "deviceClass": {
+            "basic": 4,
+            "generic": 32,
+            "specific": 1
+          }
+        }
+      ],
+      "isSecure": false,
+      "security": "None",
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": false,
+      "isListening": false,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 40000,
+      "deviceClass": {
+        "basic": 4,
+        "generic": 32,
+        "specific": 1
+      },
+      "lastActive": 1737538911139,
+      "firmwareCapabilities": {
+        "firmwareUpgradable": false
+      },
+      "protocol": 0,
+      "deviceId": "271-4097-2048",
+      "hasDeviceConfigChanged": false,
+      "batteryLevels": {
+        "0": 100
+      },
+      "minBatteryLevel": 100,
+      "supportsTime": false,
+      "statistics": {
+        "commandsTX": 0,
+        "commandsRX": 569,
+        "commandsDroppedRX": 0,
+        "commandsDroppedTX": 0,
+        "timeoutResponse": 0,
+        "lwr": {
+          "repeaters": [],
+          "protocolDataRate": 2
+        },
+        "lastSeen": "2025-01-22T09:41:51.139Z"
+      },
+      "_name": "4 - Fibargroup Motion Sensor FGMS001 (Entrée)",
+      "applicationRoute": false
+    },
+    {
       "id": 5,
       "name": "Volet Roulant",
       "loc": "salon",
@@ -11200,6 +12733,3215 @@
       "lastReceive": 1733088009919,
       "errorReceive": false,
       "errorTransmit": false
+    },
+    {
+      "id": 41,
+      "name": "41 - Fibargroup Motion Sensor FGMS001",
+      "loc": "Salon",
+      "values": [
+        {
+          "id": "41-32-0-currentValue",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "currentValue",
+          "propertyName": "currentValue",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Current value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 99,
+          "list": false,
+          "value": 0,
+          "isCurrentValue": true,
+          "targetValue": "32-0-targetValue",
+          "lastUpdate": 1737048607468,
+          "newValue": 0
+        },
+        {
+          "id": "41-32-0-targetValue",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "targetValue",
+          "propertyName": "targetValue",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Target value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "lastUpdate": 1736455330661
+        },
+        {
+          "id": "41-32-0-duration",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "duration",
+          "propertyName": "duration",
+          "type": "duration",
+          "readable": true,
+          "writeable": false,
+          "label": "Remaining duration",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": {
+            "unit": "seconds"
+          },
+          "lastUpdate": 1736455330662,
+          "newValue": {
+            "unit": "seconds"
+          }
+        },
+        {
+          "id": "41-32-0-restorePrevious",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "restorePrevious",
+          "propertyName": "restorePrevious",
+          "type": "boolean",
+          "readable": false,
+          "writeable": true,
+          "label": "Restore previous value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": true,
+          "states": [
+            {
+              "text": "Restore",
+              "value": true
+            }
+          ],
+          "lastUpdate": 1736455330662
+        },
+        {
+          "id": "41-48-0-Any",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 48,
+          "commandClassName": "Binary Sensor",
+          "endpoint": 0,
+          "property": "Any",
+          "propertyName": "Any",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Sensor state (Any)",
+          "ccSpecific": {
+            "sensorType": 255
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737048891470,
+          "newValue": false
+        },
+        {
+          "id": "41-49-0-Air temperature",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Air temperature",
+          "propertyName": "Air temperature",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Air temperature",
+          "ccSpecific": {
+            "sensorType": 1,
+            "scale": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "°C",
+          "list": false,
+          "value": 23.2,
+          "lastUpdate": 1737046842099,
+          "newValue": 23.2
+        },
+        {
+          "id": "41-49-0-Illuminance",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Illuminance",
+          "propertyName": "Illuminance",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Illuminance",
+          "ccSpecific": {
+            "sensorType": 3,
+            "scale": 1
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "Lux",
+          "list": false,
+          "value": 88,
+          "lastUpdate": 1737037728814,
+          "newValue": 88
+        },
+        {
+          "id": "41-112-0-1",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 1,
+          "propertyName": "Motion Sensor Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The lower the value, the more sensitive the PIR sensor.",
+          "label": "Motion Sensor Sensitivity",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 8,
+          "max": 255,
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736419074971,
+          "newValue": 10
+        },
+        {
+          "id": "41-112-0-2",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "After Motion Blind Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time through which the PIR sensor is \"blind\".",
+          "label": "After Motion Blind Time",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 15,
+          "list": false,
+          "value": 15,
+          "lastUpdate": 1736419075222,
+          "newValue": 15
+        },
+        {
+          "id": "41-112-0-3",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 3,
+          "propertyName": "Motion Pulses Required",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Sets the number of moves required for the PIR sensor to report motion. The more the value is, the less sensitive it is.",
+          "label": "Motion Pulses Required",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "1 move",
+              "value": 0
+            },
+            {
+              "text": "2 moves",
+              "value": 1
+            },
+            {
+              "text": "3 moves",
+              "value": 2
+            },
+            {
+              "text": "4 moves",
+              "value": 3
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736419075410,
+          "newValue": 1
+        },
+        {
+          "id": "41-112-0-4",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 4,
+          "propertyName": "Motion Window Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The amount of time the movements specified in parameter #3 need to take place in. The higher the value, the more sensitive the PIR sensor.",
+          "label": "Motion Window Time",
+          "default": 2,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "4 seconds",
+              "value": 0
+            },
+            {
+              "text": "8 seconds",
+              "value": 1
+            },
+            {
+              "text": "12 seconds",
+              "value": 2
+            },
+            {
+              "text": "16 seconds",
+              "value": 3
+            }
+          ],
+          "value": 2,
+          "lastUpdate": 1736419075600,
+          "newValue": 2
+        },
+        {
+          "id": "41-112-0-6",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 6,
+          "propertyName": "Motion Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time after which Motion alarm will be cancelled.",
+          "label": "Motion Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 30,
+          "lastUpdate": 1736419075790,
+          "newValue": 30
+        },
+        {
+          "id": "41-112-0-8",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 8,
+          "propertyName": "Motion Day/Night Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the part of day in which the PIR sensor will be active.",
+          "label": "Motion Day/Night Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "PIR sensor always active",
+              "value": 0
+            },
+            {
+              "text": "PIR sensor active during the day only",
+              "value": 1
+            },
+            {
+              "text": "PIR sensor active during the night only",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736419075980,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-9",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 9,
+          "propertyName": "Night/Day Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter defines the difference between night and day.",
+          "label": "Night/Day Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 200,
+          "lastUpdate": 1736419076170,
+          "newValue": 200
+        },
+        {
+          "id": "41-112-0-12",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 12,
+          "propertyName": "Basic Command Class Configuration",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Determines the command frames sent to 1st association group.",
+          "label": "Basic Command Class Configuration",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "On and off",
+              "value": 0
+            },
+            {
+              "text": "Only on",
+              "value": 1
+            },
+            {
+              "text": "Only off",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736419076578,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-14",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 14,
+          "propertyName": "BASIC ON Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 255 allows to turn ON a device.",
+          "label": "BASIC ON Command Frame Value",
+          "default": 255,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 255,
+          "lastUpdate": 1736419076830,
+          "newValue": 255
+        },
+        {
+          "id": "41-112-0-16",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 16,
+          "propertyName": "BASIC OFF Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 0 allows to turn OFF a device.",
+          "label": "BASIC OFF Command Frame Value",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736419077022,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-20",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 20,
+          "propertyName": "Tamper Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the changes in forces.",
+          "label": "Tamper Sensitivity",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 122,
+          "list": false,
+          "value": 15,
+          "lastUpdate": 1736419077210,
+          "newValue": 15
+        },
+        {
+          "id": "41-112-0-22",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 22,
+          "propertyName": "Tamper Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time period after which a tamper alarm will be cancelled.",
+          "label": "Tamper Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 30,
+          "lastUpdate": 1736419077401,
+          "newValue": 30
+        },
+        {
+          "id": "41-112-0-24",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 24,
+          "propertyName": "Tamper Operating Modes",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the behaviour of tamper and how it reports.",
+          "label": "Tamper Operating Modes",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 4,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper report/no cancellation report",
+              "value": 0
+            },
+            {
+              "text": "Tamper and cancellation report",
+              "value": 1
+            },
+            {
+              "text": "Tamper/No cancellation plus orientation in space",
+              "value": 2
+            },
+            {
+              "text": "Tamper/Cancellation plus orientation in space",
+              "value": 3
+            },
+            {
+              "text": "Max level of vibrations recorded (Earthquake)",
+              "value": 4
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736419077590,
+          "newValue": 1
+        },
+        {
+          "id": "41-112-0-26",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 26,
+          "propertyName": "Tamper Alarm Broadcast Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Alarm frame will or will not be sent in broadcast mode.",
+          "label": "Tamper Alarm Broadcast Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper alarm is not sent in broadcast mode",
+              "value": 0
+            },
+            {
+              "text": "Tamper alarm sent in broadcast mode",
+              "value": 1
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736419077782,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-40",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 40,
+          "propertyName": "Illumination Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of light intensity resulting in illumination report.",
+          "label": "Illumination Report Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 200,
+          "lastUpdate": 1736419077971,
+          "newValue": 200
+        },
+        {
+          "id": "41-112-0-42",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 42,
+          "propertyName": "Illumination Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time interval between consecutive illumination reports.",
+          "label": "Illumination Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736419078244,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-60",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 60,
+          "propertyName": "Temperature Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of temperature resulting in temperature report.",
+          "label": "Temperature Report Threshold",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736419078430,
+          "newValue": 10
+        },
+        {
+          "id": "41-112-0-62",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 62,
+          "propertyName": "Temperature Measuring Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines how often the temperature will be measured.",
+          "label": "Temperature Measuring Interval",
+          "default": 900,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 900,
+          "lastUpdate": 1736419078621,
+          "newValue": 900
+        },
+        {
+          "id": "41-112-0-64",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 64,
+          "propertyName": "Temperature Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How often temperature reports will be sent to the main controller.",
+          "label": "Temperature Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736419078901,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-66",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 66,
+          "propertyName": "Temperature Offset",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value to be added to the actual measured temperature.",
+          "label": "Temperature Offset",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": -1000,
+          "max": 1000,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736419079110,
+          "newValue": 0
+        },
+        {
+          "id": "41-112-0-80",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 80,
+          "propertyName": "LED Signalling Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How the light behaves after motion has been detected.",
+          "label": "LED Signalling Mode",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 26,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Disabled",
+              "value": 0
+            },
+            {
+              "text": "Depends on the temperature",
+              "value": 1
+            },
+            {
+              "text": "Flashlight mode - LED glows white 10 seconds",
+              "value": 2
+            },
+            {
+              "text": "White",
+              "value": 3
+            },
+            {
+              "text": "Red",
+              "value": 4
+            },
+            {
+              "text": "Green",
+              "value": 5
+            },
+            {
+              "text": "Blue",
+              "value": 6
+            },
+            {
+              "text": "Yellow",
+              "value": 7
+            },
+            {
+              "text": "Cyan",
+              "value": 8
+            },
+            {
+              "text": "Magenta",
+              "value": 9
+            },
+            {
+              "text": "Depends on the temperature (Blink again when motion is detected)",
+              "value": 10
+            },
+            {
+              "text": "Flashlight mode (Motion extends the flashlight)",
+              "value": 11
+            },
+            {
+              "text": "White (Blink again when motion is detected)",
+              "value": 12
+            },
+            {
+              "text": "Red (Blink again when motion is detected)",
+              "value": 13
+            },
+            {
+              "text": "Green (Blink again when motion is detected)",
+              "value": 14
+            },
+            {
+              "text": "Blue (Blink again when motion is detected)",
+              "value": 15
+            },
+            {
+              "text": "Yellow (Blink again when motion is detected)",
+              "value": 16
+            },
+            {
+              "text": "Cyan (Blink again when motion is detected)",
+              "value": 17
+            },
+            {
+              "text": "Magenta (Blink again when motion is detected)",
+              "value": 18
+            },
+            {
+              "text": "LED colour depends on the temperature (Blink twice again when motion is detected)",
+              "value": 19
+            },
+            {
+              "text": "White (Blink twice again when motion is detected)",
+              "value": 20
+            },
+            {
+              "text": "Red (Blink twice again when motion is detected)",
+              "value": 21
+            },
+            {
+              "text": "Green (Blink twice again when motion is detected)",
+              "value": 22
+            },
+            {
+              "text": "Blue (Blink twice again when motion is detected)",
+              "value": 23
+            },
+            {
+              "text": "Yellow (Blink twice again when motion is detected)",
+              "value": 24
+            },
+            {
+              "text": "Cyan (Blink twice again when motion is detected)",
+              "value": 25
+            },
+            {
+              "text": "Magenta (Blink twice again when motion is detected)",
+              "value": 26
+            }
+          ],
+          "value": 10,
+          "lastUpdate": 1736419079300,
+          "newValue": 10
+        },
+        {
+          "id": "41-112-0-81",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 81,
+          "propertyName": "LED Brightness",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Brightness of the LED when it's on.",
+          "label": "LED Brightness",
+          "default": 50,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 50,
+          "lastUpdate": 1736419079491,
+          "newValue": 50
+        },
+        {
+          "id": "41-112-0-82",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 82,
+          "propertyName": "Low Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Below which LED brightness is set to 1%",
+          "label": "Low Brightness Illuminance Threshold",
+          "default": 100,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1736419079694,
+          "newValue": 100
+        },
+        {
+          "id": "41-112-0-83",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 83,
+          "propertyName": "High Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Above which LED brightness is set to 100%",
+          "label": "High Brightness Illuminance Threshold",
+          "default": 1000,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 1000,
+          "lastUpdate": 1736419079881,
+          "newValue": 1000
+        },
+        {
+          "id": "41-112-0-86",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 86,
+          "propertyName": "Low Temperature Threshold for Blue",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "Low Temperature Threshold for Blue",
+          "default": 18,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "value": 18,
+          "lastUpdate": 1736419080071,
+          "newValue": 18
+        },
+        {
+          "id": "41-112-0-87",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 87,
+          "propertyName": "High Temperature Threshold for Red",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "High Temperature Threshold for Red",
+          "default": 28,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "value": 28,
+          "lastUpdate": 1736419080273,
+          "newValue": 28
+        },
+        {
+          "id": "41-112-0-89",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 89,
+          "propertyName": "LED Tamper Alarm",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Indicating mode resembles a police car (white, red and blue).",
+          "label": "LED Tamper Alarm",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "LED does not indicate tamper alarm",
+              "value": 0
+            },
+            {
+              "text": "LED indicates tamper alarm",
+              "value": 1
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736419080460,
+          "newValue": 1
+        },
+        {
+          "id": "41-114-0-manufacturerId",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "manufacturerId",
+          "propertyName": "manufacturerId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Manufacturer ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 271,
+          "lastUpdate": 1736419067285,
+          "newValue": 271
+        },
+        {
+          "id": "41-114-0-productType",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productType",
+          "propertyName": "productType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product type",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 2048,
+          "lastUpdate": 1736419067285,
+          "newValue": 2048
+        },
+        {
+          "id": "41-114-0-productId",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productId",
+          "propertyName": "productId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 4097,
+          "lastUpdate": 1736419067286,
+          "newValue": 4097
+        },
+        {
+          "id": "41-128-0-level",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "level",
+          "propertyName": "level",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1737026313824,
+          "newValue": 100
+        },
+        {
+          "id": "41-128-0-isLow",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "isLow",
+          "propertyName": "isLow",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Low battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737026313824,
+          "newValue": false
+        },
+        {
+          "id": "41-132-0-wakeUpInterval",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "wakeUpInterval",
+          "propertyName": "wakeUpInterval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Wake Up interval",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 16777215,
+          "list": false,
+          "value": 7200,
+          "lastUpdate": 1736419072419,
+          "newValue": 7200
+        },
+        {
+          "id": "41-132-0-controllerNodeId",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "controllerNodeId",
+          "propertyName": "controllerNodeId",
+          "type": "any",
+          "readable": true,
+          "writeable": false,
+          "label": "Node ID of the controller",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736419072419,
+          "newValue": 1
+        },
+        {
+          "id": "41-134-0-libraryType",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "libraryType",
+          "propertyName": "libraryType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Library type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": true,
+          "states": [
+            {
+              "text": "Unknown",
+              "value": 0
+            },
+            {
+              "text": "Static Controller",
+              "value": 1
+            },
+            {
+              "text": "Controller",
+              "value": 2
+            },
+            {
+              "text": "Enhanced Slave",
+              "value": 3
+            },
+            {
+              "text": "Slave",
+              "value": 4
+            },
+            {
+              "text": "Installer",
+              "value": 5
+            },
+            {
+              "text": "Routing Slave",
+              "value": 6
+            },
+            {
+              "text": "Bridge Controller",
+              "value": 7
+            },
+            {
+              "text": "Device under Test",
+              "value": 8
+            },
+            {
+              "text": "N/A",
+              "value": 9
+            },
+            {
+              "text": "AV Remote",
+              "value": 10
+            },
+            {
+              "text": "AV Device",
+              "value": 11
+            }
+          ],
+          "value": 3,
+          "lastUpdate": 1736419067636,
+          "newValue": 3
+        },
+        {
+          "id": "41-134-0-protocolVersion",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "protocolVersion",
+          "propertyName": "protocolVersion",
+          "type": "string",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave protocol version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": "3.67",
+          "lastUpdate": 1736419067636,
+          "newValue": "3.67"
+        },
+        {
+          "id": "41-134-0-firmwareVersions",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "firmwareVersions",
+          "propertyName": "firmwareVersions",
+          "type": "string[]",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip firmware versions",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": ["2.7", "2.7"],
+          "lastUpdate": 1736419067636,
+          "newValue": ["2.7", "2.7"]
+        },
+        {
+          "id": "41-134-0-hardwareVersion",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "hardwareVersion",
+          "propertyName": "hardwareVersion",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip hardware version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736419067638,
+          "newValue": 1
+        },
+        {
+          "id": "41-156-0-state-0",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "state",
+          "propertyName": "state",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "description": "Whether the alarm is active",
+          "label": "General Purpose state",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1736873813817,
+          "newValue": false
+        },
+        {
+          "id": "41-156-0-severity-0",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "severity",
+          "propertyName": "severity",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "General Purpose severity",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "lastUpdate": 1736873813817
+        },
+        {
+          "id": "41-156-0-duration-0",
+          "nodeId": 41,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "duration",
+          "propertyName": "duration",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "description": "For how long the alarm should be active",
+          "label": "General Purpose duration",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "unit": "s",
+          "list": false,
+          "lastUpdate": 1736873813817
+        }
+      ],
+      "groups": [
+        {
+          "text": "Motion Sensor Status",
+          "endpoint": 0,
+          "value": 1,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": true
+        },
+        {
+          "text": "Tamper Alarm",
+          "endpoint": 0,
+          "value": 2,
+          "maxNodes": 5,
+          "isLifeline": true,
+          "multiChannel": true
+        },
+        {
+          "text": "Controller Updates",
+          "endpoint": 0,
+          "value": 3,
+          "maxNodes": 1,
+          "isLifeline": true,
+          "multiChannel": false
+        }
+      ],
+      "neighbors": [],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [],
+      "status": "Asleep",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "prioritySUCReturnRoute": false,
+      "customSUCReturnRoutes": [],
+      "hexId": "0x010f 0x0800-0x1001",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x010f:0x0800:0x1001:2.7",
+      "manufacturerId": 271,
+      "productId": 4097,
+      "productType": 2048,
+      "deviceConfig": {
+        "filename": "/var/www/html/plugins/zwavejs/resources/zwave-js-ui/node_modules/@zwave-js/config/config/devices/0x010f/fgms001.json",
+        "isEmbedded": true,
+        "manufacturer": "Fibargroup",
+        "manufacturerId": 271,
+        "label": "FGMS001",
+        "description": "Motion Sensor",
+        "devices": [
+          {
+            "productType": 2048,
+            "productId": 4097
+          },
+          {
+            "productType": 2048,
+            "productId": 8193
+          },
+          {
+            "productType": 2048,
+            "productId": 12289
+          },
+          {
+            "productType": 2048,
+            "productId": 16385
+          },
+          {
+            "productType": 2048,
+            "productId": 24577
+          },
+          {
+            "productType": 2049,
+            "productId": 4097
+          },
+          {
+            "productType": 2049,
+            "productId": 4098
+          },
+          {
+            "productType": 2049,
+            "productId": 8193
+          },
+          {
+            "productType": 2049,
+            "productId": 8194
+          },
+          {
+            "productType": 2049,
+            "productId": 12289
+          },
+          {
+            "productType": 2049,
+            "productId": 12290
+          },
+          {
+            "productType": 2049,
+            "productId": 16385
+          },
+          {
+            "productType": 2049,
+            "productId": 16386
+          },
+          {
+            "productType": 34816,
+            "productId": 12289
+          }
+        ],
+        "firmwareVersion": {
+          "min": "0.0",
+          "max": "255.255"
+        },
+        "preferred": false,
+        "associations": {},
+        "paramInformation": {
+          "_map": {}
+        }
+      },
+      "productLabel": "FGMS001",
+      "productDescription": "Motion Sensor",
+      "manufacturer": "Fibargroup",
+      "firmwareVersion": "2.7",
+      "protocolVersion": 3,
+      "nodeType": 1,
+      "endpointsCount": 0,
+      "endpoints": [
+        {
+          "index": 0,
+          "label": "Root Endpoint",
+          "deviceClass": {
+            "basic": 4,
+            "generic": 32,
+            "specific": 1
+          }
+        }
+      ],
+      "isSecure": false,
+      "security": "None",
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": false,
+      "isListening": false,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 40000,
+      "deviceClass": {
+        "basic": 4,
+        "generic": 32,
+        "specific": 1
+      },
+      "lastActive": 1737048891523,
+      "firmwareCapabilities": {
+        "firmwareUpgradable": false
+      },
+      "protocol": 0,
+      "deviceId": "271-4097-2048",
+      "hasDeviceConfigChanged": false,
+      "batteryLevels": {
+        "0": 100
+      },
+      "minBatteryLevel": 100,
+      "supportsTime": false,
+      "statistics": {
+        "commandsTX": 2,
+        "commandsRX": 5885,
+        "commandsDroppedRX": 1,
+        "commandsDroppedTX": 0,
+        "timeoutResponse": 0,
+        "lwr": {
+          "repeaters": [],
+          "protocolDataRate": 2
+        },
+        "lastSeen": "2025-01-16T17:34:51.523Z",
+        "rtt": 176.4
+      },
+      "_name": "41 - Fibargroup Motion Sensor FGMS001",
+      "applicationRoute": false,
+      "lastReceive": 1737048891523,
+      "errorReceive": false,
+      "errorTransmit": false
+    },
+    {
+      "id": 50,
+      "name": "50 - Fibargroup Motion Sensor FGMS001",
+      "loc": "1er étage",
+      "values": [
+        {
+          "id": "50-32-0-currentValue",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "currentValue",
+          "propertyName": "currentValue",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Current value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 99,
+          "list": false,
+          "value": 0,
+          "isCurrentValue": true,
+          "targetValue": "32-0-targetValue",
+          "lastUpdate": 1737538948645,
+          "newValue": 0
+        },
+        {
+          "id": "50-32-0-targetValue",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "targetValue",
+          "propertyName": "targetValue",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Target value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "lastUpdate": 1737408216512
+        },
+        {
+          "id": "50-32-0-duration",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "duration",
+          "propertyName": "duration",
+          "type": "duration",
+          "readable": true,
+          "writeable": false,
+          "label": "Remaining duration",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": {
+            "unit": "seconds"
+          },
+          "lastUpdate": 1737408216512,
+          "newValue": {
+            "unit": "seconds"
+          }
+        },
+        {
+          "id": "50-32-0-restorePrevious",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "restorePrevious",
+          "propertyName": "restorePrevious",
+          "type": "boolean",
+          "readable": false,
+          "writeable": true,
+          "label": "Restore previous value",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": true,
+          "states": [
+            {
+              "text": "Restore",
+              "value": true
+            }
+          ],
+          "lastUpdate": 1737408216512
+        },
+        {
+          "id": "50-48-0-Any",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 48,
+          "commandClassName": "Binary Sensor",
+          "endpoint": 0,
+          "property": "Any",
+          "propertyName": "Any",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Sensor state (Any)",
+          "ccSpecific": {
+            "sensorType": 255
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1736505053910,
+          "newValue": false
+        },
+        {
+          "id": "50-48-0-General Purpose",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 48,
+          "commandClassName": "Binary Sensor",
+          "endpoint": 0,
+          "property": "General Purpose",
+          "propertyName": "General Purpose",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Sensor state (General Purpose)",
+          "ccSpecific": {
+            "sensorType": 1
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737538948591,
+          "newValue": false
+        },
+        {
+          "id": "50-49-0-Air temperature",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Air temperature",
+          "propertyName": "Air temperature",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Air temperature",
+          "ccSpecific": {
+            "sensorType": 1,
+            "scale": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "°C",
+          "list": false,
+          "value": 21.3,
+          "lastUpdate": 1737536566206,
+          "newValue": 21.3
+        },
+        {
+          "id": "50-49-0-Illuminance",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Illuminance",
+          "propertyName": "Illuminance",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Illuminance",
+          "ccSpecific": {
+            "sensorType": 3,
+            "scale": 1
+          },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "Lux",
+          "list": false,
+          "value": 23,
+          "lastUpdate": 1737535417991,
+          "newValue": 23
+        },
+        {
+          "id": "50-112-0-1",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 1,
+          "propertyName": "Motion Sensor Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The lower the value, the more sensitive the PIR sensor.",
+          "label": "Motion Sensor Sensitivity",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 8,
+          "max": 255,
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736421354669,
+          "newValue": 10
+        },
+        {
+          "id": "50-112-0-2",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "After Motion Blind Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time through which the PIR sensor is \"blind\".",
+          "label": "After Motion Blind Time",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 15,
+          "list": false,
+          "value": 15,
+          "lastUpdate": 1736421354841,
+          "newValue": 15
+        },
+        {
+          "id": "50-112-0-3",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 3,
+          "propertyName": "Motion Pulses Required",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Sets the number of moves required for the PIR sensor to report motion. The more the value is, the less sensitive it is.",
+          "label": "Motion Pulses Required",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "1 move",
+              "value": 0
+            },
+            {
+              "text": "2 moves",
+              "value": 1
+            },
+            {
+              "text": "3 moves",
+              "value": 2
+            },
+            {
+              "text": "4 moves",
+              "value": 3
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736421355019,
+          "newValue": 1
+        },
+        {
+          "id": "50-112-0-4",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 4,
+          "propertyName": "Motion Window Time",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The amount of time the movements specified in parameter #3 need to take place in. The higher the value, the more sensitive the PIR sensor.",
+          "label": "Motion Window Time",
+          "default": 2,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "4 seconds",
+              "value": 0
+            },
+            {
+              "text": "8 seconds",
+              "value": 1
+            },
+            {
+              "text": "12 seconds",
+              "value": 2
+            },
+            {
+              "text": "16 seconds",
+              "value": 3
+            }
+          ],
+          "value": 2,
+          "lastUpdate": 1736421355189,
+          "newValue": 2
+        },
+        {
+          "id": "50-112-0-6",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 6,
+          "propertyName": "Motion Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Period of time after which Motion alarm will be cancelled.",
+          "label": "Motion Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 30,
+          "lastUpdate": 1736421355359,
+          "newValue": 30
+        },
+        {
+          "id": "50-112-0-8",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 8,
+          "propertyName": "Motion Day/Night Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the part of day in which the PIR sensor will be active.",
+          "label": "Motion Day/Night Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "PIR sensor always active",
+              "value": 0
+            },
+            {
+              "text": "PIR sensor active during the day only",
+              "value": 1
+            },
+            {
+              "text": "PIR sensor active during the night only",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736421355529,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-9",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 9,
+          "propertyName": "Night/Day Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter defines the difference between night and day.",
+          "label": "Night/Day Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 200,
+          "lastUpdate": 1736421355699,
+          "newValue": 200
+        },
+        {
+          "id": "50-112-0-12",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 12,
+          "propertyName": "Basic Command Class Configuration",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Determines the command frames sent to 1st association group.",
+          "label": "Basic Command Class Configuration",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "On and off",
+              "value": 0
+            },
+            {
+              "text": "Only on",
+              "value": 1
+            },
+            {
+              "text": "Only off",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736421355869,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-14",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 14,
+          "propertyName": "BASIC ON Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 255 allows to turn ON a device.",
+          "label": "BASIC ON Command Frame Value",
+          "default": 255,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 255,
+          "lastUpdate": 1736421356039,
+          "newValue": 255
+        },
+        {
+          "id": "50-112-0-16",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 16,
+          "propertyName": "BASIC OFF Command Frame Value",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value of 0 allows to turn OFF a device.",
+          "label": "BASIC OFF Command Frame Value",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736421356169,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-20",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 20,
+          "propertyName": "Tamper Sensitivity",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the changes in forces.",
+          "label": "Tamper Sensitivity",
+          "default": 15,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 122,
+          "list": false,
+          "value": 15,
+          "lastUpdate": 1736421356339,
+          "newValue": 15
+        },
+        {
+          "id": "50-112-0-22",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 22,
+          "propertyName": "Tamper Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time period after which a tamper alarm will be cancelled.",
+          "label": "Tamper Alarm Cancellation Delay",
+          "default": 30,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 30,
+          "lastUpdate": 1736421356594,
+          "newValue": 30
+        },
+        {
+          "id": "50-112-0-24",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 24,
+          "propertyName": "Tamper Operating Modes",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines the behaviour of tamper and how it reports.",
+          "label": "Tamper Operating Modes",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 4,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper report/no cancellation report",
+              "value": 0
+            },
+            {
+              "text": "Tamper and cancellation report",
+              "value": 1
+            },
+            {
+              "text": "Tamper/No cancellation plus orientation in space",
+              "value": 2
+            },
+            {
+              "text": "Tamper/Cancellation plus orientation in space",
+              "value": 3
+            },
+            {
+              "text": "Max level of vibrations recorded (Earthquake)",
+              "value": 4
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736421356807,
+          "newValue": 1
+        },
+        {
+          "id": "50-112-0-26",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 26,
+          "propertyName": "Tamper Alarm Broadcast Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Alarm frame will or will not be sent in broadcast mode.",
+          "label": "Tamper Alarm Broadcast Mode",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Tamper alarm is not sent in broadcast mode",
+              "value": 0
+            },
+            {
+              "text": "Tamper alarm sent in broadcast mode",
+              "value": 1
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1736421356980,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-40",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 40,
+          "propertyName": "Illumination Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of light intensity resulting in illumination report.",
+          "label": "Illumination Report Threshold",
+          "default": 200,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 20,
+          "lastUpdate": 1736421357150,
+          "newValue": 20
+        },
+        {
+          "id": "50-112-0-42",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 42,
+          "propertyName": "Illumination Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Time interval between consecutive illumination reports.",
+          "label": "Illumination Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736421357320,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-60",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 60,
+          "propertyName": "Temperature Report Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Change in level of temperature resulting in temperature report.",
+          "label": "Temperature Report Threshold",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736421357500,
+          "newValue": 10
+        },
+        {
+          "id": "50-112-0-62",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 62,
+          "propertyName": "Temperature Measuring Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The parameter determines how often the temperature will be measured.",
+          "label": "Temperature Measuring Interval",
+          "default": 900,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 900,
+          "lastUpdate": 1736421357670,
+          "newValue": 900
+        },
+        {
+          "id": "50-112-0-64",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 64,
+          "propertyName": "Temperature Report Interval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How often temperature reports will be sent to the main controller.",
+          "label": "Temperature Report Interval",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "seconds",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736421357851,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-66",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 66,
+          "propertyName": "Temperature Offset",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "The value to be added to the actual measured temperature.",
+          "label": "Temperature Offset",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": -1000,
+          "max": 1000,
+          "unit": "0.1 °C",
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1736421358020,
+          "newValue": 0
+        },
+        {
+          "id": "50-112-0-80",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 80,
+          "propertyName": "LED Signalling Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "How the light behaves after motion has been detected.",
+          "label": "LED Signalling Mode",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 26,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Disabled",
+              "value": 0
+            },
+            {
+              "text": "Depends on the temperature",
+              "value": 1
+            },
+            {
+              "text": "Flashlight mode - LED glows white 10 seconds",
+              "value": 2
+            },
+            {
+              "text": "White",
+              "value": 3
+            },
+            {
+              "text": "Red",
+              "value": 4
+            },
+            {
+              "text": "Green",
+              "value": 5
+            },
+            {
+              "text": "Blue",
+              "value": 6
+            },
+            {
+              "text": "Yellow",
+              "value": 7
+            },
+            {
+              "text": "Cyan",
+              "value": 8
+            },
+            {
+              "text": "Magenta",
+              "value": 9
+            },
+            {
+              "text": "Depends on the temperature (Blink again when motion is detected)",
+              "value": 10
+            },
+            {
+              "text": "Flashlight mode (Motion extends the flashlight)",
+              "value": 11
+            },
+            {
+              "text": "White (Blink again when motion is detected)",
+              "value": 12
+            },
+            {
+              "text": "Red (Blink again when motion is detected)",
+              "value": 13
+            },
+            {
+              "text": "Green (Blink again when motion is detected)",
+              "value": 14
+            },
+            {
+              "text": "Blue (Blink again when motion is detected)",
+              "value": 15
+            },
+            {
+              "text": "Yellow (Blink again when motion is detected)",
+              "value": 16
+            },
+            {
+              "text": "Cyan (Blink again when motion is detected)",
+              "value": 17
+            },
+            {
+              "text": "Magenta (Blink again when motion is detected)",
+              "value": 18
+            },
+            {
+              "text": "LED colour depends on the temperature (Blink twice again when motion is detected)",
+              "value": 19
+            },
+            {
+              "text": "White (Blink twice again when motion is detected)",
+              "value": 20
+            },
+            {
+              "text": "Red (Blink twice again when motion is detected)",
+              "value": 21
+            },
+            {
+              "text": "Green (Blink twice again when motion is detected)",
+              "value": 22
+            },
+            {
+              "text": "Blue (Blink twice again when motion is detected)",
+              "value": 23
+            },
+            {
+              "text": "Yellow (Blink twice again when motion is detected)",
+              "value": 24
+            },
+            {
+              "text": "Cyan (Blink twice again when motion is detected)",
+              "value": 25
+            },
+            {
+              "text": "Magenta (Blink twice again when motion is detected)",
+              "value": 26
+            }
+          ],
+          "value": 10,
+          "lastUpdate": 1736421358189,
+          "newValue": 10
+        },
+        {
+          "id": "50-112-0-81",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 81,
+          "propertyName": "LED Brightness",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Brightness of the LED when it's on.",
+          "label": "LED Brightness",
+          "default": 50,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1736421358360,
+          "newValue": 10
+        },
+        {
+          "id": "50-112-0-82",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 82,
+          "propertyName": "Low Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Below which LED brightness is set to 1%",
+          "label": "Low Brightness Illuminance Threshold",
+          "default": 100,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1736421358530,
+          "newValue": 100
+        },
+        {
+          "id": "50-112-0-83",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 83,
+          "propertyName": "High Brightness Illuminance Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Above which LED brightness is set to 100%",
+          "label": "High Brightness Illuminance Threshold",
+          "default": 1000,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "unit": "lux",
+          "list": false,
+          "value": 1000,
+          "lastUpdate": 1736421358711,
+          "newValue": 1000
+        },
+        {
+          "id": "50-112-0-86",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 86,
+          "propertyName": "Low Temperature Threshold for Blue",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "Low Temperature Threshold for Blue",
+          "default": 18,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "value": 18,
+          "lastUpdate": 1736421358890,
+          "newValue": 18
+        },
+        {
+          "id": "50-112-0-87",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 87,
+          "propertyName": "High Temperature Threshold for Red",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "This parameter is relevant only when parameter 80 has been properly configured.",
+          "label": "High Temperature Threshold for Red",
+          "default": 28,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "list": false,
+          "value": 28,
+          "lastUpdate": 1736421359060,
+          "newValue": 28
+        },
+        {
+          "id": "50-112-0-89",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 89,
+          "propertyName": "LED Tamper Alarm",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "Indicating mode resembles a police car (white, red and blue).",
+          "label": "LED Tamper Alarm",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "LED does not indicate tamper alarm",
+              "value": 0
+            },
+            {
+              "text": "LED indicates tamper alarm",
+              "value": 1
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1736421359230,
+          "newValue": 1
+        },
+        {
+          "id": "50-114-0-manufacturerId",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "manufacturerId",
+          "propertyName": "manufacturerId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Manufacturer ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 271,
+          "lastUpdate": 1736421348692,
+          "newValue": 271
+        },
+        {
+          "id": "50-114-0-productType",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productType",
+          "propertyName": "productType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product type",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 2048,
+          "lastUpdate": 1736421348693,
+          "newValue": 2048
+        },
+        {
+          "id": "50-114-0-productId",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productId",
+          "propertyName": "productId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product ID",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 4097,
+          "lastUpdate": 1736421348693,
+          "newValue": 4097
+        },
+        {
+          "id": "50-128-0-level",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "level",
+          "propertyName": "level",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1737046601644,
+          "newValue": 100
+        },
+        {
+          "id": "50-128-0-isLow",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "isLow",
+          "propertyName": "isLow",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Low battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1737046601645,
+          "newValue": false
+        },
+        {
+          "id": "50-132-0-controllerNodeId",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "controllerNodeId",
+          "propertyName": "controllerNodeId",
+          "type": "any",
+          "readable": true,
+          "writeable": false,
+          "label": "Node ID of the controller",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736442915129,
+          "newValue": 1
+        },
+        {
+          "id": "50-132-0-wakeUpInterval",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "wakeUpInterval",
+          "propertyName": "wakeUpInterval",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Wake Up interval",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 16777215,
+          "list": false,
+          "value": 21600,
+          "lastUpdate": 1736442915129,
+          "newValue": 21600
+        },
+        {
+          "id": "50-134-0-libraryType",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "libraryType",
+          "propertyName": "libraryType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Library type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": true,
+          "states": [
+            {
+              "text": "Unknown",
+              "value": 0
+            },
+            {
+              "text": "Static Controller",
+              "value": 1
+            },
+            {
+              "text": "Controller",
+              "value": 2
+            },
+            {
+              "text": "Enhanced Slave",
+              "value": 3
+            },
+            {
+              "text": "Slave",
+              "value": 4
+            },
+            {
+              "text": "Installer",
+              "value": 5
+            },
+            {
+              "text": "Routing Slave",
+              "value": 6
+            },
+            {
+              "text": "Bridge Controller",
+              "value": 7
+            },
+            {
+              "text": "Device under Test",
+              "value": 8
+            },
+            {
+              "text": "N/A",
+              "value": 9
+            },
+            {
+              "text": "AV Remote",
+              "value": 10
+            },
+            {
+              "text": "AV Device",
+              "value": 11
+            }
+          ],
+          "value": 3,
+          "lastUpdate": 1736421349042,
+          "newValue": 3
+        },
+        {
+          "id": "50-134-0-protocolVersion",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "protocolVersion",
+          "propertyName": "protocolVersion",
+          "type": "string",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave protocol version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": "3.67",
+          "lastUpdate": 1736421349042,
+          "newValue": "3.67"
+        },
+        {
+          "id": "50-134-0-firmwareVersions",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "firmwareVersions",
+          "propertyName": "firmwareVersions",
+          "type": "string[]",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip firmware versions",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": ["2.7", "2.7"],
+          "lastUpdate": 1736421349043,
+          "newValue": ["2.7", "2.7"]
+        },
+        {
+          "id": "50-134-0-hardwareVersion",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "hardwareVersion",
+          "propertyName": "hardwareVersion",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip hardware version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1736421349043,
+          "newValue": 1
+        },
+        {
+          "id": "50-156-0-state-0",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "state",
+          "propertyName": "state",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "description": "Whether the alarm is active",
+          "label": "General Purpose state",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1736686587142,
+          "newValue": false
+        },
+        {
+          "id": "50-156-0-severity-0",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "severity",
+          "propertyName": "severity",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "General Purpose severity",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "lastUpdate": 1737408216513
+        },
+        {
+          "id": "50-156-0-duration-0",
+          "nodeId": 50,
+          "toUpdate": false,
+          "commandClass": 156,
+          "commandClassName": "Alarm Sensor",
+          "endpoint": 0,
+          "property": "duration",
+          "propertyName": "duration",
+          "propertyKey": 0,
+          "propertyKeyName": "0",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "description": "For how long the alarm should be active",
+          "label": "General Purpose duration",
+          "ccSpecific": {
+            "sensorType": 0
+          },
+          "stateless": false,
+          "commandClassVersion": 1,
+          "unit": "s",
+          "list": false,
+          "lastUpdate": 1737408216513
+        }
+      ],
+      "groups": [
+        {
+          "text": "Motion Sensor Status",
+          "endpoint": 0,
+          "value": 1,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": true
+        },
+        {
+          "text": "Tamper Alarm",
+          "endpoint": 0,
+          "value": 2,
+          "maxNodes": 5,
+          "isLifeline": true,
+          "multiChannel": true
+        },
+        {
+          "text": "Controller Updates",
+          "endpoint": 0,
+          "value": 3,
+          "maxNodes": 1,
+          "isLifeline": true,
+          "multiChannel": false
+        }
+      ],
+      "neighbors": [1, 9, 10, 13, 23, 25, 31, 49, 63, 64, 67, 72],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [],
+      "status": "Asleep",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "prioritySUCReturnRoute": false,
+      "customSUCReturnRoutes": [],
+      "hexId": "0x010f 0x0800-0x1001",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x010f:0x0800:0x1001:2.7",
+      "manufacturerId": 271,
+      "productId": 4097,
+      "productType": 2048,
+      "deviceConfig": {
+        "filename": "/var/www/html/plugins/zwavejs/resources/zwave-js-ui/node_modules/@zwave-js/config/config/devices/0x010f/fgms001.json",
+        "isEmbedded": true,
+        "manufacturer": "Fibargroup",
+        "manufacturerId": 271,
+        "label": "FGMS001",
+        "description": "Motion Sensor",
+        "devices": [
+          {
+            "productType": 2048,
+            "productId": 4097
+          },
+          {
+            "productType": 2048,
+            "productId": 8193
+          },
+          {
+            "productType": 2048,
+            "productId": 12289
+          },
+          {
+            "productType": 2048,
+            "productId": 16385
+          },
+          {
+            "productType": 2048,
+            "productId": 24577
+          },
+          {
+            "productType": 2049,
+            "productId": 4097
+          },
+          {
+            "productType": 2049,
+            "productId": 4098
+          },
+          {
+            "productType": 2049,
+            "productId": 8193
+          },
+          {
+            "productType": 2049,
+            "productId": 8194
+          },
+          {
+            "productType": 2049,
+            "productId": 12289
+          },
+          {
+            "productType": 2049,
+            "productId": 12290
+          },
+          {
+            "productType": 2049,
+            "productId": 16385
+          },
+          {
+            "productType": 2049,
+            "productId": 16386
+          },
+          {
+            "productType": 34816,
+            "productId": 12289
+          }
+        ],
+        "firmwareVersion": {
+          "min": "0.0",
+          "max": "255.255"
+        },
+        "preferred": false,
+        "associations": {},
+        "paramInformation": {
+          "_map": {}
+        }
+      },
+      "productLabel": "FGMS001",
+      "productDescription": "Motion Sensor",
+      "manufacturer": "Fibargroup",
+      "firmwareVersion": "2.7",
+      "protocolVersion": 3,
+      "nodeType": 1,
+      "endpointsCount": 0,
+      "endpoints": [
+        {
+          "index": 0,
+          "label": "Root Endpoint",
+          "deviceClass": {
+            "basic": 4,
+            "generic": 32,
+            "specific": 1
+          }
+        }
+      ],
+      "isSecure": false,
+      "security": "None",
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": false,
+      "isListening": false,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 40000,
+      "deviceClass": {
+        "basic": 4,
+        "generic": 32,
+        "specific": 1
+      },
+      "lastActive": 1737538948644,
+      "firmwareCapabilities": {
+        "firmwareUpgradable": false
+      },
+      "protocol": 0,
+      "deviceId": "271-4097-2048",
+      "hasDeviceConfigChanged": false,
+      "batteryLevels": {
+        "0": 100
+      },
+      "minBatteryLevel": 100,
+      "supportsTime": false,
+      "statistics": {
+        "commandsTX": 0,
+        "commandsRX": 481,
+        "commandsDroppedRX": 0,
+        "commandsDroppedTX": 0,
+        "timeoutResponse": 0,
+        "lwr": {
+          "repeaters": [10],
+          "protocolDataRate": 2
+        },
+        "lastSeen": "2025-01-22T09:42:28.644Z"
+      },
+      "_name": "50 - Fibargroup Motion Sensor FGMS001 (1er étage)",
+      "applicationRoute": false
     }
   ],
   "args": [],

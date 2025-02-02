@@ -5,7 +5,7 @@ const { getDeviceFeatureId } = require('../utils/convertToGladysDevice');
 const getProperty = require('../utils/getProperty');
 
 /**
- * @description This will be called when new Z-Wave node value is updated.
+ * @description This will be called when a Z-Wave node value is updated.
  * @param {object} message - Data sent by ZWave JS UI.
  * @returns {Promise} - Promise execution.
  * @example zwaveJSUI.onNodeValueUpdated({data: [{node}, {value}]});
