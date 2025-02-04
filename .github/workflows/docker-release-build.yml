@@ -21,7 +21,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install Global NPM Packages
         run: |
-          sudo npm install typescript node-gyp npm@latest -g
+          sudo npm install typescript node-gyp -g
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -58,7 +58,7 @@ jobs:
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - name: 📦 Install Global NPM Packages
         run: |
-          sudo npm install typescript node-gyp npm@latest -g
+          sudo npm install typescript node-gyp -g
       - name: 📦 Install NPM server packages
         working-directory: ./server
         run: |

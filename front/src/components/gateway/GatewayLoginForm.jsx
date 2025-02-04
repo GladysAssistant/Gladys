@@ -22,6 +22,16 @@ const GatewayLoginForm = ({ children, ...props }) => (
               <Text id="gatewayLogin.wrongCredentials" />
             </div>
           )}
+          {props.gatewayLoginStatus === LoginStatus.UnknownError && (
+            <>
+              <div class="alert alert-danger" role="alert">
+                <Text id="gatewayLogin.unknownError" />
+              </div>
+              <div class="alert alert-danger" role="alert">
+                {props.gatewayLoginError}
+              </div>
+            </>
+          )}
           {props.gatewayLoginStatus === RequestStatus.UserNotAcceptedLocally && (
             <div class="alert alert-danger" role="alert">
               <Text id="gatewayLogin.userNotAcceptedLocally" />

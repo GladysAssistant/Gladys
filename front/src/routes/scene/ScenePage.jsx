@@ -23,7 +23,7 @@ const ScenePage = ({ children, ...props }) => (
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
                   orderValue={props.getScenesOrderDir}
-                  search={props.debouncedSearch}
+                  search={props.search}
                   searchValue={props.sceneSearch}
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />

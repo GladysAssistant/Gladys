@@ -28,7 +28,7 @@ async function listenToCustomMqttTopicIfNeeded(device) {
       object_path: objectPath,
     });
     // Listen to MQTT topic
-    if (this.mqttClient) {
+    if (this.mqttClient && mqttTopic && mqttTopic.length) {
       logger.info(`Subscribing to MQTT topic ${mqttTopic}`);
       this.mqttClient.subscribe(mqttTopic);
     }

@@ -21,10 +21,17 @@ describe('Scene view', () => {
       .should('have.class', 'btn-primary')
       .click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
+    cy.url().should('include', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
+
+    cy.url().then(url => {
+      const relativeUrl = url.replace(Cypress.config().baseUrl, '');
+      Cypress.env('sceneUrl', relativeUrl);
+    });
   });
   it('Should edit the scene settings', () => {
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
 
     cy.get('div[class*="card-header"]')
       .contains('editScene.settings')
@@ -50,7 +57,9 @@ describe('Scene view', () => {
   });
 
   it('Should add new condition house empty', () => {
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
     cy.contains('editScene.addActionButton')
       .should('have.class', 'btn-outline-primary')
       .click();
@@ -116,7 +125,9 @@ describe('Scene view', () => {
       ]
     ).as('loadDevices');
 
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
     cy.contains('editScene.addActionButton')
       .should('have.class', 'btn-outline-primary')
       .click();
@@ -148,7 +159,9 @@ describe('Scene view', () => {
   });
 
   it('Should add new calendar event trigger', () => {
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
     cy.contains('editScene.addNewTriggerButton')
       .should('have.class', 'btn-outline-primary')
       .click();
@@ -179,7 +192,9 @@ describe('Scene view', () => {
     // on this element, and the checkbox is covered by this element
     cy.get('.custom-switch-indicator').click();
 
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
 
     cy.get('[type="checkbox"]').should('not.be.checked');
 
@@ -195,13 +210,15 @@ describe('Scene view', () => {
   });
   it('Should duplicate existing scene', () => {
     cy.login();
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
 
     cy.contains('editScene.moreButton').click();
 
     cy.contains('editScene.duplicateButton').click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene/duplicate`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}${sceneUrl}/duplicate`);
 
     cy.get('input:visible').then(inputs => {
       // Zone name
@@ -215,19 +232,27 @@ describe('Scene view', () => {
       .should('have.class', 'btn-primary')
       .click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
+    cy.url().should('include', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
+    cy.url().then(url => {
+      const relativeUrl = url.replace(Cypress.config().baseUrl, '');
+      Cypress.env('duplicatedSceneUrl', relativeUrl);
+    });
   });
 
   it('Should delete existing scene', () => {
     cy.login();
-    cy.visit('/dashboard/scene/my-scene');
+    const sceneUrl = Cypress.env('sceneUrl');
+    expect(sceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(sceneUrl);
 
     cy.contains('editScene.moreButton').click();
     cy.contains('editScene.deleteButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
 
-    cy.visit('/dashboard/scene/my-duplicated-scene');
+    const duplicatedSceneUrl = Cypress.env('duplicatedSceneUrl');
+    expect(duplicatedSceneUrl).to.exist; // Ensure the scene URL is available
+    cy.visit(duplicatedSceneUrl);
 
     cy.contains('editScene.moreButton').click();
 

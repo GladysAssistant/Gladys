@@ -2979,7 +2979,19 @@
           "57": "Brightness Down Click",
           "58": "Brightness Down Hold",
           "59": "Brightness Down Release",
-          "60": "Pressed"
+          "60": "Pressed",
+          "61": "Simple Left",
+          "62": "Simple Right",
+          "63": "Simple Both",
+          "64": "Double Left",
+          "65": "Double Right",
+          "66": "Double Both",
+          "67": "Triple Left",
+          "68": "Triple Right",
+          "69": "Triple Both",
+          "70": "Hold Left",
+          "71": "Hold Right",
+          "72": "Hold Both"
         }
       },
       "heater": {
