@@ -18,6 +18,7 @@ async function connect() {
   const devices = await this.nukiHandler.gladys.device.get({ service_id: this.serviceId });
   devices.forEach((device) => {
     this.subscribeDeviceTopic(device);
+    // this.setValue(device, 'nuki', 'lock', 0); // init to lock
   });
 }
 

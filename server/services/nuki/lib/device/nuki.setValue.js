@@ -9,7 +9,7 @@ const { BadParameters } = require('../../../../utils/coreErrors');
  * @example
  * nukiHandler.setValue(device, deviceFeature, 0);
  */
-function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
   const [prefix, topic] = deviceFeature.external_id.split(':');
 
@@ -27,7 +27,7 @@ function setValue(device, deviceFeature, value) {
   logger.trace(value);
 
   const deviceProtocol = this.getProtocolFromDevice(device);
-  this.getHandler(deviceProtocol).setValue(device, topic, command, value);
+  await this.getHandler(deviceProtocol).setValue(device, topic, command, value);
 }
 
 module.exports = {

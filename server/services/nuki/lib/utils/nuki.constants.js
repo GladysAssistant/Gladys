@@ -30,6 +30,7 @@ const TOPICS = {
   KEYPAD_BATTERY_CRITICAL: 'keypadBatteryCritical',
 };
 
+// 3.3 Lock States (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
 const LOCK_STATES = {
   0: 'uncalibrated',
   1: 'locked',
@@ -44,6 +45,28 @@ const LOCK_STATES = {
   255: 'undefined',
 };
 
+// 3.4 Lock Actions (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
+const LOCK_ACTIONS = {
+  UNLOCK: 1,
+  LOCK: 2,
+  UNLATCH: 3,
+  LOCKNGO: 4,
+  LOCKNGO_WITH_UNLATCH: 5,
+  FULL_LOCK: 6,
+};
+
+// 3.7 Trigger (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
+const TRIGGER = {
+  0: "system / bluetooth command",
+  1: "(reserved)",
+  2: "button",
+  3: "automatic",
+  6: "auto lock",
+  171: "Homekit / Matter",
+  172: "MQTT"
+};
+
+
 const DISCOVERY_TOPIC = 'homeassistant/#'; // this TOPIC is hardcoded in Nuki ...
 
 const DEVICE_EXTERNAL_ID_BASE = 'nuki';
@@ -53,7 +76,9 @@ module.exports = {
   CONFIGURATION,
   DEVICE_PARAM_NAME,
   DEVICE_PARAM_VALUE,
+  TRIGGER,
   DISCOVERY_TOPIC,
+  LOCK_ACTIONS,
   TOPICS,
   LOCK_STATES,
 };

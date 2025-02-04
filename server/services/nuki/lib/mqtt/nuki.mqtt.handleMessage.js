@@ -49,14 +49,15 @@ function handleMessage(topic, message) {
         const state = Math.round(message);
         logger.info(`Lock state has changed : ${LOCK_STATES[state]}`);
         externalId = `${main}:${deviceType}:button`;
+        const binaryValue = LOCK_STATES[state] === 'locked' ? 0 : 1;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
-          state: Math.round(message),
+          state: binaryValue,
         });
         externalId = `${main}:${deviceType}:state`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
-          state: Math.round(message),
+          state: state,
         });
         break;
       }
@@ -89,11 +90,6 @@ function handleMessage(topic, message) {
           device_feature_external_id: `${main}:${deviceType}:button`,
           state: binaryValue,
         };
-        gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
-        gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${main}:${deviceType}:state`,
-          state: binaryValue,
-        });
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
         break;
       }

@@ -29,6 +29,11 @@ const NukiController = require('./api/nuki.controller');
 
 controllers: NukiController(nukiHandler);
 
+'get /api/v1/service/nuki/status'
+'get /api/v1/service/nuki/config'
+'post /api/v1/service/nuki/config'
+'get /api/v1/service/nuki/discover/:protocol'
+'post /api/v1/service/nuki/discover/:protocol'
 
 ==========
 How To

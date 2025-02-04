@@ -9,13 +9,13 @@ const logger = require('../../../../utils/logger');
  * @example
  * nukiMQTTHandler.setValue(device, topic, command, value);
  */
-function setValue(device, topic, command, value) {
+async function setValue(device, topic, command, value) {
   logger.debug(`set value for ${device.external_id}`);
   // Send message to Nuki topics
   logger.trace(`nuki/${topic}/${command}`);
   logger.trace(`nuki/${topic}/${value}`);
 
-  this.mqttService.device.publish(`nuki/${topic}/${command}`, `true`);
+  await this.mqttService.device.publish(`nuki/${topic}/${command}`, `true`);
 }
 
 module.exports = {
