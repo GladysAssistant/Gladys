@@ -57,15 +57,14 @@ const LOCK_ACTIONS = {
 
 // 3.7 Trigger (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
 const TRIGGER = {
-  0: "system / bluetooth command",
-  1: "(reserved)",
-  2: "button",
-  3: "automatic",
-  6: "auto lock",
-  171: "Homekit / Matter",
-  172: "MQTT"
+  0: 'system / bluetooth command',
+  1: '(reserved)',
+  2: 'button',
+  3: 'automatic',
+  6: 'auto lock',
+  171: 'Homekit / Matter',
+  172: 'MQTT',
 };
-
 
 const DISCOVERY_TOPIC = 'homeassistant/#'; // this TOPIC is hardcoded in Nuki ...
 

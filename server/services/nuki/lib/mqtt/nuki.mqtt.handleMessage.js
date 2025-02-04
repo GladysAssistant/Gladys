@@ -1,12 +1,5 @@
 const logger = require('../../../../utils/logger');
-const {
-  EVENTS,
-  ACTIONS,
-  ACTIONS_STATUS,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  WEBSOCKET_MESSAGE_TYPES,
-} = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const { LOCK_STATES, TRIGGER } = require('../utils/nuki.constants');
 
@@ -57,7 +50,7 @@ function handleMessage(topic, message) {
         externalId = `${main}:${deviceType}:state`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
-          state: state,
+          state,
         });
         break;
       }
@@ -65,7 +58,7 @@ function handleMessage(topic, message) {
         // 0 = Success
         // 1-255 = Error code as described in the BLE API.
         logger.trace(feature, message);
-        if (message != 0) {
+        if (message !== 0) {
           logger.error(`Error command response : ${message}`);
         }
         break;
@@ -84,7 +77,9 @@ function handleMessage(topic, message) {
          *    outside of a time window are not published.
          */
         const [lockAction, trigger, authId, codeId, autoLock] = message.split(',');
-        logger.trace(`Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`);
+        logger.trace(
+          `Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`,
+        );
         const binaryValue = lockAction === 2 ? 1 : 0;
         const newState = {
           device_feature_external_id: `${main}:${deviceType}:button`,
