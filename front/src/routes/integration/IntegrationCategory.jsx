@@ -1,4 +1,3 @@
-import { Link } from 'preact-router/match';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 import ScrollToTopLink from '../../components/router/ScrollToTopLink';
