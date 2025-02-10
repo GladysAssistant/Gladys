@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const { BadParameters } = require('../../../../utils/coreErrors');
 
 /**
@@ -21,13 +20,8 @@ function setValue(device, deviceFeature, value) {
   }
   let command;
   value === 0 ? (command = 'lock') : (command = 'unlock');
-  logger.trace(prefix);
-  logger.trace(topic);
-  logger.trace(command);
-  logger.trace(value);
-
   const deviceProtocol = this.getProtocolFromDevice(device);
-  this.getHandler(deviceProtocol).setValue(device, topic, command, value);
+  this.getHandler(deviceProtocol).setValue(device, command, value);
 }
 
 module.exports = {

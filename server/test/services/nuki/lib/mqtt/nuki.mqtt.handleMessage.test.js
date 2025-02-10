@@ -48,4 +48,31 @@ describe('Nuki - MQTT - Handle message', () => {
     assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);
   });
+
+  it('should update NUKI battery state', () => {
+    nukiHandler.handleMessage('nuki/my_device/batteryChargeState', '42');
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should notify Gladys with NUKI state', () => {
+    nukiHandler.handleMessage('nuki/my_device/state', '0');
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledTwice(gladys.event.emit);
+  });
+
+  it('should handle NUKI commandResponse', () => {
+    nukiHandler.handleMessage('nuki/my_device/commandResponse', '255');
+
+    assert.notCalled(mqttService.device.publish);
+  });
+
+  it('should notify Gladys with NUKI lockActionEvent', () => {
+    nukiHandler.handleMessage('nuki/my_device/lockActionEvent', '1,172,0,0,0');
+
+    assert.notCalled(mqttService.device.publish);
+    assert.calledOnce(gladys.event.emit);
+  });
 });
