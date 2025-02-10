@@ -9,6 +9,10 @@ import {
 } from '../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../actions/integration';
 
+function sortRoomsInHouses(houses) {
+  houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+}
+
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
@@ -64,6 +68,7 @@ function createActions(store) {
           expand: 'rooms'
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
+        sortRoomsInHouses(housesWithRooms);
         store.setState({
           housesWithRooms,
           housesGetStatus: RequestStatus.Success
