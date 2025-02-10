@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component, createRef } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
@@ -74,6 +74,14 @@ const calculateVariation = (firstValue, lastValue) => {
 const allEqual = arr => arr.every(val => val === arr[0]);
 
 class Chartbox extends Component {
+  dropdownRef = createRef();
+
+  handleClickOutside = event => {
+    if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
+      this.setState({ dropdown: false });
+    }
+  };
+
   toggleDropdown = () => {
     this.setState({
       dropdown: !this.state.dropdown
@@ -302,6 +310,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
@@ -321,6 +330,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
   render(
     props,
@@ -351,7 +361,7 @@ class Chartbox extends Component {
             <div class={cx(style.subheader)}>{box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               {props.box.chart_type && (
-                <div class="dropdown">
+                <div class="dropdown" ref={this.dropdownRef}>
                   <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                     {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
                     {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
