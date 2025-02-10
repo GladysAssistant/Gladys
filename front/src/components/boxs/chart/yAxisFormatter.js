@@ -12,7 +12,7 @@ const yAxisFormatter = value => {
   const roundedValue = parseFloat(value.toPrecision(significantDigits));
 
   // For very small or very large numbers, use scientific notation
-  if (Math.abs(roundedValue) < 0.001 || Math.abs(roundedValue) >= 1e6) {
+  if (Math.abs(roundedValue) < 0.001 || Math.abs(roundedValue) >= 1e9) {
     return roundedValue.toExponential(2); // Scientific notation with 2 decimals
   }
 

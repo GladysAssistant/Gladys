@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import DuplicateScenePage from './DuplicateScenePage';
 import { route } from 'preact-router';
 import { RequestStatus } from '../../../utils/consts';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import get from 'get-value';
 
 class DuplicateScene extends Component {
@@ -16,7 +17,7 @@ class DuplicateScene extends Component {
       sourceScene: scene,
       loading: false,
       scene: {
-        name: '',
+        name: get(this.props.intl.dictionary, 'duplicateScene.nameAfterCopy').replace('{{name}}', scene.name),
         icon: scene.icon
       }
     });
@@ -131,4 +132,4 @@ class DuplicateScene extends Component {
   }
 }
 
-export default connect('httpClient', {})(DuplicateScene);
+export default withIntlAsProp(connect('httpClient', {})(DuplicateScene));

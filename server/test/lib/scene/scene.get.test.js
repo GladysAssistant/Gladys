@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const Promise = require('bluebird');
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
 
@@ -38,6 +39,29 @@ describe('SceneManager.get', () => {
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },
     ]);
+  });
+  it('should search scene, even in with accents', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const stringsToSearch = ['Tést', 'têst', 'tèsT'];
+    await Promise.map(stringsToSearch, async (stringToSearch) => {
+      const scenes = await sceneManager.get({
+        search: stringToSearch,
+      });
+      expect(scenes).to.be.instanceOf(Array);
+      expect(scenes).to.deep.equal([
+        {
+          id: '3a30636c-b3f0-4251-a347-90787f0fe940',
+          name: 'Test scene',
+          icon: 'fe fe-bell',
+          active: true,
+          description: null,
+          selector: 'test-scene',
+          tags: [],
+          last_executed: null,
+          updated_at: new Date('2019-02-12T07:49:07.556Z'),
+        },
+      ]);
+    });
   });
   it('should search scene by tag', async () => {
     const sceneManager = new SceneManager({}, event);

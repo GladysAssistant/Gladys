@@ -303,7 +303,7 @@
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
-        "editNameLabel": "Nom du widget",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
         "addADeviceLabel": "Ajouter un appareil :"
       },
@@ -414,7 +414,7 @@
         "no": "Non"
       },
       "scene": {
-        "editNameLabel": "Entrez le nom de cette box",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       },
@@ -2624,7 +2624,8 @@
     "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
     "invalidIcon": "L'icône est requise",
-    "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+    "sceneAlreadyExist": "Une scène avec le même nom existe déjà.",
+    "nameAfterCopy": "Copie de {{name}}"
   },
   "scene": {
     "title": "Scènes",

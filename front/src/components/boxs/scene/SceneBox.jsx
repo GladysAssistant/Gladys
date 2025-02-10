@@ -42,10 +42,11 @@ class SceneBoxComponent extends Component {
 
     return (
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{boxTitle}</h3>
-        </div>
-
+        {boxTitle && (
+          <div class="card-header">
+            <h3 class="card-title">{boxTitle}</h3>
+          </div>
+        )}
         <div
           class={cx('dimmer', {
             active: loading
