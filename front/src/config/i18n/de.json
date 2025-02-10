@@ -348,6 +348,7 @@
       "chart": {
         "defaultInterval": "Standardintervall",
         "lastHour": "Letzte Stunde",
+        "lastTwelveHours": "Letzte 12 Stunden",
         "lastDay": "Letzte 24 Stunden",
         "lastSevenDays": "Letzte 7 Tage",
         "lastThirtyDays": "Letzte 30 Tage",

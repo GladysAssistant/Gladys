@@ -576,6 +576,9 @@ class EditChart extends Component {
                 <option value="last-hour">
                   <Text id="dashboard.boxes.chart.lastHour" />
                 </option>
+                <option value="last-twelve-hours">
+                  <Text id="dashboard.boxes.chart.lastTwelveHours" />
+                </option>
                 <option value="last-day">
                   <Text id="dashboard.boxes.chart.lastDay" />
                 </option>
