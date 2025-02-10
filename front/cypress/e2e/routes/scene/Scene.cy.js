@@ -222,7 +222,9 @@ describe('Scene view', () => {
 
     cy.get('input:visible').then(inputs => {
       // Zone name
-      cy.wrap(inputs[0]).type('My Duplicated scene');
+      cy.wrap(inputs[0])
+        .clear()
+        .type('My Duplicated scene');
     });
 
     cy.get('.fe-activity').click();
