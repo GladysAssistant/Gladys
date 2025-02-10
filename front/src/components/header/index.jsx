@@ -35,10 +35,10 @@ class Header extends Component {
     }
   };
   componentDidMount() {
-    document.addEventListener('click', this.handleClickOutside);
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
   componentWillUnmount() {
-    document.removeEventListener('click', this.handleClickOutside);
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
   render(props) {
     if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
