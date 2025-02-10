@@ -15,11 +15,14 @@ async function vacuum() {
   // on big databases
   // Read: https://www.sqlite.org/lang_vacuum.html
   logger.info('Running VACUUM command to free up space.');
+  const start = Date.now();
   await db.sequelize.query('VACUUM;');
   logger.info('VACUUM finished.');
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SYSTEM.VACUUM_FINISHED,
-    payload: {},
+    payload: {
+      duration: Date.now() - start,
+    },
   });
 }
 
