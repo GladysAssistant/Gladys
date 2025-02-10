@@ -2499,6 +2499,7 @@
     "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
+    "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",

@@ -2499,6 +2499,7 @@
     "vacuumDatabaseDescription": "Auf Wunsch wird Gladys eine Datenbankreinigung starten, um Platz freizugeben. Dies löscht keine Daten, sondern entfernt nur physisch alte, als gelöscht markierte Daten. Sei vorsichtig, denn diese Aufgabe kann einige Zeit in Anspruch nehmen und während dieser Zeit wird Gladys nicht verfügbar sein.",
     "vacuumDatabaseButton": "Datenbankreinigung starten",
     "vacuumDatabaseStarted": "Die Datenbankreinigung wurde gestartet. Gladys wird erst wieder verfügbar sein, wenn dieser Vorgang abgeschlossen ist.",
+    "vacuumDatabaseFinished": "Die Datenbankreinigung wurde abgeschlossen. Gladys ist wieder verfügbar.",
     "containerState": {
       "created": "Erstellt",
       "restarting": "Startet neu",

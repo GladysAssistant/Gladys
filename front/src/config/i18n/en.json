@@ -2499,6 +2499,7 @@
     "vacuumDatabaseDescription": "By clicking on this button, Gladys will start cleaning the database to free up space. This does not delete any data, it just physically remove old deleted data. Be careful, this task can take some time to run, and during that time Gladys will not be available.",
     "vacuumDatabaseButton": "Start database cleaning",
     "vacuumDatabaseStarted": "Database cleaning has started... Gladys will not be available until this job finishes.",
+    "vacuumDatabaseFinished": "Database cleaning has finished. Gladys is back online.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
