@@ -2558,7 +2558,8 @@
     "duplicateSceneButton": "Duplicate",
     "invalidName": "Name is required",
     "invalidIcon": "Icon is required",
-    "sceneAlreadyExist": "A scene with that name already exist."
+    "sceneAlreadyExist": "A scene with that name already exist.",
+    "nameAfterCopy": "Copy of {{name}}"
   },
   "scene": {
     "title": "Scenes",
