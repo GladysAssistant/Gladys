@@ -124,6 +124,15 @@ class Chartbox extends Component {
     });
     this.getData();
   };
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getData();
+      this.wasDisconnected = false;
+    }
+  };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     let deviceFeatureNames = this.props.box.device_feature_names;
@@ -302,6 +311,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
@@ -321,6 +331,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
   render(
     props,

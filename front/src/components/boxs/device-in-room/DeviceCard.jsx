@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import DeviceRow from './DeviceRow';
 import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
@@ -56,10 +55,10 @@ const DeviceCard = ({ children, ...props }) => {
                 ? placeholderRows.map((_, index) => (
                     <tr key={`placeholder-${index}`}>
                       <td class="w-50">
-                        <div class={style.loadingSkeleton}></div>
+                        <div class={style.loadingSkeleton} />
                       </td>
                       <td>
-                        <div class={style.loadingSkeleton}></div>
+                        <div class={style.loadingSkeleton} />
                       </td>
                     </tr>
                   ))
