@@ -56,6 +56,16 @@ class RoomHumidityBoxComponent extends Component {
     this.props.getHumidityInRoom(this.props.box, this.props.x, this.props.y);
   };
 
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.refreshData();
+      this.wasDisconnected = false;
+    }
+  };
+
   updateRoomHumidity = payload => {
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
   };
@@ -63,6 +73,7 @@ class RoomHumidityBoxComponent extends Component {
   componentDidMount() {
     this.refreshData();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomHumidity);
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(previousProps) {
@@ -74,6 +85,7 @@ class RoomHumidityBoxComponent extends Component {
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomHumidity);
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(props, {}) {

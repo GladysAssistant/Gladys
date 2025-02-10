@@ -3,14 +3,20 @@ import pLimit from 'p-limit';
 export class GatewayHttpClient {
   constructor(session) {
     this.session = session;
-    this.session.dispatcher.addListener('GLADYS_GATEWAY_CONNECTED', this.emptyQueue.bind(this));
+    this.session.dispatcher.addListener('websocket.connected', this.onWebsocketConnected.bind(this));
     // Allow a maximum of 5 concurrent API calls
     this.limiter = pLimit(5);
     this.queue = [];
     this.pendingRequests = new Map(); // Cache for pending GET requests
   }
 
-  async emptyQueue() {
+  onWebsocketConnected({ connected }) {
+    if (connected) {
+      this.emptyQueue();
+    }
+  }
+
+  emptyQueue() {
     this.queue.forEach(func => {
       func();
     });

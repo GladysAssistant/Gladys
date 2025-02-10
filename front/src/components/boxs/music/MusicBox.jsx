@@ -86,12 +86,23 @@ class MusicComponent extends Component {
     }
   };
 
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getDevice();
+      this.wasDisconnected = false;
+    }
+  };
+
   componentDidMount() {
     this.getDevice();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentWillUnmount() {
@@ -99,6 +110,7 @@ class MusicComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(props, { isPlaying, musicDevice, previousFeature, nextFeature, volumeFeature }) {

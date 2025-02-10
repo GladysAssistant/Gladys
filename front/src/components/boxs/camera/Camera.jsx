@@ -32,6 +32,16 @@ class CameraBoxComponent extends Component {
     }
   };
 
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.refreshData();
+      this.wasDisconnected = false;
+    }
+  };
+
   updateDeviceStateWebsocket = payload => {
     if (this.props.box.camera === payload.device) {
       this.setState({
@@ -227,6 +237,7 @@ class CameraBoxComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(previousProps) {
@@ -245,6 +256,7 @@ class CameraBoxComponent extends Component {
     if (this.state.streaming) {
       this.stopStreaming();
     }
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(

@@ -42,6 +42,7 @@ class Session {
     this.ws = new WebSocket(websocketUrl);
     this.ws.onopen = () => {
       this.websocketConnected = true;
+      this.dispatcher.dispatch('websocket.connected', { connected: true });
       this.ws.send(
         JSON.stringify({
           type: 'authenticate.request',
@@ -61,6 +62,7 @@ class Session {
     };
     this.ws.onclose = e => {
       console.error(e);
+      this.dispatcher.dispatch('websocket.connected', { connected: false });
       this.websocketConnected = false;
       if (e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
         delete this.user.access_token;

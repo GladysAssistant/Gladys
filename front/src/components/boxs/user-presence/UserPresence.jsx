@@ -140,6 +140,15 @@ class UserPresenceComponent extends Component {
       });
     }
   };
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getUsersWithPresence();
+      this.wasDisconnected = false;
+    }
+  };
   refreshRelativeTime = () => {
     if (this.state.usersWithPresence && this.state.usersWithPresence.length > 0) {
       const usersWithPresence = this.state.usersWithPresence.map(user => {
@@ -159,6 +168,7 @@ class UserPresenceComponent extends Component {
     }, 60 * 1000);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(previousProps) {
@@ -172,6 +182,7 @@ class UserPresenceComponent extends Component {
     clearInterval(this.interval);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(props, { usersWithPresence, dashboardUserPresenceGetUsersStatus }) {
