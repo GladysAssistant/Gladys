@@ -70,11 +70,9 @@ class NukiDeviceBox extends Component {
     });
   };
 
-
-
   render(
     { deviceIndex, device, housesWithRooms, editable, ...props },
-    { loading, errorMessage, authErrorMessage, tooMuchStatesError, statesNumber }
+    { loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features.length > 0;
     // default value is 'mqtt'
@@ -91,8 +89,6 @@ class NukiDeviceBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              
-
               <div>
                 {errorMessage && (
                   <div class="alert alert-danger">
@@ -182,21 +178,21 @@ class NukiDeviceBox extends Component {
                     </div>
                     {// HIDE UNTIL HTTP IS IMPLEMENTED @TODO: implement http
                     false && (
-                    <div class="form-check form-check-inline">
-                      <label class="custom-control custom-radio">
-                        <input
-                          type="radio"
-                          class="custom-control-input"
-                          name={`device-protocol-${deviceIndex}`}
-                          value="http"
-                          checked={deviceProtocol === 'http'}
-                          disabled
-                        />
-                        <div class="custom-control-label">
-                          <Text id="integration.nuki.device.protocolHTTP" />
-                        </div>
-                      </label>
-                    </div>
+                      <div class="form-check form-check-inline">
+                        <label class="custom-control custom-radio">
+                          <input
+                            type="radio"
+                            class="custom-control-input"
+                            name={`device-protocol-${deviceIndex}`}
+                            value="http"
+                            checked={deviceProtocol === 'http'}
+                            disabled
+                          />
+                          <div class="custom-control-label">
+                            <Text id="integration.nuki.device.protocolHTTP" />
+                          </div>
+                        </label>
+                      </div>
                     )}
                   </div>
                 )}

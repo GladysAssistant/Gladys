@@ -18,7 +18,7 @@ const ICON_MAP = {
     7: 'activity', //'unlatching opening',
     253: 'cpu', //'boot run'
     254: 'alert-triangle', // 'motor blocked'
-    255: 'alert-circle', //'undefined'
+    255: 'alert-circle' //'undefined'
   }
 };
 

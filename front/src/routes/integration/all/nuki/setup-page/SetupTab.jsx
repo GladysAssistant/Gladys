@@ -44,7 +44,6 @@ const SetupTab = ({ children, ...props }) => {
             )}
 
             <form id="nukiSetupForm">
-                       
               <div class="form-group">
                 <label for="nukiUsername" class="form-label">
                   <Text id={`integration.nuki.setup.userLabel`} />
