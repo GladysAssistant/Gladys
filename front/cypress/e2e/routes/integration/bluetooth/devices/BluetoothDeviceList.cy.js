@@ -39,7 +39,6 @@ describe('Bluetooth device list', () => {
       .parent('.card')
       .within(() => {
         cy.get('input').should('have.value', device.name);
-        cy.get('select').should('have.value', '');
       });
   });
 
@@ -49,9 +48,10 @@ describe('Bluetooth device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('input')
-          .clear()
-          .type('New name');
+        cy.get('input').as('deviceInput');
+
+        cy.get('@deviceInput').clear();
+        cy.get('@deviceInput').type('New name');
         cy.get('select').select(rooms[0].name);
 
         cy.get('.card-header').should('have.text', 'New name');

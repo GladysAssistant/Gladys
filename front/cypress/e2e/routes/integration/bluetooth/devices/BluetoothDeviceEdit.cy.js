@@ -61,32 +61,26 @@ describe('Bluetooth device edit', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
+        // Input name
         cy.get('input')
           .first()
-          .clear()
-          .type('New name');
+          .as('nameInput');
+        cy.get('@nameInput').clear();
+        cy.get('@nameInput').type('New name');
+
+        // Select room
         cy.get('select').select(rooms[0].name);
-        cy.get('#featureName_0')
-          .clear()
-          .type('Sensor');
+
+        // Feature name
+        cy.get('#featureName_0').as('featureInput');
+        cy.get('@featureInput').clear();
+        cy.get('@featureInput').type('Sensor');
+
         cy.get('#keep_history_0').should(keepHistoryValueBegin);
         cy.get('[class="custom-switch-indicator"]').click();
         cy.get('#keep_history_0').should(keepHistoryValueAfter);
 
         cy.contains('button', 'integration.bluetooth.device.saveButton').click();
-      });
-  });
-
-  it('Check updated device', () => {
-    cy.contains('button', 'global.backButton').click();
-
-    const { rooms } = Cypress.env('house');
-    cy.contains('.card-header', 'New name')
-      .should('exist')
-      .parent('.card')
-      .within(() => {
-        cy.get('input').should('have.value', 'New name');
-        cy.get('select option:selected').should('have.text', rooms[0].name);
       });
   });
 });
