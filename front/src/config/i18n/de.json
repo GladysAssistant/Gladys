@@ -348,6 +348,7 @@
       "chart": {
         "defaultInterval": "Standardintervall",
         "lastHour": "Letzte Stunde",
+        "lastTwelveHours": "Letzte 12 Stunden",
         "lastDay": "Letzte 24 Stunden",
         "lastSevenDays": "Letzte 7 Tage",
         "lastThirtyDays": "Letzte 30 Tage",
@@ -2495,10 +2496,11 @@
     "numberOfHoursBeforeStateIsOutdated": "Zeit bis zum Ablauf eines Zustands",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Diese Verzögerung entspricht der Anzahl der Stunden, bevor der Zustand eines Sensors als \"abgelaufen\" betrachtet und daher nicht mehr auf dem Dashboard angezeigt wird.",
     "hours": "Stunden",
-    "vacuumDatabaseTitle": "Datenbankreinigung",
-    "vacuumDatabaseDescription": "Auf Wunsch wird Gladys eine Datenbankreinigung starten, um Platz freizugeben. Dies löscht keine Daten, sondern entfernt nur physisch alte, als gelöscht markierte Daten. Sei vorsichtig, denn diese Aufgabe kann einige Zeit in Anspruch nehmen und während dieser Zeit wird Gladys nicht verfügbar sein.",
+    "vacuumDatabaseTitle": "SQLite-Datenbankreinigung",
+    "vacuumDatabaseDescription": "Wenn du auf diese Schaltfläche klickst, beginnt Gladys mit der Bereinigung der SQLite-Datenbank, um Speicherplatz freizugeben. Dabei werden keine Daten gelöscht, es werden nur physisch alte, bereits gelöschte Daten entfernt. Während der Bereinigung ist Gladys nicht verfügbar.",
     "vacuumDatabaseButton": "Datenbankreinigung starten",
     "vacuumDatabaseStarted": "Die Datenbankreinigung wurde gestartet. Gladys wird erst wieder verfügbar sein, wenn dieser Vorgang abgeschlossen ist.",
+    "vacuumDatabaseFinished": "Die Datenbankreinigung wurde abgeschlossen. Gladys ist wieder verfügbar. Zeit für die Reinigung: {{duration}}.",
     "containerState": {
       "created": "Erstellt",
       "restarting": "Startet neu",
@@ -2558,7 +2560,8 @@
     "duplicateSceneButton": "Duplizieren",
     "invalidName": "Name ist erforderlich",
     "invalidIcon": "Symbol ist erforderlich",
-    "sceneAlreadyExist": "Eine Szene mit diesem Namen existiert bereits."
+    "sceneAlreadyExist": "Eine Szene mit diesem Namen existiert bereits.",
+    "nameAfterCopy": "Kopie von {{name}}"
   },
   "scene": {
     "title": "Szenen",

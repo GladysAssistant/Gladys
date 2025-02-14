@@ -1,6 +1,6 @@
-import { Link } from 'preact-router/match';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
+import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 
 const IntegrationCategory = ({ category, integration, currentUrl }) => {
   let url = `${currentUrl}/`;
@@ -12,7 +12,7 @@ const IntegrationCategory = ({ category, integration, currentUrl }) => {
   return (
     <div class="col-sm-6 col-lg-4">
       <div class="card">
-        <Link href={url}>
+        <ScrollToTopLink href={url}>
           <Localizer>
             <img
               class="card-img-top"
@@ -20,12 +20,12 @@ const IntegrationCategory = ({ category, integration, currentUrl }) => {
               alt={<Text id={`integration.${integration.key}.title`} />}
             />
           </Localizer>
-        </Link>
+        </ScrollToTopLink>
         <div class="card-body d-flex flex-column">
           <h4>
-            <Link href={url}>
+            <ScrollToTopLink href={url}>
               <Text id={`integration.${integration.key}.title`} />
-            </Link>
+            </ScrollToTopLink>
           </h4>
           <div class="text-muted">
             <Text id={`integration.${integration.key}.description`} />
