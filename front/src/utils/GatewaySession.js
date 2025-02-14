@@ -56,10 +56,16 @@ class GatewaySession {
         if (type === 'message') {
           this.dispatcher.dispatch(message.event, message.data);
         }
+        if (type === 'websocket.connected' && message.connected) {
+          this.websocketConnected = true;
+          this.dispatcher.dispatch('websocket.connected', { connected: true });
+        }
+        if (type === 'websocket.connected' && !message.connected) {
+          this.websocketConnected = false;
+          this.dispatcher.dispatch('websocket.connected', { connected: false });
+        }
       });
       this.ready = true;
-      this.websocketConnected = true;
-      this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
     }
   }
 
