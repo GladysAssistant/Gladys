@@ -302,6 +302,34 @@ describe('calendar.findCurrentlyRunningEvent', () => {
     const eventsId = events.map((e) => e.id);
     expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
   });
+  it('should find event in calendar - does-not-contain', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    await calendar.createEvent('test-calendar', {
+      id: '3f148ad9-b189-4862-84c3-df26f9bf263a',
+      name: 'my red event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'does-not-contain', 'red');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should find event in calendar - does not contain (rule is inside scene code)', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'does-not-contain', 'random');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
   it('should find event in calendar - starts-with', async () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
