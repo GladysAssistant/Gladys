@@ -86,6 +86,11 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
+// RFLink integration
+import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
+import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
+import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
+
 // Deprecated integration
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 
@@ -297,6 +302,12 @@ const AppRouter = connect(
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
+
+        <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
+        <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
+        <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
+        <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
+        <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
 
         <TuyaPage path="/dashboard/integration/device/tuya" />
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
