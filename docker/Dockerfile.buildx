@@ -1,6 +1,6 @@
 # STEP 1
 # Prepare server package*.json files
-FROM node:18-slim as json-files
+FROM node:22-slim as json-files
 COPY ./server /json-files/server
 WORKDIR /json-files/server/
 RUN find . -type f \! -name "package*.json" -exec rm -r {} \;
@@ -9,7 +9,7 @@ COPY ./server/utils /json-files/server/utils
 
 # STEP 3
 # Gladys Bundle
-FROM node:18-slim as gladys
+FROM node:22-slim as gladys
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

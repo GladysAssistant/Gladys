@@ -1,8 +1,8 @@
 {
   "name": "gladys-front",
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "22.x",
+    "npm": "10.x"
   },
   "scripts": {
     "start": "per-env",
@@ -23,6 +23,9 @@
     "start:cypress": "cross-env DEMO_MODE=false NODE_OPTIONS=--openssl-legacy-provider WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
+  },
+  "overrides": {
+    "esm": "npm:esm-wallaby"
   },
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",

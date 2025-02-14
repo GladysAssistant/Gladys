@@ -14,16 +14,14 @@ describe('Maps view', () => {
       // Zone name
       cy.wrap(inputs[0]).type('My zone');
       // Radius
-      cy.wrap(inputs[1])
-        .clear()
-        .type(4000);
+      cy.wrap(inputs[1]).clear();
+      cy.wrap(inputs[1]).type(4000);
     });
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('#react-select-color-picker')
-      .click()
-      .type(`${i18n.color.green}{enter}`);
+    cy.get('#react-select-color-picker').click();
+    cy.get('#react-select-color-picker').type(`${i18n.color.green}{enter}`);
 
     cy.get('.leaflet-container').click(390, 250);
 
@@ -39,13 +37,14 @@ describe('Maps view', () => {
 
     cy.get('input:visible').then(inputs => {
       // Zone name
-      cy.wrap(inputs[0])
-        .clear()
-        .type('My zone edited');
+      cy.wrap(inputs[0]).as('zoneInput');
+      cy.get('@zoneInput').clear();
+      cy.get('@zoneInput').type('My zone edited');
+
       // Radius
-      cy.wrap(inputs[1])
-        .clear()
-        .type(5000);
+      cy.wrap(inputs[1]).as('radiusInput');
+      cy.get('@radiusInput').clear();
+      cy.get('@radiusInput').type(5000);
     });
 
     cy.get('.leaflet-container').click(200, 250);

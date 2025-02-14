@@ -10,10 +10,11 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/new`);
 
-    cy.get('input:visible').then(inputs => {
-      // Zone name
-      cy.wrap(inputs[0]).type('My scene');
-    });
+    cy.get('input')
+      .first()
+      .as('sceneInput');
+    cy.get('@sceneInput').clear();
+    cy.get('@sceneInput').type('My Scene');
 
     cy.get('.fe-activity').click();
 
@@ -41,11 +42,15 @@ describe('Scene view', () => {
     cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])
         .find('input')
-        .clear()
-        .type('My scene name');
+        .as('sceneNameInput');
+      cy.get('@sceneNameInput').clear();
+      cy.get('@sceneNameInput').type('My scene name');
+
       cy.wrap(inputs[1])
         .find('input')
-        .type('My scene description');
+        .as('sceneDescriptionInput');
+
+      cy.get('@sceneDescriptionInput').type('My scene description');
       cy.wrap(inputs[2]).type('My tag 1{enter}{enter}');
     });
 
@@ -67,8 +72,11 @@ describe('Scene view', () => {
     const i18n = Cypress.env('i18n');
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1])
-        .click(0, 0, { force: true })
+      cy.wrap(inputs[1]).as('houseControl');
+
+      cy.get('@houseControl').click(0, 0, { force: true });
+
+      cy.get('@houseControl')
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
@@ -76,8 +84,10 @@ describe('Scene view', () => {
     });
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1])
-        .click(0, 0, { force: true })
+      cy.wrap(inputs[1]).as('houseControl');
+      cy.get('@houseControl').click(0, 0, { force: true });
+
+      cy.get('@houseControl')
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("My House")`)
@@ -135,8 +145,10 @@ describe('Scene view', () => {
     const i18n = Cypress.env('i18n');
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1])
-        .click(0, 0, { force: true })
+      cy.wrap(inputs[1]).as('deviceControl');
+      cy.get('@deviceControl').click(0, 0, { force: true });
+
+      cy.get('@deviceControl')
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
@@ -148,8 +160,10 @@ describe('Scene view', () => {
     cy.wait(100);
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1])
-        .click(0, 0, { force: true })
+      cy.wrap(inputs[1]).as('deviceControl');
+      cy.get('@deviceControl').click(0, 0, { force: true });
+
+      cy.get('@deviceControl')
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("Multilevel")`)
@@ -169,8 +183,10 @@ describe('Scene view', () => {
     const i18n = Cypress.env('i18n');
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.wrap(inputs[1])
-        .click(0, 0, { force: true })
+      cy.wrap(inputs[1]).as('calendarControl');
+      cy.get('@calendarControl').click(0, 0, { force: true });
+
+      cy.get('@calendarControl')
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
@@ -220,12 +236,11 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}${sceneUrl}/duplicate`);
 
-    cy.get('input:visible').then(inputs => {
-      // Zone name
-      cy.wrap(inputs[0])
-        .clear()
-        .type('My Duplicated scene');
-    });
+    cy.get('input')
+      .first()
+      .as('sceneInput');
+    cy.get('@sceneInput').clear();
+    cy.get('@sceneInput').type('My Duplicated scene');
 
     cy.get('.fe-activity').click();
 

@@ -61,12 +61,11 @@ describe('Bluetooth scanner', () => {
     cy.get('input[type=number]').should('be.disabled');
 
     // Check all buttons are enabled
-    cy.contains('button', 'integration.bluetooth.setup.saveLabel')
-      .should('not.be.disabled')
-      .first()
-      // Submit new config
-      .click()
-      .should('be.disabled');
+    cy.contains('button', 'integration.bluetooth.setup.saveLabel').as('saveButton');
+    cy.get('@saveButton').should('not.be.disabled');
+    cy.get('@saveButton').first();
+    cy.get('@saveButton').click();
+    cy.get('@saveButton').should('be.disabled');
 
     cy.wait('@saveStatus');
   });
@@ -98,12 +97,11 @@ describe('Bluetooth scanner', () => {
     cy.get('input[type=number]').type('{selectall}2');
 
     // Check all buttons are enabled
-    cy.contains('button', 'integration.bluetooth.setup.saveLabel')
-      .should('not.be.disabled')
-      .first()
-      // Submit new config
-      .click()
-      .should('be.disabled');
+    cy.contains('button', 'integration.bluetooth.setup.saveLabel').as('saveButton');
+    cy.get('@saveButton').should('not.be.disabled');
+    cy.get('@saveButton').first();
+    cy.get('@saveButton').click();
+    cy.get('@saveButton').should('be.disabled');
 
     cy.wait('@saveStatus');
   });

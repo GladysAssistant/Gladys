@@ -52,7 +52,9 @@ describe('Sign-up', () => {
       // Email
       cy.wrap(inputs[3]).type(tony.email);
       // Password
-      cy.wrap(inputs[4]).type('short');
+      cy.wrap(inputs[4]).as('passwordInput');
+      cy.get('@passwordInput').clear();
+      cy.get('@passwordInput').type('short');
       // Password retype
       cy.wrap(inputs[5]).type('short');
     });
@@ -77,9 +79,9 @@ describe('Sign-up', () => {
     // Fill form
     cy.get('input:visible').then(inputs => {
       // Password
-      cy.wrap(inputs[4])
-        .clear()
-        .type(tony.password);
+      cy.wrap(inputs[4]).as('passwordInput');
+      cy.get('@passwordInput').clear();
+      cy.get('@passwordInput').type(tony.password);
     });
 
     // Submit empty form
@@ -98,9 +100,9 @@ describe('Sign-up', () => {
     // Fill form
     cy.get('input:visible').then(inputs => {
       // Password
-      cy.wrap(inputs[5])
-        .clear()
-        .type(tony.password);
+      cy.wrap(inputs[5]).as('passwordConfirmInput');
+      cy.get('@passwordConfirmInput').clear();
+      cy.get('@passwordConfirmInput').type(tony.password);
     });
 
     // Store access token
@@ -138,15 +140,15 @@ describe('Sign-up', () => {
     // Fill form
     cy.get('input:visible').then(inputs => {
       // House name
-      cy.wrap(inputs[0])
-        .clear()
-        .type(house.name);
+      cy.wrap(inputs[0]).as('houseNameInput');
+      cy.get('@houseNameInput').clear();
+      cy.get('@houseNameInput').type(house.name);
 
       // Room
       house.rooms.forEach(room => {
-        cy.wrap(inputs[1])
-          .clear()
-          .type(room.name);
+        cy.wrap(inputs[1]).as('roomInput');
+        cy.get('@roomInput').clear();
+        cy.get('@roomInput').type(room.name);
       });
     });
 

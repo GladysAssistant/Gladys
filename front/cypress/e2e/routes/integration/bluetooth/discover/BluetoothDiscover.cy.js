@@ -43,10 +43,11 @@ describe('Bluetooth discover', () => {
       }
     ).as('scan');
 
-    cy.contains('integration.bluetooth.discover.scanButton')
-      .should('have.class', 'btn-outline-primary')
-      .click()
-      .should('have.class', 'btn-outline-danger');
+    // Start scan
+    cy.contains('integration.bluetooth.discover.scanButton').as('scanButton');
+    cy.get('@scanButton').should('have.class', 'btn-outline-primary');
+    cy.get('@scanButton').click();
+    cy.get('@scanButton').should('have.class', 'btn-outline-danger');
 
     cy.wait('@scan')
       .its('request.body')
@@ -65,10 +66,11 @@ describe('Bluetooth discover', () => {
       }
     );
 
-    cy.contains('integration.bluetooth.discover.scanButton')
-      .should('have.class', 'btn-outline-danger')
-      .click()
-      .should('have.class', 'btn-outline-primary');
+    // Manual stop scan
+    cy.contains('integration.bluetooth.discover.scanButton').as('scanButton');
+    cy.get('@scanButton').should('have.class', 'btn-outline-danger');
+    cy.get('@scanButton').click();
+    cy.get('@scanButton').should('have.class', 'btn-outline-primary');
   });
 
   it('Auto stop scan', () => {

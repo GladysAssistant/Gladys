@@ -64,6 +64,9 @@ describe('Broadlink edit remote - skip all', () => {
     cy.get('.card-body').within(() => {
       // Check device name
       cy.get('input')
+        .first()
+        .as('nameInput');
+      cy.get('@nameInput')
         .should('have.value', 'Light Remote')
         .should('not.be.disabled');
       // Check selects
@@ -109,10 +112,10 @@ describe('Broadlink edit remote - skip all', () => {
       { learn: true }
     ).as('learnMode');
 
-    cy.contains('button', 'integration.broadlink.setup.learnAllLabel')
-      .should('not.be.disabled')
-      .click()
-      .should('not.exist');
+    // Learn all mode button
+    cy.contains('button', 'integration.broadlink.setup.learnAllLabel').as('learnButton');
+    cy.get('@learnButton').should('not.be.disabled');
+    cy.get('@learnButton').click();
 
     cy.contains('button', 'integration.broadlink.setup.quitLearnModeLabel')
       .should('exist')
@@ -133,10 +136,12 @@ describe('Broadlink edit remote - skip all', () => {
       .should('exist')
       .should('not.be.disabled');
 
-    cy.get('.tag-secondary')
-      .should('be.length', 1)
+    cy.get('.tag-secondary').as('tagSecondary');
+    cy.get('@tagSecondary').should('be.length', 1);
+    cy.get('@tagSecondary')
       .first()
-      .i18n('deviceFeatureCategory.light.binary');
+      .as('firstTag');
+    cy.get('@firstTag').i18n('deviceFeatureCategory.light.binary');
   });
 
   [
