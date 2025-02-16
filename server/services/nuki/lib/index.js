@@ -1,6 +1,7 @@
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('./utils/nuki.constants');
 
 const NukiMQTTHandler = require('./mqtt');
+const NukiHTTPHandler = require('./http');
 
 const { start } = require('./commands/nuki.start');
 const { stop } = require('./commands/nuki.stop');
@@ -27,6 +28,7 @@ const nukiHandler = function NukiHandler(gladys, serviceId) {
   this.protocols = {};
   // MQTT
   this.protocols[DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT] = new NukiMQTTHandler(this);
+  this.protocols[DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].HTTP] = new NukiHTTPHandler(this);
 };
 
 // COMMANDS
