@@ -17,5 +17,7 @@
     "arm64"
   ],
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "nuki-web-api": "^2.2.1"
+  }
 }
