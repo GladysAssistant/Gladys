@@ -13,6 +13,7 @@ const DEVICE_PARAM_VALUE = {
   [DEVICE_PARAM_NAME.PROTOCOL]: {
     // HTTP: 'http', // for the future
     MQTT: 'mqtt',
+    HTTP: 'http',
   },
 };
 
