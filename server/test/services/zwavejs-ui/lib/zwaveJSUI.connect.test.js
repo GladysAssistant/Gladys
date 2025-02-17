@@ -110,6 +110,23 @@ describe('zwaveJSUIHandler.connect', () => {
     });
   });
 
+  it('should connect to MQTT broker and emit reconnect event', async () => {
+    const mqttClient = {
+      end: fake.returns(null),
+      removeAllListeners: fake.returns(null),
+      on: (event, cb) => {
+        if (event === 'reconnect') {
+          cb();
+        }
+      },
+    };
+    const mqttLibrary = {
+      connect: fake.returns(mqttClient),
+    };
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
+    await zwaveJSUIHandler.connect();
+  });
+
   it('should handleMessage on message', async () => {
     const mqttClient = {
       end: fake.returns(null),

@@ -30,7 +30,7 @@ describe('mqttHandler.connect', () => {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
     });
   });
-  it('should connect and receive error', async () => {
+  it('should connect and receive error, then reconnect', async () => {
     const gladys = {
       event: {
         emit: fake.returns(null),
@@ -47,6 +47,7 @@ describe('mqttHandler.connect', () => {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
       payload: { test: 'test' },
     });
+    mqttHandler.mqttClient.emit('reconnect');
   });
   it('should connect and receive offline', async () => {
     const gladys = {
