@@ -969,26 +969,6 @@
       "documentation": "OwnTracks-Dokumentation",
       "longDescription": "OwnTracks ist eine Open-Source-App für iOS und Android, die es dir ermöglicht, deinen Geolokalisierung an einen Server zu senden. Du kannst OwnTracks verwenden, um Szenen basierend auf deinen Standort auszulösen. Um OwnTracks mit Gladys zu konfigurieren, folge dem Tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\" target=\"_blank\" rel=\"noopener noreferrer\">in unserer Dokumentation</a>."
     },
-    "zwave": {
-      "title": "Open-Zwave [ALT]",
-      "description": "Diese Integration ist veraltet; wir migrieren zu zwave-js-ui.",
-      "documentation": "Open-Zwave-Dokumentation",
-      "device": {
-        "title": "Legacy Open-Zwave-Geräte",
-        "convertToMqtt": "In MQTT-Gerät konvertieren",
-        "oldIntegrationWarning": "Diese Integration basierte auf Open-Zwave und ist jetzt VERALTET. Wir migrieren zu Zwave-js-ui, aber in der Zwischenzeit empfehlen wir dir, Node-RED + Zwave-js-ui + Gladys zu verwenden. <br /> <br /> Wenn du uns bei der Entwicklung dieser Integration helfen möchtest, schließe dich unserer <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Community</a> an!",
-        "noDevices": "Noch keine Z-Wave-Geräte hinzugefügt.",
-        "scanButton": "Scannen",
-        "nameLabel": "Name",
-        "roomLabel": "Zimmer",
-        "featuresLabel": "Funktionen",
-        "saveButton": "Speichern",
-        "deleteButton": "Löschen",
-        "editButton": "Bearbeiten",
-        "mostRecentValueAt": "Zuletzt erhalten um {{mostRecentValueAt}}.",
-        "noValueReceived": "Kein Wert erhalten."
-      }
-    },
     "openWeather": {
       "title": "OpenWeather-API",
       "documentation": "OpenWeather-Dokumentation",
@@ -1194,7 +1174,7 @@
       "saveButton": "Speichern",
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
-      "alphaWarning": "Diese Integration ist eine Alpha-Version und unterstützt derzeit nur ein Gerät: den Türöffnungssensor von Fibaro. Wir sind dankbar für jede Unterstützung bei der Integration weiterer Geräte!",
+      "alphaWarning": "Diese Integration unterstützt eine begrenzte Anzahl von Z-Wave-Geräten. Wenn Sie nicht unterstützte Geräte haben, zögern Sie nicht, diese einzureichen, damit sie hinzugefügt werden können!",
       "device": {
         "title": "Z-Wave JS UI Geräte in Gladys",
         "editButton": "Bearbeiten",

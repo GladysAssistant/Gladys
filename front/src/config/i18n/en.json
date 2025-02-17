@@ -969,26 +969,6 @@
       "documentation": "OwnTracks documentation",
       "longDescription": "OwnTracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use OwnTracks to trigger scenes based on your geolocation. To configure OwnTracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
     },
-    "zwave": {
-      "title": "Open-Zwave [OLD]",
-      "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
-      "documentation": "Open-Zwave documentation",
-      "device": {
-        "title": "Legacy Open-Zwave Devices",
-        "convertToMqtt": "Convert to MQTT device",
-        "oldIntegrationWarning": "This integration was based on Open-Zwave and is now DEPRECATED. We are migrating to Zwave-js-ui, but in the meantime we recommend that you use Node-RED + Zwave-js-ui + Gladys. <br /> <br /> If you want to help us develop this integration, join-us on the <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum</a>!",
-        "noDevices": "No Z-Wave devices added yet.",
-        "scanButton": "Scan",
-        "nameLabel": "Name",
-        "roomLabel": "Room",
-        "featuresLabel": "Features",
-        "saveButton": "Save",
-        "deleteButton": "Delete",
-        "editButton": "Edit",
-        "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
-      }
-    },
     "openWeather": {
       "title": "OpenWeather API",
       "documentation": "OpenWeather documentation",
@@ -1194,7 +1174,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration is in alpha and currently only supports few devices. We welcome any assistance to integrate other devices!",
+      "alphaWarning": "This integration handles a limited number of Z-Wave devices. If you have unsupported devices, don't hesitate to submit them so they can be added!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",

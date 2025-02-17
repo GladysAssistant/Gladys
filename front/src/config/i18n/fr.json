@@ -1097,26 +1097,6 @@
       "documentation": "Documentation OwnTracks",
       "longDescription": "OwnTracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser OwnTracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer OwnTracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
-    "zwave": {
-      "title": "Open-Zwave [OLD]",
-      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
-      "documentation": "Documentation Open-Zwave",
-      "device": {
-        "title": "Anciens appareils Open-Zwave",
-        "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
-        "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
-        "scanButton": "Rechercher",
-        "nameLabel": "Nom",
-        "roomLabel": "Pièce",
-        "featuresLabel": "Fonctionnalités",
-        "saveButton": "Sauvegarder",
-        "deleteButton": "Supprimer",
-        "editButton": "Éditer",
-        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
-      }
-    },
     "openWeather": {
       "title": "API OpenWeather",
       "documentation": "Documentation OpenWeather",
@@ -1322,7 +1302,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un nombre limité d'appareils. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
