@@ -2388,6 +2388,7 @@
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou poster un message sur Gladys community.",
     "success": "Succès ! Je vous ai envoyé un lien de réinitialisation de mot de passe par Telegram ou Nextcloud Talk. Si vous n'avez pas configuré ces services, le lien de réinitialisation sera dans les logs de Gladys.",
+    "howToAccessLogs": "Pour accéder aux logs de Gladys, rendez-vous en ligne de commande et tapez `docker logs gladys --tail=1000` pour afficher les 1000 dernières lignes.",
     "userNotFound": "Aucun compte n'est lié à cet e-mail.",
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
