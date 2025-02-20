@@ -199,6 +199,7 @@ const ActionCard = ({ children, ...props }) => {
               actionsGroupsBefore: props.actionsGroupsBefore,
               triggersVariables: props.triggersVariables,
               deleteAction: props.deleteAction,
+              deleteActionGroup: props.deleteActionGroup,
               addAction: props.addAction,
               moveCard: props.moveCard
             };

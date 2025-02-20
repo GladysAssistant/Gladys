@@ -9,6 +9,30 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
 
+import { ACTIONS } from '../../../../../server/utils/constants';
+
+// Helper function to merge update objects
+const deepMergeUpdates = (target, source) => {
+  if (!source) return target;
+  if (!target) return source;
+
+  const result = { ...target };
+
+  Object.keys(source).forEach(key => {
+    if (source[key] && typeof source[key] === 'object') {
+      if (result[key] && typeof result[key] === 'object') {
+        result[key] = deepMergeUpdates(result[key], source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    } else {
+      result[key] = source[key];
+    }
+  });
+
+  return result;
+};
+
 class EditScene extends Component {
   getSceneBySelector = async () => {
     this.setState({
@@ -98,23 +122,87 @@ class EditScene extends Component {
     }
     this.setState({ saving: false });
   };
-  addEmptyActionGroupIfNeeded = async () => {
-    const { actions } = this.state.scene;
-    const lastActionGroup = actions[actions.length - 1];
-    if (lastActionGroup.length > 0) {
-      const newState = update(this.state, {
-        scene: {
-          actions: {
+
+  // This function is used to check and add empty groups to the actions and variables arrays
+  checkAndAddEmptyGroups = (actions, path = '', currentState) => {
+    // Guard against undefined or null actions
+    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+      return {};
+    }
+
+    let updates = {};
+
+    // Check if we need to add a new group at the end of this level
+    if (actions[actions.length - 1].length > 0) {
+      if (path) {
+        // We're in a nested path (inside then/else)
+        // Build the nested update object dynamically
+        let updateObject = { scene: { actions: {} }, variables: {} };
+        let actionsPath = updateObject.scene.actions;
+        let variablesPath = updateObject.variables;
+
+        // Split path and build nested structure
+        path.split('.').forEach((segment, index, array) => {
+          if (index === array.length - 1) {
+            actionsPath[segment] = { $push: [[]] };
+            variablesPath[segment] = { $push: [[]] };
+          } else {
+            actionsPath[segment] = {};
+            variablesPath[segment] = {};
+            actionsPath = actionsPath[segment];
+            variablesPath = variablesPath[segment];
+          }
+        });
+
+        updates = updateObject;
+      } else {
+        // We're at the root level
+        updates = {
+          scene: {
+            actions: {
+              $push: [[]]
+            }
+          },
+          variables: {
             $push: [[]]
           }
-        },
-        variables: {
-          $push: [[]]
+        };
+      }
+    }
+
+    // Process nested conditions
+    actions.forEach((actionGroup, groupIndex) => {
+      actionGroup.forEach((action, actionIndex) => {
+        if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+          if (Array.isArray(action.then)) {
+            const thenPath = path ? `${path}.${groupIndex}.${actionIndex}.then` : `${groupIndex}.${actionIndex}.then`;
+            const thenUpdates = this.checkAndAddEmptyGroups(action.then, thenPath, currentState);
+            // Merge the updates instead of using update()
+            updates = deepMergeUpdates(updates, thenUpdates);
+          }
+
+          if (Array.isArray(action.else)) {
+            const elsePath = path ? `${path}.${groupIndex}.${actionIndex}.else` : `${groupIndex}.${actionIndex}.else`;
+            const elseUpdates = this.checkAndAddEmptyGroups(action.else, elsePath, currentState);
+            // Merge the updates instead of using update()
+            updates = deepMergeUpdates(updates, elseUpdates);
+          }
         }
       });
-      await this.setState(newState);
-    }
+    });
+
+    return updates;
   };
+
+  addEmptyActionGroupIfNeeded = async () => {
+    const { actions } = this.state.scene;
+    const updates = this.checkAndAddEmptyGroups(actions, '', this.state);
+
+    const newState = update(this.state, updates);
+
+    await this.setState(newState);
+  };
+
   addAction = async (path, options = {}) => {
     await this.setState(prevState => {
       // Split the path into segments
@@ -143,36 +231,87 @@ class EditScene extends Component {
         } else {
           // Build the path to nested structures
           actionsPath[segment] = {};
-          variablesPath[segment] = {};
           actionsPath = actionsPath[segment];
+          variablesPath[segment] = {};
           variablesPath = variablesPath[segment];
         }
       });
 
-      console.log(`updateObject = ${JSON.stringify(updateObject)}`);
-      console.log(`prevState = ${JSON.stringify(prevState)}`);
-
       return update(prevState, updateObject);
     });
+    console.log('New variables:', JSON.stringify(this.state.variables, null, 2));
 
     await this.addEmptyActionGroupIfNeeded();
   };
-  deleteActionGroup = columnIndex => {
-    let newState = update(this.state, {
-      scene: {
-        actions: {
-          $splice: [[columnIndex, 1]]
-        }
-      },
-      variables: {
-        $splice: [[columnIndex, 1]]
+  deleteActionGroup = path => {
+    this.setState(prevState => {
+      console.log(`deleteActionGroup, path = ${path}`);
+
+      // Split the path into segments
+      const pathSegments = path.split('.');
+
+      // If it's a root level deletion (e.g., "1")
+      if (pathSegments.length === 1) {
+        return update(prevState, {
+          scene: {
+            actions: {
+              $splice: [[parseInt(pathSegments[0], 10), 1]]
+            }
+          },
+          variables: {
+            $splice: [[parseInt(pathSegments[0], 10), 1]]
+          }
+        });
       }
+
+      // Build the nested update object
+      let updateObject = { scene: { actions: {} }, variables: {} };
+      let actionsPath = updateObject.scene.actions;
+      let variablesPath = updateObject.variables;
+
+      // Build the nested structure up to the second-to-last segment
+      pathSegments.forEach((segment, index) => {
+        // Special handling for 'then' and 'else' segments
+        if (segment === 'then' || segment === 'else') {
+          actionsPath[segment] = {};
+          actionsPath = actionsPath[segment];
+          variablesPath[segment] = {};
+          variablesPath = variablesPath[segment];
+          return;
+        }
+
+        if (index === pathSegments.length - 1) {
+          // Last segment - perform the splice
+          actionsPath.$splice = [[parseInt(segment, 10), 1]];
+          if (!segment.includes('then') && !segment.includes('else')) {
+            variablesPath.$splice = [[parseInt(segment, 10), 1]];
+          }
+        } else if (index < pathSegments.length - 1) {
+          // Not the last segment - continue building the path
+          const nextSegment = pathSegments[index + 1];
+          if (nextSegment === 'then' || nextSegment === 'else') {
+            // If next segment is then/else, current segment needs numeric index
+            actionsPath[parseInt(segment, 10)] = {};
+            actionsPath = actionsPath[parseInt(segment, 10)];
+            variablesPath[parseInt(segment, 10)] = {};
+            variablesPath = variablesPath[parseInt(segment, 10)];
+          } else {
+            // Regular path building
+            actionsPath[segment] = {};
+            actionsPath = actionsPath[segment];
+            variablesPath[segment] = {};
+            variablesPath = variablesPath[segment];
+          }
+        }
+      });
+
+      console.log('Update object:', JSON.stringify(updateObject, null, 2));
+      console.log('New state:', JSON.stringify(update(prevState, updateObject), null, 2));
+      return update(prevState, updateObject);
     });
-    this.setState(newState);
   };
 
   deleteAction = path => {
-    console.log(`Delete action = ${path}`);
     this.setState(prevState => {
       // Split the path into segments
       const pathSegments = path.split('.');
@@ -201,8 +340,6 @@ class EditScene extends Component {
         }
       });
 
-      console.log(`updateObject = ${JSON.stringify(updateObject)}`);
-      console.log(`prevState = ${JSON.stringify(prevState)}`);
       let newState = update(prevState, updateObject);
 
       // Clean up empty action groups at the root level
@@ -231,9 +368,6 @@ class EditScene extends Component {
     });
   };
   updateActionProperty = (path, property, value) => {
-    console.log(`path = ${path}`);
-    console.log(`property = ${property}`);
-    console.log(`value = ${JSON.stringify(value)}`);
     this.setState(prevState => {
       // Split the path into segments
       const pathSegments = path.split('.');
@@ -253,8 +387,6 @@ class EditScene extends Component {
           current = current[segment];
         }
       });
-
-      console.log(`updateObject = ${JSON.stringify(updateObject)}`);
 
       return update(prevState, updateObject);
     });

@@ -49,15 +49,15 @@ class ConditionIfElseThen extends Component {
       this.props.updateActionProperty(this.props.path, 'if', []);
     }
     if (isNullOrUndefined(get(this.props, 'action.then'))) {
-      this.props.updateActionProperty(this.props.path, 'then', []);
+      this.props.updateActionProperty(this.props.path, 'then', [[]]);
     }
     if (isNullOrUndefined(get(this.props, 'action.else'))) {
-      this.props.updateActionProperty(this.props.path, 'else', []);
+      this.props.updateActionProperty(this.props.path, 'else', [[]]);
     }
     // Init variables
     this.props.setVariables(`${this.props.path}.if`, []);
-    this.props.setVariables(`${this.props.path}.then`, []);
-    this.props.setVariables(`${this.props.path}.else`, []);
+    this.props.setVariables(`${this.props.path}.then`, [[]]);
+    this.props.setVariables(`${this.props.path}.else`, [[]]);
   };
 
   componentDidMount() {
@@ -80,6 +80,17 @@ class ConditionIfElseThen extends Component {
               <Text id="scenes.conditionCard.conditions">Conditions</Text>
             </h4>
           </div>
+          {conditions.length > 0 && (
+            <div class="row">
+              <div class="col">
+                <div class="alert alert-secondary">
+                  <Text id="scenes.conditionCard.conditionDescription">
+                    If all conditions are met, the actions in the "Then" block will be executed.
+                  </Text>
+                </div>
+              </div>
+            </div>
+          )}
           <div class="row">
             {conditions.map((condition, index) => (
               <ActionCard
@@ -125,20 +136,25 @@ class ConditionIfElseThen extends Component {
           </div>
           {!thenCollapsed && props.action.then && (
             <div class="pl-4">
-              <ActionGroup
-                actions={props.action.then}
-                path={`${props.path}.then`}
-                addAction={props.addAction}
-                deleteAction={props.deleteAction}
-                updateActionProperty={props.updateActionProperty}
-                moveCard={props.moveCard}
-                highLightedActions={props.highLightedActions}
-                actionsGroupsBefore={props.actionsGroupsBefore}
-                variables={props.variables}
-                triggersVariables={props.triggersVariables}
-                setVariables={props.setVariables}
-                scene={props.scene}
-              />
+              {props.action.then.map((actions, index) => (
+                <ActionGroup
+                  actions={actions}
+                  path={`${props.path}.then.${index}`}
+                  addAction={props.addAction}
+                  deleteAction={props.deleteAction}
+                  deleteActionGroup={props.deleteActionGroup}
+                  updateActionProperty={props.updateActionProperty}
+                  moveCard={props.moveCard}
+                  highLightedActions={props.highLightedActions}
+                  actionsGroupsBefore={props.actionsGroupsBefore}
+                  variables={props.variables}
+                  triggersVariables={props.triggersVariables}
+                  setVariables={props.setVariables}
+                  scene={props.scene}
+                  firstActionGroup={index === 0}
+                  lastActionGroup={index === props.action.then.length - 1}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -156,20 +172,25 @@ class ConditionIfElseThen extends Component {
           </div>
           {!elseCollapsed && props.action.else && (
             <div class="pl-4">
-              <ActionGroup
-                actions={props.action.else}
-                path={`${props.path}.else`}
-                addAction={props.addAction}
-                deleteAction={props.deleteAction}
-                updateActionProperty={props.updateActionProperty}
-                moveCard={props.moveCard}
-                highLightedActions={props.highLightedActions}
-                actionsGroupsBefore={props.actionsGroupsBefore}
-                variables={props.variables}
-                triggersVariables={props.triggersVariables}
-                setVariables={props.setVariables}
-                scene={props.scene}
-              />
+              {props.action.else.map((actions, index) => (
+                <ActionGroup
+                  actions={actions}
+                  path={`${props.path}.else.${index}`}
+                  addAction={props.addAction}
+                  deleteAction={props.deleteAction}
+                  deleteActionGroup={props.deleteActionGroup}
+                  updateActionProperty={props.updateActionProperty}
+                  moveCard={props.moveCard}
+                  highLightedActions={props.highLightedActions}
+                  actionsGroupsBefore={props.actionsGroupsBefore}
+                  variables={props.variables}
+                  triggersVariables={props.triggersVariables}
+                  setVariables={props.setVariables}
+                  scene={props.scene}
+                  firstActionGroup={index === 0}
+                  lastActionGroup={index === props.action.else.length - 1}
+                />
+              ))}
             </div>
           )}
         </div>

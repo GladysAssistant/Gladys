@@ -74,7 +74,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
             </div>
 
             {!props.firstActionGroup && !props.lastActionGroup && (
-              <button onClick={props.deleteActionGroup} class="btn btn-outline-danger">
+              <button onClick={props.deleteThisActionGroup} class="btn btn-outline-danger">
                 <i class="fe fe-trash-2" />
               </button>
             )}
@@ -102,6 +102,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                     path={`${props.path}.${index}`}
                     updateActionProperty={props.updateActionProperty}
                     highLightedActions={props.highLightedActions}
+                    deleteActionGroup={props.deleteActionGroup}
                     addAction={props.addAction}
                     deleteAction={props.deleteAction}
                     actionsGroupsBefore={props.actionsGroupsBefore}
@@ -136,21 +137,17 @@ class ActionGroup extends Component {
   addActionToColumn = () => {
     this.props.addAction(this.props.path);
   };
-  deleteActionGroup = () => {
+  deleteThisActionGroup = () => {
     this.props.deleteActionGroup(this.props.path);
   };
 
   render(props, {}) {
-    const firstActionGroup = props.groupIndex === 0;
-    const lastActionGroup = props.groupIndex === props.actions.length - 1;
-
     return (
       <ActionGroupWithDragAndDrop
         {...props}
-        firstActionGroup={firstActionGroup}
-        lastActionGroup={lastActionGroup}
+        deleteActionGroup={props.deleteActionGroup}
         addActionToColumn={this.addActionToColumn}
-        deleteActionGroup={this.deleteActionGroup}
+        deleteThisActionGroup={this.deleteThisActionGroup}
       />
     );
   }
