@@ -7,41 +7,26 @@ const isNullOrUndefined = variable => variable === null || variable === undefine
 
 class EdfTempoCondition extends Component {
   handleDayChange = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_day', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_day', e.target.value);
   };
 
   handlePeakDayTypeChange = e => {
-    this.props.updateActionProperty(
-      this.props.columnIndex,
-      this.props.index,
-      'edf_tempo_peak_day_type',
-      e.target.value
-    );
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_day_type', e.target.value);
   };
 
   handlePeakHourTypeChange = e => {
-    this.props.updateActionProperty(
-      this.props.columnIndex,
-      this.props.index,
-      'edf_tempo_peak_hour_type',
-      e.target.value
-    );
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_hour_type', e.target.value);
   };
 
   initActionIfNeeded = () => {
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_day'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_day', 'today');
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_day', 'today');
     }
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_peak_day_type'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_peak_day_type', 'blue');
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_day_type', 'blue');
     }
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_peak_hour_type'))) {
-      this.props.updateActionProperty(
-        this.props.columnIndex,
-        this.props.index,
-        'edf_tempo_peak_hour_type',
-        'peak-hour'
-      );
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_hour_type', 'peak-hour');
     }
   };
 

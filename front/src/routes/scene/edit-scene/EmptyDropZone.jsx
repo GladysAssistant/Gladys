@@ -7,6 +7,7 @@ import style from './style.css';
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
 
 const EmptyColumnDropZone = ({ children, ...props }) => {
+  console.log(`EmptyColumnDropZone = ${props.path}`);
   const ref = useRef(null);
   const [{ isActive }, drop] = useDrop({
     accept: ACTION_CARD_TYPE,
@@ -17,7 +18,7 @@ const EmptyColumnDropZone = ({ children, ...props }) => {
       if (!ref.current) {
         return;
       }
-      props.moveCard(item.x, item.y, 0, props.y);
+      props.moveCard(item.path, `${props.path}.0`);
     }
   });
   drop(ref);

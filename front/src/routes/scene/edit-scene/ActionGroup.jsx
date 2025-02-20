@@ -12,12 +12,31 @@ const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
 import EmptyDropZone from './EmptyDropZone';
 
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
-  const { index } = props;
+  const { path } = props;
   const ref = useRef(null);
+  const convertPathToText = path => {
+    const pathSegments = path.split('.');
+    const text = pathSegments
+      .map((segment, index) => {
+        if (segment === 'if') {
+          return 'If';
+        }
+        if (segment === 'then') {
+          return 'Then';
+        }
+        if (segment === 'else') {
+          return 'Else';
+        }
+        const isLastElement = index === pathSegments.length - 1;
+        return `${Number(segment) + 1}${isLastElement ? '.' : ''}`;
+      })
+      .join('.');
+    return text;
+  };
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: ACTION_GROUP_TYPE,
     item: () => {
-      return { index };
+      return { path };
     },
     collect: monitor => ({
       isDragging: !!monitor.isDragging()
@@ -32,7 +51,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
       if (!ref.current) {
         return;
       }
-      props.moveCardGroup(item.index, index);
+      props.moveCardGroup(item.path, path);
     }
   });
   preview(drop(ref));
@@ -47,23 +66,15 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
       >
         <div class="card-status bg-green" />
         <div ref={drag} class="card-header">
-          <h4 class="text-center card-title ">
-            <Text id="global.listItem" fields={{ index: props.index + 1 }} />
-          </h4>
+          <h4 class="text-center card-title ">{convertPathToText(props.path)}</h4>
 
           <div class="card-options">
             <div class="mr-4 my-auto">
               <i class="fe fe-move" />
             </div>
 
-            <button onClick={props.addActionToColumn} class="btn btn-outline-primary">
-              <span class="d-none d-sm-inline-block">
-                <Text id="editScene.addActionButton" />
-              </span>{' '}
-              <i class="fe fe-plus" />
-            </button>
             {!props.firstActionGroup && !props.lastActionGroup && (
-              <button onClick={props.deleteActionGroup} class="btn btn-outline-danger ml-2">
+              <button onClick={props.deleteActionGroup} class="btn btn-outline-danger">
                 <i class="fe fe-trash-2" />
               </button>
             )}
@@ -88,12 +99,10 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                     moveCard={props.moveCard}
                     sceneParamsData={props.sceneParamsData}
                     action={action}
-                    columnIndex={props.index}
-                    index={index}
-                    y={props.y}
-                    x={index}
+                    path={`${props.path}.${index}`}
                     updateActionProperty={props.updateActionProperty}
                     highLightedActions={props.highLightedActions}
+                    addAction={props.addAction}
                     deleteAction={props.deleteAction}
                     actionsGroupsBefore={props.actionsGroupsBefore}
                     variables={props.variables}
@@ -104,9 +113,16 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                 ))}
                 {props.actions.length === 0 && (
                   <div class="col">
-                    <EmptyDropZone moveCard={props.moveCard} y={props.y} />
+                    <EmptyDropZone moveCard={props.moveCard} path={props.path} />
                   </div>
                 )}
+              </div>
+
+              {/* Add Action Button */}
+              <div class="text-center mt-4">
+                <button onClick={props.addActionToColumn} class="btn btn-sm btn-outline-primary">
+                  <i class="fe fe-plus" /> <Text id="editScene.addActionButton">Add action</Text>
+                </button>
               </div>
             </div>
           </div>
@@ -118,15 +134,15 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
 
 class ActionGroup extends Component {
   addActionToColumn = () => {
-    this.props.addAction(this.props.index, 'new');
+    this.props.addAction(this.props.path);
   };
   deleteActionGroup = () => {
-    this.props.deleteActionGroup(this.props.index);
+    this.props.deleteActionGroup(this.props.path);
   };
 
   render(props, {}) {
-    const firstActionGroup = props.index === 0;
-    const lastActionGroup = props.index === props.scene.actions.length - 1;
+    const firstActionGroup = props.groupIndex === 0;
+    const lastActionGroup = props.groupIndex === props.actions.length - 1;
 
     return (
       <ActionGroupWithDragAndDrop

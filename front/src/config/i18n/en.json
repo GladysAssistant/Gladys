@@ -2042,7 +2042,8 @@
       },
       "condition": {
         "only-continue-if": "Only continue if",
-        "check-time": "Time condition"
+        "check-time": "Time condition",
+        "if-then-else": "Condition: If...then...else..."
       },
       "user": {
         "set-seen-at-home": "User seen at home",

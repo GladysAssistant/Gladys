@@ -9,35 +9,31 @@ import Condition from './Condition';
 
 class OnlyContinueIf extends Component {
   handleConditionChange = (conditionIndex, condition) => {
-    const { columnIndex, index } = this.props;
     const newConditions = update(this.props.action.conditions, {
       [conditionIndex]: {
         $set: condition
       }
     });
-    this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
+    this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
   addCondition = () => {
-    const { columnIndex, index } = this.props;
     const newConditions = update(this.props.action.conditions, {
       $push: [{}]
     });
-    this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
+    this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
   deleteCondition = conditionIndex => {
-    const { columnIndex, index } = this.props;
     const newConditions = update(this.props.action.conditions, {
       $splice: [[conditionIndex, 1]]
     });
-    this.props.updateActionProperty(columnIndex, index, 'conditions', newConditions);
+    this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
   componentDidMount() {
-    const { columnIndex, index } = this.props;
     if (!this.props.action.conditions) {
-      this.props.updateActionProperty(columnIndex, index, 'conditions', [{}]);
+      this.props.updateActionProperty(this.props.path, 'conditions', [{}]);
     }
   }
 

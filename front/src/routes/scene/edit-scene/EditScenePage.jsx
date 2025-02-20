@@ -110,7 +110,7 @@ const EditScenePage = ({ children, ...props }) => (
                   sceneParamsData={props.sceneParamsData}
                   scene={props.scene}
                   index={index}
-                  y={index}
+                  path={`${index}`}
                   saving={props.saving}
                   actionsGroupsBefore={update(props.scene.actions, {
                     $splice: [[index, props.scene.actions.length - index]]
