@@ -103,6 +103,7 @@ const EditScenePage = ({ children, ...props }) => (
                   addAction={props.addAction}
                   deleteActionGroup={props.deleteActionGroup}
                   actions={parallelActions}
+                  allActions={props.scene.actions}
                   deleteAction={props.deleteAction}
                   updateSelectedNewAction={props.updateSelectedNewAction}
                   updateActionProperty={props.updateActionProperty}

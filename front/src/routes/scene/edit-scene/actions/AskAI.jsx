@@ -31,20 +31,20 @@ class AskAI extends Component {
     }
   };
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
   handleUserChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   handleCameraChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'camera', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', undefined);
+      this.props.updateActionProperty(this.props.path, 'camera', undefined);
     }
   };
 
@@ -100,6 +100,7 @@ class AskAI extends Component {
             <Localizer>
               <TextWithVariablesInjected
                 text={props.action.text}
+                path={props.path}
                 triggersVariables={props.triggersVariables}
                 actionsGroupsBefore={props.actionsGroupsBefore}
                 variables={props.variables}

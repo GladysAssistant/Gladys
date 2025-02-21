@@ -55,9 +55,9 @@ class ConditionIfElseThen extends Component {
       this.props.updateActionProperty(this.props.path, 'else', [[]]);
     }
     // Init variables
-    this.props.setVariables(`${this.props.path}.if`, []);
-    this.props.setVariables(`${this.props.path}.then`, [[]]);
-    this.props.setVariables(`${this.props.path}.else`, [[]]);
+    // this.props.setVariables(`${this.props.path}.if`, []);
+    // this.props.setVariables(`${this.props.path}.then`, [[]]);
+    // this.props.setVariables(`${this.props.path}.else`, [[]]);
   };
 
   componentDidMount() {
@@ -96,6 +96,7 @@ class ConditionIfElseThen extends Component {
               <ActionCard
                 action={condition}
                 index={index}
+                allActions={props.allActions}
                 path={`${props.path}.if.${index}`}
                 updateActionProperty={props.updateActionProperty}
                 deleteAction={props.deleteAction}
@@ -139,6 +140,7 @@ class ConditionIfElseThen extends Component {
               {props.action.then.map((actions, index) => (
                 <ActionGroup
                   actions={actions}
+                  allActions={props.allActions}
                   path={`${props.path}.then.${index}`}
                   addAction={props.addAction}
                   deleteAction={props.deleteAction}
@@ -175,6 +177,7 @@ class ConditionIfElseThen extends Component {
               {props.action.else.map((actions, index) => (
                 <ActionGroup
                   actions={actions}
+                  allActions={props.allActions}
                   path={`${props.path}.else.${index}`}
                   addAction={props.addAction}
                   deleteAction={props.deleteAction}

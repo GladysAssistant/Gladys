@@ -192,6 +192,7 @@ const ActionCard = ({ children, ...props }) => {
 
             const commonProps = {
               action: props.action,
+              allActions: props.allActions,
               path,
               updateActionProperty: props.updateActionProperty,
               variables: props.variables,

@@ -2,10 +2,11 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { useRef } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
-
 import cx from 'classnames';
+
 import ActionCard from './ActionCard';
 import style from './style.css';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
 
@@ -66,7 +67,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
       >
         <div class="card-status bg-green" />
         <div ref={drag} class="card-header">
-          <h4 class="text-center card-title ">{convertPathToText(props.path)}</h4>
+          <h4 class="text-center card-title ">{convertPathToText(props.path, props.intl.dictionary)}</h4>
 
           <div class="card-options">
             <div class="mr-4 my-auto">
@@ -110,6 +111,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                     triggersVariables={props.triggersVariables}
                     setVariables={props.setVariables}
                     scene={props.scene}
+                    allActions={props.allActions}
                   />
                 ))}
                 {props.actions.length === 0 && (
@@ -153,4 +155,4 @@ class ActionGroup extends Component {
   }
 }
 
-export default ActionGroup;
+export default withIntlAsProp(ActionGroup);

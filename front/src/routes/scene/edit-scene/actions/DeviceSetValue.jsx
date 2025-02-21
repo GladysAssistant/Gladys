@@ -27,49 +27,45 @@ class DeviceSetValue extends Component {
   toggleType = () => this.setState({ computed: !this.state.computed });
 
   onDeviceFeatureChange = (deviceFeature, device) => {
-    const { columnIndex, index } = this.props;
     const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
     if (deviceFeature) {
-      this.props.updateActionProperty(columnIndex, index, 'device_feature', deviceFeature.selector);
+      this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
     } else {
-      this.props.updateActionProperty(columnIndex, index, 'device_feature', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature', null);
     }
     if (deviceFeatureChanged) {
       if (deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
-        this.props.updateActionProperty(columnIndex, index, 'value', 0);
-        this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+        this.props.updateActionProperty(this.props.path, 'value', 0);
+        this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
       } else {
-        this.props.updateActionProperty(columnIndex, index, 'value', undefined);
-        this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+        this.props.updateActionProperty(this.props.path, 'value', undefined);
+        this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
       }
     }
     this.setState({ deviceFeature, device });
   };
 
   handleNewValue = e => {
-    const { columnIndex, index } = this.props;
-    this.props.updateActionProperty(columnIndex, index, 'value', e.target.value);
-    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+    this.props.updateActionProperty(this.props.path, 'value', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
   handleNewPureValue = value => {
-    const { columnIndex, index } = this.props;
-    this.props.updateActionProperty(columnIndex, index, 'value', value);
-    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+    this.props.updateActionProperty(this.props.path, 'value', value);
+    this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
   toggleBinaryValue = () => {
-    const { columnIndex, index, action } = this.props;
+    const { action } = this.props;
     const previousValue = action.value !== undefined ? action.value : 0;
     const newValue = previousValue === 1 ? 0 : 1;
-    this.props.updateActionProperty(columnIndex, index, 'value', newValue);
-    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+    this.props.updateActionProperty(this.props.path, 'value', newValue);
+    this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
   handleNewEvalValue = text => {
-    const { columnIndex, index } = this.props;
-    this.props.updateActionProperty(columnIndex, index, 'value', undefined);
-    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', text);
+    this.props.updateActionProperty(this.props.path, 'value', undefined);
+    this.props.updateActionProperty(this.props.path, 'evaluate_value', text);
   };
 
   getDeviceFeatureControl = () => {
@@ -94,6 +90,7 @@ class DeviceSetValue extends Component {
                 triggersVariables={this.props.triggersVariables}
                 actionsGroupsBefore={this.props.actionsGroupsBefore}
                 variables={this.props.variables}
+                path={this.props.path}
                 updateText={this.handleNewEvalValue}
               />
             </Localizer>
