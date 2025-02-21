@@ -34,25 +34,27 @@ class EdfTempoCondition extends Component {
     this.initActionIfNeeded();
   }
 
-  render({ action }, {}) {
+  render({ action, path }, {}) {
     return (
       <div>
-        <div class="row">
-          <div class="col-md-12">
-            <p>
-              <Text id="editScene.actionsCard.edfTempoCondition.description" />{' '}
-              <small>
-                <a
-                  href="https://particulier.edf.fr/fr/accueil/gestion-contrat/options/tempo.html#/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Text id="editScene.actionsCard.edfTempoCondition.knowMore" />
-                </a>
-              </small>
-            </p>
+        {path && !path.includes('.if') && (
+          <div class="row">
+            <div class="col-md-12">
+              <p>
+                <Text id="editScene.actionsCard.edfTempoCondition.description" />{' '}
+                <small>
+                  <a
+                    href="https://particulier.edf.fr/fr/accueil/gestion-contrat/options/tempo.html#/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text id="editScene.actionsCard.edfTempoCondition.knowMore" />
+                  </a>
+                </small>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <div class="row">
           <div class="col">
             <div class="form-group">

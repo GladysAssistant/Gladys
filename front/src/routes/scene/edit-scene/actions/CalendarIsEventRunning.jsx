@@ -157,16 +157,18 @@ class CheckTime extends Component {
     this.refreshSelectedOptions(nextProps.action);
   }
 
-  render({ action }, { selectedCalendarsOptions, calendarsOptions }) {
+  render({ action, path }, { selectedCalendarsOptions, calendarsOptions }) {
     return (
       <div>
-        <div class="row">
-          <div class="col-md-12">
-            <p>
-              <Text id="editScene.actionsCard.calendarEventIsRunning.description" />
-            </p>
+        {path && !path.includes('.if') && (
+          <div class="row">
+            <div class="col-md-12">
+              <p>
+                <Text id="editScene.actionsCard.calendarEventIsRunning.description" />
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">

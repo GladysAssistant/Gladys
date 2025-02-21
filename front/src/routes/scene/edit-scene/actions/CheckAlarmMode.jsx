@@ -84,9 +84,11 @@ class CheckAlarmMode extends Component {
   render(props, { alarmModesOptions, houseOptions, selectedHouseOption, selectedAlarmModeOption }) {
     return (
       <div>
-        <p>
-          <Text id="editScene.actionsCard.alarmCheckMode.description" />
-        </p>
+        {props.path && !props.path.includes('.if') && (
+          <p>
+            <Text id="editScene.actionsCard.alarmCheckMode.description" />
+          </p>
+        )}
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.alarmCheckMode.houseLabel" />
