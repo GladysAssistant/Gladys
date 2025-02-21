@@ -77,14 +77,14 @@ class ConditionIfElseThen extends Component {
         <div class="conditions-container mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h4>
-              <Text id="scenes.conditionCard.conditions">Conditions</Text>
+              <Text id="editScene.actionsCard.conditionIfThenElse.conditions">Conditions</Text>
             </h4>
           </div>
           {conditions.length > 0 && (
             <div class="row">
               <div class="col">
                 <div class="alert alert-secondary">
-                  <Text id="scenes.conditionCard.conditionDescription">
+                  <Text id="editScene.actionsCard.conditionIfThenElse.conditionDescription">
                     If all conditions are met, the actions in the "Then" block will be executed.
                   </Text>
                 </div>
@@ -110,7 +110,7 @@ class ConditionIfElseThen extends Component {
             {conditions.length === 0 && (
               <div class="col">
                 <div class="alert alert-secondary">
-                  <Text id="scenes.conditionCard.noCondition">
+                  <Text id="editScene.actionsCard.conditionIfThenElse.noCondition">
                     No condition has been added yet. Click the '+' button to add a condition to this block
                   </Text>
                 </div>
@@ -119,7 +119,8 @@ class ConditionIfElseThen extends Component {
           </div>
           <div class="text-center mt-4">
             <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
-              <i class="fe fe-plus" /> <Text id="scenes.conditionCard.addCondition">Add condition</Text>
+              <i class="fe fe-plus" />{' '}
+              <Text id="editScene.actionsCard.conditionIfThenElse.addCondition">Add condition</Text>
             </button>
           </div>
         </div>
@@ -132,7 +133,7 @@ class ConditionIfElseThen extends Component {
           >
             <h4>
               <i class={`fe fe-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
-              <Text id="scenes.conditionCard.then">Then...</Text>
+              <Text id="editScene.actionsCard.conditionIfThenElse.then">Then...</Text>
             </h4>
           </div>
           {!thenCollapsed && props.action.then && (
@@ -169,7 +170,7 @@ class ConditionIfElseThen extends Component {
           >
             <h4>
               <i class={`fe fe-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
-              <Text id="scenes.conditionCard.else">Else...</Text>
+              <Text id="editScene.actionsCard.conditionIfThenElse.else">Else...</Text>
             </h4>
           </div>
           {!elseCollapsed && props.action.else && (

@@ -33,41 +33,6 @@ const deepMergeUpdates = (target, source) => {
   return result;
 };
 
-// Helper to get all ancestor paths for a given path
-const getAncestorPaths = path => {
-  const segments = path.split('.');
-  const ancestors = [];
-  let currentPath = '';
-
-  segments.forEach((segment, index) => {
-    if (index === 0) {
-      currentPath = segment;
-    } else {
-      currentPath = `${currentPath}.${segment}`;
-    }
-    if (!segment.match(/then|else/)) {
-      // Only include actual action paths, not control structures
-      ancestors.push(currentPath);
-    }
-  });
-
-  return ancestors;
-};
-
-// Helper to get all variables available at a path
-const getAvailableVariables = (variables, path) => {
-  const ancestors = getAncestorPaths(path);
-  let available = [];
-
-  ancestors.forEach(ancestorPath => {
-    if (variables[ancestorPath]) {
-      available = [...available, ...variables[ancestorPath]];
-    }
-  });
-
-  return available;
-};
-
 // Helper to initialize variables for a scene
 const initializeSceneVariables = (actions, parentPath = '') => {
   let variables = {};
@@ -198,20 +163,21 @@ class EditScene extends Component {
       if (path) {
         // We're in a nested path (inside then/else)
         // Build the nested update object dynamically
-        let updateObject = { scene: { actions: {} }, variables: {} };
+        let updateObject = {
+          scene: { actions: {} },
+          variables: {
+            [path]: { $set: [] }
+          }
+        };
         let actionsPath = updateObject.scene.actions;
-        let variablesPath = updateObject.variables;
 
         // Split path and build nested structure
         path.split('.').forEach((segment, index, array) => {
           if (index === array.length - 1) {
             actionsPath[segment] = { $push: [[]] };
-            variablesPath[segment] = { $push: [[]] };
           } else {
             actionsPath[segment] = {};
-            variablesPath[segment] = {};
             actionsPath = actionsPath[segment];
-            variablesPath = variablesPath[segment];
           }
         });
 
@@ -225,7 +191,9 @@ class EditScene extends Component {
             }
           },
           variables: {
-            $push: [[]]
+            [path]: {
+              $set: []
+            }
           }
         };
       }
@@ -309,6 +277,16 @@ class EditScene extends Component {
       // Split the path into segments
       const pathSegments = path.split('.');
 
+      // Handle variables
+      const newVariables = {
+        ...prevState.variables
+      };
+      Object.keys(prevState.variables)
+        .filter(variablePath => variablePath.startsWith(path))
+        .forEach(pathToDelete => {
+          delete newVariables[pathToDelete];
+        });
+
       // If it's a root level deletion (e.g., "1")
       if (pathSegments.length === 1) {
         return update(prevState, {
@@ -318,15 +296,19 @@ class EditScene extends Component {
             }
           },
           variables: {
-            $splice: [[parseInt(pathSegments[0], 10), 1]]
+            $set: newVariables
           }
         });
       }
 
       // Build the nested update object
-      let updateObject = { scene: { actions: {} }, variables: {} };
+      let updateObject = {
+        scene: { actions: {} },
+        variables: {
+          $set: newVariables
+        }
+      };
       let actionsPath = updateObject.scene.actions;
-      let variablesPath = updateObject.variables;
 
       // Build the nested structure up to the second-to-last segment
       pathSegments.forEach((segment, index) => {
@@ -334,17 +316,12 @@ class EditScene extends Component {
         if (segment === 'then' || segment === 'else') {
           actionsPath[segment] = {};
           actionsPath = actionsPath[segment];
-          variablesPath[segment] = {};
-          variablesPath = variablesPath[segment];
           return;
         }
 
         if (index === pathSegments.length - 1) {
           // Last segment - perform the splice
           actionsPath.$splice = [[parseInt(segment, 10), 1]];
-          if (!segment.includes('then') && !segment.includes('else')) {
-            variablesPath.$splice = [[parseInt(segment, 10), 1]];
-          }
         } else if (index < pathSegments.length - 1) {
           // Not the last segment - continue building the path
           const nextSegment = pathSegments[index + 1];
@@ -352,14 +329,10 @@ class EditScene extends Component {
             // If next segment is then/else, current segment needs numeric index
             actionsPath[parseInt(segment, 10)] = {};
             actionsPath = actionsPath[parseInt(segment, 10)];
-            variablesPath[parseInt(segment, 10)] = {};
-            variablesPath = variablesPath[parseInt(segment, 10)];
           } else {
             // Regular path building
             actionsPath[segment] = {};
             actionsPath = actionsPath[segment];
-            variablesPath[segment] = {};
-            variablesPath = variablesPath[segment];
           }
         }
       });
