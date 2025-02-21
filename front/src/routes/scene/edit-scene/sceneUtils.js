@@ -1,8 +1,15 @@
 import get from 'get-value';
 
-// Helper function to determine if sourcePath comes before targetPath
-const isPathBefore = (sourcePath, targetPath) => {
-  const sourceSegments = sourcePath.split('.');
+// Helper function to determine if a variable in sourcePath is available
+// For an action in targetPath
+const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
+  // if the targetPath is smaller than the sourcePath, it means that
+  // the variable is not in the same branch
+  if (variableSourcePath.length > targetPath.length) {
+    return false;
+  }
+
+  const sourceSegments = variableSourcePath.split('.');
   const targetSegments = targetPath.split('.');
 
   let sourceIndex = 0;
@@ -60,4 +67,4 @@ const convertPathToText = (path, dictionary) => {
   return text;
 };
 
-export { isPathBefore, convertPathToText };
+export { isVariableAvailableAtThisPath, convertPathToText };

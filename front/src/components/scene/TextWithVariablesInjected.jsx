@@ -4,7 +4,7 @@ import '@yaireo/tagify/dist/tagify.css';
 import get from 'get-value';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
-import { isPathBefore, convertPathToText } from '../../routes/scene/edit-scene/sceneUtils';
+import { isVariableAvailableAtThisPath, convertPathToText } from '../../routes/scene/edit-scene/sceneUtils';
 
 const OPENING_VARIABLE = '{{';
 const CLOSING_VARIABLE = '}}';
@@ -45,7 +45,7 @@ class TextWithVariablesInjected extends Component {
 
     Object.keys(nextProps.variables).forEach(variablePath => {
       // If the variable is defined before the current path, we can use it
-      if (isPathBefore(variablePath, nextProps.path)) {
+      if (isVariableAvailableAtThisPath(variablePath, nextProps.path)) {
         nextProps.variables[variablePath].forEach(option => {
           if (option.ready && variableReady === null) {
             variableReady = true;

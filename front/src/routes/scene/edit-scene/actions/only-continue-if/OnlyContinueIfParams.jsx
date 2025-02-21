@@ -5,7 +5,7 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-import { isPathBefore, convertPathToText } from '../../sceneUtils';
+import { isVariableAvailableAtThisPath, convertPathToText } from '../../sceneUtils';
 
 import Condition from './Condition';
 
@@ -44,7 +44,7 @@ class OnlyContinueIf extends Component {
 
     Object.keys(props.variables).forEach(variablePath => {
       // If the variable is defined before the current path, we can use it
-      if (isPathBefore(variablePath, props.path)) {
+      if (isVariableAvailableAtThisPath(variablePath, props.path)) {
         const action = get(props.allActions, variablePath);
         variableOptions.push({
           label: `${convertPathToText(
