@@ -2041,7 +2041,7 @@
         "stop": "Arrêter le service"
       },
       "condition": {
-        "only-continue-if": "Continuer seulement si",
+        "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle"
       },
       "user": {

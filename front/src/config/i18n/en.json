@@ -2046,7 +2046,7 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if",
+        "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
         "if-then-else": "Condition: If...then...else..."
       },
