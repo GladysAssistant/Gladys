@@ -31,6 +31,42 @@ const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua',
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  calculateYAxisRange = () => {
+    const { series } = this.props;
+    // Extract all values from all series
+    const allValues = series.flatMap(serie => serie.data.map(([, value]) => value));
+
+    const minVal = Math.min(...allValues);
+    const maxVal = Math.max(...allValues);
+
+    const range = maxVal - minVal;
+    const f = Math.pow(10, Math.floor(Math.log10(Math.abs(range)))); // Scaling factor
+
+    let minY = Math.floor(minVal / f) * f;
+    let maxY = Math.ceil(maxVal / f) * f;
+
+    // Optional: Constrain the step size
+    const nbTheoreticalStep = (maxY - minY) / f;
+    let step = f; // Default step size
+
+    // Adjust number of steps for better visuals
+    if (nbTheoreticalStep > 5) {
+      step = f * 2; // if too much steps, increase step size
+      if (!Number.isInteger((maxY - minY) / step)) {
+        // If the range is not a multiple of step size, minY or maxY must be adjusted.
+        // Adjustement is choosen for a good centering of the graph
+        if (maxY - maxVal < minVal - minY) {
+          maxY = maxY + step / 2;
+        } else {
+          minY = minY - step / 2;
+        }
+      }
+    } else if (nbTheoreticalStep < 3) {
+      step = f / 2; // if too few steps, reduce step size
+    }
+
+    return { minY, maxY, step };
+  };
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
@@ -143,8 +179,12 @@ class ApexChartComponent extends Component {
     } else {
       height = 200 + this.props.additionalHeight;
     }
+    const { minY, maxY, step } = this.calculateYAxisRange();
     const options = getApexChartLineOptions({
       height,
+      minY,
+      maxY,
+      step,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
@@ -197,6 +237,7 @@ class ApexChartComponent extends Component {
   };
   displayChart = () => {
     let options;
+
     if (this.props.chart_type === 'timeline') {
       options = this.getTimelineChartOptions();
     } else if (this.props.chart_type === 'area') {
