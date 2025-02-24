@@ -590,7 +590,7 @@ const actionsFunc = {
     // verify the conditions
     let conditionsVerified;
     try {
-      await executeActions(self, [ifActions], scope, `${path}.if`);
+      await executeActions(self, [ifActions], scope, `${path}.if`, { throwUnknownError: true });
       conditionsVerified = true;
     } catch (e) {
       if (e instanceof AbortScene) {

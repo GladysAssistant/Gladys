@@ -199,19 +199,20 @@ describe('scene.conditionIfThenElse', () => {
     const message = {
       sendToUser: fake.resolves(null),
     };
-    const service = {
-      getService: fake.throws(new Error('EDF_TEMPO_NOT_FOUND')),
+    const house = {
+      getBySelector: fake.rejects(new Error('HOUSE_NOT_FOUND')),
     };
     const scope = {};
     await executeActions(
-      { stateManager, event, message, service },
+      { stateManager, event, message, house },
       [
         [
           {
             type: ACTIONS.CONDITION.IF_THEN_ELSE,
             if: [
               {
-                type: ACTIONS.EDF_TEMPO.CONDITION,
+                type: ACTIONS.ALARM.CHECK_ALARM_MODE,
+                house: 'unknown-house',
               },
             ],
             then: [
