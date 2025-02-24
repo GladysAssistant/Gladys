@@ -72,6 +72,7 @@ const ACTION_ICON = {
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
 
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
@@ -118,7 +119,7 @@ const ActionCard = ({ children, ...props }) => {
   }, [path, deleteAction]);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: ACTION_CARD_TYPE,
+    type: props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE ? ACTION_CARD_TYPE : ACTION_CARD_IF_THEN_ELSE_TYPE,
     item: () => {
       return { path };
     },
@@ -127,7 +128,7 @@ const ActionCard = ({ children, ...props }) => {
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: ACTION_CARD_TYPE,
+    accept: props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE ? ACTION_CARD_TYPE : ACTION_CARD_IF_THEN_ELSE_TYPE,
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),

@@ -104,6 +104,7 @@ class ConditionIfElseThen extends Component {
                 variables={props.variables}
                 triggersVariables={props.triggersVariables}
                 setVariables={props.setVariables}
+                moveCard={props.moveCard}
                 scene={props.scene}
               />
             ))}

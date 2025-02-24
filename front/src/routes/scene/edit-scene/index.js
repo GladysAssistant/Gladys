@@ -602,23 +602,17 @@ class EditScene extends Component {
     if (!element) return null;
 
     // Build update object for removing from original location
-    let removeUpdateObject = { scene: { actions: {} }, variables: {} };
+    let removeUpdateObject = { scene: { actions: {} } };
     let removeActionsPath = removeUpdateObject.scene.actions;
-    let removeVariablesPath = removeUpdateObject.variables;
 
     originalPath.split('.').forEach((segment, index, array) => {
       if (index === array.length - 2) {
         removeActionsPath[segment] = {
           $splice: [[parseInt(array[array.length - 1], 10), 1]]
         };
-        removeVariablesPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 1]]
-        };
       } else if (index < array.length - 2) {
         removeActionsPath[segment] = {};
-        removeVariablesPath[segment] = {};
         removeActionsPath = removeActionsPath[segment];
-        removeVariablesPath = removeVariablesPath[segment];
       }
     });
 
@@ -628,25 +622,77 @@ class EditScene extends Component {
     // Build update object for adding to destination
     let addUpdateObject = { scene: { actions: {} }, variables: {} };
     let addActionsPath = addUpdateObject.scene.actions;
-    let addVariablesPath = addUpdateObject.variables;
 
     destPath.split('.').forEach((segment, index, array) => {
       if (index === array.length - 2) {
         addActionsPath[segment] = {
           $splice: [[parseInt(array[array.length - 1], 10), 0, element]]
         };
-        addVariablesPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 0, variable]]
-        };
       } else if (index < array.length - 2) {
         addActionsPath[segment] = {};
-        addVariablesPath[segment] = {};
         addActionsPath = addActionsPath[segment];
-        addVariablesPath = addVariablesPath[segment];
       }
     });
 
-    // Add element to new location
+    // Update variables paths
+    const originalPathPrefix = originalPath.substring(0, originalPath.lastIndexOf('.'));
+    const destPathPrefix = destPath.substring(0, destPath.lastIndexOf('.'));
+    const originalIndex = parseInt(originalPath.split('.').pop(), 10);
+    const destIndex = parseInt(destPath.split('.').pop(), 10);
+
+    // Create a new variables object with updated paths
+    const updatedVariables = {};
+    Object.entries(this.state.variables).forEach(([path, value]) => {
+      let newPath;
+
+      // Check if we're moving within the same parent (swapping case)
+      if (originalPathPrefix === destPathPrefix) {
+        if (path.startsWith(originalPathPrefix)) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+
+          if (pathIndex === originalIndex) {
+            // Moving this variable to destination
+            newPath = `${destPathPrefix}.${destIndex}`;
+          } else if (pathIndex === destIndex) {
+            // The destination variable moves to original position
+            newPath = `${originalPathPrefix}.${originalIndex}`;
+          }
+        }
+      } else {
+        // Handle non-swapping case (moving between different parents)
+        if (path.startsWith(originalPathPrefix)) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+
+          if (path === originalPath) {
+            // This is the moved variable
+            newPath = destPath;
+          } else if (pathIndex > originalIndex) {
+            // This variable was after the moved one in the original location
+            const newIndex = pathIndex - 1;
+            newPath = `${originalPathPrefix}.${newIndex}`;
+          }
+        }
+
+        // If the path starts with the destination path prefix
+        if (path.startsWith(destPathPrefix)) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+          if (pathIndex >= destIndex) {
+            // This variable needs to be shifted up
+            const newIndex = pathIndex + 1;
+            newPath = `${destPathPrefix}.${newIndex}`;
+          }
+        }
+      }
+
+      if (newPath) {
+        updatedVariables[newPath] = { $set: value };
+      }
+    });
+
+    // Add variables to the update object
+    addUpdateObject.variables = updatedVariables;
+
+    // Add element to new location and update variables
     const newState = update(newStateWithoutElement, addUpdateObject);
 
     await this.setState(newState);
