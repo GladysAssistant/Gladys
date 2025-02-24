@@ -190,4 +190,45 @@ describe('scene.conditionIfThenElse', () => {
     );
     assert.calledWith(message.sendToUser, 'pepper', 'Then executed, last value = 15');
   });
+  it('should throw error, error happened in the scene', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const service = {
+      getService: fake.throws(new Error('EDF_TEMPO_NOT_FOUND')),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, message, service },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.IF_THEN_ELSE,
+            if: [
+              {
+                type: ACTIONS.EDF_TEMPO.CONDITION,
+              },
+            ],
+            then: [
+              [
+                {
+                  type: ACTIONS.MESSAGE.SEND,
+                  user: 'pepper',
+                  text: 'Then executed.',
+                },
+              ],
+            ],
+            else: [],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(message.sendToUser);
+  });
 });
