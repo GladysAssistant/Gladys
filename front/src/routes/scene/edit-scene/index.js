@@ -75,7 +75,6 @@ class EditScene extends Component {
         scene.triggers = [];
       }
       const variables = initializeSceneVariables(scene.actions);
-      console.log('variables', variables);
       const triggersVariables = [];
       scene.triggers.forEach(() => {
         triggersVariables.push([]);
@@ -272,8 +271,6 @@ class EditScene extends Component {
 
   deleteActionGroup = path => {
     this.setState(prevState => {
-      console.log(`deleteActionGroup, path = ${path}`);
-
       // Split the path into segments
       const pathSegments = path.split('.');
 
@@ -337,8 +334,6 @@ class EditScene extends Component {
         }
       });
 
-      console.log('Update object:', JSON.stringify(updateObject, null, 2));
-      console.log('New state:', JSON.stringify(update(prevState, updateObject), null, 2));
       return update(prevState, updateObject);
     });
   };
@@ -576,9 +571,6 @@ class EditScene extends Component {
   };
 
   moveCard = async (originalPath, destPath) => {
-    console.log(`originalPath = ${originalPath}`);
-    console.log(`destPath = ${destPath}`);
-
     // Helper function to get nested value using path
     const getNestedValue = (obj, path) => {
       return path.split('.').reduce((acc, key) => acc && acc[key], obj);
