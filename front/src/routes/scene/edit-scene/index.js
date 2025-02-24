@@ -597,7 +597,6 @@ class EditScene extends Component {
 
     // Get the element and variable at original path
     const element = getNestedValue(this.state.scene.actions, originalPath);
-    const variable = getNestedValue(this.state.variables, originalPath);
 
     if (!element) return null;
 
