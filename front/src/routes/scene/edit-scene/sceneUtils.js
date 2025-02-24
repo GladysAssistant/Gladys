@@ -49,13 +49,13 @@ const convertPathToText = (path, dictionary) => {
   let text = pathSegments
     .map(segment => {
       if (segment === 'if') {
-        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.if');
+        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortIf');
       }
       if (segment === 'then') {
-        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.then');
+        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortThen');
       }
       if (segment === 'else') {
-        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.else');
+        return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortElse');
       }
       return `${Number(segment) + 1}`;
     })

@@ -1891,6 +1891,18 @@
         "orButton": "+ OU",
         "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
+      "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
+        "addCondition": "Ajouter une condition",
+        "if": "Si",
+        "then": "Alors",
+        "else": "Sinon",
+        "shortIf": "S",
+        "shortThen": "A",
+        "shortElse": "S"
+      },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
         "beforeLabel": "Avant",
@@ -2042,7 +2054,8 @@
       },
       "condition": {
         "only-continue-if": "Condition sur variables",
-        "check-time": "Condition temporelle"
+        "check-time": "Condition temporelle",
+        "if-then-else": "Condition \"Si... Alors... Sinon...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",

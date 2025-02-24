@@ -1891,6 +1891,18 @@
         "orButton": "+ ODER",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
+      "conditionIfThenElse": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Wenn alle Bedingungen erfüllt sind, werden die Aktionen im \"Dann\"-Block ausgeführt. Wenn nicht, werden die Aktionen im \"Sonst\"-Block ausgeführt.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
+        "addCondition": "Bedingung hinzufügen",
+        "if": "Wenn",
+        "then": "Dann",
+        "else": "Sonst",
+        "shortIf": "W",
+        "shortThen": "D",
+        "shortElse": "S"
+      },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",
         "beforeLabel": "Vor",
@@ -2042,7 +2054,8 @@
       },
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
-        "check-time": "Zeitbedingung"
+        "check-time": "Zeitbedingung",
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",

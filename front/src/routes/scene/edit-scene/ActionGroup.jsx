@@ -7,6 +7,7 @@ import cx from 'classnames';
 import ActionCard from './ActionCard';
 import style from './style.css';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+import { convertPathToText } from '../../scene/edit-scene/sceneUtils';
 
 const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
 
@@ -15,25 +16,6 @@ import EmptyDropZone from './EmptyDropZone';
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
   const { path } = props;
   const ref = useRef(null);
-  const convertPathToText = path => {
-    const pathSegments = path.split('.');
-    const text = pathSegments
-      .map((segment, index) => {
-        if (segment === 'if') {
-          return 'If';
-        }
-        if (segment === 'then') {
-          return 'Then';
-        }
-        if (segment === 'else') {
-          return 'Else';
-        }
-        const isLastElement = index === pathSegments.length - 1;
-        return `${Number(segment) + 1}${isLastElement ? '.' : ''}`;
-      })
-      .join('.');
-    return text;
-  };
   const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: ACTION_GROUP_TYPE,
     item: () => {

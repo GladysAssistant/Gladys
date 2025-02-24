@@ -1892,9 +1892,16 @@
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
+        "addCondition": "Add condition",
         "if": "If",
         "then": "Then",
-        "else": "Else"
+        "else": "Else",
+        "shortIf": "I",
+        "shortThen": "T",
+        "shortElse": "E"
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
