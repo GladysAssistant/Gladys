@@ -870,6 +870,8 @@ const DEVICE_FEATURE_UNITS = {
   MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
   // Noise units
   DECIBEL: 'decibel',
+  // Smoke units
+  OPTICAL_DENSITY_PER_METER: 'optical-density-per-meter',
 };
 
 const WEATHER_UNITS = {
