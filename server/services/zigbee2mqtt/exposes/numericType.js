@@ -223,6 +223,13 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
+    smoke_density: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.OPTICAL_DENSITY_PER_METER,
+      },
+    },
     temperature: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
