@@ -3076,6 +3076,10 @@
       "shortCategoryName": "Presence sensor",
       "push": "Presence"
     },
+    "rain-sensor": {
+      "shortCategoryName": "Rain sensor",
+      "binary": "Rain detection Yes/No"
+    },
     "light-sensor": {
       "shortCategoryName": "Luminosity sensor",
       "integer": "Luminosity (integer)",

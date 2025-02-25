@@ -513,6 +513,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RAIN_SENSOR: 'rain-sensor',
   RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
