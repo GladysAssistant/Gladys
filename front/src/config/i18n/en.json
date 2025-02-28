@@ -1901,7 +1901,12 @@
         "else": "Else",
         "shortIf": "I",
         "shortThen": "T",
-        "shortElse": "E"
+        "shortElse": "E",
+        "actionCount": {
+          "zero": "No action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",

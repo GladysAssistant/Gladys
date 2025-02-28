@@ -44,6 +44,14 @@ class ConditionIfElseThen extends Component {
     }));
   };
 
+  getNumberOfActionsInThen = () => {
+    return this.props.action.then.map(actions => actions.length).reduce((a, b) => a + b, 0);
+  };
+
+  getNumberOfActionsInElse = () => {
+    return this.props.action.else.map(actions => actions.length).reduce((a, b) => a + b, 0);
+  };
+
   initActionIfNeeded = () => {
     if (isNullOrUndefined(get(this.props, 'action.if'))) {
       this.props.updateActionProperty(this.props.path, 'if', []);
@@ -136,6 +144,17 @@ class ConditionIfElseThen extends Component {
             <h4>
               <i class={`fe fe-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
               <Text id="editScene.actionsCard.conditionIfThenElse.then">Then...</Text>
+              {thenCollapsed && (
+                <span class="badge badge-pill badge-secondary ml-2">
+                  <Text
+                    id="editScene.actionsCard.conditionIfThenElse.actionCount"
+                    plural={this.getNumberOfActionsInThen()}
+                    fields={{
+                      count: this.getNumberOfActionsInThen()
+                    }}
+                  />
+                </span>
+              )}
             </h4>
           </div>
           {!thenCollapsed && props.action.then && (
@@ -174,6 +193,17 @@ class ConditionIfElseThen extends Component {
             <h4>
               <i class={`fe fe-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
               <Text id="editScene.actionsCard.conditionIfThenElse.else">Else...</Text>
+              {elseCollapsed && (
+                <span class="badge badge-pill badge-secondary ml-2">
+                  <Text
+                    id="editScene.actionsCard.conditionIfThenElse.actionCount"
+                    plural={this.getNumberOfActionsInElse()}
+                    fields={{
+                      count: this.getNumberOfActionsInElse()
+                    }}
+                  />
+                </span>
+              )}
             </h4>
           </div>
           {!elseCollapsed && props.action.else && (

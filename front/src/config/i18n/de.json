@@ -1901,7 +1901,12 @@
         "else": "Sonst",
         "shortIf": "W",
         "shortThen": "D",
-        "shortElse": "S"
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
       },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",

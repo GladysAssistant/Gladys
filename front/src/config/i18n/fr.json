@@ -1901,7 +1901,12 @@
         "else": "Sinon",
         "shortIf": "S",
         "shortThen": "A",
-        "shortElse": "S"
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
