@@ -9,17 +9,17 @@ import style from './style.css';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { convertPathToText } from '../../scene/edit-scene/sceneUtils';
 
-const ROOT_ACTION_GROUP_TYPE = 'ROOT_ACTION_GROUP_TYPE';
-const NESTED_ACTION_GROUP_TYPE = 'NESTED_ACTION_GROUP_TYPE';
+const ACTION_GROUP_TYPE_LEVEL = 'ACTION_GROUP_TYPE_LEVEL';
 
 import EmptyDropZone from './EmptyDropZone';
 
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
-  const isRootPath = props.path.split('.').length === 1;
+  const pathLevel = props.path.split('.').length;
   const { path } = props;
   const ref = useRef(null);
   const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: isRootPath ? ROOT_ACTION_GROUP_TYPE : NESTED_ACTION_GROUP_TYPE,
+    // You can only drag & drop an action group of the same level
+    type: `${ACTION_GROUP_TYPE_LEVEL}_${pathLevel}`,
     item: () => {
       return { path };
     },
@@ -28,7 +28,8 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: isRootPath ? ROOT_ACTION_GROUP_TYPE : NESTED_ACTION_GROUP_TYPE,
+    // You can only drag & drop an action group of the same level
+    accept: `${ACTION_GROUP_TYPE_LEVEL}_${pathLevel}`,
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
