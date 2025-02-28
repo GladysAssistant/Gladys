@@ -203,7 +203,8 @@ const ActionCard = ({ children, ...props }) => {
               deleteAction: props.deleteAction,
               deleteActionGroup: props.deleteActionGroup,
               addAction: props.addAction,
-              moveCard: props.moveCard
+              moveCard: props.moveCard,
+              moveCardGroup: props.moveCardGroup
             };
 
             return <Component {...commonProps} />;

@@ -105,6 +105,7 @@ class ConditionIfElseThen extends Component {
                 triggersVariables={props.triggersVariables}
                 setVariables={props.setVariables}
                 moveCard={props.moveCard}
+                moveCardGroup={props.moveCardGroup}
                 scene={props.scene}
               />
             ))}
@@ -149,6 +150,7 @@ class ConditionIfElseThen extends Component {
                   deleteActionGroup={props.deleteActionGroup}
                   updateActionProperty={props.updateActionProperty}
                   moveCard={props.moveCard}
+                  moveCardGroup={props.moveCardGroup}
                   highLightedActions={props.highLightedActions}
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
@@ -186,6 +188,7 @@ class ConditionIfElseThen extends Component {
                   deleteActionGroup={props.deleteActionGroup}
                   updateActionProperty={props.updateActionProperty}
                   moveCard={props.moveCard}
+                  moveCardGroup={props.moveCardGroup}
                   highLightedActions={props.highLightedActions}
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}

@@ -9,15 +9,17 @@ import style from './style.css';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { convertPathToText } from '../../scene/edit-scene/sceneUtils';
 
-const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
+const ROOT_ACTION_GROUP_TYPE = 'ROOT_ACTION_GROUP_TYPE';
+const NESTED_ACTION_GROUP_TYPE = 'NESTED_ACTION_GROUP_TYPE';
 
 import EmptyDropZone from './EmptyDropZone';
 
 const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
+  const isRootPath = props.path.split('.').length === 1;
   const { path } = props;
   const ref = useRef(null);
   const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: ACTION_GROUP_TYPE,
+    type: isRootPath ? ROOT_ACTION_GROUP_TYPE : NESTED_ACTION_GROUP_TYPE,
     item: () => {
       return { path };
     },
@@ -26,7 +28,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: ACTION_GROUP_TYPE,
+    accept: isRootPath ? ROOT_ACTION_GROUP_TYPE : NESTED_ACTION_GROUP_TYPE,
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
@@ -80,6 +82,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                 {props.actions.map((action, index) => (
                   <ActionCard
                     moveCard={props.moveCard}
+                    moveCardGroup={props.moveCardGroup}
                     sceneParamsData={props.sceneParamsData}
                     action={action}
                     path={`${props.path}.${index}`}

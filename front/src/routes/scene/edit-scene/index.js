@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
@@ -698,41 +699,64 @@ class EditScene extends Component {
     await this.addEmptyActionGroupIfNeeded();
   };
 
-  moveCardGroup = async (index, destIndex) => {
-    // incorrect coordinates
-    if (destIndex < 0) {
+  moveCardGroup = async (sourcePath, destPath) => {
+    const getElementByPath = path => {
+      const parts = path.split('.');
+      const lastPart = parts.pop();
+      const arrayPath = parts.join('.');
+
+      const array = arrayPath ? get(this.state.scene.actions, arrayPath) : this.state.scene.actions;
+
+      if (!Array.isArray(array)) {
+        throw new Error('Invalid path: could not find target array');
+      }
+
+      return {
+        array,
+        index: parseInt(lastPart, 10)
+      };
+    };
+
+    try {
+      const source = getElementByPath(sourcePath);
+      const dest = getElementByPath(destPath);
+
+      // Validate indices
+      if (dest.index < 0 || dest.index > dest.array.length) {
+        return null;
+      }
+
+      // Get the element to move
+      const element = source.array[source.index];
+
+      // Get the associated variable key-value
+      const sourceVariableKey = sourcePath;
+      const destVariableKey = destPath;
+      const variable = this.state.variables[sourceVariableKey] || [];
+
+      // Create new state by first removing from source
+      let newState = { ...this.state };
+      source.array.splice(source.index, 1);
+
+      // Then insert at destination
+      dest.array.splice(dest.index, 0, element);
+
+      // Update variables
+      const newVariables = { ...this.state.variables };
+      delete newVariables[sourceVariableKey];
+      newVariables[destVariableKey] = variable;
+
+      // Set the new state
+      await this.setState({
+        ...newState,
+        variables: newVariables
+      });
+
+      await this.addEmptyActionGroupIfNeeded();
+    } catch (error) {
+      console.error('Error moving card group:', error);
       return null;
     }
-
-    if (destIndex >= this.state.scene.actions.length) {
-      return null;
-    }
-
-    const element = this.state.scene.actions[index];
-    const variable = this.state.variables[index];
-
-    const newStateWithoutElement = update(this.state, {
-      scene: {
-        actions: {
-          $splice: [[index, 1]]
-        }
-      },
-      variables: {
-        $splice: [[index, 1]]
-      }
-    });
-    const newState = update(newStateWithoutElement, {
-      scene: {
-        actions: {
-          $splice: [[destIndex, 0, element]]
-        }
-      },
-      variables: {
-        $splice: [[destIndex, 0, variable]]
-      }
-    });
-    await this.setState(newState);
-    await this.addEmptyActionGroupIfNeeded();
   };
 
   setTags = tags => {
