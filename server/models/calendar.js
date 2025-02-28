@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 
 module.exports = (sequelize, DataTypes) => {
   const calendar = sequelize.define(
@@ -80,7 +80,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  calendar.beforeValidate(addSelector);
+  calendar.beforeValidate(addSelectorBeforeValidateHook);
 
   calendar.associate = (models) => {
     calendar.hasMany(models.CalendarEvent, {

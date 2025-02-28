@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { DASHBOARD_BOX_TYPE_LIST, DASHBOARD_TYPE_LIST, DASHBOARD_VISIBILITY_LIST } = require('../utils/constants');
 
 const boxesSchema = Joi.array().items(
@@ -97,7 +97,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  dashboard.beforeValidate(addSelector);
+  dashboard.beforeValidate(addSelectorBeforeValidateHook);
 
   return dashboard;
 };
