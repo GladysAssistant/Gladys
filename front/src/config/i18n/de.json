@@ -3034,6 +3034,10 @@
       "shortCategoryName": "Anwesenheitssensor",
       "push": "Anwesenheit"
     },
+    "rain-sensor": {
+      "shortCategoryName": "Regensensor",
+      "binary": "Regenerkennung Ja/Nein"
+    },
     "light-sensor": {
       "shortCategoryName": "Helligkeitssensor",
       "integer": "Helligkeit (ganze Zahl)",
@@ -3278,7 +3282,8 @@
     },
     "precipitation-sensor": {
       "shortCategoryName": "Niederschlagssensor",
-      "decimal": "Niederschlag"
+      "decimal": "Niederschlag",
+      "integer": "Intensität (mV)"
     },
     "uv-sensor": {
       "shortCategoryName": "UV-Sensor",

@@ -276,6 +276,13 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
+    rain_intensity: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.MILLI_VOLT,
+      },
+    },
     temperature: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
