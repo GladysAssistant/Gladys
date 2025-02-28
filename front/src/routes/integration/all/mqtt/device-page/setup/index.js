@@ -214,6 +214,14 @@ class MqttDeviceSetupPage extends Component {
           saveStatus: RequestStatus.ConflictError,
           loading: false
         });
+      }
+      if (status === 422) {
+        const properties = get(e, 'response.data.properties', []);
+        this.setState({
+          saveStatus: RequestStatus.ValidationError,
+          erroredAttributes: properties.map(p => p.attribute).filter(a => a !== 'selector'),
+          loading: false
+        });
       } else {
         this.setState({
           saveStatus: RequestStatus.Error,
