@@ -172,7 +172,8 @@ const ActionCard = ({ children, ...props }) => {
           {props.action.type === null && <i class="fe fe-plus-circle" />}
           <div class="card-title">
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
-            {props.action.type === null && <Text id="editScene.newAction" />}
+            {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
+            {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
             <div class="card-status bg-blue" />

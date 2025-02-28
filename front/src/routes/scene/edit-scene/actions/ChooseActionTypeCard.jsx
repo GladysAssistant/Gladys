@@ -69,7 +69,8 @@ class ChooseActionType extends Component {
       <div>
         <div class="form-group">
           <label class="form-label">
-            <Text id="editScene.selectActionType" />
+            {props.path.includes('if') && <Text id="editScene.selectConditionType" />}
+            {!props.path.includes('if') && <Text id="editScene.selectActionType" />}
           </label>
           <Select
             class="choose-scene-action-type"
