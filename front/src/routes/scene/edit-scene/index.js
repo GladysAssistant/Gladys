@@ -729,11 +729,6 @@ class EditScene extends Component {
       // Get the element to move
       const element = source.array[source.index];
 
-      // Get the associated variable key-value
-      const sourceVariableKey = sourcePath;
-      const destVariableKey = destPath;
-      const variable = this.state.variables[sourceVariableKey] || [];
-
       // Create new state by first removing from source
       let newState = { ...this.state };
       source.array.splice(source.index, 1);
@@ -741,10 +736,46 @@ class EditScene extends Component {
       // Then insert at destination
       dest.array.splice(dest.index, 0, element);
 
-      // Update variables
+      // Update variables - handle all affected variables
       const newVariables = { ...this.state.variables };
-      delete newVariables[sourceVariableKey];
-      newVariables[destVariableKey] = variable;
+
+      // Iterate through all variables and update their paths
+      Object.entries(this.state.variables).forEach(([path, value]) => {
+        // If the path starts with sourcePath, it means this variable was under the moved group
+        if (path.startsWith(sourcePath)) {
+          // Delete the old path
+          delete newVariables[path];
+          // Create new path by replacing sourcePath with destPath
+          const newPath = path.replace(sourcePath, destPath);
+          newVariables[newPath] = value;
+        } else {
+          // For variables after the source/dest positions, we need to update their indices
+          const sourcePathParts = sourcePath.split('.');
+          const destPathParts = destPath.split('.');
+          const pathParts = path.split('.');
+
+          // Only process if we're in the same parent path
+          if (sourcePathParts.length === pathParts.length) {
+            const sourceIndex = parseInt(sourcePathParts[sourcePathParts.length - 1], 10);
+            const destIndex = parseInt(destPathParts[destPathParts.length - 1], 10);
+            const currentIndex = parseInt(pathParts[pathParts.length - 1], 10);
+
+            // If this path is after source and before dest, decrement index
+            if (currentIndex > sourceIndex && currentIndex <= destIndex) {
+              const newIndex = currentIndex - 1;
+              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
+              newVariables[newPath] = value;
+              delete newVariables[path];
+            } else if (currentIndex >= destIndex && currentIndex < sourceIndex) {
+              // If this path is before source and after dest, increment index
+              const newIndex = currentIndex + 1;
+              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
+              newVariables[newPath] = value;
+              delete newVariables[path];
+            }
+          }
+        }
+      });
 
       // Set the new state
       await this.setState({
