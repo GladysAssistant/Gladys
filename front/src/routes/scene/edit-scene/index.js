@@ -899,6 +899,60 @@ class EditScene extends Component {
     }
   };
 
+  // Recursively generate all possible action group types based on nesting level
+  generateActionGroupTypes = (actions, parentPath = '') => {
+    if (!actions || !Array.isArray(actions)) {
+      return [];
+    }
+
+    // Start with the current level
+    let types = [];
+    const currentLevel = parentPath.split('.').length;
+
+    // Add the current level if not already in the list
+    if (!parentPath.endsWith('then') && !parentPath.endsWith('else')) {
+      const groupType = `ACTION_GROUP_TYPE_LEVEL_${currentLevel}`;
+      if (!types.includes(groupType)) {
+        types.push(groupType);
+      }
+    }
+
+    // Recursively process each action group and its actions
+    actions.forEach((actionGroup, groupIndex) => {
+      const groupPath = parentPath ? `${parentPath}.${groupIndex}` : `${groupIndex}`;
+
+      const groupType = `ACTION_GROUP_TYPE_LEVEL_${groupPath.split('.').length}`;
+      if (!types.includes(groupType)) {
+        types.push(groupType);
+      }
+
+      // Process each action in the group
+      if (Array.isArray(actionGroup)) {
+        actionGroup.forEach((action, actionIndex) => {
+          const actionPath = `${groupPath}.${actionIndex}`;
+
+          // Check if this is a conditional action with nested actions
+          if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+            // Process 'then' branch
+            if (Array.isArray(action.then)) {
+              const thenTypes = this.generateActionGroupTypes(action.then, `${actionPath}.then`);
+              types = [...types, ...thenTypes];
+            }
+
+            // Process 'else' branch
+            if (Array.isArray(action.else)) {
+              const elseTypes = this.generateActionGroupTypes(action.else, `${actionPath}.else`);
+              types = [...types, ...elseTypes];
+            }
+          }
+        });
+      }
+    });
+
+    // Remove duplicates
+    return [...new Set(types)];
+  };
+
   constructor(props) {
     super(props);
     this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
@@ -925,6 +979,7 @@ class EditScene extends Component {
   }
 
   render(props, { saving, error, variables, scene, triggersVariables, tags }) {
+    const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     return (
       scene && (
         <div>
@@ -933,6 +988,7 @@ class EditScene extends Component {
               {...props}
               scene={scene}
               tags={tags}
+              actionsGroupTypes={actionsGroupTypes}
               updateActionProperty={this.updateActionProperty}
               updateTriggerProperty={this.updateTriggerProperty}
               addAction={this.addAction}
