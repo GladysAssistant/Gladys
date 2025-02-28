@@ -380,6 +380,94 @@ class EditScene extends Component {
         }
       });
 
+      // Check if we need to remove an empty action group
+      // Only if we are not in a "if" action
+      if (!path.includes('if')) {
+        const parentPath = path
+          .split('.')
+          .slice(0, -1)
+          .join('.');
+        const parentSegments = parentPath.split('.');
+
+        // Get the current action group and check if it will be empty after deletion
+        let actionGroup = prevState.scene.actions;
+        let nextGroupIndex = null;
+
+        // Navigate to the correct action group based on the path
+        for (let i = 0; i < parentSegments.length; i++) {
+          const segment = parentSegments[i];
+          if (segment === 'then' || segment === 'else') {
+            actionGroup = actionGroup[segment];
+          } else {
+            actionGroup = actionGroup[parseInt(segment, 10)];
+          }
+        }
+
+        // Check if the current action group will be empty after deletion
+        // and if there's a next action group to potentially delete
+        const willBeEmpty = actionGroup.length === 1;
+
+        // Handle root level action groups
+        if (parentSegments.length === 1) {
+          const groupIndex = parseInt(parentSegments[0], 10);
+          nextGroupIndex = groupIndex + 1;
+
+          // If current group will be empty and next group exists and is empty
+          if (
+            willBeEmpty &&
+            nextGroupIndex < prevState.scene.actions.length &&
+            prevState.scene.actions[nextGroupIndex].length === 0
+          ) {
+            // Add deletion of next group to updateObject
+            if (!updateObject.scene.actions.$splice) {
+              updateObject.scene.actions.$splice = [];
+            }
+            updateObject.scene.actions.$splice.push([nextGroupIndex, 1]);
+          }
+        } else if (parentSegments.length > 1) {
+          // Handle nested action groups (inside then/else)
+          let container = prevState.scene.actions;
+
+          // Navigate to the container
+          for (let i = 0; i < parentSegments.length - 1; i++) {
+            const segment = parentSegments[i];
+            if (segment === 'then' || segment === 'else') {
+              container = container[segment];
+            } else {
+              container = container[parseInt(segment, 10)];
+            }
+          }
+
+          const groupIndex = parseInt(parentSegments[parentSegments.length - 1], 10);
+          nextGroupIndex = groupIndex + 1;
+
+          // If current group will be empty and next group exists and is empty
+          if (willBeEmpty && nextGroupIndex < container.length && container[nextGroupIndex].length === 0) {
+            // Build nested update for the container
+            let nestedUpdate = { scene: { actions: {} } };
+            let currentNested = nestedUpdate.scene.actions;
+
+            // Build the path to the container
+            for (let i = 0; i < parentSegments.length - 1; i++) {
+              const segment = parentSegments[i];
+              if (segment === 'then' || segment === 'else') {
+                currentNested[segment] = {};
+                currentNested = currentNested[segment];
+              } else {
+                currentNested[parseInt(segment, 10)] = {};
+                currentNested = currentNested[parseInt(segment, 10)];
+              }
+            }
+
+            // Add splice operation to delete the next group
+            currentNested.$splice = [[nextGroupIndex, 1]];
+
+            // Merge this update with the main updateObject
+            updateObject = deepMergeUpdates(updateObject, nestedUpdate);
+          }
+        }
+      }
+
       return update(prevState, {
         ...updateObject,
         variables: { $set: newVariables }
@@ -387,7 +475,6 @@ class EditScene extends Component {
     });
   };
 
-  // Helper to update paths after action deletion
   updatePathAfterDeletion = (currentPath, deletedPath) => {
     const currentSegments = currentPath.split('.');
     const deletedSegments = deletedPath.split('.');
@@ -634,52 +721,50 @@ class EditScene extends Component {
       }
     });
 
-    // Update variables paths
-    const originalPathPrefix = originalPath.substring(0, originalPath.lastIndexOf('.'));
-    const destPathPrefix = destPath.substring(0, destPath.lastIndexOf('.'));
-    const originalIndex = parseInt(originalPath.split('.').pop(), 10);
-    const destIndex = parseInt(destPath.split('.').pop(), 10);
-
-    // Create a new variables object with updated paths
+    // Update variables - handle all affected variables
     const updatedVariables = {};
     Object.entries(this.state.variables).forEach(([path, value]) => {
       let newPath;
 
       // Check if we're moving within the same parent (swapping case)
-      if (originalPathPrefix === destPathPrefix) {
-        if (path.startsWith(originalPathPrefix)) {
+      if (
+        originalPath
+          .substring(0, originalPath.lastIndexOf('.'))
+          .startsWith(destPath.substring(0, destPath.lastIndexOf('.')))
+      ) {
+        if (path.startsWith(originalPath.substring(0, originalPath.lastIndexOf('.')))) {
           const pathIndex = parseInt(path.split('.').pop(), 10);
 
-          if (pathIndex === originalIndex) {
+          if (pathIndex === parseInt(originalPath.split('.').pop(), 10)) {
             // Moving this variable to destination
-            newPath = `${destPathPrefix}.${destIndex}`;
-          } else if (pathIndex === destIndex) {
+            newPath = destPath;
+          } else if (pathIndex === parseInt(destPath.split('.').pop(), 10)) {
             // The destination variable moves to original position
-            newPath = `${originalPathPrefix}.${originalIndex}`;
+            newPath = originalPath;
           }
         }
       } else {
         // Handle non-swapping case (moving between different parents)
-        if (path.startsWith(originalPathPrefix)) {
+        if (path.startsWith(originalPath.substring(0, originalPath.lastIndexOf('.')))) {
           const pathIndex = parseInt(path.split('.').pop(), 10);
 
           if (path === originalPath) {
             // This is the moved variable
             newPath = destPath;
-          } else if (pathIndex > originalIndex) {
+          } else if (pathIndex > parseInt(originalPath.split('.').pop(), 10)) {
             // This variable was after the moved one in the original location
             const newIndex = pathIndex - 1;
-            newPath = `${originalPathPrefix}.${newIndex}`;
+            newPath = `${originalPath.substring(0, originalPath.lastIndexOf('.'))}.${newIndex}`;
           }
         }
 
         // If the path starts with the destination path prefix
-        if (path.startsWith(destPathPrefix)) {
+        if (path.startsWith(destPath.substring(0, destPath.lastIndexOf('.')))) {
           const pathIndex = parseInt(path.split('.').pop(), 10);
-          if (pathIndex >= destIndex) {
+          if (pathIndex >= parseInt(destPath.split('.').pop(), 10)) {
             // This variable needs to be shifted up
             const newIndex = pathIndex + 1;
-            newPath = `${destPathPrefix}.${newIndex}`;
+            newPath = `${destPath.substring(0, destPath.lastIndexOf('.'))}.${newIndex}`;
           }
         }
       }

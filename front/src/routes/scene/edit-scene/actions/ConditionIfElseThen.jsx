@@ -45,10 +45,12 @@ class ConditionIfElseThen extends Component {
   };
 
   getNumberOfActionsInThen = () => {
+    if (!this.props.action || !this.props.action.then) return 0;
     return this.props.action.then.map(actions => actions.length).reduce((a, b) => a + b, 0);
   };
 
   getNumberOfActionsInElse = () => {
+    if (!this.props.action || !this.props.action.else) return 0;
     return this.props.action.else.map(actions => actions.length).reduce((a, b) => a + b, 0);
   };
 
@@ -62,10 +64,6 @@ class ConditionIfElseThen extends Component {
     if (isNullOrUndefined(get(this.props, 'action.else'))) {
       this.props.updateActionProperty(this.props.path, 'else', [[]]);
     }
-    // Init variables
-    // this.props.setVariables(`${this.props.path}.if`, []);
-    // this.props.setVariables(`${this.props.path}.then`, [[]]);
-    // this.props.setVariables(`${this.props.path}.else`, [[]]);
   };
 
   componentDidMount() {
