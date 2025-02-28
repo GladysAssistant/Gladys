@@ -1298,6 +1298,13 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
+        "validationError": "Validation error : The device is not correctly filled.",
+        "validationErrors": {
+          "name": "The name field is required",
+          "min": "The minimum field is required and must be an integer",
+          "max": "The maximum field is required and must be an integer",
+          "external_id": "The external ID field is required and must be unique across all devices"
+        },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received."

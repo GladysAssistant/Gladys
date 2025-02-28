@@ -1426,6 +1426,13 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
+        "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrors": {
+          "name": "Le champ \"Nom\" est obligatoire",
+          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
+          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
+          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+        },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."

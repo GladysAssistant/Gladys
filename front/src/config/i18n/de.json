@@ -1298,6 +1298,13 @@
         "notFound": "Angefordertes Gerät nicht gefunden.",
         "backToList": "Zurück zur Geräteliste",
         "saveError": "Fehler beim Sichern oder Löschen des Geräts",
+        "validationError": "Validierungsfehler: Das Gerät ist nicht korrekt ausgefüllt.",
+        "validationErrors": {
+          "name": "Das Feld \"Name\" ist erforderlich",
+          "min": "Das Minimalfeld ist erforderlich und muss eine ganze Zahl sein",
+          "max": "Das Maximalfeld ist erforderlich und muss eine ganze Zahl sein",
+          "external_id": "Das externe ID-Feld ist erforderlich und muss über alle Geräte hinweg eindeutig sein"
+        },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",
         "noValueReceived": "Kein Wert empfangen."
