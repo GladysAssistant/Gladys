@@ -3324,7 +3324,8 @@
     },
     "precipitation-sensor": {
       "shortCategoryName": "Capteur de précipitations",
-      "decimal": "Précipitation"
+      "decimal": "Précipitation",
+      "integer": "Intensité (mV)"
     },
     "uv-sensor": {
       "shortCategoryName": "Capteur d'UV",
