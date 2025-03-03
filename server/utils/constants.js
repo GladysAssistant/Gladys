@@ -459,6 +459,10 @@ const INTENTS = {
   SCENE: {
     START: 'intent.scene.start',
   },
+  SWITCH: {
+    TURN_ON: 'intent.switch.turn-on',
+    TURN_OFF: 'intent.switch.turn-off',
+  },
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
