@@ -197,4 +197,31 @@ describe('SonosHandler.setValue', () => {
       delayMs: 700,
     });
   });
+  it('should play notification on Sonos and change volume', async () => {
+    const device = {
+      name: 'My sonos',
+      external_id: 'sonos:test-uuid',
+      service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      should_poll: false,
+    };
+    const deviceFeature = {
+      name: 'My sonos - Play notification',
+      external_id: 'sonos:test-uuid:play-notification',
+      category: 'music',
+      type: 'play_notification',
+      min: 1,
+      max: 1,
+      keep_history: false,
+      read_only: false,
+      has_feedback: false,
+    };
+    await sonosHandler.setValue(device, deviceFeature, 'http://test.com', { volume: 30 });
+    assert.calledWith(devicePlayNotification, {
+      onlyWhenPlaying: false,
+      timeout: 20,
+      trackUri: 'http://test.com',
+      volume: 30,
+      delayMs: 700,
+    });
+  });
 });
