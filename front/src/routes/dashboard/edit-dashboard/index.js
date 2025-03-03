@@ -153,18 +153,20 @@ class EditDashboard extends Component {
   };
 
   updateBoxConfig = (x, y, data) => {
-    const newState = update(this.state, {
-      currentDashboard: {
-        boxes: {
-          [x]: {
-            [y]: {
-              $merge: data
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        currentDashboard: {
+          boxes: {
+            [x]: {
+              [y]: {
+                $merge: data
+              }
             }
           }
         }
-      }
+      });
+      return { ...newState, boxNotEmptyError: false };
     });
-    this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateNewSelectedBox = (x, y, type) => {
