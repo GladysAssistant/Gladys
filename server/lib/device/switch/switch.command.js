@@ -32,17 +32,12 @@ async function command(message, classification, context) {
     if (!deviceFeature) {
       throw new NotFoundError('Feature not found');
     }
-    switch (classification.intent) {
-      case 'switch.turn-on':
-        await this.deviceManager.setValue(device, deviceFeature, STATE.ON);
-        this.messageManager.replyByIntent(message, 'switch.turn-on.success', context);
-        break;
-      case 'switch.turn-off':
-        await this.deviceManager.setValue(device, deviceFeature, STATE.OFF);
-        this.messageManager.replyByIntent(message, 'switch.turn-off.success', context);
-        break;
-      default:
-        throw new Error('Not found');
+    if (classification.intent === 'switch.turn-on') {
+      await this.deviceManager.setValue(device, deviceFeature, STATE.ON);
+      this.messageManager.replyByIntent(message, 'switch.turn-on.success', context);
+    } else if (classification.intent === 'switch.turn-off') {
+      await this.deviceManager.setValue(device, deviceFeature, STATE.OFF);
+      this.messageManager.replyByIntent(message, 'switch.turn-off.success', context);
     }
   } catch (e) {
     logger.debug(e);
