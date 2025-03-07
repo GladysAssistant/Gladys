@@ -4,13 +4,15 @@ const dayjs = require('dayjs');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../../utils/constants');
 const { AbortScene } = require('../../../../utils/coreErrors');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../../lib/state');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const event = new EventEmitter();
 
 describe('scene.action.checkTime', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   it('should execute condition.check-time, and send message because condition is true', async () => {
     const stateManager = new StateManager(event);
     const message = {

@@ -2,13 +2,15 @@ const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
 const { ACTIONS } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
 describe('scene.send-zigbee2mqtt-message', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   it('should send message with value injected from device get-value', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {

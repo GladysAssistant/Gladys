@@ -9,21 +9,19 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 class DeviceGetValue extends Component {
   onDeviceFeatureChange = (deviceFeature, device) => {
-    const { columnIndex, index } = this.props;
     if (deviceFeature) {
-      this.props.updateActionProperty(columnIndex, index, 'device_feature', deviceFeature.selector);
+      this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
       this.setVariables(device, deviceFeature);
     } else {
-      this.props.updateActionProperty(columnIndex, index, 'device_feature', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature', null);
       this.setVariables();
     }
     this.setState({ deviceFeature, device });
   };
 
   setVariables = (device, deviceFeature) => {
-    const { columnIndex, index } = this.props;
     const DEFAULT_VARIABLE_NAME = get(this.props.intl.dictionary, 'editScene.variables.device.get-value.last_value');
-    this.props.setVariables(columnIndex, index, [
+    this.props.setVariables(this.props.path, [
       {
         name: 'last_value',
         type: 'device_feature',

@@ -9,14 +9,11 @@ import style from './style.css';
 import Settings from './Settings';
 import { Text } from 'preact-i18n';
 
-const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
-const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
-
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
-        <AutoScrollMobile position="top" box_type={[ACTION_CARD_TYPE, ACTION_GROUP_TYPE]} />
+        <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
         <div class="container">
           <div class="mb-4">
             <div class="d-flex justify-content-between flex-column flex-lg-row align-items-lg-center align-items-start">
@@ -103,6 +100,7 @@ const EditScenePage = ({ children, ...props }) => (
                   addAction={props.addAction}
                   deleteActionGroup={props.deleteActionGroup}
                   actions={parallelActions}
+                  allActions={props.scene.actions}
                   deleteAction={props.deleteAction}
                   updateSelectedNewAction={props.updateSelectedNewAction}
                   updateActionProperty={props.updateActionProperty}
@@ -110,11 +108,13 @@ const EditScenePage = ({ children, ...props }) => (
                   sceneParamsData={props.sceneParamsData}
                   scene={props.scene}
                   index={index}
-                  y={index}
+                  path={`${index}`}
                   saving={props.saving}
                   actionsGroupsBefore={update(props.scene.actions, {
                     $splice: [[index, props.scene.actions.length - index]]
                   })}
+                  firstActionGroup={index === 0}
+                  lastActionGroup={index === props.scene.actions.length - 1}
                   variables={props.variables}
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
@@ -132,7 +132,7 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
           ))}
         </div>
-        <AutoScrollMobile position="bottom" box_type={[ACTION_CARD_TYPE, ACTION_GROUP_TYPE]} />
+        <AutoScrollMobile position="bottom" box_type={props.actionsGroupTypes} />
       </div>
     </div>
   </div>

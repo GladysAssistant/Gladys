@@ -8,9 +8,9 @@ import actions from '../../../../actions/scene';
 class StartSceneParams extends Component {
   handleChange = selectedOption => {
     if (selectedOption) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'scene', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'scene', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'scene', null);
+      this.props.updateActionProperty(this.props.path, 'scene', null);
     }
   };
 

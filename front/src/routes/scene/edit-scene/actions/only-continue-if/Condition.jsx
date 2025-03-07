@@ -132,6 +132,7 @@ class Condition extends Component {
                   triggersVariables={props.triggersVariables}
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
+                  path={props.path}
                   updateText={this.handleValueChange}
                   class={style.conditionTagify}
                 />

@@ -6,7 +6,8 @@ const EventEmitter = require('events');
 
 const { ACTIONS } = require('../../../../utils/constants');
 const { AbortScene } = require('../../../../utils/coreErrors');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
 const Calendar = require('../../../../lib/calendar');
@@ -14,6 +15,7 @@ const Calendar = require('../../../../lib/calendar');
 const event = new EventEmitter();
 
 describe('scene.action.isEventRunning', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   const calendar = new Calendar();
   let clock;
   const now = new Date();
@@ -67,8 +69,8 @@ describe('scene.action.isEventRunning', () => {
     );
     assert.calledWith(message.sendToUser, 'pepper', 'hello');
     expect(scope).to.deep.equal({
-      '0': {
-        '0': {
+      '0': [
+        {
           calendarEvent: {
             name: 'my test event',
             description: 'my event description',
@@ -83,7 +85,7 @@ describe('scene.action.isEventRunning', () => {
               .format('LLL'),
           },
         },
-      },
+      ],
     });
   });
   it('should execute condition is-event-running 3 times, and verify scope', async () => {
@@ -145,19 +147,19 @@ describe('scene.action.isEventRunning', () => {
         .format('LLL'),
     };
     expect(scope).to.deep.equal({
-      '0': {
-        '0': {
+      '0': [
+        {
           calendarEvent,
         },
-        '1': {
+        {
           calendarEvent,
         },
-      },
-      '1': {
-        '0': {
+      ],
+      '1': [
+        {
           calendarEvent,
         },
-      },
+      ],
     });
   });
   it('should execute condition is-event-running, and not send message because scene should stop', async () => {

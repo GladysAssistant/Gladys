@@ -5,14 +5,14 @@ import { Text, Localizer } from 'preact-i18n';
 class WaitActionParams extends Component {
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'value', newValue);
+    this.props.updateActionProperty(this.props.path, 'value', newValue);
   };
   handleChangeUnit = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'unit', e.target.value);
   };
   componentDidMount() {
     if (!this.props.action.unit) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'unit', 'seconds');
+      this.props.updateActionProperty(this.props.path, 'unit', 'seconds');
     }
   }
   render(props, {}) {

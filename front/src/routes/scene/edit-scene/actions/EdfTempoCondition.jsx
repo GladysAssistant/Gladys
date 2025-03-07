@@ -7,41 +7,26 @@ const isNullOrUndefined = variable => variable === null || variable === undefine
 
 class EdfTempoCondition extends Component {
   handleDayChange = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_day', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_day', e.target.value);
   };
 
   handlePeakDayTypeChange = e => {
-    this.props.updateActionProperty(
-      this.props.columnIndex,
-      this.props.index,
-      'edf_tempo_peak_day_type',
-      e.target.value
-    );
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_day_type', e.target.value);
   };
 
   handlePeakHourTypeChange = e => {
-    this.props.updateActionProperty(
-      this.props.columnIndex,
-      this.props.index,
-      'edf_tempo_peak_hour_type',
-      e.target.value
-    );
+    this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_hour_type', e.target.value);
   };
 
   initActionIfNeeded = () => {
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_day'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_day', 'today');
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_day', 'today');
     }
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_peak_day_type'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'edf_tempo_peak_day_type', 'blue');
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_day_type', 'blue');
     }
     if (isNullOrUndefined(get(this.props, 'action.edf_tempo_peak_hour_type'))) {
-      this.props.updateActionProperty(
-        this.props.columnIndex,
-        this.props.index,
-        'edf_tempo_peak_hour_type',
-        'peak-hour'
-      );
+      this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_hour_type', 'peak-hour');
     }
   };
 
@@ -49,25 +34,27 @@ class EdfTempoCondition extends Component {
     this.initActionIfNeeded();
   }
 
-  render({ action }, {}) {
+  render({ action, path }, {}) {
     return (
       <div>
-        <div class="row">
-          <div class="col-md-12">
-            <p>
-              <Text id="editScene.actionsCard.edfTempoCondition.description" />{' '}
-              <small>
-                <a
-                  href="https://particulier.edf.fr/fr/accueil/gestion-contrat/options/tempo.html#/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Text id="editScene.actionsCard.edfTempoCondition.knowMore" />
-                </a>
-              </small>
-            </p>
+        {path && !path.includes('.if') && (
+          <div class="row">
+            <div class="col-md-12">
+              <p>
+                <Text id="editScene.actionsCard.edfTempoCondition.description" />{' '}
+                <small>
+                  <a
+                    href="https://particulier.edf.fr/fr/accueil/gestion-contrat/options/tempo.html#/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text id="editScene.actionsCard.edfTempoCondition.knowMore" />
+                  </a>
+                </small>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <div class="row">
           <div class="col">
             <div class="form-group">

@@ -2,13 +2,15 @@ const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
 describe('scene.play-notification', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   it('should play notification with injected value', async () => {
     const stateManager = new StateManager(event);
     const deviceFeature = {

@@ -7,12 +7,12 @@ const isNullOrUndefined = variable => variable === null || variable === undefine
 
 class EcowattCondition extends Component {
   handleNetworkStatusChange = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'ecowatt_network_status', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'ecowatt_network_status', e.target.value);
   };
 
   initActionIfNeeded = () => {
     if (isNullOrUndefined(get(this.props, 'action.ecowatt_network_status'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'ecowatt_network_status', 'ok');
+      this.props.updateActionProperty(this.props.path, 'ecowatt_network_status', 'ok');
     }
   };
 

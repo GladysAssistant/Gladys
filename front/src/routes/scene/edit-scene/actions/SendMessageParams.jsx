@@ -24,13 +24,13 @@ class SendMessageParams extends Component {
     }
   };
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   refreshSelectedOptions = nextProps => {
@@ -90,6 +90,7 @@ class SendMessageParams extends Component {
           <div className="tags-input">
             <TextWithVariablesInjected
               text={props.action.text}
+              path={props.path}
               triggersVariables={props.triggersVariables}
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}

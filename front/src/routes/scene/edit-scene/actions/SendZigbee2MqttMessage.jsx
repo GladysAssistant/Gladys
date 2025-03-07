@@ -11,11 +11,11 @@ const helpTextStyle = {
 
 class SendZigbee2MqttMessage extends Component {
   handleChangeTopic = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'topic', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'topic', e.target.value);
   };
   handleChangeMessage = text => {
     const newMessage = text && text.length > 0 ? text : undefined;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'message', newMessage);
+    this.props.updateActionProperty(this.props.path, 'message', newMessage);
   };
 
   render(props) {
@@ -49,6 +49,7 @@ class SendZigbee2MqttMessage extends Component {
             <Localizer>
               <TextWithVariablesInjected
                 text={props.action.message}
+                path={props.path}
                 updateText={this.handleChangeMessage}
                 triggersVariables={props.triggersVariables}
                 actionsGroupsBefore={props.actionsGroupsBefore}

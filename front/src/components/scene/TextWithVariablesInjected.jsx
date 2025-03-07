@@ -3,6 +3,9 @@ import Tagify from '@yaireo/tagify';
 import '@yaireo/tagify/dist/tagify.css';
 import get from 'get-value';
 
+import withIntlAsProp from '../../utils/withIntlAsProp';
+import { isVariableAvailableAtThisPath, convertPathToText } from '../../routes/scene/edit-scene/sceneUtils';
+
 const OPENING_VARIABLE = '{{';
 const CLOSING_VARIABLE = '}}';
 
@@ -34,34 +37,35 @@ class TextWithVariablesInjected extends Component {
       this.parseText(text);
     });
   };
+
   refreshVariables = async nextProps => {
     const variableWhileList = [];
     let variablesKey = '';
     let variableReady = null;
-    // Action variables
-    nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
-      actionGroup.forEach((action, index) => {
-        if (nextProps.variables[groupIndex][index]) {
-          nextProps.variables[groupIndex][index].forEach(option => {
-            if (option.ready && variableReady === null) {
-              variableReady = true;
-            }
-            if (!option.ready) {
-              variableReady = false;
-            }
-            // we create a "variablesKey" string to quickly compare the variables displayed
-            // instead of having to loop through 2 arrays. It's quicker :)
-            variablesKey += `${groupIndex}.${index}.${option.name}.${option.label}.${option.ready}`;
-            variableWhileList.push({
-              id: `${groupIndex}.${index}.${option.name}`,
-              text: `${groupIndex + 1}. ${index + 1}. ${option.label}`,
-              title: `${groupIndex + 1}. ${index + 1}. ${option.label}`,
-              value: `${groupIndex}.${index}.${option.name}`
-            });
+
+    Object.keys(nextProps.variables).forEach(variablePath => {
+      // If the variable is defined before the current path, we can use it
+      if (isVariableAvailableAtThisPath(variablePath, nextProps.path)) {
+        nextProps.variables[variablePath].forEach(option => {
+          if (option.ready && variableReady === null) {
+            variableReady = true;
+          }
+          if (!option.ready) {
+            variableReady = false;
+          }
+          // we create a "variablesKey" string to quickly compare the variables displayed
+          // instead of having to loop through 2 arrays. It's quicker :)
+          variablesKey += `${variablePath}.${option.name}.${option.label}.${option.ready}`;
+          variableWhileList.push({
+            id: `${variablePath}.${option.name}`,
+            text: `${convertPathToText(variablePath, nextProps.intl.dictionary)} ${option.label}`,
+            title: `${convertPathToText(variablePath, nextProps.intl.dictionary)} ${option.label}`,
+            value: `${variablePath}.${option.name}`
           });
-        }
-      });
+        });
+      }
     });
+
     // Triggers variables
     nextProps.triggersVariables.forEach((triggerVariables, index) => {
       triggerVariables.forEach(triggerVariable => {
@@ -151,4 +155,4 @@ class TextWithVariablesInjected extends Component {
   }
 }
 
-export default TextWithVariablesInjected;
+export default withIntlAsProp(TextWithVariablesInjected);

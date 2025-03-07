@@ -38,34 +38,24 @@ class CheckTime extends Component {
   };
   updateCalendars = selectedCalendarsOptions => {
     const calendars = selectedCalendarsOptions.map(o => o.value);
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'calendars', calendars);
+    this.props.updateActionProperty(this.props.path, 'calendars', calendars);
   };
   handleComparator = e => {
     if (e.target.value) {
-      this.props.updateActionProperty(
-        this.props.columnIndex,
-        this.props.index,
-        'calendar_event_name_comparator',
-        e.target.value
-      );
+      this.props.updateActionProperty(this.props.path, 'calendar_event_name_comparator', e.target.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'calendar_event_name_comparator', null);
+      this.props.updateActionProperty(this.props.path, 'calendar_event_name_comparator', null);
     }
   };
 
   handleNameChange = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'calendar_event_name', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'calendar_event_name', e.target.value);
   };
 
   handleStopSceneIfEventFound = e => {
     const foundValue = e.target.value === 'stop';
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'stop_scene_if_event_found', foundValue);
-    this.props.updateActionProperty(
-      this.props.columnIndex,
-      this.props.index,
-      'stop_scene_if_event_not_found',
-      !foundValue
-    );
+    this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_found', foundValue);
+    this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_not_found', !foundValue);
   };
 
   initVariables = action => {
@@ -95,32 +85,26 @@ class CheckTime extends Component {
 
   initActionIfNeeded = () => {
     if (isNullOrUndefined(get(this.props, 'action.calendar_event_name_comparator'))) {
-      this.props.updateActionProperty(
-        this.props.columnIndex,
-        this.props.index,
-        'calendar_event_name_comparator',
-        'contains'
-      );
+      this.props.updateActionProperty(this.props.path, 'calendar_event_name_comparator', 'contains');
     }
     if (isNullOrUndefined(get(this.props, 'action.calendars'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'calendars', []);
+      this.props.updateActionProperty(this.props.path, 'calendars', []);
     }
     if (isNullOrUndefined(get(this.props, 'action.stop_scene_if_event_found'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'stop_scene_if_event_found', false);
+      this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_found', false);
     }
     if (isNullOrUndefined(get(this.props, 'action.stop_scene_if_event_not_found'))) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'stop_scene_if_event_not_found', true);
+      this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_not_found', true);
     }
   };
 
   setVariables = () => {
-    const { columnIndex, index } = this.props;
     const EVENT_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventName');
     const EVENT_LOCATION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventLocation');
     const EVENT_DESCRIPTION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventDescription');
     const EVENT_START_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventStart');
     const EVENT_END_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventEnd');
-    this.props.setVariables(columnIndex, index, [
+    this.props.setVariables(this.props.path, [
       {
         name: 'calendarEvent.name',
         type: 'calendar',
@@ -160,8 +144,7 @@ class CheckTime extends Component {
   };
 
   removeVariables = () => {
-    const { columnIndex, index } = this.props;
-    this.props.setVariables(columnIndex, index, []);
+    this.props.setVariables(this.props.path, []);
   };
 
   componentDidMount() {
@@ -174,16 +157,18 @@ class CheckTime extends Component {
     this.refreshSelectedOptions(nextProps.action);
   }
 
-  render({ action }, { selectedCalendarsOptions, calendarsOptions }) {
+  render({ action, path }, { selectedCalendarsOptions, calendarsOptions }) {
     return (
       <div>
-        <div class="row">
-          <div class="col-md-12">
-            <p>
-              <Text id="editScene.actionsCard.calendarEventIsRunning.description" />
-            </p>
+        {path && !path.includes('.if') && (
+          <div class="row">
+            <div class="col-md-12">
+              <p>
+                <Text id="editScene.actionsCard.calendarEventIsRunning.description" />
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">
