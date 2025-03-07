@@ -5,7 +5,7 @@ mqtt:
   server: mqtt://localhost:1884
 serial:
   port: /dev/ttyACM0
-  adapter: ezsp
+  adapter: ember
 map_options:
   graphviz:
     colors:
