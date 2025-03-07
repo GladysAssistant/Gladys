@@ -46,21 +46,24 @@ class OnlyContinueIf extends Component {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, props.path)) {
         const action = get(props.allActions, variablePath);
-        variableOptions.push({
-          label: `${convertPathToText(
-            variablePath
-              .split('.')
-              .slice(0, -1)
-              .join('.'),
-            this.props.intl.dictionary
-          )} ${get(this, `props.intl.dictionary.editScene.actions.${action.type}`)}`,
-          options: props.variables[variablePath].map(option => ({
-            label: option.label,
-            value: `${variablePath}.${option.name}`,
-            type: option.type,
-            data: option.data
-          }))
-        });
+        // If we find an action at this path
+        if (action) {
+          variableOptions.push({
+            label: `${convertPathToText(
+              variablePath
+                .split('.')
+                .slice(0, -1)
+                .join('.'),
+              this.props.intl.dictionary
+            )} ${get(this, `props.intl.dictionary.editScene.actions.${action.type}`)}`,
+            options: props.variables[variablePath].map(option => ({
+              label: option.label,
+              value: `${variablePath}.${option.name}`,
+              type: option.type,
+              data: option.data
+            }))
+          });
+        }
       }
     });
 
