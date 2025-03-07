@@ -7,21 +7,9 @@ import ActionCard from '../ActionCard';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-import { ACTIONS } from '../../../../../../server/utils/constants';
+import { CONDITION_ACTIONS } from '../../../../../../server/utils/constants';
 
 const isNullOrUndefined = variable => variable === null || variable === undefined;
-
-// List of actions that can be used as conditions
-const CONDITION_ACTIONS = [
-  ACTIONS.CONDITION.CHECK_TIME,
-  ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-  ACTIONS.EDF_TEMPO.CONDITION,
-  ACTIONS.ALARM.CHECK_ALARM_MODE,
-  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
-  ACTIONS.ECOWATT.CONDITION,
-  ACTIONS.HOUSE.IS_EMPTY,
-  ACTIONS.HOUSE.IS_NOT_EMPTY
-];
 
 class ConditionIfElseThen extends Component {
   constructor(props) {

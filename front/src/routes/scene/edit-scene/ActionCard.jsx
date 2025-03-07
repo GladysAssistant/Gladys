@@ -71,9 +71,6 @@ const ACTION_ICON = {
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
 };
 
-const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
-const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
-
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
   [ACTIONS.TIME.DELAY]: DelayActionParams,
@@ -110,6 +107,20 @@ const ACTION_COMPONENTS = {
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
 };
 
+const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+const CONDITION_CARD_TYPE = 'CONDITION_CARD_TYPE';
+const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
+
+const getDragAndDropType = (actionType, path) => {
+  if (path.includes('if')) {
+    return CONDITION_CARD_TYPE;
+  }
+  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE) {
+    return ACTION_CARD_IF_THEN_ELSE_TYPE;
+  }
+  return ACTION_CARD_TYPE;
+};
+
 const ActionCard = ({ children, ...props }) => {
   const { path, deleteAction } = props;
   const ref = useRef(null);
@@ -119,7 +130,7 @@ const ActionCard = ({ children, ...props }) => {
   }, [path, deleteAction]);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE ? ACTION_CARD_TYPE : ACTION_CARD_IF_THEN_ELSE_TYPE,
+    type: getDragAndDropType(props.action.type, props.path),
     item: () => {
       return { path };
     },
@@ -128,7 +139,7 @@ const ActionCard = ({ children, ...props }) => {
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE ? ACTION_CARD_TYPE : ACTION_CARD_IF_THEN_ELSE_TYPE,
+    accept: getDragAndDropType(props.action.type, props.path),
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
