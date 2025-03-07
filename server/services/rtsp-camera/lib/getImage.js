@@ -7,6 +7,8 @@ const { DEVICE_ROTATION } = require('../../../utils/constants');
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
 
+const IMAGE_RESOLUTION = 1280;
+
 /**
  * @description Get camera image.
  * @param {object} device - The camera to poll.
@@ -49,16 +51,16 @@ async function getImage(device) {
     args.push('-vf');
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        args.push('scale=640:-1,transpose=1'); // Rotate 90
+        args.push(`scale=${IMAGE_RESOLUTION}:-1,transpose=1`); // Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        args.push('scale=640:-1,transpose=1,transpose=1'); // Rotate 180
+        args.push(`scale=${IMAGE_RESOLUTION}:-1,transpose=1,transpose=1`); // Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        args.push('scale=640:-1,transpose=2'); // Rotate 270
+        args.push(`scale=${IMAGE_RESOLUTION}:-1,transpose=2`); // Rotate 270
         break;
       default:
-        args.push('scale=640:-1'); // Rotate 0
+        args.push(`scale=${IMAGE_RESOLUTION}:-1`); // Rotate 0
         break;
     }
 
