@@ -1956,7 +1956,8 @@
         "whenFoundLabel": "Wenn ein Ereignis gefunden wird",
         "whenNotFoundLabel": "Wenn kein Ereignis gefunden wird",
         "stopScene": "Szene stoppen",
-        "continueScene": "Szene fortsetzen"
+        "continueScene": "Szene fortsetzen",
+        "doesNotContainExplanation": "Wenn mindestens ein Ereignis gefunden wird, das den gesuchten Namen enthält, werden die anderen Ereignisse ignoriert."
       },
       "ecowattCondition": {
         "description": "Diese Bedingung ermöglicht es dir, den Status des französischen Stromnetzes zu überprüfen",
@@ -2211,6 +2212,7 @@
         "nameLabel": "Wenn der Name",
         "isExactly": "genau ist",
         "contains": "enthält",
+        "doesNotContain": "enthält nicht",
         "startsWith": "beginnt mit",
         "endsWith": "endet mit",
         "hasAnyName": "einen beliebigen Namen hat",
