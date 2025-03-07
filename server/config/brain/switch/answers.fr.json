@@ -1,0 +1,22 @@
+[
+  {
+    "label": "switch.turn-on.success",
+    "answers": ["La prise est allumée !"]
+  },
+  {
+    "label": "switch.turn-on.fail",
+    "answers": ["Je n'ai pas réussi à allumer la prise."]
+  },
+  {
+    "label": "switch.turn-off.success",
+    "answers": ["La prise est éteinte !"]
+  },
+  {
+    "label": "switch.turn-off.fail",
+    "answers": ["Je n'ai pas réussi à éteindre la prise."]
+  },
+  {
+    "label": "switch.not-found",
+    "answers": ["Je n'ai pas trouvé de prise avec ce nom."]
+  }
+]

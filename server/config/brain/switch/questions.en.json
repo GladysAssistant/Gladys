@@ -1,0 +1,12 @@
+[
+  {
+    "label": "switch.turn-on",
+    "questions": ["Turn on the switch %device%"],
+    "answers": ["Turning on the switch...", "I'm turning on the switch!"]
+  },
+  {
+    "label": "switch.turn-off",
+    "questions": ["Turn off the switch %device%"],
+    "answers": ["Turning off the switch...", "I'm turning off the switch!"]
+  }
+]
