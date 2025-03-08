@@ -348,6 +348,7 @@
       "chart": {
         "defaultInterval": "Intervalle par défaut",
         "lastHour": "Dernière heure",
+        "lastTwelveHours": "Dernières 12h",
         "lastDay": "Dernières 24h",
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
@@ -1096,26 +1097,6 @@
       "documentation": "Documentation OwnTracks",
       "longDescription": "OwnTracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser OwnTracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer OwnTracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
-    "zwave": {
-      "title": "Open-Zwave [OLD]",
-      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
-      "documentation": "Documentation Open-Zwave",
-      "device": {
-        "title": "Anciens appareils Open-Zwave",
-        "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
-        "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
-        "scanButton": "Rechercher",
-        "nameLabel": "Nom",
-        "roomLabel": "Pièce",
-        "featuresLabel": "Fonctionnalités",
-        "saveButton": "Sauvegarder",
-        "deleteButton": "Supprimer",
-        "editButton": "Éditer",
-        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
-      }
-    },
     "openWeather": {
       "title": "API OpenWeather",
       "documentation": "Documentation OpenWeather",
@@ -1321,7 +1302,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un nombre limité d'appareils. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1445,6 +1426,13 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
+        "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrors": {
+          "name": "Le champ \"Nom\" est obligatoire",
+          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
+          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
+          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+        },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
@@ -2472,7 +2460,8 @@
     "wrongEmailError": "Ce n'est pas un e-mail valide",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou poster un message sur Gladys community.",
-    "success": "Succès ! Vous devriez voir un lien de réinitialisation de mot de passe dans les logs de Gladys.",
+    "success": "Succès ! Je vous ai envoyé un lien de réinitialisation de mot de passe par Telegram ou Nextcloud Talk. Si vous n'avez pas configuré ces services, le lien de réinitialisation sera dans les logs de Gladys.",
+    "howToAccessLogs": "Pour accéder aux logs de Gladys, rendez-vous en ligne de commande et tapez `docker logs gladys --tail=1000` pour afficher les 1000 dernières lignes.",
     "userNotFound": "Aucun compte n'est lié à cet e-mail.",
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
@@ -2561,10 +2550,11 @@
     "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
     "hours": "heures",
-    "vacuumDatabaseTitle": "Nettoyer la base de données",
-    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
+    "vacuumDatabaseTitle": "Nettoyer la base de données SQLite",
+    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données SQLite, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Pendant le nettoyage, Gladys sera indisponible.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
+    "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible. Temps de nettoyage : {{duration}}.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",

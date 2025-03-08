@@ -76,6 +76,24 @@ module.exports = {
         max: 1000,
       },
     },
+    current_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
+    current_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
     current_heating_setpoint: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -128,6 +146,20 @@ module.exports = {
       },
     },
     energy: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
@@ -210,6 +242,27 @@ module.exports = {
       },
     },
     power: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
+    power_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
+    power_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
+    power_ab: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.POWER,

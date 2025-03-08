@@ -30,6 +30,16 @@ class AlarmComponent extends Component {
     await this.setState({ loading: false });
   };
 
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getHouse();
+      this.wasDisconnected = false;
+    }
+  };
+
   callAlarmApi = async action => {
     await this.setState({ loading: true });
     try {
@@ -60,6 +70,7 @@ class AlarmComponent extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.getHouse);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED, this.getHouse);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PANIC, this.getHouse);
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentWillUnmount() {
@@ -68,6 +79,7 @@ class AlarmComponent extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.getHouse);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED, this.getHouse);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.PANIC, this.getHouse);
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(nextProps) {

@@ -86,9 +86,6 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
-// Deprecated integration
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
@@ -273,8 +270,6 @@ const AppRouter = connect(
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
-        <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
-        <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />

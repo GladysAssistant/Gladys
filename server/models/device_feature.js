@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const {
   DEVICE_FEATURE_CATEGORIES_LIST,
   DEVICE_FEATURE_TYPES_LIST,
@@ -101,7 +101,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // add slug if needed
-  deviceFeature.beforeValidate(addSelector);
+  deviceFeature.beforeValidate(addSelectorBeforeValidateHook);
 
   deviceFeature.associate = (models) => {
     deviceFeature.belongsTo(models.Device, {

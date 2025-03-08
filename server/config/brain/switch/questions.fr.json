@@ -1,0 +1,12 @@
+[
+  {
+    "label": "switch.turn-on",
+    "questions": ["Allume la prise %device%"],
+    "answers": ["Allumage en cours...", "J'allume la prise !"]
+  },
+  {
+    "label": "switch.turn-off",
+    "questions": ["Eteins la prise %device%"],
+    "answers": ["Extinction en cours...", "J'éteins la prise !"]
+  }
+]

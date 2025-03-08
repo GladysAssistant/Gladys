@@ -22,4 +22,4 @@ SerialPort.list = () => {
   });
 };
 
-module.exports = SerialPort;
+module.exports = { SerialPort };

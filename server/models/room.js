@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 
 module.exports = (sequelize, DataTypes) => {
   const room = sequelize.define(
@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  room.beforeValidate(addSelector);
+  room.beforeValidate(addSelectorBeforeValidateHook);
 
   room.associate = (models) => {
     room.belongsTo(models.House, {

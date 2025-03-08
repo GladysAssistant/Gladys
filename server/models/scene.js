@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const { ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
 const actionSchema = Joi.array().items(
@@ -177,7 +177,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // add slug if needed
-  scene.beforeValidate(addSelector);
+  scene.beforeValidate(addSelectorBeforeValidateHook);
 
   scene.associate = (models) => {
     scene.hasMany(models.TagScene, {

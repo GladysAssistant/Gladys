@@ -11,6 +11,7 @@ import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
+const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
@@ -19,6 +20,7 @@ const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
+  'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
@@ -95,6 +97,14 @@ class Chartbox extends Component {
     });
     this.getData();
   };
+  switchToLastTwelveHourView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: TWELVE_HOURS_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
   switchToOneDayView = async e => {
     e.preventDefault();
     await this.setState({
@@ -131,6 +141,15 @@ class Chartbox extends Component {
       dropdown: false
     });
     this.getData();
+  };
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getData();
+      this.wasDisconnected = false;
+    }
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
@@ -310,6 +329,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
     document.addEventListener('mousedown', this.handleClickOutside);
   }
   async componentDidUpdate(previousProps) {
@@ -330,6 +350,7 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
     document.removeEventListener('mousedown', this.handleClickOutside);
   }
   render(
@@ -364,6 +385,7 @@ class Chartbox extends Component {
                 <div class="dropdown" ref={this.dropdownRef}>
                   <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                     {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                    {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
                     {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                     {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
                     {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
@@ -382,6 +404,14 @@ class Chartbox extends Component {
                       onClick={this.switchToLastHourView}
                     >
                       <Text id="dashboard.boxes.chart.lastHour" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastTwelveHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
                     </a>
                     <a
                       class={cx(style.dropdownItemChart, {

@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 
 module.exports = (sequelize, DataTypes) => {
   const calendarEvent = sequelize.define(
@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  calendarEvent.beforeValidate(addSelector);
+  calendarEvent.beforeValidate(addSelectorBeforeValidateHook);
 
   calendarEvent.associate = (models) => {
     calendarEvent.belongsTo(models.Calendar, {

@@ -44,7 +44,18 @@ class DevicesComponent extends Component {
       deviceFeatures: [],
       status: RequestStatus.Getting
     };
+    this.wasDisconnected = false;
   }
+
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.refreshData();
+      this.wasDisconnected = false;
+    }
+  };
 
   refreshData = () => {
     this.getDeviceFeatures();
@@ -180,6 +191,7 @@ class DevicesComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceTextWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(previousProps) {
@@ -198,11 +210,12 @@ class DevicesComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceTextWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(props, { deviceFeatures, status }) {
     const boxTitle = props.box.name;
-    const loading = status === RequestStatus.Getting && !status;
+    const loading = status === RequestStatus.Getting;
     const roomLightStatus = this.getLightStatus();
 
     return (

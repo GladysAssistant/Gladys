@@ -18,7 +18,7 @@ before(async function before() {
   this.timeout(16000);
   const config = {
     disableService: true,
-    disableBrainLoading: true,
+    disableBrainLoading: false,
     disableSchedulerLoading: true,
     disableDuckDbMigration: true,
     jwtSecret: 'secret',

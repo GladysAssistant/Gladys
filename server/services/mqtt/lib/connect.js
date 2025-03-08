@@ -27,6 +27,9 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   }
 
   logger.debug(`Trying to connect to MQTT server ${mqttUrl}...`);
+
+  this.defaultTopicsAlreadySubscribed = false;
+
   this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
     username: mqttUsername,
     password: mqttPassword,
@@ -37,25 +40,38 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
   this.mqttClient.on('connect', () => {
     logger.info(`Connected to MQTT server ${mqttUrl}`);
 
-    Object.keys(this.topicBinds).forEach((topic) => {
-      this.subscribe(topic, this.topicBinds[topic]);
-    });
+    if (!this.defaultTopicsAlreadySubscribed) {
+      logger.info('Subscribing to default topics');
+      Object.keys(this.topicBinds).forEach((topic) => {
+        this.subscribe(topic, this.topicBinds[topic]);
+      });
+      this.defaultTopicsAlreadySubscribed = true;
+    } else {
+      logger.info('Already subscribed to default topics');
+    }
+
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.CONNECTED,
     });
 
     this.connected = true;
   });
+
+  this.mqttClient.on('reconnect', () => {
+    logger.info('Attempting to reconnect to MQTT broker...');
+  });
+
   this.mqttClient.on('error', (err) => {
-    logger.warn(`Error while connecting to MQTT - ${err}`);
+    logger.warn(`Error while connecting to MQTT`);
+    logger.warn(err);
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
       payload: err,
     });
-
-    this.disconnect();
+    logger.info('Error detected, letting automatic reconnection handle it');
   });
+
   this.mqttClient.on('offline', () => {
     logger.warn(`Disconnected from MQTT server`);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -64,6 +80,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
     });
     this.connected = false;
   });
+
   this.mqttClient.on('message', (topic, message) => {
     this.handleNewMessage(topic, message.toString());
   });

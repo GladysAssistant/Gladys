@@ -1,8 +1,8 @@
 {
   "name": "gladys-front",
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "22.x",
+    "npm": "10.x"
   },
   "scripts": {
     "start": "per-env",
@@ -24,6 +24,9 @@
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
   },
+  "overrides": {
+    "esm": "npm:esm-wallaby"
+  },
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",
     "compare-json": "^0.4.0",
@@ -43,7 +46,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "4.15.0",
+    "@gladysassistant/gladys-gateway-js": "4.17.0",
     "@gladysassistant/theme-optimized": "^1.0.4",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",

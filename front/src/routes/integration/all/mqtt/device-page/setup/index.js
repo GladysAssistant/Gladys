@@ -210,16 +210,26 @@ class MqttDeviceSetupPage extends Component {
     } catch (e) {
       const status = get(e, 'response.status');
       if (status === 409) {
-        this.setState({
+        await this.setState({
           saveStatus: RequestStatus.ConflictError,
           loading: false
         });
+      }
+      if (status === 422) {
+        const properties = get(e, 'response.data.properties', []);
+        await this.setState({
+          saveStatus: RequestStatus.ValidationError,
+          erroredAttributes: properties.map(p => p.attribute).filter(a => a !== 'selector'),
+          loading: false
+        });
       } else {
-        this.setState({
+        await this.setState({
           saveStatus: RequestStatus.Error,
           loading: false
         });
       }
+      // Scroll to top so the user sees the error
+      window.scrollTo(0, 0);
     }
   }
 

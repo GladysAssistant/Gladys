@@ -14,6 +14,6 @@
   "dependencies": {
     "get-value": "^3.0.1",
     "lodash.clonedeep": "^4.5.0",
-    "mqtt": "^4.2.6"
+    "mqtt": "^5.10.3"
   }
 }
