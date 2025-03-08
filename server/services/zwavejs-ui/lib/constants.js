@@ -32,6 +32,56 @@ const multilevelSwitchCurtainsStateDefault = {
  * Gladys format.
  */
 const STATES = {
+  alarm_sensor: {
+    state: [{ converter: (val) => (val > 0 ? STATE.ON : STATE.OFF) }],
+  },
+  battery: {
+    level: [{ converter: (val) => val }],
+    islow: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
+  binary_sensor: {
+    any: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+    general_purpose: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case false:
+              return STATE.OFF;
+            case true:
+              return STATE.ON;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
   binary_switch: {
     currentvalue: [
       {
@@ -72,6 +122,7 @@ const STATES = {
   },
   multilevel_sensor: {
     air_temperature: [{ converter: (val) => val }],
+    illuminance: [{ converter: (val) => val }],
     power: [{ converter: (val) => val }],
   },
   multilevel_switch: {
@@ -275,6 +326,58 @@ const ACTIONS = {
  * List of supported features.
  */
 const EXPOSES = {
+  alarm_sensor: {
+    state: {
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 1,
+    },
+  },
+  battery: {
+    level: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      unit: DEVICE_FEATURE_UNITS.PERCENT,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 100,
+    },
+    islow: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+      type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      read_only: true,
+      keep_history: true,
+      has_feedback: true,
+      min: 0,
+      max: 1,
+    },
+  },
+  binary_sensor: {
+    any: {
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      min: 0,
+      max: 1,
+      read_only: true,
+      has_feedback: true,
+      keep_history: true,
+    },
+    general_purpose: {
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      min: 0,
+      max: 1,
+      read_only: true,
+      has_feedback: true,
+      keep_history: true,
+    },
+  },
   binary_switch: {
     currentvalue: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -304,6 +407,16 @@ const EXPOSES = {
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
       min: -100,
       max: 150,
+      keep_history: true,
+      read_only: true,
+      has_feedback: false,
+    },
+    illuminance: {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.LUX,
+      min: 0,
+      max: 100000,
       keep_history: true,
       read_only: true,
       has_feedback: false,
@@ -473,8 +586,14 @@ const EXPOSES = {
 };
 
 const COMMANDCLASS = {
+  ALARM_SENSOR: 156,
+  BINARY_SENSOR: 48,
   BINARY_SWITCH: 37,
   MULTILEVEL_SWITCH: 38,
+};
+
+const PRODUCTID = {
+  FIBARO_FGMS001: '271-4097-2048',
 };
 
 module.exports = {
@@ -484,4 +603,5 @@ module.exports = {
   STATES,
   PARAMS,
   COMMANDCLASS,
+  PRODUCTID,
 };

@@ -33,7 +33,8 @@ function createActions(store) {
         });
       }
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting
+        gatewayLoginStatus: RequestStatus.Getting,
+        gatewayLoginError: null
       });
       try {
         const gatewayLoginResults = await state.session.gatewayClient.login(
@@ -52,13 +53,20 @@ function createActions(store) {
         }
       } catch (e) {
         const error = get(e, 'response.data.error');
+        const status = get(e, 'response.status');
+
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {
           store.setState({
             gatewayLoginStatus: RequestStatus.NetworkError
           });
-        } else {
+        } else if (status === 403 || status === 404) {
           store.setState({
             gatewayLoginStatus: LoginStatus.WrongCredentialsError
+          });
+        } else {
+          store.setState({
+            gatewayLoginStatus: LoginStatus.UnknownError,
+            gatewayLoginError: e.message
           });
         }
       }

@@ -91,9 +91,6 @@ import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
 import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
 import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
 
-// Deprecated integration
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
@@ -194,6 +191,7 @@ const AppRouter = connect(
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
+        closeDropDown={props.closeDropDown}
         toggleCollapsedMenu={props.toggleCollapsedMenu}
         showCollapsedMenu={props.showCollapsedMenu}
         logout={props.logout}
@@ -272,8 +270,6 @@ const AppRouter = connect(
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
-        <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
-        <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />

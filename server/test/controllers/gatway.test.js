@@ -28,6 +28,57 @@ describe('Gladys Gateway call', () => {
       },
     );
   });
+  it('should call admin API route as user and get rejected', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+      role: 'user',
+    };
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'POST',
+      '/api/v1/house',
+      {},
+      {},
+      (data) => {
+        expect(data).to.have.property('status', 403);
+        expect(data).to.have.property('code', 'FORBIDDEN');
+
+        done();
+      },
+    );
+  });
+  it('should call admin API route as admin and get response', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+      role: 'admin',
+    };
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/job',
+      {},
+      {},
+      (data) => {
+        expect(data).to.be.instanceOf(Array);
+
+        done();
+      },
+    );
+  });
   it('should call unknown API route with Gladys Gateway', (done) => {
     const user = {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',

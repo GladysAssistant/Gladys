@@ -6,22 +6,35 @@ import update from 'immutability-helper';
 import ScenePage from './ScenePage';
 
 class Scene extends Component {
+  getUrlParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const sceneSearch = urlParams.get('search');
+    const sceneTagSearch = urlParams.getAll('tags');
+    const orderDir = urlParams.get('order_dir');
+
+    return { sceneSearch, sceneTagSearch, orderDir };
+  };
   getScenes = async () => {
     this.setState({
       loading: true,
       getError: false
     });
     try {
-      const orderDir = this.state.getScenesOrderDir;
-      const params = {
-        order_dir: orderDir
-      };
-      if (this.state.sceneSearch && this.state.sceneSearch.length) {
-        params.search = this.state.sceneSearch;
+      const params = {};
+
+      const { sceneSearch, sceneTagSearch, orderDir } = this.getUrlParams();
+
+      if (sceneSearch && sceneSearch.length) {
+        params.search = sceneSearch;
       }
-      if (this.state.sceneTagSearch && this.state.sceneTagSearch.length) {
-        params.searchTags = this.state.sceneTagSearch.join(',');
+      if (sceneTagSearch && sceneTagSearch.length) {
+        params.searchTags = sceneTagSearch.join(',');
       }
+      if (orderDir) {
+        params.order_dir = orderDir;
+      }
+
       const scenes = await this.props.httpClient.get('/api/v1/scene', params);
       this.setState({
         scenes,
@@ -45,35 +58,43 @@ class Scene extends Component {
       console.error(e);
     }
   };
-  updateURL = () => {
-    const { sceneSearch, sceneTagSearch } = this.state;
+  updateURL = ({ sceneSearch, sceneTagSearch, orderDir }) => {
     const urlParams = new URLSearchParams();
 
-    if (sceneSearch) urlParams.set('search', sceneSearch);
-    if (sceneTagSearch.length > 0) {
+    // If we are updating the search
+    if (sceneSearch) {
+      urlParams.set('search', sceneSearch);
+    }
+
+    // If we are updating the order dir
+    if (orderDir) {
+      urlParams.set('order_dir', orderDir);
+    }
+
+    // If we are updating the tags
+    if (sceneTagSearch && sceneTagSearch.length > 0) {
       sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
     }
+
     // Use `route` to update the URL without reloading the page
     route(`/dashboard/scene?${urlParams.toString()}`, true);
   };
   search = async e => {
-    await this.setState({
+    this.updateURL({
       sceneSearch: e.target.value
     });
-    this.updateURL();
-    await this.getScenes();
+    await this.debouncedGetScenes();
   };
   searchTags = async tags => {
-    await this.setState({
+    this.updateURL({
       sceneTagSearch: tags
     });
-    this.updateURL();
     await this.getScenes();
   };
 
   changeOrderDir = async e => {
-    await this.setState({
-      getScenesOrderDir: e.target.value
+    this.updateURL({
+      orderDir: e.target.value
     });
     await this.getScenes();
   };
@@ -118,16 +139,11 @@ class Scene extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    // Initialize state from URL parameters if they exist
-    const urlParams = new URLSearchParams(window.location.search);
     this.state = {
-      getScenesOrderDir: 'asc',
       scenes: [],
-      sceneSearch: urlParams.get('search') || '',
-      sceneTagSearch: urlParams.getAll('tags') || [],
       loading: true
     };
-    this.debouncedSearch = debounce(this.search.bind(this), 200);
+    this.debouncedGetScenes = debounce(this.getScenes.bind(this), 200);
   }
 
   componentWillMount() {
@@ -135,7 +151,8 @@ class Scene extends Component {
     this.getTags();
   }
 
-  render(props, { scenes, loading, getError, tags, sceneTagSearch, sceneSearch }) {
+  render(props, { scenes, loading, getError, tags }) {
+    const { sceneSearch, sceneTagSearch, orderDir } = this.getUrlParams();
     return (
       <ScenePage
         httpClient={props.httpClient}
@@ -143,7 +160,8 @@ class Scene extends Component {
         scenes={scenes}
         getError={getError}
         loading={loading}
-        debouncedSearch={this.debouncedSearch}
+        search={this.search}
+        orderDir={orderDir}
         changeOrderDir={this.changeOrderDir}
         switchActiveScene={this.switchActiveScene}
         tags={tags}

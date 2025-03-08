@@ -89,6 +89,19 @@ addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_RELEASE, 'brightness_down_rel
 
 addMapping('action', BUTTON_STATUS.PRESSED, 'pressed');
 
+addMapping('action', BUTTON_STATUS.SINGLE_LEFT, 'single_left');
+addMapping('action', BUTTON_STATUS.SINGLE_RIGHT, 'single_right');
+addMapping('action', BUTTON_STATUS.SINGLE_BOTH, 'single_both');
+addMapping('action', BUTTON_STATUS.DOUBLE_LEFT, 'double_left');
+addMapping('action', BUTTON_STATUS.DOUBLE_RIGHT, 'double_right');
+addMapping('action', BUTTON_STATUS.DOUBLE_BOTH, 'double_both');
+addMapping('action', BUTTON_STATUS.TRIPLE_LEFT, 'triple_left');
+addMapping('action', BUTTON_STATUS.TRIPLE_RIGHT, 'triple_right');
+addMapping('action', BUTTON_STATUS.TRIPLE_BOTH, 'triple_both');
+addMapping('action', BUTTON_STATUS.HOLD_LEFT, 'hold_left');
+addMapping('action', BUTTON_STATUS.HOLD_RIGHT, 'hold_right');
+addMapping('action', BUTTON_STATUS.HOLD_BOTH, 'hold_both');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

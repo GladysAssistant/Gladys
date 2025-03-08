@@ -22,8 +22,8 @@ const ScenePage = ({ children, ...props }) => (
               <Localizer>
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
-                  orderValue={props.getScenesOrderDir}
-                  search={props.debouncedSearch}
+                  orderValue={props.orderDir}
+                  search={props.search}
                   searchValue={props.sceneSearch}
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />

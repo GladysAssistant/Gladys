@@ -11,7 +11,7 @@ const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
   updateBoxRoomFunc(x, y, room.selector);
 };
 
-const EditRoomHumidityBox = ({ children, ...props }) => (
+const EditRoomHumidityBox = ({ children, unit, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.humidity-in-room">
     <div class="form-group">
       <label>
@@ -22,7 +22,7 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         updateRoomSelection={updateBoxRoom(props.updateBoxRoom, props.x, props.y)}
       />
     </div>
-    <div className="form-group form-check">
+    <div className="form-group form-check mb-5">
       <label className="form-check-label">
         <input
           type="checkbox"
@@ -35,7 +35,7 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
       </label>
     </div>
 
-    <div class="form-group">
+    <div class="form-group mb-2">
       <ReactSlider
         className={cx('humidity-slider', {
           'opacity-60': !(props.box.humidity_use_custom_value || false)
@@ -43,9 +43,30 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         thumbClassName="humidity-slider-thumb"
         trackClassName="humidity-slider-track"
         defaultValue={[props.humidityMin, props.humidityMax]}
-        renderThumb={(props, state) => <div {...props}>{state.valueNow}%</div>}
+        renderThumb={(props, state) => (
+          <div
+            {...props}
+            style={{
+              ...props.style,
+              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`
+            }}
+          >
+            <div
+              className={`absolute ${state.index === 0 ? 'bottom-0' : 'top-0'}
+                left-1/2
+                -translate-x-1/2
+                whitespace-nowrap`}
+            >
+              <Text id="global.percentValue" fields={{ value: state.valueNow }} />
+              <Text id={`global.${unit}`} />
+            </div>
+          </div>
+        )}
+        // renderThumb={(props, state) => <div {...props}>{state.valueNow}%</div>}
         pearling
-        minDistance={10}
+        minDistance={1}
+        max={100}
+        min={0}
         onAfterChange={props.updateBoxValue}
         value={[props.humidityMin, props.humidityMax]}
         disabled={!(props.box.humidity_use_custom_value || false)}

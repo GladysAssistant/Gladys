@@ -9,6 +9,7 @@ export class HttpClient {
     this.session = session;
     this.localApiUrl = config.localApiUrl || window.location.origin;
     this.apiScopes = apiScopes;
+    this.pendingRequests = new Map(); // Cache for pending requests
   }
 
   getAxiosHeaders() {
@@ -66,8 +67,31 @@ export class HttpClient {
     }
   }
 
+  getCacheKey(url, query) {
+    // Create a unique key based on the URL and query parameters
+    const queryKey = query ? JSON.stringify(query) : '';
+    return `${url}?${queryKey}`;
+  }
+
   async get(url, query) {
-    return this.executeQuery('get', url, query);
+    const cacheKey = this.getCacheKey(url, query);
+
+    // Check if the request is already in progress
+    if (this.pendingRequests.has(cacheKey)) {
+      return this.pendingRequests.get(cacheKey);
+    }
+
+    // Execute the request and store the promise in the cache
+    const requestPromise = this.executeQuery('get', url, query);
+    this.pendingRequests.set(cacheKey, requestPromise);
+
+    try {
+      const result = await requestPromise;
+      return result;
+    } finally {
+      // Remove the request from the cache once it is completed
+      this.pendingRequests.delete(cacheKey);
+    }
   }
 
   async post(url, body) {

@@ -64,6 +64,18 @@ const BUTTON_STATUS = {
   BRIGHTNESS_DOWN_HOLD: 58,
   BRIGHTNESS_DOWN_RELEASE: 59,
   PRESSED: 60,
+  SINGLE_LEFT: 61,
+  SINGLE_RIGHT: 62,
+  SINGLE_BOTH: 63,
+  DOUBLE_LEFT: 64,
+  DOUBLE_RIGHT: 65,
+  DOUBLE_BOTH: 66,
+  TRIPLE_LEFT: 67,
+  TRIPLE_RIGHT: 68,
+  TRIPLE_BOTH: 69,
+  HOLD_LEFT: 70,
+  HOLD_RIGHT: 71,
+  HOLD_BOTH: 72,
 };
 
 const COVER_STATE = {
@@ -446,6 +458,10 @@ const INTENTS = {
   },
   SCENE: {
     START: 'intent.scene.start',
+  },
+  SWITCH: {
+    TURN_ON: 'intent.switch.turn-on',
+    TURN_OFF: 'intent.switch.turn-off',
   },
 };
 
@@ -1100,6 +1116,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  SYSTEM: {
+    VACUUM_FINISHED: 'system.vacuum-finished',
   },
   LOCATION: {
     NEW: 'location.new',

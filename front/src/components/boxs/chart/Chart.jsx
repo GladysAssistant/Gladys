@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component, createRef } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
@@ -11,6 +11,7 @@ import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
+const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
@@ -19,6 +20,7 @@ const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
+  'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
@@ -26,7 +28,17 @@ const intervalByName = {
   'last-year': ONE_YEAR_IN_MINUTES
 };
 
-const UNITS_WHEN_DOWN_IS_POSITIVE = [DEVICE_FEATURE_UNITS.WATT_HOUR];
+const UNITS_WHEN_DOWN_IS_POSITIVE = [
+  DEVICE_FEATURE_UNITS.WATT_HOUR,
+  DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  DEVICE_FEATURE_UNITS.WATT,
+  DEVICE_FEATURE_UNITS.KILOWATT,
+  DEVICE_FEATURE_UNITS.AQI,
+  DEVICE_FEATURE_UNITS.PPM,
+  DEVICE_FEATURE_UNITS.PPB,
+  DEVICE_FEATURE_UNITS.DECIBEL,
+  DEVICE_FEATURE_UNITS.UV_INDEX
+];
 
 const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
@@ -64,6 +76,14 @@ const calculateVariation = (firstValue, lastValue) => {
 const allEqual = arr => arr.every(val => val === arr[0]);
 
 class Chartbox extends Component {
+  dropdownRef = createRef();
+
+  handleClickOutside = event => {
+    if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
+      this.setState({ dropdown: false });
+    }
+  };
+
   toggleDropdown = () => {
     this.setState({
       dropdown: !this.state.dropdown
@@ -73,6 +93,14 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_HOUR_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchToLastTwelveHourView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: TWELVE_HOURS_IN_MINUTES,
       dropdown: false
     });
     this.getData();
@@ -113,6 +141,15 @@ class Chartbox extends Component {
       dropdown: false
     });
     this.getData();
+  };
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getData();
+      this.wasDisconnected = false;
+    }
   };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
@@ -292,6 +329,8 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
@@ -311,6 +350,8 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
   render(
     props,
@@ -341,9 +382,10 @@ class Chartbox extends Component {
             <div class={cx(style.subheader)}>{box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               {props.box.chart_type && (
-                <div class="dropdown">
+                <div class="dropdown" ref={this.dropdownRef}>
                   <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                     {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                    {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
                     {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                     {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
                     {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
@@ -362,6 +404,14 @@ class Chartbox extends Component {
                       onClick={this.switchToLastHourView}
                     >
                       <Text id="dashboard.boxes.chart.lastHour" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastTwelveHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
                     </a>
                     <a
                       class={cx(style.dropdownItemChart, {

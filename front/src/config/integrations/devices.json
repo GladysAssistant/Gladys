@@ -1,9 +1,5 @@
 [
   {
-    "key": "zwave",
-    "img": "/assets/integrations/cover/zwave.jpg"
-  },
-  {
     "key": "rtspCamera",
     "link": "rtsp-camera",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"

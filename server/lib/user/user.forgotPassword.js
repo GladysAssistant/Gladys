@@ -30,7 +30,8 @@ async function forgotPassword(email, useragent) {
 
   // generate a session token
   const scope = ['reset-password:write'];
-  return this.session.create(user.id, scope, TOKEN_VALIDITY_IN_SECONDS, useragent);
+  const session = await this.session.create(user.id, scope, TOKEN_VALIDITY_IN_SECONDS, useragent);
+  return { session, user: user.get({ plain: true }) };
 }
 
 module.exports = {

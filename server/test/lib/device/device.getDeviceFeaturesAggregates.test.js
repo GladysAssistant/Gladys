@@ -2,12 +2,20 @@ const EventEmitter = require('events');
 const { expect, assert } = require('chai');
 const sinon = require('sinon');
 const { fake } = require('sinon');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
 const db = require('../../../models');
 const Device = require('../../../lib/device');
 const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
 const job = new Job(event);
+
+// Extend Day.js with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const insertStates = async (intervalInMinutes) => {
   const deviceFeatureStateToInsert = [];
@@ -94,6 +102,27 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     expect(values).to.have.lengthOf(100);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
+  });
+  it('should test timezone behavior', async () => {
+    // Create current date in Toronto timezone, 30 minutes ago
+    const torontoDate = dayjs()
+      .tz('America/Toronto')
+      .subtract(30, 'minute')
+      .toDate();
+
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1, torontoDate);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values } = await deviceInstance.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
+    expect(values).to.have.lengthOf(1);
   });
   it('should return last day states', async () => {
     await insertStates(48 * 60);

@@ -309,7 +309,259 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should save a new true binary value', async () => {
+  it('should save a new true binary sensor value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:any',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'any',
+          endpoint: 0,
+          newValue: true,
+          prevValue: false,
+          propertyName: 'any',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:any',
+      state: STATE.ON,
+    });
+  });
+
+  it('should save a new false binary value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:any',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'any',
+          endpoint: 0,
+          newValue: false,
+          prevValue: true,
+          propertyName: 'any',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:any',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should not fail on unsupported binary sensor value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:any',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'any',
+          endpoint: 0,
+          newValue: -1,
+          prevValue: true,
+          propertyName: 'any',
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should save a new true binary sensor general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: true,
+          prevValue: false,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+      state: STATE.ON,
+    });
+  });
+
+  it('should save a new false binary general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: false,
+          prevValue: true,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should not fail on unsupported binary sensor general purpose value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3:0:binary_sensor:general_purpose',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 3,
+        deviceClass: {
+          basic: 4,
+          generic: 16,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Sensor',
+          commandClass: 48,
+          property: 'General Purpose',
+          endpoint: 0,
+          newValue: -1,
+          prevValue: true,
+          propertyName: 'General Purpose',
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should save a new true binary switch value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     zwaveJSUIHandler.devices = [
       {
@@ -475,6 +727,51 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:air_temperature',
       state: 20.8,
+    });
+  });
+
+  it('should save a new illuminance value', async () => {
+    const NEW_LUMINANCE_VALUE = 120;
+
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2:0:multilevel_sensor:illuminance',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 2,
+        deviceClass: {
+          basic: 4,
+          generic: 7,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Multilevel Sensor',
+          commandClass: 49,
+          property: 'Illuminance',
+          endpoint: 0,
+          newValue: NEW_LUMINANCE_VALUE,
+          prevValue: 0,
+          propertyName: 'Illuminance',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:2:0:multilevel_sensor:illuminance',
+      state: NEW_LUMINANCE_VALUE,
     });
   });
 
@@ -1069,5 +1366,256 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       ],
     });
     assert.notCalled(gladys.event.emit);
+  });
+
+  it('should update battery level on new value received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    const BATTERY_LEVEL_RECEIVED = 2;
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:level',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'level',
+          propertyName: 'level',
+          prevValue: 100,
+          newValue: BATTERY_LEVEL_RECEIVED,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:level',
+      state: BATTERY_LEVEL_RECEIVED,
+    });
+  });
+
+  it('should set battery not low on false received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          propertyName: 'isLow',
+          prevValue: true,
+          newValue: false,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:islow',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should set battery low on true received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          propertyName: 'isLow',
+          prevValue: false,
+          newValue: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:battery:islow',
+      state: STATE.ON,
+    });
+  });
+
+  it('should not fail on battery unknown value received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:battery:islow',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Battery',
+          commandClass: 128,
+          property: 'isLow',
+          propertyName: 'isLow',
+          prevValue: 20,
+          newValue: -1,
+        },
+      ],
+    });
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should set alarm sensor state off on false received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:alarm_sensor:state',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Alarm Sensor',
+          commandClass: 156,
+          property: 'state',
+          propertyName: 'state',
+          prevValue: true,
+          newValue: false,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:alarm_sensor:state',
+      state: STATE.OFF,
+    });
+  });
+
+  it('should set alarm sensor state on on true received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:13',
+        features: [
+          {
+            external_id: 'zwavejs-ui:13:0:alarm_sensor:state',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 13,
+        deviceClass: {
+          basic: 4,
+          generic: 24,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 13 },
+        {
+          commandClassName: 'Alarm Sensor',
+          commandClass: 156,
+          property: 'state',
+          propertyName: 'state',
+          prevValue: false,
+          newValue: true,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:13:0:alarm_sensor:state',
+      state: STATE.ON,
+    });
   });
 });
