@@ -1785,7 +1785,7 @@
       "documentation": "Documentation",
       "setup": {
         "title": "Configure CallMeBot",
-        "description": "To use CallMeBot, you need to get an API key. Follow these steps:<br><br>1. Go to <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot website</a><br>2. Choose your preferred messaging platform (WhatsApp, Signal)<br>3. Follow the instructions to get your API key<br>4. Enter your API key below",
+        "description": "To use CallMeBot, you need to get an API key. Follow these steps:<br><br>1. Go to <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot website</a><br>2. Choose your preferred messaging platform (WhatsApp, Signal)<br>3. Follow the instructions to get your API key<br>4. Enter your API key below<br><br>⚠️ Note: This service is one-way only (Gladys can send messages but cannot receive any) and does not support sending images.",
         "apiKeyLabel": "API Key",
         "apiKeyPlaceholder": "Enter your CallMeBot API key",
         "apiKeyHelp": "Your API key is used to authenticate with CallMeBot service",
