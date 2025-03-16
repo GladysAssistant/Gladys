@@ -27,5 +27,9 @@
     "key": "free-mobile",
     "link": "free-mobile",
     "img": "/assets/integrations/cover/free-mobile.jpg"
+  },
+  {
+    "key": "callmebot",
+    "img": "/assets/integrations/cover/callmebot.jpg"
   }
 ]

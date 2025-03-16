@@ -1777,6 +1777,28 @@
       "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
       "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Send messages through WhatsApp and Signal.",
+      "setupTab": "Setup",
+      "documentation": "Documentation",
+      "setup": {
+        "title": "Configure CallMeBot",
+        "description": "To use CallMeBot, you need to get an API key. Follow these steps:<br><br>1. Go to <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot website</a><br>2. Choose your preferred messaging platform (WhatsApp, Signal)<br>3. Follow the instructions to get your API key<br>4. Enter your API key below",
+        "apiKeyLabel": "API Key",
+        "apiKeyPlaceholder": "Enter your CallMeBot API key",
+        "apiKeyHelp": "Your API key is used to authenticate with CallMeBot service",
+        "messagingServiceLabel": "Messaging Service",
+        "messagingServiceHelp": "Select the messaging service you want to use with CallMeBot",
+        "phoneNumberLabel": "Phone Number",
+        "phoneNumberPlaceholder": "Enter your phone number",
+        "phoneNumberHelp": "Your phone number in international format (e.g. +1234567890)",
+        "phoneNumberHelpSignal": "For Signal, this will be a UUID provided by CallMeBot (e.g. 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Save",
+        "saved": "Configuration saved!",
+        "error": "Error while saving configuration"
+      }
     }
   },
   "editScene": {

@@ -1777,6 +1777,28 @@
       "rateLimit": "Da die ChatGPT-API nicht kostenlos ist, ist diese Integration auf 1000 Anfragen pro Monat begrenzt.",
       "notOnGladysPlus": "Da die ChatGPT-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Senden Sie Nachrichten über WhatsApp und Signal.",
+      "setupTab": "Einrichtung",
+      "documentation": "Dokumentation",
+      "setup": {
+        "title": "CallMeBot konfigurieren",
+        "description": "Um CallMeBot zu nutzen, benötigen Sie einen API-Schlüssel. Folgen Sie diesen Schritten:<br><br>1. Besuchen Sie die <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot-Website</a><br>2. Wählen Sie Ihre bevorzugte Messaging-Plattform (WhatsApp, Signal)<br>3. Folgen Sie den Anweisungen, um Ihren API-Schlüssel zu erhalten<br>4. Geben Sie unten Ihren API-Schlüssel ein",
+        "apiKeyLabel": "API-Schlüssel",
+        "apiKeyPlaceholder": "Geben Sie Ihren CallMeBot API-Schlüssel ein",
+        "apiKeyHelp": "Ihr API-Schlüssel wird zur Authentifizierung beim CallMeBot-Service verwendet",
+        "messagingServiceLabel": "Messaging-Dienst",
+        "messagingServiceHelp": "Wählen Sie den Messaging-Dienst, den Sie mit CallMeBot verwenden möchten",
+        "phoneNumberLabel": "Telefonnummer",
+        "phoneNumberPlaceholder": "Geben Sie Ihre Telefonnummer ein",
+        "phoneNumberHelp": "Ihre Telefonnummer im internationalen Format (z.B. +49123456789)",
+        "phoneNumberHelpSignal": "Für Signal wird dies eine von CallMeBot bereitgestellte UUID sein (z.B. 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Speichern",
+        "saved": "Konfiguration gespeichert!",
+        "error": "Fehler beim Speichern der Konfiguration"
+      }
     }
   },
   "editScene": {
