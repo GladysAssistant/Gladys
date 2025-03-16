@@ -34,9 +34,6 @@ async function send(userId, message) {
       case 'signal':
         url = `https://api.callmebot.com/signal/send.php?phone=${phoneNumber}&text=${encodedMessage}&apikey=${apiKey}`;
         break;
-      case 'telegram':
-        url = `https://api.callmebot.com/telegram/send.php?phone=${phoneNumber}&text=${encodedMessage}&apikey=${apiKey}`;
-        break;
       default:
         throw new Error(`Unsupported messaging service: ${messagingService}`);
     }
