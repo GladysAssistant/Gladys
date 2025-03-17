@@ -194,6 +194,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.LUX,
         min: 0,
         max: 100000,
       },
