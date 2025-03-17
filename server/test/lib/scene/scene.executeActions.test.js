@@ -4,14 +4,16 @@ const EventEmitter = require('events');
 const cloneDeep = require('lodash.clonedeep');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { AbortScene } = require('../../../utils/coreErrors');
-const { executeActions } = require('../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../lib/state');
+const actionsFunc = require('../../../lib/scene/scene.actions');
 
 // WE ARE SLOWLY MOVING ALL TESTS FROM THIS BIG FILE
 // TO A SMALLER SET OF FILE IN THE "ACTIONS" FOLDER.
 
 describe('scene.executeActions', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   let event;
   let stateManager;
 

@@ -408,6 +408,7 @@ const ACTIONS = {
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
+    IF_THEN_ELSE: 'condition.if-then-else',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -440,6 +441,18 @@ const ACTIONS = {
     SEND: 'sms.send',
   },
 };
+
+// List of actions that can be used as conditions
+const CONDITION_ACTIONS = [
+  ACTIONS.CONDITION.CHECK_TIME,
+  ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+  ACTIONS.EDF_TEMPO.CONDITION,
+  ACTIONS.ALARM.CHECK_ALARM_MODE,
+  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+  ACTIONS.ECOWATT.CONDITION,
+  ACTIONS.HOUSE.IS_EMPTY,
+  ACTIONS.HOUSE.IS_NOT_EMPTY,
+];
 
 const INTENTS = {
   LIGHT: {
@@ -1282,6 +1295,7 @@ module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
 module.exports.CONDITIONS = CONDITIONS;
 module.exports.ACTIONS = ACTIONS;
+module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;
 module.exports.DEVICE_FEATURE_CATEGORIES = DEVICE_FEATURE_CATEGORIES;
 module.exports.DEVICE_FEATURE_TYPES = DEVICE_FEATURE_TYPES;

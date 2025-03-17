@@ -1821,12 +1821,14 @@
     "addTriggerButton": "Auslöser hinzufügen",
     "selectTriggerLabel": "Wähle einen Auslösertyp aus",
     "newAction": "Neue Aktion",
+    "newCondition": "Neue Bedingung",
     "selectActionType": "Wähle einen Aktionstyp aus",
+    "selectConditionType": "Wähle eine Bedingungstyp aus",
     "addActionButton": "Aktion hinzufügen",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
     "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
-    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum nächsten Block hinzu.",
+    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum næchsten Block hinzu.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
@@ -1919,6 +1921,23 @@
         "orText": "ODER",
         "orButton": "+ ODER",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Wenn alle Bedingungen erfüllt sind, werden die Aktionen im \"Dann\"-Block ausgeführt. Wenn nicht, werden die Aktionen im \"Sonst\"-Block ausgeführt.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
+        "addCondition": "Bedingung hinzufügen",
+        "if": "Wenn",
+        "then": "Dann",
+        "else": "Sonst",
+        "shortIf": "W",
+        "shortThen": "D",
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
       },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",
@@ -2071,7 +2090,8 @@
       },
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
-        "check-time": "Zeitbedingung"
+        "check-time": "Zeitbedingung",
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",

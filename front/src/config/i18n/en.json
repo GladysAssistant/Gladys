@@ -1873,7 +1873,9 @@
     "addTriggerButton": "Add trigger",
     "selectTriggerLabel": "Select a trigger type",
     "newAction": "New action",
+    "newCondition": "New condition",
     "selectActionType": "Select an action type",
+    "selectConditionType": "Select a condition type",
     "addActionButton": "Add action",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
@@ -1971,6 +1973,23 @@
         "orText": "OR",
         "orButton": "+ OR",
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
+        "addCondition": "Add condition",
+        "if": "If",
+        "then": "Then",
+        "else": "Else",
+        "shortIf": "I",
+        "shortThen": "T",
+        "shortElse": "E",
+        "actionCount": {
+          "zero": "No action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
@@ -2122,8 +2141,9 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if",
-        "check-time": "Time condition"
+        "only-continue-if": "Condition on variables",
+        "check-time": "Time condition",
+        "if-then-else": "Condition: If...then...else..."
       },
       "user": {
         "set-seen-at-home": "User seen at home",

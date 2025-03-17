@@ -30,17 +30,17 @@ class BlinkLight extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const devices = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', devices);
+      this.props.updateActionProperty(this.props.path, 'devices', devices);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
+      this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
   handleChangeBlinkingTime = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_time', newValue);
+    this.props.updateActionProperty(this.props.path, 'blinking_time', newValue);
   };
   handleChangeBlinkingSpeed = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_speed', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'blinking_speed', e.target.value);
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
@@ -65,7 +65,7 @@ class BlinkLight extends Component {
   async componentDidMount() {
     this.getOptions();
     if (!this.props.action.blinking_speed) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinking_speed', 'slow');
+      this.props.updateActionProperty(this.props.path, 'blinking_speed', 'slow');
     }
   }
 
