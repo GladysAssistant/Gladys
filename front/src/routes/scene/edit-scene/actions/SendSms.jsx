@@ -6,7 +6,7 @@ import TextWithVariablesInjected from '../../../../components/scene/TextWithVari
 
 class SendSms extends Component {
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
 
   render(props, {}) {
@@ -25,6 +25,7 @@ class SendSms extends Component {
           <Localizer>
             <TextWithVariablesInjected
               text={props.action.text}
+              path={props.path}
               triggersVariables={props.triggersVariables}
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}

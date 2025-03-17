@@ -16,19 +16,20 @@ const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'satur
 class CheckTime extends Component {
   handleBeforeTimeChange = time => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'before', timeFormatted);
+    this.props.updateActionProperty(this.props.path, 'before', timeFormatted);
   };
   handleBeforeAfterChange = time => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'after', timeFormatted);
+    this.props.updateActionProperty(this.props.path, 'after', timeFormatted);
   };
   handleDayOfTheWeekChange = options => {
     const values = options ? options.map(option => option.value) : undefined;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'days_of_the_week', values);
+    this.props.updateActionProperty(this.props.path, 'days_of_the_week', values);
   };
 
   render() {
     const language = get(this.props, 'user.language');
+    const { path } = this.props;
     const localeSet = language === 'fr' ? fr : 'en';
     const before = this.props.action.before
       ? new Date().setHours(this.props.action.before.substr(0, 2), this.props.action.before.substr(3, 2))
@@ -45,11 +46,13 @@ class CheckTime extends Component {
       : [];
     return (
       <div>
-        <p>
-          <small>
-            <Text id="editScene.actionsCard.checkTime.description" />
-          </small>
-        </p>
+        {path && !path.includes('.if') && (
+          <p>
+            <small>
+              <Text id="editScene.actionsCard.checkTime.description" />
+            </small>
+          </p>
+        )}
         <div class="row">
           <div class="col">
             <div class="form-group">

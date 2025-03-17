@@ -3,13 +3,15 @@ const { expect } = require('chai');
 const EventEmitter = require('events');
 
 const { ACTIONS } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
 
 const event = new EventEmitter();
 
 describe('action.httpRequest', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   it('should execute action http.request', async () => {
     const stateManager = new StateManager(event);
     const http = {
@@ -91,8 +93,8 @@ describe('action.httpRequest', () => {
       scope,
     );
     expect(scope).to.deep.equal({
-      '0': { '0': { success: true }, '1': { success: true } },
-      '1': { '0': { success: true } },
+      '0': [{ success: true }, { success: true }],
+      '1': [{ success: true }],
     });
   });
   it('should execute action http.request with empty body', async () => {

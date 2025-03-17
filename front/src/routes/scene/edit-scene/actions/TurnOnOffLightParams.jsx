@@ -26,9 +26,9 @@ class TurnOnOffLight extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const lights = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
+      this.props.updateActionProperty(this.props.path, 'devices', lights);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
+      this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
   refreshSelectedOptions = nextProps => {

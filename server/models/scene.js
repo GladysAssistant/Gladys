@@ -3,71 +3,74 @@ const { ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constant
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
-const actionSchema = Joi.array().items(
-  Joi.array().items(
-    Joi.object().keys({
-      type: Joi.string()
-        .valid(...ACTION_LIST)
+const actionSchema = Joi.object()
+  .keys({
+    type: Joi.string()
+      .valid(...ACTION_LIST)
+      .required(),
+    device_feature: Joi.string(),
+    device_features: Joi.array().items(Joi.string()),
+    device: Joi.string(),
+    devices: Joi.array().items(Joi.string()),
+    user: Joi.string(),
+    house: Joi.string(),
+    scene: Joi.string(),
+    camera: Joi.string(),
+    text: Joi.string(),
+    value: Joi.number(),
+    evaluate_value: Joi.string(),
+    minutes: Joi.number(),
+    unit: Joi.string(),
+    url: Joi.string().uri(),
+    body: Joi.string(),
+    method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
+    days_of_the_week: Joi.array().items(
+      Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+    ),
+    before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+    after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+    calendar_event_name_comparator: Joi.string().valid(
+      'is-exactly',
+      'contains',
+      'starts-with',
+      'ends-with',
+      'has-any-name',
+    ),
+    calendars: Joi.array().items(Joi.string()),
+    calendar_event_name: Joi.string(),
+    stop_scene_if_event_found: Joi.boolean(),
+    stop_scene_if_event_not_found: Joi.boolean(),
+    request_response_keys: Joi.array().items(Joi.string()),
+    ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
+    edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
+    edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
+    edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
+    headers: Joi.array().items(
+      Joi.object().keys({
+        key: Joi.string(),
+        value: Joi.string(),
+      }),
+    ),
+    conditions: Joi.array().items({
+      variable: Joi.string().required(),
+      operator: Joi.string()
+        .valid('=', '!=', '>', '>=', '<', '<=')
         .required(),
-      device_feature: Joi.string(),
-      device_features: Joi.array().items(Joi.string()),
-      device: Joi.string(),
-      devices: Joi.array().items(Joi.string()),
-      user: Joi.string(),
-      house: Joi.string(),
-      scene: Joi.string(),
-      camera: Joi.string(),
-      text: Joi.string(),
       value: Joi.number(),
       evaluate_value: Joi.string(),
-      minutes: Joi.number(),
-      unit: Joi.string(),
-      url: Joi.string().uri(),
-      body: Joi.string(),
-      method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
-      days_of_the_week: Joi.array().items(
-        Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
-      ),
-      before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
-      after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
-      calendar_event_name_comparator: Joi.string().valid(
-        'is-exactly',
-        'contains',
-        'starts-with',
-        'ends-with',
-        'has-any-name',
-      ),
-      calendars: Joi.array().items(Joi.string()),
-      calendar_event_name: Joi.string(),
-      stop_scene_if_event_found: Joi.boolean(),
-      stop_scene_if_event_not_found: Joi.boolean(),
-      request_response_keys: Joi.array().items(Joi.string()),
-      ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
-      edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
-      edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
-      edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
-      headers: Joi.array().items(
-        Joi.object().keys({
-          key: Joi.string(),
-          value: Joi.string(),
-        }),
-      ),
-      conditions: Joi.array().items({
-        variable: Joi.string().required(),
-        operator: Joi.string()
-          .valid('=', '!=', '>', '>=', '<', '<=')
-          .required(),
-        value: Joi.number(),
-        evaluate_value: Joi.string(),
-      }),
-      alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
-      topic: Joi.string(),
-      message: Joi.string().allow(''),
-      blinking_time: Joi.number(),
-      blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
     }),
-  ),
-);
+    alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
+    topic: Joi.string(),
+    message: Joi.string().allow(''),
+    blinking_time: Joi.number(),
+    blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
+    if: Joi.array().items(Joi.link('#action')),
+    then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+  })
+  .id('action');
+
+const actionsSchema = Joi.array().items(Joi.array().items(actionSchema));
 
 const triggersSchema = Joi.array().items(
   Joi.object().keys({
@@ -151,7 +154,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = actionSchema.validate(value);
+            const result = actionsSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }
