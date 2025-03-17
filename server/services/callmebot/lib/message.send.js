@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
  * @description Send a message through CallMeBot.
@@ -19,7 +18,8 @@ async function send(userId, message) {
   const phoneNumber = await this.gladys.variable.getValue('CALLMEBOT_PHONE_NUMBER', this.serviceId, userId);
 
   if (!apiKey || !messagingService || !phoneNumber) {
-    throw new NotFoundError('CallMeBot configuration not found for this user');
+    logger.debug('CallMeBot configuration not found for this user');
+    return;
   }
 
   try {

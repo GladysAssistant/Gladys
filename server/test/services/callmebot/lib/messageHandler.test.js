@@ -78,15 +78,13 @@ describe('CallMeBot.message', () => {
     expect(gladys.http.request.args[0][1]).to.include('https://api.callmebot.com/signal/send.php');
   });
 
-  it('should throw error when configuration is missing', async () => {
+  it('should return when configuration is missing', async () => {
     // Mock missing configuration
     gladys.variable.getValue = stub().resolves(null);
 
-    const promise = messageHandler.send('test-user-id', {
+    await messageHandler.send('test-user-id', {
       text: 'Hello from Gladys!',
     });
-
-    await expect(promise).to.be.rejectedWith('CallMeBot configuration not found for this user');
   });
 
   it('should throw error when messaging service is not supported', async () => {
