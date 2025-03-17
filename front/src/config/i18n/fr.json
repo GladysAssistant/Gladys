@@ -1843,6 +1843,28 @@
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Envoyez des messages via WhatsApp et Signal.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation",
+      "setup": {
+        "title": "Configurer CallMeBot",
+        "description": "Pour utiliser CallMeBot, vous devez obtenir une clé API. Suivez ces étapes :<br><br>1. Allez sur le <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">site web de CallMeBot</a><br>2. Choisissez votre plateforme de messagerie préférée (WhatsApp, Signal)<br>3. Suivez les instructions pour obtenir votre clé API<br>4. Entrez votre clé API ci-dessous<br><br>⚠️ Note : Ce service est unidirectionnel (Gladys peut envoyer des messages mais ne peut pas en recevoir) et ne supporte pas l'envoi d'images.",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez votre clé API CallMeBot",
+        "apiKeyHelp": "Votre clé API est utilisée pour s'authentifier auprès du service CallMeBot",
+        "messagingServiceLabel": "Service de messagerie",
+        "messagingServiceHelp": "Choisissez le service de messagerie que vous souhaitez utiliser avec CallMeBot",
+        "phoneNumberLabel": "Numéro de téléphone",
+        "phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
+        "phoneNumberHelp": "Votre numéro de téléphone au format international (ex: +33612345678)",
+        "phoneNumberHelpSignal": "Pour Signal, ce sera un UUID fourni par CallMeBot (ex: 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Sauvegarder la configuration",
+        "saved": "Configuration sauvegardée !",
+        "error": "Erreur lors de la sauvegarde de la configuration"
+      }
     }
   },
   "editScene": {
