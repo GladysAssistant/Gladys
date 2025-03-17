@@ -40,7 +40,7 @@ async function send(userId, message) {
 
     const response = await this.gladys.http.request('get', url);
 
-    if (!response.data.includes('Message Queued')) {
+    if (!response.data.toLowerCase().includes('message queued')) {
       throw new Error(`Failed to send message: ${response.data}`);
     }
 
