@@ -216,7 +216,8 @@ const ActionCard = ({ children, ...props }) => {
               deleteActionGroup: props.deleteActionGroup,
               addAction: props.addAction,
               moveCard: props.moveCard,
-              moveCardGroup: props.moveCardGroup
+              moveCardGroup: props.moveCardGroup,
+              scene: props.scene
             };
 
             return <Component {...commonProps} />;
