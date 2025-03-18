@@ -131,7 +131,7 @@ class HttpRequestAction extends Component {
     this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
   loadVariables = keys => {
-    const { columnIndex, index } = this.props;
+    const { path } = this.props;
     const keysVariables = keys.map(key => {
       const keyWithData = `data.${key}`;
       return {
@@ -147,7 +147,7 @@ class HttpRequestAction extends Component {
       ready: true,
       label: 'status'
     });
-    this.props.setVariables(columnIndex, index, keysVariables);
+    this.props.setVariables(path, keysVariables);
   };
   tryRequest = async e => {
     e.preventDefault();
