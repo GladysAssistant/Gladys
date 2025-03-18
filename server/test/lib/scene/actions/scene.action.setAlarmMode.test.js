@@ -2,11 +2,13 @@ const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
 const { ACTIONS } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
 
 describe('scene.set-alarm-mode', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   let event;
   let stateManager;
 

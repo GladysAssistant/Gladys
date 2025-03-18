@@ -17,6 +17,7 @@ const ACTION_LIST = [
   ACTIONS.MESSAGE.SEND,
   ACTIONS.MESSAGE.SEND_CAMERA,
   ACTIONS.DEVICE.GET_VALUE,
+  ACTIONS.CONDITION.IF_THEN_ELSE,
   ACTIONS.CONDITION.ONLY_CONTINUE_IF,
   ACTIONS.USER.SET_SEEN_AT_HOME,
   ACTIONS.USER.SET_OUT_OF_HOME,
@@ -53,11 +54,13 @@ class ChooseActionType extends Component {
       currentAction: selectedOption
     });
     if (selectedOption) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'type', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'type', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'filter', undefined);
     }
   };
   render(props, { currentAction }) {
-    const options = ACTION_LIST.map(action => ({
+    const actionListFiltered = props.action && props.action.filter ? props.action.filter : ACTION_LIST;
+    const options = actionListFiltered.map(action => ({
       value: action,
       label: props[`editScene.actions.${action}`]
     }));
@@ -66,7 +69,8 @@ class ChooseActionType extends Component {
       <div>
         <div class="form-group">
           <label class="form-label">
-            <Text id="editScene.selectActionType" />
+            {props.path.includes('if') && <Text id="editScene.selectConditionType" />}
+            {!props.path.includes('if') && <Text id="editScene.selectActionType" />}
           </label>
           <Select
             class="choose-scene-action-type"

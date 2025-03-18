@@ -1,12 +1,14 @@
 const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
 const StateManager = require('../../../../lib/state');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const event = new EventEmitter();
 
 describe('scene.ask-ai', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   it('should ask AI about a camera image then send answer to user', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {

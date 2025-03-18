@@ -174,6 +174,8 @@ import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
 // Free Mobile integration
 import FreeMobilePage from '../routes/integration/all/free-mobile';
+// CallMeBot integration
+import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -284,6 +286,7 @@ const AppRouter = connect(
         <NodeRedPage path="/dashboard/integration/device/node-red" />
 
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
+        <CallMeBotPage path="dashboard/integration/communication/callmebot" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />

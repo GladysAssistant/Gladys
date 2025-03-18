@@ -1856,6 +1856,28 @@
       "rateLimit": "Da die ChatGPT-API nicht kostenlos ist, ist diese Integration auf 1000 Anfragen pro Monat begrenzt.",
       "notOnGladysPlus": "Da die ChatGPT-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Senden Sie Nachrichten über WhatsApp und Signal.",
+      "setupTab": "Einrichtung",
+      "documentation": "Dokumentation",
+      "setup": {
+        "title": "CallMeBot konfigurieren",
+        "description": "Um CallMeBot zu nutzen, benötigen Sie einen API-Schlüssel. Folgen Sie diesen Schritten:<br><br>1. Besuchen Sie die <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot-Website</a><br>2. Wählen Sie Ihre bevorzugte Messaging-Plattform (WhatsApp, Signal)<br>3. Folgen Sie den Anweisungen, um Ihren API-Schlüssel zu erhalten<br>4. Geben Sie unten Ihren API-Schlüssel ein<br><br>⚠️ Hinweis: Dieser Dienst ist nur unidirektional (Gladys kann Nachrichten senden, aber keine empfangen) und unterstützt keine Bildübertragung.",
+        "apiKeyLabel": "API-Schlüssel",
+        "apiKeyPlaceholder": "Geben Sie Ihren CallMeBot API-Schlüssel ein",
+        "apiKeyHelp": "Ihr API-Schlüssel wird zur Authentifizierung beim CallMeBot-Service verwendet",
+        "messagingServiceLabel": "Messaging-Dienst",
+        "messagingServiceHelp": "Wählen Sie den Messaging-Dienst, den Sie mit CallMeBot verwenden möchten",
+        "phoneNumberLabel": "Telefonnummer",
+        "phoneNumberPlaceholder": "Geben Sie Ihre Telefonnummer ein",
+        "phoneNumberHelp": "Ihre Telefonnummer im internationalen Format (z.B. +49123456789)",
+        "phoneNumberHelpSignal": "Für Signal wird dies eine von CallMeBot bereitgestellte UUID sein (z.B. 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Speichern",
+        "saved": "Konfiguration gespeichert!",
+        "error": "Fehler beim Speichern der Konfiguration"
+      }
     }
   },
   "editScene": {
@@ -1878,12 +1900,14 @@
     "addTriggerButton": "Auslöser hinzufügen",
     "selectTriggerLabel": "Wähle einen Auslösertyp aus",
     "newAction": "Neue Aktion",
+    "newCondition": "Neue Bedingung",
     "selectActionType": "Wähle einen Aktionstyp aus",
+    "selectConditionType": "Wähle eine Bedingungstyp aus",
     "addActionButton": "Aktion hinzufügen",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
     "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
-    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum nächsten Block hinzu.",
+    "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum næchsten Block hinzu.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
@@ -1976,6 +2000,23 @@
         "orText": "ODER",
         "orButton": "+ ODER",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Wenn alle Bedingungen erfüllt sind, werden die Aktionen im \"Dann\"-Block ausgeführt. Wenn nicht, werden die Aktionen im \"Sonst\"-Block ausgeführt.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
+        "addCondition": "Bedingung hinzufügen",
+        "if": "Wenn",
+        "then": "Dann",
+        "else": "Sonst",
+        "shortIf": "W",
+        "shortThen": "D",
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
       },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",
@@ -2128,7 +2169,8 @@
       },
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
-        "check-time": "Zeitbedingung"
+        "check-time": "Zeitbedingung",
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",

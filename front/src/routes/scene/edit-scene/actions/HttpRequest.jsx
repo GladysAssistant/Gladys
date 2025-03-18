@@ -92,17 +92,17 @@ class Header extends Component {
 
 class HttpRequestAction extends Component {
   handleChangeMethod = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'method', e.target.value);
     if (!METHOD_WITH_BODY.includes(e.target.value)) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', undefined);
+      this.props.updateActionProperty(this.props.path, 'body', undefined);
     }
   };
   handleChangeUrl = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'url', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'url', e.target.value);
   };
   handleChangeBody = text => {
     const newBody = text && text.length > 0 ? text : undefined;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', newBody);
+    this.props.updateActionProperty(this.props.path, 'body', newBody);
   };
   addNewHeader = e => {
     e.preventDefault();
@@ -114,7 +114,7 @@ class HttpRequestAction extends Component {
         }
       ]
     });
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+    this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
   updateHeader = (index, newHeader) => {
     const newHeaderArray = update(this.props.action.headers, {
@@ -122,16 +122,16 @@ class HttpRequestAction extends Component {
         $set: newHeader
       }
     });
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+    this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
   deleteHeader = index => {
     const newHeaderArray = update(this.props.action.headers, {
       $splice: [[index, 1]]
     });
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', newHeaderArray);
+    this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
   loadVariables = keys => {
-    const { columnIndex, index } = this.props;
+    const { path } = this.props;
     const keysVariables = keys.map(key => {
       const keyWithData = `data.${key}`;
       return {
@@ -147,7 +147,7 @@ class HttpRequestAction extends Component {
       ready: true,
       label: 'status'
     });
-    this.props.setVariables(columnIndex, index, keysVariables);
+    this.props.setVariables(path, keysVariables);
   };
   tryRequest = async e => {
     e.preventDefault();
@@ -175,7 +175,7 @@ class HttpRequestAction extends Component {
       });
       if (isJsonResponse) {
         const keys = getAllPropertiesObject(data);
-        this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'request_response_keys', keys);
+        this.props.updateActionProperty(this.props.path, 'request_response_keys', keys);
         this.loadVariables(keys);
       }
       await this.setState({ error: false, pending: false });
@@ -186,10 +186,10 @@ class HttpRequestAction extends Component {
   };
   componentDidMount() {
     if (!this.props.action.method) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', 'post');
+      this.props.updateActionProperty(this.props.path, 'method', 'post');
     }
     if (!this.props.action.headers) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'headers', []);
+      this.props.updateActionProperty(this.props.path, 'headers', []);
     }
     if (this.props.action.request_response_keys) {
       this.loadVariables(this.props.action.request_response_keys);
@@ -281,6 +281,7 @@ class HttpRequestAction extends Component {
                   <Localizer>
                     <TextWithVariablesInjected
                       text={props.action.body}
+                      path={props.path}
                       updateText={this.handleChangeBody}
                       triggersVariables={props.triggersVariables}
                       actionsGroupsBefore={props.actionsGroupsBefore}

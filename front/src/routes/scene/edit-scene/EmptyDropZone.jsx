@@ -17,7 +17,7 @@ const EmptyColumnDropZone = ({ children, ...props }) => {
       if (!ref.current) {
         return;
       }
-      props.moveCard(item.x, item.y, 0, props.y);
+      props.moveCard(item.path, `${props.path}.0`);
     }
   });
   drop(ref);

@@ -1856,6 +1856,28 @@
       "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
       "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Send messages through WhatsApp and Signal.",
+      "setupTab": "Setup",
+      "documentation": "Documentation",
+      "setup": {
+        "title": "Configure CallMeBot",
+        "description": "To use CallMeBot, you need to get an API key. Follow these steps:<br><br>1. Go to <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">CallMeBot website</a><br>2. Choose your preferred messaging platform (WhatsApp, Signal)<br>3. Follow the instructions to get your API key<br>4. Enter your API key below<br><br>⚠️ Note: This service is one-way only (Gladys can send messages but cannot receive any) and does not support sending images.",
+        "apiKeyLabel": "API Key",
+        "apiKeyPlaceholder": "Enter your CallMeBot API key",
+        "apiKeyHelp": "Your API key is used to authenticate with CallMeBot service",
+        "messagingServiceLabel": "Messaging Service",
+        "messagingServiceHelp": "Select the messaging service you want to use with CallMeBot",
+        "phoneNumberLabel": "Phone Number",
+        "phoneNumberPlaceholder": "Enter your phone number",
+        "phoneNumberHelp": "Your phone number in international format (e.g. +1234567890)",
+        "phoneNumberHelpSignal": "For Signal, this will be a UUID provided by CallMeBot (e.g. 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Save",
+        "saved": "Configuration saved!",
+        "error": "Error while saving configuration"
+      }
     }
   },
   "editScene": {
@@ -1878,7 +1900,9 @@
     "addTriggerButton": "Add trigger",
     "selectTriggerLabel": "Select a trigger type",
     "newAction": "New action",
+    "newCondition": "New condition",
     "selectActionType": "Select an action type",
+    "selectConditionType": "Select a condition type",
     "addActionButton": "Add new action",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
@@ -1976,6 +2000,23 @@
         "orText": "OR",
         "orButton": "+ OR",
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
+        "addCondition": "Add condition",
+        "if": "If",
+        "then": "Then",
+        "else": "Else",
+        "shortIf": "I",
+        "shortThen": "T",
+        "shortElse": "E",
+        "actionCount": {
+          "zero": "No action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
@@ -2127,8 +2168,9 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if",
-        "check-time": "Time condition"
+        "only-continue-if": "Condition on variables",
+        "check-time": "Time condition",
+        "if-then-else": "Condition: If...then...else..."
       },
       "user": {
         "set-seen-at-home": "User seen at home",
