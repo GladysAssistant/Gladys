@@ -57,12 +57,16 @@ describe('RFLink device edit', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
+        // Input name
         cy.get('input')
           .first()
-          .clear()
-          .type('Switch Living room');
+          .as('nameInput');
+        cy.get('@nameInput').clear();
+        cy.get('@nameInput').type('Switch Living room');
 
+        // Select room
         cy.get('select').select(rooms[0].name);
+
         cy.contains('button', 'integration.rflink.device.saveButton').click();
       });
   });
