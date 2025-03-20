@@ -36,7 +36,7 @@ const DEFAULT = {
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
   DOCKER_MQTT_VERSION: '4', // Last version of MQTT docker file
-  DOCKER_Z2M_VERSION: '4', // Last version of Z2M docker file,
+  DOCKER_Z2M_VERSION: '5', // Last version of Z2M docker file,
   CONFIGURATION_PATH: 'zigbee2mqtt/z2m/configuration.yaml',
   CONFIGURATION_CONTENT: {
     homeassistant: false,
