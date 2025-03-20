@@ -1,0 +1,24 @@
+{
+  "author": {
+    "name": "mathis tondenier"
+  },
+  "contributors": [
+    "Nicolas Geissel <protz@beroot.fr> (https://github.com/ngeissel/)"
+  ],
+  "name": "gladys-rflink",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "serialport": "11.0.0",
+    "@serialport/parser-readline": "11.0.0"
+  }
+}
