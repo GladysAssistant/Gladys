@@ -55,13 +55,12 @@ describe('RFLink device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-         
         cy.get('input')
-         .first()
-         .as('nameInput');
+          .first()
+          .as('nameInput');
         cy.get('@nameInput').clear();
         cy.get('@nameInput').type('Another Switch in Living room');
-       
+
         cy.get('select').select(rooms[0].name);
 
         cy.get('.card-header').should('have.text', 'New name');
