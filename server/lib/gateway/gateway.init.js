@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, USER_ROLE } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
@@ -35,6 +35,15 @@ async function init() {
     }
   } catch (e) {
     logger.debug(e);
+    if (e.response && e.response.data.status === 401 && e.response.data.error_code === 'UNAUTHORIZED') {
+      logger.warn('Gladys Gateway: Unauthorized. Refresh token is outdated');
+      // Warn users that Gladys Gateway is disconnected
+      this.message.sendToAdmins('gladys-plus.disconnected', {});
+      // Destroy local keys
+      await this.variable.destroy('GLADYS_GATEWAY_REFRESH_TOKEN');
+      await this.variable.destroy('GLADYS_GATEWAY_RSA_PRIVATE_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
+    }
     this.connected = false;
   }
 
