@@ -1814,6 +1814,8 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "deleteText": "Êtes-vous sûr de vouloir supprimer cette scène ?",
+    "cancelButton": "Annuler",
     "duplicateButton": "Dupliquer",
     "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
