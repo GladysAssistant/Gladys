@@ -3076,6 +3076,10 @@
       "shortCategoryName": "Presence sensor",
       "push": "Presence"
     },
+    "rain-sensor": {
+      "shortCategoryName": "Rain sensor",
+      "binary": "Rain detection Yes/No"
+    },
     "light-sensor": {
       "shortCategoryName": "Luminosity sensor",
       "integer": "Luminosity (integer)",
@@ -3320,7 +3324,8 @@
     },
     "precipitation-sensor": {
       "shortCategoryName": "Precipitation sensor",
-      "decimal": "Precipitation"
+      "decimal": "Precipitation",
+      "integer": "Intensity (mV)"
     },
     "uv-sensor": {
       "shortCategoryName": "UV Sensor",
