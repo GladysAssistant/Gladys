@@ -230,8 +230,6 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.contains('editScene.moreButton').click();
-
     cy.contains('editScene.duplicateButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}${sceneUrl}/duplicate`);
@@ -262,7 +260,8 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.contains('editScene.moreButton').click();
+    cy.contains('editScene.deleteButton').click();
+    // Confirmation button
     cy.contains('editScene.deleteButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
@@ -271,8 +270,8 @@ describe('Scene view', () => {
     expect(duplicatedSceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(duplicatedSceneUrl);
 
-    cy.contains('editScene.moreButton').click();
-
+    cy.contains('editScene.deleteButton').click();
+    // Confirmation button
     cy.contains('editScene.deleteButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
