@@ -1814,7 +1814,7 @@
     "startButton": "Start",
     "saveButton": "Sichern",
     "deleteButton": "Löschen",
-    "deleteText": "Bist du sicher, dass du dieses Szene löschen möchtest?",
+    "deleteText": "Bist du sicher?",
     "cancelButton": "Abbrechen",
     "duplicateButton": "Duplizieren",
     "moreButton": "Mehr",

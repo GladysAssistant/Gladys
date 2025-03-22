@@ -1814,7 +1814,7 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
-    "deleteText": "Are you sure you want to delete this scene?",
+    "deleteText": "Are you sure?",
     "cancelButton": "Cancel",
     "duplicateButton": "Duplicate",
     "moreButton": "More",
