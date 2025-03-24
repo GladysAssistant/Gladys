@@ -56,7 +56,7 @@ async function init() {
   const rule = { tz: timezone, hour: 2, minute: 0, second: 0 };
   this.backupSchedule = this.scheduler.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
 
-  // Get latest Gladys version in 5 minutes
+  // Get latest Gladys version in 10 seconds
   // To let the system initialize
   setTimeout(async () => {
     try {
@@ -64,7 +64,7 @@ async function init() {
         await this.getLatestGladysVersion();
       }
     } catch (e) {
-      logger.debug(e);
+      logger.warn(e);
     }
   }, this.getLatestGladysVersionInitTimeout);
 }
