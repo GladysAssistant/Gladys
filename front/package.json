@@ -67,6 +67,7 @@
     "linkstate": "^1.1.1",
     "p-limit": "^4.0.0",
     "preact": "^10.7.2",
+    "preact-async-route": "^2.2.1",
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
