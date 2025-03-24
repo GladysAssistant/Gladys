@@ -14,6 +14,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
 describe('gateway.init', () => {
   const variable = {};
   const event = {};
+  const message = {};
   const userKeys = [
     {
       id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
@@ -46,6 +47,7 @@ describe('gateway.init', () => {
       return JSON.stringify(userKeys);
     };
     variable.setValue = fake.resolves(null);
+    variable.destroy = fake.resolves(null);
 
     event.on = fake.returns(null);
     event.emit = fake.returns(null);
@@ -62,7 +64,9 @@ describe('gateway.init', () => {
       },
     };
 
-    gateway = new Gateway(variable, event, {}, {}, config, {}, {}, {}, job, scheduler);
+    message.sendToAdmins = fake.resolves(null);
+
+    gateway = new Gateway(variable, event, {}, {}, config, {}, {}, {}, job, scheduler, message, {});
 
     clock = sinon.useFakeTimers();
   });
@@ -98,6 +102,27 @@ describe('gateway.init', () => {
 
     clock.tick(1000);
 
+    expect(gateway.connected).to.equal(false);
+    expect(gateway.usersKeys).to.deep.equal(userKeys);
+    expect(gateway.backupSchedule).to.deep.contains({
+      rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
+    });
+  });
+
+  it('should disconnect Gladys Gateway', async () => {
+    // Store job with cancel method
+    gateway.backupSchedule = {};
+    // Force error
+    const unauthorizedError = new Error();
+    // @ts-ignore
+    unauthorizedError.response = { data: { status: 401, error_code: 'UNAUTHORIZED' } };
+    gateway.gladysGatewayClient.instanceConnect = fake.rejects(unauthorizedError);
+
+    await gateway.init();
+
+    clock.tick(1000);
+    assert.calledOnce(message.sendToAdmins);
+    assert.called(variable.destroy);
     expect(gateway.connected).to.equal(false);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({

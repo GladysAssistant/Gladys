@@ -35,6 +35,17 @@ async function init() {
     }
   } catch (e) {
     logger.debug(e);
+    if (e.response && e.response.data.status === 401 && e.response.data.error_code === 'UNAUTHORIZED') {
+      logger.warn('Gladys Gateway: Unauthorized. Refresh token is outdated');
+      // Warn users that Gladys Gateway is disconnected
+      this.message.sendToAdmins('gladys-plus.disconnected', {});
+      // Destroy local keys
+      await this.variable.destroy('GLADYS_GATEWAY_REFRESH_TOKEN');
+      await this.variable.destroy('GLADYS_GATEWAY_RSA_PRIVATE_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_RSA_PUBLIC_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PUBLIC_KEY');
+    }
     this.connected = false;
   }
 
@@ -47,7 +58,7 @@ async function init() {
   const rule = { tz: timezone, hour: 2, minute: 0, second: 0 };
   this.backupSchedule = this.scheduler.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
 
-  // Get latest Gladys version in 5 minutes
+  // Get latest Gladys version in 10 seconds
   // To let the system initialize
   setTimeout(async () => {
     try {
@@ -55,7 +66,7 @@ async function init() {
         await this.getLatestGladysVersion();
       }
     } catch (e) {
-      logger.debug(e);
+      logger.warn(e);
     }
   }, this.getLatestGladysVersionInitTimeout);
 }
