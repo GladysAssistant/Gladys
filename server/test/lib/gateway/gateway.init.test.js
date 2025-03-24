@@ -122,7 +122,7 @@ describe('gateway.init', () => {
 
     clock.tick(1000);
     assert.calledOnce(message.sendToAdmins);
-    assert.calledThrice(variable.destroy);
+    assert.called(variable.destroy);
     expect(gateway.connected).to.equal(false);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({

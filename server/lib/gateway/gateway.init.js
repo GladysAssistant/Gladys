@@ -43,6 +43,8 @@ async function init() {
       await this.variable.destroy('GLADYS_GATEWAY_REFRESH_TOKEN');
       await this.variable.destroy('GLADYS_GATEWAY_RSA_PRIVATE_KEY');
       await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_RSA_PUBLIC_KEY');
+      await this.variable.destroy('GLADYS_GATEWAY_ECDSA_PUBLIC_KEY');
     }
     this.connected = false;
   }
