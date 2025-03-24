@@ -42,7 +42,8 @@ async function refreshingTokens() {
     });
     const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Erreur Netatmo :', response.status, rawBody);
+      logger.error('Error getting new accessToken to Netatmo - Details:', response.status, rawBody);
+      throw new Error(`HTTP error ${response.status} - ${rawBody}`);
     }
     const data = JSON.parse(rawBody);
     const tokens = {
@@ -55,6 +56,7 @@ async function refreshingTokens() {
     logger.debug('Netatmo new access tokens well loaded with status: ', this.status);
     return { success: true };
   } catch (e) {
+    logger.error('Error getting new accessToken to Netatmo - Details:', e);
     logger.error('Netatmo no successfull refresh token and disconnect');
     const tokens = {
       accessToken: '',
@@ -63,12 +65,6 @@ async function refreshingTokens() {
     };
     await this.setTokens(tokens);
     await this.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' });
-    if (e.response) {
-      const data = await e.response.json();
-      logger.error('Error getting new accessToken to Netatmo - Details:', data);
-    } else {
-      logger.error('Error getting new accessToken to Netatmo - Details:', e);
-    }
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
 }

@@ -51,6 +51,7 @@ async function retrieveTokens(body) {
     const rawBody = await response.text();
     if (!response.ok) {
       logger.error('Erreur Netatmo :', response.status, rawBody);
+      throw new Error(`HTTP error ${response.status} - ${rawBody}`);
     }
     const data = JSON.parse(rawBody);
     const tokens = {
