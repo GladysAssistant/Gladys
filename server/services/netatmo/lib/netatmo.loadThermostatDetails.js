@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
@@ -13,12 +13,19 @@ async function loadThermostatDetails() {
   let plugs;
   const thermostats = [];
   try {
-    const responseGetThermostat = await axios({
-      url: API.GET_THERMOSTATS,
-      method: 'get',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
+    const responseGetThermostat = await fetch(API.GET_THERMOSTATS, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Accept: API.HEADER.ACCEPT,
+      },
     });
-    const { body, status } = responseGetThermostat.data;
+    if (!responseGetThermostat.ok) {
+      logger.error('Erreur Netatmo :', responseGetThermostat.status, await responseGetThermostat.text());
+    }
+    const data = await responseGetThermostat.json();
+    const { body, status } = data;
     plugs = body.devices;
     if (status === 'ok') {
       plugs.forEach((plug) => {

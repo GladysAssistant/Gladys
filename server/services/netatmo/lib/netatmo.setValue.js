@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, STATUS, PARAMS } = require('./utils/netatmo.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -34,19 +34,26 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(`Change value for device ${device.name} / ${featureName} to value ${transformedValue}...`);
 
   const paramsForm = {
-    home_id: homeId.value, // mandatory
-    room_id: roomId.value, // mandatory
-    mode: 'manual', // mandatory
+    home_id: homeId.value,
+    room_id: roomId.value,
+    mode: 'manual',
     temp: transformedValue,
   };
   try {
-    await axios({
-      url: API.SET_ROOM_THERMPOINT,
-      method: 'post',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
-      data: paramsForm,
+    const responseSetRoomThermpoint = await fetch(API.SET_ROOM_THERMPOINT, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Accept: API.HEADER.ACCEPT,
+      },
+      body: new URLSearchParams(paramsForm).toString(),
     });
-    logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
+    if (!responseSetRoomThermpoint.ok) {
+      logger.error('Erreur Netatmo :', responseSetRoomThermpoint.status, await responseSetRoomThermpoint.text());
+    } else {
+      logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
+    }
   } catch (e) {
     logger.error(
       'setValue error with status code: ',

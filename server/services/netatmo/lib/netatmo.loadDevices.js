@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const { default: axios } = require('axios');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
@@ -14,12 +14,20 @@ async function loadDevices() {
 
   if (this.configuration.energyApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
     try {
-      const responsePage = await axios({
-        url: API.HOMESDATA,
-        method: 'get',
-        headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
+      const responsePage = await fetch(API.HOMESDATA, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': API.HEADER.CONTENT_TYPE,
+          Accept: API.HEADER.ACCEPT,
+        },
       });
-      const { body, status } = responsePage.data;
+      if (!responsePage.ok) {
+        logger.error('Erreur Netatmo :', responsePage.status, await responsePage.text());
+      }
+
+      const data = await responsePage.json();
+      const { body, status } = data;
       const { homes } = body;
       if (status === 'ok') {
         const results = await Promise.map(

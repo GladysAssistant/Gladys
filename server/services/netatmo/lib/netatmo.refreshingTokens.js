@@ -1,5 +1,4 @@
-const { default: axios } = require('axios');
-const querystring = require('querystring');
+const { fetch } = require('undici');
 
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
@@ -32,16 +31,23 @@ async function refreshingTokens() {
     refresh_token: this.refreshToken,
   };
   try {
-    const response = await axios({
-      url: `${API.TOKEN}`,
-      method: 'post',
-      headers: { 'Content-Type': API.HEADER.CONTENT_TYPE, Host: API.HEADER.HOST },
-      data: querystring.stringify(authentificationForm),
+    const response = await fetch(API.TOKEN, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Host: API.HEADER.HOST,
+      },
+      body: new URLSearchParams(authentificationForm).toString(),
     });
+    if (!response.ok) {
+      logger.error('Erreur Netatmo :', response.status, await response.text());
+    }
+    const data = await response.json();
     const tokens = {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
-      expireIn: response.data.expire_in,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expireIn: data.expire_in,
     };
     await this.setTokens(tokens);
     await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
@@ -56,7 +62,12 @@ async function refreshingTokens() {
     };
     await this.setTokens(tokens);
     await this.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' });
-    logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
+    if (e.response) {
+      const data = await e.response.json();
+      logger.error('Error getting new accessToken to Netatmo - Details:', data);
+    } else {
+      logger.error('Error getting new accessToken to Netatmo - Details:', e);
+    }
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
 }
