@@ -98,10 +98,12 @@ describe('Netatmo Refreshing Tokens', () => {
     };
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(200, tokens);
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
 
     const result = await netatmoHandler.refreshingTokens();
     expect(result).to.deep.equal({ success: true });
@@ -137,12 +139,13 @@ describe('Netatmo Refreshing Tokens', () => {
   });
 
   it('should handle an error during token refresh', async () => {
-
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(400, { error: 'invalid_request' });
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(400, { error: 'invalid_request' });
 
     try {
       await netatmoHandler.refreshingTokens();
@@ -180,10 +183,12 @@ describe('Netatmo Refreshing Tokens', () => {
     netatmoHandler.refreshToken = 'refresh-token';
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).replyWithError('Network error');
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .replyWithError('Network error');
     try {
       await netatmoHandler.refreshingTokens();
       expect.fail('should have thrown an error');

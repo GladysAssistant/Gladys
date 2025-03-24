@@ -45,13 +45,15 @@ describe('Netatmo Load Devices', () => {
 
   it('should load all devices successfully if all API not configured', async () => {
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -62,13 +64,15 @@ describe('Netatmo Load Devices', () => {
   it('should load energy devices successfully', async () => {
     netatmoHandler.configuration.energyApi = true;
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -93,13 +97,15 @@ describe('Netatmo Load Devices', () => {
         }
       });
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
     expect(devices).to.be.an('array');
@@ -133,13 +139,15 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.configuration.weatherApi = true;
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -152,21 +160,23 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(400, {
-      error: {
-        code: {
-          type: 'number',
-          example: 21,
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(400, {
+        error: {
+          code: {
+            type: 'number',
+            example: 21,
+          },
+          message: {
+            type: 'string',
+            example: 'invalid [parameter]',
+          },
         },
-        message: {
-          type: 'string',
-          example: 'invalid [parameter]',
-        },
-      },
-    });
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -177,13 +187,15 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'error',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'error',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -199,13 +211,15 @@ describe('Netatmo Load Devices', () => {
     badBodyHomesData.homes[1].modules = undefined;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: badBodyHomesData,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: badBodyHomesData,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -219,13 +233,15 @@ describe('Netatmo Load Devices', () => {
     bodyHomesDataEmpty.homes = [];
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataEmpty,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataEmpty,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -241,13 +257,15 @@ describe('Netatmo Load Devices', () => {
     });
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataNoModules,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataNoModules,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 
@@ -262,13 +280,15 @@ describe('Netatmo Load Devices', () => {
     sinon.stub(logger, 'error');
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/homesdata',
-    }).reply(200, {
-      body: bodyHomesDataMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDevices();
 

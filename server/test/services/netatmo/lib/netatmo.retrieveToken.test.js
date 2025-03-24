@@ -97,10 +97,12 @@ describe('Netatmo retrieveTokens', () => {
     };
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(200, tokens);
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
 
     const result = await netatmoHandler.retrieveTokens(body);
 
@@ -128,10 +130,12 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.energyApi = true;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(200, tokens);
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
 
     const result = await netatmoHandler.retrieveTokens(body);
 
@@ -157,10 +161,12 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(400, { error: 'invalid_request' });
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(400, { error: 'invalid_request' });
 
     try {
       await netatmoHandler.retrieveTokens(bodyFake);
@@ -201,10 +207,12 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.stateGetAccessToken = 'valid-state';
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).replyWithError('Network error');
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .replyWithError('Network error');
 
     try {
       await netatmoHandler.retrieveTokens(bodyFake);

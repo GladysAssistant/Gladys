@@ -49,10 +49,12 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/api/setroomthermpoint',
-    }).reply(200, {});
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
+      .reply(200, {});
 
     await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
   });
@@ -124,21 +126,23 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/api/setroomthermpoint',
-    }).reply(400, {
-      error: {
-        code: {
-          type: 'number',
-          example: 21,
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
+      .reply(400, {
+        error: {
+          code: {
+            type: 'number',
+            example: 21,
+          },
+          message: {
+            type: 'string',
+            example: 'invalid [parameter]',
+          },
         },
-        message: {
-          type: 'string',
-          example: 'invalid [parameter]',
-        },
-      },
-    });
+      });
 
     await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
 
@@ -164,15 +168,17 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/api/setroomthermpoint',
-    }).reply(403, {
-      error: {
-        code: 13,
-        message: 'invalid [parameter]',
-      },
-    });
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
+      .reply(403, {
+        error: {
+          code: 13,
+          message: 'invalid [parameter]',
+        },
+      });
 
     await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
 

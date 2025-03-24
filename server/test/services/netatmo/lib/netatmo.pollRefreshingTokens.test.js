@@ -71,10 +71,12 @@ describe('Netatmo pollRefreshingToken', () => {
     tokens.refresh_token = 'new-refresh-token2';
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'POST',
-      path: '/oauth2/token',
-    }).reply(200, tokens);
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
 
     clock.tick(3600 * 1000);
     clock.restore();

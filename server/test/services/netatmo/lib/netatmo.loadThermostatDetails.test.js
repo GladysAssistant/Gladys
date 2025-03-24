@@ -36,13 +36,15 @@ describe('Netatmo Load Thermostat Details', () => {
     netatmoHandler.configuration.energyApi = false;
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/getthermostatsdata',
-    }).reply(200, {
-      body: bodyGetThermostatMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/getthermostatsdata',
+      })
+      .reply(200, {
+        body: bodyGetThermostatMock,
+        status: 'ok',
+      });
 
     const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
 
@@ -67,13 +69,15 @@ describe('Netatmo Load Thermostat Details', () => {
     });
 
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/getthermostatsdata',
-    }).reply(200, {
-      body: bodyGetThermostatMock,
-      status: 'ok',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/getthermostatsdata',
+      })
+      .reply(200, {
+        body: bodyGetThermostatMock,
+        status: 'ok',
+      });
 
     const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
     expect(plugs).to.deep.eq(thermostatsDetailsMock.plugs);
@@ -84,21 +88,23 @@ describe('Netatmo Load Thermostat Details', () => {
 
   it('should handle API errors gracefully', async () => {
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/getthermostatsdata',
-    }).reply(400, {
-      error: {
-        code: {
-          type: 'number',
-          example: 21,
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/getthermostatsdata',
+      })
+      .reply(400, {
+        error: {
+          code: {
+            type: 'number',
+            example: 21,
+          },
+          message: {
+            type: 'string',
+            example: 'invalid [parameter]',
+          },
         },
-        message: {
-          type: 'string',
-          example: 'invalid [parameter]',
-        },
-      },
-    });
+      });
 
     const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
 
@@ -108,13 +114,15 @@ describe('Netatmo Load Thermostat Details', () => {
 
   it('should handle unexpected API responses', async () => {
     // 🧪 Intercept the HTTP/2 call via undici
-    netatmoMock.intercept({
-      method: 'GET',
-      path: '/api/getthermostatsdata',
-    }).reply(200, {
-      body: bodyGetThermostatMock,
-      status: 'error',
-    });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/getthermostatsdata',
+      })
+      .reply(200, {
+        body: bodyGetThermostatMock,
+        status: 'error',
+      });
 
     const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
     expect(plugs).to.deep.eq(bodyGetThermostatMock.devices);
