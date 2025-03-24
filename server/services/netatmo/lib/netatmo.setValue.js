@@ -49,8 +49,20 @@ async function setValue(device, deviceFeature, value) {
       },
       body: new URLSearchParams(paramsForm).toString(),
     });
+    const rawBody = await responseSetRoomThermpoint.text();
     if (!responseSetRoomThermpoint.ok) {
-      logger.error('Erreur Netatmo :', responseSetRoomThermpoint.status, await responseSetRoomThermpoint.text());
+      logger.error('Erreur Netatmo :', responseSetRoomThermpoint.status, rawBody);
+      if (responseSetRoomThermpoint.status === 403 && JSON.parse(rawBody).error.code === 13) {
+        await this.saveStatus({
+          statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+          message: 'set_devices_value_fail_scope_rights',
+        });
+      } else {
+        await this.saveStatus({
+          statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+          message: 'set_devices_value_error_unknown',
+        });
+      }
     } else {
       logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
     }
@@ -64,17 +76,6 @@ async function setValue(device, deviceFeature, value) {
       e.response.statusText,
     );
     logger.error('error details: ', e.response.data.error.code, ' - ', e.response.data.error.message);
-    if (e.response.status === 403 && e.response.data.error.code === 13) {
-      await this.saveStatus({
-        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
-        message: 'set_devices_value_fail_scope_rights',
-      });
-    } else {
-      await this.saveStatus({
-        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
-        message: 'set_devices_value_error_unknown',
-      });
-    }
   }
 }
 

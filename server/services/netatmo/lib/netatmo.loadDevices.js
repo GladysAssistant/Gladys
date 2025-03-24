@@ -22,11 +22,12 @@ async function loadDevices() {
           Accept: API.HEADER.ACCEPT,
         },
       });
+      const rawBody = await responsePage.text();
       if (!responsePage.ok) {
-        logger.error('Erreur Netatmo :', responsePage.status, await responsePage.text());
+        logger.error('Erreur Netatmo :', responsePage.status, rawBody);
       }
 
-      const data = await responsePage.json();
+      const data = JSON.parse(rawBody);
       const { body, status } = data;
       const { homes } = body;
       if (status === 'ok') {

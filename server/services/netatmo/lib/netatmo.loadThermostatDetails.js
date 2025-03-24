@@ -21,10 +21,11 @@ async function loadThermostatDetails() {
         Accept: API.HEADER.ACCEPT,
       },
     });
+    const rawBody = await responseGetThermostat.text();
     if (!responseGetThermostat.ok) {
-      logger.error('Erreur Netatmo :', responseGetThermostat.status, await responseGetThermostat.text());
+      logger.error('Erreur Netatmo :', responseGetThermostat.status, rawBody);
     }
-    const data = await responseGetThermostat.json();
+    const data = JSON.parse(rawBody);
     const { body, status } = data;
     plugs = body.devices;
     if (status === 'ok') {

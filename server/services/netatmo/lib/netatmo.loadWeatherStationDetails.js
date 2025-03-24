@@ -21,11 +21,12 @@ async function loadWeatherStationDetails() {
         Accept: API.HEADER.ACCEPT,
       },
     });
+    const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Erreur Netatmo :', response.status, await response.text());
+      logger.error('Erreur Netatmo :', response.status, rawBody);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(rawBody);
     const { body, status } = data;
     weatherStations = body.devices;
     if (status === 'ok') {

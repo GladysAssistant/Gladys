@@ -27,13 +27,15 @@ async function loadDeviceDetails(homeData) {
         Accept: API.HEADER.ACCEPT,
       },
     });
+    const rawBody = await responseGetHomestatus.text();
     if (!responseGetHomestatus.ok) {
-      logger.error('Erreur Netatmo :', responseGetHomestatus.status, await responseGetHomestatus.text());
+      logger.error('Erreur Netatmo :', responseGetHomestatus.status, rawBody);
     }
 
-    const data = await responseGetHomestatus.json();
+    const data = JSON.parse(rawBody);
     const { body, status } = data;
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = body.home;
+
     if (status === 'ok') {
       if (modulesHomestatus) {
         listDevices = modulesHomestatus.map((module) => {

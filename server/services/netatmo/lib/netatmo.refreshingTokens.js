@@ -40,10 +40,11 @@ async function refreshingTokens() {
       },
       body: new URLSearchParams(authentificationForm).toString(),
     });
+    const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Erreur Netatmo :', response.status, await response.text());
+      logger.error('Erreur Netatmo :', response.status, rawBody);
     }
-    const data = await response.json();
+    const data = JSON.parse(rawBody);
     const tokens = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
