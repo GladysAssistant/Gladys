@@ -178,7 +178,7 @@ const store = createStore(defaultState);
 
 const SafeAsyncRoute = props => (
   <div class="async-route-wrapper">
-    <AsyncRoute {...props} loading={() => <div class="loading-placeholder"></div>} />
+    <AsyncRoute {...props} loading={() => <div class="loading-placeholder" />} />
   </div>
 );
 
