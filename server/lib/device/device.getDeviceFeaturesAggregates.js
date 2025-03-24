@@ -1,12 +1,60 @@
-const { Op, fn, col, literal } = require('sequelize');
-const { LTTB } = require('downsample');
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
-dayjs.extend(utc);
+const NON_BINARY_QUERY = `
+  WITH intervals AS (
+        SELECT
+            created_at,
+            value,
+            NTILE(?) OVER (ORDER BY created_at) AS interval
+        FROM
+            t_device_feature_state
+        WHERE device_feature_id = ?
+        AND created_at > ?
+    )
+    SELECT
+        MIN(created_at) AS created_at,
+        AVG(value) AS value
+    FROM
+        intervals
+    GROUP BY
+        interval
+    ORDER BY
+        created_at;
+`;
+
+const BINARY_QUERY = `
+WITH value_changes AS (
+    SELECT
+        created_at,
+        value,
+        LAG(value) OVER (ORDER BY created_at) AS prev_value
+    FROM
+        t_device_feature_state
+    WHERE
+        device_feature_id = ?
+        AND created_at > ?
+),
+state_transitions AS (
+    SELECT
+        created_at,
+        value,
+        LEAD(created_at) OVER (ORDER BY created_at) AS end_time
+    FROM
+        value_changes
+    WHERE
+        prev_value IS NULL OR value != prev_value
+)
+SELECT
+    value,
+    created_at,
+    end_time
+FROM
+    state_transitions
+ORDER BY
+    created_at ASC
+LIMIT ?
+`;
 
 /**
  * @description Get all features states aggregates.
@@ -24,78 +72,19 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   }
   const device = this.stateManager.get('deviceById', deviceFeature.device_id);
 
-  const now = new Date();
-  const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
-  const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
-  const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
-  const tenHoursAgo = new Date(now.getTime() - 10 * 60 * 60 * 1000);
-  const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
+  const isBinary = ['binary', 'push'].includes(deviceFeature.type);
 
-  let type;
-  let groupByFunction;
+  // Get the interval date, and offset in UTC
+  const intervalDate = new Date(Date.now() - intervalInMinutes * 60 * 1000);
+  intervalDate.setMinutes(intervalDate.getMinutes() - intervalDate.getTimezoneOffset());
 
-  if (intervalDate < sixMonthsAgo) {
-    type = 'monthly';
-    groupByFunction = fn('date', col('created_at'));
-  } else if (intervalDate < fiveDaysAgo) {
-    type = 'daily';
-    groupByFunction = fn('date', col('created_at'));
-  } else if (intervalDate < thirthyHoursAgo) {
-    type = 'hourly';
-    groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
-  } else if (intervalDate < tenHoursAgo) {
-    type = 'hourly';
-    // this will extract date rounded to the 5 minutes
-    // So if the user queries 24h, he'll get 24 * 12 = 288 items
-    groupByFunction = literal(`datetime(strftime('%s', created_at) - strftime('%s', created_at) % 300, 'unixepoch')`);
+  let values;
+
+  if (isBinary) {
+    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, intervalDate, maxStates);
   } else {
-    type = 'live';
+    values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, intervalDate);
   }
-
-  let rows;
-
-  if (type === 'live') {
-    rows = await db.DeviceFeatureState.findAll({
-      raw: true,
-      attributes: ['created_at', 'value'],
-      where: {
-        device_feature_id: deviceFeature.id,
-        created_at: {
-          [Op.gte]: intervalDate,
-        },
-      },
-    });
-  } else {
-    rows = await db.DeviceFeatureStateAggregate.findAll({
-      raw: true,
-      attributes: [
-        [groupByFunction, 'created_at'],
-        [fn('round', fn('avg', col('value')), 2), 'value'],
-      ],
-      group: [groupByFunction],
-      where: {
-        device_feature_id: deviceFeature.id,
-        type,
-        created_at: {
-          [Op.gte]: intervalDate,
-        },
-      },
-    });
-  }
-
-  const dataForDownsampling = rows.map((deviceFeatureState) => {
-    return [dayjs.utc(deviceFeatureState.created_at), deviceFeatureState.value];
-  });
-
-  const downsampled = LTTB(dataForDownsampling, maxStates);
-
-  // @ts-ignore
-  const values = downsampled.map((e) => {
-    return {
-      created_at: e[0],
-      value: e[1],
-    };
-  });
 
   return {
     device: {

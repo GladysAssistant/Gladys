@@ -1,3 +1,5 @@
+import { yAxisFormatter } from './yAxisFormatter';
+
 const getApexChartStepLineOptions = ({ height, displayAxes, series, colors, locales, defaultLocale }) => {
   const options = {
     chart: {
@@ -49,7 +51,8 @@ const getApexChartStepLineOptions = ({ height, displayAxes, series, colors, loca
     },
     yaxis: {
       labels: {
-        padding: 4
+        padding: 4,
+        formatter: yAxisFormatter
       }
     },
     colors,

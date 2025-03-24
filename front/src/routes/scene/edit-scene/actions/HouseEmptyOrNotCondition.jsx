@@ -24,9 +24,9 @@ class HouseEmptyOrNotCondition extends Component {
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', null);
+      this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
   refreshSelectedOptions = nextProps => {
@@ -56,14 +56,16 @@ class HouseEmptyOrNotCondition extends Component {
   render(props, { houseOptions, selectedHouseOption }) {
     return (
       <div>
-        <p>
-          {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
-            <Text id="editScene.actionsCard.houseEmptyOrNot.houseIsEmptyDescription" />
-          )}
-          {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
-            <Text id="editScene.actionsCard.houseEmptyOrNot.houseIsNotEmptyDescription" />
-          )}
-        </p>
+        {props.path && !props.path.includes('.if') && (
+          <p>
+            {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
+              <Text id="editScene.actionsCard.houseEmptyOrNot.houseIsEmptyDescription" />
+            )}
+            {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
+              <Text id="editScene.actionsCard.houseEmptyOrNot.houseIsNotEmptyDescription" />
+            )}
+          </p>
+        )}
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.houseEmptyOrNot.houseLabel" />

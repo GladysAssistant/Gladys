@@ -13,7 +13,7 @@ const ScenePage = ({ children, ...props }) => (
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">
-          <div class="page-header">
+          <div class={cx('page-header', style.pageHeaderResponsive)}>
             <h1 class="page-title">
               <Text id="scene.title" />
             </h1>
@@ -22,8 +22,8 @@ const ScenePage = ({ children, ...props }) => (
               <Localizer>
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
-                  orderValue={props.getScenesOrderDir}
-                  search={props.debouncedSearch}
+                  orderValue={props.orderDir}
+                  search={props.search}
                   searchValue={props.sceneSearch}
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />
@@ -43,7 +43,7 @@ const ScenePage = ({ children, ...props }) => (
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.sceneListContainer)}>
-              <div class="row">
+              <div class="row mt-2">
                 <div class="col-lg-12">
                   {props.scenes && <SceneCards {...props} />}
                   {props.scenes && props.scenes.length === 0 && <EmptyState />}

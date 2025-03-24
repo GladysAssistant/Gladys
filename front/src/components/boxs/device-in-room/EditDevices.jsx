@@ -5,7 +5,7 @@ import Select from 'react-select';
 import update from 'immutability-helper';
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
-import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
+import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
@@ -24,7 +24,7 @@ class EditDevices extends Component {
 
   refreshDeviceFeaturesNames = () => {
     const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
-      return o.new_label !== undefined ? o.new_label : o.label;
+      return o.new_label !== undefined && o.new_label !== '' ? o.new_label : o.label;
     });
     const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.value;
@@ -45,8 +45,10 @@ class EditDevices extends Component {
     if (!this.state.deviceOptions) {
       return;
     }
-    const { selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(this.state.devices);
-    await this.setState({ selectedDeviceFeaturesOptions });
+    const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
+      this.state.devices
+    );
+    await this.setState({ deviceOptions, selectedDeviceFeaturesOptions });
   };
 
   updateDeviceFeatureName = async (index, name) => {
@@ -60,7 +62,10 @@ class EditDevices extends Component {
       }
     });
     await this.setState(newState);
-    this.refreshDeviceFeaturesNames();
+
+    if (name !== '') {
+      this.refreshDeviceFeaturesNames();
+    }
   };
 
   getSelectedDeviceFeaturesAndOptions = devices => {
@@ -100,10 +105,15 @@ class EditDevices extends Component {
           }
           return 0;
         });
-        deviceOptions.push({
-          label: device.name,
-          options: deviceFeatures
-        });
+        const filteredDeviceFeatures = deviceFeatures.filter(
+          feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
+        );
+        if (filteredDeviceFeatures.length > 0) {
+          deviceOptions.push({
+            label: device.name,
+            options: filteredDeviceFeatures
+          });
+        }
       }
     });
     if (this.props.box.device_features) {

@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { ALARM_MODES_LIST, ALARM_MODES } = require('../utils/constants');
 
 module.exports = (sequelize, DataTypes) => {
@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  house.beforeValidate(addSelector);
+  house.beforeValidate(addSelectorBeforeValidateHook);
 
   house.associate = (models) => {
     house.hasMany(models.Room, {

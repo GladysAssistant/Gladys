@@ -24,8 +24,32 @@ function buildAccessory(device) {
 
   const accessory = new this.hap.Accessory(device.name, device.id);
   Object.keys(categories).forEach((category) => {
-    const service = this.buildService(device, categories[category], mappings[category]);
-    accessory.addService(service);
+    const serviceConfigs = [];
+
+    categories[category].forEach((cat) => {
+      if (
+        serviceConfigs.length > 0 &&
+        !serviceConfigs[serviceConfigs.length - 1].find(
+          (config) => config.category === cat.category && config.type === cat.type,
+        )
+      ) {
+        serviceConfigs[serviceConfigs.length - 1].push(cat);
+
+        return;
+      }
+
+      serviceConfigs.push([cat]);
+    });
+
+    serviceConfigs.forEach((config, i) => {
+      const service = this.buildService(
+        device,
+        config,
+        mappings[category],
+        serviceConfigs.length > 1 ? `${category} ${i + 1}` : undefined,
+      );
+      accessory.addService(service);
+    });
   });
 
   return accessory.services.length <= 1 ? null : accessory;

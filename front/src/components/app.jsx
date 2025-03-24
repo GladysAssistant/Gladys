@@ -86,9 +86,6 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
-// Deprecated integration
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
@@ -152,6 +149,10 @@ import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
 import GoogleCastDevicePage from '../routes/integration/all/google-cast/device-page';
 import GoogleCastDiscoveryPage from '../routes/integration/all/google-cast/discover-page';
 
+// Airplay integration
+import AirplayDevicePage from '../routes/integration/all/airplay/device-page';
+import AirplayDiscoveryPage from '../routes/integration/all/airplay/discover-page';
+
 // ZWaveJS-UI integration
 import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
 import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
@@ -165,6 +166,11 @@ import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-pa
 
 // NodeRed integration
 import NodeRedPage from '../routes/integration/all/node-red/setup-page';
+
+// Free Mobile integration
+import FreeMobilePage from '../routes/integration/all/free-mobile';
+// CallMeBot integration
+import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -182,6 +188,7 @@ const AppRouter = connect(
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
+        closeDropDown={props.closeDropDown}
         toggleCollapsedMenu={props.toggleCollapsedMenu}
         showCollapsedMenu={props.showCollapsedMenu}
         logout={props.logout}
@@ -260,8 +267,6 @@ const AppRouter = connect(
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
-        <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
-        <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -274,6 +279,9 @@ const AppRouter = connect(
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <NodeRedPage path="/dashboard/integration/device/node-red" />
+
+        <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
+        <CallMeBotPage path="dashboard/integration/communication/callmebot" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
@@ -302,6 +310,9 @@ const AppRouter = connect(
 
         <GoogleCastDevicePage path="/dashboard/integration/device/google-cast" />
         <GoogleCastDiscoveryPage path="/dashboard/integration/device/google-cast/discover" />
+
+        <AirplayDevicePage path="/dashboard/integration/device/airplay" />
+        <AirplayDiscoveryPage path="/dashboard/integration/device/airplay/discover" />
 
         <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
         <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />

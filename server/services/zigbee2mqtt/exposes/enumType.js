@@ -4,6 +4,7 @@ const {
   BUTTON_STATUS,
   COVER_STATE,
   SIREN_LMH_VOLUME,
+  PILOT_WIRE_MODE,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -77,6 +78,30 @@ addMapping('action', BUTTON_STATUS.SHORT_RELEASE, 'short_release');
 addMapping('action', BUTTON_STATUS.LONG_RELEASE, 'long_release');
 addMapping('action', BUTTON_STATUS.DOUBLE_PRESS, 'double_press');
 
+addMapping('action', BUTTON_STATUS.TOGGLE, 'toggle');
+addMapping('action', BUTTON_STATUS.TOGGLE_HOLD, 'toggle_hold');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_UP_CLICK, 'brightness_up_click');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_UP_HOLD, 'brightness_up_hold');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_UP_RELEASE, 'brightness_up_release');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_CLICK, 'brightness_down_click');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_HOLD, 'brightness_down_hold');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_DOWN_RELEASE, 'brightness_down_release');
+
+addMapping('action', BUTTON_STATUS.PRESSED, 'pressed');
+
+addMapping('action', BUTTON_STATUS.SINGLE_LEFT, 'single_left');
+addMapping('action', BUTTON_STATUS.SINGLE_RIGHT, 'single_right');
+addMapping('action', BUTTON_STATUS.SINGLE_BOTH, 'single_both');
+addMapping('action', BUTTON_STATUS.DOUBLE_LEFT, 'double_left');
+addMapping('action', BUTTON_STATUS.DOUBLE_RIGHT, 'double_right');
+addMapping('action', BUTTON_STATUS.DOUBLE_BOTH, 'double_both');
+addMapping('action', BUTTON_STATUS.TRIPLE_LEFT, 'triple_left');
+addMapping('action', BUTTON_STATUS.TRIPLE_RIGHT, 'triple_right');
+addMapping('action', BUTTON_STATUS.TRIPLE_BOTH, 'triple_both');
+addMapping('action', BUTTON_STATUS.HOLD_LEFT, 'hold_left');
+addMapping('action', BUTTON_STATUS.HOLD_RIGHT, 'hold_right');
+addMapping('action', BUTTON_STATUS.HOLD_BOTH, 'hold_both');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
@@ -84,6 +109,13 @@ addMapping('state', COVER_STATE.STOP, 'STOP');
 addMapping('volume', SIREN_LMH_VOLUME.LOW, 'low');
 addMapping('volume', SIREN_LMH_VOLUME.MEDIUM, 'medium');
 addMapping('volume', SIREN_LMH_VOLUME.HIGH, 'high');
+
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT, 'comfort');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.ECO, 'eco');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.FROST_PROTECTION, 'frost_protection');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.OFF, 'off');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_1, 'comfort_-1');
+addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_2, 'comfort_-2');
 
 module.exports = {
   type: 'enum',
@@ -141,6 +173,12 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+      },
+    },
+    pilot_wire_mode: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.HEATER,
+        type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
       },
     },
   },

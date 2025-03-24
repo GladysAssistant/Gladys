@@ -19,7 +19,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install Global NPM Packages
         run: |
-          sudo npm install typescript node-gyp npm@latest -g
+          sudo npm install typescript node-gyp -g
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -62,7 +62,7 @@ jobs:
         env:
           RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: static
           path: front/build
@@ -86,7 +86,7 @@ jobs:
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - name: 📦 Install Global NPM Packages
         run: |
-          sudo npm install typescript node-gyp npm@latest -g
+          sudo npm install typescript node-gyp -g
       - name: 📦 Install NPM server packages
         working-directory: ./server
         run: |

@@ -55,6 +55,27 @@ const BUTTON_STATUS = {
   SHORT_RELEASE: 49,
   LONG_RELEASE: 50,
   DOUBLE_PRESS: 51,
+  TOGGLE: 52,
+  TOGGLE_HOLD: 53,
+  BRIGHTNESS_UP_CLICK: 54,
+  BRIGHTNESS_UP_HOLD: 55,
+  BRIGHTNESS_UP_RELEASE: 56,
+  BRIGHTNESS_DOWN_CLICK: 57,
+  BRIGHTNESS_DOWN_HOLD: 58,
+  BRIGHTNESS_DOWN_RELEASE: 59,
+  PRESSED: 60,
+  SINGLE_LEFT: 61,
+  SINGLE_RIGHT: 62,
+  SINGLE_BOTH: 63,
+  DOUBLE_LEFT: 64,
+  DOUBLE_RIGHT: 65,
+  DOUBLE_BOTH: 66,
+  TRIPLE_LEFT: 67,
+  TRIPLE_RIGHT: 68,
+  TRIPLE_BOTH: 69,
+  HOLD_LEFT: 70,
+  HOLD_RIGHT: 71,
+  HOLD_BOTH: 72,
 };
 
 const COVER_STATE = {
@@ -75,6 +96,15 @@ const AC_MODE = {
   HEATING: 2,
   DRYING: 3,
   FAN: 4,
+};
+
+const PILOT_WIRE_MODE = {
+  OFF: 0,
+  FROST_PROTECTION: 1,
+  ECO: 2,
+  COMFORT_1: 3,
+  COMFORT_2: 4,
+  COMFORT: 5,
 };
 
 const MUSIC_PLAYBACK_STATE = {
@@ -131,6 +161,7 @@ const SYSTEM_VARIABLE_NAMES = {
   TIMEZONE: 'TIMEZONE',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
+  DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
 };
 
 const EVENTS = {
@@ -158,6 +189,8 @@ const EVENTS = {
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
     PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
     CHECK_BATTERIES: 'device.check-batteries',
+    MIGRATE_FROM_SQLITE_TO_DUCKDB: 'device.migrate-from-sqlite-to-duckdb',
+    PURGE_ALL_SQLITE_STATES: 'device.purge-all-sqlite-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -238,6 +271,7 @@ const EVENTS = {
   MESSAGE: {
     NEW: 'message.new',
     NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
+    PURGE_OLD_MESSAGES: 'message.purge-old-messages',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
@@ -331,6 +365,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  AI: {
+    ASK: 'ai.ask',
+  },
   ALARM: {
     CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
     SET_ALARM_MODE: 'alarm.set-alarm-mode',
@@ -366,6 +403,7 @@ const ACTIONS = {
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
+    IF_THEN_ELSE: 'condition.if-then-else',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -388,10 +426,28 @@ const ACTIONS = {
   MQTT: {
     SEND: 'mqtt.send',
   },
+  ZIGBEE2MQTT: {
+    SEND: 'zigbee2mqtt.send',
+  },
   MUSIC: {
     PLAY_NOTIFICATION: 'music.play-notification',
   },
+  SMS: {
+    SEND: 'sms.send',
+  },
 };
+
+// List of actions that can be used as conditions
+const CONDITION_ACTIONS = [
+  ACTIONS.CONDITION.CHECK_TIME,
+  ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+  ACTIONS.EDF_TEMPO.CONDITION,
+  ACTIONS.ALARM.CHECK_ALARM_MODE,
+  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+  ACTIONS.ECOWATT.CONDITION,
+  ACTIONS.HOUSE.IS_EMPTY,
+  ACTIONS.HOUSE.IS_NOT_EMPTY,
+];
 
 const INTENTS = {
   LIGHT: {
@@ -416,6 +472,10 @@ const INTENTS = {
   SCENE: {
     START: 'intent.scene.start',
   },
+  SWITCH: {
+    TURN_ON: 'intent.switch.turn-on',
+    TURN_OFF: 'intent.switch.turn-off',
+  },
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
@@ -439,6 +499,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DISTANCE_SENSOR: 'distance-sensor',
   DURATION: 'duration',
   ENERGY_SENSOR: 'energy-sensor',
+  HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
@@ -452,6 +513,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RAIN_SENSOR: 'rain-sensor',
   RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
@@ -463,6 +525,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
   TAMPER: 'tamper',
+  TELEINFORMATION: 'teleinformation',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
@@ -473,6 +536,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
+  INPUT: 'input',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -538,6 +602,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+    PUSH: 'push',
   },
   SIGNAL: {
     QUALITY: 'integer',
@@ -546,6 +611,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+  },
+  HEATER: {
+    PILOT_WIRE_MODE: 'pilot-wire-mode',
   },
   SURFACE: {
     DECIMAL: 'decimal',
@@ -602,6 +670,66 @@ const DEVICE_FEATURE_TYPES = {
     INDEX: 'index',
     DAILY_CONSUMPTION: 'daily-consumption',
   },
+  TELEINFORMATION: {
+    BINARY: 'binary',
+    EAST: 'east',
+    EAIT: 'eait',
+    EASF01: 'easf01',
+    EASF02: 'easf02',
+    EASF03: 'easf03',
+    EASF04: 'easf04',
+    EASF05: 'easf05',
+    EASF06: 'easf06',
+    EASF07: 'easf07',
+    EASF08: 'easf08',
+    EASF09: 'easf09',
+    EASF10: 'easf10',
+    PREF: 'pref',
+    PCOUP: 'pcoup',
+    VTIC: 'vtic',
+    CCASN: 'ccasn',
+    CCASN_1: 'ccasn_1',
+    UMOY1: 'umoy1',
+    UMOY2: 'umoy2',
+    UMOY3: 'umoy3',
+    ERQ1: 'erq1',
+    ERQ2: 'erq2',
+    ERQ3: 'erq3',
+    ERQ4: 'erq4',
+    IRMS1: 'irms1',
+    IRMS2: 'irms2',
+    IRMS3: 'irms3',
+    URMS1: 'urms1',
+    URMS2: 'urms2',
+    URMS3: 'urms3',
+    EASD01: 'easd01',
+    EASD02: 'easd02',
+    EASD03: 'easd03',
+    EASD04: 'easd04',
+    NTARF: 'ntarf',
+    CCAIN: 'ccain',
+    CCAIN_1: 'ccain_1',
+    SINSTI: 'sinsti',
+    SMAXIN: 'smaxin',
+    SMAXIN_1: 'smaxin_1',
+    SMAXN: 'smaxn',
+    SMAXN2: 'smaxn2',
+    SMAXN3: 'smaxn3',
+    SINSTS: 'sinsts',
+    SINSTS2: 'sinsts2',
+    SINSTS3: 'sinsts3',
+    SMAXN_1: 'smaxn_1',
+    SMAXN2_1: 'smaxn2_1',
+    SMAXN3_1: 'smaxn3_1',
+    HHPHC: 'hhphc',
+    IMAX: 'imax',
+    ADPS: 'adps',
+    IMAX2: 'imax2',
+    IMAX3: 'imax3',
+    ADIR1: 'adir1',
+    ADIR2: 'adir2',
+    ADIR3: 'adir3',
+  },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
@@ -614,6 +742,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   PRECIPITATION_SENSOR: {
     DECIMAL: 'decimal',
+    INTEGER: 'integer',
   },
   VOLUME_SENSOR: {
     DECIMAL: 'decimal',
@@ -657,6 +786,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   RISK: {
     INTEGER: 'integer',
+  },
+  INPUT: {
+    BINARY: 'binary',
   },
 };
 
@@ -835,6 +967,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
   ],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
   [DEVICE_FEATURE_CATEGORIES.DURATION]: [
@@ -936,6 +1069,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  SYSTEM: {
+    VACUUM_FINISHED: 'system.vacuum-finished',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1064,9 +1200,11 @@ const JOB_TYPES = {
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   DEVICE_STATES_PURGE: 'device-state-purge',
+  DEVICE_STATES_PURGE_ALL_SQLITE_STATES: 'device-state-purge-all-sqlite-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
+  MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
 };
 
 const JOB_STATUS = {
@@ -1136,11 +1274,13 @@ module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
 module.exports.CONDITIONS = CONDITIONS;
 module.exports.ACTIONS = ACTIONS;
+module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;
 module.exports.DEVICE_FEATURE_CATEGORIES = DEVICE_FEATURE_CATEGORIES;
 module.exports.DEVICE_FEATURE_TYPES = DEVICE_FEATURE_TYPES;

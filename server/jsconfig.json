@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "resolveJsonModule": true,
-    "lib": ["es5", "es2018"]
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "target": "ES2022"
   },
+
   "exclude": ["node_modules", "**/node_modules/*"]
 }

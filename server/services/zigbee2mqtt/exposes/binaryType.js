@@ -44,6 +44,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  rain: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
   smoke: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
@@ -88,6 +94,12 @@ const names = {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.TAMPER,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
+  input: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.INPUT,
+      type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
     },
   },
 };

@@ -2,8 +2,8 @@ const { pathToRegexp } = require('path-to-regexp');
 
 const nodeUrl = require('url');
 const errorMiddleware = require('./middlewares/errorMiddleware');
-const { EVENTS } = require('../utils/constants');
-const { NotFoundError } = require('../utils/coreErrors');
+const { USER_ROLE, EVENTS } = require('../utils/constants');
+const { NotFoundError, ForbiddenError } = require('../utils/coreErrors');
 
 /**
  * @description Setup Gateway API calls.
@@ -23,6 +23,7 @@ function setupGateway(gladys, routes) {
       method,
       keys,
       regex: pathToRegexp(path, keys),
+      admin: routes[routeKey].admin,
       controller: routes[routeKey].controller,
     };
   });
@@ -58,6 +59,12 @@ function setupGateway(gladys, routes) {
       regexes[i - 1].keys.forEach((key, index) => {
         req.params[key.name] = results[index + 1];
       });
+      if (regexes[i - 1].admin) {
+        if (user.role !== USER_ROLE.ADMIN) {
+          errorMiddleware(new ForbiddenError('This route is only accessible to admin user.'), req, res);
+          return null;
+        }
+      }
       // and we call the controller
       regexes[i - 1].controller(req, res, (e) => {
         errorMiddleware(e, req, res);
@@ -66,6 +73,7 @@ function setupGateway(gladys, routes) {
       // if not, we contact the error middleware with a not found error
       errorMiddleware(new NotFoundError(`Route ${req.url} not found`), req, res);
     }
+    return null;
   });
 }
 

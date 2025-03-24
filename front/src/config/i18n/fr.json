@@ -18,7 +18,9 @@
     "fahrenheit": "F",
     "metersPerSec": "m/s",
     "milesPerHour": "m/h",
-    "selectPlaceholder": "Sélectionnez..."
+    "selectPlaceholder": "Sélectionnez...",
+    "yes": "Oui",
+    "no": "Non"
   },
   "color": {
     "aqua": "Aqua",
@@ -229,6 +231,7 @@
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
+    "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Éditer le tableau de bord",
@@ -244,6 +247,8 @@
       "private": "privé",
       "public": "public"
     },
+    "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
@@ -293,11 +298,12 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-",
-        "motionDetected": "Mouvement détecté"
+        "motionDetected": "Mouvement détecté",
+        "pushButton": "Appuyer"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
-        "editNameLabel": "Nom du widget",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
         "addADeviceLabel": "Ajouter un appareil :"
       },
@@ -342,6 +348,7 @@
       "chart": {
         "defaultInterval": "Intervalle par défaut",
         "lastHour": "Dernière heure",
+        "lastTwelveHours": "Dernières 12h",
         "lastDay": "Dernières 24h",
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
@@ -349,6 +356,8 @@
         "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "noChartType": "Aucun type de graphique sélectionné",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
@@ -356,16 +365,22 @@
         "chartType": "Sélectionner le type de graphique",
         "chartColor": "Sélectionner la couleur du graphique",
         "dataColor": "Sélectionner la couleur pour {{featureLabel}}",
+        "timelineColor": "Sélectionner la couleur pour la position ",
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
+        "timeline": "Binaire",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
         "yes": "Oui",
         "no": "Non",
         "preview": "Prévisualisation",
-        "showPreviewButton": "Afficher une prévisualisation"
+        "showPreviewButton": "Afficher une prévisualisation",
+        "on": "On",
+        "off": "Off",
+        "start_date": "Début le : ",
+        "end_date": "Fin le : "
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -400,7 +415,7 @@
         "no": "Non"
       },
       "scene": {
-        "editNameLabel": "Entrez le nom de cette box",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       },
@@ -602,6 +617,17 @@
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
       "buttonSave": "Sauvegarder"
+    },
+    "free-mobile": {
+      "title": "Free Mobile",
+      "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
+      "documentation": "Documentation Free Mobile",
+      "introduction": "Ce plugin vous permet d’envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
+      "username": "Identifiant client Free Mobile",
+      "key": "Clé d'identification au service",
+      "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
+      "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
+      "saveButton": "Sauvegarder"
     },
     "philipsHue": {
       "title": "Philips Hue",
@@ -854,7 +880,7 @@
         "modes": {
           "local": {
             "title": "Installation depuis Gladys",
-            "description": "Gladys va configurer deux containers Docker : MQTT and Zigbee2mqtt.",
+            "description": "Gladys va configurer deux containers Docker : MQTT et Zigbee2mqtt.",
             "dockerInstallationRequirementLabel": "Gladys doit s'exécuter sous Docker",
             "dockerNetworkHostRequirementLabel": "Le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"",
             "usbDongleRequirementLabel": "Le dongle USB Zigbee doit être connecté",
@@ -876,7 +902,7 @@
           "remote": {
             "title": "Connexion à une installation existante",
             "description": "Gladys va se connecter à une installation externe existante à travers MQTT.",
-            "z2mInstallationRequirementLabel": "Une application Zigbe2Mqtt autonome",
+            "z2mInstallationRequirementLabel": "Une application Zigbee2Mqtt autonome",
             "mqttBrokerRequirementLabel": "Un broker MQTT connecté à l'application Zigbee2Mqtt",
             "detailsDescription": "Avec ce mode de configuration, il est possible de se connecter à une installation Zigbee2Mqtt externe avec son broker MQTT.",
             "mqttModeLabel": "Choix du broker MQTT",
@@ -1075,26 +1101,6 @@
       "documentation": "Documentation OwnTracks",
       "longDescription": "OwnTracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser OwnTracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer OwnTracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
-    "zwave": {
-      "title": "Open-Zwave [OLD]",
-      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
-      "documentation": "Documentation Open-Zwave",
-      "device": {
-        "title": "Anciens appareils Open-Zwave",
-        "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
-        "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
-        "scanButton": "Rechercher",
-        "nameLabel": "Nom",
-        "roomLabel": "Pièce",
-        "featuresLabel": "Fonctionnalités",
-        "saveButton": "Sauvegarder",
-        "deleteButton": "Supprimer",
-        "editButton": "Éditer",
-        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
-      }
-    },
     "openWeather": {
       "title": "API OpenWeather",
       "documentation": "Documentation OpenWeather",
@@ -1248,6 +1254,41 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "airplay": {
+      "title": "Airplay",
+      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Airplay",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Airplay",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Airplay",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Airplay dans Gladys",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil Airplay trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Airplay sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Airplay. Est-ce que votre enceinte Airplay est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Airplay n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "zwavejs-ui": {
       "title": "ZWave JS UI",
       "description": "Contrôler vos appareils dans Z-Wave JS UI",
@@ -1265,7 +1306,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un nombre limité d'appareils. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1389,6 +1430,13 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
+        "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrors": {
+          "name": "Le champ \"Nom\" est obligatoire",
+          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
+          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
+          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+        },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
@@ -1615,13 +1663,15 @@
     },
     "lanManager": {
       "title": "LAN Manager",
-      "description": "Gérez les appareils sur votre réseau local.",
+      "description": "Détection de présence via scan réseau",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte LAN",
       "setupTab": "Scanner de présence",
       "documentation": "Documentation LAN Manager",
       "device": {
-        "title": "Appareils LAN",
+        "title": "Appareils ajoutés à l'intégration",
+        "explanation": "Cette intégration vous permet de détecter la présence des utilisateurs en scannant le réseau.",
+        "iosWarning": "Attention, cette intégration ne fonctionne pas avec les appareils iOS.",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
         "manufacturerLabel": "Constructeur",
@@ -1731,6 +1781,28 @@
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Envoyez des messages via WhatsApp et Signal.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation",
+      "setup": {
+        "title": "Configurer CallMeBot",
+        "description": "Pour utiliser CallMeBot, vous devez obtenir une clé API. Suivez ces étapes :<br><br>1. Allez sur le <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">site web de CallMeBot</a><br>2. Choisissez votre plateforme de messagerie préférée (WhatsApp, Signal)<br>3. Suivez les instructions pour obtenir votre clé API<br>4. Entrez votre clé API ci-dessous<br><br>⚠️ Note : Ce service est unidirectionnel (Gladys peut envoyer des messages mais ne peut pas en recevoir) et ne supporte pas l'envoi d'images.",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez votre clé API CallMeBot",
+        "apiKeyHelp": "Votre clé API est utilisée pour s'authentifier auprès du service CallMeBot",
+        "messagingServiceLabel": "Service de messagerie",
+        "messagingServiceHelp": "Choisissez le service de messagerie que vous souhaitez utiliser avec CallMeBot",
+        "phoneNumberLabel": "Numéro de téléphone",
+        "phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
+        "phoneNumberHelp": "Votre numéro de téléphone au format international (ex: +33612345678)",
+        "phoneNumberHelpSignal": "Pour Signal, ce sera un UUID fourni par CallMeBot (ex: 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Sauvegarder la configuration",
+        "saved": "Configuration sauvegardée !",
+        "error": "Erreur lors de la sauvegarde de la configuration"
+      }
     }
   },
   "editScene": {
@@ -1753,7 +1825,9 @@
     "addTriggerButton": "Ajouter déclencheur",
     "selectTriggerLabel": "Sélectionnez un type de déclencheur",
     "newAction": "Nouvelle action",
+    "newCondition": "Nouvelle condition",
     "selectActionType": "Sélectionnez un type d'action",
+    "selectConditionType": "Sélectionner un type de condition",
     "addActionButton": "Nouvelle action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
@@ -1782,6 +1856,19 @@
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
+      "askAi": {
+        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "userLabel": "Gladys répondra à",
+        "cameraLabel": "Joindre une image de caméra (optionnel)",
+        "textLabel": "Ma question pour l'IA",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
+      "smsSend": {
+        "textLabel": "Message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
       },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
@@ -1838,6 +1925,23 @@
         "orText": "OU",
         "orButton": "+ OU",
         "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
+        "addCondition": "Ajouter une condition",
+        "if": "Si",
+        "then": "Alors",
+        "else": "Sinon",
+        "shortIf": "S",
+        "shortThen": "A",
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
@@ -1939,6 +2043,13 @@
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
+      "zigbee2mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
+      },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
@@ -1958,6 +2069,9 @@
       "message": {
         "send": "Envoyer un message",
         "send-camera": "Envoyer une image de caméra"
+      },
+      "sms": {
+        "send": "Envoyer un sms"
       },
       "delay": "Attendre",
       "light": {
@@ -1979,8 +2093,9 @@
         "stop": "Arrêter le service"
       },
       "condition": {
-        "only-continue-if": "Continuer seulement si",
-        "check-time": "Condition temporelle"
+        "only-continue-if": "Condition sur variables",
+        "check-time": "Condition temporelle",
+        "if-then-else": "Condition \"Si... Alors... Sinon...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
@@ -2007,8 +2122,14 @@
       "mqtt": {
         "send": "Envoyer un message MQTT"
       },
+      "zigbee2mqtt": {
+        "send": "Envoyer un message Zigbee2mqtt"
+      },
       "music": {
         "play-notification": "Parler sur une enceinte"
+      },
+      "ai": {
+        "ask": "Demander à l'IA"
       }
     },
     "variables": {
@@ -2076,7 +2197,8 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
-        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )"
+        "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
+        "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -2318,7 +2440,8 @@
     "wrongEmailError": "Ce n'est pas un e-mail valide",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou poster un message sur Gladys community.",
-    "success": "Succès ! Vous devriez voir un lien de réinitialisation de mot de passe dans les logs de Gladys.",
+    "success": "Succès ! Je vous ai envoyé un lien de réinitialisation de mot de passe par Telegram ou Nextcloud Talk. Si vous n'avez pas configuré ces services, le lien de réinitialisation sera dans les logs de Gladys.",
+    "howToAccessLogs": "Pour accéder aux logs de Gladys, rendez-vous en ligne de commande et tapez `docker logs gladys --tail=1000` pour afficher les 1000 dernières lignes.",
     "userNotFound": "Aucun compte n'est lié à cet e-mail.",
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
@@ -2366,7 +2489,9 @@
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
       "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de données",
-      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
+      "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2405,10 +2530,11 @@
     "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
     "hours": "heures",
-    "vacuumDatabaseTitle": "Nettoyer la base de données",
-    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
+    "vacuumDatabaseTitle": "Nettoyer la base de données SQLite",
+    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données SQLite, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Pendant le nettoyage, Gladys sera indisponible.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
+    "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible. Temps de nettoyage : {{duration}}.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -2419,7 +2545,18 @@
       "dead": "Mort"
     },
     "batteryLevel": "Alerte sur le niveau de batterie",
-    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi."
+    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi.",
+    "duckDbMigrationTitle": "Migration vers DuckDB",
+    "duckDbMigrationDescription": "Nous migrons vers un nouveau système de base de donnée pour les données de capteurs. Gladys va effectuer une migration de vos données automatiquement, mais ne supprimera pas vos données de votre base SQLite afin d'éviter les pertes de données.",
+    "duckDbMigrationProgressTitle": "Avancement de la migration",
+    "duckDbMigrationMigrationDone": "Migration effectuée :",
+    "duckDbNumberOfStatesinSQlite": "Nombre d'états dans SQLite",
+    "duckDbNumberOfStatesinDuckDb": "Nombre d'états dans DuckDB",
+    "restartMigrationTitle": "Relancer la migration",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "purgeSQliteTitle": "Purger les états SQLite",
+    "purgeSQliteDescription": "Une fois que tous les états seront supprimés de SQLite, vous devrez faire un \"nettoyage de la base de données\" sur l'onglet à droite afin de relâcher l'espace disque. Cette étape peut prendre un certain temps."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
@@ -2457,7 +2594,8 @@
     "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
     "invalidIcon": "L'icône est requise",
-    "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+    "sceneAlreadyExist": "Une scène avec le même nom existe déjà.",
+    "nameAfterCopy": "Copie de {{name}}"
   },
   "scene": {
     "title": "Scènes",
@@ -2736,6 +2874,16 @@
           "heating": "Chauffage"
         }
       },
+      "heater": {
+        "pilot-wire-mode": {
+          "comfort": "Confort",
+          "eco": "Eco",
+          "off": "Off",
+          "frost-protection": "Hors Gel",
+          "comfort_-1": "Confort -1°C",
+          "comfort_-2": "Confort -2°C"
+        }
+      },
       "siren": {
         "lmh_volume": {
           "low": "Faible",
@@ -2807,7 +2955,38 @@
           "48": "Pression longue",
           "49": "Relâchement court",
           "50": "Relâchement long",
-          "51": "Pression double"
+          "51": "Pression double",
+          "52": "Bouton Bascule",
+          "53": "Bouton Bascule maintenu",
+          "54": "Luminosité Plus Clic",
+          "55": "Luminosité Plus Maintenu",
+          "56": "Luminosité Plus Relâchée",
+          "57": "Luminosité Moins Clic",
+          "58": "Luminosité Moins Maintenu",
+          "59": "Luminosité Moins Relâchée",
+          "60": "Pressé",
+          "61": "Simple Gauche",
+          "62": "Simple Droit",
+          "63": "Simple sur les deux",
+          "64": "Double Gauche",
+          "65": "Double Droit",
+          "66": "Double sur les deux",
+          "67": "Triple Gauche",
+          "68": "Triple Droit",
+          "69": "Triple sur les deux",
+          "70": "Maintenu Gauche",
+          "71": "Maintenu Droit",
+          "72": "Maintenu sur les deux"
+        }
+      },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Off",
+          "1": "Hors Gel",
+          "2": "Eco",
+          "3": "Confort -1°C",
+          "4": "Confort -2°C",
+          "5": "Confort"
         }
       },
       "opening-sensor": {
@@ -2843,6 +3022,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Non",
           "one": "Oui"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Off",
+          "one": "On"
         }
       },
       "risk": {
@@ -2893,6 +3079,10 @@
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
       "push": "Présence"
+    },
+    "rain-sensor": {
+      "shortCategoryName": "Détecteur de pluie",
+      "binary": "Détection pluie Oui/Non"
     },
     "light-sensor": {
       "shortCategoryName": "Capteur de luminosité",
@@ -2956,7 +3146,8 @@
     },
     "button": {
       "shortCategoryName": "Bouton",
-      "click": "Clic bouton"
+      "click": "Clic bouton",
+      "push": "Bouton poussoir"
     },
     "pressure-sensor": {
       "shortCategoryName": "Capteur de pression",
@@ -3010,6 +3201,10 @@
       "mode": "Mode",
       "target-temperature": "Température"
     },
+    "heater": {
+      "shortCategoryName": "Chauffage",
+      "pilot-wire-mode": "Mode"
+    },
     "tamper": {
       "shortCategoryName": "Détecteur de sabotage",
       "binary": "Détection sabotage (Oui/Non)"
@@ -3056,6 +3251,67 @@
       "index": "Index",
       "daily-consumption": "Consommation journalière"
     },
+    "teleinformation": {
+      "shortCategoryName": "Téléinformation",
+      "binary": "Relais",
+      "east": "Energie active soutirée totale (EAST)",
+      "eait": "Energie active injectée totale (EAIT)",
+      "easf01": "Energie active soutirée fournisseur (EASF01)",
+      "easf02": "Energie active soutirée fournisseur (EASF02)",
+      "easf03": "Energie active soutirée fournisseur (EASF03)",
+      "easf04": "Energie active soutirée fournisseur (EASF04)",
+      "easf05": "Energie active soutirée fournisseur (EASF05)",
+      "easf06": "Energie active soutirée fournisseur (EASF06)",
+      "easf07": "Energie active soutirée fournisseur (EASF07)",
+      "easf08": "Energie active soutirée fournisseur (EASF08)",
+      "easf09": "Energie active soutirée fournisseur (EASF09)",
+      "easf10": "Energie active soutirée fournisseur (EASF10)",
+      "pref": "Puissance apparente référence (PREF)",
+      "pcoup": "Puissance apparente coupure (PCOUP)",
+      "vtic": "Version du protocole (VTIC)",
+      "ccasn": "Position de la courbe charge active (CCASN)",
+      "ccasn_1": "Position de la courbe charge active (CCASN-1)",
+      "umoy1": "Tension moyenne (UMOY1)",
+      "umoy2": "Tension moyenne (UMOY2)",
+      "umoy3": "Tension moyenne (UMOY3)",
+      "erq1": "Energie réactive Q1 totale (ERQ1)",
+      "erq2": "Energie réactive Q2 totale (ERQ2)",
+      "erq3": "Energie réactive Q3 totale (ERQ3)",
+      "erq4": "Energie réactive Q4 totale (ERQ4)",
+      "irms1": "Courant efficace (IRMS1)",
+      "irms2": "Courant efficace (IRMS2)",
+      "irms3": "Courant efficace (IRMS3)",
+      "urms1": "Tension efficace (URMS1)",
+      "urms2": "Tension efficace (URMS2)",
+      "urms3": "Tension efficace (URMS3)",
+      "easd01": "Energie active soutirée distributeur (EASD01)",
+      "easd02": "Energie active soutirée distributeur (EASD02)",
+      "easd03": "Energie active soutirée distributeur (EASD03)",
+      "easd04": "Energie active soutirée distributeur (EASD04)",
+      "ntarf": "Numéro d'indice tarifaire (NTARF)",
+      "ccain": "Point n de la courbe de charge active injectée (CCAIN)",
+      "ccain_1": "Point n-1 de la courbe de charge active injectée (CCAIN-1)",
+      "sinsti": "Puissance apparente instantanée injectée (SINSTI)",
+      "smaxin": "Puissance apparente max. injectée n (SMAXIN)",
+      "smaxin_1": "Puissance apparente max. injectée n-1 (SMAXIN-1)",
+      "smaxn": "Puissance apparente max. soutirée (SMAXN)",
+      "smaxn2": "Puissance apparente max. soutirée (SMAXN2)",
+      "smaxn3": "Puissance apparente max. soutirée (SMAXN3)",
+      "sinsts": "Puissance apparente instantanée soutirée (SINSTS)",
+      "sinsts2": "Puissance apparente instantanée soutirée (SINSTS2)",
+      "sinsts3": "Puissance apparente instantanée soutirée (SINSTS3)",
+      "smaxn_1": "Puissance apparente max. soutirée n-1 (SMAXN-1)",
+      "smaxn2_1": "Puissance apparente max. soutirée n-1 (SMAXN2-1)",
+      "smaxn3_1": "Puissance apparente max. soutirée n-1 (SMAXN3-1)",
+      "hhphc": "Programme HPHC (HHPHC)",
+      "imax": "Intensité maximale (IMAX)",
+      "adps": "Alerte dépassement puissance souscrite (ADPS)",
+      "imax2": "Intensité maximale (IMAX2)",
+      "imax3": "Intensité maximale (IMAX3)",
+      "adir1": "Alerte de surcourant (ADIR1)",
+      "adir2": "Alerte de surcourant (ADIR2)",
+      "adir3": "Alerte de surcourant (ADIR3)"
+    },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",
       "decimal": "Volume (décimale)",
@@ -3072,7 +3328,8 @@
     },
     "precipitation-sensor": {
       "shortCategoryName": "Capteur de précipitations",
-      "decimal": "Précipitation"
+      "decimal": "Précipitation",
+      "integer": "Intensité (mV)"
     },
     "uv-sensor": {
       "shortCategoryName": "Capteur d'UV",
@@ -3146,6 +3403,10 @@
     "risk": {
       "shortCategoryName": "Risque",
       "integer": "Niveau de risque"
+    },
+    "input": {
+      "shortCategoryName": "Entrée",
+      "binary": "Etat de l'entrée"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

@@ -27,13 +27,13 @@ class PlayNotification extends Component {
     }
   };
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
   handleDeviceChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'device', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device', null);
+      this.props.updateActionProperty(this.props.path, 'device', null);
     }
   };
 
@@ -97,6 +97,7 @@ class PlayNotification extends Component {
           <div className="tags-input">
             <TextWithVariablesInjected
               text={props.action.text}
+              path={props.path}
               triggersVariables={props.triggersVariables}
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}

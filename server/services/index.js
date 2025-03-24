@@ -1,6 +1,7 @@
 module.exports.alexa = require('./alexa');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
+module.exports.callmebot = require('./callmebot');
 module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
 module.exports.ecowatt = require('./ecowatt');
@@ -28,3 +29,5 @@ module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
 module.exports['google-cast'] = require('./google-cast');
+module.exports.airplay = require('./airplay');
+module.exports['free-mobile'] = require('./free-mobile');

@@ -1,3 +1,5 @@
+import { yAxisFormatter } from './yAxisFormatter';
+
 const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultLocale }) => {
   const options = {
     chart: {
@@ -59,7 +61,8 @@ const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultL
     },
     yaxis: {
       labels: {
-        padding: 4
+        padding: 4,
+        formatter: yAxisFormatter
       }
     },
     colors,

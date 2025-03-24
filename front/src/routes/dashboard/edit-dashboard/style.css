@@ -1,3 +1,39 @@
+.columnsCard {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding-right: 0;
+}
+
+.column {
+  flex-grow: 1;
+  flex-basis: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  min-width: 0px;
+}
+
+.columnBoxHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 48px;
+  height: auto;
+}
+
+.btnLinkDelete {
+  text-decoration: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #343a40;
+  background-color: transparent;
+}
+
+.btnAddColumn {
+  padding: 0;
+}
+
 .dropZone {
   height: 100%;
   min-height: 10rem;
@@ -27,9 +63,72 @@
   margin-bottom: 1.5rem;
 }
 
-@media (max-width: 992px) {
+@media (min-width: 1280px) {
+  .columnAddButton {
+    position: relative;
+    flex: 0 0 46px;
+    max-width: 46px;
+    padding-left: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .btnAddColumn {
+    width: 31px;
+  }
+
+  .btnAddColumn[data-title]:hover:after {
+    content: attr(data-title);
+    position: absolute;
+    top: 100%;
+    left: 100%;
+    transform: translateX(-100%) translateY(5px);
+    white-space: normal;
+    color: #467fcf;
+    background-color: #fff;
+    padding: 2px 4px;
+    border: 1px solid #467fcf;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    width: 150px;
+  }
+}
+
+@media (max-width: 1280px) {
   .bottomDropZone {
     min-height: 5rem;
     height: 5rem;
+  }
+
+  .columnsCard {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .column {
+    flex-grow: 1;
+    flex-basis: 100%;
+    padding: 0 0px;
+  }
+
+  .columnBoxHeader {
+    padding-top: 1.5rem;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-top: 1px dashed #bdbdbd;
+    min-height: 0px;
+  }
+
+  .columnAddButton {
+    width: 100%;
+    flex: none;
+  }
+
+  .displayTextMobile {
+    display: inline !important;
+    margin-left: 0.5rem;
+    text-wrap: wrap;
   }
 }

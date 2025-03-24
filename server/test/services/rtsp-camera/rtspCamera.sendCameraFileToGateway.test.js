@@ -1,7 +1,6 @@
 const fse = require('fs-extra');
 const path = require('path');
 const { fake, assert: fakeAssert } = require('sinon');
-const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 
 const gladys = {
@@ -23,12 +22,7 @@ describe('Camera.sendCameraFileToGateway', () => {
   const indexFilePath = path.join(folderPath, 'index.m3u8');
   const keyfilePath = path.join(folderPath, 'index.m3u8.key');
   const videoFilePath = path.join(folderPath, 'index0.ts');
-  const rtspCameraManager = new RtspCameraManager(
-    gladys,
-    FfmpegMock,
-    childProcessMock,
-    'de051f90-f34a-4fd5-be2e-e502339ec9bc',
-  );
+  const rtspCameraManager = new RtspCameraManager(gladys, childProcessMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   before(async () => {
     await fse.ensureDir(folderPath);
     await fse.writeFile(indexFilePath, 'this is index');

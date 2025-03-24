@@ -1,6 +1,9 @@
-const { executeActions } = require('./scene.executeActions');
+const executeActionsFactory = require('./scene.executeActions');
+const actionsFunc = require('./scene.actions');
 const logger = require('../../utils/logger');
 const { AbortScene } = require('../../utils/coreErrors');
+
+const { executeActions } = executeActionsFactory(actionsFunc);
 
 /**
  * @description Execute a scene by its selector.

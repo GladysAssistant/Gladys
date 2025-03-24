@@ -21,6 +21,38 @@ process.on('uncaughtException', (error, promise) => {
   logger.error(error);
 });
 
+const closeSQLite = async () => {
+  try {
+    await db.sequelize.close();
+    logger.info('SQLite closed.');
+  } catch (e) {
+    logger.info('SQLite database is probably already closed');
+    logger.warn(e);
+  }
+};
+
+// Close properly all DuckDB connections & database
+const closeDuckDB = async () => {
+  try {
+    return new Promise((resolve) => {
+      db.duckDbReadConnection.close((err1) => {
+        db.duckDbWriteConnection.close((err2) => {
+          db.duckDb.close((err3) => {
+            if (err1 || err2 || err3) {
+              logger.error(err1, err2, err3);
+            }
+            logger.info('DuckDB closed.');
+            resolve();
+          });
+        });
+      });
+    });
+  } catch (e) {
+    logger.warn(e);
+    return null;
+  }
+};
+
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
   // We give Gladys 10 seconds to properly shutdown, otherwise we do it
@@ -28,13 +60,8 @@ const shutdown = async (signal) => {
     logger.info('Timeout to shutdown expired, forcing shut down.');
     process.exit();
   }, 10 * 1000);
-  logger.info('Closing database connection.');
-  try {
-    await db.sequelize.close();
-  } catch (e) {
-    logger.info('Database is probably already closed');
-    logger.warn(e);
-  }
+  logger.info('Closing database connections.');
+  await Promise.all([closeSQLite(), closeDuckDB()]);
   process.exit();
 };
 
@@ -45,7 +72,6 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   // create Gladys object
   const gladys = Gladys({
     jwtSecret: process.env.JWT_SECRET,
-    disableDeviceStateAggregation: true,
   });
 
   // start Gladys

@@ -38,6 +38,7 @@ describe('zigbee2mqtt disconnect', () => {
       system: {
         getContainers: fake.resolves([container]),
         stopContainer: fake.resolves(true),
+        removeContainer: fake.resolves(true),
       },
     };
 
@@ -71,6 +72,7 @@ describe('zigbee2mqtt disconnect', () => {
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
+    assert.calledTwice(gladys.system.removeContainer);
   });
 
   it('mqtt connected', async () => {
@@ -96,6 +98,7 @@ describe('zigbee2mqtt disconnect', () => {
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
+    assert.calledTwice(gladys.system.removeContainer);
     assert.calledOnce(mqtt.end);
     assert.calledOnce(mqtt.removeAllListeners);
 

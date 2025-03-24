@@ -16,6 +16,22 @@ function addSelector(item) {
   }
 }
 
+/**
+ * @description Add a selector in the context of a beforeValidate sequelize hook.
+ * @param {object} item - Any object to add a selector to.
+ * @example
+ * addSelectorBeforeValidateHook({
+ *  name: 'my object'
+ * });
+ */
+function addSelectorBeforeValidateHook(item) {
+  // We only slugify the selector for creation, not update
+  if (item.isNewRecord) {
+    addSelector(item);
+  }
+}
+
 module.exports = {
   addSelector,
+  addSelectorBeforeValidateHook,
 };

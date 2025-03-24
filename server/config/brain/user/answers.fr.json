@@ -1,0 +1,6 @@
+[
+  {
+    "label": "user.forgot-password.success",
+    "answers": ["Vous avez demandé à réinitialiser votre mot de passe. Voici le lien :"]
+  }
+]

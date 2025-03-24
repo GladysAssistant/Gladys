@@ -131,6 +131,7 @@ module.exports = function UserController(gladys) {
    * @apiGroup User
    */
   async function updateMySelf(req, res, next) {
+    delete req.body.role;
     const newUser = await gladys.user.update(req.user.id, req.body);
     res.json(newUser);
   }
@@ -157,8 +158,13 @@ module.exports = function UserController(gladys) {
    * }
    */
   async function forgotPassword(req, res) {
-    const session = await gladys.user.forgotPassword(req.body.email, req.headers['user-agent']);
+    const { session, user } = await gladys.user.forgotPassword(req.body.email, req.headers['user-agent']);
     const link = `${req.body.origin}/reset-password?token=${session.access_token}`;
+    // Try to send the link to the user if he has configured an external service like Telegram
+    const text = gladys.brain.getReply(user.language, 'user.forgot-password.success', {});
+    await gladys.message.sendToUser(user.selector, text);
+    await gladys.message.sendToUser(user.selector, link);
+    // If not, we log the link to the logs.
     logger.info(`Forgot password initiated for user ${req.body.email}, link = ${link}`);
     res.json({
       success: true,

@@ -37,6 +37,13 @@ const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerD
       </div>
     </div>
     <div class="card-body">
+      <div class="alert alert-info">
+        <Text id="integration.lanManager.device.explanation" />
+        <br />
+        <b>
+          <Text id="integration.lanManager.device.iosWarning" />
+        </b>
+      </div>
       <div
         class={cx('dimmer', {
           active: getLANManagerDevicesStatus === RequestStatus.Getting,

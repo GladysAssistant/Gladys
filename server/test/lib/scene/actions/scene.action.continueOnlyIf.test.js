@@ -4,13 +4,15 @@ const chaiAssert = require('chai').assert;
 
 const { ACTIONS } = require('../../../../utils/constants');
 const { AbortScene } = require('../../../../utils/coreErrors');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../../lib/state');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 describe('scene.continue-only-if', () => {
   let event;
   let stateManager;
+  const { executeActions } = executeActionsFactory(actionsFunc);
 
   beforeEach(() => {
     event = new EventEmitter();
