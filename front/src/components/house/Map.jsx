@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import leaflet from 'leaflet';
 
-const icon = leaflet.icon({
+const DEFAULT_COORDS = [48.8583, 2.2945];
+
+const icon = {
   iconUrl: '/assets/leaflet/marker-icon.png',
   iconRetinaUrl: '/assets/leaflet/marker-icon-2x.png',
   shadowUrl: '/assets/leaflet/marker-shadow.png',
@@ -10,12 +11,21 @@ const icon = leaflet.icon({
   popupAnchor: [1, -34],
   tooltipAnchor: [16, -28],
   shadowSize: [41, 41]
-});
+};
 
-const DEFAULT_COORDS = [48.8583, 2.2945];
+let leaflet = null;
+const getLeaflet = async () => {
+  if (!leaflet) {
+    const L = await import('leaflet');
+    leaflet = L.default;
+  }
+  return leaflet;
+};
 
 class MapComponent extends Component {
-  initMap = () => {
+  initMap = async () => {
+    const L = await getLeaflet();
+
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
@@ -25,15 +35,13 @@ class MapComponent extends Component {
     } else {
       coordinates = DEFAULT_COORDS;
     }
-    this.leafletMap = leaflet.map(this.map).setView(coordinates, 2);
-    leaflet
-      .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-        subdomains: 'abcd',
-        maxZoom: 19
-      })
-      .addTo(this.leafletMap);
+    this.leafletMap = L.map(this.map).setView(coordinates, 2);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(this.leafletMap);
     this.leafletMap.on('click', this.onClickOnMap);
 
     // add house pin
@@ -47,15 +55,14 @@ class MapComponent extends Component {
     this.props.updateHouseLocation(e.latlng.lat, e.latlng.lng, this.props.houseIndex);
   };
 
-  setPinMap = (latitude, longitude) => {
+  setPinMap = async (latitude, longitude) => {
+    const L = await getLeaflet();
     if (this.houseMarker) {
-      this.houseMarker.setLatLng(leaflet.latLng(latitude, longitude));
+      this.houseMarker.setLatLng(L.latLng(latitude, longitude));
     } else {
-      this.houseMarker = leaflet
-        .marker([latitude, longitude], {
-          icon
-        })
-        .addTo(this.leafletMap);
+      this.houseMarker = L.marker([latitude, longitude], {
+        icon: L.icon(icon)
+      }).addTo(this.leafletMap);
     }
   };
 
@@ -67,8 +74,8 @@ class MapComponent extends Component {
     this.props = props;
   }
 
-  componentDidMount() {
-    this.initMap();
+  async componentDidMount() {
+    await this.initMap();
   }
 
   componentWillUnmount() {
