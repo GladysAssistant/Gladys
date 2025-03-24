@@ -2,7 +2,6 @@ import { Component, createRef } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
-import Hls from 'hls.js';
 
 import config from '../../../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
@@ -15,6 +14,9 @@ const SEGMENT_DURATIONS_PER_LATENCY = {
   medium: 3,
   standard: 6
 };
+
+// Add global cache for Hls
+let Hls = null;
 
 class CameraBoxComponent extends Component {
   videoRef = createRef();
@@ -62,6 +64,18 @@ class CameraBoxComponent extends Component {
   };
 
   startStreaming = async () => {
+    // Dynamically import Hls only when needed
+    if (!Hls) {
+      try {
+        const { default: HlsModule } = await import('hls.js');
+        Hls = HlsModule;
+      } catch (e) {
+        console.error('Failed to load hls.js:', e);
+        this.setState({ liveStartError: true });
+        return;
+      }
+    }
+
     if (!Hls.isSupported()) {
       this.setState({ liveNotSupportedBrowser: true });
       return;
