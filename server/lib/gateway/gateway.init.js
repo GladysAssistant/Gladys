@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES, USER_ROLE } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
