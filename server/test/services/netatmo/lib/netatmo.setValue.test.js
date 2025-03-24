@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const nock = require('nock');
+const { MockAgent, setGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -23,9 +23,17 @@ const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, 
 const [deviceMock] = devicesMock.filter((device) => device.model === 'NATherm1');
 
 describe('Netatmo Set Value', () => {
+  let mockAgent;
+  let netatmoMock;
+
   beforeEach(() => {
     sinon.reset();
-    nock.cleanAll();
+
+    // 🧪 MockAgent setup
+    mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+    netatmoMock = mockAgent.get('https://api.netatmo.com');
 
     netatmoHandler.status = 'connected';
     netatmoHandler.accessToken = 'valid_access_token';
@@ -33,7 +41,6 @@ describe('Netatmo Set Value', () => {
 
   afterEach(() => {
     sinon.reset();
-    nock.cleanAll();
   });
 
   it('should set device value successfully', async () => {
@@ -42,8 +49,12 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    nock('https://api.netatmo.com')
-      .post('/api/setroomthermpoint')
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
       .reply(200, {});
 
     await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
@@ -115,8 +126,12 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    nock('https://api.netatmo.com')
-      .post('/api/setroomthermpoint')
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
       .reply(400, {
         error: {
           code: {
@@ -153,8 +168,12 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    nock('https://api.netatmo.com')
-      .post('/api/setroomthermpoint')
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
       .reply(403, {
         error: {
           code: 13,

@@ -13,10 +13,10 @@
     "arm64"
   ],
   "dependencies": {
-    "axios": "^1.6.2",
     "bluebird": "^3.7.2",
     "bottleneck": "^2.19.5",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^8.0.1"
+    "fs-extra": "^8.0.1",
+    "undici": "^7.5.0"
   }
 }

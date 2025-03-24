@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const nock = require('nock');
+const { MockAgent, setGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -23,9 +23,17 @@ netatmoHandler.pollRefreshingValues = fake.resolves(null);
 
 describe('Netatmo retrieveTokens', () => {
   let body;
+  let mockAgent;
+  let netatmoMock;
+
   beforeEach(() => {
     sinon.reset();
-    nock.cleanAll();
+
+    // 🧪 MockAgent setup
+    mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+    netatmoMock = mockAgent.get('https://api.netatmo.com');
 
     body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
     netatmoHandler.configuration.clientId = 'clientId-fake';
@@ -36,7 +44,6 @@ describe('Netatmo retrieveTokens', () => {
 
   afterEach(() => {
     sinon.reset();
-    nock.cleanAll();
   });
 
   it('should throw an error if configuration is not complete', async () => {
@@ -89,9 +96,13 @@ describe('Netatmo retrieveTokens', () => {
       refresh_token: 'refresh-token',
       expire_in: 3600,
     };
-    nock('https://api.netatmo.com')
-      .persist()
-      .post('/oauth2/token')
+
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(200, tokens);
 
     const result = await netatmoHandler.retrieveTokens(body);
@@ -119,9 +130,12 @@ describe('Netatmo retrieveTokens', () => {
     };
     netatmoHandler.configuration.energyApi = true;
 
-    nock('https://api.netatmo.com')
-      .persist()
-      .post('/oauth2/token')
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(200, tokens);
 
     const result = await netatmoHandler.retrieveTokens(body);
@@ -147,15 +161,20 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.clientSecret = 'test-client-secret';
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(400, { error: 'invalid_request' });
 
     try {
       await netatmoHandler.retrieveTokens(bodyFake);
       expect.fail('should have thrown an error');
     } catch (e) {
-      expect(e.message).to.include('Service is not connected with error');
+      expect(e).to.be.instanceOf(Error);
+      expect(e.message).to.include('HTTP error 400 - {"error":"invalid_request"}');
       expect(netatmoHandler.status).to.equal('disconnected');
       expect(netatmoHandler.configured).to.equal(true);
       expect(netatmoHandler.connected).to.equal(false);
@@ -187,8 +206,13 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.clientSecret = 'test-client-secret';
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
+
+    // 🧪 Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .replyWithError('Network error');
 
     try {
