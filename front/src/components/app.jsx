@@ -8,9 +8,9 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
-
 import { getDefaultState } from '../utils/getDefaultState';
 
+// Keep core components and routes that don't need lazy loading
 import Header from './header';
 import Layout from './layout';
 import Redirect from './router/Redirect';
@@ -20,7 +20,7 @@ import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
 
-// Gateway
+// Gateway core components
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
@@ -28,150 +28,14 @@ import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
-import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
-import AlexaGateway from '../routes/integration/all/alexa-gateway';
-import EnedisGateway from '../routes/integration/all/enedis-gateway/Welcome';
-import EnedisGatewayUsagePoints from '../routes/integration/all/enedis-gateway/UsagePoints';
 
+// Signup core components
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
 import SignupCreateAccountGladysGateway from '../routes/signup/2-create-account-gladys-gateway';
 import SignupPreferences from '../routes/signup/3-preferences';
 import SignupConfigureHouse from '../routes/signup/4-configure-house';
 import SignupSuccess from '../routes/signup/5-success';
-
-// Dashboard
-import Dashboard from '../routes/dashboard';
-import NewDashboard from '../routes/dashboard/new-dashboard';
-import EditDashboard from '../routes/dashboard/edit-dashboard';
-
-import IntegrationPage from '../routes/integration';
-import ChatPage from '../routes/chat';
-import MapPage from '../routes/map';
-import MapNewAreaPage from '../routes/map/NewArea';
-import CalendarPage from '../routes/calendar';
-import ScenePage from '../routes/scene';
-import NewScenePage from '../routes/scene/new-scene';
-import DuplicateScenePage from '../routes/scene/duplicate-scene';
-import EditScenePage from '../routes/scene/edit-scene';
-import ProfilePage from '../routes/profile';
-import SettingsSessionPage from '../routes/settings/settings-session';
-import SettingsHousePage from '../routes/settings/settings-house';
-import SettingsUserPage from '../routes/settings/settings-users';
-import SettingsEditUserPage from '../routes/settings/settings-users/edit-user';
-import SettingsCreateUserPage from '../routes/settings/settings-users/create-user';
-import SettingsSystemPage from '../routes/settings/settings-system';
-import SettingsServicePage from '../routes/settings/settings-service';
-import SettingsGateway from '../routes/settings/settings-gateway';
-import SettingsBackup from '../routes/settings/settings-backup';
-import SettingsBilling from '../routes/settings/settings-billing';
-import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
-import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
-import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs';
-
-// Integrations
-import TelegramPage from '../routes/integration/all/telegram';
-import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
-import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
-import HomeKitPage from '../routes/integration/all/homekit';
-import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
-import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
-import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
-import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
-import OpenWeatherPage from '../routes/integration/all/openweather';
-import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
-import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
-import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
-import RtspCameraPage from '../routes/integration/all/rtsp-camera';
-import XiaomiPage from '../routes/integration/all/xiaomi';
-import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
-import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
-
-// Broadlink integration
-import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
-import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
-import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
-
-// LAN-Manager integration
-import LANManagerDevicePage from '../routes/integration/all/lan-manager/device-page';
-import LANManagerDiscoverPage from '../routes/integration/all/lan-manager/discover-page';
-import LANManagerSettingsPage from '../routes/integration/all/lan-manager/settings-page';
-
-// MQTT integration
-import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
-import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
-import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
-import MqttDebugPage from '../routes/integration/all/mqtt/debug-page/Debug';
-
-// Zigbee2mqtt
-import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
-import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/discover-page';
-import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
-import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
-
-// Tasmota
-import TasmotaPage from '../routes/integration/all/tasmota/device-page';
-import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
-import TasmotaMqttDiscoverPage from '../routes/integration/all/tasmota/discover-mqtt';
-import TasmotaHttpDiscoverPage from '../routes/integration/all/tasmota/discover-http';
-
-// Integrations Bluetooth
-import BluetoothDevicePage from '../routes/integration/all/bluetooth/device-page';
-import BluetoothEditDevicePage from '../routes/integration/all/bluetooth/edit-page';
-import BluetoothSetupPage from '../routes/integration/all/bluetooth/setup-page';
-import BluetoothSetupPeripheralPage from '../routes/integration/all/bluetooth/setup-page/setup-peripheral';
-import BluetoothSettingsPage from '../routes/integration/all/bluetooth/settings-page';
-
-// EweLink
-import EweLinkPage from '../routes/integration/all/ewelink/device-page';
-import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
-import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
-import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
-
-// OpenAI integration
-import OpenAIPage from '../routes/integration/all/openai/index';
-
-// Tuya integration
-import TuyaPage from '../routes/integration/all/tuya/device-page';
-import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
-import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
-import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
-
-// Netatmo integration
-import NetatmoPage from '../routes/integration/all/netatmo/device-page';
-import NetatmoSetupPage from '../routes/integration/all/netatmo/setup-page';
-import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page';
-
-// Sonos integration
-import SonosDevicePage from '../routes/integration/all/sonos/device-page';
-import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
-
-// Google Cast integration
-import GoogleCastDevicePage from '../routes/integration/all/google-cast/device-page';
-import GoogleCastDiscoveryPage from '../routes/integration/all/google-cast/discover-page';
-
-// Airplay integration
-import AirplayDevicePage from '../routes/integration/all/airplay/device-page';
-import AirplayDiscoveryPage from '../routes/integration/all/airplay/discover-page';
-
-// ZWaveJS-UI integration
-import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
-import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
-import ZwaveJSUISetupPage from '../routes/integration/all/zwavejs-ui/setup-page';
-
-// MELCloud integration
-import MELCloudPage from '../routes/integration/all/melcloud/device-page';
-import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
-import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
-import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
-
-// NodeRed integration
-import NodeRedPage from '../routes/integration/all/node-red/setup-page';
-
-// Free Mobile integration
-import FreeMobilePage from '../routes/integration/all/free-mobile';
-// CallMeBot integration
-import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -188,21 +52,11 @@ const AppRouter = connect(
 )(props => (
   <div id="app">
     <Layout currentUrl={props.currentUrl}>
-      <Header
-        currentUrl={props.currentUrl}
-        user={props.user}
-        fullScreen={props.fullScreen}
-        profilePicture={props.profilePicture}
-        toggleDropDown={props.toggleDropDown}
-        showDropDown={props.showDropDown}
-        closeDropDown={props.closeDropDown}
-        toggleCollapsedMenu={props.toggleCollapsedMenu}
-        showCollapsedMenu={props.showCollapsedMenu}
-        logout={props.logout}
-      />
+      <Header {...props} />
       <Router onChange={props.handleRoute}>
         <Redirect path="/" to="/dashboard" />
-        {/** ROUTE WHICH ARE DIFFERENT IN GATEWAY MODE */}
+
+        {/** GATEWAY MODE ROUTES */}
         {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
         {config.gatewayMode ? (
           <GatewayForgotPassword path="/forgot-password" />
@@ -219,150 +73,541 @@ const AppRouter = connect(
         {config.gatewayMode && <SignupGateway path="/signup-gateway" />}
         {config.gatewayMode && <ConfigureTwoFactorGateway path="/gateway-configure-two-factor" />}
         {config.gatewayMode && <GatewayConfirmEmail path="/confirm-email" />}
-        {config.gatewayMode && <SettingsBilling path="/dashboard/settings/billing" />}
-        {config.gatewayMode && <SettingsGatewayUsers path="/dashboard/settings/gateway-users" />}
-        {config.gatewayMode && <SettingsGatewayOpenApi path="/dashboard/settings/gateway-open-api" />}
+        {config.gatewayMode && (
+          <SafeAsyncRoute
+            path="/dashboard/settings/billing"
+            getComponent={() => import('../routes/settings/settings-billing').then(m => m.default)}
+          />
+        )}
+        {config.gatewayMode && (
+          <SafeAsyncRoute
+            path="/dashboard/settings/gateway-users"
+            getComponent={() => import('../routes/settings/settings-gateway-users').then(m => m.default)}
+          />
+        )}
+        {config.gatewayMode && (
+          <SafeAsyncRoute
+            path="/dashboard/settings/gateway-open-api"
+            getComponent={() => import('../routes/settings/settings-gateway-open-api').then(m => m.default)}
+          />
+        )}
 
+        {/** SIGNUP ROUTES */}
         {!config.gatewayMode && <SignupWelcomePage path="/signup" />}
-        {/** END OF ROUTES WHICH ARE DIFFERENT IN GATEWAY MODE */}
-        <SignupCreateAccountLocal path="/signup/create-account-local" />
-        <SignupCreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
-        <SignupPreferences path="/signup/preference" />
-        <SignupConfigureHouse path="/signup/configure-house" />
-        <SignupSuccess path="/signup/success" />
-        <SafeAsyncRoute path="/dashboard" component={Dashboard} />
-        <SafeAsyncRoute path="/dashboard/:dashboardSelector" component={Dashboard} />
-        <EditDashboard path="/dashboard/:dashboardSelector/edit" />
-        <NewDashboard path="/dashboard/create/new" />
-        <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
+        <SafeAsyncRoute
+          path="/signup/create-account-local"
+          getComponent={() => import('../routes/signup/2-create-account-local').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/signup/create-account-gladys-gateway"
+          getComponent={() => import('../routes/signup/2-create-account-gladys-gateway').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/signup/preference"
+          getComponent={() => import('../routes/signup/3-preferences').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/signup/configure-house"
+          getComponent={() => import('../routes/signup/4-configure-house').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/signup/success"
+          getComponent={() => import('../routes/signup/5-success').then(m => m.default)}
+        />
 
-        <IntegrationPage path="/dashboard/integration/device" category="device" />
-        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
-        <IntegrationPage path="/dashboard/integration/music" category="music" />
-        <IntegrationPage path="/dashboard/integration/health" category="health" />
-        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        {/** DASHBOARD ROUTES */}
+        <SafeAsyncRoute path="/dashboard" getComponent={() => import('../routes/dashboard').then(m => m.default)} />
+        <SafeAsyncRoute
+          path="/dashboard/:dashboardSelector"
+          getComponent={() => import('../routes/dashboard').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/:dashboardSelector/edit"
+          getComponent={() => import('../routes/dashboard/edit-dashboard').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/create/new"
+          getComponent={() => import('../routes/dashboard/new-dashboard').then(m => m.default)}
+        />
 
-        <TelegramPage path="/dashboard/integration/communication/telegram" />
+        {/** INTEGRATION ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+        />
+
+        {/** INTEGRATION CATEGORY ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="device"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="communication"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/calendar"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="calendar"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/music"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="music"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/health"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="health"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/weather"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="weather"
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/navigation"
+          getComponent={() => import('../routes/integration').then(m => m.default)}
+          category="navigation"
+        />
+
+        {/** SPECIFIC INTEGRATION ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/telegram"
+          getComponent={() => import('../routes/integration/all/telegram').then(m => m.default)}
+        />
         <Redirect
           path="/dashboard/integration/communication/nextcloudtalk"
           to="/dashboard/integration/communication/nextcloud-talk"
         />
-        <NextcloudTalkPage path="/dashboard/integration/communication/nextcloud-talk" />
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/nextcloud-talk"
+          getComponent={() => import('../routes/integration/all/nextcloud-talk').then(m => m.default)}
+        />
+
+        {/** CALDAV ROUTES */}
         <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
-        <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
-        <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
-        <CalDAVSharePage path="/dashboard/integration/calendar/caldav/share" />
-        <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
+        <SafeAsyncRoute
+          path="/dashboard/integration/calendar/caldav/account"
+          getComponent={() => import('../routes/integration/all/caldav/account-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/calendar/caldav/sync"
+          getComponent={() => import('../routes/integration/all/caldav/sync-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/calendar/caldav/share"
+          getComponent={() => import('../routes/integration/all/caldav/share-page').then(m => m.default)}
+        />
+
+        {/** WEATHER INTEGRATION */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/weather/openweather"
+          getComponent={() => import('../routes/integration/all/openweather').then(m => m.default)}
+        />
+
+        {/** PHILIPS HUE ROUTES */}
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
-        <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
-        <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/philips-hue/setup"
+          getComponent={() => import('../routes/integration/all/philips-hue/setup-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/philips-hue/device"
+          getComponent={() => import('../routes/integration/all/philips-hue/device-page').then(m => m.default)}
+        />
+
+        {/** TP-LINK ROUTES */}
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
-        <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
-        <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
-        <MqttDevicePage path="/dashboard/integration/device/mqtt" />
-        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
-        <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
-        <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
-        <MqttDebugPage path="/dashboard/integration/device/mqtt/debug" />
-        <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
-        <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
-        <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
-        <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tp-link/device"
+          getComponent={() => import('../routes/integration/all/tp-link/device-page').then(m => m.default)}
+        />
 
-        <NodeRedPage path="/dashboard/integration/device/node-red" />
+        {/** RTSP CAMERA ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/rtsp-camera"
+          getComponent={() => import('../routes/integration/all/rtsp-camera').then(m => m.default)}
+        />
 
-        <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
-        <CallMeBotPage path="dashboard/integration/communication/callmebot" />
+        {/** MQTT ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/mqtt"
+          getComponent={() => import('../routes/integration/all/mqtt/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/mqtt/edit"
+          getComponent={() => import('../routes/integration/all/mqtt/device-page/setup').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/mqtt/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/mqtt/device-page/setup').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/mqtt/setup"
+          getComponent={() => import('../routes/integration/all/mqtt/setup-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/mqtt/debug"
+          getComponent={() => import('../routes/integration/all/mqtt/debug-page/Debug').then(m => m.default)}
+        />
 
-        <XiaomiPage path="/dashboard/integration/device/xiaomi" />
-        <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
-        <TasmotaPage path="/dashboard/integration/device/tasmota" />
-        <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
-        <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
-        <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
-        <EweLinkPage path="/dashboard/integration/device/ewelink" />
-        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
-        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
-        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
-        <HomeKitPage path="/dashboard/integration/communication/homekit" />
-        <OpenAIPage path="/dashboard/integration/communication/openai" />
+        {/** ZIGBEE2MQTT ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zigbee2mqtt"
+          getComponent={() => import('../routes/integration/all/zigbee2mqtt/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zigbee2mqtt/discover"
+          getComponent={() => import('../routes/integration/all/zigbee2mqtt/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zigbee2mqtt/setup"
+          getComponent={() => import('../routes/integration/all/zigbee2mqtt/setup-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/zigbee2mqtt/edit-page').then(m => m.default)}
+        />
 
-        <TuyaPage path="/dashboard/integration/device/tuya" />
-        <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
-        <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
-        <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
+        {/** NODE-RED ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/node-red"
+          getComponent={() => import('../routes/integration/all/node-red/setup-page').then(m => m.default)}
+        />
 
-        <NetatmoPage path="/dashboard/integration/device/netatmo" />
-        <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
-        <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />
+        {/** COMMUNICATION ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/free-mobile"
+          getComponent={() => import('../routes/integration/all/free-mobile').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/callmebot"
+          getComponent={() => import('../routes/integration/all/callmebot/setup-page').then(m => m.default)}
+        />
 
-        <SonosDevicePage path="/dashboard/integration/device/sonos" />
-        <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
+        {/** XIAOMI ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/xiaomi"
+          getComponent={() => import('../routes/integration/all/xiaomi').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/xiaomi/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/xiaomi/edit-page').then(m => m.default)}
+        />
 
-        <GoogleCastDevicePage path="/dashboard/integration/device/google-cast" />
-        <GoogleCastDiscoveryPage path="/dashboard/integration/device/google-cast/discover" />
+        {/** TASMOTA ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tasmota"
+          getComponent={() => import('../routes/integration/all/tasmota/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tasmota/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/tasmota/edit-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tasmota/mqtt"
+          getComponent={() => import('../routes/integration/all/tasmota/discover-mqtt').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tasmota/http"
+          getComponent={() => import('../routes/integration/all/tasmota/discover-http').then(m => m.default)}
+        />
 
-        <AirplayDevicePage path="/dashboard/integration/device/airplay" />
-        <AirplayDiscoveryPage path="/dashboard/integration/device/airplay/discover" />
+        {/** EWELINK ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/ewelink"
+          getComponent={() => import('../routes/integration/all/ewelink/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/ewelink/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/ewelink/edit-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/ewelink/discover"
+          getComponent={() => import('../routes/integration/all/ewelink/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/ewelink/setup"
+          getComponent={() => import('../routes/integration/all/ewelink/setup-page').then(m => m.default)}
+        />
 
-        <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
-        <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
-        <ZwaveJSUISetupPage path="/dashboard/integration/device/zwavejs-ui/setup" />
+        {/** HOMEKIT & OPENAI ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/homekit"
+          getComponent={() => import('../routes/integration/all/homekit').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/openai"
+          getComponent={() => import('../routes/integration/all/openai').then(m => m.default)}
+        />
 
-        <MELCloudPage path="/dashboard/integration/device/melcloud" />
-        <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
-        <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
-        <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
+        {/** TUYA ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tuya"
+          getComponent={() => import('../routes/integration/all/tuya/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tuya/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/tuya/edit-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tuya/discover"
+          getComponent={() => import('../routes/integration/all/tuya/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/tuya/setup"
+          getComponent={() => import('../routes/integration/all/tuya/setup-page').then(m => m.default)}
+        />
 
-        <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
-        <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
-        <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
-        <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
-        <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+        {/** NETATMO ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/netatmo"
+          getComponent={() => import('../routes/integration/all/netatmo/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/netatmo/discover"
+          getComponent={() => import('../routes/integration/all/netatmo/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/netatmo/setup"
+          getComponent={() => import('../routes/integration/all/netatmo/setup-page').then(m => m.default)}
+        />
 
-        <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
-        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
-        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
-        <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
+        {/** SONOS ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/sonos"
+          getComponent={() => import('../routes/integration/all/sonos/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/sonos/discover"
+          getComponent={() => import('../routes/integration/all/sonos/discover-page').then(m => m.default)}
+        />
 
-        <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
-        <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
-        <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
+        {/** GOOGLE CAST ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/google-cast"
+          getComponent={() => import('../routes/integration/all/google-cast/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/google-cast/discover"
+          getComponent={() => import('../routes/integration/all/google-cast/discover-page').then(m => m.default)}
+        />
 
-        <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
-        <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
-        <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
-        <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
-        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
-        <EnedisGateway path="/dashboard/integration/device/enedis" />
-        <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
-        <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />
+        {/** AIRPLAY ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/airplay"
+          getComponent={() => import('../routes/integration/all/airplay/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/airplay/discover"
+          getComponent={() => import('../routes/integration/all/airplay/discover-page').then(m => m.default)}
+        />
 
-        <SafeAsyncRoute path="/dashboard/chat" component={ChatPage} />
-        <SafeAsyncRoute path="/dashboard/maps" component={MapPage} />
-        <MapNewAreaPage path="/dashboard/maps/area/new" />
-        <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
-        <SafeAsyncRoute path="/dashboard/calendar" component={CalendarPage} />
-        <SafeAsyncRoute path="/dashboard/scene" component={ScenePage} />
-        <NewScenePage path="/dashboard/scene/new" />
-        <DuplicateScenePage path="/dashboard/scene/:scene_selector/duplicate" />
-        <EditScenePage path="/dashboard/scene/:scene_selector" />
-        <SafeAsyncRoute path="/dashboard/profile" component={ProfilePage} />
-        <SettingsSessionPage path="/dashboard/settings/session" />
-        <SafeAsyncRoute path="/dashboard/settings/house" component={SettingsHousePage} />
-        <SettingsUserPage path="/dashboard/settings/user" />
-        <SettingsEditUserPage path="/dashboard/settings/user/edit/:user_selector" />
-        <SettingsCreateUserPage path="/dashboard/settings/user/new" />
-        <SettingsSystemPage path="/dashboard/settings/system" />
-        <SettingsGateway path="/dashboard/settings/gateway" />
-        <SettingsServicePage path="/dashboard/settings/service" />
-        <SettingsBackup path="/dashboard/settings/backup" />
-        <SettingsBackgroundJobs path="/dashboard/settings/jobs" />
+        {/** ZWAVE ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zwavejs-ui"
+          getComponent={() => import('../routes/integration/all/zwavejs-ui/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zwavejs-ui/discover"
+          getComponent={() => import('../routes/integration/all/zwavejs-ui/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/zwavejs-ui/setup"
+          getComponent={() => import('../routes/integration/all/zwavejs-ui/setup-page').then(m => m.default)}
+        />
+
+        {/** MELCLOUD ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/melcloud"
+          getComponent={() => import('../routes/integration/all/melcloud/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/melcloud/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/melcloud/edit-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/melcloud/discover"
+          getComponent={() => import('../routes/integration/all/melcloud/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/melcloud/setup"
+          getComponent={() => import('../routes/integration/all/melcloud/setup-page').then(m => m.default)}
+        />
+
+        {/** BLUETOOTH ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/bluetooth"
+          getComponent={() => import('../routes/integration/all/bluetooth/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/bluetooth/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/bluetooth/edit-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/bluetooth/setup"
+          getComponent={() => import('../routes/integration/all/bluetooth/setup-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/bluetooth/setup/:uuid"
+          getComponent={() =>
+            import('../routes/integration/all/bluetooth/setup-page/setup-peripheral').then(m => m.default)
+          }
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/bluetooth/config"
+          getComponent={() => import('../routes/integration/all/bluetooth/settings-page').then(m => m.default)}
+        />
+
+        {/** BROADLINK ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/broadlink"
+          getComponent={() => import('../routes/integration/all/broadlink/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/broadlink/edit"
+          getComponent={() => import('../routes/integration/all/broadlink/remote-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/broadlink/edit/:deviceSelector"
+          getComponent={() => import('../routes/integration/all/broadlink/remote-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/broadlink/peripheral"
+          getComponent={() => import('../routes/integration/all/broadlink/peripheral-page').then(m => m.default)}
+        />
+
+        {/** LAN MANAGER ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/lan-manager"
+          getComponent={() => import('../routes/integration/all/lan-manager/device-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/lan-manager/discover"
+          getComponent={() => import('../routes/integration/all/lan-manager/discover-page').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/lan-manager/config"
+          getComponent={() => import('../routes/integration/all/lan-manager/settings-page').then(m => m.default)}
+        />
+
+        {/** GOOGLE HOME & ALEXA ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/googlehome"
+          getComponent={() => import('../routes/integration/all/google-home-gateway/welcome').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/google-home/authorize"
+          getComponent={() => import('../routes/integration/all/google-home-gateway').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/communication/alexa"
+          getComponent={() => import('../routes/integration/all/alexa-gateway/welcome').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/alexa/authorize"
+          getComponent={() => import('../routes/integration/all/alexa-gateway').then(m => m.default)}
+        />
+
+        {/** OTHER DEVICE INTEGRATIONS */}
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/owntracks"
+          getComponent={() => import('../routes/integration/all/owntracks/welcome').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/enedis"
+          getComponent={() => import('../routes/integration/all/enedis-gateway/Welcome').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/enedis/usage-points"
+          getComponent={() => import('../routes/integration/all/enedis-gateway/UsagePoints').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/integration/device/enedis/redirect"
+          getComponent={() => import('../routes/integration/all/enedis-gateway/Welcome').then(m => m.default)}
+        />
+
+        {/** MAIN APP ROUTES */}
+        <SafeAsyncRoute path="/dashboard/chat" getComponent={() => import('../routes/chat').then(m => m.default)} />
+        <SafeAsyncRoute path="/dashboard/maps" getComponent={() => import('../routes/map').then(m => m.default)} />
+        <SafeAsyncRoute
+          path="/dashboard/maps/area/new"
+          getComponent={() => import('../routes/map/NewArea').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/maps/area/edit/:areaSelector"
+          getComponent={() => import('../routes/map/NewArea').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/calendar"
+          getComponent={() => import('../routes/calendar').then(m => m.default)}
+        />
+        <SafeAsyncRoute path="/dashboard/scene" getComponent={() => import('../routes/scene').then(m => m.default)} />
+        <SafeAsyncRoute
+          path="/dashboard/scene/new"
+          getComponent={() => import('../routes/scene/new-scene').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/scene/:scene_selector/duplicate"
+          getComponent={() => import('../routes/scene/duplicate-scene').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/scene/:scene_selector"
+          getComponent={() => import('../routes/scene/edit-scene').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/profile"
+          getComponent={() => import('../routes/profile').then(m => m.default)}
+        />
+
+        {/** SETTINGS ROUTES */}
+        <SafeAsyncRoute
+          path="/dashboard/settings/house"
+          getComponent={() => import('../routes/settings/settings-house').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/session"
+          getComponent={() => import('../routes/settings/settings-session').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/user"
+          getComponent={() => import('../routes/settings/settings-users').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/user/edit/:user_selector"
+          getComponent={() => import('../routes/settings/settings-users/edit-user').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/user/new"
+          getComponent={() => import('../routes/settings/settings-users/create-user').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/system"
+          getComponent={() => import('../routes/settings/settings-system').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/gateway"
+          getComponent={() => import('../routes/settings/settings-gateway').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/service"
+          getComponent={() => import('../routes/settings/settings-service').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/backup"
+          getComponent={() => import('../routes/settings/settings-backup').then(m => m.default)}
+        />
+        <SafeAsyncRoute
+          path="/dashboard/settings/jobs"
+          getComponent={() => import('../routes/settings/settings-background-jobs').then(m => m.default)}
+        />
+
         <Error type="404" default />
       </Router>
     </Layout>
