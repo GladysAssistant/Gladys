@@ -14,28 +14,14 @@ import { getDefaultState } from '../utils/getDefaultState';
 import Header from './header';
 import Layout from './layout';
 import Redirect from './router/Redirect';
-import Login from '../routes/login';
 import Locked from '../routes/locked';
 import Error from '../routes/error';
-import ForgotPassword from '../routes/forgot-password';
-import ResetPassword from '../routes/reset-password';
 
 // Gateway core components
-import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
-import GatewayForgotPassword from '../routes/gateway-forgot-password';
-import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
-
-// Signup core components
-import SignupWelcomePage from '../routes/signup/1-welcome';
-import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
-import SignupCreateAccountGladysGateway from '../routes/signup/2-create-account-gladys-gateway';
-import SignupPreferences from '../routes/signup/3-preferences';
-import SignupConfigureHouse from '../routes/signup/4-configure-house';
-import SignupSuccess from '../routes/signup/5-success';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -57,16 +43,32 @@ const AppRouter = connect(
         <Redirect path="/" to="/dashboard" />
 
         {/** GATEWAY MODE ROUTES */}
-        {config.gatewayMode ? <LoginGateway path="/login" /> : <Login path="/login" />}
         {config.gatewayMode ? (
-          <GatewayForgotPassword path="/forgot-password" />
+          <SafeAsyncRoute path="/login" getComponent={() => import('../routes/login-gateway').then(m => m.default)} />
         ) : (
-          <ForgotPassword path="/forgot-password" />
+          <SafeAsyncRoute path="/login" getComponent={() => import('../routes/login').then(m => m.default)} />
         )}
         {config.gatewayMode ? (
-          <GatewayResetPassword path="/reset-password" />
+          <SafeAsyncRoute
+            path="/forgot-password"
+            getComponent={() => import('../routes/gateway-forgot-password').then(m => m.default)}
+          />
         ) : (
-          <ResetPassword path="/reset-password" />
+          <SafeAsyncRoute
+            path="/forgot-password"
+            getComponent={() => import('../routes/forgot-password').then(m => m.default)}
+          />
+        )}
+        {config.gatewayMode ? (
+          <SafeAsyncRoute
+            path="/reset-password"
+            getComponent={() => import('../routes/gateway-reset-password').then(m => m.default)}
+          />
+        ) : (
+          <SafeAsyncRoute
+            path="/reset-password"
+            getComponent={() => import('../routes/reset-password').then(m => m.default)}
+          />
         )}
         <Locked path="/locked" />
         {config.gatewayMode && <LinkGatewayUser path="/link-gateway-user" />}
@@ -93,7 +95,12 @@ const AppRouter = connect(
         )}
 
         {/** SIGNUP ROUTES */}
-        {!config.gatewayMode && <SignupWelcomePage path="/signup" />}
+        {!config.gatewayMode && (
+          <SafeAsyncRoute
+            path="/signup"
+            getComponent={() => import('../routes/signup/1-welcome').then(m => m.default)}
+          />
+        )}
         <SafeAsyncRoute
           path="/signup/create-account-local"
           getComponent={() => import('../routes/signup/2-create-account-local').then(m => m.default)}
