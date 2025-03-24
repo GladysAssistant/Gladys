@@ -1,3 +1,4 @@
+import 'preact/debug';
 import '@gladysassistant/theme-optimized/dashboard.css';
 import 'dayjs/locale/en';
 import 'dayjs/locale/fr';
