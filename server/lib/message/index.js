@@ -5,15 +5,17 @@ const { reply } = require('./message.reply');
 const { purge } = require('./message.purge');
 const { handleEvent } = require('./message.handleEvent');
 const { replyByIntent } = require('./message.replyByIntent');
+const { sendToAdmins } = require('./message.sendToAdmins');
 const { sendToUser } = require('./message.sendToUser');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
-const MessageHandler = function MessageHandler(event, brain, service, state, variable) {
+const MessageHandler = function MessageHandler(event, brain, service, state, variable, user) {
   this.event = event;
   this.brain = brain;
   this.service = service;
   this.state = state;
   this.variable = variable;
+  this.user = user;
   this.event.on(EVENTS.MESSAGE.NEW, (message) => this.handleEvent(message));
   this.event.on(EVENTS.MESSAGE.PURGE_OLD_MESSAGES, eventFunctionWrapper(this.purge.bind(this)));
 };
@@ -24,6 +26,7 @@ MessageHandler.prototype.handleEvent = handleEvent;
 MessageHandler.prototype.reply = reply;
 MessageHandler.prototype.purge = purge;
 MessageHandler.prototype.replyByIntent = replyByIntent;
+MessageHandler.prototype.sendToAdmins = sendToAdmins;
 MessageHandler.prototype.sendToUser = sendToUser;
 
 module.exports = MessageHandler;
