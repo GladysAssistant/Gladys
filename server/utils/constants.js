@@ -1081,11 +1081,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     BACK_HOME: 'user.back-home',
     SEEN_AT_HOME: 'user.seen-at-home',
   },
-  UPGRADE: {
-    DOWNLOAD_PROGRESS: 'upgrade.download-progress',
-    DOWNLOAD_FINISHED: 'upgrade.download-finished',
-    DOWNLOAD_FAILED: 'upgrade.download-failed',
-  },
   LAN: {
     SCANNING: 'lan.scanning',
   },

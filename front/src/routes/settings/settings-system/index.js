@@ -2,8 +2,25 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import SettingsSystemPage from './SettingsSystemPage';
 import actions from '../../../actions/system';
+import { RequestStatus } from '../../../utils/constants';
 
 class SettingsSystem extends Component {
+  upgradeGladys = async () => {
+    this.setState({
+      SystemUpgradeStatus: RequestStatus.Getting
+    });
+    try {
+      await state.httpClient.post('/api/v1/system/upgrade');
+      store.setState({
+        SystemUpgradeStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      store.setState({
+        SystemGetDiskSpaceStatus: RequestStatus.Error
+      });
+    }
+  };
+
   componentDidMount() {
     this.props.getInfos();
     this.props.getDiskSpace();
@@ -20,7 +37,7 @@ class SettingsSystem extends Component {
   }
 
   render(props, {}) {
-    return <SettingsSystemPage {...props} />;
+    return <SettingsSystemPage {...props} upgradeGladys={this.upgradeGladys} />;
   }
 }
 

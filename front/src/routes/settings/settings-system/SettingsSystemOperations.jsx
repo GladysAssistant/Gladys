@@ -1,7 +1,7 @@
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
-const SettingsSystemOperations = ({ systemInfos }) => (
+const SettingsSystemOperations = ({ systemInfos, upgradeGladys }) => (
   <div class="card">
     <h4 class="card-header">
       <Text id="systemSettings.operations" />
@@ -16,6 +16,9 @@ const SettingsSystemOperations = ({ systemInfos }) => (
           <p>
             <Text id="systemSettings.newUpgradeAvailableText" />
           </p>
+          <button class="btn btn-primary" onClick={upgradeGladys}>
+            <Text id="systemSettings.updateNow" />
+          </button>
         </div>
       </div>
     )}

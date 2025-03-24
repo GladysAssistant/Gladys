@@ -10,18 +10,27 @@ async function installUpgrade() {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
-  const containers = await this.getContainers();
-  const watchTowerContainer = containers.find((container) => {
-    return container.image.startsWith('containrrr/watchtower');
+
+  // Create and start Watchtower container
+  const container = await this.dockerode.createContainer({
+    Image: 'containrrr/watchtower',
+    name: `gladys-watchtower-${Date.now()}`,
+    HostConfig: {
+      AutoRemove: true,
+      Binds: ['/var/run/docker.sock:/var/run/docker.sock'],
+    },
+    Cmd: ['--run-once'],
   });
-  if (!watchTowerContainer) {
-    throw new PlatformNotCompatible('WATCHTOWER_NOT_FOUND');
+
+  // Start the container
+  await container.start();
+
+  // Wait for container to finish
+  const { StatusCode } = await container.wait();
+
+  if (StatusCode !== 0) {
+    throw new Error(`Watchtower container exited with status code ${StatusCode}`);
   }
-  await this.dockerode.getContainer(watchTowerContainer.id).restart();
-  // reset download upgrade status
-  this.downloadUpgradeError = null;
-  this.downloadUpgradeFinished = null;
-  this.downloadUpgradeLastEvent = null;
 }
 
 module.exports = {
