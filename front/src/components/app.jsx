@@ -23,6 +23,14 @@ import SignupGateway from '../routes/signup-gateway';
 import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 
+// Add these new imports
+import Welcome from '../routes/signup/1-welcome';
+import CreateAccountLocal from '../routes/signup/2-create-account-local';
+import CreateAccountGladysGateway from '../routes/signup/2-create-account-gladys-gateway';
+import Preferences from '../routes/signup/3-preferences';
+import ConfigureHouse from '../routes/signup/4-configure-house';
+import Success from '../routes/signup/5-success';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -95,6 +103,12 @@ const AppRouter = connect(
         )}
 
         {/** SIGNUP ROUTES */}
+        {!config.gatewayMode && <Welcome path="/signup" />}
+        <CreateAccountLocal path="/signup/create-account-local" />
+        <CreateAccountGladysGateway path="/signup/create-account-gladys-gateway" />
+        <Preferences path="/signup/preference" />
+        <ConfigureHouse path="/signup/configure-house" />
+        <Success path="/signup/success" />
         {!config.gatewayMode && (
           <SafeAsyncRoute
             path="/signup"
