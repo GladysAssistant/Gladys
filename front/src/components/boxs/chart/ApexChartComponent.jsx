@@ -1,9 +1,4 @@
 import { Component, createRef } from 'preact';
-import ApexCharts from 'apexcharts';
-
-import fr from 'apexcharts/dist/locales/fr.json';
-import en from 'apexcharts/dist/locales/en.json';
-import de from 'apexcharts/dist/locales/de.json';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -29,8 +24,47 @@ const DEFAULT_COLORS = [
 ];
 const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua', 'pink', 'orange', 'grey'];
 
+// Cache for dependencies
+let dependenciesPromise = null;
+
+const loadSharedDependencies = async () => {
+  if (!dependenciesPromise) {
+    dependenciesPromise = (async () => {
+      const [apexCharts, fr, en, de] = await Promise.all([
+        import('apexcharts'),
+        import('apexcharts/dist/locales/fr.json'),
+        import('apexcharts/dist/locales/en.json'),
+        import('apexcharts/dist/locales/de.json')
+      ]);
+
+      return {
+        ApexCharts: apexCharts.default,
+        locales: {
+          fr: fr.default,
+          en: en.default,
+          de: de.default
+        }
+      };
+    })();
+  }
+  return dependenciesPromise;
+};
+
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  ApexCharts = null;
+  locales = {
+    fr: null,
+    en: null,
+    de: null
+  };
+
+  async loadDependencies() {
+    const { ApexCharts, locales } = await loadSharedDependencies();
+    this.ApexCharts = ApexCharts;
+    this.locales = locales;
+  }
+
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
@@ -107,7 +141,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       series: this.props.series,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
-      locales: [fr, en, de],
+      locales: [this.locales.fr, this.locales.en, this.locales.de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -127,7 +161,7 @@ class ApexChartComponent extends Component {
       series: this.props.series,
       displayAxes: this.props.display_axes,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
-      locales: [fr, en, de],
+      locales: [this.locales.fr, this.locales.en, this.locales.de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -148,7 +182,7 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [this.locales.fr, this.locales.en, this.locales.de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -168,7 +202,7 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [this.locales.fr, this.locales.en, this.locales.de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -189,13 +223,17 @@ class ApexChartComponent extends Component {
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en, de],
+      locales: [this.locales.fr, this.locales.en, this.locales.de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatterRangeBar(options);
     return options;
   };
-  displayChart = () => {
+  displayChart = async () => {
+    if (!this.ApexCharts) {
+      await this.loadDependencies();
+    }
+
     let options;
     if (this.props.chart_type === 'timeline') {
       options = this.getTimelineChartOptions();
@@ -213,15 +251,15 @@ class ApexChartComponent extends Component {
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
-      this.chart = new ApexCharts(this.chartRef.current, options);
+      this.chart = new this.ApexCharts(this.chartRef.current, options);
 
       this.chart.render();
     }
   };
-  componentDidMount() {
-    this.displayChart();
+  async componentDidMount() {
+    await this.displayChart();
   }
-  componentDidUpdate(nextProps) {
+  async componentDidUpdate(nextProps) {
     const seriesDifferent = nextProps.series !== this.props.series;
     const chartTypeDifferent = nextProps.chart_type !== this.props.chart_type;
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
@@ -236,7 +274,7 @@ class ApexChartComponent extends Component {
       sizeDifferent ||
       additionalHeightDifferent
     ) {
-      this.displayChart();
+      await this.displayChart();
     }
   }
   componentWillUnmount() {
