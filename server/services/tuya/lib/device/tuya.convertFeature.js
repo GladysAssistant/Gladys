@@ -19,12 +19,14 @@ function convertFeature(tuyaFunctions, externalId) {
   }
 
   let valuesObject = {};
-  try {
-    valuesObject = JSON.parse(values);
-  } catch (e) {
-    logger.error(
-      `Tuya function as unmappable "${values}" values on "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type with "${code}" code`,
-    );
+  if (values) {
+    try {
+      valuesObject = JSON.parse(values);
+    } catch (e) {
+      logger.error(
+        `Tuya function as unmappable "${values}" values on "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type with "${code}" code`,
+      );
+    }
   }
 
   const feature = {
@@ -38,12 +40,13 @@ function convertFeature(tuyaFunctions, externalId) {
     ...featuresCategoryAndType,
   };
   if ('min' in valuesObject) {
-    feature.min = valuesObject.min;
+    const minValue = Number(valuesObject.min);
+    feature.min = Number.isFinite(minValue) ? minValue : 0;
   }
   if ('max' in valuesObject) {
-    feature.max = valuesObject.max;
+    const maxValue = Number(valuesObject.max);
+    feature.max = Number.isFinite(maxValue) ? maxValue : 1;
   }
-
   return feature;
 }
 
