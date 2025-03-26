@@ -23,7 +23,7 @@ async function loadWeatherStationDetails() {
     });
     const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Netatmo error: ', response.status, rawBody);
+      logger.error('Netatmo error:', response.status, rawBody);
     }
 
     const data = JSON.parse(rawBody);

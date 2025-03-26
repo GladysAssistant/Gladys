@@ -50,7 +50,7 @@ async function retrieveTokens(body) {
     });
     const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Netatmo error: ', response.status, rawBody);
+      logger.error('Error getting new accessToken to Netatmo - Details:', response.status, rawBody);
       throw new Error(`HTTP error ${response.status} - ${rawBody}`);
     }
     const data = JSON.parse(rawBody);
