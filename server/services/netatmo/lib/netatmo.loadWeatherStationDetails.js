@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
@@ -13,12 +13,21 @@ async function loadWeatherStationDetails() {
   let weatherStations;
   const modulesWeatherStations = [];
   try {
-    const response = await axios({
-      url: API.GET_WEATHER_STATIONS,
-      method: 'get',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
+    const response = await fetch(API.GET_WEATHER_STATIONS, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Accept: API.HEADER.ACCEPT,
+      },
     });
-    const { body, status } = response.data;
+    const rawBody = await response.text();
+    if (!response.ok) {
+      logger.error('Netatmo error: ', response.status, rawBody);
+    }
+
+    const data = JSON.parse(rawBody);
+    const { body, status } = data;
     weatherStations = body.devices;
     if (status === 'ok') {
       weatherStations.forEach((weatherStation) => {

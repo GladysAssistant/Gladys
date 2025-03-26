@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, STATUS, PARAMS } = require('./utils/netatmo.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -34,19 +34,38 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(`Change value for device ${device.name} / ${featureName} to value ${transformedValue}...`);
 
   const paramsForm = {
-    home_id: homeId.value, // mandatory
-    room_id: roomId.value, // mandatory
-    mode: 'manual', // mandatory
+    home_id: homeId.value,
+    room_id: roomId.value,
+    mode: 'manual',
     temp: transformedValue,
   };
   try {
-    await axios({
-      url: API.SET_ROOM_THERMPOINT,
-      method: 'post',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
-      data: paramsForm,
+    const responseSetRoomThermpoint = await fetch(API.SET_ROOM_THERMPOINT, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Accept: API.HEADER.ACCEPT,
+      },
+      body: new URLSearchParams(paramsForm).toString(),
     });
-    logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
+    const rawBody = await responseSetRoomThermpoint.text();
+    if (!responseSetRoomThermpoint.ok) {
+      logger.error('Netatmo error: ', responseSetRoomThermpoint.status, rawBody);
+      if (responseSetRoomThermpoint.status === 403 && JSON.parse(rawBody).error.code === 13) {
+        await this.saveStatus({
+          statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+          message: 'set_devices_value_fail_scope_rights',
+        });
+      } else {
+        await this.saveStatus({
+          statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+          message: 'set_devices_value_error_unknown',
+        });
+      }
+    } else {
+      logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
+    }
   } catch (e) {
     logger.error(
       'setValue error with status code: ',
@@ -57,17 +76,6 @@ async function setValue(device, deviceFeature, value) {
       e.response.statusText,
     );
     logger.error('error details: ', e.response.data.error.code, ' - ', e.response.data.error.message);
-    if (e.response.status === 403 && e.response.data.error.code === 13) {
-      await this.saveStatus({
-        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
-        message: 'set_devices_value_fail_scope_rights',
-      });
-    } else {
-      await this.saveStatus({
-        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
-        message: 'set_devices_value_error_unknown',
-      });
-    }
   }
 }
 
