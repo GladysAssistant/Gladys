@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const bodyHomesDataMock = JSON.parse(JSON.stringify(require('../netatmo.homesdata.mock.test.json')));
 const bodyHomeStatusMock = JSON.parse(JSON.stringify(require('../netatmo.homestatus.mock.test.json')));
@@ -16,11 +16,15 @@ const homesMock = bodyHomesDataMock.homes[0];
 describe('Netatmo Load Device Details', () => {
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
 
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -32,12 +36,16 @@ describe('Netatmo Load Device Details', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should load device details successfully with API not configured', async () => {
     netatmoHandler.configuration.energyApi = false;
     netatmoHandler.configuration.weatherApi = false;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -103,7 +111,7 @@ describe('Netatmo Load Device Details', () => {
   it('should no load device details without modules with API configured', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.configuration.weatherApi = true;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -149,7 +157,7 @@ describe('Netatmo Load Device Details', () => {
       (module) => module.type !== 'NATherm1',
     );
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -193,7 +201,7 @@ describe('Netatmo Load Device Details', () => {
     bodyHomeStatusMockFake.home.modules = bodyHomeStatusMock.home.modules.filter((module) => module.type !== 'NAMain');
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -232,7 +240,7 @@ describe('Netatmo Load Device Details', () => {
   it('should load device details successfully but without weather station details', async () => {
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -325,7 +333,7 @@ describe('Netatmo Load Device Details', () => {
     const bodyHomeStatusMockFake = { ...bodyHomeStatusMock };
     bodyHomeStatusMockFake.home.modules = undefined;
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -342,7 +350,7 @@ describe('Netatmo Load Device Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',

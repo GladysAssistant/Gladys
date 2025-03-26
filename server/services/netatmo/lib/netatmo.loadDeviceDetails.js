@@ -30,7 +30,7 @@ async function loadDeviceDetails(homeData) {
     });
     const rawBody = await responseGetHomestatus.text();
     if (!responseGetHomestatus.ok) {
-      logger.error('Netatmo error:', responseGetHomestatus.status, rawBody);
+      logger.error('Netatmo error: ', responseGetHomestatus.status, rawBody);
     }
 
     const data = JSON.parse(rawBody);

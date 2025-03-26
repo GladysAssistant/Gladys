@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const bodyGetThermostatMock = JSON.parse(JSON.stringify(require('../netatmo.getThermostat.mock.test.json')));
 const thermostatsDetailsMock = JSON.parse(JSON.stringify(require('../netatmo.loadThermostatDetails.mock.test.json')));
@@ -15,10 +15,15 @@ const accessToken = 'testAccessToken';
 describe('Netatmo Load Thermostat Details', () => {
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
+
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -31,12 +36,16 @@ describe('Netatmo Load Thermostat Details', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should load thermostat details successfully with API not configured', async () => {
     netatmoHandler.configuration.energyApi = false;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -68,7 +77,7 @@ describe('Netatmo Load Thermostat Details', () => {
       module.plug.apiNotConfigured = false;
     });
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -87,7 +96,7 @@ describe('Netatmo Load Thermostat Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -113,7 +122,7 @@ describe('Netatmo Load Thermostat Details', () => {
   });
 
   it('should handle unexpected API responses', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',

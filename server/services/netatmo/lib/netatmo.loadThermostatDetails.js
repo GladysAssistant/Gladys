@@ -24,7 +24,7 @@ async function loadThermostatDetails() {
     });
     const rawBody = await responseGetThermostat.text();
     if (!responseGetThermostat.ok) {
-      logger.error('Erreur Netatmo :', responseGetThermostat.status, rawBody);
+      logger.error('Netatmo error: ', responseGetThermostat.status, rawBody);
     }
     const data = JSON.parse(rawBody);
     const { body, status } = data;

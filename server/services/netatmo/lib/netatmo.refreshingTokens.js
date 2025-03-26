@@ -42,7 +42,7 @@ async function refreshingTokens() {
     });
     const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Error getting new accessToken to Netatmo - Details:', response.status, rawBody);
+      logger.error('Error getting new refresh token: ', response.status, rawBody);
       throw new Error(`HTTP error ${response.status} - ${rawBody}`);
     }
     const data = JSON.parse(rawBody);
@@ -56,8 +56,7 @@ async function refreshingTokens() {
     logger.debug('Netatmo new access tokens well loaded with status: ', this.status);
     return { success: true };
   } catch (e) {
-    logger.error('Error getting new accessToken to Netatmo - Details:', e);
-    logger.error('Netatmo no successfull refresh token and disconnect');
+    logger.error('Netatmo no successfull refresh token and disconnect: ', e);
     const tokens = {
       accessToken: '',
       refreshToken: '',

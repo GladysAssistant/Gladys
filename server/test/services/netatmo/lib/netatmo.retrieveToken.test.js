@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -25,11 +25,15 @@ describe('Netatmo retrieveTokens', () => {
   let body;
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
 
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -44,6 +48,10 @@ describe('Netatmo retrieveTokens', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should throw an error if configuration is not complete', async () => {
@@ -97,7 +105,7 @@ describe('Netatmo retrieveTokens', () => {
       expire_in: 3600,
     };
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -130,7 +138,7 @@ describe('Netatmo retrieveTokens', () => {
     };
     netatmoHandler.configuration.energyApi = true;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -161,7 +169,7 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.clientSecret = 'test-client-secret';
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -207,7 +215,7 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

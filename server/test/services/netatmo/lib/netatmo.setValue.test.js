@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -25,11 +25,15 @@ const [deviceMock] = devicesMock.filter((device) => device.model === 'NATherm1')
 describe('Netatmo Set Value', () => {
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
 
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -41,6 +45,10 @@ describe('Netatmo Set Value', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should set device value successfully', async () => {
@@ -49,7 +57,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -126,7 +134,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -168,7 +176,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

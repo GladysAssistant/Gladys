@@ -28,7 +28,7 @@ async function loadDevices() {
       });
       const rawBody = await responsePage.text();
       if (!responsePage.ok) {
-        logger.error('Netatmo error:', responsePage.status, rawBody);
+        logger.error('Netatmo error: ', responsePage.status, rawBody);
       }
 
       const data = JSON.parse(rawBody);

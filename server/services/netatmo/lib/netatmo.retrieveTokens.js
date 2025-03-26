@@ -50,7 +50,7 @@ async function retrieveTokens(body) {
     });
     const rawBody = await response.text();
     if (!response.ok) {
-      logger.error('Erreur Netatmo :', response.status, rawBody);
+      logger.error('Error getting new accessToken to Netatmo - Details: ', response.status, rawBody);
       throw new Error(`HTTP error ${response.status} - ${rawBody}`);
     }
     const data = JSON.parse(rawBody);
@@ -73,7 +73,7 @@ async function retrieveTokens(body) {
       statusType: STATUS.ERROR.PROCESSING_TOKEN,
       message: 'get_access_token_fail',
     });
-    logger.error('Error getting new accessToken to Netatmo - Details:', e);
+    logger.error('Error getting new accessToken to Netatmo - Details: ', e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
 }
