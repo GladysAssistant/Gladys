@@ -26,7 +26,6 @@ describe('Netatmo retrieveTokens', () => {
   let netatmoMock;
   let originalDispatcher;
 
-
   beforeEach(() => {
     sinon.reset();
 
@@ -105,7 +104,7 @@ describe('Netatmo retrieveTokens', () => {
       expire_in: 3600,
     };
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -138,7 +137,7 @@ describe('Netatmo retrieveTokens', () => {
     };
     netatmoHandler.configuration.energyApi = true;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -169,7 +168,7 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.clientSecret = 'test-client-secret';
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -215,7 +214,7 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.stateGetAccessToken = 'valid-state';
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

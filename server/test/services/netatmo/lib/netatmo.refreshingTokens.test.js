@@ -24,7 +24,6 @@ describe('Netatmo Refreshing Tokens', () => {
   let netatmoMock;
   let originalDispatcher;
 
-
   beforeEach(() => {
     sinon.reset();
 
@@ -106,7 +105,7 @@ describe('Netatmo Refreshing Tokens', () => {
       expire_in: 3600,
     };
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -148,7 +147,7 @@ describe('Netatmo Refreshing Tokens', () => {
   });
 
   it('should handle an error during token refresh', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -191,7 +190,7 @@ describe('Netatmo Refreshing Tokens', () => {
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.refreshToken = 'refresh-token';
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

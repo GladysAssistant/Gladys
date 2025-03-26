@@ -26,7 +26,6 @@ describe('Netatmo Set Value', () => {
   let netatmoMock;
   let originalDispatcher;
 
-
   beforeEach(() => {
     sinon.reset();
 
@@ -57,7 +56,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -134,7 +133,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -176,7 +175,7 @@ describe('Netatmo Set Value', () => {
     )[0];
     const newValue = 20;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

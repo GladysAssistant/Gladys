@@ -46,7 +46,7 @@ describe('Netatmo Load Weather Station Details', () => {
   it('should load weather station details successfully with API not configured', async () => {
     netatmoHandler.configuration.weatherApi = false;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -78,7 +78,7 @@ describe('Netatmo Load Weather Station Details', () => {
       moduleWeatherStations.plug.apiNotConfigured = false;
     });
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -97,7 +97,7 @@ describe('Netatmo Load Weather Station Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -123,7 +123,7 @@ describe('Netatmo Load Weather Station Details', () => {
   });
 
   it('should handle unexpected API responses', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',

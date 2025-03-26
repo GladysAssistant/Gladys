@@ -44,7 +44,7 @@ describe('Netatmo Load Device Details', () => {
   it('should load device details successfully with API not configured', async () => {
     netatmoHandler.configuration.energyApi = false;
     netatmoHandler.configuration.weatherApi = false;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -100,7 +100,7 @@ describe('Netatmo Load Device Details', () => {
   it('should no load device details without modules with API configured', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.configuration.weatherApi = true;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -139,7 +139,7 @@ describe('Netatmo Load Device Details', () => {
       (module) => module.type !== 'NATherm1',
     );
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -181,7 +181,7 @@ describe('Netatmo Load Device Details', () => {
     bodyHomeStatusMockFake.home.modules = bodyHomeStatusMock.home.modules.filter((module) => module.type !== 'NAMain');
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -218,7 +218,7 @@ describe('Netatmo Load Device Details', () => {
   it('should load device details successfully but without weather station details', async () => {
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -260,7 +260,7 @@ describe('Netatmo Load Device Details', () => {
     const bodyHomeStatusMockFake = { ...bodyHomeStatusMock };
     bodyHomeStatusMockFake.home.modules = undefined;
 
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',
@@ -277,7 +277,7 @@ describe('Netatmo Load Device Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    // 💥 Intercept specific to this test
+    // Intercept specific to this test
     netatmoMock
       .intercept({
         method: 'GET',

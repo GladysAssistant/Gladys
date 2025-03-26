@@ -29,7 +29,6 @@ describe('Netatmo pollRefreshingToken', () => {
   let netatmoMock;
   let originalDispatcher;
 
-
   beforeEach(() => {
     sinon.reset();
 
@@ -79,7 +78,7 @@ describe('Netatmo pollRefreshingToken', () => {
     netatmoHandler.refreshingTokens = refreshingTokens;
     tokens.refresh_token = 'new-refresh-token2';
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',

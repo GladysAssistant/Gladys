@@ -51,7 +51,7 @@ async function setValue(device, deviceFeature, value) {
     });
     const rawBody = await responseSetRoomThermpoint.text();
     if (!responseSetRoomThermpoint.ok) {
-      logger.error('Erreur Netatmo :', responseSetRoomThermpoint.status, rawBody);
+      logger.error('Netatmo error: ', responseSetRoomThermpoint.status, rawBody);
       if (responseSetRoomThermpoint.status === 403 && JSON.parse(rawBody).error.code === 13) {
         await this.saveStatus({
           statusType: STATUS.ERROR.SET_DEVICES_VALUES,

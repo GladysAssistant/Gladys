@@ -22,7 +22,6 @@ describe('Netatmo Load Devices', () => {
   let netatmoMock;
   let originalDispatcher;
 
-
   beforeEach(() => {
     sinon.reset();
 
@@ -53,7 +52,7 @@ describe('Netatmo Load Devices', () => {
   });
 
   it('should load all devices successfully if all API not configured', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -72,7 +71,7 @@ describe('Netatmo Load Devices', () => {
 
   it('should load energy devices successfully', async () => {
     netatmoHandler.configuration.energyApi = true;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -105,7 +104,7 @@ describe('Netatmo Load Devices', () => {
           plug.modules_bridged = plug.modules.map((module) => module._id);
         }
       });
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -147,7 +146,7 @@ describe('Netatmo Load Devices', () => {
   it('should load energy and weather devices successfully', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.configuration.weatherApi = true;
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -168,7 +167,7 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -195,7 +194,7 @@ describe('Netatmo Load Devices', () => {
   it('should handle unexpected API responses', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -219,7 +218,7 @@ describe('Netatmo Load Devices', () => {
     badBodyHomesData.homes[0].modules = undefined;
     badBodyHomesData.homes[1].modules = undefined;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -241,7 +240,7 @@ describe('Netatmo Load Devices', () => {
     const bodyHomesDataEmpty = { ...JSON.parse(JSON.stringify(bodyHomesDataMock)) };
     bodyHomesDataEmpty.homes = [];
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -265,7 +264,7 @@ describe('Netatmo Load Devices', () => {
       home.modules = undefined;
     });
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -288,7 +287,7 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.loadWeatherStationDetails = sinon.stub().rejects(new Error('Failed to load weatherStationsDetails'));
     sinon.stub(logger, 'error');
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',

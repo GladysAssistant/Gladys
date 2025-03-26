@@ -44,7 +44,7 @@ describe('Netatmo Load Thermostat Details', () => {
   it('should load thermostat details successfully with API not configured', async () => {
     netatmoHandler.configuration.energyApi = false;
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -77,7 +77,7 @@ describe('Netatmo Load Thermostat Details', () => {
       thermostat.plug.apiNotConfigured = false;
     });
 
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -96,7 +96,7 @@ describe('Netatmo Load Thermostat Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
@@ -122,7 +122,7 @@ describe('Netatmo Load Thermostat Details', () => {
   });
 
   it('should handle unexpected API responses', async () => {
-    // 🧪 Intercept the HTTP/2 call via undici
+    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'GET',
