@@ -589,7 +589,8 @@
           "get_access_token_fail": "Falsche Informationen eingegeben oder Konto deaktiviert. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>."
         },
         "weatherApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Weather\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Station zu erhalten.",
-        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten."
+        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten.",
+        "securityApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Home + Security\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten."
       },
       "device": {
         "title": "Netatmo-Geräte in Gladys",
@@ -631,6 +632,8 @@
         "descriptionAdditionalInformationEnergyApi": "Sie müssen unten auf der Seite die API \"Energy\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
         "titleAdditionalInformationWeatherApi": "Weitere Informationen über die Funktionsweise der \"Weather\"-API:",
         "descriptionAdditionalInformationWeatherApi": "Sie müssen unten auf der Seite die API \"Weather\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Wenn Sie auch über Geräte verfügen, die zur API \"Energy\" gehören (Stecker, Thermostat oder Ventil), haben Sie Zugriff auf eine zusätzliche Funktionalität bei Innenhygrometergeräten, um die Durchschnittstemperatur des entsprechenden Raums zu ermitteln. Vergessen Sie also nicht, die API \"Energy\" auszuwählen, um auf diese Funktionalität zuzugreifen.",
+        "titleAdditionalInformationSecurityApi": "Zusätzliche Informationen zur Funktionsweise der API \"Home + Security\":",
+        "descriptionAdditionalInformationSecurityApi": "Sie müssen unten auf der Seite die API \"Home + Security\" auswählen, um auf die Befehle für die entsprechenden Geräte zuzugreifen. Insbesondere für zukünftige Entwicklungen wie die Steuerung der Außenkamera, der Sirene oder der BTicino-Türsteherklasse 300 EOS sowie Anwesenheitskontrolle.",
         "clientIdLabel": "Kunden-ID",
         "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
         "clientSecretLabel": "Kundengeheimnis",
@@ -638,6 +641,7 @@
         "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
         "energyApiLabel": "Aktiviere \"Energy\" API (Netatmo Stecker, Thermostat und Ventile abrufen)",
         "weatherApiLabel": "Aktiviere \"Weather\" API (Netatmo Wetterstation Geräte abrufen)",
+        "securityApiLabel": "Aktiviere \"Home + Security\" API (Netatmo Innenkameras abrufen)",
         "saveLabel": "Speichern und verbinden",
         "disconnectLabel": "Trennen"
       },

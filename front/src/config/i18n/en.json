@@ -589,7 +589,8 @@
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
-        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices."
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices.",
+        "securityApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Home + Security\" API in order to have access to all the information on your devices."
       },
       "device": {
         "title": "Netatmo Devices in Gladys",
@@ -631,6 +632,8 @@
         "descriptionAdditionalInformationEnergyApi": "You must select the \"Energy\" API at the bottom of the page to access the corresponding devices. Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
         "titleAdditionalInformationWeatherApi": "Additional Information on the Operation of the \"Weather\" API:",
         "descriptionAdditionalInformationWeatherApi": "You must select the \"Weather\" API at the bottom of the page to access the corresponding devices. If you also have devices belonging to the \"Energy\" API (Plug, thermostat or valve) you will have access to an additional functionality on indoor hygrometer devices to obtain the average temperature of the corresponding room. So don't forget to select the \"Energy\" API to access this functionality.",
+        "titleAdditionalInformationSecurityApi": "Additional information on how the \"Home + Security\" API works:",
+        "descriptionAdditionalInformationSecurityApi": "You must select the \"Home + Security\" API at the bottom of the page to access the commands for the corresponding devices. Particularly for future developments such as controlling the exterior camera, the siren or the BTicino doorman Class 300 EOS as well as presence control.",
         "clientIdLabel": "Client ID",
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",
@@ -638,6 +641,7 @@
         "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
         "energyApiLabel": "Enable \"Energy\" API (retrieve Netatmo Plug, Thermostat, and Valve devices)",
         "weatherApiLabel": "Enable \"Weather\" API (retrieve Netatmo Weather Station devices)",
+        "securityApiLabel": "Enable \"Home + Security\" API (retrieve Netatmo indoor cameras devices)",
         "saveLabel": "Save and connect",
         "disconnectLabel": "Disconnect"
       },

@@ -717,7 +717,8 @@
           "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "weatherApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Weather\" dans le but d'avoir accès à la totalité des informations de votre station.",
-        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils."
+        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils.",
+        "securityApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Home + Security\" dans le but d'avoir accès à la totalité des informations de vos appareils."
       },
       "device": {
         "title": "Appareils Netatmo dans Gladys",
@@ -759,13 +760,16 @@
         "descriptionAdditionalInformationEnergyApi": "Vous devez sélectionner l'API \"Energy\" en bas de page pour accéder aux appareils correspondants. Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
         "titleAdditionalInformationWeatherApi": "Informations complémentaires sur le fonctionnement de l'API \"Weather\" :",
         "descriptionAdditionalInformationWeatherApi": "Vous devez sélectionner l'API \"Weather\" en bas de page pour accéder aux appareils correspondants. Si vous avez également des appareils appartenant à l'API \"Energy\" (Plug, thermostat ou vanne) vous aurez accès à une fonctionnalité supplémentaire sur les appareils hygromètres intérieurs pour obtenir la température moyenne de la pièce correspondante. N'oubliez donc pas de sélectionner l'API \"Energy\" pour accéder à cette fonctionnalité.",
+        "titleAdditionalInformationSecurityApi": "Informations complémentaires sur le fonctionnement de l'API \"Home + Security\" :",
+        "descriptionAdditionalInformationSecurityApi": "Vous devez sélectionner l'API \"Home + Security\" en bas de page pour accéder aux commandes des appareils correspondants. Notamment pour les évolutions futures comme le contrôle de la Caméra extérieur, de la sirène ou du portier BTicino Classe 300 EOS ainsi que le contrôle de la présence.",
         "clientIdLabel": "Identifiant client",
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
         "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
-        "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
+        "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plugs, Thermostats et Vannes Netatmo)",
         "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
+        "securityApiLabel": "Activer l'API \"Home + Security\" (récupérer les appareils Caméras intérieurs Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
         "disconnectLabel": "Déconnecter"
       },

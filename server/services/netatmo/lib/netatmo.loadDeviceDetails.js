@@ -1,4 +1,5 @@
-const { default: axios } = require('axios');
+const Promise = require('bluebird');
+const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
@@ -18,14 +19,24 @@ async function loadDeviceDetails(homeData) {
     home_id: homeId,
   };
   try {
-    const responseGetHomestatus = await axios({
-      url: `${API.HOMESTATUS}`,
-      method: 'get',
-      headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
-      data: paramsForm,
+    const url = `${API.HOMESTATUS}?${new URLSearchParams(paramsForm).toString()}`;
+    const responseGetHomestatus = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Accept: API.HEADER.ACCEPT,
+      },
     });
-    const { body, status } = responseGetHomestatus.data;
+    const rawBody = await responseGetHomestatus.text();
+    if (!responseGetHomestatus.ok) {
+      logger.error('Netatmo error: ', responseGetHomestatus.status, rawBody);
+    }
+
+    const data = JSON.parse(rawBody);
+    const { body, status } = data;
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = body.home;
+
     if (status === 'ok') {
       if (modulesHomestatus) {
         listDevices = modulesHomestatus.map((module) => {
@@ -60,6 +71,17 @@ async function loadDeviceDetails(homeData) {
             }
             moduleSupported = true;
             categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+          }
+          if (
+            model === SUPPORTED_MODULE_TYPE.NACAMERA
+          ) {
+            if (!this.configuration.securityApi) {
+              apiNotConfigured = true;
+            } else {
+              apiNotConfigured = false;
+            }
+            moduleSupported = true;
+            categoryAPI = SUPPORTED_CATEGORY_TYPE.SECURITY;
           }
 
           const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);

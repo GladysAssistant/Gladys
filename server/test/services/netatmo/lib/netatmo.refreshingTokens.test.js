@@ -1,11 +1,12 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const nock = require('nock');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
 const { EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { FfmpegMock, childProcessMock } = require('../FfmpegMock.test');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -17,12 +18,24 @@ const gladys = {
   },
 };
 const serviceId = 'serviceId';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const netatmoHandler = new NetatmoHandler(gladys, FfmpegMock, childProcessMock, serviceId);
 
 describe('Netatmo Refreshing Tokens', () => {
+  let mockAgent;
+  let netatmoMock;
+  let originalDispatcher;
+
   beforeEach(() => {
     sinon.reset();
-    nock.cleanAll();
+
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
+    mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+    netatmoMock = mockAgent.get('https://api.netatmo.com');
 
     netatmoHandler.configuration = {
       clientId: 'valid_client_id',
@@ -36,7 +49,10 @@ describe('Netatmo Refreshing Tokens', () => {
 
   afterEach(() => {
     sinon.reset();
-    nock.cleanAll();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should throw an error if configuration are missing', async () => {
@@ -89,8 +105,13 @@ describe('Netatmo Refreshing Tokens', () => {
       refresh_token: 'new-refresh-token',
       expire_in: 3600,
     };
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(200, tokens);
 
     const result = await netatmoHandler.refreshingTokens();
@@ -127,16 +148,20 @@ describe('Netatmo Refreshing Tokens', () => {
   });
 
   it('should handle an error during token refresh', async () => {
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(400, { error: 'invalid_request' });
 
     try {
       await netatmoHandler.refreshingTokens();
       expect.fail('should have thrown an error');
     } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-      expect(e.message).to.include('NETATMO: Service is not connected with error');
+      expect(e).to.be.instanceOf(Error);
+      expect(e.message).to.include('HTTP error 400 - {"error":"invalid_request"}');
       expect(netatmoHandler.status).to.equal('disconnected');
       expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
       expect(
@@ -165,10 +190,14 @@ describe('Netatmo Refreshing Tokens', () => {
     netatmoHandler.configuration.clientSecret = 'test-client-secret';
     netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
     netatmoHandler.refreshToken = 'refresh-token';
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
-      .replyWithError('Network error');
 
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .replyWithError('Network error');
     try {
       await netatmoHandler.refreshingTokens();
       expect.fail('should have thrown an error');

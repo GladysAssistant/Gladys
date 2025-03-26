@@ -1,6 +1,6 @@
 {
   "name": "gladys-netatmo",
-  "version": "1.0.0",
+  "version": "1.7.0",
   "main": "index.js",
   "os": [
     "darwin",
@@ -13,7 +13,10 @@
     "arm64"
   ],
   "dependencies": {
-    "axios": "^1.6.2",
-    "bluebird": "^3.7.2"
+    "bluebird": "^3.7.2",
+    "bottleneck": "^2.19.5",
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^8.0.1",
+    "undici": "^7.5.0"
   }
 }
