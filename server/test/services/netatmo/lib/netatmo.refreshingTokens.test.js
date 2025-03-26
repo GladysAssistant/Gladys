@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -22,11 +22,16 @@ const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 describe('Netatmo Refreshing Tokens', () => {
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
+
 
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -44,6 +49,10 @@ describe('Netatmo Refreshing Tokens', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should throw an error if configuration are missing', async () => {

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { MockAgent, setGlobalDispatcher } = require('undici');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const devicesMock = JSON.parse(JSON.stringify(require('../netatmo.loadDevicesComplete.mock.test.json')));
 const deviceDetailsMock = JSON.parse(JSON.stringify(require('../netatmo.loadDevicesDetails.mock.test.json')));
@@ -20,11 +20,16 @@ const accessToken = 'testAccessToken';
 describe('Netatmo Load Devices', () => {
   let mockAgent;
   let netatmoMock;
+  let originalDispatcher;
+
 
   beforeEach(() => {
     sinon.reset();
 
-    // 🧪 MockAgent setup
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
     mockAgent = new MockAgent();
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
@@ -41,6 +46,10 @@ describe('Netatmo Load Devices', () => {
 
   afterEach(() => {
     sinon.reset();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should load all devices successfully if all API not configured', async () => {
