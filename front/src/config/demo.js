@@ -1100,6 +1100,7 @@ const data = {
     icon: 'fe fe-bell',
     active: true,
     name: 'Wake Up',
+    tags: [],
     triggers: [
       {
         type: 'device.new-state',

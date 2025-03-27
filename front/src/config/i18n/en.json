@@ -1814,6 +1814,8 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
+    "deleteText": "Are you sure?",
+    "cancelButton": "Cancel",
     "duplicateButton": "Duplicate",
     "moreButton": "More",
     "triggersTitle": "Triggers",
