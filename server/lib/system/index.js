@@ -8,6 +8,7 @@ const { installUpgrade } = require('./system.installUpgrade');
 const { isDocker } = require('./system.isDocker');
 const { getGladysBasePath } = require('./system.getGladysBasePath');
 const { getContainers } = require('./system.getContainers');
+const { updateContainers } = require('./system.updateContainers');
 const { getContainerMounts } = require('./system.getContainerMounts');
 const { inspectContainer } = require('./system.inspectContainer');
 const { getGladysContainerId } = require('./system.getGladysContainerId');
@@ -37,8 +38,10 @@ const System = function System(sequelize, event, config, job) {
   this.job = job;
   this.dockerode = null;
   this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
+  this.updateContainers = this.job.wrapper(JOB_TYPES.UPDATE_CONTAINERS, this.updateContainers.bind(this));
   this.event.on(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, eventFunctionWrapper(this.downloadUpgrade.bind(this)));
   this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
+  this.event.on(EVENTS.SYSTEM.UPDATE_CONTAINERS, eventFunctionWrapper(this.updateContainers.bind(this)));
   this.networkMode = null;
 };
 
@@ -47,6 +50,7 @@ System.prototype.init = init;
 System.prototype.installUpgrade = installUpgrade;
 System.prototype.isDocker = isDocker;
 System.prototype.getContainers = getContainers;
+System.prototype.updateContainers = updateContainers;
 System.prototype.getContainerMounts = getContainerMounts;
 System.prototype.inspectContainer = inspectContainer;
 System.prototype.getGladysBasePath = getGladysBasePath;
