@@ -1799,6 +1799,49 @@
         "saved": "Configuration saved!",
         "error": "Error while saving configuration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Add and manage your Matter devices.",
+      "deviceTab": "Devices",
+      "addTab": "Add Device",
+      "settingsTab": "Settings",
+      "documentation": "Documentation",
+      "discover": {
+        "title": "Add Matter Device",
+        "description": "Your Matter device provides an 11-digit pairing code that you need to enter here to add it to Gladys. If your device is a Thread device, it must be connected to a Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Pairing Code",
+        "pairingCodeHelp": "Enter the 11-digit pairing code provided by your Matter device",
+        "addButton": "Add to Gladys"
+      },
+      "settings": {
+        "title": "Matter Settings",
+        "description": "Enable or disable the Matter integration in Gladys. When enabled, Gladys will be able to communicate with your Matter devices.",
+        "enableIntegration": "Enable Matter Integration",
+        "saveButton": "Save",
+        "error": "An error occurred while saving settings"
+      },
+      "device": {
+        "title": "Matter Devices",
+        "noDeviceFound": "No Matter devices found",
+        "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
+        "addToGladys": "Add to Gladys"
+      },
+      "discoverDeviceDescr": "Add a new Matter device",
+      "nameLabel": "Name",
+      "namePlaceholder": "My Matter Device",
+      "roomLabel": "Room",
+      "featuresLabel": "Features",
+      "noFeaturesHandled": "No features are handled by this device",
+      "alreadyCreatedButton": "Device already added",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "error": {
+        "defaultError": "An error occurred while saving the device",
+        "conflictError": "A device with this name already exists",
+        "defaultDeletionError": "An error occurred while deleting the device",
+        "getDevicesError": "An error occurred while getting the devices list"
+      }
     }
   },
   "editScene": {

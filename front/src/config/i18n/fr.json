@@ -581,7 +581,7 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
@@ -622,7 +622,7 @@
       "title": "Free Mobile",
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
       "documentation": "Documentation Free Mobile",
-      "introduction": "Ce plugin vous permet d’envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
+      "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
       "username": "Identifiant client Free Mobile",
       "key": "Clé d'identification au service",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
@@ -763,7 +763,7 @@
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
-        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d'accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
         "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
         "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
@@ -1689,7 +1689,7 @@
         "title": "Scanner de présence",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan",
         "presenceScannerFrequencyUnit": "minutes",
@@ -1798,6 +1798,49 @@
         "saveButton": "Sauvegarder la configuration",
         "saved": "Configuration sauvegardée !",
         "error": "Erreur lors de la sauvegarde de la configuration"
+      }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Ajoutez et gérez vos appareils Matter.",
+      "deviceTab": "Appareils",
+      "addTab": "Ajouter un appareil",
+      "settingsTab": "Paramètres",
+      "documentation": "Documentation",
+      "device": {
+        "title": "Appareils Matter",
+        "noDeviceFound": "Aucun appareil Matter trouvé",
+        "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
+        "addToGladys": "Ajouter à Gladys"
+      },
+      "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Mon appareil Matter",
+      "roomLabel": "Pièce",
+      "featuresLabel": "Fonctionnalités",
+      "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
+      "alreadyCreatedButton": "Appareil déjà ajouté",
+      "saveButton": "Enregistrer",
+      "deleteButton": "Supprimer",
+      "error": {
+        "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
+        "conflictError": "Un appareil avec ce nom existe déjà",
+        "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
+        "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
+      },
+      "discover": {
+        "title": "Ajouter un appareil Matter",
+        "description": "Votre appareil fournit un code d'appairage à 11 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Code d'appairage",
+        "pairingCodeHelp": "Entrez le code d'appairage à 11 chiffres fourni par votre appareil Matter",
+        "addButton": "Ajouter à Gladys"
+      },
+      "settings": {
+        "title": "Paramètres Matter",
+        "description": "Activez ou désactivez l'intégration Matter dans Gladys. Lorsqu'elle est activée, Gladys pourra communiquer avec vos appareils Matter.",
+        "enableIntegration": "Activer l'intégration Matter",
+        "saveButton": "Enregistrer",
+        "error": "Une erreur est survenue lors de l'enregistrement des paramètres"
       }
     }
   },
@@ -2643,7 +2686,7 @@
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
-    "forgotPasswordLabel": "J’ai oublié mon mot de passe",
+    "forgotPasswordLabel": "J'ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "loginButtonText": "Connexion",
     "wrongCredentials": "E-mail / mot de passe incorrect.",

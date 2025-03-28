@@ -1,0 +1,19 @@
+{
+  "name": "gladys-matter",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "@matter/main": "^0.12.6",
+    "@project-chip/matter.js": "^0.12.6",
+    "fs-extra": "^11.3.0"
+  }
+}
