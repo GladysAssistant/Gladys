@@ -45,7 +45,7 @@ async function pairDevice(pairingCode) {
     await Promise.each(nodeDetails, async (nodeDetail) => {
       const node = await this.commissioningController.getNode(nodeDetail.nodeId);
       const devices = node.getDevices();
-      devices.forEach(async (device) => {
+      await Promise.each(devices, async (device) => {
         const gladysDevice = await convertToGladysDevice(
           this.serviceId,
           nodeDetail.nodeId,
