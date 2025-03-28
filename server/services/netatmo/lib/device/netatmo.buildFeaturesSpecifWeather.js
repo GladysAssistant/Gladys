@@ -80,7 +80,7 @@ function buildFeatureNoise(name, externalId) {
  * @description Transforms Netatmo feature as Gladys feature. Current Pressure or Absolute pressure.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
- * @param {string} featureName - Gladys external ID.
+ * @param {string} featureName - featureName - Gladys feature constructor.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeaturePressure(device_name, 'netatmo:device_id', 'pressure');
@@ -106,7 +106,6 @@ function buildFeaturePressure(name, externalId, featureName) {
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
  * @param {string} featureName - Gladys feature constructor.
- * @param {string} unit - Gladys unit.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeatureWindStrength(device_name, 'netatmo:device_id', 'wind_strength');
@@ -131,7 +130,7 @@ function buildFeatureWindStrength(name, externalId, featureName) {
  * @description Transforms Netatmo feature as Gladys feature. Angle of wind.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
- * @param {string} featureName - Gladys external ID.
+ * @param {string} featureName - featureName - Gladys feature constructor.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeatureWindAngle(device_name, 'netatmo:device_id', 'wind_angle');
