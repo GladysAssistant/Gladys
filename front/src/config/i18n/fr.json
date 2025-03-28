@@ -1840,7 +1840,13 @@
         "description": "Activez ou désactivez l'intégration Matter dans Gladys. Lorsqu'elle est activée, Gladys pourra communiquer avec vos appareils Matter.",
         "enableIntegration": "Activer l'intégration Matter",
         "saveButton": "Enregistrer",
-        "error": "Une erreur est survenue lors de l'enregistrement des paramètres"
+        "error": "Une erreur est survenue lors de l'enregistrement des paramètres",
+        "nodesTitle": "Nœuds Matter",
+        "nodeIdLabel": "ID du nœud",
+        "nodeDetailsLabel": "Détails du nœud",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Décommissionner",
+        "noNodesFound": "Aucun nœud Matter trouvé"
       }
     }
   },

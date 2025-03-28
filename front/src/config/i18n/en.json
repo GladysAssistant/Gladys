@@ -1819,7 +1819,13 @@
         "description": "Enable or disable the Matter integration in Gladys. When enabled, Gladys will be able to communicate with your Matter devices.",
         "enableIntegration": "Enable Matter Integration",
         "saveButton": "Save",
-        "error": "An error occurred while saving settings"
+        "error": "An error occurred while saving settings",
+        "nodesTitle": "Matter Nodes",
+        "nodeIdLabel": "Node ID",
+        "nodeDetailsLabel": "Node Details",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Decommission",
+        "noNodesFound": "No Matter nodes found"
       },
       "device": {
         "title": "Matter Devices",

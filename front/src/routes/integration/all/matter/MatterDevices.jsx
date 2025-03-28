@@ -194,7 +194,7 @@ class MatterDevices extends Component {
                         deleteButton
                         device={device}
                         deviceIndex={index}
-                        getMatterDevices={this.getMatterDevices}
+                        refreshMatterDevices={this.init}
                         housesWithRooms={housesWithRooms}
                       />
                     ))

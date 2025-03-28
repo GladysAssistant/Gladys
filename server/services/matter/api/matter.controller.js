@@ -21,6 +21,26 @@ module.exports = function MatterController(matterHandler) {
     res.json(devices);
   }
 
+  /**
+   * @api {get} /api/v1/service/matter/node Get nodes
+   * @apiName getNodes
+   * @apiGroup Matter
+   */
+  async function getNodes(req, res) {
+    const nodes = matterHandler.getNodes();
+    res.json(nodes);
+  }
+
+  /**
+   * @api {post} /api/v1/service/matter/node/:node_id/decommission Decommission a node
+   * @apiName decommissionNode
+   * @apiGroup Matter
+   */
+  async function decommissionNode(req, res) {
+    await matterHandler.decommission(BigInt(req.params.node_id));
+    res.json({ success: true });
+  }
+
   return {
     'post /api/v1/service/matter/pair-device': {
       authenticated: true,
@@ -29,6 +49,14 @@ module.exports = function MatterController(matterHandler) {
     'get /api/v1/service/matter/paired-device': {
       authenticated: true,
       controller: asyncMiddleware(getPairedDevices),
+    },
+    'get /api/v1/service/matter/node': {
+      authenticated: true,
+      controller: asyncMiddleware(getNodes),
+    },
+    'post /api/v1/service/matter/node/:node_id/decommission': {
+      authenticated: true,
+      controller: asyncMiddleware(decommissionNode),
     },
   };
 };

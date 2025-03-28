@@ -63,6 +63,7 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
           read_only: false,
           has_feedback: true,
           external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
           min: 0,
           max: 1,
         });

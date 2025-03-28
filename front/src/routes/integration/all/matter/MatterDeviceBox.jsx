@@ -77,8 +77,9 @@ class MatterDeviceBox extends Component {
       if (this.state.device.created_at) {
         await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
       }
-      this.props.getMatterDevices();
+      this.props.refreshMatterDevices();
     } catch (e) {
+      console.error(e);
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
       if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {

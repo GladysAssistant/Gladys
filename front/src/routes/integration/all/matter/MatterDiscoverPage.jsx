@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
+import { route } from 'preact-router';
 import { connect } from 'unistore/preact';
 import MatterPage from './MatterPage';
 
@@ -18,10 +19,10 @@ class MatterDiscoverPage extends Component {
     this.setState({ loading: true });
 
     try {
-      const gladysDevice = await this.props.httpClient.post('/api/v1/service/matter/pair-device', {
+      await this.props.httpClient.post('/api/v1/service/matter/pair-device', {
         pairing_code: this.state.pairingCode
       });
-      await this.props.httpClient.post('/api/v1/device', gladysDevice);
+      route('/dashboard/integration/device/matter');
     } catch (e) {
       console.error(e);
     }
