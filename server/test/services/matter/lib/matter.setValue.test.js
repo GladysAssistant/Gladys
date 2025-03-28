@@ -4,7 +4,7 @@ const { fake, assert } = sinon;
 
 const MatterHandler = require('../../../../services/matter/lib');
 
-describe('Matter.init', () => {
+describe('Matter.setValue', () => {
   let matterHandler;
 
   beforeEach(() => {

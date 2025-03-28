@@ -1,4 +1,5 @@
 const { ManualPairingCodeCodec } = require('@matter/main/types');
+const Promise = require('bluebird');
 const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 const logger = require('../../../utils/logger');
 
@@ -40,12 +41,22 @@ async function pairDevice(pairingCode) {
 
     logger.info(`Successfully commissioned device with nodeId ${nodeId}`);
 
-    const node = await this.commissioningController.getNode(nodeId);
-    const devices = node.getDevices();
-    this.nodesMap.set(nodeId, node);
-    devices.forEach(async (device) => {
-      const gladysDevice = await convertToGladysDevice(this.serviceId, nodeId, node, device);
-      this.devices.push(gladysDevice);
+    const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
+    await Promise.each(nodeDetails, async (nodeDetail) => {
+      const node = await this.commissioningController.getNode(nodeDetail.nodeId);
+      const devices = node.getDevices();
+      devices.forEach(async (device) => {
+        const gladysDevice = await convertToGladysDevice(
+          this.serviceId,
+          nodeDetail.nodeId,
+          node,
+          device,
+          nodeDetail.deviceData,
+        );
+        this.listenToStateChange(nodeDetail.nodeId, device);
+        this.nodesMap.set(nodeDetail.nodeId, node);
+        this.devices.push(gladysDevice);
+      });
     });
   } catch (error) {
     logger.error(`Error commissioning device: ${error}`);

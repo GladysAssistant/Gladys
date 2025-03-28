@@ -13,7 +13,6 @@ async function listenToStateChange(nodeId, device) {
   if (onOff) {
     // Subscribe to OnOff attribute changes
     onOff.addOnOffAttributeListener((value) => {
-      console.log(`Device state changed to: ${value ? 'ON' : 'OFF'}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${device.number}:${OnOff.Complete.id}`,
         state: value ? STATE.ON : STATE.OFF,
