@@ -42,14 +42,30 @@ function createActions(store) {
         };
         if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
           options.search = state.rtspCameraSearch;
+          options.model = 'NACamera';
         }
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
+        const netatmoDevices = await state.httpClient.get('/api/v1/service/netatmo/device', options);
+        // find camera params 
+        console.log('netatmoDevices', netatmoDevices);
+        const netatmoCameras = netatmoDevices.filter(device => device.model === 'NACamera');
+        console.log('netatmoCameras', netatmoCameras);
+        // .map(device => {
+          
+        //   const camera = rtspCameras.find(camera => camera.external_id === device.external_id);
+        //   if (camera) {
+        //     camera.params = device.params;
+        //   }
+        //   return camera;
+        // });
+        const cameras = [...rtspCameras, ...netatmoCameras];
+
         // find camera params
-        rtspCameras.forEach(camera => {
+        cameras.forEach(camera => {
           actions.complete(camera);
         });
         store.setState({
-          rtspCameras,
+          rtspCameras: cameras,
           getRtspCameraStatus: RequestStatus.Success
         });
       } catch (e) {
