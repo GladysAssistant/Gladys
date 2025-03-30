@@ -74,7 +74,7 @@ const Gateway = function Gateway(
   this.googleHomeForwardStateTimeout = 5 * 1000;
   this.alexaForwardStateTimeout = 5 * 1000;
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
-  this.getLatestGladysVersionInitTimeout = 10 * 1000; // 10 seconds
+  this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({
     cryptoLib: webcrypto,
