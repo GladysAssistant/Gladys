@@ -10,6 +10,7 @@ const {
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
+const { coverStateMapping } = require('./deviceMappings');
 
 const sleep = promisify(setTimeout);
 
@@ -180,6 +181,46 @@ function buildService(device, features, categoryMapping, subtype) {
           }
 
           callback(undefined, currentTemp);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:
+      case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.STATE}`: {
+        const characteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+          callback(undefined, coverStateMapping[updatedFeatures.find((feat) => feat.id === feature.id).last_value]);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
+      case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
+        const { characteristics } = categoryMapping.capabilities[feature.type];
+        characteristics.forEach((c) => {
+          const characteristic = service.getCharacteristic(Characteristic[c]);
+          if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
+            characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+              const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+              callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
+            });
+          }
+
+          if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
+            characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
+              const action = {
+                type: ACTIONS.DEVICE.SET_VALUE,
+                status: ACTIONS_STATUS.PENDING,
+                value,
+                device: device.selector,
+                device_feature: feature.selector,
+              };
+              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+              callback();
+            });
+          }
         });
         break;
       }

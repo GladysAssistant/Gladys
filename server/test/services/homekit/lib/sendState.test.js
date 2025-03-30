@@ -25,10 +25,14 @@ describe('Send state to HomeKit', () => {
         ContactSensorState: 'CONTACTSENSORSTATE',
         MotionDetected: 'MOTIONDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
+        CurrentPosition: 'CURRENTPOSITION',
+        PositionState: 'POSITIONSTATE',
+        TargetPosition: 'TARGETPOSITION',
       },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
+        WindowCovering: 'WINDOWCOVERING',
       },
     },
     notifyTimeouts: {},
@@ -258,6 +262,60 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 20]);
+  });
+
+  it('should notify shutter state', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 0,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Shutter state',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['POSITIONSTATE', 2]);
+  });
+
+  it('should notify shutter current/target position', async () => {
+    const updateCharacteristic = stub();
+    updateCharacteristic.returns({ updateCharacteristic });
+
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 60,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Shutter position',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.callCount).eq(2);
+    expect(updateCharacteristic.args[0]).eql(['CURRENTPOSITION', 60]);
+    expect(updateCharacteristic.args[1]).eql(['TARGETPOSITION', 60]);
   });
 
   it('should do nothing wrong device category & type', async () => {

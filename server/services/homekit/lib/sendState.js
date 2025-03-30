@@ -2,7 +2,7 @@ const { intToRgb, rgbToHsb } = require('../../../utils/colors');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
-const { mappings } = require('./deviceMappings');
+const { mappings, coverStateMapping } = require('./deviceMappings');
 
 /**
  * @description Forward new state value to HomeKit.
@@ -79,6 +79,23 @@ function sendState(hkAccessory, feature, event) {
       hkAccessory
         .getService(Service.TemperatureSensor)
         .updateCharacteristic(Characteristic.CurrentTemperature, currentTemp);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.STATE}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(Characteristic.PositionState, coverStateMapping[event.last_value]);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
+      const { characteristics } = mappings[feature.category].capabilities[feature.type];
+      characteristics.forEach((c) => {
+        hkAccessory
+          .getService(Service[mappings[feature.category].service])
+          .updateCharacteristic(Characteristic[c], event.last_value);
+      });
       break;
     }
     default:
