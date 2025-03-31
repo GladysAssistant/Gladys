@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const nock = require('nock');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const bodyHomesDataMock = JSON.parse(JSON.stringify(require('../netatmo.homesdata.mock.test.json')));
 const bodyHomeStatusMock = JSON.parse(JSON.stringify(require('../netatmo.homestatus.mock.test.json')));
@@ -13,9 +13,21 @@ const accessToken = 'testAccessToken';
 const homesMock = bodyHomesDataMock.homes[0];
 
 describe('Netatmo Load Device Details', () => {
+  let mockAgent;
+  let netatmoMock;
+  let originalDispatcher;
+
   beforeEach(() => {
     sinon.reset();
-    nock.cleanAll();
+
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
+    mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+    netatmoMock = mockAgent.get('https://api.netatmo.com');
 
     netatmoHandler.status = 'not_initialized';
     netatmoHandler.accessToken = accessToken;
@@ -23,15 +35,25 @@ describe('Netatmo Load Device Details', () => {
 
   afterEach(() => {
     sinon.reset();
-    nock.cleanAll();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should load device details successfully with API not configured', async () => {
     netatmoHandler.configuration.energyApi = false;
     netatmoHandler.configuration.weatherApi = false;
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMock,
+        status: 'ok',
+      });
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     expect(devices).to.have.lengthOf(10);
@@ -78,10 +100,16 @@ describe('Netatmo Load Device Details', () => {
   it('should no load device details without modules with API configured', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.configuration.weatherApi = true;
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
-
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMock,
+        status: 'ok',
+      });
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     expect(devices).to.have.lengthOf(10);
@@ -111,9 +139,16 @@ describe('Netatmo Load Device Details', () => {
       (module) => module.type !== 'NATherm1',
     );
 
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMockFake.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
@@ -146,9 +181,16 @@ describe('Netatmo Load Device Details', () => {
     bodyHomeStatusMockFake.home.modules = bodyHomeStatusMock.home.modules.filter((module) => module.type !== 'NAMain');
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMockFake.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
@@ -176,9 +218,16 @@ describe('Netatmo Load Device Details', () => {
   it('should load device details successfully but without weather station details', async () => {
     netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMock,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
@@ -211,9 +260,16 @@ describe('Netatmo Load Device Details', () => {
     const bodyHomeStatusMockFake = { ...bodyHomeStatusMock };
     bodyHomeStatusMockFake.home.modules = undefined;
 
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMockFake.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
@@ -221,9 +277,14 @@ describe('Netatmo Load Device Details', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
       .reply(400, {
+        status: 'error',
         error: {
           code: {
             type: 'number',
@@ -242,11 +303,18 @@ describe('Netatmo Load Device Details', () => {
   });
 
   it('should handle unexpected API responses', async () => {
-    nock('https://api.netatmo.com')
-      .get('/api/homestatus')
-      .reply(200, { body: bodyHomeStatusMock, status: 'error' });
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMock,
+        status: 'error',
+      });
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
+
     expect(devices).to.be.an('array');
     expect(devices).to.have.lengthOf(0);
   });

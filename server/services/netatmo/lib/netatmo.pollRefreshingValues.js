@@ -46,7 +46,7 @@ function pollRefreshingValues() {
     try {
       await this.refreshNetatmoValues();
     } catch (error) {
-      logger.error('Error refreshing Netatmo values:', error);
+      logger.error('Error refreshing Netatmo values: ', error);
     }
   }, 120 * 1000);
 }

@@ -1,5 +1,4 @@
-const { default: axios } = require('axios');
-const querystring = require('querystring');
+const { fetch } = require('undici');
 
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
@@ -32,23 +31,32 @@ async function refreshingTokens() {
     refresh_token: this.refreshToken,
   };
   try {
-    const response = await axios({
-      url: `${API.TOKEN}`,
-      method: 'post',
-      headers: { 'Content-Type': API.HEADER.CONTENT_TYPE, Host: API.HEADER.HOST },
-      data: querystring.stringify(authentificationForm),
+    const response = await fetch(API.TOKEN, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Host: API.HEADER.HOST,
+      },
+      body: new URLSearchParams(authentificationForm).toString(),
     });
+    const rawBody = await response.text();
+    if (!response.ok) {
+      logger.error('Error getting new refresh token: ', response.status, rawBody);
+      throw new Error(`HTTP error ${response.status} - ${rawBody}`);
+    }
+    const data = JSON.parse(rawBody);
     const tokens = {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
-      expireIn: response.data.expire_in,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expireIn: data.expire_in,
     };
     await this.setTokens(tokens);
     await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
     logger.debug('Netatmo new access tokens well loaded with status: ', this.status);
     return { success: true };
   } catch (e) {
-    logger.error('Netatmo no successfull refresh token and disconnect');
+    logger.error('Netatmo no successfull refresh token and disconnect: ', e);
     const tokens = {
       accessToken: '',
       refreshToken: '',
@@ -56,7 +64,6 @@ async function refreshingTokens() {
     };
     await this.setTokens(tokens);
     await this.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' });
-    logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
 }
