@@ -2,21 +2,32 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import SettingsSystemPage from './SettingsSystemPage';
 import actions from '../../../actions/system';
-import { RequestStatus } from '../../../utils/constants';
+import { RequestStatus } from '../../../utils/consts';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 class SettingsSystem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      SystemUpgradeStatus: null,
+      watchtowerLogs: []
+    };
+  }
+
   upgradeGladys = async () => {
     this.setState({
-      SystemUpgradeStatus: RequestStatus.Getting
+      SystemUpgradeStatus: RequestStatus.Getting,
+      watchtowerLogs: []
     });
     try {
-      await state.httpClient.post('/api/v1/system/upgrade');
-      store.setState({
+      await this.props.httpClient.post('/api/v1/system/upgrade');
+      this.setState({
         SystemUpgradeStatus: RequestStatus.Success
       });
     } catch (e) {
-      store.setState({
-        SystemGetDiskSpaceStatus: RequestStatus.Error
+      console.error(e);
+      this.setState({
+        SystemUpgradeStatus: RequestStatus.Error
       });
     }
   };
@@ -30,14 +41,34 @@ class SettingsSystem extends Component {
     this.refreshPingIntervalId = setInterval(() => {
       this.props.ping();
     }, 3000);
+
+    // Listen to Watchtower logs
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG, this.handleWatchtowerLog);
   }
 
   componentWillUnmount() {
     clearInterval(this.refreshPingIntervalId);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
+      this.handleWatchtowerLog
+    );
   }
 
-  render(props, {}) {
-    return <SettingsSystemPage {...props} upgradeGladys={this.upgradeGladys} />;
+  handleWatchtowerLog = payload => {
+    this.setState(prevState => ({
+      watchtowerLogs: [...prevState.watchtowerLogs, payload.message]
+    }));
+  };
+
+  render(props, { SystemUpgradeStatus, watchtowerLogs }) {
+    return (
+      <SettingsSystemPage
+        {...props}
+        upgradeGladys={this.upgradeGladys}
+        SystemUpgradeStatus={SystemUpgradeStatus}
+        watchtowerLogs={watchtowerLogs}
+      />
+    );
   }
 }
 

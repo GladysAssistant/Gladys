@@ -37,6 +37,7 @@ const System = function System(sequelize, event, config, job) {
   this.dockerode = null;
   this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
   this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
+  this.event.on(EVENTS.SYSTEM.UPGRADE_CONTAINERS, eventFunctionWrapper(this.installUpgrade.bind(this)));
   this.networkMode = null;
 };
 

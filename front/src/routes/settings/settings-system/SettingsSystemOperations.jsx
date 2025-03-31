@@ -1,7 +1,8 @@
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import { RequestStatus } from '../../../utils/consts';
 
-const SettingsSystemOperations = ({ systemInfos, upgradeGladys }) => (
+const SettingsSystemOperations = ({ systemInfos, upgradeGladys, SystemUpgradeStatus, watchtowerLogs }) => (
   <div class="card">
     <h4 class="card-header">
       <Text id="systemSettings.operations" />
@@ -16,7 +17,45 @@ const SettingsSystemOperations = ({ systemInfos, upgradeGladys }) => (
           <p>
             <Text id="systemSettings.newUpgradeAvailableText" />
           </p>
-          <button class="btn btn-primary" onClick={upgradeGladys}>
+          {(SystemUpgradeStatus === RequestStatus.Getting || SystemUpgradeStatus === RequestStatus.Success) && (
+            <div class="mt-3">
+              <div class="alert alert-info">
+                <Text id="systemSettings.upgradeInProgress" />
+              </div>
+              {watchtowerLogs && watchtowerLogs.length > 0 && (
+                <div class="mt-3">
+                  <h5>
+                    <Text id="systemSettings.upgradeLogs" />
+                  </h5>
+                  <div class="card">
+                    <div class="card-body p-0">
+                      <div
+                        class="bg-dark text-light p-3"
+                        style={{
+                          maxHeight: '300px',
+                          overflowY: 'auto',
+                          fontFamily: 'monospace',
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word'
+                        }}
+                      >
+                        {watchtowerLogs.map((log, index) => (
+                          <div key={index} class="mb-1">
+                            {log}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            class="btn btn-primary"
+            onClick={upgradeGladys}
+            disabled={SystemUpgradeStatus === RequestStatus.Getting || SystemUpgradeStatus === RequestStatus.Success}
+          >
             <Text id="systemSettings.updateNow" />
           </button>
         </div>

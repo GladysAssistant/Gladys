@@ -38,9 +38,10 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function installUpgrade(req, res) {
-    await gladys.system.installUpgrade();
+    gladys.event.emit(EVENTS.SYSTEM.UPGRADE_CONTAINERS);
     res.json({
       success: true,
+      message: 'Upgrade started',
     });
   }
 
