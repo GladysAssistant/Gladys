@@ -1,7 +1,6 @@
 import { RequestStatus } from '../utils/consts';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import get from 'get-value';
 
 dayjs.extend(relativeTime);
 
