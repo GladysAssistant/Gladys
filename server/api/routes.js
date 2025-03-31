@@ -359,6 +359,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.openAIAsk,
     },
+    'post /api/v1/gateway/refresh-latest-gladys-version': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshLatestGladysVersion,
+    },
     // room
     'get /api/v1/room': {
       authenticated: true,

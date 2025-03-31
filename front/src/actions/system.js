@@ -25,27 +25,6 @@ function createActions(store) {
         });
       }
     },
-    async getInfos(state) {
-      store.setState({
-        SystemGetInfosStatus: RequestStatus.Getting
-      });
-      try {
-        const systemInfos = await state.httpClient.get('/api/v1/system/info');
-        const today = new Date().getTime();
-        const systemStartedAt = today - systemInfos.uptime * 1000;
-        systemInfos.uptime_formatted = dayjs(systemStartedAt)
-          .locale(state.user.language)
-          .fromNow();
-        store.setState({
-          systemInfos,
-          SystemGetInfosStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          SystemGetInfosStatus: RequestStatus.Error
-        });
-      }
-    },
     async getDiskSpace(state) {
       store.setState({
         SystemGetDiskSpaceStatus: RequestStatus.Getting

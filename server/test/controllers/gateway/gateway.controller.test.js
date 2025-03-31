@@ -121,3 +121,13 @@ describe('POST /api/v1/gateway/openai/ask', () => {
     expect(response.body).to.have.property('answer', 'this is my answer');
   });
 });
+
+describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
+  it('should refresh latest gladys version', async () => {
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/refresh-latest-gladys-version')
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.have.property('message', 'Refresh finished');
+  });
+});

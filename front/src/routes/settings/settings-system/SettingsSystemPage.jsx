@@ -90,6 +90,9 @@ const SystemPage = ({ children, ...props }) => (
           SystemUpgradeStatus={props.SystemUpgradeStatus}
           watchtowerLogs={props.watchtowerLogs}
           websocketConnected={props.websocketConnected}
+          checkForUpdates={props.checkForUpdates}
+          SystemGetInfosStatus={props.SystemGetInfosStatus}
+          systemInfos={props.systemInfos}
         />
         <SettingsSystemDuckDbMigration />
         <SettingsSystemKeepDeviceHistory />
