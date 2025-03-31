@@ -2511,6 +2511,7 @@
     "updateNow": "Jetzt aktualisieren",
     "upgradeInProgress": "Aktualisierung läuft …",
     "upgradeLogs": "Messages von Watchtower",
+    "websocketNotConnected": "WebSocket-Verbindung verloren... Gladys ist wahrscheinlich neu gestartet. Du kannst diese Seite neu laden, um zu prüfen, ob Gladys wieder online ist.",
     "notAvailable": "Nicht verfügbar bei benutzerdefinierter Installation.",
     "containers": "Container",
     "containerName": "Name",
