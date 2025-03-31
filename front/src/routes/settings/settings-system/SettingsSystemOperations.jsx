@@ -2,7 +2,13 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { RequestStatus } from '../../../utils/consts';
 
-const SettingsSystemOperations = ({ systemInfos, upgradeGladys, SystemUpgradeStatus, watchtowerLogs }) => (
+const SettingsSystemOperations = ({
+  systemInfos,
+  upgradeGladys,
+  SystemUpgradeStatus,
+  watchtowerLogs,
+  websocketConnected
+}) => (
   <div class="card">
     <h4 class="card-header">
       <Text id="systemSettings.operations" />
@@ -22,6 +28,11 @@ const SettingsSystemOperations = ({ systemInfos, upgradeGladys, SystemUpgradeSta
               <div class="alert alert-info">
                 <Text id="systemSettings.upgradeInProgress" />
               </div>
+              {websocketConnected === false && (
+                <div class="alert alert-secondary">
+                  <Text id="systemSettings.websocketNotConnected" />
+                </div>
+              )}
               {watchtowerLogs && watchtowerLogs.length > 0 && (
                 <div class="mt-3">
                   <h5>

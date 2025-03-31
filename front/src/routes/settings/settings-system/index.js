@@ -44,6 +44,7 @@ class SettingsSystem extends Component {
 
     // Listen to Watchtower logs
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG, this.handleWatchtowerLog);
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentWillUnmount() {
@@ -52,6 +53,7 @@ class SettingsSystem extends Component {
       WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
       this.handleWatchtowerLog
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   handleWatchtowerLog = payload => {
@@ -60,13 +62,20 @@ class SettingsSystem extends Component {
     }));
   };
 
-  render(props, { SystemUpgradeStatus, watchtowerLogs }) {
+  handleWebsocketConnected = payload => {
+    this.setState({
+      websocketConnected: payload.connected
+    });
+  };
+
+  render(props, { SystemUpgradeStatus, watchtowerLogs, websocketConnected }) {
     return (
       <SettingsSystemPage
         {...props}
         upgradeGladys={this.upgradeGladys}
         SystemUpgradeStatus={SystemUpgradeStatus}
         watchtowerLogs={watchtowerLogs}
+        websocketConnected={websocketConnected}
       />
     );
   }

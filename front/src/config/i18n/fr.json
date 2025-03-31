@@ -2511,6 +2511,7 @@
     "updateNow": "Mettre à jour maintenant",
     "upgradeInProgress": "Mise à jour en cours...",
     "upgradeLogs": "Messages de Watchtower",
+    "websocketNotConnected": "Connexion Websocket perdue... Gladys est probablement en cours de redémarrage. Vous pouvez rafraichir cette page pour vérifier si Gladys est de nouveau accessible.",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",
     "containerName": "Nom",
