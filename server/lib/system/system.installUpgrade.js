@@ -30,14 +30,6 @@ const parseWatchtowerLog = (logMessage) => {
         return `Starting Watchtower ${cleanMessage.match(/\d+\.\d+\.\d+/)[0]}`;
       }
 
-      if (cleanMessage.includes('Session done')) {
-        const matches = cleanMessage.match(/Failed=(\d+) Scanned=(\d+) Updated=(\d+)/);
-        if (matches) {
-          const [, failed, scanned, updated] = matches;
-          return `Update completed: ${scanned} container(s) scanned, ${updated} updated, ${failed} failed`;
-        }
-      }
-
       return cleanMessage;
     }
 
@@ -66,7 +58,7 @@ async function installUpgrade() {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  const watchtowerImage = 'containrrr/watchtower';
+  const watchtowerImage = 'containrrr/watchtower:latest';
 
   logger.info(`Pulling ${watchtowerImage} image...`);
   await this.pull(watchtowerImage);
@@ -96,8 +88,8 @@ async function installUpgrade() {
 
   // Handle log stream
   logStream.on('data', (chunk) => {
-    const logMessage = chunk.toString().trim();
-    if (logMessage) {
+    if (chunk) {
+      const logMessage = chunk.toString().trim();
       logger.debug('Watchtower log:', logMessage);
 
       // Split the message into lines and process each line
@@ -119,10 +111,6 @@ async function installUpgrade() {
   // Wait for container to finish
   const { StatusCode } = await container.wait();
   logger.info(`Watchtower container finished with status code ${StatusCode}`);
-
-  if (StatusCode !== 0) {
-    throw new Error(`Watchtower container exited with status code ${StatusCode}`);
-  }
 }
 
 module.exports = {
