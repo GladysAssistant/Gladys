@@ -25,6 +25,7 @@ const container = {
       on: (event, callback) => {
         if (event === 'data') {
           const logLines = [
+            'D > Watchtower starting',
             'atime="2025-03-31T14:24:23Z" level=info msg="Watchtower 1.7.1"',
             'mtime="2025-03-31T14:24:23Z" level=info msg="Using no notifications"',
             'Htime="2025-03-31T14:24:23Z" level=info msg="Checking all containers (except explicitly disabled with label)"',
