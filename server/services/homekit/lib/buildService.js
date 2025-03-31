@@ -81,14 +81,16 @@ function buildService(device, features, categoryMapping, subtype) {
           if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
             characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
               const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-              callback(undefined,
+              callback(
+                undefined,
                 normalize(
                   updatedFeatures.find((feat) => feat.id === feature.id).last_value,
                   feature.min,
                   feature.max,
                   characteristic.props.minValue,
                   characteristic.props.maxValue,
-                ),);
+                ),
+              );
             });
           }
 

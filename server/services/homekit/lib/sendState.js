@@ -45,13 +45,16 @@ function sendState(hkAccessory, feature, event) {
       characteristics.forEach((c) => {
         hkAccessory
           .getService(Service[mappings[feature.category].service])
-          .updateCharacteristic(Characteristic[c], normalize(
-            event.last_value,
-            feature.min,
-            feature.max,
-            Characteristic[c].props.minValue,
-            Characteristic[c].props.maxValue,
-          ));
+          .updateCharacteristic(
+            Characteristic[c],
+            normalize(
+              event.last_value,
+              feature.min,
+              feature.max,
+              Characteristic[c].props.minValue,
+              Characteristic[c].props.maxValue,
+            ),
+          );
       });
       break;
     }

@@ -19,34 +19,38 @@ describe('Send state to HomeKit', () => {
       Characteristic: {
         On: 'ON',
         Brightness: {
-          name: 'BRIGHTNESS', props: {
+          name: 'BRIGHTNESS',
+          props: {
             minValue: 0,
             maxValue: 100,
-          }
+          },
         },
         Hue: 'HUE',
         Saturation: 'SATURATION',
         ColorTemperature: {
-          name: 'COLORTEMPERATURE', props: {
+          name: 'COLORTEMPERATURE',
+          props: {
             minValue: 140,
             maxValue: 500,
-          }
+          },
         },
         ContactSensorState: 'CONTACTSENSORSTATE',
         MotionDetected: 'MOTIONDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
         CurrentPosition: {
-          name: 'CURRENTPOSITION', props: {
+          name: 'CURRENTPOSITION',
+          props: {
             minValue: 0,
             maxValue: 100,
-          }
+          },
         },
         PositionState: 'POSITIONSTATE',
         TargetPosition: {
-          name: 'TARGETPOSITION', props: {
+          name: 'TARGETPOSITION',
+          props: {
             minValue: 0,
             maxValue: 100,
-          }
+          },
         },
       },
       Service: {
