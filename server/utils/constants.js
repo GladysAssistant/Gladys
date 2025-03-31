@@ -279,6 +279,7 @@ const EVENTS = {
     TIMEZONE_CHANGED: 'system.timezone-changed',
     VACUUM: 'system.vacuum',
     START: 'system.start',
+    UPDATE_CONTAINERS: 'system.update-containers',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -1205,6 +1206,7 @@ const JOB_TYPES = {
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
+  UPDATE_CONTAINERS: 'update-containers',
 };
 
 const JOB_STATUS = {

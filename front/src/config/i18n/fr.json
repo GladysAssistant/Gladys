@@ -2487,7 +2487,8 @@
       "vacuum": "Nettoyage de la base de données",
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
-      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
+      "update-containers": "Mise à jour des containers avec Watchtower"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2509,6 +2510,9 @@
     "newUpgradeAvailable": "Mise à jour disponible",
     "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez l'image Raspberry Pi OS Gladys officielle. Pour une installation manuellle, vous devez avoir configuré Watchtower pour que Gladys Assistant se mette à jour.",
     "download": "Télécharger",
+    "manualUpdate": "Mise à jour manuelle de Gladys",
+    "manualUpdateButton": "Lancer la mise à jour",
+    "updateContainersStarted": "Gladys va vérifier et se mettre à jour si une nouvelle image docker est disponible.",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",
     "containerName": "Nom",
