@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 const stream = require('stream');
-const EventEmitter = require('events');
 
 const { fake } = sinon;
 const { containers, images, networks } = require('./DockerApiMock.test');
