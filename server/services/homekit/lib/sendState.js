@@ -38,19 +38,21 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`:
-    case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
-      const characteristic = hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]]);
-      characteristic.updateValue(
-        normalize(
-          event.last_value,
-          feature.min,
-          feature.max,
-          characteristic.props.minValue,
-          characteristic.props.maxValue,
-        ),
-      );
+    case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
+      const { characteristics } = mappings[feature.category].capabilities[feature.type];
+      characteristics.forEach((c) => {
+        hkAccessory
+          .getService(Service[mappings[feature.category].service])
+          .updateCharacteristic(Characteristic[c], normalize(
+            event.last_value,
+            feature.min,
+            feature.max,
+            Characteristic[c].props.minValue,
+            Characteristic[c].props.maxValue,
+          ));
+      });
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
@@ -86,16 +88,6 @@ function sendState(hkAccessory, feature, event) {
       hkAccessory
         .getService(Service[mappings[feature.category].service])
         .updateCharacteristic(Characteristic.PositionState, coverStateMapping[event.last_value]);
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
-    case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
-      const { characteristics } = mappings[feature.category].capabilities[feature.type];
-      characteristics.forEach((c) => {
-        hkAccessory
-          .getService(Service[mappings[feature.category].service])
-          .updateCharacteristic(Characteristic[c], event.last_value);
-      });
       break;
     }
     default:

@@ -497,7 +497,9 @@ describe('Build service', () => {
       .returns({
         on,
         props: {
-          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+          perms: ['PAIRED_READ'],
+          minValue: 0,
+          maxValue: 100,
         },
       })
       .onCall(2)
@@ -505,6 +507,8 @@ describe('Build service', () => {
         on,
         props: {
           perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+          minValue: 0,
+          maxValue: 100,
         },
       });
     const WindowCovering = stub().returns({
@@ -543,6 +547,8 @@ describe('Build service', () => {
         name: 'Shutter Position',
         category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
         type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        min: 0,
+        max: 100,
       },
     ];
 
@@ -551,26 +557,17 @@ describe('Build service', () => {
     await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SHUTTER]);
     await on.args[0][1](cb);
     await on.args[1][1](cb);
-    await on.args[2][1](30, cb);
-    await on.args[3][1](cb);
-    await on.args[4][1](70, cb);
+    await on.args[2][1](cb);
+    await on.args[3][1](70, cb);
 
     expect(WindowCovering.args[0][0]).to.equal('Shutter');
-    expect(on.callCount).to.equal(5);
+    expect(on.callCount).to.equal(4);
     expect(getCharacteristic.args[0][0]).to.equal('POSITIONSTATE');
     expect(getCharacteristic.args[1][0]).to.equal('CURRENTPOSITION');
     expect(getCharacteristic.args[2][0]).to.equal('TARGETPOSITION');
     expect(cb.args[0][1]).to.equal(2);
     expect(cb.args[1][1]).to.equal(80);
     expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
-      type: ACTIONS.DEVICE.SET_VALUE,
-      status: ACTIONS_STATUS.PENDING,
-      value: 30,
-      device: device.selector,
-      device_feature: features[1].selector,
-    });
-    expect(cb.args[3][1]).to.equal(80);
-    expect(homekitHandler.gladys.event.emit.args[1][1]).to.eql({
       type: ACTIONS.DEVICE.SET_VALUE,
       status: ACTIONS_STATUS.PENDING,
       value: 70,

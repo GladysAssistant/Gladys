@@ -72,48 +72,48 @@ function buildService(device, features, categoryMapping, subtype) {
       }
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`:
-      case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
-        const characteristic = service.getCharacteristic(
-          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
-        );
-
-        if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
-          characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-            callback(
-              undefined,
-              normalize(
-                updatedFeatures.find((feat) => feat.id === feature.id).last_value,
-                feature.min,
-                feature.max,
-                characteristic.props.minValue,
-                characteristic.props.maxValue,
-              ),
-            );
-          });
-        }
-
-        if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
-          characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
-            const action = {
-              type: ACTIONS.DEVICE.SET_VALUE,
-              status: ACTIONS_STATUS.PENDING,
-              value: Math.round(
+      case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
+      case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
+        const { characteristics } = categoryMapping.capabilities[feature.type];
+        characteristics.forEach((c) => {
+          const characteristic = service.getCharacteristic(Characteristic[c]);
+          if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
+            characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+              const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+              callback(undefined,
                 normalize(
-                  value,
-                  characteristic.props.minValue,
-                  characteristic.props.maxValue,
+                  updatedFeatures.find((feat) => feat.id === feature.id).last_value,
                   feature.min,
                   feature.max,
+                  characteristic.props.minValue,
+                  characteristic.props.maxValue,
+                ),);
+            });
+          }
+
+          if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
+            characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
+              const action = {
+                type: ACTIONS.DEVICE.SET_VALUE,
+                status: ACTIONS_STATUS.PENDING,
+                value: Math.round(
+                  normalize(
+                    value,
+                    characteristic.props.minValue,
+                    characteristic.props.maxValue,
+                    feature.min,
+                    feature.max,
+                  ),
                 ),
-              ),
-              device: device.selector,
-              device_feature: feature.selector,
-            };
-            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-            callback();
-          });
-        }
+                device: device.selector,
+                device_feature: feature.selector,
+              };
+              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+              callback();
+            });
+          }
+        });
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
@@ -193,34 +193,6 @@ function buildService(device, features, categoryMapping, subtype) {
         characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
           callback(undefined, coverStateMapping[updatedFeatures.find((feat) => feat.id === feature.id).last_value]);
-        });
-        break;
-      }
-      case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
-      case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
-        const { characteristics } = categoryMapping.capabilities[feature.type];
-        characteristics.forEach((c) => {
-          const characteristic = service.getCharacteristic(Characteristic[c]);
-          if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
-            characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-              const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-              callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
-            });
-          }
-
-          if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
-            characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
-              const action = {
-                type: ACTIONS.DEVICE.SET_VALUE,
-                status: ACTIONS_STATUS.PENDING,
-                value,
-                device: device.selector,
-                device_feature: feature.selector,
-              };
-              this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-              callback();
-            });
-          }
         });
         break;
       }
