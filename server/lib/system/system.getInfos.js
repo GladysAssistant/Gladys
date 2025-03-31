@@ -30,7 +30,6 @@ async function getInfos() {
   } else {
     infos.new_release_available = false;
   }
-  infos.new_release_available = true;
   return infos;
 }
 
