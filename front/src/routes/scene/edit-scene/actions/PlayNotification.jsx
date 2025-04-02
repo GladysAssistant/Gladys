@@ -26,6 +26,9 @@ class PlayNotification extends Component {
       console.error(e);
     }
   };
+  updateVolume = e => {
+    this.props.updateActionProperty(this.props.path, 'volume', e.target.value);
+  };
   updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);
   };
@@ -82,6 +85,24 @@ class PlayNotification extends Component {
             options={devicesOptions}
             value={selectedDeviceFeatureOption}
             onChange={this.handleDeviceChange}
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="editScene.actionsCard.playNotification.volumeLabel" />
+            <span class="form-required">
+              <Text id="global.requiredField" />
+            </span>
+          </label>
+          <input type="text" class="form-control" value={props.action.volume} disabled />
+          <input
+            type="range"
+            value={props.action.volume}
+            onChange={this.updateVolume}
+            class="form-control custom-range"
+            step="1"
+            min={0}
+            max={100}
           />
         </div>
         <div class="form-group">

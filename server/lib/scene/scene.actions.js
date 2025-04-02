@@ -573,7 +573,7 @@ const actionsFunc = {
     // Get TTS URL
     const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
     // Play TTS Notification on device
-    await self.device.setValue(device, deviceFeature, url);
+    await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
   },
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');
