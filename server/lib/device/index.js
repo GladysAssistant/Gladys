@@ -6,6 +6,7 @@ const CameraManager = require('./camera');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
 const HumiditySensorManager = require('./humidity-sensor');
+const SwitchManager = require('./switch');
 
 // Functions
 const { add } = require('./device.add');
@@ -66,6 +67,7 @@ const DeviceManager = function DeviceManager(
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
+  this.switchManager = new SwitchManager(eventManager, stateManager, messageManager, this);
 
   this.purgeStatesByFeatureId = this.job.wrapper(
     JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE,

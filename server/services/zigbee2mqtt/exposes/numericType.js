@@ -76,6 +76,24 @@ module.exports = {
         max: 1000,
       },
     },
+    current_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
+    current_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+      },
+    },
     current_heating_setpoint: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
@@ -134,6 +152,20 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
+    energy_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
+    energy_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      },
+    },
     gas: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
@@ -162,6 +194,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.LUX,
         min: 0,
         max: 100000,
       },
@@ -216,11 +249,39 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
+    power_a: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
+    power_b: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
+    power_ab: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+      },
+    },
     pressure: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+      },
+    },
+    rain_intensity: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.MILLI_VOLT,
       },
     },
     temperature: {

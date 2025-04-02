@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
-import { useRef } from 'preact/hooks';
+import { useRef, useCallback } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 
 import style from './style.css';
@@ -34,10 +34,7 @@ import PlayNotification from './actions/PlayNotification';
 import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
-
-const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
-  deleteAction(columnIndex, rowIndex);
-};
+import ConditionIfElseThen from './actions/ConditionIfElseThen';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -50,6 +47,7 @@ const ACTION_ICON = {
   [ACTIONS.TIME.DELAY]: 'fe fe-clock',
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
   [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
@@ -73,22 +71,75 @@ const ACTION_ICON = {
   [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
 };
 
+const ACTION_COMPONENTS = {
+  [null]: ChooseActionTypeParams,
+  [ACTIONS.TIME.DELAY]: DelayActionParams,
+  [ACTIONS.LIGHT.TURN_ON]: TurnOnOffLightParams,
+  [ACTIONS.LIGHT.TURN_OFF]: TurnOnOffLightParams,
+  [ACTIONS.LIGHT.TOGGLE]: TurnOnOffLightParams,
+  [ACTIONS.LIGHT.BLINK]: BlinkLightParams,
+  [ACTIONS.SWITCH.TURN_ON]: TurnOnOffSwitchParams,
+  [ACTIONS.SWITCH.TURN_OFF]: TurnOnOffSwitchParams,
+  [ACTIONS.SWITCH.TOGGLE]: TurnOnOffSwitchParams,
+  [ACTIONS.MESSAGE.SEND]: SendMessageParams,
+  [ACTIONS.MESSAGE.SEND_CAMERA]: SendMessageCameraParams,
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: OnlyContinueIfParams,
+  [ACTIONS.DEVICE.GET_VALUE]: DeviceGetValueParams,
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: UserPresence,
+  [ACTIONS.USER.CHECK_PRESENCE]: CheckUserPresence,
+  [ACTIONS.USER.SET_OUT_OF_HOME]: UserPresence,
+  [ACTIONS.HTTP.REQUEST]: HttpRequest,
+  [ACTIONS.CONDITION.CHECK_TIME]: CheckTime,
+  [ACTIONS.SCENE.START]: StartSceneParams,
+  [ACTIONS.HOUSE.IS_EMPTY]: HouseEmptyOrNotCondition,
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
+  [ACTIONS.DEVICE.SET_VALUE]: DeviceSetValue,
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: CalendarIsEventRunning,
+  [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
+  [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
+  [ACTIONS.ALARM.SET_ALARM_MODE]: SetAlarmMode,
+  [ACTIONS.MQTT.SEND]: SendMqttMessage,
+  [ACTIONS.ZIGBEE2MQTT.SEND]: SendZigbee2MqttMessage,
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
+  [ACTIONS.AI.ASK]: AskAI,
+  [ACTIONS.SMS.SEND]: SendSms,
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
+};
+
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+const CONDITION_CARD_TYPE = 'CONDITION_CARD_TYPE';
+const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
+
+const getDragAndDropType = (actionType, path) => {
+  if (path.includes('if')) {
+    return CONDITION_CARD_TYPE;
+  }
+  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE) {
+    return ACTION_CARD_IF_THEN_ELSE_TYPE;
+  }
+  return ACTION_CARD_TYPE;
+};
 
 const ActionCard = ({ children, ...props }) => {
-  const { x, y } = props;
+  const { path, deleteAction } = props;
   const ref = useRef(null);
+
+  const handleDelete = useCallback(() => {
+    deleteAction(path);
+  }, [path, deleteAction]);
+
   const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: ACTION_CARD_TYPE,
+    type: getDragAndDropType(props.action.type, props.path),
     item: () => {
-      return { x, y };
+      return { path };
     },
     collect: monitor => ({
       isDragging: !!monitor.isDragging()
     })
   }));
   const [{ isActive }, drop] = useDrop({
-    accept: ACTION_CARD_TYPE,
+    accept: getDragAndDropType(props.action.type, props.path),
     collect: monitor => ({
       isActive: monitor.canDrop() && monitor.isOver()
     }),
@@ -96,14 +147,16 @@ const ActionCard = ({ children, ...props }) => {
       if (!ref.current) {
         return;
       }
-      props.moveCard(item.x, item.y, x, y);
+      props.moveCard(item.path, path);
     }
   });
   preview(drop(ref));
   return (
     <div
       class={cx({
-        'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+        'col-lg-12':
+          props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ||
+          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE,
         'col-lg-6':
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
@@ -130,7 +183,8 @@ const ActionCard = ({ children, ...props }) => {
           {props.action.type === null && <i class="fe fe-plus-circle" />}
           <div class="card-title">
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
-            {props.action.type === null && <Text id="editScene.newAction" />}
+            {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
+            {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
             <div class="card-status bg-blue" />
@@ -139,310 +193,35 @@ const ActionCard = ({ children, ...props }) => {
             <a>
               <i class="fe fe-move mr-4" />
             </a>
-            <a
-              onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
-              class="card-options-remove"
-            >
+            <a onClick={handleDelete} class="card-options-remove">
               <i class="fe fe-x" />
             </a>
           </div>
         </div>
         <div class="card-body">
-          {props.action.type === ACTIONS.TIME.DELAY && (
-            <DelayActionParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === null && (
-            <ChooseActionTypeParams
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.LIGHT.TURN_ON && (
-            <TurnOnOffLightParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
-            <TurnOnOffLightParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.LIGHT.TOGGLE && (
-            <TurnOnOffLightParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.LIGHT.BLINK && (
-            <BlinkLightParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.SWITCH.TURN_ON && (
-            <TurnOnOffSwitchParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
-            <TurnOnOffSwitchParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.SWITCH.TOGGLE && (
-            <TurnOnOffSwitchParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.MESSAGE.SEND && (
-            <SendMessageParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.MESSAGE.SEND_CAMERA && (
-            <SendMessageCameraParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
-            <OnlyContinueIfParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              triggersVariables={props.triggersVariables}
-              variables={props.variables}
-              setVariables={props.setVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.DEVICE.GET_VALUE && (
-            <DeviceGetValueParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              variables={props.variables}
-              setVariables={props.setVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.USER.SET_SEEN_AT_HOME && (
-            <UserPresence
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.USER.CHECK_PRESENCE && (
-            <CheckUserPresence
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.USER.SET_OUT_OF_HOME && (
-            <UserPresence
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.HTTP.REQUEST && (
-            <HttpRequest
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              setVariables={props.setVariables}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (
-            <CheckTime
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              setVariables={props.setVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.SCENE.START && (
-            <StartSceneParams
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              variables={props.variables}
-              setVariables={props.setVariables}
-              scene={props.scene}
-            />
-          )}
-          {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
-            <HouseEmptyOrNotCondition
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
-            <HouseEmptyOrNotCondition
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.DEVICE.SET_VALUE && (
-            <DeviceSetValue
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              triggersVariables={props.triggersVariables}
-              variables={props.variables}
-            />
-          )}
-          {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (
-            <CalendarIsEventRunning
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              variables={props.variables}
-              setVariables={props.setVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.ECOWATT.CONDITION && (
-            <EcowattCondition
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.EDF_TEMPO.CONDITION && (
-            <EdfTempoCondition
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.ALARM.CHECK_ALARM_MODE && (
-            <CheckAlarmMode
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.ALARM.SET_ALARM_MODE && (
-            <SetAlarmMode
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-            />
-          )}
-          {props.action.type === ACTIONS.MQTT.SEND && (
-            <SendMqttMessage
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.ZIGBEE2MQTT.SEND && (
-            <SendZigbee2MqttMessage
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.MUSIC.PLAY_NOTIFICATION && (
-            <PlayNotification
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.AI.ASK && (
-            <AskAI
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
-          {props.action.type === ACTIONS.SMS.SEND && (
-            <SendSms
-              action={props.action}
-              columnIndex={props.columnIndex}
-              index={props.index}
-              updateActionProperty={props.updateActionProperty}
-              actionsGroupsBefore={props.actionsGroupsBefore}
-              variables={props.variables}
-              triggersVariables={props.triggersVariables}
-            />
-          )}
+          {(() => {
+            const Component = ACTION_COMPONENTS[props.action.type];
+            if (!Component) return null;
+
+            const commonProps = {
+              action: props.action,
+              allActions: props.allActions,
+              path,
+              updateActionProperty: props.updateActionProperty,
+              variables: props.variables,
+              setVariables: props.setVariables,
+              actionsGroupsBefore: props.actionsGroupsBefore,
+              triggersVariables: props.triggersVariables,
+              deleteAction: props.deleteAction,
+              deleteActionGroup: props.deleteActionGroup,
+              addAction: props.addAction,
+              moveCard: props.moveCard,
+              moveCardGroup: props.moveCardGroup,
+              scene: props.scene
+            };
+
+            return <Component {...commonProps} />;
+          })()}
         </div>
       </div>
     </div>

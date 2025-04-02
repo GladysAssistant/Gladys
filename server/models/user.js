@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const passwordUtils = require('../utils/password');
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { AVAILABLE_LANGUAGES_LIST, USER_ROLE_LIST } = require('../utils/constants');
 
 const MAX_SIZE_PROFILE_PICTURE = 80 * 1024; // 80 ko
@@ -128,7 +128,7 @@ module.exports = (sequelize, DataTypes) => {
     user.email = String(user.email).toLowerCase();
     if (!user.selector) {
       user.name = user.firstname;
-      addSelector(user);
+      addSelectorBeforeValidateHook(user);
       delete user.name;
     }
   });

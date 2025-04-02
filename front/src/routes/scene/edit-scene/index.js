@@ -5,9 +5,62 @@ import { route } from 'preact-router';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
+
+import { ACTIONS } from '../../../../../server/utils/constants';
+
+// Helper function to merge update objects
+const deepMergeUpdates = (target, source) => {
+  if (!source) return target;
+  if (!target) return source;
+
+  const result = { ...target };
+
+  Object.keys(source).forEach(key => {
+    if (source[key] && typeof source[key] === 'object') {
+      if (result[key] && typeof result[key] === 'object') {
+        result[key] = deepMergeUpdates(result[key], source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    } else {
+      result[key] = source[key];
+    }
+  });
+
+  return result;
+};
+
+// Helper to initialize variables for a scene
+const initializeSceneVariables = (actions, parentPath = '') => {
+  let variables = {};
+
+  actions.forEach((actionGroup, groupIndex) => {
+    actionGroup.forEach((action, actionIndex) => {
+      const currentPath = parentPath ? `${parentPath}.${groupIndex}.${actionIndex}` : `${groupIndex}.${actionIndex}`;
+
+      // Initialize empty array for each action path
+      variables[currentPath] = [];
+
+      // Handle nested conditions
+      if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+        if (Array.isArray(action.then)) {
+          const thenVariables = initializeSceneVariables(action.then, `${currentPath}.then`);
+          variables = { ...variables, ...thenVariables };
+        }
+        if (Array.isArray(action.else)) {
+          const elseVariables = initializeSceneVariables(action.else, `${currentPath}.else`);
+          variables = { ...variables, ...elseVariables };
+        }
+      }
+    });
+  });
+
+  return variables;
+};
 
 class EditScene extends Component {
   getSceneBySelector = async () => {
@@ -22,10 +75,7 @@ class EditScene extends Component {
       if (!scene.triggers) {
         scene.triggers = [];
       }
-      const variables = [];
-      scene.actions.forEach(actionGroup => {
-        variables.push(actionGroup.map(() => []));
-      });
+      const variables = initializeSceneVariables(scene.actions);
       const triggersVariables = [];
       scene.triggers.forEach(() => {
         triggersVariables.push([]);
@@ -98,117 +148,373 @@ class EditScene extends Component {
     }
     this.setState({ saving: false });
   };
+
+  // This function is used to check and add empty groups to the actions and variables arrays
+  checkAndAddEmptyGroups = (actions, path = '', currentState) => {
+    // Guard against undefined or null actions
+    if (!actions || !Array.isArray(actions) || actions.length === 0) {
+      return {};
+    }
+
+    let updates = {};
+
+    // Check if we need to add a new group at the end of this level
+    if (actions[actions.length - 1].length > 0) {
+      if (path) {
+        // We're in a nested path (inside then/else)
+        // Build the nested update object dynamically
+        let updateObject = {
+          scene: { actions: {} },
+          variables: {
+            [path]: { $set: [] }
+          }
+        };
+        let actionsPath = updateObject.scene.actions;
+
+        // Split path and build nested structure
+        path.split('.').forEach((segment, index, array) => {
+          if (index === array.length - 1) {
+            actionsPath[segment] = { $push: [[]] };
+          } else {
+            actionsPath[segment] = {};
+            actionsPath = actionsPath[segment];
+          }
+        });
+
+        updates = updateObject;
+      } else {
+        // We're at the root level
+        updates = {
+          scene: {
+            actions: {
+              $push: [[]]
+            }
+          },
+          variables: {
+            [path]: {
+              $set: []
+            }
+          }
+        };
+      }
+    }
+
+    // Process nested conditions
+    actions.forEach((actionGroup, groupIndex) => {
+      actionGroup.forEach((action, actionIndex) => {
+        if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+          if (Array.isArray(action.then)) {
+            const thenPath = path ? `${path}.${groupIndex}.${actionIndex}.then` : `${groupIndex}.${actionIndex}.then`;
+            const thenUpdates = this.checkAndAddEmptyGroups(action.then, thenPath, currentState);
+            // Merge the updates instead of using update()
+            updates = deepMergeUpdates(updates, thenUpdates);
+          }
+
+          if (Array.isArray(action.else)) {
+            const elsePath = path ? `${path}.${groupIndex}.${actionIndex}.else` : `${groupIndex}.${actionIndex}.else`;
+            const elseUpdates = this.checkAndAddEmptyGroups(action.else, elsePath, currentState);
+            // Merge the updates instead of using update()
+            updates = deepMergeUpdates(updates, elseUpdates);
+          }
+        }
+      });
+    });
+
+    return updates;
+  };
+
   addEmptyActionGroupIfNeeded = async () => {
     const { actions } = this.state.scene;
-    const lastActionGroup = actions[actions.length - 1];
-    if (lastActionGroup.length > 0) {
-      const newState = update(this.state, {
-        scene: {
-          actions: {
-            $push: [[]]
-          }
-        },
-        variables: {
-          $push: [[]]
-        }
-      });
-      await this.setState(newState);
-    }
+    const updates = this.checkAndAddEmptyGroups(actions, '', this.state);
+
+    const newState = update(this.state, updates);
+
+    await this.setState(newState);
   };
-  addAction = async columnIndex => {
+
+  addAction = async (path, options = {}) => {
     await this.setState(prevState => {
-      let newState = update(prevState, {
-        scene: {
-          actions: {
-            [columnIndex]: {
-              $push: [
-                {
-                  type: null
-                }
-              ]
-            }
-          }
-        },
-        variables: {
-          [columnIndex]: {
-            $push: [[]]
-          }
+      // Build the nested update object for actions
+      const pathSegments = path.split('.');
+      let updateObject = { scene: { actions: {} } };
+      let current = updateObject.scene.actions;
+
+      pathSegments.forEach((segment, index) => {
+        if (index === pathSegments.length - 1) {
+          current[segment] = {
+            $push: [
+              {
+                type: null,
+                ...options
+              }
+            ]
+          };
+        } else {
+          current[segment] = {};
+          current = current[segment];
         }
       });
-      return newState;
+
+      // Add empty variables array for the new action
+      const newVariables = {
+        ...prevState.variables,
+        [path]: []
+      };
+
+      return update(prevState, {
+        ...updateObject,
+        variables: { $set: newVariables }
+      });
     });
+
     await this.addEmptyActionGroupIfNeeded();
   };
-  deleteActionGroup = columnIndex => {
-    let newState = update(this.state, {
-      scene: {
-        actions: {
-          $splice: [[columnIndex, 1]]
-        }
-      },
-      variables: {
-        $splice: [[columnIndex, 1]]
-      }
-    });
-    this.setState(newState);
-  };
 
-  deleteAction = (columnIndex, rowIndex) => {
+  deleteActionGroup = path => {
     this.setState(prevState => {
-      let newState = update(prevState, {
-        scene: {
-          actions: {
-            [columnIndex]: {
-              $splice: [[rowIndex, 1]]
+      // Split the path into segments
+      const pathSegments = path.split('.');
+
+      // Handle variables
+      const newVariables = {
+        ...prevState.variables
+      };
+      Object.keys(prevState.variables)
+        .filter(variablePath => variablePath.startsWith(path))
+        .forEach(pathToDelete => {
+          delete newVariables[pathToDelete];
+        });
+
+      // If it's a root level deletion (e.g., "1")
+      if (pathSegments.length === 1) {
+        return update(prevState, {
+          scene: {
+            actions: {
+              $splice: [[parseInt(pathSegments[0], 10), 1]]
             }
+          },
+          variables: {
+            $set: newVariables
           }
-        },
+        });
+      }
+
+      // Build the nested update object
+      let updateObject = {
+        scene: { actions: {} },
         variables: {
-          [columnIndex]: {
-            $splice: [[rowIndex, 1]]
+          $set: newVariables
+        }
+      };
+      let actionsPath = updateObject.scene.actions;
+
+      // Build the nested structure up to the second-to-last segment
+      pathSegments.forEach((segment, index) => {
+        // Special handling for 'then' and 'else' segments
+        if (segment === 'then' || segment === 'else') {
+          actionsPath[segment] = {};
+          actionsPath = actionsPath[segment];
+          return;
+        }
+
+        if (index === pathSegments.length - 1) {
+          // Last segment - perform the splice
+          actionsPath.$splice = [[parseInt(segment, 10), 1]];
+        } else if (index < pathSegments.length - 1) {
+          // Not the last segment - continue building the path
+          const nextSegment = pathSegments[index + 1];
+          if (nextSegment === 'then' || nextSegment === 'else') {
+            // If next segment is then/else, current segment needs numeric index
+            actionsPath[parseInt(segment, 10)] = {};
+            actionsPath = actionsPath[parseInt(segment, 10)];
+          } else {
+            // Regular path building
+            actionsPath[segment] = {};
+            actionsPath = actionsPath[segment];
           }
         }
       });
-      // if necessary, we remove the last action group
-      if (newState.scene.actions.length >= 2) {
+
+      return update(prevState, updateObject);
+    });
+  };
+
+  deleteAction = path => {
+    this.setState(prevState => {
+      // Remove the action
+      const pathSegments = path.split('.');
+      let updateObject = { scene: { actions: {} } };
+      let current = updateObject.scene.actions;
+
+      pathSegments.forEach((segment, index) => {
+        if (index === pathSegments.length - 2) {
+          current[segment] = {
+            $splice: [[parseInt(pathSegments[index + 1], 10), 1]]
+          };
+        } else if (index < pathSegments.length - 2) {
+          current[segment] = {};
+          current = current[segment];
+        }
+      });
+
+      // Remove variables for the deleted action and update paths for subsequent actions
+      const newVariables = { ...prevState.variables };
+      delete newVariables[path];
+
+      // Update paths for actions after the deleted one
+      Object.keys(newVariables).forEach(varPath => {
         if (
-          newState.scene.actions[newState.scene.actions.length - 1].length === 0 &&
-          newState.scene.actions[newState.scene.actions.length - 2].length === 0
+          varPath.startsWith(
+            path
+              .split('.')
+              .slice(0, -1)
+              .join('.')
+          )
         ) {
-          newState = update(newState, {
-            scene: {
-              actions: {
-                $splice: [[newState.scene.actions.length - 1, 1]]
-              }
-            },
-            variables: {
-              $splice: [[newState.scene.actions.length - 1, 1]]
+          const remainingVars = newVariables[varPath];
+          delete newVariables[varPath];
+          const newPath = this.updatePathAfterDeletion(varPath, path);
+          if (newPath) {
+            newVariables[newPath] = remainingVars;
+          }
+        }
+      });
+
+      // Check if we need to remove an empty action group
+      // Only if we are not in a "if" action
+      if (!path.includes('if')) {
+        const parentPath = path
+          .split('.')
+          .slice(0, -1)
+          .join('.');
+        const parentSegments = parentPath.split('.');
+
+        // Get the current action group and check if it will be empty after deletion
+        let actionGroup = prevState.scene.actions;
+        let nextGroupIndex = null;
+
+        // Navigate to the correct action group based on the path
+        for (let i = 0; i < parentSegments.length; i++) {
+          const segment = parentSegments[i];
+          if (segment === 'then' || segment === 'else') {
+            actionGroup = actionGroup[segment];
+          } else {
+            actionGroup = actionGroup[parseInt(segment, 10)];
+          }
+        }
+
+        // Check if the current action group will be empty after deletion
+        // and if there's a next action group to potentially delete
+        const willBeEmpty = actionGroup.length === 1;
+
+        // Handle root level action groups
+        if (parentSegments.length === 1) {
+          const groupIndex = parseInt(parentSegments[0], 10);
+          nextGroupIndex = groupIndex + 1;
+
+          // If current group will be empty and next group exists and is empty
+          if (
+            willBeEmpty &&
+            nextGroupIndex < prevState.scene.actions.length &&
+            prevState.scene.actions[nextGroupIndex].length === 0
+          ) {
+            // Add deletion of next group to updateObject
+            if (!updateObject.scene.actions.$splice) {
+              updateObject.scene.actions.$splice = [];
             }
-          });
+            updateObject.scene.actions.$splice.push([nextGroupIndex, 1]);
+          }
+        } else if (parentSegments.length > 1) {
+          // Handle nested action groups (inside then/else)
+          let container = prevState.scene.actions;
+
+          // Navigate to the container
+          for (let i = 0; i < parentSegments.length - 1; i++) {
+            const segment = parentSegments[i];
+            if (segment === 'then' || segment === 'else') {
+              container = container[segment];
+            } else {
+              container = container[parseInt(segment, 10)];
+            }
+          }
+
+          const groupIndex = parseInt(parentSegments[parentSegments.length - 1], 10);
+          nextGroupIndex = groupIndex + 1;
+
+          // If current group will be empty and next group exists and is empty
+          if (willBeEmpty && nextGroupIndex < container.length && container[nextGroupIndex].length === 0) {
+            // Build nested update for the container
+            let nestedUpdate = { scene: { actions: {} } };
+            let currentNested = nestedUpdate.scene.actions;
+
+            // Build the path to the container
+            for (let i = 0; i < parentSegments.length - 1; i++) {
+              const segment = parentSegments[i];
+              if (segment === 'then' || segment === 'else') {
+                currentNested[segment] = {};
+                currentNested = currentNested[segment];
+              } else {
+                currentNested[parseInt(segment, 10)] = {};
+                currentNested = currentNested[parseInt(segment, 10)];
+              }
+            }
+
+            // Add splice operation to delete the next group
+            currentNested.$splice = [[nextGroupIndex, 1]];
+
+            // Merge this update with the main updateObject
+            updateObject = deepMergeUpdates(updateObject, nestedUpdate);
+          }
         }
       }
 
-      return newState;
+      return update(prevState, {
+        ...updateObject,
+        variables: { $set: newVariables }
+      });
     });
   };
-  updateActionProperty = (columnIndex, rowIndex, property, value) => {
+
+  updatePathAfterDeletion = (currentPath, deletedPath) => {
+    const currentSegments = currentPath.split('.');
+    const deletedSegments = deletedPath.split('.');
+    const lastDeletedIndex = parseInt(deletedSegments[deletedSegments.length - 1], 10);
+
+    if (currentSegments.length === deletedSegments.length) {
+      const currentIndex = parseInt(currentSegments[currentSegments.length - 1], 10);
+      if (currentIndex > lastDeletedIndex) {
+        currentSegments[currentSegments.length - 1] = (currentIndex - 1).toString();
+        return currentSegments.join('.');
+      }
+    }
+    return null;
+  };
+
+  updateActionProperty = (path, property, value) => {
     this.setState(prevState => {
-      const newState = update(prevState, {
-        scene: {
-          actions: {
-            [columnIndex]: {
-              [rowIndex]: {
-                [property]: {
-                  $set: value
-                }
-              }
-            }
-          }
+      // Split the path into segments
+      const pathSegments = path.split('.');
+
+      // Build the nested update object
+      let updateObject = { scene: { actions: {} } };
+      let current = updateObject.scene.actions;
+
+      // Build the nested structure based on path
+      pathSegments.forEach((segment, index) => {
+        if (index === pathSegments.length - 1) {
+          current[segment] = {
+            [property]: { $set: value }
+          };
+        } else {
+          current[segment] = {};
+          current = current[segment];
         }
       });
-      return newState;
+
+      return update(prevState, updateObject);
     });
   };
+
   highlighCurrentlyExecutedAction = ({ columnIndex, rowIndex }) => {
     this.setState({
       highLightedActions: {
@@ -287,19 +593,13 @@ class EditScene extends Component {
     });
   };
 
-  setVariables = (columnIndex, index, variables) => {
-    this.setState(prevState => {
-      const newState = update(prevState, {
-        variables: {
-          [columnIndex]: {
-            [index]: {
-              $set: variables
-            }
-          }
-        }
-      });
-      return newState;
-    });
+  setVariables = (path, newVariables) => {
+    this.setState(prevState => ({
+      variables: {
+        ...prevState.variables,
+        [path]: newVariables
+      }
+    }));
   };
 
   setVariablesTrigger = (index, variables) => {
@@ -358,84 +658,221 @@ class EditScene extends Component {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
 
-  moveCard = async (originalX, originalY, destX, destY) => {
-    // incorrect coordinates
-    if (destX < 0 || destY < 0) {
+  moveCard = async (originalPath, destPath) => {
+    // Helper function to get nested value using path
+    const getNestedValue = (obj, path) => {
+      return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+    };
+
+    // Helper function to check if path exists and is valid
+    const isValidPath = (actions, path) => {
+      const segments = path.split('.');
+      let current = actions;
+
+      for (let i = 0; i < segments.length - 1; i++) {
+        current = current && current[segments[i]];
+        if (!current) return false;
+      }
+
+      const lastSegment = parseInt(segments[segments.length - 1], 10);
+      return current && lastSegment >= 0 && lastSegment <= current.length;
+    };
+
+    // Validate destination path
+    if (!isValidPath(this.state.scene.actions, destPath)) {
       return null;
     }
 
-    if (destY >= this.state.scene.actions.length || destX > this.state.scene.actions[destY].length) {
-      return null;
-    }
-    const element = this.state.scene.actions[originalY][originalX];
-    const variable = this.state.variables[originalY][originalX];
-    const newStateWithoutElement = update(this.state, {
-      scene: {
-        actions: {
-          [originalY]: {
-            $splice: [[originalX, 1]]
-          }
-        }
-      },
-      variables: {
-        [originalY]: {
-          $splice: [[originalX, 1]]
-        }
+    // Get the element and variable at original path
+    const element = getNestedValue(this.state.scene.actions, originalPath);
+
+    if (!element) return null;
+
+    // Build update object for removing from original location
+    let removeUpdateObject = { scene: { actions: {} } };
+    let removeActionsPath = removeUpdateObject.scene.actions;
+
+    originalPath.split('.').forEach((segment, index, array) => {
+      if (index === array.length - 2) {
+        removeActionsPath[segment] = {
+          $splice: [[parseInt(array[array.length - 1], 10), 1]]
+        };
+      } else if (index < array.length - 2) {
+        removeActionsPath[segment] = {};
+        removeActionsPath = removeActionsPath[segment];
       }
     });
-    const newState = update(newStateWithoutElement, {
-      scene: {
-        actions: {
-          [destY]: {
-            $splice: [[destX, 0, element]]
-          }
-        }
-      },
-      variables: {
-        [destY]: {
-          $splice: [[destX, 0, variable]]
-        }
+
+    // Remove element from original location
+    const newStateWithoutElement = update(this.state, removeUpdateObject);
+
+    // Build update object for adding to destination
+    let addUpdateObject = { scene: { actions: {} }, variables: {} };
+    let addActionsPath = addUpdateObject.scene.actions;
+
+    destPath.split('.').forEach((segment, index, array) => {
+      if (index === array.length - 2) {
+        addActionsPath[segment] = {
+          $splice: [[parseInt(array[array.length - 1], 10), 0, element]]
+        };
+      } else if (index < array.length - 2) {
+        addActionsPath[segment] = {};
+        addActionsPath = addActionsPath[segment];
       }
     });
+
+    // Update variables - handle all affected variables
+    const updatedVariables = {};
+    Object.entries(this.state.variables).forEach(([path, value]) => {
+      let newPath;
+
+      // Check if we're moving within the same parent (swapping case)
+      if (
+        originalPath
+          .substring(0, originalPath.lastIndexOf('.'))
+          .startsWith(destPath.substring(0, destPath.lastIndexOf('.')))
+      ) {
+        if (path.startsWith(originalPath.substring(0, originalPath.lastIndexOf('.')))) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+
+          if (pathIndex === parseInt(originalPath.split('.').pop(), 10)) {
+            // Moving this variable to destination
+            newPath = destPath;
+          } else if (pathIndex === parseInt(destPath.split('.').pop(), 10)) {
+            // The destination variable moves to original position
+            newPath = originalPath;
+          }
+        }
+      } else {
+        // Handle non-swapping case (moving between different parents)
+        if (path.startsWith(originalPath.substring(0, originalPath.lastIndexOf('.')))) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+
+          if (path === originalPath) {
+            // This is the moved variable
+            newPath = destPath;
+          } else if (pathIndex > parseInt(originalPath.split('.').pop(), 10)) {
+            // This variable was after the moved one in the original location
+            const newIndex = pathIndex - 1;
+            newPath = `${originalPath.substring(0, originalPath.lastIndexOf('.'))}.${newIndex}`;
+          }
+        }
+
+        // If the path starts with the destination path prefix
+        if (path.startsWith(destPath.substring(0, destPath.lastIndexOf('.')))) {
+          const pathIndex = parseInt(path.split('.').pop(), 10);
+          if (pathIndex >= parseInt(destPath.split('.').pop(), 10)) {
+            // This variable needs to be shifted up
+            const newIndex = pathIndex + 1;
+            newPath = `${destPath.substring(0, destPath.lastIndexOf('.'))}.${newIndex}`;
+          }
+        }
+      }
+
+      if (newPath) {
+        updatedVariables[newPath] = { $set: value };
+      }
+    });
+
+    // Add variables to the update object
+    addUpdateObject.variables = updatedVariables;
+
+    // Add element to new location and update variables
+    const newState = update(newStateWithoutElement, addUpdateObject);
+
     await this.setState(newState);
     await this.addEmptyActionGroupIfNeeded();
   };
 
-  moveCardGroup = async (index, destIndex) => {
-    // incorrect coordinates
-    if (destIndex < 0) {
+  moveCardGroup = async (sourcePath, destPath) => {
+    const getElementByPath = path => {
+      const parts = path.split('.');
+      const lastPart = parts.pop();
+      const arrayPath = parts.join('.');
+
+      const array = arrayPath ? get(this.state.scene.actions, arrayPath) : this.state.scene.actions;
+
+      if (!Array.isArray(array)) {
+        throw new Error('Invalid path: could not find target array');
+      }
+
+      return {
+        array,
+        index: parseInt(lastPart, 10)
+      };
+    };
+
+    try {
+      const source = getElementByPath(sourcePath);
+      const dest = getElementByPath(destPath);
+
+      // Validate indices
+      if (dest.index < 0 || dest.index > dest.array.length) {
+        return null;
+      }
+
+      // Get the element to move
+      const element = source.array[source.index];
+
+      // Create new state by first removing from source
+      let newState = { ...this.state };
+      source.array.splice(source.index, 1);
+
+      // Then insert at destination
+      dest.array.splice(dest.index, 0, element);
+
+      // Update variables - handle all affected variables
+      const newVariables = { ...this.state.variables };
+
+      // Iterate through all variables and update their paths
+      Object.entries(this.state.variables).forEach(([path, value]) => {
+        // If the path starts with sourcePath, it means this variable was under the moved group
+        if (path.startsWith(sourcePath)) {
+          // Delete the old path
+          delete newVariables[path];
+          // Create new path by replacing sourcePath with destPath
+          const newPath = path.replace(sourcePath, destPath);
+          newVariables[newPath] = value;
+        } else {
+          // For variables after the source/dest positions, we need to update their indices
+          const sourcePathParts = sourcePath.split('.');
+          const destPathParts = destPath.split('.');
+          const pathParts = path.split('.');
+
+          // Only process if we're in the same parent path
+          if (sourcePathParts.length === pathParts.length) {
+            const sourceIndex = parseInt(sourcePathParts[sourcePathParts.length - 1], 10);
+            const destIndex = parseInt(destPathParts[destPathParts.length - 1], 10);
+            const currentIndex = parseInt(pathParts[pathParts.length - 1], 10);
+
+            // If this path is after source and before dest, decrement index
+            if (currentIndex > sourceIndex && currentIndex <= destIndex) {
+              const newIndex = currentIndex - 1;
+              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
+              newVariables[newPath] = value;
+              delete newVariables[path];
+            } else if (currentIndex >= destIndex && currentIndex < sourceIndex) {
+              // If this path is before source and after dest, increment index
+              const newIndex = currentIndex + 1;
+              const newPath = [...pathParts.slice(0, -1), newIndex].join('.');
+              newVariables[newPath] = value;
+              delete newVariables[path];
+            }
+          }
+        }
+      });
+
+      // Set the new state
+      await this.setState({
+        ...newState,
+        variables: newVariables
+      });
+
+      await this.addEmptyActionGroupIfNeeded();
+    } catch (error) {
+      console.error('Error moving card group:', error);
       return null;
     }
-
-    if (destIndex >= this.state.scene.actions.length) {
-      return null;
-    }
-
-    const element = this.state.scene.actions[index];
-    const variable = this.state.variables[index];
-
-    const newStateWithoutElement = update(this.state, {
-      scene: {
-        actions: {
-          $splice: [[index, 1]]
-        }
-      },
-      variables: {
-        $splice: [[index, 1]]
-      }
-    });
-    const newState = update(newStateWithoutElement, {
-      scene: {
-        actions: {
-          $splice: [[destIndex, 0, element]]
-        }
-      },
-      variables: {
-        $splice: [[destIndex, 0, variable]]
-      }
-    });
-    await this.setState(newState);
-    await this.addEmptyActionGroupIfNeeded();
   };
 
   setTags = tags => {
@@ -460,6 +897,60 @@ class EditScene extends Component {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  // Recursively generate all possible action group types based on nesting level
+  generateActionGroupTypes = (actions, parentPath = '') => {
+    if (!actions || !Array.isArray(actions)) {
+      return [];
+    }
+
+    // Start with the current level
+    let types = [];
+    const currentLevel = parentPath.split('.').length;
+
+    // Add the current level if not already in the list
+    if (!parentPath.endsWith('then') && !parentPath.endsWith('else')) {
+      const groupType = `ACTION_GROUP_TYPE_LEVEL_${currentLevel}`;
+      if (!types.includes(groupType)) {
+        types.push(groupType);
+      }
+    }
+
+    // Recursively process each action group and its actions
+    actions.forEach((actionGroup, groupIndex) => {
+      const groupPath = parentPath ? `${parentPath}.${groupIndex}` : `${groupIndex}`;
+
+      const groupType = `ACTION_GROUP_TYPE_LEVEL_${groupPath.split('.').length}`;
+      if (!types.includes(groupType)) {
+        types.push(groupType);
+      }
+
+      // Process each action in the group
+      if (Array.isArray(actionGroup)) {
+        actionGroup.forEach((action, actionIndex) => {
+          const actionPath = `${groupPath}.${actionIndex}`;
+
+          // Check if this is a conditional action with nested actions
+          if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+            // Process 'then' branch
+            if (Array.isArray(action.then)) {
+              const thenTypes = this.generateActionGroupTypes(action.then, `${actionPath}.then`);
+              types = [...types, ...thenTypes];
+            }
+
+            // Process 'else' branch
+            if (Array.isArray(action.else)) {
+              const elseTypes = this.generateActionGroupTypes(action.else, `${actionPath}.else`);
+              types = [...types, ...elseTypes];
+            }
+          }
+        });
+      }
+    });
+
+    // Remove duplicates
+    return [...new Set(types)];
   };
 
   constructor(props) {
@@ -488,6 +979,7 @@ class EditScene extends Component {
   }
 
   render(props, { saving, error, variables, scene, triggersVariables, tags }) {
+    const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     return (
       scene && (
         <div>
@@ -496,6 +988,7 @@ class EditScene extends Component {
               {...props}
               scene={scene}
               tags={tags}
+              actionsGroupTypes={actionsGroupTypes}
               updateActionProperty={this.updateActionProperty}
               updateTriggerProperty={this.updateTriggerProperty}
               addAction={this.addAction}

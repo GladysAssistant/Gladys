@@ -3,8 +3,12 @@ const { Error429 } = require('../../utils/httpErrors');
 
 const intentTranslation = {
   SHOW_CAMERA: 'camera.get-image',
-  TURN_ON: 'light.turn-on',
-  TURN_OFF: 'light.turn-off',
+  TURN_ON: 'light.turn-on', // To be removed later, for backward compatibility
+  TURN_OFF: 'light.turn-off', // To be removed later, for backward compatibility
+  LIGHT_TURN_ON: 'light.turn-on',
+  LIGHT_TURN_OFF: 'light.turn-off',
+  SWITCH_TURN_ON: 'switch.turn-on',
+  SWITCH_TURN_OFF: 'switch.turn-off',
   GET_TEMPERATURE: 'temperature-sensor.get-in-room',
   GET_HUMIDITY: 'humidity-sensor.get-in-room',
   SCENE_START: 'scene.start',

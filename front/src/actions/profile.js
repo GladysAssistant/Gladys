@@ -70,7 +70,7 @@ function createActions(store) {
         errored = true;
         errors.email = true;
       }
-      if (user.password) {
+      if (user.password !== undefined) {
         if (user.password !== user.passwordRepeat) {
           errored = true;
           errors.passwordRepeat = true;
@@ -157,7 +157,7 @@ function createActions(store) {
         const data = Object.assign({}, state.newUser);
         const errored = actions.validateUser(state);
         if (errored) {
-          throw new Error();
+          throw new Error('VALIDATION_FAILED');
         }
         data.birthdate = new Date(data.birthdateYear, data.birthdateMonth - 1, data.birthdateDay);
         delete data.birthdateYear;
@@ -177,7 +177,9 @@ function createActions(store) {
       } catch (e) {
         console.error(e);
         const status = get(e, 'response.status');
-        if (status === 409) {
+        if (e.message === 'VALIDATION_FAILED') {
+          console.error('User validation failed');
+        } else if (status === 409) {
           store.setState({
             createUserError: e.response.data,
             createUserStatus: RequestStatus.ConflictError

@@ -30,16 +30,16 @@ class SetAlarmMode extends Component {
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', null);
+      this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
   handleAlarmModeChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'alarm_mode', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'alarm_mode', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'alarm_mode', null);
+      this.props.updateActionProperty(this.props.path, 'alarm_mode', null);
     }
   };
   refreshSelectedOptions = nextProps => {

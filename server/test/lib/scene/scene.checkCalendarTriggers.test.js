@@ -52,7 +52,7 @@ describe('scene.checkCalendarTriggers', () => {
   });
   it('should check if calendar events are matching the trigger - contains true', async () => {
     sceneManager.execute = fake.returns(null);
-    await sceneManager.create({
+    const sceneCreated = await sceneManager.create({
       name: 'check-events',
       icon: 'bell',
       triggers: [
@@ -71,7 +71,7 @@ describe('scene.checkCalendarTriggers', () => {
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
-    assert.calledWith(sceneManager.execute, 'check-events', {
+    assert.calledWith(sceneManager.execute, sceneCreated.selector, {
       triggerEvent: {
         type: EVENTS.CALENDAR.EVENT_IS_COMING,
         calendarEvent: {

@@ -74,8 +74,9 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
 
   const isBinary = ['binary', 'push'].includes(deviceFeature.type);
 
-  const now = new Date();
-  const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
+  // Get the interval date, and offset in UTC
+  const intervalDate = new Date(Date.now() - intervalInMinutes * 60 * 1000);
+  intervalDate.setMinutes(intervalDate.getMinutes() - intervalDate.getTimezoneOffset());
 
   let values;
 

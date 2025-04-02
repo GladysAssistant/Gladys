@@ -102,6 +102,7 @@ function Gladys(params = {}) {
   const gladys = {
     version: '0.1.0', // todo, read package.json
     area,
+    brain,
     calendar,
     config,
     dashboard,

@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const sinon = require('sinon');
 
+const db = require('../../../models');
 const User = require('../../../lib/user');
 
 const { fake, assert } = sinon;
@@ -53,6 +54,22 @@ describe('House', () => {
       });
       expect(updatedHouse).to.have.property('name', 'Updated house');
       expect(updatedHouse).to.have.property('selector', 'test-house');
+      assert.calledWith(event.emit, EVENTS.HOUSE.UPDATED);
+    });
+    it('should not update a house selector', async () => {
+      const testHouse = await db.House.findOne({
+        where: {
+          selector: 'test-house',
+        },
+      });
+      await testHouse.update({
+        selector: 'test-house-',
+      });
+      const updatedHouse = await house.update('test-house-', {
+        name: 'Updated house',
+      });
+      expect(updatedHouse).to.have.property('name', 'Updated house');
+      expect(updatedHouse).to.have.property('selector', 'test-house-');
       assert.calledWith(event.emit, EVENTS.HOUSE.UPDATED);
     });
     it('should return not found', async () => {

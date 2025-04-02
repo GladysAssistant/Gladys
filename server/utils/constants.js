@@ -63,6 +63,19 @@ const BUTTON_STATUS = {
   BRIGHTNESS_DOWN_CLICK: 57,
   BRIGHTNESS_DOWN_HOLD: 58,
   BRIGHTNESS_DOWN_RELEASE: 59,
+  PRESSED: 60,
+  SINGLE_LEFT: 61,
+  SINGLE_RIGHT: 62,
+  SINGLE_BOTH: 63,
+  DOUBLE_LEFT: 64,
+  DOUBLE_RIGHT: 65,
+  DOUBLE_BOTH: 66,
+  TRIPLE_LEFT: 67,
+  TRIPLE_RIGHT: 68,
+  TRIPLE_BOTH: 69,
+  HOLD_LEFT: 70,
+  HOLD_RIGHT: 71,
+  HOLD_BOTH: 72,
 };
 
 const COVER_STATE = {
@@ -390,6 +403,7 @@ const ACTIONS = {
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
+    IF_THEN_ELSE: 'condition.if-then-else',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -423,6 +437,18 @@ const ACTIONS = {
   },
 };
 
+// List of actions that can be used as conditions
+const CONDITION_ACTIONS = [
+  ACTIONS.CONDITION.CHECK_TIME,
+  ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+  ACTIONS.EDF_TEMPO.CONDITION,
+  ACTIONS.ALARM.CHECK_ALARM_MODE,
+  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+  ACTIONS.ECOWATT.CONDITION,
+  ACTIONS.HOUSE.IS_EMPTY,
+  ACTIONS.HOUSE.IS_NOT_EMPTY,
+];
+
 const INTENTS = {
   LIGHT: {
     TURN_ON: 'intent.light.turn-on',
@@ -445,6 +471,10 @@ const INTENTS = {
   },
   SCENE: {
     START: 'intent.scene.start',
+  },
+  SWITCH: {
+    TURN_ON: 'intent.switch.turn-on',
+    TURN_OFF: 'intent.switch.turn-off',
   },
 };
 
@@ -483,6 +513,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RAIN_SENSOR: 'rain-sensor',
   RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
@@ -711,6 +742,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   PRECIPITATION_SENSOR: {
     DECIMAL: 'decimal',
+    INTEGER: 'integer',
   },
   VOLUME_SENSOR: {
     DECIMAL: 'decimal',
@@ -935,6 +967,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
   ],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
   [DEVICE_FEATURE_CATEGORIES.DURATION]: [
@@ -1036,6 +1069,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  SYSTEM: {
+    VACUUM_FINISHED: 'system.vacuum-finished',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1244,6 +1280,7 @@ module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
 module.exports.CONDITIONS = CONDITIONS;
 module.exports.ACTIONS = ACTIONS;
+module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;
 module.exports.DEVICE_FEATURE_CATEGORIES = DEVICE_FEATURE_CATEGORIES;
 module.exports.DEVICE_FEATURE_TYPES = DEVICE_FEATURE_TYPES;

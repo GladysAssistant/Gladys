@@ -2,7 +2,11 @@
   {
     "label": "battery-threshold.success",
     "answers": [
-      "Avertissement !!! Le niveau de la batterie de {{ device.name }} est inférieur à {{ value.min }}% (actuel : {{ value.current }}%)"
+      "Avertissement ! Le niveau de la batterie de {{ device.name }} est inférieur à {{ value.min }}% (actuel : {{ value.current }}%)"
     ]
+  },
+  {
+    "label": "battery-level-is-low.success",
+    "answers": ["Avertissement ! Le niveau de la batterie de {{ device.name }} est faible !"]
   }
 ]

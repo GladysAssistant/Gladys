@@ -4,7 +4,8 @@ export const LoginStatus = {
   Processing: 'Processing',
   WrongCredentialsError: 'WrongCredentialsError',
   WrongEmailError: 'WrongEmailError',
-  LoginSuccess: 'LoginSuccess'
+  LoginSuccess: 'LoginSuccess',
+  UnknownError: 'UnknownError'
 };
 
 export const CreateUserErrors = {
@@ -243,6 +244,9 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'droplet'
   },
+  [DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'umbrella'
+  },
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'droplet'
   },
@@ -349,7 +353,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.UV_SENSOR.INTEGER]: 'sun'
   },
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: {
-    [DEVICE_FEATURE_TYPES.PRECIPITATION_SENSOR.DECIMAL]: 'umbrella'
+    [DEVICE_FEATURE_TYPES.PRECIPITATION_SENSOR.DECIMAL]: 'umbrella',
+    [DEVICE_FEATURE_TYPES.PRECIPITATION_SENSOR.INTEGER]: 'umbrella'
   },
   [DEVICE_FEATURE_CATEGORIES.CURRENCY]: {
     [DEVICE_FEATURE_TYPES.CURRENCY.DECIMAL]: 'dollar-sign'

@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const DashboardSettings = ({ children, user }) => (
+const CallMeBotPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -9,20 +10,31 @@ const DashboardSettings = ({ children, user }) => (
           <div class="row">
             <div class="col-lg-3">
               <h3 class="page-title mb-5">
-                <Text id="integration.zwave.title" />
+                <Text id="integration.callmebot.title" />
               </h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
+                  <Link
+                    href="/dashboard/integration/communication/callmebot"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-sliders" />
+                    </span>
+                    <Text id="integration.callmebot.setupTab" />
+                  </Link>
+
                   <DeviceConfigurationLink
                     user={user}
                     configurationKey="integrations"
-                    documentKey="zwave"
+                    documentKey="callmebot"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-book-open" />
                     </span>
-                    <Text id="integration.zwave.documentation" />
+                    <Text id="integration.callmebot.documentation" />
                   </DeviceConfigurationLink>
                 </div>
               </div>
@@ -36,4 +48,4 @@ const DashboardSettings = ({ children, user }) => (
   </div>
 );
 
-export default DashboardSettings;
+export default CallMeBotPage;

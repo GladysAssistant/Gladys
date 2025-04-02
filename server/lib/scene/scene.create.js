@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { slugify } = require('../../utils/slugify');
 
 /**
  * @description Create a new scene.
@@ -10,8 +11,16 @@ const db = require('../../models');
  * });
  */
 async function create(scene) {
+  let sceneWithSelector = scene;
+  if (!scene.selector) {
+    // add selector with random characters if no selector is passed
+    sceneWithSelector = {
+      ...scene,
+      selector: slugify(scene.name, true),
+    };
+  }
   // create scene in DB
-  const createdScene = await db.Scene.create(scene, {
+  const createdScene = await db.Scene.create(sceneWithSelector, {
     include: [
       {
         model: db.TagScene,

@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
 const intersection = require('lodash.intersection');
 const db = require('../../models');
+const { removeAccentsString, replaceAccentsSQlite } = require('../../utils/accents');
 
 const DEFAULT_OPTIONS = {
   fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
@@ -52,8 +53,8 @@ async function get(options) {
   const where = [];
   if (optionsWithDefault.search) {
     where.push(
-      Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
-        [Op.like]: `%${optionsWithDefault.search}%`,
+      Sequelize.where(Sequelize.fn('lower', replaceAccentsSQlite(Sequelize.col('t_scene.name'))), {
+        [Op.like]: `%${removeAccentsString(optionsWithDefault.search)}%`,
       }),
     );
   }

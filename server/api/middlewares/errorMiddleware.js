@@ -22,6 +22,7 @@ const logger = require('../../utils/logger');
 
 module.exports = function errorMiddleware(error, req, res, next) {
   let responseError;
+  logger.debug(error);
 
   // If Joi validationError
   if (error && error.isJoi === true) {

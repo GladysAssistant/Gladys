@@ -52,6 +52,13 @@ async function sendToUser(userSelector, text, file = null) {
       await nextcloudTalkService.message.send(nextcloudTalkToken, messageCreated);
     }
   }
+  // We send the message to the callmebot service
+  const callmebotService = this.service.getService('callmebot');
+  // if the service exist
+  if (callmebotService) {
+    // we forward the message to CallMeBot
+    await callmebotService.message.send(user.id, messageCreated);
+  }
   return messageCreated;
 }
 

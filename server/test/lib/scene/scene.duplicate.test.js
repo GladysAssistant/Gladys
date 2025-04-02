@@ -27,11 +27,16 @@ describe('scene.duplicate', () => {
   });
 
   it('should duplicate a scene', async () => {
-    const duplicatedScene = await sceneManager.duplicate('to-duplicate-scene', 'new-name', 'new-icon');
-    expect(sceneManager.scenes['new-name']).not.to.equal(undefined);
+    const duplicatedScene = await sceneManager.duplicate('to-duplicate-scene', 'New name', 'new-icon');
+    expect(duplicatedScene).to.have.property('selector');
+    expect(duplicatedScene.selector).to.contain('new-name');
+    // selector should have 4 random characters at the end + dash
+    expect(duplicatedScene.selector).to.have.lengthOf('new-name'.length + 5);
 
-    expect(duplicatedScene).to.have.property('selector', 'new-name');
-    expect(duplicatedScene).to.have.property('name', 'new-name');
+    // check that the scene was added to memory
+    expect(sceneManager.scenes[duplicatedScene.selector]).not.to.equal(undefined);
+
+    expect(duplicatedScene).to.have.property('name', 'New name');
     expect(duplicatedScene).to.have.property('icon', 'new-icon');
     expect(duplicatedScene.actions).deep.equal([
       [

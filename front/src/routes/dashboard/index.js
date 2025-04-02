@@ -136,10 +136,12 @@ class Dashboard extends Component {
   };
 
   isBrowserFullScreenCompatible = () => {
+    // eslint-disable-next-line compat/compat
     return document.fullscreenEnabled || document.webkitFullscreenEnabled;
   };
 
   isFullScreen = () => {
+    // eslint-disable-next-line compat/compat
     return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
   };
 

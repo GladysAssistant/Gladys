@@ -14,6 +14,6 @@
   "dependencies": {
     "bluebird": "^3.7.2",
     "get-value": "^3.0.1",
-    "mqtt": "^4.0.0"
+    "mqtt": "^5.10.3"
   }
 }
