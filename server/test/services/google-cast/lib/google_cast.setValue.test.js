@@ -14,7 +14,7 @@ const player = {
     playerName: 'Nest mini',
   },
   on: (event, cb) => {
-    cb({ playerState: 'paused' });
+    cb({ playerState: 'paused', idleReason: 'FINISHED' });
   },
   load: (param1, param2, cb) => {
     cb(null, { playerState: 'playing' });
@@ -44,7 +44,7 @@ class GoogleCastClient {
 
   // eslint-disable-next-line class-methods-use-this
   setVolume(volume, cb) {
-    cb(null, 30);
+    cb(null, volume);
   }
 
   // eslint-disable-next-line class-methods-use-this

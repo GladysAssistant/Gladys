@@ -27,7 +27,7 @@ class PlayNotification extends Component {
     }
   };
   updateVolume = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'volume', e.target.value);
+    this.props.updateActionProperty(this.props.path, 'volume', e.target.value);
   };
   updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);

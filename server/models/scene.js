@@ -65,9 +65,9 @@ const actionSchema = Joi.object()
     blinking_time: Joi.number(),
     blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
     volume: Joi.number()
-        .integer()
-        .max(100)
-        .min(0),
+      .integer()
+      .max(100)
+      .min(0),
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
