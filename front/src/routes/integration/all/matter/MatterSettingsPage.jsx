@@ -5,6 +5,125 @@ import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import MatterPage from './MatterPage';
 
+const DeviceDisplay = ({
+  device,
+  nodeId,
+  collapsedDevices,
+  visibleKeys,
+  toggleDevice,
+  toggleKeys,
+  parentPath = ''
+}) => {
+  const devicePath = parentPath ? `${parentPath}-${device.number}` : `${nodeId}-${device.number}`;
+  const isCollapsed = collapsedDevices[devicePath];
+  const level = parentPath.split('-').length - 1;
+
+  return (
+    <div class={cx('mb-4', { 'ms-4': level > 0 })}>
+      <div class="d-flex align-items-center cursor-pointer mb-3" onClick={() => toggleDevice(devicePath)}>
+        <i
+          class={cx('fe me-2', {
+            'fe-chevron-right': isCollapsed,
+            'fe-chevron-down': !isCollapsed
+          })}
+        />
+        <h6 class="mb-0">
+          {level > 0 && <span class="text-muted me-2">Child Endpoint:</span>}
+          Device: {device.name} (Endpoint: {device.number})
+        </h6>
+      </div>
+
+      {!isCollapsed && (
+        <>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Cluster ID</th>
+                  <th>Cluster Name</th>
+                  <th>Attributes</th>
+                  <th>Commands</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {device.cluster_clients.map(cluster => {
+                  const clusterKey = `${devicePath}-${cluster.id}`;
+                  const areKeysVisible = visibleKeys[clusterKey];
+
+                  return (
+                    <>
+                      <tr>
+                        <td>{cluster.id}</td>
+                        <td>{cluster.name}</td>
+                        <td>
+                          <ul class="list-unstyled mb-0">
+                            {cluster.attributes.map(attr => (
+                              <li>
+                                <small>{attr}</small>
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td>
+                          <ul class="list-unstyled mb-0">
+                            {cluster.commands.map(cmd => (
+                              <li>
+                                <small>{cmd}</small>
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td>
+                          <button class="btn btn-outline-secondary btn-sm" onClick={() => toggleKeys(clusterKey)}>
+                            {areKeysVisible ? 'Hide Keys' : 'Show Keys'}
+                          </button>
+                        </td>
+                      </tr>
+                      {areKeysVisible && (
+                        <tr>
+                          <td colspan="5" class="bg-light">
+                            <div class="p-2">
+                              <small class="text-muted">All Keys:</small>
+                              <div class="row mt-2">
+                                {cluster.all_keys.map(key => (
+                                  <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <small>{key}</small>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {device.child_endpoints && device.child_endpoints.length > 0 && (
+            <div class="mt-4">
+              {device.child_endpoints.map(childDevice => (
+                <DeviceDisplay
+                  device={childDevice}
+                  nodeId={nodeId}
+                  collapsedDevices={collapsedDevices}
+                  visibleKeys={visibleKeys}
+                  toggleDevice={toggleDevice}
+                  toggleKeys={toggleKeys}
+                  parentPath={devicePath}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
 class MatterSettingsPage extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +134,8 @@ class MatterSettingsPage extends Component {
       nodes: [],
       loadingNodes: true,
       decommissioningNodes: {},
-      collapsedDevices: {}
+      collapsedDevices: {},
+      visibleKeys: {}
     };
   }
 
@@ -130,12 +250,20 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  toggleDevice = (nodeId, deviceNumber) => {
-    const key = `${nodeId}-${deviceNumber}`;
+  toggleDevice = devicePath => {
     this.setState(prevState => ({
       collapsedDevices: {
         ...prevState.collapsedDevices,
-        [key]: !prevState.collapsedDevices[key]
+        [devicePath]: !prevState.collapsedDevices[devicePath]
+      }
+    }));
+  };
+
+  toggleKeys = clusterKey => {
+    this.setState(prevState => ({
+      visibleKeys: {
+        ...prevState.visibleKeys,
+        [clusterKey]: !prevState.visibleKeys[clusterKey]
       }
     }));
   };
@@ -173,7 +301,16 @@ class MatterSettingsPage extends Component {
   };
 
   render() {
-    const { matterEnabled, saving, error, nodes, loadingNodes, decommissioningNodes, collapsedDevices } = this.state;
+    const {
+      matterEnabled,
+      saving,
+      error,
+      nodes,
+      loadingNodes,
+      decommissioningNodes,
+      collapsedDevices,
+      visibleKeys
+    } = this.state;
 
     return (
       <MatterPage user={this.props.user}>
@@ -258,75 +395,16 @@ class MatterSettingsPage extends Component {
                                 </div>
                               </div>
                               <div class="card-body">
-                                {node.devices.map((device, index, array) => {
-                                  const deviceKey = `${node.node_id}-${device.number}`;
-                                  const isCollapsed = collapsedDevices[deviceKey];
-                                  const isLastDevice = index === array.length - 1;
-
-                                  return (
-                                    <div
-                                      class={cx({
-                                        'mb-4': !isLastDevice
-                                      })}
-                                    >
-                                      <div
-                                        class="d-flex align-items-center cursor-pointer mb-3"
-                                        onClick={() => this.toggleDevice(node.node_id, device.number)}
-                                      >
-                                        <i
-                                          class={cx('fe me-2', {
-                                            'fe-chevron-right': isCollapsed,
-                                            'fe-chevron-down': !isCollapsed
-                                          })}
-                                        />
-                                        <h6 class="mb-0">
-                                          Device: {device.name} (Endpoint: {device.number})
-                                        </h6>
-                                      </div>
-
-                                      {!isCollapsed && (
-                                        <div class="table-responsive">
-                                          <table class="table table-sm">
-                                            <thead>
-                                              <tr>
-                                                <th>Cluster ID</th>
-                                                <th>Cluster Name</th>
-                                                <th>Attributes</th>
-                                                <th>Commands</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {device.cluster_clients.map(cluster => (
-                                                <tr>
-                                                  <td>{cluster.id}</td>
-                                                  <td>{cluster.name}</td>
-                                                  <td>
-                                                    <ul class="list-unstyled mb-0">
-                                                      {cluster.attributes.map(attr => (
-                                                        <li>
-                                                          <small>{attr}</small>
-                                                        </li>
-                                                      ))}
-                                                    </ul>
-                                                  </td>
-                                                  <td>
-                                                    <ul class="list-unstyled mb-0">
-                                                      {cluster.commands.map(cmd => (
-                                                        <li>
-                                                          <small>{cmd}</small>
-                                                        </li>
-                                                      ))}
-                                                    </ul>
-                                                  </td>
-                                                </tr>
-                                              ))}
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
+                                {node.devices.map(device => (
+                                  <DeviceDisplay
+                                    device={device}
+                                    nodeId={node.node_id}
+                                    collapsedDevices={collapsedDevices}
+                                    visibleKeys={visibleKeys}
+                                    toggleDevice={this.toggleDevice}
+                                    toggleKeys={this.toggleKeys}
+                                  />
+                                ))}
                               </div>
                             </div>
                           ))}

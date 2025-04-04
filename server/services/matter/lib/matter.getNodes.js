@@ -1,5 +1,32 @@
 const Promise = require('bluebird');
 
+const convertDevice = (device) => {
+  const clusterClients = [];
+
+  // Each cluster client is a feature of the device
+  device.clusterClients.forEach((clusterClient, clusterIndex) => {
+    clusterClients.push({
+      id: clusterClient.id.toString(),
+      name: clusterClient.name,
+      attributes: Object.keys(clusterClient.attributes),
+      commands: Object.keys(clusterClient.commands),
+      all_keys: Object.keys(clusterClient),
+    });
+  });
+
+  // Convert child endpoints (child devices)
+  const childEndpoints = device.childEndpoints.map((childDeviceEndpoint) => {
+    return convertDevice(childDeviceEndpoint);
+  });
+
+  return {
+    name: device.name,
+    number: device.number.toString(),
+    cluster_clients: clusterClients,
+    child_endpoints: childEndpoints,
+  };
+};
+
 /**
  * @description Get the nodes.
  * @returns {Promise<Array>} The nodes.
@@ -14,23 +41,7 @@ async function getNodes() {
     return {
       node_id: nodeDetail.nodeId.toString(),
       devices: devices.map((device) => {
-        const clusterClients = [];
-
-        device.clusterClients.forEach((clusterClient, clusterIndex) => {
-          clusterClients.push({
-            id: clusterClient.id.toString(),
-            name: clusterClient.name,
-            attributes: Object.keys(clusterClient.attributes),
-            commands: Object.keys(clusterClient.commands),
-            all_keys: Object.keys(clusterClient),
-          });
-        });
-
-        return {
-          name: device.name,
-          number: device.number.toString(),
-          cluster_clients: clusterClients,
-        };
+        return convertDevice(device);
       }),
       node_information: {
         vendor_name: nodeDetail.deviceData.basicInformation.vendorName,
