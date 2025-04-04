@@ -124,6 +124,12 @@ describe('POST /api/v1/gateway/openai/ask', () => {
 
 describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
   it('should refresh latest gladys version', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/v1/api/gladys/version', (body) => true)
+      .reply(200, {
+        name: 'v4.56.1',
+        created_at: '2025-03-31T08:17:48.202Z',
+      });
     const response = await authenticatedRequest
       .post('/api/v1/gateway/refresh-latest-gladys-version')
       .expect('Content-Type', /json/)
