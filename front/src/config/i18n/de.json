@@ -2508,6 +2508,7 @@
     "upToDate": "Gladys ist auf dem neuesten Stand",
     "newUpgradeAvailable": "Softwareupdate verfügbar",
     "newUpgradeAvailableText": "Gladys wird sich automatisch aktualisieren, wenn du Gladys mit dem offiziellen Gladys-Raspberry-Pi-OS-Image installiert hast. Wenn du Gladys manuell installiert hast, achte darauf, dass Watchtower ausgeführt wird.",
+    "notConnectedToDocker": "Gladys ist nicht mit Docker verbunden. Um Docker aus Gladys heraus zugänglich zu machen, musst du Gladys mit dem richtigen Volume `-v /var/run/docker.sock:/var/run/docker.sock` starten.",
     "updateNow": "Jetzt aktualisieren",
     "upgradeInProgress": "Aktualisierung läuft …",
     "upgradeLogs": "Messages von Watchtower",

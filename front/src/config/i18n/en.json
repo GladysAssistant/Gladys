@@ -2508,6 +2508,7 @@
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
     "newUpgradeAvailableText": "Gladys will update automatically if you use Watchtower. If you want to update manually, click the button below. This will launch a Watchtower container that will update all containers present on this machine.",
+    "notConnectedToDocker": "Gladys is not connected to Docker. To access Docker from Gladys, you need to start Gladys with the correct volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
     "updateNow": "Update now",
     "upgradeInProgress": "Upgrade in progress...",
     "upgradeLogs": "Watchtower messages",

@@ -75,11 +75,18 @@ const SettingsSystemOperations = ({
                   )}
                 </div>
               )}
+              {systemInfos.is_docker === false && (
+                <div class="alert alert-warning">
+                  <Text id="systemSettings.notConnectedToDocker" />
+                </div>
+              )}
               <button
                 class="btn btn-primary"
                 onClick={upgradeGladys}
                 disabled={
-                  SystemUpgradeStatus === RequestStatus.Getting || SystemUpgradeStatus === RequestStatus.Success
+                  SystemUpgradeStatus === RequestStatus.Getting ||
+                  SystemUpgradeStatus === RequestStatus.Success ||
+                  systemInfos.is_docker === false
                 }
               >
                 <Text id="systemSettings.updateNow" />
