@@ -6,6 +6,7 @@ const { setValue } = require('./matter.setValue');
 const { listenToStateChange } = require('./matter.listenToStateChange');
 const { decommission } = require('./matter.decommission');
 const { getNodes } = require('./matter.getNodes');
+
 /**
  * @description Matter handler.
  * @param {object} gladys - Gladys instance.
@@ -23,6 +24,8 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.devices = [];
   this.nodesMap = new Map();
   this.commissioningController = null;
+  process.on('SIGTERM', this.stop);
+  process.on('SIGINT', this.stop);
 };
 
 MatterHandler.prototype.init = init;

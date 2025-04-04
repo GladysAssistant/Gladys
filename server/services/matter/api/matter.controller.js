@@ -27,7 +27,8 @@ module.exports = function MatterController(matterHandler) {
    * @apiGroup Matter
    */
   async function getNodes(req, res) {
-    const nodes = matterHandler.getNodes();
+    const nodes = await matterHandler.getNodes();
+    nodes.forEach(console.log);
     res.json(nodes);
   }
 

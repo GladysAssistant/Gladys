@@ -1846,7 +1846,10 @@
         "nodeDetailsLabel": "Détails du nœud",
         "actionsLabel": "Actions",
         "decommissionButton": "Décommissionner",
-        "noNodesFound": "Aucun nœud Matter trouvé"
+        "noNodesFound": "Aucun nœud Matter trouvé",
+        "disabledWarning": "Matter n'est pas activé, veuillez l'activer pour commencer à utiliser l'intégration.",
+        "enableButton": "Activer Matter",
+        "disableButton": "Désactiver Matter"
       }
     }
   },

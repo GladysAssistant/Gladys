@@ -10,10 +10,11 @@ const logger = require('../../../utils/logger');
  * @example matter.init();
  */
 async function init() {
-  const { Environment, StorageService } = this.MatterMain;
+  const { Environment, StorageService, Logger } = this.MatterMain;
   const { CommissioningController } = this.ProjectChipMatter;
+
   // Store the matter data in the same folder as the Gladys database
-  const storagePath = path.join(path.dirname(this.gladys.config.storage), 'matter');
+  const storagePath = process.env.MATTER_FOLDER_PATH || path.join(path.dirname(this.gladys.config.storage), 'matter');
   logger.info(`Matter.init: storagePath: ${storagePath}`);
   // Create the storage folder if it doesn't exist
   await fse.ensureDir(storagePath);
@@ -39,6 +40,7 @@ async function init() {
     const node = await this.commissioningController.getNode(nodeDetail.nodeId);
     const devices = node.getDevices();
     await Promise.each(devices, async (device) => {
+      console.log(device);
       const gladysDevice = await convertToGladysDevice(
         this.serviceId,
         nodeDetail.nodeId,

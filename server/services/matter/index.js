@@ -1,6 +1,7 @@
 const logger = require('../../utils/logger');
 const MatterHandler = require('./lib');
 const MatterController = require('./api/matter.controller');
+const { VARIABLES } = require('./utils/constants');
 
 module.exports = function MatterService(gladys, serviceId) {
   const MatterMain = require('@matter/main');
@@ -15,7 +16,14 @@ module.exports = function MatterService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Matter service');
+    const matterEnabled = await gladys.variable.getValue(VARIABLES.MATTER_ENABLED, serviceId);
+    if (matterEnabled !== 'true') {
+      logger.info('Matter is not enabled');
+      return;
+    }
+    logger.info('Matter is enabled, starting...');
     await matterHandler.init();
+    logger.info('Matter started');
   }
 
   /**

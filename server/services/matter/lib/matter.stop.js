@@ -3,7 +3,9 @@
  * @example matter.stop();
  */
 async function stop() {
-  await this.commissioningController.close();
+  if (this.commissioningController) {
+    await this.commissioningController.close();
+  }
 }
 
 module.exports = {

@@ -9,12 +9,13 @@ class MatterSettingsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      matterEnabled: false,
+      matterEnabled: null,
       saving: false,
       error: null,
       nodes: [],
       loadingNodes: true,
-      decommissioningNodes: {}
+      decommissioningNodes: {},
+      collapsedDevices: {}
     };
   }
 
@@ -29,9 +30,11 @@ class MatterSettingsPage extends Component {
 
   loadConfiguration = async () => {
     try {
-      const config = await this.props.httpClient.get('/api/v1/service/matter/configuration');
+      const { value: matterEnabled } = await this.props.httpClient.get(
+        '/api/v1/service/matter/variable/MATTER_ENABLED'
+      );
       this.setState({
-        matterEnabled: config.enabled
+        matterEnabled: matterEnabled === 'true'
       });
     } catch (e) {
       console.error(e);
@@ -43,20 +46,41 @@ class MatterSettingsPage extends Component {
     this.setState({ loadingNodes: true });
     try {
       const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
-      this.setState({ nodes, loadingNodes: false });
+
+      // Initialize all devices as collapsed
+      const collapsedDevices = {};
+      nodes.forEach(node => {
+        node.devices.forEach(device => {
+          const deviceKey = `${node.node_id}-${device.number}`;
+          collapsedDevices[deviceKey] = true;
+        });
+      });
+
+      this.setState({
+        nodes,
+        loadingNodes: false,
+        collapsedDevices
+      });
     } catch (e) {
       console.error(e);
       this.setState({ loadingNodes: false });
     }
   };
 
-  saveConfiguration = async () => {
+  disableMatter = async () => {
     this.setState({ saving: true });
     try {
-      await this.props.httpClient.post('/api/v1/service/matter/configuration', {
-        enabled: this.state.matterEnabled
+      await this.props.httpClient.post('/api/v1/service/matter/variable/MATTER_ENABLED', {
+        value: 'false'
       });
-      this.setState({ saving: false, error: null });
+      // stop service
+      await this.props.httpClient.post('/api/v1/service/matter/stop');
+      this.setState({
+        saving: false,
+        error: null,
+        nodes: [],
+        matterEnabled: false
+      });
     } catch (e) {
       console.error(e);
       this.setState({ saving: false, error: RequestStatus.Error });
@@ -84,8 +108,40 @@ class MatterSettingsPage extends Component {
     });
   };
 
+  enableMatter = async () => {
+    this.setState({ saving: true });
+    try {
+      await this.props.httpClient.post('/api/v1/service/matter/variable/MATTER_ENABLED', {
+        value: 'true'
+      });
+      // start service
+      await this.props.httpClient.post('/api/v1/service/matter/start');
+      // Load the nodes
+      await this.loadNodes();
+
+      this.setState({
+        saving: false,
+        error: null,
+        matterEnabled: true
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ saving: false, error: RequestStatus.Error });
+    }
+  };
+
+  toggleDevice = (nodeId, deviceNumber) => {
+    const key = `${nodeId}-${deviceNumber}`;
+    this.setState(prevState => ({
+      collapsedDevices: {
+        ...prevState.collapsedDevices,
+        [key]: !prevState.collapsedDevices[key]
+      }
+    }));
+  };
+
   render() {
-    const { matterEnabled, saving, error, nodes, loadingNodes, decommissioningNodes } = this.state;
+    const { matterEnabled, saving, error, nodes, loadingNodes, decommissioningNodes, collapsedDevices } = this.state;
 
     return (
       <MatterPage user={this.props.user}>
@@ -96,96 +152,155 @@ class MatterSettingsPage extends Component {
             </h3>
           </div>
           <div class="card-body">
-            <div class="alert alert-info">
-              <Text id="integration.matter.settings.description" />
-            </div>
-
-            <div class="form-group">
-              <label class="custom-switch">
-                <input
-                  type="checkbox"
-                  class="custom-switch-input"
-                  checked={matterEnabled}
-                  onChange={e => this.setState({ matterEnabled: e.target.checked })}
-                  disabled={saving}
-                />
-                <span class="custom-switch-indicator" />
-                <span class="custom-switch-description">
-                  <Text id="integration.matter.settings.enableIntegration" />
-                </span>
-              </label>
-            </div>
-
-            <div class="form-group">
-              <button onClick={this.saveConfiguration} class="btn btn-success" disabled={saving}>
-                <Text id="integration.matter.settings.saveButton" />
-              </button>
-            </div>
-
-            {error === RequestStatus.Error && (
-              <div class="alert alert-danger">
-                <Text id="integration.matter.settings.error" />
-              </div>
+            {!matterEnabled && (
+              <>
+                <div class="alert alert-warning">
+                  <Text id="integration.matter.settings.disabledWarning" />
+                </div>
+                <div class="form-group">
+                  <button onClick={this.enableMatter} class="btn btn-success" disabled={saving}>
+                    <Text id="integration.matter.settings.enableButton" />
+                  </button>
+                </div>
+              </>
             )}
 
-            <div class="mt-5">
-              <h4>
-                <Text id="integration.matter.settings.nodesTitle" />
-              </h4>
-              <div
-                class={cx('dimmer', {
-                  active: loadingNodes
-                })}
-              >
-                <div class="loader" />
-                <div class="dimmer-content">
-                  {nodes && nodes.length > 0 ? (
-                    <div class="table-responsive">
-                      <table class="table table-hover table-outline">
-                        <thead>
-                          <tr>
-                            <th>
-                              <Text id="integration.matter.settings.nodeIdLabel" />
-                            </th>
-                            <th>
-                              <Text id="integration.matter.settings.nodeDetailsLabel" />
-                            </th>
-                            <th class="text-right">
-                              <Text id="integration.matter.settings.actionsLabel" />
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {nodes.map(node => (
-                            <tr>
-                              <td>{node.node_id}</td>
-                              <td>
-                                {node.node_information.vendor_name} - {node.node_information.product_label}
-                              </td>
-                              <td class="text-right">
-                                <button
-                                  onClick={() => this.decommissionNode(node.node_id)}
-                                  class={cx('btn btn-danger', {
-                                    loading: decommissioningNodes[node.node_id]
-                                  })}
-                                  disabled={decommissioningNodes[node.node_id]}
-                                >
-                                  <Text id="integration.matter.settings.decommissionButton" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <div class="alert alert-secondary">
-                      <Text id="integration.matter.settings.noNodesFound" />
-                    </div>
-                  )}
+            {matterEnabled && (
+              <>
+                <div class="alert alert-info">
+                  <Text id="integration.matter.settings.description" />
                 </div>
-              </div>
-            </div>
+
+                {error === RequestStatus.Error && (
+                  <div class="alert alert-danger">
+                    <Text id="integration.matter.settings.error" />
+                  </div>
+                )}
+
+                <div class="mt-5">
+                  <h4>
+                    <Text id="integration.matter.settings.nodesTitle" />
+                  </h4>
+                  <div
+                    class={cx('dimmer', {
+                      active: loadingNodes
+                    })}
+                  >
+                    <div class="loader" />
+                    <div class="dimmer-content">
+                      {nodes && nodes.length > 0 ? (
+                        <div class="table-responsive">
+                          {nodes.map(node => (
+                            <div class="card mb-4">
+                              <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                  <div>
+                                    <h5 class="mb-0">
+                                      {node.node_information.vendor_name} - {node.node_information.product_name}
+                                    </h5>
+                                    <small class="text-muted">
+                                      Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} | Product
+                                      ID: {node.node_information.product_id}
+                                    </small>
+                                  </div>
+                                  <div class="ms-auto">
+                                    <button
+                                      onClick={() => this.decommissionNode(node.node_id)}
+                                      class={cx('btn btn-danger', {
+                                        loading: decommissioningNodes[node.node_id]
+                                      })}
+                                      disabled={decommissioningNodes[node.node_id]}
+                                    >
+                                      <Text id="integration.matter.settings.decommissionButton" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="card-body">
+                                {node.devices.map(device => {
+                                  const deviceKey = `${node.node_id}-${device.number}`;
+                                  const isCollapsed = collapsedDevices[deviceKey];
+
+                                  return (
+                                    <div class="mb-4">
+                                      <div
+                                        class="d-flex align-items-center cursor-pointer mb-3"
+                                        onClick={() => this.toggleDevice(node.node_id, device.number)}
+                                      >
+                                        <i
+                                          class={cx('fe me-2', {
+                                            'fe-chevron-right': isCollapsed,
+                                            'fe-chevron-down': !isCollapsed
+                                          })}
+                                        />
+                                        <h6 class="mb-0">
+                                          Device: {device.name} (Endpoint: {device.number})
+                                        </h6>
+                                      </div>
+
+                                      {!isCollapsed && (
+                                        <div class="table-responsive">
+                                          <table class="table table-sm">
+                                            <thead>
+                                              <tr>
+                                                <th>Cluster ID</th>
+                                                <th>Cluster Name</th>
+                                                <th>Attributes</th>
+                                                <th>Commands</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {device.cluster_clients.map(cluster => (
+                                                <tr>
+                                                  <td>{cluster.id}</td>
+                                                  <td>{cluster.name}</td>
+                                                  <td>
+                                                    <ul class="list-unstyled mb-0">
+                                                      {cluster.attributes.map(attr => (
+                                                        <li>
+                                                          <small>{attr}</small>
+                                                        </li>
+                                                      ))}
+                                                    </ul>
+                                                  </td>
+                                                  <td>
+                                                    <ul class="list-unstyled mb-0">
+                                                      {cluster.commands.map(cmd => (
+                                                        <li>
+                                                          <small>{cmd}</small>
+                                                        </li>
+                                                      ))}
+                                                    </ul>
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div class="alert alert-secondary">
+                          <Text id="integration.matter.settings.noNodesFound" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
+                    <Text id="integration.matter.settings.disableButton" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </MatterPage>

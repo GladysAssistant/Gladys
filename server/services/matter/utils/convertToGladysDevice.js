@@ -1,5 +1,5 @@
-const { OnOff } = require('@matter/main/clusters');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { OnOff, OccupancySensing, IlluminanceMeasurement } = require('@matter/main/clusters');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
 /** 
@@ -41,7 +41,7 @@ const logger = require('../../../utils/logger');
  */
 async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetailDeviceData) {
   const gladysDevice = {
-    name: '',
+    name: device.name,
     external_id: `matter:${nodeId}:${device.number}`,
     selector: `matter:${nodeId}:${device.number}`,
     service_id: serviceId,
@@ -50,7 +50,8 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
     params: [],
   };
   if (nodeDetailDeviceData && nodeDetailDeviceData.basicInformation) {
-    gladysDevice.name = `${nodeDetailDeviceData.basicInformation.vendorName} (${nodeDetailDeviceData.basicInformation.productLabel})`;
+    gladysDevice.name = `${nodeDetailDeviceData.basicInformation.vendorName} (${nodeDetailDeviceData.basicInformation
+      .productLabel || device.name})`;
   }
   if (device.clusterClients) {
     device.clusterClients.forEach((clusterClient, clusterIndex) => {
@@ -67,6 +68,33 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
           min: 0,
           max: 1,
         });
+      } else if (clusterIndex === OccupancySensing.Complete.id) {
+        gladysDevice.features.push({
+          name: 'occupancy',
+          category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === IlluminanceMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          name: 'illuminance',
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.LUX,
+          external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          min: 1,
+          max: 6553,
+        });
+      } else {
+        logger.info(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }
     });
   }
