@@ -140,6 +140,38 @@ class MatterSettingsPage extends Component {
     }));
   };
 
+  downloadNodesJson = () => {
+    const { nodes } = this.state;
+    const dataStr = JSON.stringify(nodes, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(dataBlob);
+
+    // Create filename with local datetime
+    const now = new Date();
+    const datetime = now
+      .toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+      .replace(/[/,:]/g, '-')
+      .replace(/\s/g, '_');
+
+    const filename = `matter-nodes-gladys-assistant-${datetime}.json`;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   render() {
     const { matterEnabled, saving, error, nodes, loadingNodes, decommissioningNodes, collapsedDevices } = this.state;
 
@@ -178,9 +210,18 @@ class MatterSettingsPage extends Component {
                 )}
 
                 <div class="mt-5">
-                  <h4>
-                    <Text id="integration.matter.settings.nodesTitle" />
-                  </h4>
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">
+                      <Text id="integration.matter.settings.nodesTitle" />
+                    </h4>
+                    {nodes && nodes.length > 0 && (
+                      <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
+                        <i class="fe fe-download me-2" />
+                        Download Nodes JSON
+                      </button>
+                    )}
+                  </div>
+
                   <div
                     class={cx('dimmer', {
                       active: loadingNodes
@@ -206,7 +247,7 @@ class MatterSettingsPage extends Component {
                                   <div class="ms-auto">
                                     <button
                                       onClick={() => this.decommissionNode(node.node_id)}
-                                      class={cx('btn btn-danger', {
+                                      class={cx('btn btn-danger btn-sm', {
                                         loading: decommissioningNodes[node.node_id]
                                       })}
                                       disabled={decommissioningNodes[node.node_id]}
@@ -217,12 +258,17 @@ class MatterSettingsPage extends Component {
                                 </div>
                               </div>
                               <div class="card-body">
-                                {node.devices.map(device => {
+                                {node.devices.map((device, index, array) => {
                                   const deviceKey = `${node.node_id}-${device.number}`;
                                   const isCollapsed = collapsedDevices[deviceKey];
+                                  const isLastDevice = index === array.length - 1;
 
                                   return (
-                                    <div class="mb-4">
+                                    <div
+                                      class={cx({
+                                        'mb-4': !isLastDevice
+                                      })}
+                                    >
                                       <div
                                         class="d-flex align-items-center cursor-pointer mb-3"
                                         onClick={() => this.toggleDevice(node.node_id, device.number)}
