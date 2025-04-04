@@ -15,7 +15,40 @@ class Docker {
 
 Docker.prototype.listContainers = fake.resolves(containers);
 Docker.prototype.listImages = fake.resolves(images);
-Docker.prototype.createContainer = fake.resolves({ id: containers[0].Id });
+
+const container = {
+  id: containers[0].Id,
+  start: fake.resolves(true),
+  wait: fake.resolves({ StatusCode: 0 }),
+  logs: () => {
+    const logStream = {
+      on: (event, callback) => {
+        if (event === 'data') {
+          const logLines = [
+            'D > Watchtower starting',
+            'atime="2025-03-31T14:24:23Z" level=info msg="Watchtower 1.7.1"',
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Using no notifications"',
+            'Htime="2025-03-31T14:24:23Z" level=info msg="Checking all containers (except explicitly disabled with label)"',
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Running a one time update."',
+            'time="2025-03-31T14:24:23Z" level=info msg="Watchtower is running"', // Malformed line
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Waiting for the notification goroutine to finish"',
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Found new gladysassistant/gladys:add-upgrade-gladys-button image (3190df200e61)"',
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Stopping /gladys (12283a8deb34) with SIGTERM"',
+            'mtime="2025-03-31T14:24:23Z" level=info msg="Session done"',
+          ];
+
+          logLines.forEach((line) => {
+            callback(line);
+          });
+        }
+      },
+    };
+
+    return logStream;
+  },
+};
+
+Docker.prototype.createContainer = fake.resolves(container);
 
 Docker.prototype.getContainer = fake.returns({
   inspect: fake.resolves({
