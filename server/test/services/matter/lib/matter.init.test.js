@@ -33,6 +33,14 @@ describe('Matter.init', () => {
       addOnOffAttributeListener: fake.returns(null),
     });
 
+    clusterClients.set(1030, {
+      addOccupancyAttributeListener: fake.returns(null),
+    });
+
+    clusterClients.set(1024, {
+      addMeasuredValueAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -110,6 +118,29 @@ describe('Matter.init', () => {
             min: 0,
             max: 1,
           },
+          {
+            name: 'occupancy',
+            category: 'motion-sensor',
+            type: 'binary',
+            read_only: true,
+            has_feedback: true,
+            external_id: 'matter:12345:1:1030',
+            selector: 'matter:12345:1:1030',
+            min: 0,
+            max: 1,
+          },
+          {
+            name: 'illuminance',
+            category: 'light-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'lux',
+            external_id: 'matter:12345:1:1024',
+            selector: 'matter:12345:1:1024',
+            min: 1,
+            max: 6553,
+          },
         ],
         params: [],
       },
@@ -130,6 +161,29 @@ describe('Matter.init', () => {
             selector: 'matter:12345:1:child_endpoint:2:6',
             min: 0,
             max: 1,
+          },
+          {
+            name: 'occupancy',
+            category: 'motion-sensor',
+            type: 'binary',
+            read_only: true,
+            has_feedback: true,
+            external_id: 'matter:12345:1:child_endpoint:2:1030',
+            selector: 'matter:12345:1:child_endpoint:2:1030',
+            min: 0,
+            max: 1,
+          },
+          {
+            name: 'illuminance',
+            category: 'light-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'lux',
+            external_id: 'matter:12345:1:child_endpoint:2:1024',
+            selector: 'matter:12345:1:child_endpoint:2:1024',
+            min: 1,
+            max: 6553,
           },
         ],
         params: [],
