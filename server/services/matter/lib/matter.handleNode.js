@@ -16,7 +16,7 @@ const handleDevice = async (nodeDetail, node, device, devices, listenToStateChan
     newDevicePath,
   );
   if (gladysDevice.features.length > 0) {
-    listenToStateChange(nodeDetail.nodeId, device);
+    listenToStateChange(nodeDetail.nodeId, newDevicePath, device);
     devices.push(gladysDevice);
   }
   if (device.childEndpoints) {

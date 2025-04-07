@@ -36,7 +36,7 @@ describe('Matter.listenToStateChange', () => {
       number: 1,
       clusterClients,
     };
-    await matterHandler.listenToStateChange(1234n, device);
+    await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:6',
       state: STATE.ON,
@@ -53,9 +53,26 @@ describe('Matter.listenToStateChange', () => {
       number: 1,
       clusterClients,
     };
-    await matterHandler.listenToStateChange(1234n, device);
+    await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:6',
+      state: STATE.OFF,
+    });
+  });
+  it('should listen to state change in nested child endpoint (OFF)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(OnOff.Complete.id, {
+      addOnOffAttributeListener: (callback) => {
+        callback(false);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1:child_endpoint:2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:child_endpoint:2:6',
       state: STATE.OFF,
     });
   });
@@ -70,7 +87,7 @@ describe('Matter.listenToStateChange', () => {
       number: 1,
       clusterClients,
     };
-    await matterHandler.listenToStateChange(1234n, device);
+    await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1030',
       state: STATE.ON,
@@ -87,7 +104,7 @@ describe('Matter.listenToStateChange', () => {
       number: 1,
       clusterClients,
     };
-    await matterHandler.listenToStateChange(1234n, device);
+    await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1030',
       state: STATE.OFF,
@@ -104,7 +121,7 @@ describe('Matter.listenToStateChange', () => {
       number: 1,
       clusterClients,
     };
-    await matterHandler.listenToStateChange(1234n, device);
+    await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1024',
       state: 100,
