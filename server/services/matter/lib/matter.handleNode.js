@@ -44,8 +44,9 @@ async function handleNode(nodeDetail) {
   const node = await this.commissioningController.getNode(nodeDetail.nodeId);
   this.nodesMap.set(nodeDetail.nodeId, node);
   const devices = node.getDevices();
+  const boundListenToStateChange = this.listenToStateChange.bind(this);
   await Promise.each(devices, async (device) => {
-    await handleDevice(nodeDetail, node, device, this.devices, this.listenToStateChange, this.serviceId, '');
+    await handleDevice(nodeDetail, node, device, this.devices, boundListenToStateChange, this.serviceId, '');
   });
 }
 
