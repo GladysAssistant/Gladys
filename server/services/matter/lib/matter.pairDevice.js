@@ -1,6 +1,5 @@
 const { ManualPairingCodeCodec } = require('@matter/main/types');
-const Promise = require('bluebird');
-const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
+
 const logger = require('../../../utils/logger');
 
 /**
