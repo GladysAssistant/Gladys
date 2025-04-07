@@ -17,7 +17,33 @@ describe('Matter.getNodes', () => {
   });
 
   it('should return all nodes', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(6, {
+      id: 2,
+      name: 'OnOff',
+      attributes: {
+        onOff: {},
+      },
+      commands: {},
+    });
     matterHandler.commissioningController = {
+      getNode: fake.returns({
+        getDevices: fake.returns([
+          {
+            number: 1,
+            name: 'Test Device',
+            clusterClients: new Map(),
+            childEndpoints: [
+              {
+                name: 'Test Device child',
+                number: 2,
+                clusterClients,
+                childEndpoints: [],
+              },
+            ],
+          },
+        ]),
+      }),
       getCommissionedNodesDetails: fake.returns([
         {
           nodeId: 1234n,
@@ -33,11 +59,34 @@ describe('Matter.getNodes', () => {
         },
       ]),
     };
-    const nodes = matterHandler.getNodes();
+    const nodes = await matterHandler.getNodes();
     expect(nodes).to.have.lengthOf(1);
     expect(nodes).to.deep.equal([
       {
         node_id: '1234',
+        devices: [
+          {
+            name: 'Test Device',
+            number: '1',
+            cluster_clients: [],
+            child_endpoints: [
+              {
+                name: 'Test Device child',
+                number: '2',
+                cluster_clients: [
+                  {
+                    id: '2',
+                    name: 'OnOff',
+                    attributes: ['onOff'],
+                    commands: [],
+                    all_keys: ['id', 'name', 'attributes', 'commands'],
+                  },
+                ],
+                child_endpoints: [],
+              },
+            ],
+          },
+        ],
         node_information: {
           vendor_name: 'Test Vendor',
           product_name: 'Test Product',

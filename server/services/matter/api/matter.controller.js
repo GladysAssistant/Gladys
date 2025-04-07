@@ -28,7 +28,6 @@ module.exports = function MatterController(matterHandler) {
    */
   async function getNodes(req, res) {
     const nodes = await matterHandler.getNodes();
-    nodes.forEach(console.log);
     res.json(nodes);
   }
 
