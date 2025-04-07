@@ -34,13 +34,13 @@ const logger = require('../../../utils/logger');
  * @param {string} serviceId - The service ID.
  * @param {bigint} nodeId - The node ID of the device.
  * @param {object} device - The device on the node.
- * @param {object} nodeDetailDeviceData - The node detail device data.
+ * @param {object} nodeDetailDeviceDataBasicInformation - The node detail device data basic information.
  * @param {string} devicePath - The path of the device.
  * @example
  * const gladysDevice = await convertToGladysDevice(serviceId, nodeId, node, device);
  * @returns {Promise<object>} The Gladys device.
  */
-async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceData, devicePath) {
+async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceDataBasicInformation, devicePath) {
   const gladysDevice = {
     name: device.name,
     external_id: `matter:${nodeId}:${devicePath}`,
@@ -50,9 +50,12 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
     features: [],
     params: [],
   };
-  if (nodeDetailDeviceData && nodeDetailDeviceData.basicInformation) {
-    gladysDevice.name = `${nodeDetailDeviceData.basicInformation.vendorName} (${nodeDetailDeviceData.basicInformation
-      .productLabel || device.name})`;
+  if (nodeDetailDeviceDataBasicInformation) {
+    gladysDevice.name = `${
+      nodeDetailDeviceDataBasicInformation.vendorName
+    } (${nodeDetailDeviceDataBasicInformation.nodeLabel ||
+      nodeDetailDeviceDataBasicInformation.productLabel ||
+      device.name})`;
   }
   if (device.clusterClients) {
     device.clusterClients.forEach((clusterClient, clusterIndex) => {

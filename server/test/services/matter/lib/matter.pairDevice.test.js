@@ -1,5 +1,7 @@
 const sinon = require('sinon');
 const { expect, assert } = require('chai');
+// eslint-disable-next-line import/no-unresolved
+const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');
 
 const { fake } = sinon;
 
@@ -57,6 +59,55 @@ describe('Matter.pairDevice', () => {
     await matterHandler.pairDevice(pairingCode);
     expect(matterHandler.devices).to.have.lengthOf(1);
     expect(matterHandler.nodesMap.size).to.equal(1);
+  });
+  it('should pair a bridge device', async () => {
+    const pairingCode = '1450-134-1614';
+    const clusterClients = new Map();
+    clusterClients.set(6, {
+      addOnOffAttributeListener: fake.returns(null),
+    });
+    const bridgeClusterClients = new Map();
+    bridgeClusterClients.set(BridgedDeviceBasicInformation.Complete.id, {
+      nodeLabel: 'Bridge Device',
+      vendorName: 'Test Vendor',
+      productLabel: 'Bridge Product',
+    });
+    matterHandler.commissioningController = {
+      commissionNode: fake.resolves(12345n),
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 12345n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Test Vendor',
+              productName: 'Test Product',
+            },
+          },
+        },
+      ]),
+      getNode: fake.resolves({
+        getDevices: fake.returns([
+          {
+            id: 'device-1',
+            name: 'Test Device',
+            number: 1,
+            clusterClients: bridgeClusterClients,
+            childEndpoints: [
+              {
+                id: 'child-endpoint-1',
+                name: 'Child Endpoint',
+                number: 2,
+                clusterClients,
+              },
+            ],
+          },
+        ]),
+      }),
+    };
+    await matterHandler.pairDevice(pairingCode);
+    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.nodesMap.size).to.equal(1);
+    expect(matterHandler.devices[0].name).to.equal('Test Vendor (Bridge Device)');
   });
   it('should not pair a device, commissioning failed', async () => {
     const pairingCode = '1450-134-1614';
