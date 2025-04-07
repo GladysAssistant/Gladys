@@ -1799,6 +1799,58 @@
         "saved": "Configuration sauvegardée !",
         "error": "Erreur lors de la sauvegarde de la configuration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Ajoutez et gérez vos appareils Matter.",
+      "deviceTab": "Appareils",
+      "addTab": "Ajouter un appareil",
+      "settingsTab": "Paramètres",
+      "documentation": "Documentation",
+      "device": {
+        "title": "Appareils Matter",
+        "noDeviceFound": "Aucun appareil Matter trouvé",
+        "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
+        "addToGladys": "Ajouter à Gladys"
+      },
+      "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Mon appareil Matter",
+      "roomLabel": "Pièce",
+      "featuresLabel": "Fonctionnalités",
+      "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
+      "alreadyCreatedButton": "Appareil déjà ajouté",
+      "saveButton": "Enregistrer",
+      "deleteButton": "Supprimer",
+      "error": {
+        "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
+        "conflictError": "Un appareil avec ce nom existe déjà",
+        "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
+        "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
+      },
+      "discover": {
+        "title": "Ajouter un appareil Matter",
+        "description": "Votre appareil fournit un code d'appairage à 11 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Code d'appairage",
+        "pairingCodeHelp": "Entrez le code d'appairage à 11 chiffres fourni par votre appareil Matter",
+        "addButton": "Ajouter à Gladys"
+      },
+      "settings": {
+        "title": "Paramètres Matter",
+        "description": "Activez ou désactivez l'intégration Matter dans Gladys. Lorsqu'elle est activée, Gladys pourra communiquer avec vos appareils Matter.",
+        "enableIntegration": "Activer l'intégration Matter",
+        "saveButton": "Enregistrer",
+        "error": "Une erreur est survenue lors de l'enregistrement des paramètres",
+        "nodesTitle": "Nœuds Matter",
+        "nodeIdLabel": "ID du nœud",
+        "nodeDetailsLabel": "Détails du nœud",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Décommissionner",
+        "noNodesFound": "Aucun nœud Matter trouvé",
+        "disabledWarning": "Matter n'est pas activé, veuillez l'activer pour commencer à utiliser l'intégration.",
+        "enableButton": "Activer Matter",
+        "disableButton": "Désactiver Matter"
+      }
     }
   },
   "editScene": {
