@@ -41,23 +41,11 @@ async function pairDevice(pairingCode) {
 
     logger.info(`Successfully commissioned device with nodeId ${nodeId}`);
 
+    // Get the node details
     const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
-    await Promise.each(nodeDetails, async (nodeDetail) => {
-      const node = await this.commissioningController.getNode(nodeDetail.nodeId);
-      const devices = node.getDevices();
-      await Promise.each(devices, async (device) => {
-        const gladysDevice = await convertToGladysDevice(
-          this.serviceId,
-          nodeDetail.nodeId,
-          node,
-          device,
-          nodeDetail.deviceData,
-        );
-        this.listenToStateChange(nodeDetail.nodeId, device);
-        this.nodesMap.set(nodeDetail.nodeId, node);
-        this.devices.push(gladysDevice);
-      });
-    });
+    const nodeDetail = nodeDetails.find((nd) => nd.nodeId === nodeId);
+    // Convert the node & listen to state changes
+    await this.handleNode(nodeDetail);
   } catch (error) {
     logger.error(`Error commissioning device: ${error}`);
     throw error;

@@ -18,6 +18,10 @@ describe('Matter.pairDevice', () => {
 
   it('should pair a device', async () => {
     const pairingCode = '1450-134-1614';
+    const clusterClients = new Map();
+    clusterClients.set(6, {
+      addOnOffAttributeListener: fake.returns(null),
+    });
     matterHandler.commissioningController = {
       commissionNode: fake.resolves(12345n),
       getCommissionedNodesDetails: fake.returns([
@@ -36,6 +40,16 @@ describe('Matter.pairDevice', () => {
           {
             id: 'device-1',
             name: 'Test Device',
+            number: 1,
+            clusterClients: new Map(),
+            childEndpoints: [
+              {
+                id: 'child-endpoint-1',
+                name: 'Child Endpoint',
+                number: 2,
+                clusterClients,
+              },
+            ],
           },
         ]),
       }),

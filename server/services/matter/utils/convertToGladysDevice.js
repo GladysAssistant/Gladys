@@ -32,18 +32,18 @@ const logger = require('../../../utils/logger');
  * @description Convert a Matter device to a Gladys device.
  * @param {string} serviceId - The service ID.
  * @param {bigint} nodeId - The node ID of the device.
- * @param {object} node - The Matter node.
  * @param {object} device - The device on the node.
  * @param {object} nodeDetailDeviceData - The node detail device data.
+ * @param {string} devicePath - The path of the device.
  * @example
  * const gladysDevice = await convertToGladysDevice(serviceId, nodeId, node, device);
  * @returns {Promise<object>} The Gladys device.
  */
-async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetailDeviceData) {
+async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceData, devicePath) {
   const gladysDevice = {
     name: device.name,
-    external_id: `matter:${nodeId}:${device.number}`,
-    selector: `matter:${nodeId}:${device.number}`,
+    external_id: `matter:${nodeId}:${devicePath}`,
+    selector: `matter:${nodeId}:${devicePath}`,
     service_id: serviceId,
     should_poll: false,
     features: [],
@@ -63,8 +63,8 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
           type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
           read_only: false,
           has_feedback: true,
-          external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
-          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 1,
         });
@@ -75,8 +75,8 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
           type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
           read_only: true,
           has_feedback: true,
-          external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
-          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 1,
         });
@@ -88,8 +88,8 @@ async function convertToGladysDevice(serviceId, nodeId, node, device, nodeDetail
           read_only: true,
           has_feedback: true,
           unit: DEVICE_FEATURE_UNITS.LUX,
-          external_id: `matter:${nodeId}:${device.number}:${clusterIndex}`,
-          selector: `matter:${nodeId}:${device.number}:${clusterIndex}`,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 1,
           max: 6553,
         });

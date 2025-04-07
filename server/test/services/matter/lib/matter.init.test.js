@@ -12,6 +12,7 @@ describe('Matter.init', () => {
   let environment;
   let storageService;
   let commissioningController;
+  let clusterClients;
 
   beforeEach(() => {
     // Mock environment and storage service
@@ -25,6 +26,12 @@ describe('Matter.init', () => {
     storageService = {
       location: '',
     };
+
+    clusterClients = new Map();
+
+    clusterClients.set(6, {
+      addOnOffAttributeListener: fake.returns(null),
+    });
 
     // Mock commissioning controller
     commissioningController = {
@@ -45,6 +52,16 @@ describe('Matter.init', () => {
           {
             id: 'device-1',
             name: 'Test Device',
+            number: 1,
+            clusterClients,
+            childEndpoints: [
+              {
+                id: 'child-endpoint-1',
+                name: 'Child Endpoint',
+                number: 2,
+                clusterClients,
+              },
+            ],
           },
         ]),
       }),
@@ -73,7 +90,51 @@ describe('Matter.init', () => {
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
-    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.devices).to.have.lengthOf(2);
+    expect(matterHandler.devices).to.deep.equal([
+      {
+        name: 'Test Vendor (Test Device)',
+        external_id: 'matter:12345:1',
+        selector: 'matter:12345:1',
+        service_id: 'service-1',
+        should_poll: false,
+        features: [
+          {
+            name: 'on_off',
+            category: 'switch',
+            type: 'binary',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:6',
+            selector: 'matter:12345:1:6',
+            min: 0,
+            max: 1,
+          },
+        ],
+        params: [],
+      },
+      {
+        name: 'Test Vendor (Child Endpoint)',
+        external_id: 'matter:12345:1:child_endpoint:2',
+        selector: 'matter:12345:1:child_endpoint:2',
+        service_id: 'service-1',
+        should_poll: false,
+        features: [
+          {
+            name: 'on_off',
+            category: 'switch',
+            type: 'binary',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:child_endpoint:2:6',
+            selector: 'matter:12345:1:child_endpoint:2:6',
+            min: 0,
+            max: 1,
+          },
+        ],
+        params: [],
+      },
+    ]);
     expect(matterHandler.nodesMap.size).to.equal(1);
   });
 

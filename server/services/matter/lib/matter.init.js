@@ -2,7 +2,6 @@ const path = require('path');
 const fse = require('fs-extra');
 const Promise = require('bluebird');
 
-const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 const logger = require('../../../utils/logger');
 
 /**
@@ -10,7 +9,7 @@ const logger = require('../../../utils/logger');
  * @example matter.init();
  */
 async function init() {
-  const { Environment, StorageService, Logger } = this.MatterMain;
+  const { Environment, StorageService } = this.MatterMain;
   const { CommissioningController } = this.ProjectChipMatter;
 
   // Store the matter data in the same folder as the Gladys database
@@ -36,22 +35,9 @@ async function init() {
   await this.commissioningController.start();
   logger.info('Matter controller started');
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
+
   await Promise.each(nodeDetails, async (nodeDetail) => {
-    const node = await this.commissioningController.getNode(nodeDetail.nodeId);
-    const devices = node.getDevices();
-    await Promise.each(devices, async (device) => {
-      console.log(device);
-      const gladysDevice = await convertToGladysDevice(
-        this.serviceId,
-        nodeDetail.nodeId,
-        node,
-        device,
-        nodeDetail.deviceData,
-      );
-      this.listenToStateChange(nodeDetail.nodeId, device);
-      this.nodesMap.set(nodeDetail.nodeId, node);
-      this.devices.push(gladysDevice);
-    });
+    await this.handleNode(nodeDetail);
   });
 }
 

@@ -6,6 +6,7 @@ const { setValue } = require('./matter.setValue');
 const { listenToStateChange } = require('./matter.listenToStateChange');
 const { decommission } = require('./matter.decommission');
 const { getNodes } = require('./matter.getNodes');
+const { handleNode } = require('./matter.handleNode');
 
 /**
  * @description Matter handler.
@@ -36,4 +37,5 @@ MatterHandler.prototype.setValue = setValue;
 MatterHandler.prototype.listenToStateChange = listenToStateChange;
 MatterHandler.prototype.decommission = decommission;
 MatterHandler.prototype.getNodes = getNodes;
+MatterHandler.prototype.handleNode = handleNode;
 module.exports = MatterHandler;
