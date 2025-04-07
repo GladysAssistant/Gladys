@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const { ManualPairingCodeCodec } = require('@matter/main/types');
 
 const logger = require('../../../utils/logger');

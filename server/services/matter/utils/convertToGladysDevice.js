@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const { OnOff, OccupancySensing, IlluminanceMeasurement } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');

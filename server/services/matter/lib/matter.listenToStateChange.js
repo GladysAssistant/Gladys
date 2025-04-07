@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const { OnOff, OccupancySensing, IlluminanceMeasurement } = require('@matter/main/clusters');
 const { EVENTS, STATE } = require('../../../utils/constants');
 /**
