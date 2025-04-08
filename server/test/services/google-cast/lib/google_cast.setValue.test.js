@@ -14,7 +14,7 @@ const player = {
     playerName: 'Nest mini',
   },
   on: (event, cb) => {
-    cb({ playerState: 'paused' });
+    cb({ playerState: 'paused', idleReason: 'FINISHED' });
   },
   load: (param1, param2, cb) => {
     cb(null, { playerState: 'playing' });
@@ -35,6 +35,16 @@ class GoogleCastClient {
   // eslint-disable-next-line class-methods-use-this
   on(event, cb) {
     cb({ message: 'this is an error' });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getVolume(cb) {
+    cb(null, { level: 1 });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  setVolume(volume, cb) {
+    cb(null, volume);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -80,14 +90,14 @@ describe('GoogleCastHandler.setValue', () => {
     googleCastHandler.scanTimeout = 1;
     const devices = await googleCastHandler.scan();
     const device = devices[0];
-    await googleCastHandler.setValue(device, device.features[0], 'http://play-url.com');
+    await googleCastHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
   });
   it('should return device not found', async () => {
     googleCastHandler.scanTimeout = 1;
     const device = {
       external_id: 'google_cast:toto',
     };
-    const promise = googleCastHandler.setValue(device, {}, 'http://play-url.com');
+    const promise = googleCastHandler.setValue(device, {}, 'http://play-url.com', { volume: 30 });
     await assert.isRejected(promise, 'Device not found on network');
   });
 });
