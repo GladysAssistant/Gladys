@@ -52,10 +52,26 @@ module.exports = function NukiController(nukiHandler) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/nuki/connect Connect to Nuki Web service.
+   * @apiName connect
+   * @apiGroup Nuki
+   */
+  function connect(req, res) {
+    nukiHandler.getHandler('http').connect();
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/nuki/status': {
       authenticated: true,
       controller: asyncMiddleware(getStatus),
+    },
+    'get /api/v1/service/nuki/connect': {
+      authenticated: true,
+      controller: asyncMiddleware(connect),
     },
     'get /api/v1/service/nuki/config': {
       authenticated: true,

@@ -21,7 +21,7 @@ describe('nuki.saveConfiguration config command', () => {
 
   it('should save configuration of service', async () => {
     const nukiService = NukiService(gladys, serviceId);
-    await nukiService.device.saveConfiguration({ login: 'john@doe.com', password: '666' });
-    assert.calledTwice(gladys.variable.setValue);
+    await nukiService.device.saveConfiguration({ apiKey: '666' });
+    assert.calledOnce(gladys.variable.setValue);
   });
 });

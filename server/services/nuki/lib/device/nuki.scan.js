@@ -5,8 +5,8 @@
  * @example
  * scan(['http'], options);
  */
-function scan(protocol, options) {
-  this.getHandler(protocol).scan(options);
+async function scan(protocol, options) {
+  await this.getHandler(protocol).scan(options);
 }
 
 module.exports = {

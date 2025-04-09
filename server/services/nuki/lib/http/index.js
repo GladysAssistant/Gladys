@@ -1,9 +1,11 @@
 const { connect } = require('./nuki.http.connect');
 const { disconnect } = require('./nuki.http.disconnect');
-const { scan } = require('./nuki.http.scan');
-/*
-
 const { getDiscoveredDevices } = require('./nuki.http.getDiscoveredDevices');
+const { scan } = require('./nuki.http.scan');
+const { convertToDevice } = require('./nuki.http.convertToDevice');
+
+const { setValue } = require('./nuki.http.setValue');
+/*
 const { getValue } = require('./nuki.http.getValue');
 const { setValue } = require('./nuki.http.setValue');
 
@@ -21,17 +23,20 @@ const NukiHTTPHandler = function NukiHTTPHandler(nukiHandler) {
   this.nukiHandler = nukiHandler;
   // Found devices
   this.discoveredDevices = {};
+  this.nukiApi = undefined;
 };
 
 // Commons
 NukiHTTPHandler.prototype.connect = connect;
 NukiHTTPHandler.prototype.disconnect = disconnect;
-NukiHTTPHandler.prototype.scan = scan;
-/*
-
 NukiHTTPHandler.prototype.getDiscoveredDevices = getDiscoveredDevices;
-NukiHTTPHandler.prototype.getValue = getValue;
+NukiHTTPHandler.prototype.scan = scan;
+NukiHTTPHandler.prototype.convertToDevice = convertToDevice;
 NukiHTTPHandler.prototype.setValue = setValue;
+
+/*
+NukiHTTPHandler.prototype.getValue = getValue;
+
 
 // HTTP
 NukiHTTPHandler.prototype.status = status;

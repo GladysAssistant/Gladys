@@ -24,10 +24,9 @@ describe('nuki.getConfiguration config command', () => {
     const nukiService = NukiService(gladys, serviceId);
     const result = await nukiService.device.getConfiguration();
     const expected = {
-      login: null,
-      password: null,
+      apiKey: null,
     };
-    assert.calledTwice(gladys.variable.getValue);
+    assert.calledOnce(gladys.variable.getValue);
     expect(result).deep.eq(expected);
   });
 });

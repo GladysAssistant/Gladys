@@ -161,6 +161,7 @@ class NukiDeviceBox extends Component {
                     <label class="form-label">
                       <Text id="integration.nuki.device.protocolLabel" />
                     </label>
+                    
                     <div class="form-check form-check-inline">
                       <label class="custom-control custom-radio">
                         <input
@@ -176,24 +177,22 @@ class NukiDeviceBox extends Component {
                         </div>
                       </label>
                     </div>
-                    {// HIDE UNTIL HTTP IS IMPLEMENTED @TODO: implement http
-                    false && (
-                      <div class="form-check form-check-inline">
-                        <label class="custom-control custom-radio">
-                          <input
-                            type="radio"
-                            class="custom-control-input"
-                            name={`device-protocol-${deviceIndex}`}
-                            value="http"
-                            checked={deviceProtocol === 'http'}
-                            disabled
-                          />
-                          <div class="custom-control-label">
-                            <Text id="integration.nuki.device.protocolHTTP" />
-                          </div>
-                        </label>
-                      </div>
-                    )}
+                    
+                    <div class="form-check form-check-inline">
+                      <label class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          name={`device-protocol-${deviceIndex}`}
+                          value="http"
+                          checked={deviceProtocol === 'http'}
+                          disabled
+                        />
+                        <div class="custom-control-label">
+                          <Text id="integration.nuki.device.protocolHTTP" />
+                        </div>
+                      </label>
+                    </div>
                   </div>
                 )}
 

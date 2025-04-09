@@ -1133,6 +1133,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   NUKI: {
     CONNECTED: 'nuki.connected',
     NEW_MQTT_DEVICE: 'nuki.new-mqtt-device',
+    NEW_HTTP_DEVICE: 'nuki.new-http-device',
     ERROR: 'nuki.error',
   },
   BROADLINK: {

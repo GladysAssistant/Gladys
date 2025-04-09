@@ -131,6 +131,7 @@ import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 import NukiPage from '../routes/integration/all/nuki';
 import NukiSetupPage from '../routes/integration/all/nuki/setup-page';
 import NukiMqttDiscoverPage from '../routes/integration/all/nuki/discover-mqtt';
+import NukiHttpDiscoverPage from '../routes/integration/all/nuki/discover-http';
 
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
@@ -331,7 +332,8 @@ const AppRouter = connect(
         <NukiPage path="/dashboard/integration/device/nuki" />
         <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />
         <NukiMqttDiscoverPage path="/dashboard/integration/device/nuki/mqtt" />
-
+        <NukiHttpDiscoverPage path="/dashboard/integration/device/nuki/http" />
+        
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />

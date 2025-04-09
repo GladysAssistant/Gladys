@@ -45,30 +45,14 @@ const SetupTab = ({ children, ...props }) => {
 
             <form id="nukiSetupForm">
               <div class="form-group">
-                <label for="nukiUsername" class="form-label">
-                  <Text id={`integration.nuki.setup.userLabel`} />
+                <label for="nukiApiKey" class="form-label">
+                  <Text id={`integration.nuki.setup.apiKeyLabel`} />
                 </label>
                 <Localizer>
                   <input
-                    name="nukiUsername"
-                    placeholder={<Text id="integration.nuki.setup.userPlaceholder" />}
-                    value={props.nukiUsername}
-                    class="form-control"
-                    onInput={props.updateConfiguration}
-                  />
-                </Localizer>
-              </div>
-
-              <div class="form-group">
-                <label for="nukiPassword" class="form-label">
-                  <Text id={`integration.nuki.setup.passwordLabel`} />
-                </label>
-                <Localizer>
-                  <input
-                    name="nukiPassword"
-                    type="password"
-                    placeholder={<Text id="integration.nuki.setup.passwordPlaceholder" />}
-                    value={props.nukiPassword}
+                    name="nukiApiKey"
+                    placeholder={<Text id="integration.nuki.setup.apiKeyPlaceholder" />}
+                    value={props.nukiApiKey}
                     class="form-control"
                     onInput={props.updateConfiguration}
                   />

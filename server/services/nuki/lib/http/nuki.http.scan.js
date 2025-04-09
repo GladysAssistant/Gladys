@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
-const Nuki = require('nuki-web-api');
 const { BadParameters } = require('../../../../utils/coreErrors');
+const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Scan for HTTP devices.
@@ -8,17 +8,19 @@ const { BadParameters } = require('../../../../utils/coreErrors');
  * @example
  * nukiHTTPManager.scan();
  */
-function scan() {
+async function scan() {
   logger.info(`Nuki : Scan for http devices`);
-  let token = "4d9e1cf1e1b296bb80fd598f704f41b9946dc1be338af9728a138f552fed363df27346572b117411"
-  let nuki = new Nuki(token)
-
-  nuki.getSmartlocks().then(function(res) {
-      console.log('getSmartlocks(): ' + JSON.stringify(res))
-
-  }).catch(function(e) {console.error('getSmartlocks(): ' + e.message)});
-
-  return null;
+  try {
+    const locks = await this.nukiApi.getSmartlocks();
+    locks.forEach( (lock) => {
+      const device = this.convertToDevice(lock);
+      this.discoveredDevices[device.external_id] = device;
+      logger.trace(device);
+      this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_HTTP_DEVICE);
+    });
+  } catch (e) {
+    logger.error('getSmartlocks(): ' + e.message);
+  }
 }
 
 module.exports = {

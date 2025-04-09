@@ -4,7 +4,7 @@ import createActionsHouse from '../../../../actions/house';
 import createActionsIntegration from '../../../../actions/integration';
 import debounce from 'debounce';
 
-const HIDDEN_PASSWORD = '*********';
+const HIDDEN_API_KEY = '*********';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
@@ -16,11 +16,8 @@ function createActions(store) {
         configuration = await state.httpClient.get('/api/v1/service/nuki/config');
       } finally {
         store.setState({
-          nukiUsername: configuration.login,
-          nukiPassword: configuration.login && HIDDEN_PASSWORD,
-          // HYGEN : createActions field placeholder
-          // HYGEN : end of placeholder
-          passwordChanges: false,
+          nukiApiKey: configuration.apiKey && HIDDEN_API_KEY,
+          apiKeyChanges: false,
           connected: false
         });
       }
@@ -51,8 +48,8 @@ function createActions(store) {
     updateConfiguration(state, e) {
       const data = {};
       data[e.target.name] = e.target.value;
-      if (e.target.name === 'nukiPassword') {
-        data.passwordChanges = true;
+      if (e.target.name === 'nukiApiKey') {
+        data.apiKeyChanges = true;
       }
       store.setState(data);
     },
@@ -64,10 +61,9 @@ function createActions(store) {
         nukiConnectionError: undefined
       });
       try {
-        const { nukiUsername, nukiPassword } = state;
+        const { nukiApiKey } = state;
         await state.httpClient.post('/api/v1/service/nuki/config', {
-          login: nukiUsername,
-          password: (state.passwordChanges && nukiPassword) || undefined
+          apiKey: (state.apiKeyChanges && nukiApiKey) || undefined
         });
         await state.httpClient.get(`/api/v1/service/nuki/connect`);
 
@@ -79,7 +75,7 @@ function createActions(store) {
       } catch (e) {
         store.setState({
           nukiConnectionStatus: RequestStatus.Error,
-          passwordChanges: false
+          apiKeyChanges: false
         });
       }
     },
@@ -89,7 +85,6 @@ function createActions(store) {
       });
       try {
         const discoveredDevices = await state.httpClient.get(`/api/v1/service/nuki/discover/${type}`);
-        // const discoveredDevices = [];
         store.setState({
           discoveredDevices,
           loading: false,

@@ -36,6 +36,6 @@ class NukiIntegration extends Component {
 }
 
 export default connect(
-  'user,session,nukiUsername,nukiPassword,nukiConnectionStatus,nukiConnected,nukiConnectionError,nukiDevices,housesWithRooms,getNukiStatus,nukiSearch,getNukiOrderDir',
+  'user,session,nukiApiKey,nukiConnectionStatus,nukiConnected,nukiConnectionError,nukiDevices,housesWithRooms,getNukiStatus,nukiSearch,getNukiOrderDir',
   actions
 )(NukiIntegration);

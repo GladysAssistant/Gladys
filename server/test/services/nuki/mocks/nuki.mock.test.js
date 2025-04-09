@@ -12,8 +12,7 @@ NukiHandlerMock.prototype.start = fake.returns(null);
 NukiHandlerMock.prototype.getStatus = fake.resolves(true);
 NukiHandlerMock.prototype.saveConfiguration = fake.resolves(true);
 NukiHandlerMock.prototype.getConfiguration = fake.resolves({
-  login: 'login',
-  password: 'password',
+  apiKey: '42',
 });
 NukiHandlerMock.prototype.getDiscoveredDevices = fake.returns(discoveredDevices);
 NukiHandlerMock.prototype.scan = fake.returns(discoveredDevices);

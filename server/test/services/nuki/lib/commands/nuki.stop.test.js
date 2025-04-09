@@ -9,6 +9,7 @@ const mockInstance = new NukiProtocolHandlerMock();
 
 const NukiHandler = proxyquire('../../../../../services/nuki/lib', {
   './mqtt': NukiProtocolHandlerMock,
+  './http': NukiProtocolHandlerMock,
 });
 
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../../../../../services/nuki/lib/utils/nuki.constants');

@@ -14,10 +14,7 @@ const variableNotConfigured = {
 
 const variableOk = {
   getValue: (valueId, notUsed) => {
-    if (valueId === 'NUKI_LOGIN') {
-      return Promise.resolve('email@valid.ok');
-    }
-    if (valueId === 'NUKI_PASSWORD') {
+    if (valueId === 'NUKI_API_KEY') {
       return Promise.resolve('S0m3Th1ngTru3');
     }
     return Promise.resolve(undefined);
@@ -27,10 +24,7 @@ const variableOk = {
 
 const variableNok = {
   getValue: (valueId, notUsed) => {
-    if (valueId === 'NUKI_LOGIN') {
-      return Promise.resolve('email@unvalid.ko');
-    }
-    if (valueId === 'NUKI_PASSWORD') {
+    if (valueId === 'NUKI_API_KEY') {
       return Promise.resolve('S0m3Th1ngF4ls3');
     }
     return Promise.resolve(undefined);

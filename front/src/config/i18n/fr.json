@@ -1780,6 +1780,7 @@
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte Web",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud nuki, plus d'informations sur la ",
         "setupPageLink": "page de configuration nuki.",
@@ -1794,6 +1795,7 @@
         "noDeviceFound": "Aucun appareil Nuki trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
         "protocolLabel": "Protocole",
         "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Fonctionnalités"
       },
       "discover": {
@@ -1806,17 +1808,18 @@
           "title": "Découverte des appareils Nuki sur MQTT",
           "description": "Les appareils Nuki configurés sont automatiquement découverts sur le réseau MQTT.",
           "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Nuki dans le cloud NukiWeb",
+          "description": "Les appareils Nuki configurés sont automatiquement découverts sur votre compte NukiWeb.",
+          "scan": "Rechercher"
         }
       },
       "setup": {
         "title": "Configuration nuki",
         "nukiDescription": "Vous pouvez connecter Gladys à votre compte cloud nuki pour commander les appareils associés.",
-        "userLabel": "Nom d'utilisateur",
-        "userPlaceholder": "Entrez le nom d'utilisateur nuki",
-        "countryCodeLabel": "Code pays",
-        "countryPlaceholder": "Entrez le code de votre pays (ex: fr)",
-        "passwordLabel": "Mot de passe",
-        "passwordPlaceholder": "Entrez le mot de passe utilisateur nuki",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez la clé API Nuki web",
         "saveLabel": "Enregistrer la configuration",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud nuki...",

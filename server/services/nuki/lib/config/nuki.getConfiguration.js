@@ -3,8 +3,7 @@ const { CONFIGURATION } = require('../utils/nuki.constants');
 
 /**
  * @typedef {object} Configuration
- * @property {string} login Login to the service.
- * @property {number} password Password to the service.
+ * @property {string} apiKey API key to the service.
  */
 /**
  * @description Returns Nuki configuration informations.
@@ -14,11 +13,9 @@ const { CONFIGURATION } = require('../utils/nuki.constants');
  */
 async function getConfiguration() {
   logger.debug('Nuki : get configuration');
-  const login = await this.gladys.variable.getValue(CONFIGURATION.NUKI_LOGIN_KEY, this.serviceId);
-  const password = await this.gladys.variable.getValue(CONFIGURATION.NUKI_PASSWORD_KEY, this.serviceId);
+  const apiKey = await this.gladys.variable.getValue(CONFIGURATION.NUKI_API_KEY, this.serviceId);
   return {
-    login,
-    password,
+    apiKey
   };
 }
 
