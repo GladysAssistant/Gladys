@@ -16,8 +16,8 @@ const EditScenePage = ({ children, ...props }) => (
         <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
         <div class="container mb-8">
           <div class="mb-4">
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-baseline align-items-md-center">
-              <div>
+            <div class="row justify-content-between">
+              <div class="md-col-8 col-7">
                 <h1 class="page-title">
                   <span>{props.scene.name}</span>
 
@@ -36,17 +36,20 @@ const EditScenePage = ({ children, ...props }) => (
                 <span class="text-muted">{props.scene.description && <span>{props.scene.description}</span>}</span>
               </div>
 
-              <div class="ml-auto">
+              <div class="md-col-4 col-5">
                 {props.askDeleteScene && (
-                  <div class="d-flex flex-column flex-md-row align-items-center">
-                    <div class="ml-auto mb-2 mb-md-0">
+                  <div class="d-flex flex-column flex-lg-row align-items-center text-right">
+                    <div class="ml-auto mb-2 mb-lg-0">
                       <Text id="editScene.deleteText" />
                     </div>
-                    <div>
-                      <button onClick={props.deleteScene} className="btn btn-outline-danger ml-2">
+                    <div class="ml-auto ml-lg-0">
+                      <button onClick={props.deleteScene} className="btn btn-outline-danger ml-2 mb-2 mb-lg-0">
                         <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
                       </button>
-                      <button onClick={props.cancelDeleteCurrentScene} className="btn btn-outline-secondary ml-2">
+                      <button
+                        onClick={props.cancelDeleteCurrentScene}
+                        className="btn btn-outline-secondary ml-2 mb-2 mb-lg-0"
+                      >
                         <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
                       </button>
                     </div>
@@ -54,7 +57,7 @@ const EditScenePage = ({ children, ...props }) => (
                 )}
 
                 {!props.askDeleteScene && (
-                  <div>
+                  <div class="text-right">
                     <button onClick={props.duplicateScene} className="btn btn-outline-primary">
                       <span class="d-none d-sm-inline-block">
                         <Text id="editScene.duplicateButton" />
