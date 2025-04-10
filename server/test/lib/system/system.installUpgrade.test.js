@@ -59,27 +59,6 @@ describe('system.installUpgrade', () => {
 
   it('should install upgrade', async () => {
     await system.installUpgrade();
-
-    assert.calledOnce(system.dockerode.getContainer);
-    assert.calledWith(system.dockerode.getContainer, 'b594e692-e6d3-4531-bdcc-f0afcf515113');
-
-    assert.notCalled(sequelize.close);
-    assert.notCalled(event.on);
-  });
-
-  it('should fail: watchtower not installed', async () => {
-    system.dockerode.listContainers = fake.resolves([]);
-
-    try {
-      await system.installUpgrade();
-      assert.fail('should have fail');
-    } catch (e) {
-      expect(e).be.instanceOf(PlatformNotCompatible);
-      expect(e).to.have.property('message', 'WATCHTOWER_NOT_FOUND');
-
-      assert.notCalled(system.dockerode.getContainer);
-      assert.notCalled(sequelize.close);
-      assert.notCalled(event.on);
-    }
+    assert.called(system.dockerode.createContainer);
   });
 });

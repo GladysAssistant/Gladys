@@ -1,21 +1,22 @@
 const fs = require('fs');
+const logger = require('../../utils/logger');
 
 /**
- * @description Return true if process is running inside Docker.
- * @returns {Promise<boolean>} Resolve with true if inside Docker.
+ * @description Return true if process is running inside Docker & can use the Docker API.
+ * @returns {Promise<boolean>} Resolve with true if inside Docker and can use the Docker API.
  * @example
- * isDocker();
+ * gladys.system.isDocker();
  */
-function isDocker() {
-  return new Promise((resolve) => {
-    fs.access('/.dockerenv', fs.constants.F_OK, (err) => {
-      if (err) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
+async function isDocker() {
+  try {
+    await fs.promises.access('/.dockerenv', fs.constants.F_OK);
+    logger.info('System.isDocker: This system is running inside Docker.');
+    return !!this.dockerode;
+  } catch (err) {
+    logger.debug(err);
+    logger.info('System.isDocker: This system is not running inside Docker.');
+    return false;
+  }
 }
 
 module.exports = {

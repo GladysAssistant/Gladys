@@ -18,17 +18,45 @@ describe('Send state to HomeKit', () => {
     hap: {
       Characteristic: {
         On: 'ON',
-        Brightness: 'BRIGHTNESS',
+        Brightness: {
+          name: 'BRIGHTNESS',
+          props: {
+            minValue: 0,
+            maxValue: 100,
+          },
+        },
         Hue: 'HUE',
         Saturation: 'SATURATION',
-        ColorTemperature: 'COLORTEMPERATURE',
+        ColorTemperature: {
+          name: 'COLORTEMPERATURE',
+          props: {
+            minValue: 140,
+            maxValue: 500,
+          },
+        },
         ContactSensorState: 'CONTACTSENSORSTATE',
         MotionDetected: 'MOTIONDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
+        CurrentPosition: {
+          name: 'CURRENTPOSITION',
+          props: {
+            minValue: 0,
+            maxValue: 100,
+          },
+        },
+        PositionState: 'POSITIONSTATE',
+        TargetPosition: {
+          name: 'TARGETPOSITION',
+          props: {
+            minValue: 0,
+            maxValue: 100,
+          },
+        },
       },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
+        WindowCovering: 'WINDOWCOVERING',
       },
     },
     notifyTimeouts: {},
@@ -110,17 +138,11 @@ describe('Send state to HomeKit', () => {
   });
 
   it('should notify light brightness', async () => {
-    const updateValue = stub().returns();
+    const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
       getService: stub().returns({
-        getCharacteristic: stub().returns({
-          props: {
-            minValue: 0,
-            maxValue: 100,
-          },
-          updateValue,
-        }),
+        updateCharacteristic,
       }),
     };
 
@@ -141,7 +163,8 @@ describe('Send state to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateValue.args[0]).eql([50]);
+    expect(updateCharacteristic.args[0][0].name).eql('BRIGHTNESS');
+    expect(updateCharacteristic.args[0][1]).eql(50);
   });
 
   it('should notify light color', async () => {
@@ -174,17 +197,11 @@ describe('Send state to HomeKit', () => {
   });
 
   it('should notify light temperature', async () => {
-    const updateValue = stub().returns();
+    const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
       getService: stub().returns({
-        getCharacteristic: stub().returns({
-          props: {
-            minValue: 140,
-            maxValue: 500,
-          },
-          updateValue,
-        }),
+        updateCharacteristic,
       }),
     };
 
@@ -205,7 +222,8 @@ describe('Send state to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateValue.args[0]).eql([320]);
+    expect(updateCharacteristic.args[0][0].name).eql('COLORTEMPERATURE');
+    expect(updateCharacteristic.args[0][1]).eql(320);
   });
 
   it('should notify sensor temperature Kelvin', async () => {
@@ -258,6 +276,64 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 20]);
+  });
+
+  it('should notify shutter state', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 0,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Shutter state',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['POSITIONSTATE', 2]);
+  });
+
+  it('should notify shutter current/target position', async () => {
+    const updateCharacteristic = stub();
+    updateCharacteristic.returns({ updateCharacteristic });
+
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 60,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Shutter position',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      min: 0,
+      max: 100,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.callCount).eq(2);
+    expect(updateCharacteristic.args[0][0].name).eql('CURRENTPOSITION');
+    expect(updateCharacteristic.args[0][1]).eql(60);
+    expect(updateCharacteristic.args[1][0].name).eql('TARGETPOSITION');
+    expect(updateCharacteristic.args[1][1]).eql(60);
   });
 
   it('should do nothing wrong device category & type', async () => {

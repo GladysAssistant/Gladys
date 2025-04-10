@@ -359,6 +359,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.openAIAsk,
     },
+    'post /api/v1/gateway/refresh-latest-gladys-version': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshLatestGladysVersion,
+    },
     // room
     'get /api/v1/room': {
       authenticated: true,
@@ -548,14 +553,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: systemController.shutdown,
     },
-    'post /api/v1/system/upgrade/download': {
+    'post /api/v1/system/upgrade': {
       authenticated: true,
       admin: true,
-      controller: systemController.downloadUpgrade,
-    },
-    'get /api/v1/system/upgrade/download/status': {
-      authenticated: true,
-      controller: systemController.getUpgradeDownloadStatus,
+      controller: systemController.installUpgrade,
     },
     'post /api/v1/system/vacuum': {
       authenticated: true,

@@ -1,5 +1,4 @@
-const { default: axios } = require('axios');
-const querystring = require('querystring');
+const { fetch } = require('undici');
 
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
@@ -40,16 +39,25 @@ async function retrieveTokens(body) {
     code: body.codeOAuth,
   };
   try {
-    const response = await axios({
-      url: API.TOKEN,
-      method: 'post',
-      headers: { 'Content-Type': API.HEADER.CONTENT_TYPE, Host: API.HEADER.HOST },
-      data: querystring.stringify(authentificationForm),
+    const response = await fetch(API.TOKEN, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': API.HEADER.CONTENT_TYPE,
+        Host: API.HEADER.HOST,
+      },
+      body: new URLSearchParams(authentificationForm).toString(),
     });
+    const rawBody = await response.text();
+    if (!response.ok) {
+      logger.error('Error getting new accessToken to Netatmo - Details: ', response.status, rawBody);
+      throw new Error(`HTTP error ${response.status} - ${rawBody}`);
+    }
+    const data = JSON.parse(rawBody);
     const tokens = {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
-      expireIn: response.data.expire_in,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expireIn: data.expire_in,
     };
     await this.setTokens(tokens);
     this.accessToken = tokens.accessToken;
@@ -65,7 +73,7 @@ async function retrieveTokens(body) {
       statusType: STATUS.ERROR.PROCESSING_TOKEN,
       message: 'get_access_token_fail',
     });
-    logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
+    logger.error('Error getting new accessToken to Netatmo - Details: ', e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
 }

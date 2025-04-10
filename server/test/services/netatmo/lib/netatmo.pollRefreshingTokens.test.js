@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const nock = require('nock');
+const { MockAgent, setGlobalDispatcher, getGlobalDispatcher } = require('undici');
 
 const { fake } = sinon;
 
@@ -25,10 +25,21 @@ const { refreshingTokens } = netatmoHandler;
 describe('Netatmo pollRefreshingToken', () => {
   let clock;
   let tokens;
+  let mockAgent;
+  let netatmoMock;
+  let originalDispatcher;
 
   beforeEach(() => {
     sinon.reset();
-    nock.cleanAll();
+
+    // Store the original dispatcher
+    originalDispatcher = getGlobalDispatcher();
+
+    // MockAgent setup
+    mockAgent = new MockAgent();
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+    netatmoMock = mockAgent.get('https://api.netatmo.com');
 
     clock = sinon.useFakeTimers();
     netatmoHandler.status = 'not_initialized';
@@ -50,7 +61,10 @@ describe('Netatmo pollRefreshingToken', () => {
   afterEach(() => {
     clock.restore();
     sinon.reset();
-    nock.cleanAll();
+    // Clean up the mock agent
+    mockAgent.close();
+    // Restore the original dispatcher
+    setGlobalDispatcher(originalDispatcher);
   });
 
   it('should refresh tokens periodically', async () => {
@@ -63,8 +77,13 @@ describe('Netatmo pollRefreshingToken', () => {
 
     netatmoHandler.refreshingTokens = refreshingTokens;
     tokens.refresh_token = 'new-refresh-token2';
-    nock('https://api.netatmo.com')
-      .post('/oauth2/token')
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
       .reply(200, tokens);
 
     clock.tick(3600 * 1000);

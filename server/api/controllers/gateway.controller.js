@@ -135,6 +135,16 @@ module.exports = function GatewayController(gladys) {
     res.json(response);
   }
 
+  /**
+   * @api {post} /api/v1/gateway/refresh-latest-gladys-version
+   * @apiName refreshLatestGladysVersion
+   * @apiGroup Gateway
+   */
+  async function refreshLatestGladysVersion(req, res) {
+    await gladys.gateway.getLatestGladysVersion();
+    res.json({ message: 'Refresh finished' });
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     login: asyncMiddleware(login),
@@ -148,5 +158,6 @@ module.exports = function GatewayController(gladys) {
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
     openAIAsk: asyncMiddleware(openAIAsk),
+    refreshLatestGladysVersion: asyncMiddleware(refreshLatestGladysVersion),
   });
 };

@@ -70,7 +70,8 @@
     "proxyquire": "^2.1.0",
     "shx": "^0.3.2",
     "sinon": "^8.1.1",
-    "supertest": "^3.4.2"
+    "supertest": "^3.4.2",
+    "undici": "^7.5.0"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "4.15.0",

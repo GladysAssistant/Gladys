@@ -1,16 +1,15 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-
-const { fake, assert } = sinon;
-
-const proxyquire = require('proxyquire').noCallThru();
 const fs = require('fs');
 
-let fsError = false;
+const { fake } = sinon;
+
+const proxyquire = require('proxyquire').noCallThru();
+
 const fsMock = {
   ...fs,
-  access: (file, options, callback) => {
-    callback(fsError);
+  promises: {
+    access: fake.resolves(null),
   },
 };
 
@@ -20,6 +19,7 @@ const { isDocker } = proxyquire('../../../lib/system/system.isDocker', {
 const System = proxyquire('../../../lib/system', {
   './system.isDocker': { isDocker },
 });
+
 const Job = require('../../../lib/job');
 
 const sequelize = {
@@ -42,31 +42,32 @@ describe('system.isDocker', () => {
 
   beforeEach(async () => {
     system = new System(sequelize, event, config, job);
-    await system.init();
-    // Reset all fakes invoked within init call
-    sinon.reset();
+    system.dockerode = null;
   });
 
   afterEach(() => {
     sinon.reset();
-    fsError = false;
   });
 
   it('should run inside docker', async () => {
+    fsMock.promises.access = fake.resolves(null);
+    system.dockerode = {
+      listContainers: fake.resolves(null),
+    };
     const insideDocker = await system.isDocker();
     expect(insideDocker).to.equal(true);
-
-    assert.notCalled(sequelize.close);
-    assert.notCalled(event.on);
   });
 
   it('should not run inside docker', async () => {
-    fsError = true;
-
+    fsMock.promises.access = fake.rejects(new Error('Not found'));
     const insideDocker = await system.isDocker();
     expect(insideDocker).to.equal(false);
+  });
 
-    assert.notCalled(sequelize.close);
-    assert.notCalled(event.on);
+  it('should not run inside docker (dockerode not available)', async () => {
+    fsMock.promises.access = fake.resolves(null);
+    system.dockerode = null;
+    const insideDocker = await system.isDocker();
+    expect(insideDocker).to.equal(false);
   });
 });

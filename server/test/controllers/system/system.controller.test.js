@@ -39,3 +39,14 @@ describe('POST /api/v1/system/vacuum', () => {
       });
   });
 });
+
+describe('POST /api/v1/system/upgrade', () => {
+  it('should upgrade', async () => {
+    const res = await authenticatedRequest
+      .post('/api/v1/system/upgrade')
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(res.body).to.have.property('success', true);
+    expect(res.body).to.have.property('message');
+  });
+});

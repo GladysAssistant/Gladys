@@ -130,7 +130,8 @@
     "import/no-import-module-exports": "off",
     "import/no-relative-packages": "off",
     "default-param-last": "warn",
-    "promise/prefer-await-to-then": "warn"
+    "promise/prefer-await-to-then": "warn",
+    "no-control-regex": "off"
   },
   "overrides": [
     {
