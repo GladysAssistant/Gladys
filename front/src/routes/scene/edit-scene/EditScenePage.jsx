@@ -3,10 +3,10 @@ import cx from 'classnames';
 
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import ActionGroup from './ActionGroup';
-import SceneActionsDropdown from './SceneActionsDropdown';
 import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
+import EditActions from './EditActions';
 import { Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => (
@@ -14,10 +14,10 @@ const EditScenePage = ({ children, ...props }) => (
     <div class="page-main">
       <div class="my-3 my-md-5">
         <AutoScrollMobile position="top" box_type={props.actionsGroupTypes} />
-        <div class="container">
+        <div class="container mb-8">
           <div class="mb-4">
-            <div class="d-flex justify-content-between flex-column flex-lg-row align-items-lg-center align-items-start">
-              <div>
+            <div class="row justify-content-between">
+              <div class="md-col-8 col-7">
                 <h1 class="page-title">
                   <span>{props.scene.name}</span>
 
@@ -36,20 +36,42 @@ const EditScenePage = ({ children, ...props }) => (
                 <span class="text-muted">{props.scene.description && <span>{props.scene.description}</span>}</span>
               </div>
 
-              <div class="mt-2 mt-lg-0">
-                <button onClick={props.startScene} className="btn btn-primary">
-                  <span class="d-none d-sm-inline-block">
-                    <Text id="editScene.startButton" />
-                  </span>{' '}
-                  <i class="fe fe-play" />
-                </button>
-                <button onClick={props.saveScene} disabled={props.saving} className="btn btn-success ml-2">
-                  <span class="d-none d-sm-inline-block">
-                    <Text id="editScene.saveButton" />
-                  </span>{' '}
-                  <i class="fe fe-save" />
-                </button>
-                <SceneActionsDropdown duplicateScene={props.duplicateScene} deleteScene={props.deleteScene} />
+              <div class="md-col-4 col-5">
+                {props.askDeleteScene && (
+                  <div class="d-flex flex-column flex-lg-row align-items-center text-right">
+                    <div class="ml-auto mb-2 mb-lg-0">
+                      <Text id="editScene.deleteText" />
+                    </div>
+                    <div class="ml-auto ml-lg-0">
+                      <button onClick={props.deleteScene} className="btn btn-outline-danger ml-2 mb-2 mb-lg-0">
+                        <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
+                      </button>
+                      <button
+                        onClick={props.cancelDeleteCurrentScene}
+                        className="btn btn-outline-secondary ml-2 mb-2 mb-lg-0"
+                      >
+                        <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {!props.askDeleteScene && (
+                  <div class="text-right">
+                    <button onClick={props.duplicateScene} className="btn btn-outline-primary">
+                      <span class="d-none d-sm-inline-block">
+                        <Text id="editScene.duplicateButton" />
+                      </span>{' '}
+                      <i class="fe fe-copy" />
+                    </button>
+                    <button onClick={props.askDeleteCurrentScene} className="btn btn-outline-danger ml-2">
+                      <span class="d-none d-sm-inline-block">
+                        <Text id="editScene.deleteButton" />
+                      </span>{' '}
+                      <i class="fe fe-trash" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -131,6 +153,7 @@ const EditScenePage = ({ children, ...props }) => (
               )}
             </div>
           ))}
+          <EditActions {...props} />
         </div>
         <AutoScrollMobile position="bottom" box_type={props.actionsGroupTypes} />
       </div>

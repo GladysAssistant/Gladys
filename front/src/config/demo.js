@@ -1099,7 +1099,8 @@ const data = {
     selector: 'wake-up',
     icon: 'fe fe-bell',
     active: true,
-    name: 'Wake Up',
+    name: 'Wake Up when sun is rising',
+    tags: [],
     triggers: [
       {
         type: 'device.new-state',
