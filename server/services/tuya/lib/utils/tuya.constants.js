@@ -29,6 +29,17 @@ const API = {
   VERSION_1_1: '/v1.1/iot-03',
   VERSION_1_2: '/v1.2/iot-03',
   VERSION_1_3: '/v1.3/iot-03',
+  VERSION_2_0: '/v2.0',
+};
+
+const INFRARED_CATEGORIES = {
+  INFRARED_TV: 'infrared_tv',
+  INFRARED_AC: 'infrared_ac',
+};
+
+const INFRARED_MODELS = {
+  INFRARED_TV: 'TV',
+  INFRARED_AC: 'Air Conditioner',
 };
 
 module.exports = {
@@ -36,4 +47,6 @@ module.exports = {
   TUYA_ENDPOINTS,
   STATUS,
   API,
+  INFRARED_CATEGORIES,
+  INFRARED_MODELS,
 };
