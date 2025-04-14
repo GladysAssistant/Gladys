@@ -1,12 +1,21 @@
 import { RequestStatus } from '../../utils/consts';
 import { route } from 'preact-router';
 import update from 'immutability-helper';
-import leaflet from 'leaflet';
 import JSConfetti from 'js-confetti';
 
 const jsConfetti = new JSConfetti();
 
-const icon = leaflet.icon({
+let leaflet = null;
+
+const getLeaflet = async () => {
+  if (!leaflet) {
+    const L = await import('leaflet');
+    leaflet = L.default;
+  }
+  return leaflet;
+};
+
+const icon = {
   iconUrl: '/assets/leaflet/marker-icon.png',
   iconRetinaUrl: '/assets/leaflet/marker-icon-2x.png',
   shadowUrl: '/assets/leaflet/marker-shadow.png',
@@ -15,7 +24,7 @@ const icon = leaflet.icon({
   popupAnchor: [1, -34],
   tooltipAnchor: [16, -28],
   shadowSize: [41, 41]
-});
+};
 
 function createActions(store) {
   const actions = {
@@ -25,27 +34,26 @@ function createActions(store) {
       });
     },
     async initLeafletMap(state) {
+      const L = await getLeaflet();
+
       if (state.signupHouseLeafletMap) {
         state.signupHouseLeafletMap.remove();
       }
-      const leafletMap = leaflet.map('select-house-location-map').setView([48.8583, 2.2945], 2);
-      leaflet
-        .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
-          subdomains: 'abcd',
-          maxZoom: 19
-        })
-        .addTo(leafletMap);
+      const leafletMap = L.map('select-house-location-map').setView([48.8583, 2.2945], 2);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(leafletMap);
+
       leafletMap.on('click', e => {
         if (store.getState().signupNewHouseMarker) {
           store.getState().signupNewHouseMarker.setLatLng(e.latlng);
         } else {
-          const marker = leaflet
-            .marker([e.latlng.lat, e.latlng.lng], {
-              icon
-            })
-            .addTo(leafletMap);
+          const marker = L.marker([e.latlng.lat, e.latlng.lng], {
+            icon: L.icon(icon)
+          }).addTo(leafletMap);
           store.setState({
             signupNewHouseMarker: marker,
             signupNewHouseLatitude: e.latlng.lat,
