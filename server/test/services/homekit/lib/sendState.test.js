@@ -119,7 +119,7 @@ describe('Send state to HomeKit', () => {
       props: {
         minValue: 0,
         maxValue: 100,
-      }
+      },
     });
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
@@ -185,7 +185,7 @@ describe('Send state to HomeKit', () => {
       props: {
         minValue: 140,
         maxValue: 500,
-      }
+      },
     });
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
@@ -300,7 +300,7 @@ describe('Send state to HomeKit', () => {
       props: {
         minValue: 0,
         maxValue: 100,
-      }
+      },
     });
 
     const accessory = {
