@@ -1829,7 +1829,8 @@
         "noNodesFound": "Keine Matter-Knoten gefunden",
         "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es, bevor du die Integration verwendest.",
         "enableButton": "Matter aktivieren",
-        "disableButton": "Matter deaktivieren"
+        "disableButton": "Matter deaktivieren",
+        "downloadNodesJson": "Knoten-JSON herunterladen"
       },
       "device": {
         "title": "Matter-Geräte",

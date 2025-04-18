@@ -353,8 +353,7 @@ class MatterSettingsPage extends Component {
                     </h4>
                     {nodes && nodes.length > 0 && (
                       <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
-                        <i class="fe fe-download me-2" />
-                        Download Nodes JSON
+                        <i class="fe fe-download me-2" /> <Text id="integration.matter.settings.downloadNodesJson" />
                       </button>
                     )}
                   </div>

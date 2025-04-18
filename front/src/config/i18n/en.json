@@ -1829,7 +1829,8 @@
         "noNodesFound": "No Matter nodes found",
         "disabledWarning": "Matter is not activated. Please activate it before using the integration",
         "enableButton": "Enable Matter",
-        "disableButton": "Disable Matter"
+        "disableButton": "Disable Matter",
+        "downloadNodesJson": "Download Nodes JSON"
       },
       "device": {
         "title": "Matter Devices",
