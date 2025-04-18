@@ -13,25 +13,66 @@ const handleDevice = async (
   serviceId,
   devicePath,
 ) => {
+  // Create a completely new object for child informations
+  const childInformations = {
+    vendorName: deviceBasicInformation.vendorName,
+    nodeLabel: deviceBasicInformation.nodeLabel,
+    productLabel: deviceBasicInformation.productLabel,
+    productName: deviceBasicInformation.productName,
+  };
+
+  // If we have this cluster, it means we are in a bridge device
+  const bridgedDeviceBasicInformationClusterClient = device.clusterClients.get(
+    BridgedDeviceBasicInformation.Complete.id,
+  );
+
+  // We get all attributes for this child endpoint
+  if (bridgedDeviceBasicInformationClusterClient) {
+    if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'vendorName')) {
+      const vendorName = await bridgedDeviceBasicInformationClusterClient.attributes.vendorName.get();
+      childInformations.vendorName = vendorName;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'nodeLabel')) {
+      const nodeLabel = await bridgedDeviceBasicInformationClusterClient.attributes.nodeLabel.get();
+      childInformations.nodeLabel = nodeLabel;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'productLabel')) {
+      const productLabel = await bridgedDeviceBasicInformationClusterClient.attributes.productLabel.get();
+      childInformations.productLabel = productLabel;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'productName')) {
+      const productName = await bridgedDeviceBasicInformationClusterClient.attributes.productName.get();
+      childInformations.productName = productName;
+    }
+  }
+
   let newDevicePath = devicePath;
+
+  // If there is already a parent path, it means we are in a child endpoints
+  // And we need to append the parent endpoint
   if (devicePath) {
     newDevicePath = `${devicePath}:${device.number}`;
   } else {
     newDevicePath = `${device.number}`;
   }
-  const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, deviceBasicInformation, newDevicePath);
+
+  const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, childInformations, newDevicePath);
+
+  // If the device has features that Gladys can handle, we add it to Gladys, otherwise we don't add it
+  // to avoid bloating Gladys
   if (gladysDevice.features.length > 0) {
     listenToStateChange(nodeId, newDevicePath, device);
     devices.push(gladysDevice);
   }
-  // If we have this cluster, it means we are in a bridge devic
-  const bridgedDeviceBasicInformation = device.clusterClients.get(BridgedDeviceBasicInformation.Complete.id);
 
   if (device.childEndpoints) {
-    await Promise.each(device.childEndpoints, async (childDevice) => {
+    await Promise.each(device.childEndpoints, async (childDevice, index) => {
       await handleDevice(
         nodeId,
-        bridgedDeviceBasicInformation || deviceBasicInformation,
+        childInformations,
         node,
         childDevice,
         devices,

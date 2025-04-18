@@ -55,6 +55,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       nodeDetailDeviceDataBasicInformation.vendorName
     } (${nodeDetailDeviceDataBasicInformation.nodeLabel ||
       nodeDetailDeviceDataBasicInformation.productLabel ||
+      nodeDetailDeviceDataBasicInformation.productName ||
       device.name})`;
   }
   if (device.clusterClients) {
