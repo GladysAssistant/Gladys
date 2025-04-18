@@ -88,12 +88,18 @@ describe('AirplayHandler.setValue', () => {
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
     sinon.assert.calledOnce(pipe);
   });
+  it('should talk on speaker with custom volume', async () => {
+    airplayHandler.scanTimeout = 1;
+    const devices = await airplayHandler.scan();
+    const device = devices[0];
+    await airplayHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
+  });
   it('should return device not found', async () => {
     airplayHandler.scanTimeout = 1;
     const device = {
       external_id: 'airplay:toto',
     };
-    const promise = airplayHandler.setValue(device, {}, 'http://play-url.com');
+    const promise = airplayHandler.setValue(device, {}, 'http://play-url.com', { volume: 30 });
     await assert.isRejected(promise, 'Device not found on network');
   });
 });

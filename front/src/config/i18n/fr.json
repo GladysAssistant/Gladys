@@ -2050,6 +2050,7 @@
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
         "deviceLabel": "Enceinte",
+        "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }
