@@ -363,6 +363,7 @@ class EditScene extends Component {
 
       // Update paths for actions after the deleted one
       Object.keys(newVariables).forEach(varPath => {
+        // Check if the variable path is in the same parent group as the deleted action
         if (
           varPath.startsWith(
             path
@@ -480,14 +481,21 @@ class EditScene extends Component {
     const deletedSegments = deletedPath.split('.');
     const lastDeletedIndex = parseInt(deletedSegments[deletedSegments.length - 1], 10);
 
-    if (currentSegments.length === deletedSegments.length) {
+    // Get the parent paths to compare them
+    const currentParentPath = currentSegments.slice(0, -1).join('.');
+    const deletedParentPath = deletedSegments.slice(0, -1).join('.');
+
+    // If they are in the same parent group
+    if (currentParentPath === deletedParentPath) {
       const currentIndex = parseInt(currentSegments[currentSegments.length - 1], 10);
       if (currentIndex > lastDeletedIndex) {
         currentSegments[currentSegments.length - 1] = (currentIndex - 1).toString();
         return currentSegments.join('.');
       }
     }
-    return null;
+
+    // If not in the same group, keep the original path
+    return currentPath;
   };
 
   updateActionProperty = (path, property, value) => {

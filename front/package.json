@@ -46,7 +46,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.18.0",
+    "@gladysassistant/gladys-gateway-js": "4.17.0",
     "@gladysassistant/theme-optimized": "^1.0.4",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",
