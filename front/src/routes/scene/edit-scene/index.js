@@ -493,7 +493,7 @@ class EditScene extends Component {
         return currentSegments.join('.');
       }
     }
-    
+
     // If not in the same group, keep the original path
     return currentPath;
   };
