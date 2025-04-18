@@ -263,7 +263,7 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présents",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce",
+      "devices-in-room": "Appareils de la pièce (Déprécié)",
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",

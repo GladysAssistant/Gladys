@@ -2,6 +2,11 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { DASHBOARD_BOX_TYPE_LIST } from '../../../../server/utils/constants';
 
+// Widget "devices in room" is deprecated and will be removed soon
+const DASHBOARD_BOX_TYPE_LIST_FILTERED = DASHBOARD_BOX_TYPE_LIST.filter(
+  dashboardBoxType => dashboardBoxType !== 'devices-in-room'
+);
+
 import BaseEditBox from './baseEditBox';
 
 class SelectBoxType extends Component {
@@ -19,7 +24,7 @@ class SelectBoxType extends Component {
             <option>
               <Text id="global.emptySelectOption" />
             </option>
-            {DASHBOARD_BOX_TYPE_LIST.map(dashboardBoxType => (
+            {DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => (
               <option value={dashboardBoxType}>
                 <Text id={`dashboard.boxTitle.${dashboardBoxType}`} />
               </option>

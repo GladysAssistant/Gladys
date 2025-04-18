@@ -263,7 +263,7 @@
       "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room",
+      "devices-in-room": "Devices in room (Deprecated)",
       "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
