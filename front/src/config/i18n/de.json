@@ -1799,6 +1799,59 @@
         "saved": "Konfiguration gespeichert!",
         "error": "Fehler beim Speichern der Konfiguration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Füge deine Matter-Geräte hinzu und verwalte sie.",
+      "deviceTab": "Geräte",
+      "addTab": "Gerät hinzufügen",
+      "settingsTab": "Einstellungen",
+      "documentation": "Dokumentation",
+      "discover": {
+        "title": "Matter-Gerät hinzufügen",
+        "description": "Dein Matter-Gerät stellt einen 11-stelligen Pairing-Code bereit, den du hier eingeben musst, um es zu Gladys hinzuzufügen. Wenn dein Gerät ein Thread-Gerät ist, muss es mit einem Thread Border Router verbunden sein (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Pairing-Code",
+        "pairingCodePlaceholder": "1234-567-9101 oder 12345679101",
+        "pairingCodeHelp": "Gib den 11-stelligen Pairing-Code deines Matter-Geräts ein",
+        "addButton": "Zu Gladys hinzufügen"
+      },
+      "settings": {
+        "title": "Matter-Einstellungen",
+        "description": "Aktiviere oder deaktiviere die Matter-Integration in Gladys. Wenn aktiviert, kann Gladys mit deinen Matter-Geräten kommunizieren.",
+        "enableIntegration": "Matter-Integration aktivieren",
+        "saveButton": "Speichern",
+        "error": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten",
+        "nodesTitle": "Matter-Knoten",
+        "nodeIdLabel": "Knoten-ID",
+        "nodeDetailsLabel": "Knotendetails",
+        "actionsLabel": "Aktionen",
+        "decommissionButton": "Stilllegen",
+        "noNodesFound": "Keine Matter-Knoten gefunden",
+        "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es, bevor du die Integration verwendest.",
+        "enableButton": "Matter aktivieren",
+        "disableButton": "Matter deaktivieren"
+      },
+      "device": {
+        "title": "Matter-Geräte",
+        "noDeviceFound": "Keine Matter-Geräte gefunden",
+        "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
+        "addToGladys": "Zu Gladys hinzufügen"
+      },
+      "discoverDeviceDescr": "Ein neues Matter-Gerät hinzufügen",
+      "nameLabel": "Name",
+      "namePlaceholder": "Mein Matter-Gerät",
+      "roomLabel": "Raum",
+      "featuresLabel": "Funktionen",
+      "noFeaturesHandled": "Dieses Gerät unterstützt keine Funktionen",
+      "alreadyCreatedButton": "Gerät bereits hinzugefügt",
+      "saveButton": "Speichern",
+      "deleteButton": "Löschen",
+      "error": {
+        "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten",
+        "conflictError": "Ein Gerät mit diesem Namen existiert bereits",
+        "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten",
+        "getDevicesError": "Beim Abrufen der Geräteliste ist ein Fehler aufgetreten"
+      }
     }
   },
   "editScene": {

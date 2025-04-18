@@ -1826,7 +1826,10 @@
         "nodeDetailsLabel": "Node Details",
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
-        "noNodesFound": "No Matter nodes found"
+        "noNodesFound": "No Matter nodes found",
+        "disabledWarning": "Matter is not activated. Please activate it before using the integration",
+        "enableButton": "Enable Matter",
+        "disableButton": "Disable Matter"
       },
       "device": {
         "title": "Matter Devices",
