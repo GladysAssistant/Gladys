@@ -41,20 +41,20 @@ function sendState(hkAccessory, feature, event) {
     case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
     case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
       const { characteristics } = mappings[feature.category].capabilities[feature.type];
       characteristics.forEach((c) => {
-        hkAccessory
-          .getService(Service[mappings[feature.category].service])
-          .updateCharacteristic(
-            Characteristic[c],
-            normalize(
-              event.last_value,
-              feature.min,
-              feature.max,
-              Characteristic[c].props.minValue,
-              Characteristic[c].props.maxValue,
-            ),
-          );
+        const characteristic = service.getCharacteristic(Characteristic[c]);
+        service.updateCharacteristic(
+          Characteristic[c],
+          normalize(
+            event.last_value,
+            feature.min,
+            feature.max,
+            characteristic.props.minValue,
+            characteristic.props.maxValue,
+          ),
+        );
       });
       break;
     }

@@ -18,40 +18,16 @@ describe('Send state to HomeKit', () => {
     hap: {
       Characteristic: {
         On: 'ON',
-        Brightness: {
-          name: 'BRIGHTNESS',
-          props: {
-            minValue: 0,
-            maxValue: 100,
-          },
-        },
+        Brightness: 'BRIGHTNESS',
         Hue: 'HUE',
         Saturation: 'SATURATION',
-        ColorTemperature: {
-          name: 'COLORTEMPERATURE',
-          props: {
-            minValue: 140,
-            maxValue: 500,
-          },
-        },
+        ColorTemperature: 'COLORTEMPERATURE',
         ContactSensorState: 'CONTACTSENSORSTATE',
         MotionDetected: 'MOTIONDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
-        CurrentPosition: {
-          name: 'CURRENTPOSITION',
-          props: {
-            minValue: 0,
-            maxValue: 100,
-          },
-        },
+        CurrentPosition: 'CURRENTPOSITION',
         PositionState: 'POSITIONSTATE',
-        TargetPosition: {
-          name: 'TARGETPOSITION',
-          props: {
-            minValue: 0,
-            maxValue: 100,
-          },
-        },
+        TargetPosition: 'TARGETPOSITION',
       },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
@@ -139,10 +115,17 @@ describe('Send state to HomeKit', () => {
 
   it('should notify light brightness', async () => {
     const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 100,
+      },
+    });
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
       getService: stub().returns({
         updateCharacteristic,
+        getCharacteristic,
       }),
     };
 
@@ -163,7 +146,7 @@ describe('Send state to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateCharacteristic.args[0][0].name).eql('BRIGHTNESS');
+    expect(updateCharacteristic.args[0][0]).eql('BRIGHTNESS');
     expect(updateCharacteristic.args[0][1]).eql(50);
   });
 
@@ -198,10 +181,17 @@ describe('Send state to HomeKit', () => {
 
   it('should notify light temperature', async () => {
     const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 140,
+        maxValue: 500,
+      },
+    });
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
       getService: stub().returns({
         updateCharacteristic,
+        getCharacteristic,
       }),
     };
 
@@ -222,7 +212,7 @@ describe('Send state to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateCharacteristic.args[0][0].name).eql('COLORTEMPERATURE');
+    expect(updateCharacteristic.args[0][0]).eql('COLORTEMPERATURE');
     expect(updateCharacteristic.args[0][1]).eql(320);
   });
 
@@ -306,10 +296,16 @@ describe('Send state to HomeKit', () => {
   it('should notify shutter current/target position', async () => {
     const updateCharacteristic = stub();
     updateCharacteristic.returns({ updateCharacteristic });
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 100,
+      },
+    });
 
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
     };
 
     const event = {
@@ -330,9 +326,9 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.callCount).eq(2);
-    expect(updateCharacteristic.args[0][0].name).eql('CURRENTPOSITION');
+    expect(updateCharacteristic.args[0][0]).eql('CURRENTPOSITION');
     expect(updateCharacteristic.args[0][1]).eql(60);
-    expect(updateCharacteristic.args[1][0].name).eql('TARGETPOSITION');
+    expect(updateCharacteristic.args[1][0]).eql('TARGETPOSITION');
     expect(updateCharacteristic.args[1][1]).eql(60);
   });
 
