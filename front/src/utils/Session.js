@@ -43,10 +43,8 @@ class Session {
     if (this.ws && this.ws.close) {
       this.ws.close();
     }
-    console.log('Trying to connect in Websocket...');
     this.ws = new WebSocket(websocketUrl);
     this.ws.onopen = () => {
-      console.log('Sending Websocket authentication request...');
       this.websocketConnected = true;
       this.ws.send(
         JSON.stringify({
@@ -61,7 +59,6 @@ class Session {
         const { type, payload } = JSON.parse(data);
         // Only dispatch connected websocket message in case we are authenticated
         if (type === WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED) {
-          console.log('Websocket authenticated with success!');
           this.dispatcher.dispatch('websocket.connected', { connected: true });
         }
         this.dispatcher.dispatch(type, payload);
