@@ -1811,6 +1811,7 @@
         "title": "Add Matter Device",
         "description": "Your Matter device provides an 11-digit pairing code that you need to enter here to add it to Gladys. If your device is a Thread device, it must be connected to a Thread Border Router (Apple TV 4K, Google Home, Alexa).",
         "pairingCodeLabel": "Pairing Code",
+        "pairingCodePlaceholder": "1234-567-9101 or 12345679101",
         "pairingCodeHelp": "Enter the 11-digit pairing code provided by your Matter device",
         "addButton": "Add to Gladys"
       },

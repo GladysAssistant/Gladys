@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { route } from 'preact-router';
@@ -35,12 +35,12 @@ class MatterDiscoverPage extends Component {
       <MatterPage user={this.props.user}>
         <div class="card">
           <div class="card-header">
-            <div class="d-flex">
+            <div class="d-flex align-items-center">
               <button onClick={() => window.history.back()} class="btn btn-secondary mr-2">
                 <i class="fe fe-arrow-left" />
                 <Text id="global.backButton" />
               </button>
-              <h3 class="card-title">
+              <h3 class="card-title mb-0">
                 <Text id="integration.matter.discover.title" />
               </h3>
             </div>
@@ -55,15 +55,17 @@ class MatterDiscoverPage extends Component {
                 <label class="form-label">
                   <Text id="integration.matter.discover.pairingCodeLabel" />
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="1234-567-9101"
-                  value={this.state.pairingCode}
-                  onInput={e => this.setState({ pairingCode: e.target.value })}
-                  pattern="[0-9]{4}-[0-9]{3}-[0-9]{4}"
-                  required
-                />
+                <Localizer>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
+                    value={this.state.pairingCode}
+                    onInput={e => this.setState({ pairingCode: e.target.value })}
+                    pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})"
+                    required
+                  />
+                </Localizer>
                 <small class="form-text text-muted">
                   <Text id="integration.matter.discover.pairingCodeHelp" />
                 </small>
