@@ -1062,6 +1062,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
+    CONNECTED: 'authentication.connected',
   },
   GATEWAY: {
     BACKUP_UPLOAD_PROGRESS: 'gateway.backup-upload-progress',

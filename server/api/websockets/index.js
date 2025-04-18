@@ -72,6 +72,13 @@ function userConnected(user, client) {
     });
   }
 
+  // Send a message to the frontend to tell it's connected
+  this.sendMessageUser({
+    type: WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED,
+    payload: {},
+    userId: user.id,
+  });
+
   return null;
 }
 
