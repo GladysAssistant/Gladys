@@ -68,9 +68,20 @@ describe('Matter.pairDevice', () => {
     });
     const bridgeClusterClients = new Map();
     bridgeClusterClients.set(BridgedDeviceBasicInformation.Complete.id, {
-      nodeLabel: 'Bridge Device',
-      vendorName: 'Test Vendor',
-      productLabel: 'Bridge Product',
+      attributes: {
+        vendorName: {
+          get: fake.resolves('Test Vendor'),
+        },
+        productName: {
+          get: fake.resolves('Test Product'),
+        },
+        productLabel: {
+          get: fake.resolves('Test Product Label'),
+        },
+        nodeLabel: {
+          get: fake.resolves('node label'),
+        },
+      },
     });
     matterHandler.commissioningController = {
       commissionNode: fake.resolves(12345n),
@@ -107,7 +118,7 @@ describe('Matter.pairDevice', () => {
     await matterHandler.pairDevice(pairingCode);
     expect(matterHandler.devices).to.have.lengthOf(1);
     expect(matterHandler.nodesMap.size).to.equal(1);
-    expect(matterHandler.devices[0].name).to.equal('Test Vendor (Bridge Device)');
+    expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label)');
   });
   it('should not pair a device, commissioning failed', async () => {
     const pairingCode = '1450-134-1614';
