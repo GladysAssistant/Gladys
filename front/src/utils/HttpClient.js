@@ -10,6 +10,7 @@ export class HttpClient {
     this.localApiUrl = config.localApiUrl || window.location.origin;
     this.apiScopes = apiScopes;
     this.pendingRequests = new Map(); // Cache for pending requests
+    this.session.setRefreshAccessTokenFunction(this.refreshAccessToken.bind(this));
   }
 
   getAxiosHeaders() {
