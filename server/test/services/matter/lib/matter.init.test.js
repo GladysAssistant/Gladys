@@ -101,7 +101,7 @@ describe('Matter.init', () => {
     expect(matterHandler.devices).to.have.lengthOf(2);
     expect(matterHandler.devices).to.deep.equal([
       {
-        name: 'Test Vendor (Test Device)',
+        name: 'Test Vendor (Test Product)',
         external_id: 'matter:12345:1',
         selector: 'matter:12345:1',
         service_id: 'service-1',
@@ -145,7 +145,7 @@ describe('Matter.init', () => {
         params: [],
       },
       {
-        name: 'Test Vendor (Child Endpoint)',
+        name: 'Test Vendor (Test Product)',
         external_id: 'matter:12345:1:child_endpoint:2',
         selector: 'matter:12345:1:child_endpoint:2',
         service_id: 'service-1',
