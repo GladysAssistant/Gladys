@@ -4,8 +4,8 @@ const { ManualPairingCodeCodec } = require('@matter/main/types');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Pair a device using a pairing code
- * @param {string} pairingCode - The pairing code to pair the device with
+ * @description Pair a device using a pairing code.
+ * @param {string} pairingCode - The pairing code to pair the device with.
  * @example
  * await matterHandler.pairDevice('1234-567-9012');
  */

@@ -1,39 +1,13 @@
-// eslint-disable-next-line import/no-unresolved
 const {
   OnOff,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
   WindowCovering,
+  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
-
-/** 
- * {
-  basicInformation: {
-    dataModelRevision: 1,
-    vendorName: 'Nanoleaf',
-    vendorId: 4442,
-    productName: 'NL67',
-    productId: 67,
-    nodeLabel: '',
-    location: 'XX',
-    hardwareVersion: 418,
-    hardwareVersionString: '4.1.8',
-    softwareVersion: 197120,
-    softwareVersionString: '3.5.39',
-    manufacturingDate: '20200101',
-    partNumber: '',
-    productUrl: '',
-    productLabel: 'Essentials A19/A60',
-    serialNumber: 'N24150B0B49',
-    localConfigDisabled: false,
-    reachable: true,
-    uniqueId: '64F10E0A17A7F9E1',
-    capabilityMinima: { caseSessionsPerFabric: 3, subscriptionsPerFabric: 3 }
-  },
- */
 
 /**
  * @description Convert a Matter device to a Gladys device.
@@ -128,7 +102,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:position`,
           selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:position`,
           min: 0,
-          max: 99,
+          max: 100,
         });
         gladysDevice.features.push({
           name: 'Window Cover State',

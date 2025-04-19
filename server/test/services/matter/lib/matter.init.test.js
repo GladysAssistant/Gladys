@@ -49,6 +49,11 @@ describe('Matter.init', () => {
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
+    // Window Shutters
+    clusterClients.set(258, {
+      addCurrentPositionLiftPercent100thsAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -161,6 +166,30 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            name: 'Window Cover Position',
+            category: 'shutter',
+            type: 'position',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:258:position',
+            selector: 'matter:12345:1:258:position',
+            min: 0,
+            max: 100,
+          },
+          {
+            name: 'Window Cover State',
+            category: 'shutter',
+            type: 'state',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:258:state',
+            selector: 'matter:12345:1:258:state',
+            min: 0,
+            max: 1,
+          },
         ],
         params: [],
       },
@@ -216,6 +245,30 @@ describe('Matter.init', () => {
             selector: 'matter:12345:1:child_endpoint:2:1026',
             min: -100,
             max: 200,
+          },
+          {
+            name: 'Window Cover Position',
+            category: 'shutter',
+            type: 'position',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:258:position',
+            selector: 'matter:12345:1:child_endpoint:2:258:position',
+            min: 0,
+            max: 100,
+          },
+          {
+            name: 'Window Cover State',
+            category: 'shutter',
+            type: 'state',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:258:state',
+            selector: 'matter:12345:1:child_endpoint:2:258:state',
+            min: 0,
+            max: 1,
           },
         ],
         params: [],

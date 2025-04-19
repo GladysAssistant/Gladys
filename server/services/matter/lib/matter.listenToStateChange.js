@@ -1,5 +1,11 @@
-// eslint-disable-next-line import/no-unresolved
-const { OnOff, OccupancySensing, IlluminanceMeasurement, TemperatureMeasurement } = require('@matter/main/clusters');
+const {
+  OnOff,
+  OccupancySensing,
+  IlluminanceMeasurement,
+  TemperatureMeasurement,
+  WindowCovering,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
 const { EVENTS, STATE } = require('../../../utils/constants');
 /**
  * @description Listen to state changes of a device.
@@ -50,6 +56,18 @@ async function listenToStateChange(nodeId, devicePath, device) {
     temperatureSensor.addMeasuredValueAttributeListener((value) => {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`,
+        state: value / 100,
+      });
+    });
+  }
+
+  const windowCover = device.clusterClients.get(WindowCovering.Complete.id);
+
+  if (windowCover) {
+    // Subscribe to change in position
+    windowCover.addCurrentPositionLiftPercent100thsAttributeListener((value) => {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${WindowCovering.Complete.id}:position`,
         state: value / 100,
       });
     });
