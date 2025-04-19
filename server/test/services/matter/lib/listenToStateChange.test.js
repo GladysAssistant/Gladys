@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, OccupancySensing, IlluminanceMeasurement } = require('@matter/main/clusters');
+const { OnOff, OccupancySensing, IlluminanceMeasurement, TemperatureMeasurement } = require('@matter/main/clusters');
 
 const sinon = require('sinon');
 
@@ -125,6 +125,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1024',
       state: 100,
+    });
+  });
+  it('should listen to state change (TemperatureMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(TemperatureMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(2150);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1026',
+      state: 21.5,
     });
   });
 });

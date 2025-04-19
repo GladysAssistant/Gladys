@@ -29,15 +29,23 @@ describe('Matter.init', () => {
 
     clusterClients = new Map();
 
+    // On/Off
     clusterClients.set(6, {
       addOnOffAttributeListener: fake.returns(null),
     });
 
+    // Occupancy
     clusterClients.set(1030, {
       addOccupancyAttributeListener: fake.returns(null),
     });
 
+    // Illuminance
     clusterClients.set(1024, {
+      addMeasuredValueAttributeListener: fake.returns(null),
+    });
+
+    // Temperature sensor
+    clusterClients.set(1026, {
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
@@ -141,6 +149,18 @@ describe('Matter.init', () => {
             min: 1,
             max: 6553,
           },
+          {
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:1026',
+            selector: 'matter:12345:1:1026',
+            min: -100,
+            max: 200,
+          },
         ],
         params: [],
       },
@@ -184,6 +204,18 @@ describe('Matter.init', () => {
             selector: 'matter:12345:1:child_endpoint:2:1024',
             min: 1,
             max: 6553,
+          },
+          {
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:1026',
+            selector: 'matter:12345:1:child_endpoint:2:1026',
+            min: -100,
+            max: 200,
           },
         ],
         params: [],

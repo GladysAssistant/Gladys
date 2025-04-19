@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, OccupancySensing, IlluminanceMeasurement } = require('@matter/main/clusters');
+const { OnOff, OccupancySensing, IlluminanceMeasurement, TemperatureMeasurement } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
@@ -97,6 +97,19 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 1,
           max: 6553,
+        });
+      } else if (clusterIndex === TemperatureMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          name: 'Temperature',
+          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: -100,
+          max: 200,
         });
       } else {
         logger.info(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
