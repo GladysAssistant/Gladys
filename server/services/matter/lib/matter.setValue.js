@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff } = require('@matter/main/clusters');
-const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { OnOff, WindowCovering } = require('@matter/main/clusters');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
 /**
@@ -56,6 +56,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   const devices = node.getDevices();
+
   if (devices.length === 0) {
     throw new Error(`No devices found for node ${nodeId}`);
   }
@@ -73,6 +74,12 @@ async function setValue(gladysDevice, gladysFeature, value) {
     throw new Error(`Device not found for path ${devicePath.join(':')}`);
   }
 
+  // Connect if not already connected
+  if (!node.isConnected) {
+    node.connect();
+    await node.events.initialized;
+  }
+
   // Handle binary device
   if (gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
     const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
@@ -81,17 +88,32 @@ async function setValue(gladysDevice, gladysFeature, value) {
       throw new Error('Device does not support OnOff cluster');
     }
 
-    // Connect if not already connected
-    if (!node.isConnected) {
-      node.connect();
-      await node.events.initialized;
-    }
-
     // Control the device
     if (value === 1) {
       await onOff.on();
     } else {
       await onOff.off();
+    }
+  }
+
+  // Handle shutters
+  if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER) {
+    const windowCovering = targetDevice.clusterClients.get(WindowCovering.Complete.id);
+    // Handle device feature shutter position
+    if (gladysFeature.type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION) {
+      await windowCovering.goToLiftPercentage({
+        liftPercent100thsValue: value * 100,
+      });
+    }
+    // Handle device feature shutter state
+    if (gladysFeature.type === DEVICE_FEATURE_TYPES.SHUTTER.STATE) {
+      if (value === COVER_STATE.CLOSE) {
+        await windowCovering.downOrClose();
+      } else if (value === COVER_STATE.OPEN) {
+        await windowCovering.upOrOpen();
+      } else if (value === COVER_STATE.STOP) {
+        await windowCovering.stopMotion();
+      }
     }
   }
 }

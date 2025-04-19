@@ -1,5 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, OccupancySensing, IlluminanceMeasurement, TemperatureMeasurement } = require('@matter/main/clusters');
+const {
+  OnOff,
+  OccupancySensing,
+  IlluminanceMeasurement,
+  TemperatureMeasurement,
+  WindowCovering,
+} = require('@matter/main/clusters');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
@@ -110,6 +116,31 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: -100,
           max: 200,
+        });
+      } else if (clusterIndex === WindowCovering.Complete.id) {
+        gladysDevice.features.push({
+          name: 'Window Cover Position',
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+          read_only: false,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:position`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:position`,
+          min: 0,
+          max: 99,
+        });
+        gladysDevice.features.push({
+          name: 'Window Cover State',
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+          read_only: false,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: 0,
+          max: 1,
         });
       } else {
         logger.info(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);

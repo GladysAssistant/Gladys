@@ -4,6 +4,7 @@ const { assert: chaiAssert } = require('chai');
 const { fake, assert } = sinon;
 
 const MatterHandler = require('../../../../services/matter/lib');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
 
 describe('Matter.setValue', () => {
   let matterHandler;
@@ -143,6 +144,87 @@ describe('Matter.setValue', () => {
     await matterHandler.setValue(gladysDevice, gladysFeature, value);
     assert.notCalled(clusterClient.on);
     assert.calledOnce(clusterClient.off);
+  });
+  it('should set the percentage of a shutter (position)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+    };
+
+    const value = 80;
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      goToLiftPercentage: fake.resolves(null),
+    };
+    clusterClients.set(258, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledWith(clusterClient.goToLiftPercentage, { liftPercent100thsValue: 8000 });
+  });
+  it('should control of a shutter (state)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+    };
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      upOrOpen: fake.resolves(null),
+      downOrClose: fake.resolves(null),
+      stopMotion: fake.resolves(null),
+    };
+
+    clusterClients.set(258, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, COVER_STATE.OPEN);
+    assert.called(clusterClient.upOrOpen);
+    await matterHandler.setValue(gladysDevice, gladysFeature, COVER_STATE.CLOSE);
+    assert.called(clusterClient.downOrClose);
+    await matterHandler.setValue(gladysDevice, gladysFeature, COVER_STATE.STOP);
+    assert.called(clusterClient.stopMotion);
   });
   it('should return an error, no node found', async () => {
     const gladysDevice = {
