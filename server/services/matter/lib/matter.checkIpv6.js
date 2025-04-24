@@ -1,5 +1,3 @@
-const os = require('os');
-
 /**
  * @description Checks if the system has a valid IPv6 configuration.
  * Matter protocol requires IPv6 to be working properly.
@@ -13,7 +11,7 @@ const os = require('os');
  * }
  */
 function checkIpv6() {
-  const networkInterfaces = os.networkInterfaces();
+  const networkInterfaces = this.os.networkInterfaces();
   let hasIpv6 = false;
   const ipv6Interfaces = [];
 

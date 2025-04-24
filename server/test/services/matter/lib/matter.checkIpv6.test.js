@@ -1,12 +1,10 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-const os = require('os');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
 describe('Matter.checkIpv6', () => {
   let matterHandler;
-  let networkInterfacesStub;
 
   beforeEach(() => {
     const gladys = {};
@@ -14,16 +12,19 @@ describe('Matter.checkIpv6', () => {
     const ProjectChipMatter = {};
 
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
-    networkInterfacesStub = sinon.stub(os, 'networkInterfaces');
+    // @ts-ignore
+    matterHandler.os = {
+      networkInterfaces: sinon.stub(),
+    };
   });
 
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   it('should detect when IPv6 is available', () => {
     // Mock networkInterfaces to return an IPv6 address
-    networkInterfacesStub.returns({
+    matterHandler.os.networkInterfaces.returns({
       eth0: [
         {
           address: '192.168.1.10',
@@ -71,7 +72,7 @@ describe('Matter.checkIpv6', () => {
 
   it('should detect when IPv6 is not available', () => {
     // Mock networkInterfaces to return only IPv4 addresses
-    networkInterfacesStub.returns({
+    matterHandler.os.networkInterfaces.returns({
       eth0: [
         {
           address: '192.168.1.10',
@@ -109,7 +110,7 @@ describe('Matter.checkIpv6', () => {
 
   it('should handle empty network interfaces', () => {
     // Mock networkInterfaces to return empty object
-    networkInterfacesStub.returns({});
+    matterHandler.os.networkInterfaces.returns({});
 
     // Test the checkIpv6 function
     const result = matterHandler.checkIpv6();
@@ -120,7 +121,7 @@ describe('Matter.checkIpv6', () => {
 
   it('should ignore internal IPv6 interfaces', () => {
     // Mock networkInterfaces to return only internal IPv6 addresses
-    networkInterfacesStub.returns({
+    matterHandler.os.networkInterfaces.returns({
       eth0: [
         {
           address: '192.168.1.10',

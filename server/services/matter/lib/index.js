@@ -1,3 +1,5 @@
+const os = require('os');
+
 const { init } = require('./matter.init');
 const { stop } = require('./matter.stop');
 const { pairDevice } = require('./matter.pairDevice');
@@ -23,6 +25,7 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.MatterMain = MatterMain;
   this.ProjectChipMatter = ProjectChipMatter;
   this.serviceId = serviceId;
+  this.os = os;
   this.devices = [];
   this.nodesMap = new Map();
   this.commissioningController = null;
