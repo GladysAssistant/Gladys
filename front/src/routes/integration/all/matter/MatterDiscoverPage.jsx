@@ -37,7 +37,6 @@ class MatterDiscoverPage extends Component {
           <div class="card-header">
             <div class="d-flex align-items-center">
               <button onClick={() => window.history.back()} class="btn btn-secondary mr-2">
-                <i class="fe fe-arrow-left" />
                 <Text id="global.backButton" />
               </button>
               <h3 class="card-title mb-0">
