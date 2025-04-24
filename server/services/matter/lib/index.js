@@ -7,6 +7,7 @@ const { listenToStateChange } = require('./matter.listenToStateChange');
 const { decommission } = require('./matter.decommission');
 const { getNodes } = require('./matter.getNodes');
 const { handleNode } = require('./matter.handleNode');
+const { checkIpv6 } = require('./matter.checkIpv6');
 
 /**
  * @description Matter handler.
@@ -38,4 +39,6 @@ MatterHandler.prototype.listenToStateChange = listenToStateChange;
 MatterHandler.prototype.decommission = decommission;
 MatterHandler.prototype.getNodes = getNodes;
 MatterHandler.prototype.handleNode = handleNode;
+MatterHandler.prototype.checkIpv6 = checkIpv6;
+
 module.exports = MatterHandler;

@@ -12,6 +12,19 @@ describe('MatterController', () => {
       pairDevice: fake.resolves(null),
       getDevices: fake.returns([{ name: 'toto' }]),
       getNodes: fake.returns([{ name: 'toto' }]),
+      checkIpv6: fake.returns({
+        hasIpv6: true,
+        ipv6Interfaces: [
+          {
+            address: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+            netmask: 'ffff:ffff:ffff:ffff::',
+            family: 'IPv6',
+            mac: '00:00:00:00:00:00',
+            internal: false,
+            scopeid: 0,
+          },
+        ],
+      }),
       decommission: fake.resolves(null),
       listenToStateChange: fake.resolves(null),
     };
@@ -52,6 +65,28 @@ describe('MatterController', () => {
     await controller['get /api/v1/service/matter/node'].controller(req, res);
     assert.calledOnce(matterHandler.getNodes);
     assert.calledWith(res.json, [{ name: 'toto' }]);
+  });
+  it('should get ipv6 status', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns([]),
+    };
+
+    await controller['get /api/v1/service/matter/ipv6'].controller(req, res);
+    assert.calledOnce(matterHandler.checkIpv6);
+    assert.calledWith(res.json, {
+      has_ipv6: true,
+      ipv6_interfaces: [
+        {
+          address: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+          netmask: 'ffff:ffff:ffff:ffff::',
+          family: 'IPv6',
+          mac: '00:00:00:00:00:00',
+          internal: false,
+          scopeid: 0,
+        },
+      ],
+    });
   });
   it('should decommission a node', async () => {
     const req = {

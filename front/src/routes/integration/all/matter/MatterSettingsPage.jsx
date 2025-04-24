@@ -153,8 +153,13 @@ class MatterSettingsPage extends Component {
       const { value: matterEnabled } = await this.props.httpClient.get(
         '/api/v1/service/matter/variable/MATTER_ENABLED'
       );
+      const { has_ipv6: hasIpv6, ipv6_interfaces: ipv6Interfaces } = await this.props.httpClient.get(
+        '/api/v1/service/matter/ipv6'
+      );
       this.setState({
-        matterEnabled: matterEnabled === 'true'
+        matterEnabled: matterEnabled === 'true',
+        hasIpv6,
+        ipv6Interfaces
       });
     } catch (e) {
       console.error(e);
@@ -309,7 +314,9 @@ class MatterSettingsPage extends Component {
       loadingNodes,
       decommissioningNodes,
       collapsedDevices,
-      visibleKeys
+      visibleKeys,
+      hasIpv6,
+      ipv6Interfaces
     } = this.state;
 
     return (
@@ -321,6 +328,18 @@ class MatterSettingsPage extends Component {
             </h3>
           </div>
           <div class="card-body">
+            {hasIpv6 === false && (
+              <div class="alert alert-danger">
+                <Text id="integration.matter.settings.ipv6NotEnabled" />
+              </div>
+            )}
+
+            {hasIpv6 === true && (
+              <div class="alert alert-success">
+                <Text id="integration.matter.settings.ipv6Enabled" />
+              </div>
+            )}
+
             {!matterEnabled && (
               <>
                 <div class="alert alert-warning">

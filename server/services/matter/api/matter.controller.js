@@ -32,6 +32,19 @@ module.exports = function MatterController(matterHandler) {
   }
 
   /**
+   * @api {get} /api/v1/service/matter/ipv6 Get ipv6 status
+   * @apiName getIpv6Status
+   * @apiGroup Matter
+   */
+  async function getIpv6Status(req, res) {
+    const { hasIpv6, ipv6Interfaces } = await matterHandler.checkIpv6();
+    res.json({
+      has_ipv6: hasIpv6,
+      ipv6_interfaces: ipv6Interfaces,
+    });
+  }
+
+  /**
    * @api {post} /api/v1/service/matter/node/:node_id/decommission Decommission a node
    * @apiName decommissionNode
    * @apiGroup Matter
@@ -53,6 +66,10 @@ module.exports = function MatterController(matterHandler) {
     'get /api/v1/service/matter/node': {
       authenticated: true,
       controller: asyncMiddleware(getNodes),
+    },
+    'get /api/v1/service/matter/ipv6': {
+      authenticated: true,
+      controller: asyncMiddleware(getIpv6Status),
     },
     'post /api/v1/service/matter/node/:node_id/decommission': {
       authenticated: true,

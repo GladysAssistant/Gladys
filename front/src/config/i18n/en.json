@@ -1817,6 +1817,8 @@
       },
       "settings": {
         "title": "Matter Settings",
+        "ipv6Enabled": "IPv6 interfaces are available on this machine ✅",
+        "ipv6NotEnabled": "Matter requires IPv6 to function, but no IPv6 interface was detected on this machine ❌",
         "description": "Enable or disable the Matter integration in Gladys. When enabled, Gladys will be able to communicate with your Matter devices.",
         "enableIntegration": "Enable Matter Integration",
         "saveButton": "Save",
