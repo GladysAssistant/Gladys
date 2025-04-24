@@ -111,6 +111,7 @@ class MatterDevices extends Component {
       search: e.target.value
     });
     this.getMatterDevices();
+    // No need to call getPairedDevices here as we filter them client-side in render
   };
 
   changeOrderDir = async e => {
@@ -118,9 +119,37 @@ class MatterDevices extends Component {
       orderDir: e.target.value
     });
     this.getMatterDevices();
+    // No need to call getPairedDevices here as we sort them client-side in render
   };
 
   render(props, { orderDir, search, loading, error, matterDevices, pairedDevices, housesWithRooms }) {
+    // Apply client-side filtering to paired devices
+    const filteredPairedDevices = pairedDevices.filter(device => {
+      // If no search term, include all devices
+      if (!search || search.trim() === '') {
+        return true;
+      }
+
+      // Search in name, model, and external_id
+      const searchLower = search.toLowerCase();
+      return (
+        (device.name && device.name.toLowerCase().includes(searchLower)) ||
+        (device.model && device.model.toLowerCase().includes(searchLower))
+      );
+    });
+
+    // Apply client-side sorting to paired devices
+    const sortedPairedDevices = [...filteredPairedDevices].sort((a, b) => {
+      const nameA = (a.name || a.model || '').toLowerCase();
+      const nameB = (b.name || b.model || '').toLowerCase();
+
+      if (orderDir === 'asc') {
+        return nameA.localeCompare(nameB);
+      } else {
+        return nameB.localeCompare(nameA);
+      }
+    });
+
     return (
       <MatterPage user={props.user}>
         <div class="card">
@@ -141,13 +170,13 @@ class MatterDevices extends Component {
             </div>
           </div>
           <div class="card-body">
-            {pairedDevices && pairedDevices.length > 0 && (
+            {sortedPairedDevices && sortedPairedDevices.length > 0 && (
               <div class="alert alert-info">
                 <h4 class="alert-heading">
                   <Text id="integration.matter.device.pairedDevicesTitle" />
                 </h4>
                 <div class="row mt-4">
-                  {pairedDevices.map(device => (
+                  {sortedPairedDevices.map(device => (
                     <div class="col-md-6">
                       <div class="card">
                         <div class="card-header">{device.name || device.model}</div>
