@@ -315,8 +315,7 @@ class MatterSettingsPage extends Component {
       decommissioningNodes,
       collapsedDevices,
       visibleKeys,
-      hasIpv6,
-      ipv6Interfaces
+      hasIpv6
     } = this.state;
 
     return (
