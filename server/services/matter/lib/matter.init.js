@@ -9,7 +9,7 @@ const logger = require('../../../utils/logger');
  * @example matter.init();
  */
 async function init() {
-  const { Environment, StorageService } = this.MatterMain;
+  const { Environment, StorageService, Logger, LogLevel } = this.MatterMain;
   const { CommissioningController } = this.ProjectChipMatter;
 
   // Store the matter data in the same folder as the Gladys database
@@ -18,6 +18,10 @@ async function init() {
   // Create the storage folder if it doesn't exist
   await fse.ensureDir(storagePath);
   const environment = Environment.default;
+  // Set the log level to "notice"
+  // Log levels are defined here:
+  // https://github.com/project-chip/matter.js/blob/b0ffc2ff3c8acd7fef19918337d4fd95dfa466e6/packages/general/src/log/LogLevel.ts
+  Logger.level = LogLevel('notice');
   const storageService = environment.get(StorageService);
   storageService.location = storagePath;
 
