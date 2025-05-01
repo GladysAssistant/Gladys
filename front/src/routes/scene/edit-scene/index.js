@@ -256,17 +256,35 @@ class EditScene extends Component {
       Object.entries(prevState.variables).forEach(([path, value]) => {
         const pathSegments = path.split('.');
 
-        // Only update root level paths (not nested in then/else)
-        if (pathSegments.length === 2) {
-          const groupIndex = parseInt(pathSegments[0], 10);
+        // Handle both root level paths and nested paths in then/else
+        if (pathSegments.length >= 2) {
+          // Check if this is a root level path (e.g., "1.0")
+          if (pathSegments.length === 2) {
+            const groupIndex = parseInt(pathSegments[0], 10);
 
-          // If this path is after the inserted group, increment index
-          if (groupIndex >= index + 1) {
-            const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
-            newVariables[newPath] = value;
-            delete newVariables[path];
-            console.log(`Deleting ${path}, adding ${newPath}`);
-            pathToUpdateInVariables.push({ prevPath: path, newPath });
+            // If this path is after the inserted group, increment index
+            if (groupIndex >= index + 1) {
+              const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
+              newVariables[newPath] = value;
+              delete newVariables[path];
+              pathToUpdateInVariables.push({ prevPath: path, newPath });
+            }
+          } else {
+            // Handle nested paths (e.g., "1.0.then.0.0" or "1.0.else.0.0")
+            // Find the root group index which is the first segment
+            const rootGroupIndex = parseInt(pathSegments[0], 10);
+
+            // Only update if the root group index is affected by the insertion
+            if (rootGroupIndex >= index + 1) {
+              // Create a new path with incremented root group index
+              const newPathSegments = [...pathSegments];
+              newPathSegments[0] = (rootGroupIndex + 1).toString();
+              const newPath = newPathSegments.join('.');
+
+              newVariables[newPath] = value;
+              delete newVariables[path];
+              pathToUpdateInVariables.push({ prevPath: path, newPath });
+            }
           }
         }
       });
@@ -279,36 +297,64 @@ class EditScene extends Component {
 
       // Update variable paths for all actions after the inserted group
       pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
-        prevState.scene.actions.forEach(actionGroup => {
-          actionGroup.forEach(action => {
-            if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
-              VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
-                // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
-                if (attribute.includes('.')) {
-                  // We split the attribute path
-                  const attributePath = attribute.split('.');
-                  // If the first part is an array (e.g., conditions[])
-                  if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
-                    // We loop through the array
-                    action[attributePath[0].slice(0, -2)].forEach(subAction => {
-                      if (subAction[attributePath[1]]) {
-                        // And replace the second part if it is a variable
-                        subAction[attributePath[1]] = subAction[attributePath[1]].replace(
-                          `{{${prevPath}.`,
-                          `{{${newPath}.`
-                        );
-                      }
-                    });
+        // Recursive function to process all actions, including nested ones in if/then/else blocks
+        const processActions = actions => {
+          if (!Array.isArray(actions)) return;
+
+          actions.forEach(actionGroup => {
+            if (!Array.isArray(actionGroup)) return;
+
+            actionGroup.forEach(action => {
+              if (!action) return;
+
+              // Process the current action
+              if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
+                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
+                  // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
+                  if (attribute.includes('.')) {
+                    // We split the attribute path
+                    const attributePath = attribute.split('.');
+                    // If the first part is an array (e.g., conditions[])
+                    if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
+                      // We loop through the array
+                      action[attributePath[0].slice(0, -2)].forEach(subAction => {
+                        if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
+                          // And replace the second part if it is a variable
+                          // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
+                          subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
+                        }
+                      });
+                    }
+                  } else if (action[attribute]) {
+                    // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
+                    action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
                   }
-                } else {
-                  console.log(`Updating ${attribute} from ${prevPath} to ${newPath}. Before = ${action[attribute]}`);
-                  action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
-                  console.log(action[attribute]);
+                });
+              }
+
+              // Check for nested actions in if/then/else blocks
+              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+                // Process 'if' branch if it exists
+                if (Array.isArray(action.if)) {
+                  processActions([action.if]);
                 }
-              });
-            }
+
+                // Process 'then' branch if it exists
+                if (Array.isArray(action.then)) {
+                  processActions(action.then);
+                }
+
+                // Process 'else' branch if it exists
+                if (Array.isArray(action.else)) {
+                  processActions(action.else);
+                }
+              }
+            });
           });
-        });
+        };
+
+        // Start processing from the root actions
+        processActions(prevState.scene.actions);
       });
 
       return {
