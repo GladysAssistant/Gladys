@@ -61,7 +61,7 @@ const BaseEditBox = ({ children, ...props }) => {
   return (
     <div
       ref={ref}
-      class="card"
+      class="card mb-2"
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'pointer',

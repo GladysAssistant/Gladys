@@ -46,6 +46,7 @@ const EditDashboard = ({ children, ...props }) => (
                     <div class="card-body">
                       {props.currentDashboard && (
                         <EditBoxColumns
+                          addBoxAtPosition={props.addBoxAtPosition}
                           user={props.user}
                           isTouchDevice={props.isTouchDevice}
                           dashboards={props.dashboards}
