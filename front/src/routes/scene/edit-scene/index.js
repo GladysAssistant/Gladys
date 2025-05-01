@@ -12,6 +12,19 @@ import EditScenePage from './EditScenePage';
 
 import { ACTIONS } from '../../../../../server/utils/constants';
 
+const VARIABLES_ATTRIBUTES_IN_ACTION = {
+  [ACTIONS.MESSAGE.SEND]: ['text'],
+  [ACTIONS.AI.ASK]: ['text'],
+  [ACTIONS.MESSAGE.SEND_CAMERA]: ['text'],
+  [ACTIONS.SMS.SEND]: ['text'],
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: ['text'],
+  [ACTIONS.MQTT.SEND]: ['message'],
+  [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
+  [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
+  [ACTIONS.HTTP.REQUEST]: ['body'],
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
+};
+
 // Helper function to merge update objects
 const deepMergeUpdates = (target, source) => {
   if (!source) return target;
@@ -233,44 +246,74 @@ class EditScene extends Component {
   };
 
   addActionGroupAfter = async index => {
-    await this.setState(prevState => {
-      return update(prevState, {
-        scene: {
-          actions: {
-            $splice: [[index + 1, 0, []]]
-          }
-        },
-        variables: {
-          [`${index + 1}`]: {
-            $set: []
-          }
-        }
-      });
-    });
-
     // Update variable paths for all actions after the inserted group
     await this.setState(prevState => {
       const newVariables = { ...prevState.variables };
+
+      const pathToUpdateInVariables = [];
 
       // Iterate through all variables and update their paths
       Object.entries(prevState.variables).forEach(([path, value]) => {
         const pathSegments = path.split('.');
 
         // Only update root level paths (not nested in then/else)
-        if (pathSegments.length === 1) {
+        if (pathSegments.length === 2) {
           const groupIndex = parseInt(pathSegments[0], 10);
 
           // If this path is after the inserted group, increment index
-          if (groupIndex > index + 1) {
-            const newPath = `${groupIndex + 1}`;
+          if (groupIndex >= index + 1) {
+            const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
             newVariables[newPath] = value;
             delete newVariables[path];
+            console.log(`Deleting ${path}, adding ${newPath}`);
+            pathToUpdateInVariables.push({ prevPath: path, newPath });
           }
         }
       });
 
+      const newScene = update(prevState.scene, {
+        actions: {
+          $splice: [[index + 1, 0, []]]
+        }
+      });
+
+      // Update variable paths for all actions after the inserted group
+      pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
+        prevState.scene.actions.forEach(actionGroup => {
+          actionGroup.forEach(action => {
+            if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
+              VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
+                // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
+                if (attribute.includes('.')) {
+                  // We split the attribute path
+                  const attributePath = attribute.split('.');
+                  // If the first part is an array (e.g., conditions[])
+                  if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
+                    // We loop through the array
+                    action[attributePath[0].slice(0, -2)].forEach(subAction => {
+                      if (subAction[attributePath[1]]) {
+                        // And replace the second part if it is a variable
+                        subAction[attributePath[1]] = subAction[attributePath[1]].replace(
+                          `{{${prevPath}.`,
+                          `{{${newPath}.`
+                        );
+                      }
+                    });
+                  }
+                } else {
+                  console.log(`Updating ${attribute} from ${prevPath} to ${newPath}. Before = ${action[attribute]}`);
+                  action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
+                  console.log(action[attribute]);
+                }
+              });
+            }
+          });
+        });
+      });
+
       return {
-        variables: newVariables
+        variables: newVariables,
+        scene: newScene
       };
     });
   };
