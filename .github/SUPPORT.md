@@ -1,14 +1,14 @@
-# Getting support from Gladys Community
+# 💬 Getting Support from the Gladys Community
 
-First, thanks for trying out Gladys!
+First of all — thank you for using Gladys Assistant!
 
-The best place to ask for help is our forum, in [french](https://community.gladysassistant.com/) or [english](https://en-community.gladysassistant.com/).
+If you need help, the best place to ask questions is on our community forums:
 
-Please **_do not_** raise an issue on GitHub if it's a support problem!
+- 🌍 [English Forum](https://en-community.gladysassistant.com/)
+- 🇫🇷 [French Forum](https://community.gladysassistant.com/)
 
-GitHub issues are used for:
+Please **do not open a GitHub issue for support questions** — GitHub is reserved for bug reports.
 
-- Bug report
-- Feature request
+For anything else, we’ll be happy to help you on the forum!
 
-Thanks for being here, see you on the forum 🙏
+See you there 🙏
