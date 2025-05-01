@@ -1825,6 +1825,7 @@
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
     "addActionButton": "Add action",
+    "addActionGroupButton": "Add action group",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",

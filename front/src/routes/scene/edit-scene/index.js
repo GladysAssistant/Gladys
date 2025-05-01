@@ -232,6 +232,49 @@ class EditScene extends Component {
     await this.setState(newState);
   };
 
+  addActionGroupAfter = async index => {
+    await this.setState(prevState => {
+      return update(prevState, {
+        scene: {
+          actions: {
+            $splice: [[index + 1, 0, []]]
+          }
+        },
+        variables: {
+          [`${index + 1}`]: {
+            $set: []
+          }
+        }
+      });
+    });
+
+    // Update variable paths for all actions after the inserted group
+    await this.setState(prevState => {
+      const newVariables = { ...prevState.variables };
+
+      // Iterate through all variables and update their paths
+      Object.entries(prevState.variables).forEach(([path, value]) => {
+        const pathSegments = path.split('.');
+
+        // Only update root level paths (not nested in then/else)
+        if (pathSegments.length === 1) {
+          const groupIndex = parseInt(pathSegments[0], 10);
+
+          // If this path is after the inserted group, increment index
+          if (groupIndex > index + 1) {
+            const newPath = `${groupIndex + 1}`;
+            newVariables[newPath] = value;
+            delete newVariables[path];
+          }
+        }
+      });
+
+      return {
+        variables: newVariables
+      };
+    });
+  };
+
   addAction = async (path, options = {}) => {
     await this.setState(prevState => {
       // Build the nested update object for actions
@@ -1021,6 +1064,7 @@ class EditScene extends Component {
               duplicateScene={this.duplicateScene}
               setTags={this.setTags}
               updateSceneIcon={this.updateSceneIcon}
+              addActionGroupAfter={this.addActionGroupAfter}
             />
           </DndProvider>
         </div>
