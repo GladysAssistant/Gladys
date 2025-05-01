@@ -78,7 +78,7 @@ describe('Device', () => {
     assert.calledTwice(mqttService.device.listenToCustomMqttTopicIfNeeded);
     assert.calledOnce(mqttService.device.unListenToCustomMqttTopic);
   });
-  it('should update device which already exist', async () => {
+  it('should update device which already exist (update by id)', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceByExternalId', 'test-device-external', {
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
@@ -127,12 +127,134 @@ describe('Device', () => {
     });
     expect(newDevice.features).to.deep.equal([]);
   });
-  it('should update device which already exist, update a feature and a param', async () => {
+  it('should update device which already exist (update by external_id)', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceByExternalId', 'test-device-external', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Test device',
+      selector: 'test-device',
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: '10',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
+      ],
+    });
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const newDevice = await device.create({
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      params: [
+        {
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
+      ],
+    });
+    expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(1);
+    newDevice.params.forEach((param) => {
+      expect(param).to.have.property('value', 'UPDATED_VALUE');
+    });
+    expect(newDevice.features).to.deep.equal([]);
+  });
+  it('should update device which already exist, update a feature and a param (by id)', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
     const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          read_only: false,
+          has_feedback: false,
+          last_value: 0,
+          last_value_changed: null,
+          last_value_string: null,
+          last_daily_aggregate: null,
+          last_hourly_aggregate: null,
+          last_monthly_aggregate: null,
+          min: 0,
+          max: 100,
+        },
+      ],
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        },
+      ],
+    });
+    expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(1);
+    newDevice.params.forEach((param) => {
+      expect(param).to.have.property('value', 'UPDATED_VALUE');
+    });
+    expect(newDevice.features).to.deep.equal([
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'New device feature',
+        selector: 'new-device-feature',
+        device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        external_id: 'hue:binary:1',
+        category: 'temperature',
+        type: 'decimal',
+        read_only: false,
+        has_feedback: false,
+        min: 0,
+        max: 100,
+        keep_history: true,
+        last_value: 0,
+        last_daily_aggregate: null,
+        last_hourly_aggregate: null,
+        last_monthly_aggregate: null,
+        last_value_changed: null,
+        last_value_string: null,
+        unit: null,
+        created_at: newDevice.features[0] && newDevice.features[0].created_at,
+        updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
+      },
+    ]);
+  });
+  it('should update device which already exist, update a feature and a param (by external_id)', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const newDevice = await device.create({
       name: 'RENAMED_DEVICE',
       selector: 'test-device',
       external_id: 'test-device-external',
