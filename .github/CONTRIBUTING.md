@@ -19,7 +19,7 @@ Gladys is fully managed on [GitHub](https://github.com/gladysassistant/Gladys).
 We use it to:
 
 - Host the code
-- Track bugs and feature requests
+- Track bugs
 - Collaborate on pull requests
 
 ---
@@ -40,7 +40,8 @@ We recommend starting with a quick discussion on the Gladys forum to make sure y
 - [Forum (English)](https://en-community.gladysassistant.com/)
 - [Forum (Français)](https://community.gladysassistant.com/)
 
-Then, follow our guide:  
+Then, follow our guide:
+
 👉 [How to contribute a new service](https://gladysassistant.com/docs/dev/developing-a-service/)
 
 > 💡 As soon as you have some code, feel free to open a **Draft Pull Request**. This allows the team to follow your progress and provide early feedback.

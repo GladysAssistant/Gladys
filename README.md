@@ -57,7 +57,9 @@ Whether you're installing on a mini-PC, a NAS or a Raspberry Pi, we've got you c
 
 ## 🤝 Contribute to Gladys
 
-We welcome contributions of all kinds — code, documentation, translations, or feature ideas. Gladys is built by an open-source community, and **you can be a part of it!**
+We welcome contributions of all kinds — code, documentation, translations, or feature ideas.
+
+Gladys is built by an open-source community, and **you can be a part of it!**
 
 ### 1. Set up your development environment
 
