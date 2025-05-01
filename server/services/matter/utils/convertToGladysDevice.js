@@ -37,6 +37,12 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       nodeDetailDeviceDataBasicInformation.productLabel ||
       nodeDetailDeviceDataBasicInformation.productName ||
       device.name})`;
+    if (nodeDetailDeviceDataBasicInformation.uniqueId) {
+      gladysDevice.params.push({
+        name: 'UNIQUE_ID',
+        value: nodeDetailDeviceDataBasicInformation.uniqueId,
+      });
+    }
   }
   if (device.clusterClients) {
     device.clusterClients.forEach((clusterClient, clusterIndex) => {

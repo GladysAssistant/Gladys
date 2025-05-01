@@ -1838,7 +1838,9 @@
         "title": "Matter-Geräte",
         "noDeviceFound": "Keine Matter-Geräte gefunden",
         "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
-        "addToGladys": "Zu Gladys hinzufügen"
+        "addToGladys": "Zu Gladys hinzufügen",
+        "deviceAlreadyExist": "Ein Gerät mit derselben eindeutigen Kennung existiert bereits. Du kannst es mit dem untenstehenden Button aktualisieren.",
+        "replaceExisting": "Vorhandenes Gerät aktualisieren"
       },
       "discoverDeviceDescr": "Ein neues Matter-Gerät hinzufügen",
       "nameLabel": "Name",

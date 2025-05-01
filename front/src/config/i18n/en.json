@@ -1838,7 +1838,9 @@
         "title": "Matter Devices",
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
-        "addToGladys": "Add to Gladys"
+        "addToGladys": "Add to Gladys",
+        "deviceAlreadyExist": "A device with the same unique identifier already exists. You can update it using the button below.",
+        "replaceExisting": "Update existing device"
       },
       "discoverDeviceDescr": "Add a new Matter device",
       "nameLabel": "Name",

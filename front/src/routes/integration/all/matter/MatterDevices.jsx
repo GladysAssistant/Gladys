@@ -6,6 +6,7 @@ import debounce from 'debounce';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
+import { getDeviceParam } from '../../../../utils/device';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
 import MatterPage from './MatterPage';
@@ -20,7 +21,8 @@ class MatterDevices extends Component {
       matterDevices: [],
       pairedDevices: [],
       loading: true,
-      error: null
+      error: null,
+      devicesThatAlreadyExistButWithDifferentNodeId: new Map()
     };
     this.debouncedSearch = debounce(this.search, 200).bind(this);
   }
@@ -70,7 +72,33 @@ class MatterDevices extends Component {
         pairedDevice =>
           !this.state.matterDevices.some(gladysDevice => gladysDevice.external_id === pairedDevice.external_id)
       );
-      this.setState({ pairedDevices: filteredPairedDevices });
+      const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
+      filteredPairedDevices.forEach(pairedDevice => {
+        // First, we get the unique_id of the paired device if it exists
+        const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
+        if (!pairedDeviceUniqueId) {
+          return undefined;
+        }
+        // We find another device already in Gladys with the same unique_id
+        const deviceWithSameUniqueId = this.state.matterDevices.find(gladysDevice => {
+          const gladysDeviceUniqueId = getDeviceParam(gladysDevice, 'UNIQUE_ID');
+          if (!gladysDeviceUniqueId) {
+            return false;
+          }
+          return pairedDeviceUniqueId === gladysDeviceUniqueId;
+        });
+
+        if (deviceWithSameUniqueId) {
+          devicesThatAlreadyExistButWithDifferentNodeId.set(
+            pairedDevice.external_id,
+            deviceWithSameUniqueId.external_id
+          );
+        }
+
+        return undefined;
+      });
+
+      this.setState({ pairedDevices: filteredPairedDevices, devicesThatAlreadyExistButWithDifferentNodeId });
     } catch (e) {
       console.error(e);
     }
@@ -78,6 +106,39 @@ class MatterDevices extends Component {
 
   addDeviceToGladys = async device => {
     try {
+      await this.props.httpClient.post('/api/v1/device', device);
+      await this.getMatterDevices();
+      await this.getPairedDevices();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  replaceGladysDevice = async device => {
+    try {
+      const gladysDevice = this.state.matterDevices.find(gladysDevice => {
+        return (
+          gladysDevice.external_id === this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(device.external_id)
+        );
+      });
+
+      // We'll update the external_id of the existing device
+      const newExternalId = device.external_id;
+      const oldExternalId = gladysDevice.external_id;
+
+      // Put the id of the gladys device so we replace the device
+      device.id = gladysDevice.id;
+      device.features = device.features.map(f => {
+        // try to find match feature to replace the external_id
+        const gladysFeature = gladysDevice.features.find(gladysF => {
+          return gladysF.external_id.replace(oldExternalId, newExternalId) === f.external_id;
+        });
+        // If a matching feature is found, give the id of the feature
+        if (gladysFeature) {
+          f.id = gladysFeature.id;
+        }
+        return f;
+      });
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
@@ -122,7 +183,19 @@ class MatterDevices extends Component {
     // No need to call getPairedDevices here as we sort them client-side in render
   };
 
-  render(props, { orderDir, search, loading, error, matterDevices, pairedDevices, housesWithRooms }) {
+  render(
+    props,
+    {
+      orderDir,
+      search,
+      loading,
+      error,
+      matterDevices,
+      pairedDevices,
+      housesWithRooms,
+      devicesThatAlreadyExistButWithDifferentNodeId
+    }
+  ) {
     // Apply client-side filtering to paired devices
     const filteredPairedDevices = pairedDevices.filter(device => {
       // If no search term, include all devices
@@ -181,6 +254,11 @@ class MatterDevices extends Component {
                       <div class="card">
                         <div class="card-header">{device.name || device.model}</div>
                         <div class="card-body">
+                          {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                            <div class="alert alert-info">
+                              <Text id="integration.matter.device.deviceAlreadyExist" />
+                            </div>
+                          )}
                           {device.features && device.features.length > 0 && (
                             <div class="form-group">
                               <label class="form-label">
@@ -189,11 +267,20 @@ class MatterDevices extends Component {
                               <DeviceFeatures features={device.features} />
                             </div>
                           )}
-                          <div class="form-group">
-                            <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
-                              <Text id="integration.matter.device.addToGladys" />
-                            </button>
-                          </div>
+                          {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                            <div class="form-group">
+                              <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
+                                <Text id="integration.matter.device.replaceExisting" />
+                              </button>
+                            </div>
+                          )}
+                          {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                            <div class="form-group">
+                              <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
+                                <Text id="integration.matter.device.addToGladys" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
