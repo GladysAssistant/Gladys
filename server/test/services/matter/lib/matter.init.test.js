@@ -94,6 +94,10 @@ describe('Matter.init', () => {
         default: environment,
       },
       StorageService: storageService,
+      Logger: {
+        level: 0,
+      },
+      LogLevel: fake.returns(1),
     };
     const ProjectChipMatter = {
       CommissioningController: fake.returns(commissioningController),
