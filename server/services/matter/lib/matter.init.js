@@ -12,6 +12,11 @@ async function init() {
   const { Environment, StorageService, Logger, LogLevel } = this.MatterMain;
   const { CommissioningController } = this.ProjectChipMatter;
 
+  // Reset memory
+  this.devices = [];
+  this.nodesMap = new Map();
+  this.commissioningController = null;
+
   // Store the matter data in the same folder as the Gladys database
   const storagePath = process.env.MATTER_FOLDER_PATH || path.join(path.dirname(this.gladys.config.storage), 'matter');
   logger.info(`Matter.init: storagePath: ${storagePath}`);
