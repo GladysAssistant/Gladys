@@ -1099,6 +1099,7 @@ const data = {
     selector: 'wake-up',
     icon: 'fe fe-bell',
     active: true,
+    description: 'Long description about scene managing light thanks to sunrise',
     name: 'Wake Up when sun is rising',
     tags: [],
     triggers: [
