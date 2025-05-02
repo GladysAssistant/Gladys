@@ -74,21 +74,7 @@ const handleDevice = async (
   // to avoid bloating Gladys
   if (gladysDevice.features.length > 0) {
     listenToStateChange(nodeId, newDevicePath, device);
-
-    // Find existing device with same unique_id
-    const existingDevice = devices.find((d) => {
-      // Find the unique_id of the device in the list
-      const uniqueIdParam = getDeviceParam(d, 'UNIQUE_ID');
-      // If the unique_id matches, we return true
-      return uniqueIdParam && childInformations.uniqueId && uniqueIdParam === childInformations.uniqueId;
-    });
-
-    if (existingDevice) {
-      // Update existing device features only
-      existingDevice.features = [...existingDevice.features, ...gladysDevice.features];
-    } else {
-      devices.push(gladysDevice);
-    }
+    devices.push(gladysDevice);
   }
 
   if (device.childEndpoints) {

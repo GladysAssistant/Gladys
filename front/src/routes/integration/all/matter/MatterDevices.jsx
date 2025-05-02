@@ -87,7 +87,8 @@ class MatterDevices extends Component {
         pairedDevice =>
           !this.state.matterDevices.some(gladysDevice => gladysDevice.external_id === pairedDevice.external_id)
       );
-      const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
+
+      /* const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
       filteredPairedDevices.forEach(pairedDevice => {
         // First, we get the unique_id of the paired device if it exists
         const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
@@ -111,9 +112,9 @@ class MatterDevices extends Component {
         }
 
         return undefined;
-      });
+      }); */
 
-      this.setState({ pairedDevices: filteredPairedDevices, devicesThatAlreadyExistButWithDifferentNodeId });
+      this.setState({ pairedDevices: filteredPairedDevices });
     } catch (e) {
       console.error(e);
     }

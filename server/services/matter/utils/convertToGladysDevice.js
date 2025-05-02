@@ -44,6 +44,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       });
     }
   }
+
+  // Add endpoint number to the name so the user can identify the device
+  gladysDevice.name += ` ${device.number}`;
+
   if (device.clusterClients) {
     device.clusterClients.forEach((clusterClient, clusterIndex) => {
       logger.info(`Matter pairing - Cluster client ${clusterIndex}`);
