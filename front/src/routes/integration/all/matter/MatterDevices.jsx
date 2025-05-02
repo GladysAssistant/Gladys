@@ -6,7 +6,6 @@ import debounce from 'debounce';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
-import { getDeviceParam } from '../../../../utils/device';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
 import MatterPage from './MatterPage';
@@ -87,32 +86,6 @@ class MatterDevices extends Component {
         pairedDevice =>
           !this.state.matterDevices.some(gladysDevice => gladysDevice.external_id === pairedDevice.external_id)
       );
-
-      /* const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
-      filteredPairedDevices.forEach(pairedDevice => {
-        // First, we get the unique_id of the paired device if it exists
-        const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
-        if (!pairedDeviceUniqueId) {
-          return undefined;
-        }
-        // We find another device already in Gladys with the same unique_id
-        const deviceWithSameUniqueId = this.state.matterDevices.find(gladysDevice => {
-          const gladysDeviceUniqueId = getDeviceParam(gladysDevice, 'UNIQUE_ID');
-          if (!gladysDeviceUniqueId) {
-            return false;
-          }
-          return pairedDeviceUniqueId === gladysDeviceUniqueId;
-        });
-
-        if (deviceWithSameUniqueId) {
-          devicesThatAlreadyExistButWithDifferentNodeId.set(
-            pairedDevice.external_id,
-            deviceWithSameUniqueId.external_id
-          );
-        }
-
-        return undefined;
-      }); */
 
       this.setState({ pairedDevices: filteredPairedDevices });
     } catch (e) {

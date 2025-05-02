@@ -3,7 +3,6 @@ const Promise = require('bluebird');
 const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
-const { getDeviceParam } = require('../../../utils/device');
 const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 
 const handleDevice = async (
