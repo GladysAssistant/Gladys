@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { route } from 'preact-router';
 import { connect } from 'unistore/preact';
+import { RequestStatus } from '../../../../utils/consts';
 import MatterPage from './MatterPage';
 
 class MatterDiscoverPage extends Component {
@@ -10,9 +11,29 @@ class MatterDiscoverPage extends Component {
     super(props);
     this.state = {
       pairingCode: '',
-      loading: false
+      loading: false,
+      matterEnabled: null,
+      error: null
     };
   }
+
+  componentDidMount() {
+    this.loadConfiguration();
+  }
+
+  loadConfiguration = async () => {
+    try {
+      const { value: matterEnabled } = await this.props.httpClient.get(
+        '/api/v1/service/matter/variable/MATTER_ENABLED'
+      );
+      this.setState({
+        matterEnabled: matterEnabled === 'true'
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: RequestStatus.Error });
+    }
+  };
 
   handleSubmit = async e => {
     e.preventDefault();
@@ -45,6 +66,11 @@ class MatterDiscoverPage extends Component {
             </div>
           </div>
           <div class="card-body">
+            {!this.state.matterEnabled && (
+              <div class="alert alert-warning">
+                <Text id="integration.matter.settings.disabledWarning" />
+              </div>
+            )}
             <div class="alert alert-info">
               <Text id="integration.matter.discover.description" />
             </div>

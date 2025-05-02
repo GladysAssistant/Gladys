@@ -22,15 +22,30 @@ class MatterDevices extends Component {
       pairedDevices: [],
       loading: true,
       error: null,
+      matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map()
     };
     this.debouncedSearch = debounce(this.search, 200).bind(this);
   }
 
   init = async () => {
-    await this.getHouses();
-    await this.getMatterDevices();
+    await Promise.all([this.loadConfiguration(), this.getHouses(), this.getMatterDevices()]);
+    // We need to wait before getting all matter devices before being able to load paired devices
     await this.getPairedDevices();
+  };
+
+  loadConfiguration = async () => {
+    try {
+      const { value: matterEnabled } = await this.props.httpClient.get(
+        '/api/v1/service/matter/variable/MATTER_ENABLED'
+      );
+      this.setState({
+        matterEnabled: matterEnabled === 'true'
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: RequestStatus.Error });
+    }
   };
 
   componentWillMount() {
@@ -193,7 +208,8 @@ class MatterDevices extends Component {
       matterDevices,
       pairedDevices,
       housesWithRooms,
-      devicesThatAlreadyExistButWithDifferentNodeId
+      devicesThatAlreadyExistButWithDifferentNodeId,
+      matterEnabled
     }
   ) {
     // Apply client-side filtering to paired devices
@@ -243,6 +259,11 @@ class MatterDevices extends Component {
             </div>
           </div>
           <div class="card-body">
+            {!matterEnabled && (
+              <div class="alert alert-warning">
+                <Text id="integration.matter.settings.disabledWarning" />
+              </div>
+            )}
             {sortedPairedDevices && sortedPairedDevices.length > 0 && (
               <div class="alert alert-info">
                 <h4 class="alert-heading">

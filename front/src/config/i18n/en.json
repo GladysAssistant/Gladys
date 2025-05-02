@@ -1829,7 +1829,7 @@
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
         "noNodesFound": "No Matter nodes found",
-        "disabledWarning": "Matter is not activated. Please activate it before using the integration",
+        "disabledWarning": "Matter is not activated. Please activate it in \"Settings\" before using the integration",
         "enableButton": "Enable Matter",
         "disableButton": "Disable Matter",
         "downloadNodesJson": "Download Nodes JSON"

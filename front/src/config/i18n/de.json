@@ -1829,7 +1829,7 @@
         "actionsLabel": "Aktionen",
         "decommissionButton": "Stilllegen",
         "noNodesFound": "Keine Matter-Knoten gefunden",
-        "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es, bevor du die Integration verwendest.",
+        "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es in \"Einstellungen\" bevor du die Integration verwendest.",
         "enableButton": "Matter aktivieren",
         "disableButton": "Matter deaktivieren",
         "downloadNodesJson": "Knoten-JSON herunterladen"
