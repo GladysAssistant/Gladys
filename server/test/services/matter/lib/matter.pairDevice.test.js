@@ -133,13 +133,13 @@ describe('Matter.pairDevice', () => {
       }),
     };
     await matterHandler.pairDevice(pairingCode);
-    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.devices).to.have.lengthOf(2);
     expect(matterHandler.devices[0].params).to.have.lengthOf(1);
     expect(matterHandler.devices[0].params[0]).to.have.property('name', 'UNIQUE_ID');
     expect(matterHandler.devices[0].params[0]).to.have.property('value', 'uniqueId');
-    expect(matterHandler.devices[0].features).to.have.lengthOf(2);
+    expect(matterHandler.devices[0].features).to.have.lengthOf(1);
     expect(matterHandler.nodesMap.size).to.equal(1);
-    expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label)');
+    expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label) 2');
   });
   it('should not pair a device, commissioning failed', async () => {
     const pairingCode = '1450-134-1614';
