@@ -57,6 +57,10 @@ describe('Matter.getNodes', () => {
             },
           },
         },
+        {
+          nodeId: 1235n,
+          deviceData: undefined,
+        },
       ]),
     };
     const nodes = await matterHandler.getNodes();

@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const logger = require('../../../utils/logger');
 
 const convertDevice = (device) => {
   const clusterClients = [];
@@ -35,7 +36,14 @@ const convertDevice = (device) => {
  */
 async function getNodes() {
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
-  return Promise.mapSeries(nodeDetails, async (nodeDetail) => {
+  const filteredNodeDetails = nodeDetails.filter((nodeDetail) => {
+    if (!nodeDetail.deviceData) {
+      logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data`);
+      return false;
+    }
+    return true;
+  });
+  return Promise.mapSeries(filteredNodeDetails, async (nodeDetail) => {
     const node = await this.commissioningController.getNode(nodeDetail.nodeId);
     const devices = node.getDevices();
     return {

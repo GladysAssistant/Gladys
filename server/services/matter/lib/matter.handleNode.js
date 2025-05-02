@@ -100,6 +100,10 @@ const handleDevice = async (
  */
 async function handleNode(nodeDetail) {
   logger.info(`Matter: Handling node ${nodeDetail.nodeId}`);
+  if (!nodeDetail.deviceData) {
+    logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data`);
+    return;
+  }
   const node = await this.commissioningController.getNode(nodeDetail.nodeId);
   this.nodesMap.set(nodeDetail.nodeId, node);
   const devices = node.getDevices();

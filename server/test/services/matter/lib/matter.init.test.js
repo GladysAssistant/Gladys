@@ -102,6 +102,10 @@ describe('Matter.init', () => {
             },
           },
         },
+        {
+          nodeId: 12346n,
+          deviceData: undefined,
+        },
       ]),
       getNode: fake.resolves({
         getDevices: fake.returns([
