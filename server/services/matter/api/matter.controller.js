@@ -7,8 +7,12 @@ module.exports = function MatterController(matterHandler) {
    * @apiGroup Matter
    */
   async function pairDevice(req, res) {
-    await matterHandler.pairDevice(req.body.pairing_code);
-    res.json({ success: true });
+    try {
+      await matterHandler.pairDevice(req.body.pairing_code);
+      res.json({ success: true });
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
   }
 
   /**

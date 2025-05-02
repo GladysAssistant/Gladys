@@ -46,6 +46,25 @@ describe('MatterController', () => {
     assert.calledOnce(matterHandler.pairDevice);
     assert.calledWith(res.json, { success: true });
   });
+  it('should return an error when pairing a device', async () => {
+    const req = {
+      body: {
+        pairing_code: '123456',
+      },
+    };
+    const resJson = {
+      json: fake.returns(null),
+    };
+    const res = {
+      status: fake.returns(resJson),
+    };
+
+    matterHandler.pairDevice = fake.rejects(new Error('Pairing failed'));
+    await controller['post /api/v1/service/matter/pair-device'].controller(req, res);
+    assert.calledOnce(matterHandler.pairDevice);
+    assert.calledWith(res.status, 400);
+    assert.calledWith(resJson.json, { error: 'Pairing failed' });
+  });
   it('should get devices', async () => {
     const req = {};
     const res = {

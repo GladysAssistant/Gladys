@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { route } from 'preact-router';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
+import style from './style.css';
 import MatterPage from './MatterPage';
 
 class MatterDiscoverPage extends Component {
@@ -37,7 +38,7 @@ class MatterDiscoverPage extends Component {
 
   handleSubmit = async e => {
     e.preventDefault();
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: null });
 
     try {
       await this.props.httpClient.post('/api/v1/service/matter/pair-device', {
@@ -46,6 +47,9 @@ class MatterDiscoverPage extends Component {
       route('/dashboard/integration/device/matter');
     } catch (e) {
       console.error(e);
+      if (e.response && e.response.data && e.response.data.error) {
+        this.setState({ error: e.response.data.error });
+      }
     }
 
     this.setState({ loading: false });
@@ -75,37 +79,59 @@ class MatterDiscoverPage extends Component {
               <Text id="integration.matter.discover.description" />
             </div>
 
-            <form onSubmit={this.handleSubmit}>
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="integration.matter.discover.pairingCodeLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
-                    value={this.state.pairingCode}
-                    onInput={e => this.setState({ pairingCode: e.target.value })}
-                    pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})"
-                    required
-                  />
-                </Localizer>
-                <small class="form-text text-muted">
-                  <Text id="integration.matter.discover.pairingCodeHelp" />
-                </small>
-              </div>
+            {this.state.error && (
+              <>
+                <div class="alert alert-danger">
+                  <Text id="integration.matter.discover.error" />
+                </div>
+                <div class="alert alert-danger">{this.state.error}</div>
+              </>
+            )}
 
-              <div class="form-group">
-                <button
-                  type="submit"
-                  class={cx('btn btn-primary', { loading: this.state.loading })}
-                  disabled={this.state.loading}
-                >
-                  <Text id="integration.matter.discover.addButton" />
-                </button>
+            <div class={this.state.loading ? 'dimmer active' : 'dimmer'}>
+              {this.state.loading && (
+                <div>
+                  <div class="loader" />
+                  <div class={style.loadingText}>
+                    <Text id="integration.matter.discover.loading" />
+                  </div>
+                </div>
+              )}
+              <div class="dimmer-content">
+                <form onSubmit={this.handleSubmit}>
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.matter.discover.pairingCodeLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
+                        value={this.state.pairingCode}
+                        onInput={e => this.setState({ pairingCode: e.target.value })}
+                        pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})"
+                        required
+                        disabled={!this.state.matterEnabled}
+                      />
+                    </Localizer>
+                    <small class="form-text text-muted">
+                      <Text id="integration.matter.discover.pairingCodeHelp" />
+                    </small>
+                  </div>
+
+                  <div class="form-group">
+                    <button
+                      type="submit"
+                      class={cx('btn btn-primary', { loading: this.state.loading })}
+                      disabled={this.state.loading || !this.state.matterEnabled}
+                    >
+                      <Text id="integration.matter.discover.addButton" />
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </MatterPage>

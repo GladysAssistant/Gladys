@@ -1836,7 +1836,9 @@
         "pairingCodeLabel": "Code d'appairage",
         "pairingCodePlaceholder": "1234-567-9101 ou 12345679101",
         "pairingCodeHelp": "Entrez le code d'appairage à 11 chiffres fourni par votre appareil Matter",
-        "addButton": "Ajouter à Gladys"
+        "addButton": "Ajouter à Gladys",
+        "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
       },
       "settings": {
         "title": "Paramètres Matter",
