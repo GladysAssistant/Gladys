@@ -1,7 +1,6 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-
-const { fake } = sinon;
+const { fake, assert } = sinon;
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -24,6 +23,21 @@ describe('Matter.decommission', () => {
       external_id: 'matter:1234:1',
     });
     await matterHandler.decommission(1234n);
+    expect(matterHandler.devices).to.have.lengthOf(0);
+    expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+  it('should force decommission a device and remove it from the nodes map', async () => {
+    matterHandler.nodesMap.set(1234n, {
+      decommission: fake.rejects('Impossible to decommission'),
+    });
+    matterHandler.devices.push({
+      external_id: 'matter:1234:1',
+    });
+    matterHandler.commissioningController = {
+      removeNode: fake.resolves(null),
+    };
+    await matterHandler.decommission(1234n);
+    assert.calledOnce(matterHandler.commissioningController.removeNode);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
   });
