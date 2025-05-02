@@ -30,8 +30,8 @@ async function pairDevice(pairingCode) {
       },
     },
     passcode: pairingCodeCodec.passcode,
-    commissioningTimeoutSeconds: 60,
-    commissioningAttempts: 3,
+    commissioningTimeoutSeconds: 90,
+    commissioningAttempts: 4,
     commissioningRetryDelayMs: 1000,
   };
 
