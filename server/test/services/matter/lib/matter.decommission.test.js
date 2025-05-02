@@ -1,5 +1,6 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
+
 const { fake, assert } = sinon;
 
 const MatterHandler = require('../../../../services/matter/lib');
