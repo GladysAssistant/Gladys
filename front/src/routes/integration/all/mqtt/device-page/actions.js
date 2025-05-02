@@ -63,10 +63,10 @@ function createActions(store) {
       store.setState(newState);
     },
     async search(state, e) {
-      store.setState({
+      await store.setState({
         mqttDeviceSearch: e.target.value
       });
-      await actions.getMqttDevices(store.getState());
+      actions.debouncedGetMqttDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
@@ -127,7 +127,7 @@ function createActions(store) {
       });
     }
   };
-  actions.debouncedSearch = debounce(actions.search, 200);
+  actions.debouncedGetMqttDevices = debounce(actions.getMqttDevices, 200);
   return Object.assign({}, houseActions, integrationActions, actions);
 }
 
