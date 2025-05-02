@@ -49,7 +49,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       logger.info(`Matter pairing - Cluster client ${clusterIndex}`);
       if (clusterIndex === OnOff.Complete.id) {
         gladysDevice.features.push({
-          name: 'on_off',
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
           read_only: false,
@@ -61,7 +61,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === OccupancySensing.Complete.id) {
         gladysDevice.features.push({
-          name: 'occupancy',
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
           category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
           read_only: true,
@@ -73,7 +73,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === IlluminanceMeasurement.Complete.id) {
         gladysDevice.features.push({
-          name: 'illuminance',
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
           category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
@@ -86,7 +86,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === TemperatureMeasurement.Complete.id) {
         gladysDevice.features.push({
-          name: 'Temperature',
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
@@ -99,7 +99,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === WindowCovering.Complete.id) {
         gladysDevice.features.push({
-          name: 'Window Cover Position',
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Position)`,
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           read_only: false,
@@ -111,7 +111,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 100,
         });
         gladysDevice.features.push({
-          name: 'Window Cover State',
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           read_only: false,

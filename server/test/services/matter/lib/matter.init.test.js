@@ -31,26 +31,61 @@ describe('Matter.init', () => {
 
     // On/Off
     clusterClients.set(6, {
+      id: 6,
+      name: 'OnOff',
+      endpointId: 1,
+      attributes: {
+        onOff: {},
+      },
+      commands: {},
       addOnOffAttributeListener: fake.returns(null),
     });
 
     // Occupancy
     clusterClients.set(1030, {
+      id: 1030,
+      name: 'OccupancySensing',
+      endpointId: 1,
+      attributes: {
+        occupancy: {},
+      },
+      commands: {},
       addOccupancyAttributeListener: fake.returns(null),
     });
 
     // Illuminance
     clusterClients.set(1024, {
+      id: 1024,
+      name: 'IlluminanceMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
     // Temperature sensor
     clusterClients.set(1026, {
+      id: 1026,
+      name: 'TemperatureMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
     // Window Shutters
     clusterClients.set(258, {
+      id: 258,
+      name: 'WindowCovering',
+      endpointId: 1,
+      attributes: {
+        currentPositionLiftPercent100ths: {},
+      },
+      commands: {},
       addCurrentPositionLiftPercent100thsAttributeListener: fake.returns(null),
     });
 
@@ -125,7 +160,7 @@ describe('Matter.init', () => {
         should_poll: false,
         features: [
           {
-            name: 'on_off',
+            name: 'OnOff - 1',
             category: 'switch',
             type: 'binary',
             read_only: false,
@@ -136,7 +171,7 @@ describe('Matter.init', () => {
             max: 1,
           },
           {
-            name: 'occupancy',
+            name: 'OccupancySensing - 1',
             category: 'motion-sensor',
             type: 'binary',
             read_only: true,
@@ -147,7 +182,7 @@ describe('Matter.init', () => {
             max: 1,
           },
           {
-            name: 'illuminance',
+            name: 'IlluminanceMeasurement - 1',
             category: 'light-sensor',
             type: 'decimal',
             read_only: true,
@@ -159,7 +194,7 @@ describe('Matter.init', () => {
             max: 6553,
           },
           {
-            name: 'Temperature',
+            name: 'TemperatureMeasurement - 1',
             category: 'temperature-sensor',
             type: 'decimal',
             read_only: true,
@@ -171,7 +206,7 @@ describe('Matter.init', () => {
             max: 200,
           },
           {
-            name: 'Window Cover Position',
+            name: 'WindowCovering - 1 (Position)',
             category: 'shutter',
             type: 'position',
             read_only: false,
@@ -183,7 +218,7 @@ describe('Matter.init', () => {
             max: 100,
           },
           {
-            name: 'Window Cover State',
+            name: 'WindowCovering - 1 (State)',
             category: 'shutter',
             type: 'state',
             read_only: false,
@@ -205,7 +240,7 @@ describe('Matter.init', () => {
         should_poll: false,
         features: [
           {
-            name: 'on_off',
+            name: 'OnOff - 1',
             category: 'switch',
             type: 'binary',
             read_only: false,
@@ -216,7 +251,7 @@ describe('Matter.init', () => {
             max: 1,
           },
           {
-            name: 'occupancy',
+            name: 'OccupancySensing - 1',
             category: 'motion-sensor',
             type: 'binary',
             read_only: true,
@@ -227,7 +262,7 @@ describe('Matter.init', () => {
             max: 1,
           },
           {
-            name: 'illuminance',
+            name: 'IlluminanceMeasurement - 1',
             category: 'light-sensor',
             type: 'decimal',
             read_only: true,
@@ -239,7 +274,7 @@ describe('Matter.init', () => {
             max: 6553,
           },
           {
-            name: 'Temperature',
+            name: 'TemperatureMeasurement - 1',
             category: 'temperature-sensor',
             type: 'decimal',
             read_only: true,
@@ -251,7 +286,7 @@ describe('Matter.init', () => {
             max: 200,
           },
           {
-            name: 'Window Cover Position',
+            name: 'WindowCovering - 1 (Position)',
             category: 'shutter',
             type: 'position',
             read_only: false,
@@ -263,7 +298,7 @@ describe('Matter.init', () => {
             max: 100,
           },
           {
-            name: 'Window Cover State',
+            name: 'WindowCovering - 1 (State)',
             category: 'shutter',
             type: 'state',
             read_only: false,
