@@ -115,6 +115,20 @@ describe('Matter.pairDevice', () => {
               },
             ],
           },
+          {
+            id: 'device-2',
+            name: 'Test Device 2',
+            number: 2,
+            clusterClients: bridgeClusterClients,
+            childEndpoints: [
+              {
+                id: 'child-endpoint-2',
+                name: 'Child Endpoint 2',
+                number: 2,
+                clusterClients,
+              },
+            ],
+          },
         ]),
       }),
     };
@@ -123,6 +137,7 @@ describe('Matter.pairDevice', () => {
     expect(matterHandler.devices[0].params).to.have.lengthOf(1);
     expect(matterHandler.devices[0].params[0]).to.have.property('name', 'UNIQUE_ID');
     expect(matterHandler.devices[0].params[0]).to.have.property('value', 'uniqueId');
+    expect(matterHandler.devices[0].features).to.have.lengthOf(2);
     expect(matterHandler.nodesMap.size).to.equal(1);
     expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label)');
   });

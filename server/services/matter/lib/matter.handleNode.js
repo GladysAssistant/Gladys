@@ -1,6 +1,9 @@
 const Promise = require('bluebird');
 // eslint-disable-next-line import/no-unresolved
 const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');
+
+const logger = require('../../../utils/logger');
+const { getDeviceParam } = require('../../../utils/device');
 const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 
 const handleDevice = async (
@@ -71,7 +74,21 @@ const handleDevice = async (
   // to avoid bloating Gladys
   if (gladysDevice.features.length > 0) {
     listenToStateChange(nodeId, newDevicePath, device);
-    devices.push(gladysDevice);
+
+    // Find existing device with same unique_id
+    const existingDevice = devices.find((d) => {
+      // Find the unique_id of the device in the list
+      const uniqueIdParam = getDeviceParam(d, 'UNIQUE_ID');
+      // If the unique_id matches, we return true
+      return uniqueIdParam && childInformations.uniqueId && uniqueIdParam === childInformations.uniqueId;
+    });
+
+    if (existingDevice) {
+      // Update existing device features only
+      existingDevice.features = [...existingDevice.features, ...gladysDevice.features];
+    } else {
+      devices.push(gladysDevice);
+    }
   }
 
   if (device.childEndpoints) {
@@ -97,11 +114,13 @@ const handleDevice = async (
  * await handleNode(nodeDetail);
  */
 async function handleNode(nodeDetail) {
+  logger.info(`Matter: Handling node ${nodeDetail.nodeId}`);
   const node = await this.commissioningController.getNode(nodeDetail.nodeId);
   this.nodesMap.set(nodeDetail.nodeId, node);
   const devices = node.getDevices();
   const boundListenToStateChange = this.listenToStateChange.bind(this);
   await Promise.each(devices, async (device) => {
+    logger.debug(`Matter: Handling device ${device.number}`);
     await handleDevice(
       nodeDetail.nodeId,
       nodeDetail.deviceData.basicInformation,
