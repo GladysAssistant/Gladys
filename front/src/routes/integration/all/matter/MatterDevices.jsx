@@ -24,7 +24,7 @@ class MatterDevices extends Component {
       matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map()
     };
-    this.debouncedSearch = debounce(this.search, 200).bind(this);
+    this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
   }
 
   init = async () => {
@@ -160,7 +160,7 @@ class MatterDevices extends Component {
     await this.setState({
       search: e.target.value
     });
-    this.getMatterDevices();
+    this.debouncedGetMatterDevices();
     // No need to call getPairedDevices here as we filter them client-side in render
   };
 
@@ -225,7 +225,7 @@ class MatterDevices extends Component {
                 <CardFilter
                   changeOrderDir={this.changeOrderDir}
                   orderValue={orderDir}
-                  search={this.debouncedSearch}
+                  search={this.search}
                   searchValue={search}
                   searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
                 />
