@@ -37,7 +37,7 @@ const EditScenePage = ({ children, ...props }) => (
 
               <div class="col-4">
                 {props.askDeleteScene && (
-                  <div class="d-flex flex-column flex-lg-row align-items-center text-right">
+                  <div class="d-none d-md-flex flex-column flex-lg-row align-items-center text-right">
                     <div class="ml-auto mb-2">
                       <Text id="editScene.deleteText" />
                     </div>
@@ -55,13 +55,16 @@ const EditScenePage = ({ children, ...props }) => (
                 {!props.askDeleteScene && (
                   <div class="text-right">
                     <button onClick={props.duplicateScene} className="btn btn-outline-primary mb-0 mb-sm-2 mb-lg-0">
-                      <span class="d-none d-sm-inline-block">
+                      <span class="d-none d-md-inline-block">
                         <Text id="editScene.duplicateButton" />
                       </span>{' '}
                       <i class="fe fe-copy" />
                     </button>
-                    <button onClick={props.askDeleteCurrentScene} className="btn btn-outline-danger ml-2">
-                      <span class="d-none d-sm-inline-block">
+                    <button
+                      onClick={props.askDeleteCurrentScene}
+                      className="btn btn-outline-danger ml-2 mb-0 mb-sm-2 mb-lg-0"
+                    >
+                      <span class="d-none d-md-inline-block">
                         <Text id="editScene.deleteButton" />
                       </span>{' '}
                       <i class="fe fe-trash" />
@@ -70,6 +73,25 @@ const EditScenePage = ({ children, ...props }) => (
                 )}
               </div>
               <div class="col-12 text-muted">{props.scene.description && <span>{props.scene.description}</span>}</div>
+
+              {/* Mobile delete confirmation - only visible on small screens */}
+              {props.askDeleteScene && (
+                <div class="col-12 d-md-none mt-3">
+                  <div class="d-flex flex-column align-items-center text-center">
+                    <div class="mb-2">
+                      <Text id="editScene.deleteText" />
+                    </div>
+                    <div>
+                      <button onClick={props.deleteScene} className="btn btn-outline-danger mx-1 mb-2">
+                        <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
+                      </button>
+                      <button onClick={props.cancelDeleteCurrentScene} className="btn btn-outline-secondary mx-1 mb-2">
+                        <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div>
