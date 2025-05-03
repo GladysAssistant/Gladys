@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import SignupLayout from '../layout';
 import ConfigureHouseTab from './ConfigureHouseTab';
 import actions from '../../../actions/signup/signupConfigureHouse';
-import 'leaflet/dist/leaflet.css';
 
 class ConfigureHouse extends Component {
   componentWillMount() {
