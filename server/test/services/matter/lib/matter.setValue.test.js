@@ -245,6 +245,11 @@ describe('Matter.setValue', () => {
     };
     clusterClients.set(8, clusterClient);
 
+    const onOff = {
+      on: fake.resolves(null),
+    };
+    clusterClients.set(6, onOff);
+
     matterHandler.nodesMap.set(12345n, {
       isConnected: false,
       connect: fake.resolves(null),
@@ -264,13 +269,14 @@ describe('Matter.setValue', () => {
     await matterHandler.setValue(gladysDevice, gladysFeature, value);
     assert.calledWith(clusterClient.moveToLevel, {
       level: value,
-      transitionTime: 1,
+      transitionTime: null,
       optionsMask: {
         coupleColorTempToLevel: false,
         executeIfOff: true,
       },
       optionsOverride: {},
     });
+    assert.calledOnce(onOff.on);
   });
   it('should control a light color', async () => {
     const gladysDevice = {
@@ -290,6 +296,10 @@ describe('Matter.setValue', () => {
       moveToHueAndSaturation: fake.resolves(null),
     };
     clusterClients.set(768, clusterClient);
+    const onOff = {
+      on: fake.resolves(null),
+    };
+    clusterClients.set(6, onOff);
 
     matterHandler.nodesMap.set(12345n, {
       isConnected: false,
@@ -311,12 +321,13 @@ describe('Matter.setValue', () => {
     assert.calledWith(clusterClient.moveToHueAndSaturation, {
       hue: 100,
       saturation: 41,
-      transitionTime: 1,
+      transitionTime: null,
       optionsMask: {
         executeIfOff: true,
       },
       optionsOverride: {},
     });
+    assert.calledOnce(onOff.on);
   });
   it('should return an error, no node found', async () => {
     const gladysDevice = {

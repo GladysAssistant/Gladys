@@ -126,15 +126,20 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
   ) {
     const levelControl = targetDevice.clusterClients.get(LevelControl.Complete.id);
+    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
     await levelControl.moveToLevel({
       level: value,
-      transitionTime: 1,
+      transitionTime: null,
       optionsMask: {
         coupleColorTempToLevel: false,
         executeIfOff: true,
       },
       optionsOverride: {},
     });
+    // If the value is more than 0, we need to turn on the light
+    if (value > 0) {
+      await onOff.on();
+    }
   }
 
   // Handle light color
@@ -143,6 +148,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
   ) {
     const colorControl = targetDevice.clusterClients.get(ColorControl.Complete.id);
+    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
     const [hue, saturation] = intToHsb(value);
 
     // Convert from standard HSB ranges to Matter ranges
@@ -154,12 +160,14 @@ async function setValue(gladysDevice, gladysFeature, value) {
     await colorControl.moveToHueAndSaturation({
       hue: matterHue,
       saturation: matterSaturation,
-      transitionTime: 1,
+      transitionTime: null,
       optionsMask: {
         executeIfOff: true,
       },
       optionsOverride: {},
     });
+    // If the user changes the color, we needs to turn on the light
+    await onOff.on();
   }
 }
 
