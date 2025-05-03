@@ -1,0 +1,108 @@
+[
+  {
+    "name": "Relais Test",
+    "external_id": "netatmo:70:ee:50:xx:xx:xx",
+    "selector": "netatmo:70:ee:50:xx:xx:xx",
+    "model": "NAPlug",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Link Wifi quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Relais Test connected boiler",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:plug_connected_boiler",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:plug_connected_boiler",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[\"01:00:00:xx:xx:xx\",\"02:00:00:xx:xx:xx\"]"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "1234567890"
+      },
+      {
+        "name": "room_name",
+        "value": "Garage Test"
+      }
+    ],
+    "deviceNetatmo": {
+      "id": "70:ee:50:xx:xx:xx",
+      "type": "NAPlug",
+      "firmware_revision": 123,
+      "rf_strength": 70,
+      "wifi_strength": 45,
+      "name": "Relais Test",
+      "setup_date": 1580000000,
+      "room_id": "1234567890",
+      "modules_bridged": ["01:00:00:xx:xx:xx", "02:00:00:xx:xx:xx"],
+      "_id": "70:ee:50:xx:xx:xx",
+      "last_setup": 1580000000,
+      "firmware": 123,
+      "last_status_store": 1600000000,
+      "plug_connected_boiler": false,
+      "wifi_status": 50,
+      "last_bilan": { "y": 2022, "m": 6 },
+      "station_name": "Relais Test",
+      "place": {
+        "altitude": 50,
+        "city": "Ville Test",
+        "continent": "Europe",
+        "country": "FR",
+        "country_name": "France",
+        "location": [1.234, 2.345],
+        "street": "Rue de Test",
+        "timezone": "Europe/Paris",
+        "trust_location": true
+      },
+      "udp_conn": true,
+      "last_plug_seen": 1600000000,
+      "home": "5e1xxxxxxxxxxxxxxxxx",
+      "room": {
+        "id": "1234567890",
+        "name": "Garage Test",
+        "type": "garage",
+        "module_ids": ["01:00:00:xx:xx:xx"]
+      },
+      "plug": null,
+      "categoryAPI": "Energy",
+      "apiNotConfigured": true
+    }
+  }
+]

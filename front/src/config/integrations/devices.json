@@ -94,5 +94,10 @@
     "key": "airplay",
     "link": "airplay",
     "img": "/assets/integrations/cover/airplay.jpg"
+  },
+  {
+    "key": "tessie",
+    "link": "tessie",
+    "img": "/assets/integrations/cover/tessie.jpg"
   }
 ]
