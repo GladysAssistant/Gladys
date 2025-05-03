@@ -6,6 +6,7 @@ const {
   WindowCovering,
   LevelControl,
   ColorControl,
+  RelativeHumidityMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -161,6 +162,19 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 6579300,
           });
         }
+      } else if (clusterIndex === RelativeHumidityMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
+          category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
       } else {
         logger.debug(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }

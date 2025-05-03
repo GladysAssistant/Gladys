@@ -119,6 +119,18 @@ describe('Matter.init', () => {
       getMaxLevelAttribute: fake.resolves(100),
     });
 
+    // Relative humidity measurement
+    clusterClients.set(1029, {
+      id: 1029,
+      name: 'RelativeHumidityMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -285,6 +297,18 @@ describe('Matter.init', () => {
             min: 0,
             max: 100,
           },
+          {
+            name: 'RelativeHumidityMeasurement - 1',
+            category: 'humidity-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'percent',
+            external_id: 'matter:12345:1:1029',
+            selector: 'matter:12345:1:1029',
+            min: 0,
+            max: 100,
+          },
         ],
         params: [],
       },
@@ -384,6 +408,18 @@ describe('Matter.init', () => {
             has_feedback: true,
             external_id: 'matter:12345:1:child_endpoint:2:8',
             selector: 'matter:12345:1:child_endpoint:2:8',
+            min: 0,
+            max: 100,
+          },
+          {
+            name: 'RelativeHumidityMeasurement - 1',
+            category: 'humidity-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'percent',
+            external_id: 'matter:12345:1:child_endpoint:2:1029',
+            selector: 'matter:12345:1:child_endpoint:2:1029',
             min: 0,
             max: 100,
           },

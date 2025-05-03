@@ -6,6 +6,7 @@ const {
   WindowCovering,
   LevelControl,
   ColorControl,
+  RelativeHumidityMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
@@ -127,6 +128,17 @@ async function listenToStateChange(nodeId, devicePath, device) {
         emitColorState();
       });
     }
+  }
+
+  const relativeHumidityMeasurement = device.clusterClients.get(RelativeHumidityMeasurement.Complete.id);
+  if (relativeHumidityMeasurement) {
+    // Subscribe to RelativeHumidityMeasurement attribute changes
+    relativeHumidityMeasurement.addMeasuredValueAttributeListener((value) => {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${RelativeHumidityMeasurement.Complete.id}`,
+        state: value / 100,
+      });
+    });
   }
 }
 

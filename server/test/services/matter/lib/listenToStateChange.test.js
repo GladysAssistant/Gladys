@@ -6,6 +6,7 @@ const {
   WindowCovering,
   ColorControl,
   LevelControl,
+  RelativeHumidityMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -150,6 +151,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1026',
       state: 21.5,
+    });
+  });
+  it('should listen to state change (RelativeHumidityMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(RelativeHumidityMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(5000);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1029',
+      state: 50,
     });
   });
   it('should listen to state change (WindowCovering)', async () => {
