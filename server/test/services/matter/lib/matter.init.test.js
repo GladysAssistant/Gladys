@@ -89,6 +89,33 @@ describe('Matter.init', () => {
       addCurrentPositionLiftPercent100thsAttributeListener: fake.returns(null),
     });
 
+    // Color control
+    clusterClients.set(768, {
+      id: 768,
+      name: 'ColorControl',
+      endpointId: 1,
+      attributes: {},
+      commands: {},
+      addCurrentHueAttributeListener: fake.returns(null),
+      addCurrentSaturationAttributeListener: fake.returns(null),
+      getCurrentHueAttribute: fake.resolves(128),
+      getCurrentSaturationAttribute: fake.resolves(128),
+    });
+
+    // Level control
+    clusterClients.set(8, {
+      id: 8,
+      name: 'LevelControl',
+      endpointId: 1,
+      attributes: {},
+      commands: {},
+      supportedFeatures: {
+        lighting: true,
+      },
+      getMinLevelAttribute: fake.resolves(0),
+      getMaxLevelAttribute: fake.resolves(100),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -233,6 +260,28 @@ describe('Matter.init', () => {
             min: 0,
             max: 1,
           },
+          {
+            name: 'ColorControl - 1',
+            category: 'light',
+            type: 'color',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:768',
+            selector: 'matter:12345:1:768',
+            min: 0,
+            max: 6579300,
+          },
+          {
+            name: 'LevelControl - 1',
+            category: 'light',
+            type: 'brightness',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:8',
+            selector: 'matter:12345:1:8',
+            min: 0,
+            max: 100,
+          },
         ],
         params: [],
       },
@@ -312,6 +361,28 @@ describe('Matter.init', () => {
             selector: 'matter:12345:1:child_endpoint:2:258:state',
             min: 0,
             max: 1,
+          },
+          {
+            name: 'ColorControl - 1',
+            category: 'light',
+            type: 'color',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:child_endpoint:2:768',
+            selector: 'matter:12345:1:child_endpoint:2:768',
+            min: 0,
+            max: 6579300,
+          },
+          {
+            name: 'LevelControl - 1',
+            category: 'light',
+            type: 'brightness',
+            read_only: false,
+            has_feedback: true,
+            external_id: 'matter:12345:1:child_endpoint:2:8',
+            selector: 'matter:12345:1:child_endpoint:2:8',
+            min: 0,
+            max: 100,
           },
         ],
         params: [],

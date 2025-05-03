@@ -226,6 +226,98 @@ describe('Matter.setValue', () => {
     await matterHandler.setValue(gladysDevice, gladysFeature, COVER_STATE.STOP);
     assert.called(clusterClient.stopMotion);
   });
+  it('should control a light brightness', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+    };
+
+    const value = 150;
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      moveToLevel: fake.resolves(null),
+    };
+    clusterClients.set(8, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledWith(clusterClient.moveToLevel, {
+      level: value,
+      transitionTime: 1,
+      optionsMask: {
+        coupleColorTempToLevel: false,
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
+  });
+  it('should control a light color', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+
+    const value = 14090213;
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      moveToHueAndSaturation: fake.resolves(null),
+    };
+    clusterClients.set(768, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledWith(clusterClient.moveToHueAndSaturation, {
+      hue: 100,
+      saturation: 41,
+      transitionTime: 1,
+      optionsMask: {
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
+  });
   it('should return an error, no node found', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',

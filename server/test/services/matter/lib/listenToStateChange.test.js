@@ -4,6 +4,8 @@ const {
   IlluminanceMeasurement,
   TemperatureMeasurement,
   WindowCovering,
+  ColorControl,
+  LevelControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -165,6 +167,69 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:258:position',
       state: 84,
+    });
+  });
+  it('should listen to state change (LevelControl)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(LevelControl.Complete.id, {
+      addCurrentLevelAttributeListener: (callback) => {
+        callback(99);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:8',
+      state: 99,
+    });
+  });
+  it('should listen to state change (ColorControl)', async () => {
+    const clusterClients = new Map();
+    const promise = new Promise((resolve) => {
+      let callCount = 0;
+      const checkThatEveryThingWasCalled = () => {
+        callCount += 1;
+        if (callCount === 4) {
+          resolve();
+        }
+      };
+      clusterClients.set(ColorControl.Complete.id, {
+        addCurrentHueAttributeListener: (callback) => {
+          callback(100);
+          checkThatEveryThingWasCalled();
+        },
+        addCurrentSaturationAttributeListener: (callback) => {
+          callback(40);
+          checkThatEveryThingWasCalled();
+        },
+        getCurrentHueAttribute: () => {
+          checkThatEveryThingWasCalled();
+          return 100;
+        },
+        getCurrentSaturationAttribute: () => {
+          checkThatEveryThingWasCalled();
+          return 40;
+        },
+      });
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    // We need to make sure that we called all 4 functions before checking the events
+    await promise;
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:768',
+      state: 14090213,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:768',
+      state: 14090213,
     });
   });
 });

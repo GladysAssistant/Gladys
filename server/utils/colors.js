@@ -216,6 +216,21 @@ function xyToInt(x, y) {
 }
 
 /**
+ * @description Converts int color to HSB (Hue, Saturation, Brightness).
+ * @param {number} intColor - Color between 0 and 16777215.
+ * @returns {Array} [hue, saturation, brightness] - Hue (0-360), Saturation (0-100), Brightness (0-100).
+ * @example
+ * const [h, s, b] = intToHsb(16711680); // Red
+ * // Returns approximately [0, 100, 100]
+ */
+const intToHsb = (intColor) => {
+  // Convert int to RGB first
+  const [r, g, b] = intToRgb(intColor);
+  // Then convert RGB to HSB
+  return rgbToHsb([r, g, b]);
+};
+
+/**
  * @description Convert mired to kelvin.
  * @param {number} mired - Color temperature in mired.
  * @returns {number} Returns color in kelvin.
@@ -243,6 +258,7 @@ module.exports = {
   xyToInt,
   hsbToRgb,
   rgbToHsb,
+  intToHsb,
   miredToKelvin,
   kelvinToMired,
   kelvinToRGB,

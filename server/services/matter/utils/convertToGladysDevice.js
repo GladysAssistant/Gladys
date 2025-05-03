@@ -4,8 +4,11 @@ const {
   IlluminanceMeasurement,
   TemperatureMeasurement,
   WindowCovering,
+  LevelControl,
+  ColorControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
+const Promise = require('bluebird');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 
@@ -49,7 +52,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
   gladysDevice.name += ` ${device.number}`;
 
   if (device.clusterClients) {
-    device.clusterClients.forEach((clusterClient, clusterIndex) => {
+    await Promise.each(Array.from(device.clusterClients.entries()), async ([clusterIndex, clusterClient]) => {
       logger.info(`Matter pairing - Cluster client ${clusterIndex}`);
       if (clusterIndex === OnOff.Complete.id) {
         gladysDevice.features.push({
@@ -126,8 +129,38 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 1,
         });
+      } else if (
+        clusterIndex === LevelControl.Complete.id &&
+        clusterClient.supportedFeatures &&
+        clusterClient.supportedFeatures.lighting
+      ) {
+        const minLevel = await clusterClient.getMinLevelAttribute();
+        const maxLevel = await clusterClient.getMaxLevelAttribute();
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: minLevel,
+          max: maxLevel,
+        });
+      } else if (clusterIndex === ColorControl.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+          type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 6579300,
+        });
       } else {
-        logger.info(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
+        logger.debug(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }
     });
   }

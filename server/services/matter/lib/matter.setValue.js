@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, WindowCovering } = require('@matter/main/clusters');
+const { OnOff, WindowCovering, LevelControl, ColorControl } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
+const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
 
 /**
@@ -49,7 +50,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
   const parts = gladysDevice.external_id.split(':');
   const nodeId = BigInt(parts[1]);
 
-  logger.info(`Setting value for node ${nodeId}`);
+  logger.info(`Setting value for node ${nodeId}, value = ${value}`);
   const node = this.nodesMap.get(nodeId);
   if (!node) {
     throw new Error(`Node ${nodeId} not found`);
@@ -76,8 +77,10 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   // Connect if not already connected
   if (!node.isConnected) {
+    logger.warn(`Matter: Node ${nodeId} is not connected, connecting...`);
     node.connect();
     await node.events.initialized;
+    logger.info(`Matter: Node ${nodeId} connected.`);
   }
 
   // Handle binary device
@@ -115,6 +118,48 @@ async function setValue(gladysDevice, gladysFeature, value) {
         await windowCovering.stopMotion();
       }
     }
+  }
+
+  // Handle light level
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+  ) {
+    const levelControl = targetDevice.clusterClients.get(LevelControl.Complete.id);
+    await levelControl.moveToLevel({
+      level: value,
+      transitionTime: 1,
+      optionsMask: {
+        coupleColorTempToLevel: false,
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
+  }
+
+  // Handle light color
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
+  ) {
+    const colorControl = targetDevice.clusterClients.get(ColorControl.Complete.id);
+    const [hue, saturation] = intToHsb(value);
+
+    // Convert from standard HSB ranges to Matter ranges
+    // Matter uses hue in range 0-254, saturation in range 0-254
+    // Our HSB values are in ranges: hue (0-360), saturation (0-100), brightness (0-100)
+    const matterHue = Math.round((hue / 360) * 254);
+    const matterSaturation = Math.round((saturation / 100) * 254);
+
+    await colorControl.moveToHueAndSaturation({
+      hue: matterHue,
+      saturation: matterSaturation,
+      transitionTime: 1,
+      optionsMask: {
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
   }
 }
 
