@@ -148,17 +148,19 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: maxLevel,
         });
       } else if (clusterIndex === ColorControl.Complete.id) {
-        gladysDevice.features.push({
-          name: `${clusterClient.name} - ${clusterClient.endpointId}`,
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-          read_only: false,
-          has_feedback: true,
-          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          selector: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 6579300,
-        });
+        if (clusterClient.supportedFeatures.hueSaturation) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId}`,
+            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+            type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:color`,
+            selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:color`,
+            min: 0,
+            max: 6579300,
+          });
+        }
       } else {
         logger.debug(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }

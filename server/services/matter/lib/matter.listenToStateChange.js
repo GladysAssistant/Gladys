@@ -111,20 +111,22 @@ async function listenToStateChange(nodeId, devicePath, device) {
 
       // Emit the state change event with the integer color
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}`,
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`,
         state: intColor,
       });
     };
 
-    // Listen for hue changes
-    colorControl.addCurrentHueAttributeListener(() => {
-      emitColorState();
-    });
+    if (colorControl.supportedFeatures.hueSaturation) {
+      // Listen for hue changes
+      colorControl.addCurrentHueAttributeListener(() => {
+        emitColorState();
+      });
 
-    // Listen for saturation changes
-    colorControl.addCurrentSaturationAttributeListener(() => {
-      emitColorState();
-    });
+      // Listen for saturation changes
+      colorControl.addCurrentSaturationAttributeListener(() => {
+        emitColorState();
+      });
+    }
   }
 }
 

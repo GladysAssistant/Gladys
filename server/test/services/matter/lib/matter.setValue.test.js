@@ -294,6 +294,9 @@ describe('Matter.setValue', () => {
 
     const clusterClient = {
       moveToHueAndSaturation: fake.resolves(null),
+      supportedFeatures: {
+        hueSaturation: true,
+      },
     };
     clusterClients.set(768, clusterClient);
     const onOff = {
