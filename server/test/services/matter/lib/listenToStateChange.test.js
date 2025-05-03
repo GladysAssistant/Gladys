@@ -197,6 +197,9 @@ describe('Matter.listenToStateChange', () => {
         }
       };
       clusterClients.set(ColorControl.Complete.id, {
+        supportedFeatures: {
+          hueSaturation: true,
+        },
         addCurrentHueAttributeListener: (callback) => {
           callback(100);
           checkThatEveryThingWasCalled();
@@ -224,11 +227,11 @@ describe('Matter.listenToStateChange', () => {
     await promise;
     assert.calledTwice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'matter:1234:1:768',
+      device_feature_external_id: 'matter:1234:1:768:color',
       state: 14090213,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'matter:1234:1:768',
+      device_feature_external_id: 'matter:1234:1:768:color',
       state: 14090213,
     });
   });
