@@ -7,6 +7,7 @@ const {
   LevelControl,
   ColorControl,
   RelativeHumidityMeasurement,
+  Thermostat,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -175,6 +176,35 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 100,
         });
+      } else if (clusterIndex === Thermostat.Complete.id) {
+        if (clusterClient.supportedFeatures.heating) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Heating)`,
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:heating`,
+            selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:heating`,
+            min: -100,
+            max: 200,
+          });
+        }
+        if (clusterClient.supportedFeatures.cooling) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Cooling)`,
+            category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+            type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+            read_only: false,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:cooling`,
+            selector: `matter:${nodeId}:${devicePath}:${clusterIndex}:cooling`,
+            min: -100,
+            max: 200,
+          });
+        }
       } else {
         logger.debug(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }

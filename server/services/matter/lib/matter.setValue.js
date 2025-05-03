@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, WindowCovering, LevelControl, ColorControl } = require('@matter/main/clusters');
+const { OnOff, WindowCovering, LevelControl, ColorControl, Thermostat } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
@@ -168,6 +168,24 @@ async function setValue(gladysDevice, gladysFeature, value) {
     });
     // If the user changes the color, we needs to turn on the light
     await onOff.on();
+  }
+
+  // Handle thermostat
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
+  ) {
+    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    await thermostat.setOccupiedHeatingSetpointAttribute(value * 100);
+  }
+
+  // Handle air conditioning
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
+  ) {
+    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
   }
 }
 

@@ -7,6 +7,7 @@ const {
   ColorControl,
   LevelControl,
   RelativeHumidityMeasurement,
+  Thermostat,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -168,6 +169,46 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1029',
       state: 50,
+    });
+  });
+  it('should listen to state change (Thermostat heating)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(Thermostat.Complete.id, {
+      supportedFeatures: {
+        heating: true,
+      },
+      addOccupiedHeatingSetpointAttributeListener: (callback) => {
+        callback(2000);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:heating',
+      state: 20,
+    });
+  });
+  it('should listen to state change (Thermostat cooling)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(Thermostat.Complete.id, {
+      supportedFeatures: {
+        cooling: true,
+      },
+      addOccupiedCoolingSetpointAttributeListener: (callback) => {
+        callback(2000);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:cooling',
+      state: 20,
     });
   });
   it('should listen to state change (WindowCovering)', async () => {

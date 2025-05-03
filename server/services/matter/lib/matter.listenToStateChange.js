@@ -7,6 +7,7 @@ const {
   LevelControl,
   ColorControl,
   RelativeHumidityMeasurement,
+  Thermostat,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
@@ -139,6 +140,27 @@ async function listenToStateChange(nodeId, devicePath, device) {
         state: value / 100,
       });
     });
+  }
+
+  const thermostat = device.clusterClients.get(Thermostat.Complete.id);
+  if (thermostat) {
+    // Subscribe to thermostat attribute changes
+    if (thermostat.supportedFeatures.heating) {
+      thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:heating`,
+          state: value / 100,
+        });
+      });
+    }
+    if (thermostat.supportedFeatures.cooling) {
+      thermostat.addOccupiedCoolingSetpointAttributeListener((value) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`,
+          state: value / 100,
+        });
+      });
+    }
   }
 }
 

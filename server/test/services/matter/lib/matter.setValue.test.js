@@ -332,6 +332,82 @@ describe('Matter.setValue', () => {
     });
     assert.calledOnce(onOff.on);
   });
+  it('should control a thermostat target temperature (heating)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+    };
+
+    const value = 25;
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      setOccupiedHeatingSetpointAttribute: fake.resolves(null),
+    };
+    clusterClients.set(513, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledWith(clusterClient.setOccupiedHeatingSetpointAttribute, value * 100);
+  });
+  it('should control a thermostat target temperature (cooling)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+    };
+
+    const value = 25;
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      setOccupiedCoolingSetpointAttribute: fake.resolves(null),
+    };
+    clusterClients.set(513, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledWith(clusterClient.setOccupiedCoolingSetpointAttribute, value * 100);
+  });
   it('should return an error, no node found', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',

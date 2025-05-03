@@ -131,6 +131,24 @@ describe('Matter.init', () => {
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
+    // Thermostat
+    clusterClients.set(513, {
+      id: 513,
+      name: 'Thermostat',
+      endpointId: 1,
+      attributes: {
+        occupiedHeatingSetpoint: {},
+        occupiedCoolingSetpoint: {},
+      },
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+      },
+      commands: {},
+      addOccupiedHeatingSetpointAttributeListener: fake.returns(null),
+      addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -309,6 +327,30 @@ describe('Matter.init', () => {
             min: 0,
             max: 100,
           },
+          {
+            name: 'Thermostat - 1 (Heating)',
+            category: 'thermostat',
+            type: 'target-temperature',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:513:heating',
+            selector: 'matter:12345:1:513:heating',
+            min: -100,
+            max: 200,
+          },
+          {
+            name: 'Thermostat - 1 (Cooling)',
+            category: 'air-conditioning',
+            type: 'target-temperature',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:513:cooling',
+            selector: 'matter:12345:1:513:cooling',
+            min: -100,
+            max: 200,
+          },
         ],
         params: [],
       },
@@ -422,6 +464,30 @@ describe('Matter.init', () => {
             selector: 'matter:12345:1:child_endpoint:2:1029',
             min: 0,
             max: 100,
+          },
+          {
+            name: 'Thermostat - 1 (Heating)',
+            category: 'thermostat',
+            type: 'target-temperature',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:513:heating',
+            selector: 'matter:12345:1:child_endpoint:2:513:heating',
+            min: -100,
+            max: 200,
+          },
+          {
+            name: 'Thermostat - 1 (Cooling)',
+            category: 'air-conditioning',
+            type: 'target-temperature',
+            read_only: false,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:513:cooling',
+            selector: 'matter:12345:1:child_endpoint:2:513:cooling',
+            min: -100,
+            max: 200,
           },
         ],
         params: [],
