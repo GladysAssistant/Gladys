@@ -161,7 +161,7 @@ class NukiDeviceBox extends Component {
                     <label class="form-label">
                       <Text id="integration.nuki.device.protocolLabel" />
                     </label>
-                    
+
                     <div class="form-check form-check-inline">
                       <label class="custom-control custom-radio">
                         <input
@@ -177,7 +177,7 @@ class NukiDeviceBox extends Component {
                         </div>
                       </label>
                     </div>
-                    
+
                     <div class="form-check form-check-inline">
                       <label class="custom-control custom-radio">
                         <input
