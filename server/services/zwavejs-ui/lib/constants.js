@@ -449,8 +449,8 @@ const EXPOSES = {
         keep_history: true,
         read_only: true,
         has_feedback: false,
-      }
-    }
+      },
+    },
   },
   multilevel_sensor: {
     air_temperature: {
