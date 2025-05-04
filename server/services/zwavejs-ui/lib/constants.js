@@ -120,6 +120,14 @@ const STATES = {
       },
     ],
   },
+  meter: {
+    value: {
+      electric_a_consumed: [{ converter: (val) => val }],
+      electric_kwh_consumed: [{ converter: (val) => val }],
+      electric_v_consumed: [{ converter: (val) => val }],
+      electric_w_consumed: [{ converter: (val) => val }],
+    },
+  },
   multilevel_sensor: {
     air_temperature: [{ converter: (val) => val }],
     illuminance: [{ converter: (val) => val }],
