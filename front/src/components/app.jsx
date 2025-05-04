@@ -333,7 +333,7 @@ const AppRouter = connect(
         <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />
         <NukiMqttDiscoverPage path="/dashboard/integration/device/nuki/mqtt" />
         <NukiHttpDiscoverPage path="/dashboard/integration/device/nuki/http" />
-        
+
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
