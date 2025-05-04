@@ -400,6 +400,50 @@ const EXPOSES = {
       has_feedback: true,
     },
   },
+  meter: {
+    value: {
+      electric_a_consumed: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000,
+        keep_history: true,
+        read_only: true,
+        has_feedback: false,
+      },
+      electric_kwh_consumed: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
+        keep_history: true,
+        read_only: true,
+        has_feedback: false,
+      },
+      electric_v_consumed: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
+        unit: DEVICE_FEATURE_UNITS.VOLT,
+        min: 0,
+        max: 10000,
+        keep_history: true,
+        read_only: true,
+        has_feedback: false,
+      },
+      electric_w_consumed: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.WATT,
+        min: 0,
+        max: 1000000,
+        keep_history: true,
+        read_only: true,
+        has_feedback: false,
+      }
+    }
+  },
   multilevel_sensor: {
     air_temperature: {
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
