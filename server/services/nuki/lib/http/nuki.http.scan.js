@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { BadParameters } = require('../../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
@@ -12,6 +11,7 @@ async function scan() {
   logger.info(`Nuki : Scan for http devices`);
   try {
     const locks = await this.nukiApi.getSmartlocks();
+    logger.trace(locks);
     locks.forEach( (lock) => {
       const device = this.convertToDevice(lock);
       this.discoveredDevices[device.external_id] = device;
