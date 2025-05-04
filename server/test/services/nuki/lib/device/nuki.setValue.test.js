@@ -12,7 +12,7 @@ const mqttService = {
 };
 const gladys = {};
 
-describe('Nuki - MQTT - setValue', () => {
+describe('NukiHandler.setValue', () => {
   let nukiHandler;
 
   beforeEach(() => {
@@ -49,7 +49,44 @@ describe('Nuki - MQTT - setValue', () => {
       assert.fail('Should ends on error');
     } catch (e) {
       assert.notCalled(mqttService.device.publish);
-      expect(e.message).to.eq('Nuki device external_id is invalid: "nuki:" have no network indicator');
+      expect(e.message).to.eq('Nuki device external_id is invalid: "nuki:" have no topic indicator');
     }
+  });
+
+  it('should call mqtt handler setValue', () => {
+    const device = {
+      external_id: 'nuki:1234',
+      params: [ { name: 'protocol', value: 'mqtt' } ]
+    };
+    const feature = {
+      external_id: 'nuki:1234:button',    
+    };
+    const value = 0;
+    nukiHandler.setValue(device, feature, value);
+  });
+
+  it('should call mqtt handler setValue', () => {
+    const device = {
+      external_id: 'nuki:1234',
+      params: [ { name: 'protocol', value: 'mqtt' } ]
+    };
+    const feature = {
+      external_id: 'nuki:1234:button',    
+    };
+    const value = 1;
+    nukiHandler.setValue(device, feature, value);
+  });
+
+  
+  it('should call http handler setValue', () => {
+    const device = {
+      external_id: 'nuki:1234',
+      params: [ { name: 'protocol', value: 'mqtt' } ]
+    };
+    const feature = {
+      external_id: 'nuki:1234:button',    
+    };
+    const value = 0;
+    nukiHandler.setValue(device, feature, value);
   });
 });

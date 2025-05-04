@@ -28,11 +28,19 @@ describe('nuki.http.setValue command', () => {
     sinon.reset();
   });
 
-  it('should call setAction of the Nuki Web API', async () => {
-    const command = 'on';
+  it('should call setAction with lock of the Nuki Web API', async () => {
+    const command = 'lock';
+    const value = 0;
+    nukiHttpHandler.setValue(device, command, value);
+    assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
+    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 2);
+  });
+
+  it('should call setAction with unlock of the Nuki Web API', async () => {
+    const command = 'unlock';
     const value = 1;
     nukiHttpHandler.setValue(device, command, value);
     assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
-    
+    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 1);
   });
 });

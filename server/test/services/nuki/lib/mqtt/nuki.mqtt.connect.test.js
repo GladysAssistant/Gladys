@@ -17,7 +17,7 @@ const gladys = {
     setValue: fake.resolves(null),
   },
   device: {
-    get: fake.resolves([]),
+    get: fake.resolves([{external_id: 'nuki:398172F4'}]),
   },
   service: {
     getService: fake.returns(mqttService),
@@ -31,16 +31,18 @@ describe('nuki.mqtt.connect command', () => {
     const nuki = new NukiHandler(gladys, serviceId);
     nukiHandler = new NukiMQTTHandler(nuki);
     sinon.spy(nukiHandler, 'handleMessage');
+    sinon.spy(nukiHandler, 'subscribeDeviceTopic');
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('should connect to mqtt topic', async () => {
+  it('should connect to search mqtt topic and subscribe to specific device mqtt topic', async () => {
     await nukiHandler.connect();
     assert.calledWith(gladys.service.getService, 'mqtt');
-    assert.callCount(mqttService.device.subscribe, 1);
+    assert.callCount(mqttService.device.subscribe, 2);
     mqttService.device.subscribe.firstCall.calledWith('stat/+/+', nukiHandler.handleMessage.bind(nukiHandler));
+    assert.calledOnce(nukiHandler.subscribeDeviceTopic);
   });
 });

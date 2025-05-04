@@ -18,13 +18,14 @@ const gladys = {
 };
 
 const device = {
-  external_id: 'nuki:398172F4:button',
+  external_id: 'nuki:398172F4:button', 
 };
 
 describe('nuki.mqtt.setValue command', () => {
   let nukiHandler;
 
   beforeEach(() => {
+    sinon.reset();
     const nuki = new NukiHandler(gladys, serviceId);
     nukiHandler = new NukiMQTTHandler(nuki);
     nukiHandler.mqttService = mqttService;

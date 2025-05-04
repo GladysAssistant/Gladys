@@ -25,7 +25,7 @@ describe('Nuki - postCreate', () => {
     sinon.reset();
   });
 
-  it('postCreate', () => {
+  it('should subscribe to mqtt device topic', () => {
     const device = {
       params: [
         {
@@ -36,5 +36,18 @@ describe('Nuki - postCreate', () => {
     };
     nukiHandler.postCreate(device);
     assert.calledOnce(mockInstance.subscribeDeviceTopic);
+  });
+
+  it('should do nothing', () => {
+    const device = {
+      params: [
+        {
+          name: DEVICE_PARAM_NAME.PROTOCOL,
+          value: DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].HTTP,
+        },
+      ],
+    };
+    nukiHandler.postCreate(device);
+    assert.notCalled(mockInstance.subscribeDeviceTopic);
   });
 });
