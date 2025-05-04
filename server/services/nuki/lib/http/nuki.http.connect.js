@@ -1,5 +1,5 @@
-const logger = require('../../../../utils/logger');
 const Nuki = require('nuki-web-api');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Initialize service with dependencies and connect to devices.

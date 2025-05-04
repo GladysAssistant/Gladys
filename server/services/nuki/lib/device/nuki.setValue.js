@@ -16,7 +16,7 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" should starts with "nuki:"`);
   }
   if (!topic || topic.length === 0) {
-    throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" have no network indicator`);
+    throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" have no topic indicator`);
   }
   let command;
   value === 0 ? (command = 'lock') : (command = 'unlock');

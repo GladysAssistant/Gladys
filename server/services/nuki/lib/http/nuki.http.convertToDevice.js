@@ -18,17 +18,17 @@ const {
 function convertToDevice(message) {
   /* Sample message
   {
-    smartlockId: 18144654068,
-    accountId: 1989075864,
+    smartlockId: 12345678901,
+    accountId: 11234567890,
     type: 4,
     lmType: 0,
-    authId: 1915420675,
-    name: 'Maison',
+    authId: 6664212345,
+    name: 'MyLock',
     favorite: false,
     config: {
       name: 'Maison',
-      latitude: 48.50615,
-      longitude: 7.5245657,
+      latitude: 69.50615,
+      longitude: 42.5245657,
       capabilities: 1,
       autoUnlatch: false,
       liftUpHandle: false,
@@ -98,14 +98,14 @@ function convertToDevice(message) {
   }
 
   */
-  
 
+  logger.trace(message);
   const deviceExternalId = message.smartlockId;
   logger.trace(`Id ${deviceExternalId} `);
   delete this.discoveredDevices[deviceExternalId];
 
   const friendlyName = message.name;
-  
+
   const externalId = `nuki:${deviceExternalId}`;
   const device = {
     name: friendlyName,

@@ -18,7 +18,7 @@ const gladys = {
 };
 
 const device = {
-  external_id: 'nuki:398172F4:button', 
+  external_id: 'nuki:398172F4:button',
 };
 
 describe('nuki.mqtt.setValue command', () => {

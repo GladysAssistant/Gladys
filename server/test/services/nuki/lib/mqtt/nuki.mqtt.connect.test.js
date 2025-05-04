@@ -17,7 +17,7 @@ const gladys = {
     setValue: fake.resolves(null),
   },
   device: {
-    get: fake.resolves([{external_id: 'nuki:398172F4'}]),
+    get: fake.resolves([{ external_id: 'nuki:398172F4' }]),
   },
   service: {
     getService: fake.returns(mqttService),

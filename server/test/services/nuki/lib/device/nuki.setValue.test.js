@@ -56,10 +56,10 @@ describe('NukiHandler.setValue', () => {
   it('should call mqtt handler setValue', () => {
     const device = {
       external_id: 'nuki:1234',
-      params: [ { name: 'protocol', value: 'mqtt' } ]
+      params: [{ name: 'protocol', value: 'mqtt' }],
     };
     const feature = {
-      external_id: 'nuki:1234:button',    
+      external_id: 'nuki:1234:button',
     };
     const value = 0;
     nukiHandler.setValue(device, feature, value);
@@ -68,23 +68,22 @@ describe('NukiHandler.setValue', () => {
   it('should call mqtt handler setValue', () => {
     const device = {
       external_id: 'nuki:1234',
-      params: [ { name: 'protocol', value: 'mqtt' } ]
+      params: [{ name: 'protocol', value: 'mqtt' }],
     };
     const feature = {
-      external_id: 'nuki:1234:button',    
+      external_id: 'nuki:1234:button',
     };
     const value = 1;
     nukiHandler.setValue(device, feature, value);
   });
 
-  
   it('should call http handler setValue', () => {
     const device = {
       external_id: 'nuki:1234',
-      params: [ { name: 'protocol', value: 'mqtt' } ]
+      params: [{ name: 'protocol', value: 'mqtt' }],
     };
     const feature = {
-      external_id: 'nuki:1234:button',    
+      external_id: 'nuki:1234:button',
     };
     const value = 0;
     nukiHandler.setValue(device, feature, value);

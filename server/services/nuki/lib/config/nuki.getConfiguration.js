@@ -15,7 +15,7 @@ async function getConfiguration() {
   logger.debug('Nuki : get configuration');
   const apiKey = await this.gladys.variable.getValue(CONFIGURATION.NUKI_API_KEY, this.serviceId);
   return {
-    apiKey
+    apiKey,
   };
 }
 

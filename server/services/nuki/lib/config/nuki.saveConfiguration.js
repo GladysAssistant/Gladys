@@ -9,11 +9,9 @@ const { CONFIGURATION } = require('../utils/nuki.constants');
  * @example
  * nuki.saveConfiguration();
  */
-async function saveConfiguration({ apiKey, }) {
+async function saveConfiguration({ apiKey }) {
   logger.debug(`Nuki: save config`);
-  logger.debug(
-    `Nuki: save config with ${CONFIGURATION.NUKI_API_KEY}=${apiKey}`,
-  );
+  logger.debug(`Nuki: save config with ${CONFIGURATION.NUKI_API_KEY}=${apiKey}`);
   await this.gladys.variable.setValue(CONFIGURATION.NUKI_API_KEY, apiKey, this.serviceId);
   return null;
 }

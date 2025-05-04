@@ -1,5 +1,3 @@
-const logger = require('../../../../utils/logger');
-
 const LOCK_ACTION = 2;
 const UNLOCK_ACTION = 1;
 
@@ -13,7 +11,7 @@ const UNLOCK_ACTION = 1;
  */
 async function setValue(device, command, value) {
   let action;
-  value === 0 ? action = LOCK_ACTION : action = UNLOCK_ACTION;
+  value === 0 ? (action = LOCK_ACTION) : (action = UNLOCK_ACTION);
   const smartlockId = device.external_id.split(':')[1];
   await this.nukiApi.setAction(smartlockId, action);
 }

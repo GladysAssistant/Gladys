@@ -6,7 +6,7 @@ const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiHTTPHandler = require('../../../../../services/nuki/lib/http');
 
 const fakeNukiWebApi = {
-     setAction: fake.returns(true),
+  setAction: fake.returns(true),
 };
 
 const gladys = {};
