@@ -97,15 +97,29 @@ class MatterDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms },
+    { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
+    const nodeId = device.external_id.split(':')[1];
+    const nodeIsDisconnected = nodesIsConnected.get(nodeId) === false;
 
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">{device.name}</div>
+          <div class="card-header">
+            {device.name}
+            {nodeIsDisconnected && (
+              <div class="page-options d-flex">
+                <div class="tag tag-danger">
+                  <Text id="integration.matter.device.nodeDisconnected" />
+                  <span class="tag-addon">
+                    <i class="fe fe-wifi-off" />
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           <div
             class={cx('dimmer', {
               active: loading

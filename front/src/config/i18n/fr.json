@@ -1813,7 +1813,8 @@
         "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
         "addToGladys": "Ajouter à Gladys",
         "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
-        "replaceExisting": "Mettre à jour l'appareil existant"
+        "replaceExisting": "Mettre à jour l'appareil existant",
+        "nodeDisconnected": "Déconnecté"
       },
       "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
       "nameLabel": "Nom",

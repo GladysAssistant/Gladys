@@ -48,6 +48,7 @@ async function getNodes() {
     const devices = node.getDevices();
     return {
       node_id: nodeDetail.nodeId.toString(),
+      is_connected: node.isConnected,
       devices: devices.map((device) => {
         return convertDevice(device);
       }),

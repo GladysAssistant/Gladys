@@ -23,7 +23,8 @@ class MatterDevices extends Component {
       loading: true,
       error: null,
       matterEnabled: null,
-      devicesThatAlreadyExistButWithDifferentNodeId: new Map()
+      devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
+      nodesIsConnected: new Map()
     };
     this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
   }
@@ -70,6 +71,7 @@ class MatterDevices extends Component {
         loading: false,
         error: null
       });
+      this.getNodes();
     } catch (e) {
       console.error(e);
       this.setState({
@@ -125,6 +127,21 @@ class MatterDevices extends Component {
       });
 
       this.setState({ pairedDevices: filteredPairedDevices, devicesThatAlreadyExistButWithDifferentNodeId });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  getNodes = async () => {
+    try {
+      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
+      const nodesIsConnected = new Map();
+      nodes.forEach(node => {
+        nodesIsConnected.set(node.node_id, node.is_connected);
+      });
+      this.setState({
+        nodesIsConnected
+      });
     } catch (e) {
       console.error(e);
     }
@@ -220,7 +237,8 @@ class MatterDevices extends Component {
       pairedDevices,
       housesWithRooms,
       devicesThatAlreadyExistButWithDifferentNodeId,
-      matterEnabled
+      matterEnabled,
+      nodesIsConnected
     }
   ) {
     // Apply client-side filtering to paired devices
@@ -284,7 +302,19 @@ class MatterDevices extends Component {
                   {sortedPairedDevices.map(device => (
                     <div class="col-md-6">
                       <div class="card">
-                        <div class="card-header">{device.name || device.model}</div>
+                        <div class="card-header">
+                          {device.name || device.model}
+                          {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                            <div class="page-options d-flex">
+                              <div class="tag tag-danger">
+                                <Text id="integration.matter.device.nodeDisconnected" />
+                                <span class="tag-addon">
+                                  <i class="fe fe-wifi-off" />
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         <div class="card-body">
                           {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
                             <div class="alert alert-info">
@@ -343,6 +373,7 @@ class MatterDevices extends Component {
                         device={device}
                         deviceIndex={index}
                         refreshMatterDevices={this.init}
+                        nodesIsConnected={nodesIsConnected}
                         housesWithRooms={housesWithRooms}
                       />
                     ))

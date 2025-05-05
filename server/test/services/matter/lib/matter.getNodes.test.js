@@ -28,6 +28,7 @@ describe('Matter.getNodes', () => {
     });
     matterHandler.commissioningController = {
       getNode: fake.returns({
+        isConnected: true,
         getDevices: fake.returns([
           {
             number: 1,
@@ -68,6 +69,7 @@ describe('Matter.getNodes', () => {
     expect(nodes).to.deep.equal([
       {
         node_id: '1234',
+        is_connected: true,
         devices: [
           {
             name: 'Test Device',
