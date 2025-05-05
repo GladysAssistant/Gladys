@@ -800,8 +800,12 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
   },
   LEVEL_SENSOR: {
-    // Enum type used by the Tuya ME201WZ in Zigbee2mqtt
+    // Types used by the Tuya ME201WZ in Zigbee2mqtt
     LIQUID_STATE: 'liquid-state',
+    LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
+    LIQUID_DEPTH: 'liquid-depth',
+    LIQUID_DEPTH_MAX: 'liquid-depth-max',
+    INSTALLATION_HEIGHT: 'installation-height',
   },
 };
 

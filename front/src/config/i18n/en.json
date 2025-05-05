@@ -3109,7 +3109,11 @@
     "level-sensor": {
       "shortCategoryName": "Level sensor",
       "decimal": "Level sensor",
-      "liquid-state": "Liquid level state"
+      "liquid-state": "Liquid level state",
+      "liquid-level-percent": "Liquid level percent",
+      "liquid-depth": "Liquid depth",
+      "liquid-depth-max": "Liquid depth max",
+      "installation-height": "Installation height"
     },
     "camera": {
       "shortCategoryName": "Camera",
