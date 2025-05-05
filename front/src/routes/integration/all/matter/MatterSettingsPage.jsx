@@ -386,42 +386,45 @@ class MatterSettingsPage extends Component {
                       {nodes && nodes.length > 0 ? (
                         <div class="table-responsive">
                           {nodes.map(node => (
-                            <div class="card mb-4">
-                              <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center w-100">
-                                  <div>
-                                    <h5 class="mb-0">
-                                      {node.node_information.vendor_name} - {node.node_information.product_name}
-                                    </h5>
-                                    <small class="text-muted">
-                                      Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} | Product
-                                      ID: {node.node_information.product_id}
-                                    </small>
-                                  </div>
-                                  <div class="ms-auto">
-                                    <button
-                                      onClick={() => this.decommissionNode(node.node_id)}
-                                      class={cx('btn btn-danger btn-sm', {
-                                        loading: decommissioningNodes[node.node_id]
-                                      })}
-                                      disabled={decommissioningNodes[node.node_id]}
-                                    >
-                                      <Text id="integration.matter.settings.decommissionButton" />
-                                    </button>
+                            <div class={cx('card mb-4', { 'dimmer active': decommissioningNodes[node.node_id] })}>
+                              {decommissioningNodes[node.node_id] && <div class="loader" />}
+                              <div class="dimmer-content">
+                                <div class="card-header">
+                                  <div class="d-flex justify-content-between align-items-center w-100">
+                                    <div>
+                                      <h5 class="mb-0">
+                                        {node.node_information.vendor_name} - {node.node_information.product_name}
+                                      </h5>
+                                      <small class="text-muted">
+                                        Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} | Product
+                                        ID: {node.node_information.product_id}
+                                      </small>
+                                    </div>
+                                    <div class="ms-auto">
+                                      <button
+                                        onClick={() => this.decommissionNode(node.node_id)}
+                                        class={cx('btn btn-danger btn-sm', {
+                                          loading: decommissioningNodes[node.node_id]
+                                        })}
+                                        disabled={decommissioningNodes[node.node_id]}
+                                      >
+                                        <Text id="integration.matter.settings.decommissionButton" />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="card-body">
-                                {node.devices.map(device => (
-                                  <DeviceDisplay
-                                    device={device}
-                                    nodeId={node.node_id}
-                                    collapsedDevices={collapsedDevices}
-                                    visibleKeys={visibleKeys}
-                                    toggleDevice={this.toggleDevice}
-                                    toggleKeys={this.toggleKeys}
-                                  />
-                                ))}
+                                <div class="card-body">
+                                  {node.devices.map(device => (
+                                    <DeviceDisplay
+                                      device={device}
+                                      nodeId={node.node_id}
+                                      collapsedDevices={collapsedDevices}
+                                      visibleKeys={visibleKeys}
+                                      toggleDevice={this.toggleDevice}
+                                      toggleKeys={this.toggleKeys}
+                                    />
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           ))}
