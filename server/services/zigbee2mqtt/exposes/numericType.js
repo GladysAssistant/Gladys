@@ -944,5 +944,41 @@ module.exports = {
         max: 90,
       },
     },
+    installation_height: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.METER,
+        min: 0.1,
+        max: 4,
+      },
+    },
+    liquid_depth: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.METER,
+        min: 0,
+        max: 1000,
+      },
+    },
+    liquid_depth_max: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.METER,
+        min: 0.1,
+        max: 4,
+      },
+    },
+    liquid_level_percent: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    },
   },
 };

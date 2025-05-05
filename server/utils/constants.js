@@ -117,6 +117,13 @@ const OPENING_SENSOR_STATE = {
   CLOSE: 1,
 };
 
+// Used by the Tuya ME201WZ in Zigbee2mqtt
+const LIQUID_STATE = {
+  LOW: 0,
+  NORMAL: 1,
+  HIGH: 2,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -505,6 +512,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
   LIGHT_SENSOR: 'light-sensor',
+  LEVEL_SENSOR: 'level-sensor',
   MOTION_SENSOR: 'motion-sensor',
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
@@ -791,6 +799,10 @@ const DEVICE_FEATURE_TYPES = {
   INPUT: {
     BINARY: 'binary',
   },
+  LEVEL_SENSOR: {
+    // Enum type used by the Tuya ME201WZ in Zigbee2mqtt
+    LIQUID_STATE: 'liquid-state',
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -909,6 +921,12 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MM,
+    DEVICE_FEATURE_UNITS.CM,
+    DEVICE_FEATURE_UNITS.M,
+    DEVICE_FEATURE_UNITS.KM,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: [
     DEVICE_FEATURE_UNITS.MM,
     DEVICE_FEATURE_UNITS.CM,
     DEVICE_FEATURE_UNITS.M,
@@ -1273,6 +1291,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
+module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

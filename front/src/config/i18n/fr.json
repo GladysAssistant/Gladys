@@ -3040,6 +3040,14 @@
           "high-risk": "Élevé",
           "unknown": "Inconnu"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Faible",
+          "1": "Normal",
+          "2": "Élevé",
+          "unknown": "Inconnu"
+        }
       }
     }
   },
@@ -3097,6 +3105,11 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Capteur de niveau",
+      "decimal": "Capteur de niveau",
+      "liquid-state": "État du niveau"
     },
     "camera": {
       "shortCategoryName": "Caméra",
