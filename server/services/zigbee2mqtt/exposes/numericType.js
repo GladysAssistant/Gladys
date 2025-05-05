@@ -948,7 +948,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.METER,
+        unit: DEVICE_FEATURE_UNITS.M,
         min: 0.1,
         max: 4,
       },
@@ -957,7 +957,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.METER,
+        unit: DEVICE_FEATURE_UNITS.M,
         min: 0,
         max: 1000,
       },
@@ -966,7 +966,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.METER,
+        unit: DEVICE_FEATURE_UNITS.M,
         min: 0.1,
         max: 4,
       },
