@@ -98,6 +98,15 @@ describe('Matter.checkIpv6', () => {
           internal: true,
           scopeid: 0,
         },
+        {
+          // This address is a link-local address
+          address: 'fe80::215:5dff:fe3a:7a4e',
+          netmask: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff',
+          family: 'IPv6',
+          mac: '00:00:00:00:00:00',
+          internal: false,
+          scopeid: 0,
+        },
       ],
     });
 
