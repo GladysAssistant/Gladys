@@ -10,6 +10,7 @@ import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import { getDeviceParam } from '../../../../utils/device';
 
 class MatterDevices extends Component {
   constructor(props) {
@@ -87,7 +88,43 @@ class MatterDevices extends Component {
           !this.state.matterDevices.some(gladysDevice => gladysDevice.external_id === pairedDevice.external_id)
       );
 
-      this.setState({ pairedDevices: filteredPairedDevices });
+      const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
+
+      // We group all paired devices by unique_id (one unique id can be shared by multiple devices)
+      const pairedDevicesGroupedByUniqueId = pairedDevices.reduce((acc, pairDevice) => {
+        const pairedDeviceUniqueId = getDeviceParam(pairDevice, 'UNIQUE_ID');
+        acc[pairedDeviceUniqueId] = acc[pairedDeviceUniqueId] || [];
+        acc[pairedDeviceUniqueId].push(pairDevice);
+        return acc;
+      }, {});
+
+      // We group all devices already in Gladys by unique_id (one unique id can be shared by multiple devices)
+      const devicesGroupedByUniqueId = this.state.matterDevices.reduce((acc, device) => {
+        const deviceUniqueId = getDeviceParam(device, 'UNIQUE_ID');
+        acc[deviceUniqueId] = acc[deviceUniqueId] || [];
+        acc[deviceUniqueId].push(device);
+        return acc;
+      }, {});
+
+      Object.entries(pairedDevicesGroupedByUniqueId).forEach(([uniqueId, pairedDevices]) => {
+        // We find all devices already created with the same unique id
+        const devices = devicesGroupedByUniqueId[uniqueId];
+        if (!devices) {
+          return;
+        }
+
+        // We can only match paired device with existing device if they have exactly the same number of devices
+        if (devices.length !== pairedDevices.length) {
+          return;
+        }
+
+        // We match devices by position
+        pairedDevices.forEach((pairedDevice, index) => {
+          devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, devices[index].external_id);
+        });
+      });
+
+      this.setState({ pairedDevices: filteredPairedDevices, devicesThatAlreadyExistButWithDifferentNodeId });
     } catch (e) {
       console.error(e);
     }
