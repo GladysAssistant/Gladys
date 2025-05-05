@@ -378,7 +378,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             property_name: 'value',
             read_only: true,
             selector: 'zwavejs-ui:5:1:meter:value:electric_kwh_consumed',
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
             unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
           },
           {
