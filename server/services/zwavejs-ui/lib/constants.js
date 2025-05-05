@@ -422,7 +422,7 @@ const EXPOSES = {
       },
       electric_kwh_consumed: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
         min: 0,
         max: 1000000,
