@@ -169,8 +169,12 @@ class MatterDevices extends Component {
       const newExternalId = device.external_id;
       const oldExternalId = gladysDevice.external_id;
 
-      // Put the id of the gladys device so we replace the device
+      // Put back all the attributes of the previous device
       device.id = gladysDevice.id;
+      device.selector = gladysDevice.selector;
+      device.name = gladysDevice.name;
+      device.room = gladysDevice.room;
+
       device.features = device.features.map(f => {
         // try to find match feature to replace the external_id
         const gladysFeature = gladysDevice.features.find(gladysF => {
@@ -179,6 +183,7 @@ class MatterDevices extends Component {
         // If a matching feature is found, give the id of the feature
         if (gladysFeature) {
           f.id = gladysFeature.id;
+          f.selector = gladysFeature.selector;
         }
         return f;
       });
