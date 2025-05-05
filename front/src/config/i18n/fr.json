@@ -1814,6 +1814,8 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "deleteText": "Êtes-vous sûr(e) ?",
+    "cancelButton": "Annuler",
     "duplicateButton": "Dupliquer",
     "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
