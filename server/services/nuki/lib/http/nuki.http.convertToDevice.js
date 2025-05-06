@@ -100,8 +100,8 @@ function convertToDevice(message) {
 
   */
 
-  logger.debug(`Id ${deviceExternalId} received mqtt message :  ${message}`);
   const deviceExternalId = message.smartlockId;
+  logger.debug(`Id ${deviceExternalId} received mqtt message :  ${message}`);
   delete this.discoveredDevices[deviceExternalId];
 
   const friendlyName = message.name;

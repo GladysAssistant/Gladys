@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../utils/nuki.constants');
 
@@ -34,7 +33,6 @@ function convertToDevice(message) {
   const config = JSON.parse(message);
 
   const deviceExternalId = config.dev.ids.replace(/[[\]']+/g, '');
-  logger.trace(`Id ${deviceExternalId} `);
   delete this.discoveredDevices[deviceExternalId];
 
   const friendlyName = config.dev.mdl;

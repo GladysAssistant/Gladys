@@ -13,15 +13,11 @@ const { LOCK_STATES, TRIGGER } = require('../utils/nuki.constants');
 function handleMessage(topic, message) {
   const [main, deviceType, feature] = topic.split('/');
 
-  logger.trace(main, deviceType, feature);
-  // logger.trace(`NUKI TOPIC ${topic}`);
-  // logger.trace(`NUKI MESSAGE ${message}`);
   let device;
   if (main === 'homeassistant') {
-    logger.trace(topic, deviceType);
+    logger.debug(topic, deviceType);
     device = this.convertToDevice(message);
     this.discoveredDevices[device.external_id] = device;
-    // logger.trace(device);
     this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_MQTT_DEVICE);
   } else if (main === 'nuki') {
     let externalId;
@@ -29,7 +25,6 @@ function handleMessage(topic, message) {
 
     switch (feature) {
       case 'batteryChargeState': {
-        logger.trace(feature, message);
         externalId = `${main}:${deviceType}:battery`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
@@ -57,7 +52,6 @@ function handleMessage(topic, message) {
       case 'commandResponse': {
         // 0 = Success
         // 1-255 = Error code as described in the BLE API.
-        logger.trace(feature, message);
         if (message !== 0) {
           logger.error(`Error command response : ${message}`);
         }
@@ -77,7 +71,7 @@ function handleMessage(topic, message) {
          *    outside of a time window are not published.
          */
         const [lockAction, trigger, authId, codeId, autoLock] = message.split(',');
-        logger.trace(
+        logger.debug(
           `Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`,
         );
         const binaryValue = lockAction === 2 ? 1 : 0;

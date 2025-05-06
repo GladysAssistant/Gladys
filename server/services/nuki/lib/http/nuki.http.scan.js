@@ -11,11 +11,9 @@ async function scan() {
   logger.info(`Nuki : Scan for http devices`);
   try {
     const locks = await this.nukiApi.getSmartlocks();
-    logger.trace(locks);
     locks.forEach((lock) => {
       const device = this.convertToDevice(lock);
       this.discoveredDevices[device.external_id] = device;
-      logger.trace(device);
       this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_HTTP_DEVICE);
     });
   } catch (e) {
