@@ -4,9 +4,10 @@
  * @example
  * nukiManager.poll({}),
  */
-function poll(device) {
+async function poll(device) {
   const protocol = this.getProtocolFromDevice(device);
-  this.getHandler(protocol).getValue(device);
+  const handler = this.getHandler(protocol);
+  await handler.getValue(device);
 }
 
 module.exports = {

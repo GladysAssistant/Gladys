@@ -4,13 +4,7 @@ const { scan } = require('./nuki.http.scan');
 const { convertToDevice } = require('./nuki.http.convertToDevice');
 
 const { setValue } = require('./nuki.http.setValue');
-/*
 const { getValue } = require('./nuki.http.getValue');
-const { setValue } = require('./nuki.http.setValue');
-
-const { status } = require('./nuki.http.status');
-const { subStatus } = require('./nuki.http.subStatus');
-*/
 
 /**
  * @description Add ability to connect to Nuki HTTP devices.
@@ -31,13 +25,6 @@ NukiHTTPHandler.prototype.getDiscoveredDevices = getDiscoveredDevices;
 NukiHTTPHandler.prototype.scan = scan;
 NukiHTTPHandler.prototype.convertToDevice = convertToDevice;
 NukiHTTPHandler.prototype.setValue = setValue;
-
-/*
 NukiHTTPHandler.prototype.getValue = getValue;
 
-
-// HTTP
-NukiHTTPHandler.prototype.status = status;
-NukiHTTPHandler.prototype.subStatus = subStatus;
-*/
 module.exports = NukiHTTPHandler;

@@ -56,7 +56,6 @@ const NukiPage = ({ children }) => (
                     </span>
                     <Text id="integration.nuki.httpDiscoverTab" />
                   </Link>
-
                 </div>
               </div>
             </div>

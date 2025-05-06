@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 
 /**
@@ -114,7 +115,8 @@ function convertToDevice(message) {
     features: [],
     model: '',
     service_id: this.nukiHandler.serviceId,
-    should_poll: false,
+    should_poll: true,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_SECONDS,
     params: [
       {
         name: DEVICE_PARAM_NAME.PROTOCOL,
