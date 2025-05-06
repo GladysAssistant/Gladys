@@ -1,9 +1,10 @@
 const chai = require('chai');
+
 const { expect } = chai;
 
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const { serviceId } = require('../../mocks/consts.test');
