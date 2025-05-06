@@ -37,14 +37,17 @@ describe('nuki.http.getValue command', () => {
     sinon.reset();
   });
 
-  it('should get battery and state value through nuki web api', async () => {
+  it('should poll device values as battery or state through nuki web api and finally and update button state according to results', async () => {
     await nukiHttpHandler.getValue(device);
-    assert.calledTwice(gladys.event.emit);
+    assert.calledThrice(gladys.event.emit);
     // battery 38
     const expectedBatteryState = { device_feature_external_id: 'nuki:18144654068:battery', state: 38 };
     expect(gladys.event.emit.getCall(0).args[1]).to.deep.equal(expectedBatteryState);
-    // state 1
+    // state 1 (=locked in nuki)
     const expectedDeviceState = { device_feature_external_id: 'nuki:18144654068:state', state: 1 };
     expect(gladys.event.emit.getCall(1).args[1]).to.deep.equal(expectedDeviceState);
+    // button 0 (=off in gladys)
+    const expectedDeviceButton = { device_feature_external_id: 'nuki:18144654068:button', state: 0 };
+    expect(gladys.event.emit.getCall(2).args[1]).to.deep.equal(expectedDeviceButton);
   });
 });
