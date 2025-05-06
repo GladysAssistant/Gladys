@@ -575,7 +575,6 @@ const DEVICE_FEATURE_TYPES = {
   LOCK: {
     BINARY: 'binary',
     INTEGER: 'integer',
-    POWER: 'power',
     STATE: 'state',
   },
   CAMERA: {

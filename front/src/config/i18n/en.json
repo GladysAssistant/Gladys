@@ -1765,54 +1765,71 @@
     },
     "nuki": {
       "title": "nuki",
-      "description": "Control your nuki devices.",
+      "description": "Control your Nuki devices.",
       "deviceTab": "Devices",
-      "discoverTab": "Discover nuki",
+      "discoverTab": "Nuki Discovery",
       "setupTab": "Setup",
-      "discoverDeviceDescr": "Automatically scan nuki devices",
+      "discoverDeviceDescr": "Automatically scan for Nuki devices",
       "nameLabel": "Device Name",
-      "namePlaceholder": "Enter the name of your device",
+      "namePlaceholder": "Enter your device name",
+      "modelLabel": "Model",
       "roomLabel": "Room",
       "saveButton": "Save",
       "updateButton": "Update",
-      "alreadyCreatedButton": "Already created",
+      "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
+      "unmanagedModelButton": "Unsupported or unavailable model",
+      "mqttDiscoverTab": "MQTT Discovery",
+      "httpDiscoverTab": "Web Discovery",
       "status": {
-        "notConnected": "Gladys failed to connect to nuki cloud account, please go to ",
-        "setupPageLink": "nuki configuration page."
+        "notConnected": "Gladys failed to connect to the Nuki cloud account. More information on the ",
+        "setupPageLink": "Nuki setup page.",
+        "online": "Online",
+        "offline": "Offline"
       },
       "device": {
-        "title": "Devices in Gladys",
-        "search": "Search devices",
-        "updates": "Check updates",
+        "title": "Nuki Devices in Gladys",
+        "search": "Search Devices",
+        "updates": "Check for Updates",
         "editButton": "Edit",
-        "noDeviceFound": "No nuki device found.",
+        "noDeviceFound": "No Nuki device found. You can add devices with the following actions:",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
         "featuresLabel": "Features"
       },
       "discover": {
-        "title": "Devices detected on your nuki cloud account",
-        "description": "nuki devices are automatically discovered. Your nuki devices need to be added to your nuki cloud account before.",
-        "error": "Error discovering nuki devices. Please verify your credentials on Setup.",
-        "noDeviceFound": "No nuki device discovered.",
-        "scan": "Scan"
+        "title": "Devices detected on your Nuki cloud account",
+        "description": "Nuki devices are automatically discovered.",
+        "error": "Error discovering Nuki devices.",
+        "noDeviceFound": "No Nuki device was discovered.",
+        "scan": "Scan",
+        "mqtt": {
+          "title": "Discover Nuki Devices on MQTT",
+          "description": "Configured Nuki devices are automatically discovered on the MQTT network.",
+          "scan": "Search"
+        },
+        "http": {
+          "title": "Discover Nuki Devices on the NukiWeb cloud",
+          "description": "Configured Nuki devices are automatically discovered from your NukiWeb account.",
+          "scan": "Search"
+        }
       },
       "setup": {
-        "title": "nuki configuration",
-        "nukiDescription": "You can connect Gladys to your nuki cloud account to command the associated devices.",
-        "userLabel": "Username",
-        "userPlaceholder": "Enter nuki username",
-        "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter nuki password",
-        "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
-        "connecting": "Configuration saved. Now connecting to your nuki cloud account...",
-        "connected": "Connected to the nuki cloud account with success !",
-        "connectionError": "Error while connecting, please check your configuration."
+        "title": "Nuki Setup",
+        "nukiDescription": "You can connect Gladys to your Nuki cloud account to control associated devices.",
+        "apiKeyLabel": "API Key",
+        "apiKeyPlaceholder": "Enter your Nuki Web API key",
+        "saveLabel": "Save Configuration",
+        "error": "An error occurred while saving the configuration.",
+        "connecting": "Configuration saved. Connecting to your Nuki cloud account...",
+        "connected": "Successfully connected to the Nuki cloud account!",
+        "connectionError": "Connection error, please check your configuration."
       },
       "error": {
-        "defaultError": "There was an error saving the device.",
-        "defaultDeletionError": "There was an error deleting the device.",
-        "conflictError": "Current device is already in Gladys."
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "This device already exists in Gladys."
       }
     },
     "openai": {
@@ -3436,6 +3453,8 @@
       "play_notification": "Broadcast a notification"
     },
     "lock": {
+      "shortCategoryName": "Lock",
+      "integer": "Battery",
       "binary": "Locking",
       "state": "State"
     },

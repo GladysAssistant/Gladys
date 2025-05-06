@@ -3453,8 +3453,10 @@
       "play_notification": "Diffuser une notification"
     },
     "lock": {
-      "binary": "Vérouillage",
-      "state": "Etat"
+      "shortCategoryName": "Serrure",
+      "integer": "Batterie",
+      "binary": "Verrouillage",
+      "state": "État"
     },
     "noise-sensor": {
       "shortCategoryName": "Capteur sonore",
