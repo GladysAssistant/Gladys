@@ -1,15 +1,25 @@
-#Description
+Description
+===========
 
-This service is handling Nuki lock for Gladys Assistant (using MQTT for now) : battery, lock state, lock / unlock action.
+This service is handling Nuki lock for Gladys Assistant (using MQTT and HTTP for now) : battery, lock state, lock / unlock action.
 
 How To
-=====
+======
 
-1. Configure mqtt in Nuki app (use IP, not domain name)
+MQTT
+----
+
+1. Configure mqtt in Nuki app (use IP, not domain name) [Configure Nuki with MQTT](https://help.nuki.io/hc/fr/articles/14052016143249-Activation-et-configuration-via-l-App-Nuki "Configure Nuki with MQTT")
 2. Go in Gladys and configure service (mqtt, then nuki)
 
+HTTP
+----
+
+1. Activate and configure your Nuki Web account [Configure Nuki Web](https://help.nuki.io/hc/fr/articles/360016485718-Activer-et-d%C3%A9sactiver-un-compte-Nuki-Web#:~:text=Activez%20Nuki%20Web%20dans%20l,dans%20l'App%20de%20Nuki.  "Configure Nuki Web")
+2. Go in Gladys and configure service : API key then HTTP discovering
+
 Technical infos
-=========
+===============
 
 Folder
 ------
@@ -24,12 +34,10 @@ Resources
 ---------
 [Nuki MQTT API](https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf "Nuki MQTT API")
 
-Commands
---------
+Infos
+-----
 
-nuki.start.js
-
-nuki.stop.js
+Structure and design similar to Tasmota service : choose the right handler depending on which protocol is used.
 
 
 HANDLER
@@ -42,6 +50,11 @@ const nukiHandler = new NukiHandler(gladys, serviceId);
 MQTTHandler : NukiMqttHandler
 ```
 const nukiMQTTHandler = new NukiMQTTHandler(nukiHandler);
+```
+
+HTTPHandler : NukiMqttHandler
+```
+const nukiHTTPHandler = new NukiHTTPHandler(nukiHandler);
 ```
 
 API
@@ -59,15 +72,12 @@ controllers: NukiController(nukiHandler);
 'post /api/v1/service/nuki/discover/:protocol'
 
 
-
-
-
 Todos
 =====
 
 1. Documentation
 
-2. Real life test
+2. Real life test (Used since March 2025)
 
 3. Videos to show this working
 
@@ -85,5 +95,5 @@ Issue description ...
 Improvments
 ===========
 
-* NukiHttp implementation
-* Get the username using the nuki device
+* Matter implementation (from v4 locks)
+* Get the username using the nuki device (lock logs)
