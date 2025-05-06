@@ -4,10 +4,11 @@ const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
+ * @param {object} options - Optional configs.
  * @example
  * setValue(device, deviceFeature, 0);
  */
-async function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value, options) {
   const deviceUuid = device.external_id.split(':')[1];
   const sonosDevice = this.manager.Devices.find((d) => d.uuid === deviceUuid);
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY) {
@@ -30,7 +31,7 @@ async function setValue(device, deviceFeature, value) {
     await sonosDevice.PlayNotification({
       trackUri: value,
       onlyWhenPlaying: false,
-      volume: 45, // Set the volume for the notification (and revert back afterwards)
+      volume: options?.volume || 45, // Set the volume for the notification (and revert back afterwards)
       timeout: 20, // If the events don't work (to see when it stops playing) or if you turned on a stream,
       // it will revert back after this amount of seconds.
       delayMs: 700, // Pause between commands in ms, (when sonos fails to play sort notification sounds).

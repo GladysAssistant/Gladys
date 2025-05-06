@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../utils/constants');
 
 const mappings = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
@@ -68,6 +68,34 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
+    service: 'WindowCovering',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SHUTTER.POSITION]: {
+        characteristics: ['CurrentPosition', 'TargetPosition'],
+      },
+      [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: {
+        characteristics: ['PositionState'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    service: 'WindowCovering',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: {
+        characteristics: ['CurrentPosition', 'TargetPosition'],
+      },
+      [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: {
+        characteristics: ['PositionState'],
+      },
+    },
+  },
 };
 
-module.exports = { mappings };
+const coverStateMapping = {
+  [COVER_STATE.CLOSE]: 0,
+  [COVER_STATE.OPEN]: 1,
+  [COVER_STATE.STOP]: 2,
+};
+
+module.exports = { mappings, coverStateMapping };

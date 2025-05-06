@@ -83,6 +83,7 @@ class OnlyContinueIf extends Component {
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}
               path={props.path}
+              canDeleteCondition={props.action.conditions.length > 1}
             />
           ))}
       </div>

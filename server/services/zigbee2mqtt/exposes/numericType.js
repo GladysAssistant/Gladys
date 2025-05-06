@@ -194,6 +194,7 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.LUX,
         min: 0,
         max: 100000,
       },
@@ -274,6 +275,13 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+      },
+    },
+    rain_intensity: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.MILLI_VOLT,
       },
     },
     temperature: {

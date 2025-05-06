@@ -279,11 +279,12 @@ const EVENTS = {
     PURGE_OLD_MESSAGES: 'message.purge-old-messages',
   },
   SYSTEM: {
-    DOWNLOAD_UPGRADE: 'system.download-upgrade',
+    UPGRADE_CONTAINERS: 'system.upgrade-containers',
     CHECK_UPGRADE: 'system.check-upgrade',
     TIMEZONE_CHANGED: 'system.timezone-changed',
     VACUUM: 'system.vacuum',
     START: 'system.start',
+    WATCHTOWER_LOG: 'system.watchtower-log',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -519,6 +520,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
+  RAIN_SENSOR: 'rain-sensor',
   RISK: 'risk',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
@@ -752,6 +754,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   PRECIPITATION_SENSOR: {
     DECIMAL: 'decimal',
+    INTEGER: 'integer',
   },
   VOLUME_SENSOR: {
     DECIMAL: 'decimal',
@@ -976,6 +979,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
     DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
   ],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
   [DEVICE_FEATURE_CATEGORIES.DURATION]: [
@@ -1069,6 +1073,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
+    CONNECTED: 'authentication.connected',
   },
   GATEWAY: {
     BACKUP_UPLOAD_PROGRESS: 'gateway.backup-upload-progress',
@@ -1080,6 +1085,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
+    WATCHTOWER_LOG: 'system.watchtower-log',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1088,11 +1094,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEFT_HOME: 'user.left-home',
     BACK_HOME: 'user.back-home',
     SEEN_AT_HOME: 'user.seen-at-home',
-  },
-  UPGRADE: {
-    DOWNLOAD_PROGRESS: 'upgrade.download-progress',
-    DOWNLOAD_FINISHED: 'upgrade.download-finished',
-    DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
   LAN: {
     SCANNING: 'lan.scanning',

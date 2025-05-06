@@ -6,10 +6,11 @@ const logger = require('../../../utils/logger');
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
+ * @param {object} options - Optional configs.
  * @example
- * setValue(device, deviceFeature, 0);
+ * setValue(device, deviceFeature, 0, 30);
  */
-async function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value, options) {
   const deviceName = device.external_id.split(':')[1];
   const ipAddress = this.deviceIpAddresses.get(deviceName);
   if (!ipAddress) {
@@ -19,7 +20,7 @@ async function setValue(device, deviceFeature, value) {
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
     const client = new this.Airtunes();
     const airplayDevice = client.add(ipAddress, {
-      volume: 70,
+      volume: options?.volume || 70,
     });
     let decodeProcess;
 

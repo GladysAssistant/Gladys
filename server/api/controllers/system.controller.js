@@ -33,28 +33,15 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/system/upgrade/download
-   * @apiName getContainers
+   * @api {post} /api/v1/system/upgrade
+   * @apiName installUpgrade
    * @apiGroup System
    */
-  async function downloadUpgrade(req, res) {
-    gladys.event.emit(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, req.body.tag);
+  async function installUpgrade(req, res) {
+    gladys.event.emit(EVENTS.SYSTEM.UPGRADE_CONTAINERS);
     res.json({
       success: true,
-      message: 'Download is in progress',
-    });
-  }
-
-  /**
-   * @api {get} /api/v1/system/upgrade/download/status
-   * @apiName getContainers
-   * @apiGroup System
-   */
-  async function getUpgradeDownloadStatus(req, res) {
-    res.json({
-      error: gladys.system.downloadUpgradeError,
-      upgrade_finished: gladys.system.downloadUpgradeFinished,
-      last_event: gladys.system.downloadUpgradeLastEvent,
+      message: 'Upgrade started',
     });
   }
 
@@ -85,12 +72,11 @@ module.exports = function SystemController(gladys) {
   }
 
   return Object.freeze({
-    downloadUpgrade: asyncMiddleware(downloadUpgrade),
+    installUpgrade: asyncMiddleware(installUpgrade),
     getSystemInfos: asyncMiddleware(getSystemInfos),
     getDiskSpace: asyncMiddleware(getDiskSpace),
     getContainers: asyncMiddleware(getContainers),
     shutdown: asyncMiddleware(shutdown),
-    getUpgradeDownloadStatus: asyncMiddleware(getUpgradeDownloadStatus),
     vacuum: asyncMiddleware(vacuum),
   });
 };
