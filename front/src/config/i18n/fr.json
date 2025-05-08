@@ -1827,6 +1827,7 @@
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
     "addActionButton": "Nouvelle action",
+    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
