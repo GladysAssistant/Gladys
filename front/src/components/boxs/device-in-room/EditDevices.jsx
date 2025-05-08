@@ -7,7 +7,6 @@ import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
 import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
-import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
 class EditDevices extends Component {
   addDeviceFeature = async selectedDeviceFeatureOption => {
