@@ -248,7 +248,7 @@ const actionsFunc = {
     const image = await self.device.camera.getLiveImage(action.camera);
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
-  [ACTIONS.AI.ASK]: async (self, action, scope) => {
+  [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     let image;
     if (action.camera) {
@@ -266,11 +266,12 @@ const actionsFunc = {
       language: user.language,
       text: textWithVariables,
     };
-    await self.gateway.forwardMessageToOpenAI({
+    const { answer } = await self.gateway.forwardMessageToOpenAI({
       message,
       image,
       context: {},
     });
+    set(scope, path, { answer }, { merge: true });
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
