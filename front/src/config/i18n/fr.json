@@ -2037,14 +2037,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"

@@ -50,8 +50,8 @@ const DeviceRow = ({ children, ...props }) => {
   const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
 
   if (!elementType) {
-    // if no related components, we return nothing
-    return null;
+    // if no related components, we display the device as a sensor
+    return <SensorDeviceFeature user={props.user} device={device} deviceFeature={deviceFeature} rowName={rowName} />;
   }
 
   return createElement(elementType, { ...props, rowName });
