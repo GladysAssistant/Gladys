@@ -1819,7 +1819,7 @@
       },
       "settings": {
         "title": "Matter-Einstellungen",
-        "ipv6Enabled": "IPv6-Schnittstellen sind auf diesem Gerät verfügbar ✅",
+        "ipv6Enabled": "Eine IPv6-Schnittstelle ist auf diesem Gerät verfügbar ✅",
         "ipv6NotEnabled": "Matter benötigt IPv6, aber auf diesem Gerät wurde keine IPv6-Schnittstelle erkannt ❌",
         "description": "Aktiviere oder deaktiviere die Matter-Integration in Gladys. Wenn aktiviert, kann Gladys mit deinen Matter-Geräten kommunizieren.",
         "enableIntegration": "Matter-Integration aktivieren",
