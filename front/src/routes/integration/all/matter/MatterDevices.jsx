@@ -12,6 +12,27 @@ import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam } from '../../../../utils/device';
 
+const compareDevices = (deviceA, deviceB) => {
+  // If external_id is different, it's not the same device
+  if (deviceA.external_id !== deviceB.external_id) {
+    return false;
+  }
+  // Compare device features
+  if (deviceA.features.length !== deviceB.features.length) {
+    return false;
+  }
+  // We sort all features by external_id
+  const deviceAFeaturesExternalIdSorted = deviceA.features.map(f => f.external_id).sort();
+  const deviceBFeaturesExternalIdSorted = deviceB.features.map(f => f.external_id).sort();
+  // We compare all features external_id
+  for (let i = 0; i < deviceAFeaturesExternalIdSorted.length; i++) {
+    if (deviceAFeaturesExternalIdSorted[i] !== deviceBFeaturesExternalIdSorted[i]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -84,10 +105,11 @@ class MatterDevices extends Component {
   getPairedDevices = async () => {
     try {
       const pairedDevices = await this.props.httpClient.get('/api/v1/service/matter/paired-device');
+
       // Filter out devices that are already in Gladys
       const filteredPairedDevices = pairedDevices.filter(
-        pairedDevice =>
-          !this.state.matterDevices.some(gladysDevice => gladysDevice.external_id === pairedDevice.external_id)
+        // We compare all devices by external_id and features external_id
+        pairedDevice => !this.state.matterDevices.some(gladysDevice => compareDevices(gladysDevice, pairedDevice))
       );
 
       const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
