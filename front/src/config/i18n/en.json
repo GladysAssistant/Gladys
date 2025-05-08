@@ -1841,7 +1841,10 @@
         "milliseconds": "milliseconds",
         "seconds": "seconds",
         "minutes": "minutes",
-        "hours": "hours"
+        "hours": "hours",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "messageSend": {
         "userLabel": "User",
