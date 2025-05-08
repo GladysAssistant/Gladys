@@ -19,7 +19,7 @@ const DeviceTab = ({ children, ...props }) => (
           <CardFilter
             changeOrderDir={props.changeOrderDir}
             orderValue={props.getZigbee2mqttOrderDir}
-            search={props.debouncedSearch}
+            search={props.search}
             searchValue={props.zigbee2mqttSearch}
             searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
           />

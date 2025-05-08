@@ -1,5 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
-const { COMMANDCLASS } = require('./constants');
+const { COMMANDCLASS } = require('../lib/constants');
 
 /**
  * @description Identify a more precise category if we can.

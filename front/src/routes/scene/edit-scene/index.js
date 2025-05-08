@@ -672,6 +672,18 @@ class EditScene extends Component {
     }, 500);
   };
 
+  askDeleteCurrentScene = async () => {
+    await this.setState({
+      askDeleteScene: true
+    });
+  };
+
+  cancelDeleteCurrentScene = async () => {
+    await this.setState({
+      askDeleteScene: false
+    });
+  };
+
   deleteScene = async () => {
     this.setState({ saving: true });
     try {
@@ -1118,7 +1130,7 @@ class EditScene extends Component {
     document.removeEventListener('click', this.closeEdition, true);
   }
 
-  render(props, { saving, error, variables, scene, triggersVariables, tags }) {
+  render(props, { saving, error, variables, scene, triggersVariables, tags, askDeleteScene }) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     return (
       scene && (
@@ -1154,6 +1166,9 @@ class EditScene extends Component {
               setTags={this.setTags}
               updateSceneIcon={this.updateSceneIcon}
               addActionGroupAfter={this.addActionGroupAfter}
+              askDeleteScene={askDeleteScene}
+              askDeleteCurrentScene={this.askDeleteCurrentScene}
+              cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
             />
           </DndProvider>
         </div>

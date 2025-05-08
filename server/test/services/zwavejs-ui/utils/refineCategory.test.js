@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { refineCategory } = require('../../../../services/zwavejs-ui/lib/zwaveJSUI.refineCategory');
+const { refineCategory } = require('../../../../services/zwavejs-ui/utils/refineCategory');
 const { COMMANDCLASS } = require('../../../../services/zwavejs-ui/lib/constants');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
