@@ -2144,6 +2144,9 @@
         "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
+      },
+      "askAi": {
+        "answer": "Réponse de l'IA"
       }
     },
     "triggers": {

@@ -59,6 +59,9 @@ async function forwardMessageToOpenAI({ message, image, previousQuestions, conte
 
     classification.intent = intentTranslation[response.type];
 
+    // Add answer to classification
+    classification.answer = response.answer;
+
     // Reply with OpenAI response
     if (!disableOpenAiFirstReply.has(response.type)) {
       await this.message.reply(message, response.answer);
