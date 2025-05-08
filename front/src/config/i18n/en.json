@@ -3111,9 +3111,7 @@
       "decimal": "Level sensor",
       "liquid-state": "Liquid level state",
       "liquid-level-percent": "Liquid level percent",
-      "liquid-depth": "Liquid depth",
-      "liquid-depth-max": "Liquid depth max",
-      "installation-height": "Installation height"
+      "liquid-depth": "Liquid depth"
     },
     "camera": {
       "shortCategoryName": "Camera",

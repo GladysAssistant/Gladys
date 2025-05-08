@@ -3111,9 +3111,7 @@
       "decimal": "Füllstand",
       "liquid-state": "Flüssigkeitsstand-Status",
       "liquid-level-percent": "Flüssigkeitspegel in Prozent",
-      "liquid-depth": "Flüssigkeitstiefe",
-      "liquid-depth-max": "Maximale Flüssigkeitstiefe",
-      "installation-height": "Installationshöhe"
+      "liquid-depth": "Flüssigkeitstiefe"
     },
     "camera": {
       "shortCategoryName": "Kamera",

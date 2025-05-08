@@ -3111,9 +3111,7 @@
       "decimal": "Capteur de niveau",
       "liquid-state": "État du niveau",
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
-      "liquid-depth": "Profondeur du liquide",
-      "liquid-depth-max": "Profondeur max du liquide",
-      "installation-height": "Hauteur d'installation"
+      "liquid-depth": "Profondeur du liquide"
     },
     "camera": {
       "shortCategoryName": "Caméra",

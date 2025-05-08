@@ -944,15 +944,6 @@ module.exports = {
         max: 90,
       },
     },
-    installation_height: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
-        type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.INSTALLATION_HEIGHT,
-        unit: DEVICE_FEATURE_UNITS.M,
-        min: 0.1,
-        max: 4,
-      },
-    },
     liquid_depth: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
@@ -960,15 +951,6 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.M,
         min: 0,
         max: 1000,
-      },
-    },
-    liquid_depth_max: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
-        type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH_MAX,
-        unit: DEVICE_FEATURE_UNITS.M,
-        min: 0.1,
-        max: 4,
       },
     },
     liquid_level_percent: {

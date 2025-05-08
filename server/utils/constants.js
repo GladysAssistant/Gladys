@@ -804,8 +804,6 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_STATE: 'liquid-state',
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
-    LIQUID_DEPTH_MAX: 'liquid-depth-max',
-    INSTALLATION_HEIGHT: 'installation-height',
   },
 };
 
