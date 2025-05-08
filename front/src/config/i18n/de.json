@@ -380,7 +380,15 @@
         "on": "An",
         "off": "Aus",
         "start_date": "Startdatum: ",
-        "end_date": "Enddatum: "
+        "end_date": "Enddatum: ",
+        "aggregateFunction": "Aggregationsfunktion",
+        "aggregateFunctions": {
+          "sum": "Summe",
+          "avg": "Durchschnitt",
+          "max": "Max",
+          "min": "Min",
+          "count": "Count"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",
