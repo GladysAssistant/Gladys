@@ -213,11 +213,17 @@ const actionsFunc = {
 
     // If the value should be calculated from a formula
     if (action.evaluate_value !== undefined) {
-      value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+      try {
+        value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+      } catch (e) {
+        logger.warn(`Delay: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
     }
 
-    // We verify the wait time is a number
     if (Number.isNaN(Number(value))) {
+      logger.warn(`Delay: Value is not a number: ${value}`);
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
@@ -240,7 +246,7 @@ const actionsFunc = {
         timeToWaitMilliseconds = Math.round(valueInNumber * 1000 * 60 * 60);
         break;
       default:
-        throw new Error(`Unit ${action.unit} not recognized`);
+        throw new AbortScene(`Unit ${action.unit} not recognized`);
     }
 
     logger.debug(`Delay: Wait ${timeToWaitMilliseconds} milliseconds.`);

@@ -1,10 +1,15 @@
 const sinon = require('sinon');
 const EventEmitter = require('events');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const { ACTIONS } = require('../../../../utils/constants');
 const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
-
+const { AbortScene } = require('../../../../utils/coreErrors');
 const actionsFunc = require('../../../../lib/scene/scene.actions');
 
+chai.use(chaiAsPromised);
+
+const { assert } = chai;
 const event = new EventEmitter();
 
 describe('scene.action.delay', () => {
@@ -149,5 +154,59 @@ describe('scene.action.delay', () => {
     await clock.tickAsync(16 * 1000 + 1);
 
     await actionPromise;
+  });
+
+  it('should throw an error when evaluate_value is not a number', async () => {
+    const actionPromise = executeActions(
+      { event },
+      [
+        [
+          {
+            type: ACTIONS.TIME.DELAY,
+            unit: 'seconds',
+            evaluate_value: 'not_a_number',
+          },
+        ],
+      ],
+      {},
+    );
+
+    return assert.isRejected(actionPromise, AbortScene, 'ACTION_VALUE_NOT_A_NUMBER');
+  });
+
+  it('should throw an error when value is not a number', async () => {
+    const actionPromise = executeActions(
+      { event },
+      [
+        [
+          {
+            type: ACTIONS.TIME.DELAY,
+            unit: 'seconds',
+            value: 'not_a_number',
+          },
+        ],
+      ],
+      {},
+    );
+
+    return assert.isRejected(actionPromise, AbortScene, 'ACTION_VALUE_NOT_A_NUMBER');
+  });
+
+  it('should throw an error when unit is unknown', async () => {
+    const actionPromise = executeActions(
+      { event },
+      [
+        [
+          {
+            type: ACTIONS.TIME.DELAY,
+            unit: 'unknown_unit',
+            value: 5,
+          },
+        ],
+      ],
+      {},
+    );
+
+    return assert.isRejected(actionPromise, AbortScene, 'Unit unknown_unit not recognized');
   });
 });
