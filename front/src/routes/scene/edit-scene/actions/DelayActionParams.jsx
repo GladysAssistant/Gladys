@@ -56,6 +56,7 @@ class WaitActionParams extends Component {
                 variables={this.props.variables}
                 path={this.props.path}
                 updateText={this.handleNewEvalValue}
+                placeholder={<Text id="editScene.actionsCard.delay.inputPlaceholder" />}
               />
             </Localizer>
           </div>
