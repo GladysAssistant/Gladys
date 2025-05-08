@@ -2,11 +2,11 @@ import DeviceRow from './DeviceRow';
 import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-const hasSwitchFeature = (features, featureSelectors) => {
-  return features.find(feature => isSwitchFeature(feature, featureSelectors));
+const countLightBinaryFeature = (features, featureSelectors) => {
+  return features.filter(feature => isLightBinaryFeature(feature, featureSelectors)).length;
 };
 
-const isSwitchFeature = (feature, featureSelectors) => {
+const isLightBinaryFeature = (feature, featureSelectors) => {
   return (
     feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY &&
@@ -19,7 +19,7 @@ const DeviceCard = ({ children, ...props }) => {
   const { boxTitle, roomLightStatus, loading, deviceFeatures = [], box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
 
-  const hasBinaryLightDeviceFeature = hasSwitchFeature(deviceFeatures, featureSelectors) !== undefined;
+  const hasAtLeastTwoLightBinaryFeature = countLightBinaryFeature(deviceFeatures, featureSelectors) >= 2;
 
   // Create placeholder rows based on the number of expected features
   const placeholderRows = Array(featureSelectors.length).fill(0);
@@ -29,7 +29,7 @@ const DeviceCard = ({ children, ...props }) => {
       {boxTitle && (
         <div class="card-header">
           <h3 class="card-title">{boxTitle}</h3>
-          {hasBinaryLightDeviceFeature && (
+          {hasAtLeastTwoLightBinaryFeature && (
             <div class="card-options">
               <label class="custom-switch m-0">
                 <input
