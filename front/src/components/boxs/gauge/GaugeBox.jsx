@@ -87,9 +87,7 @@ class GaugeBox extends Component {
         radialBar: {
           dataLabels: {
             value: {
-              formatter: function() {
-                return value.toFixed(1);
-              }
+              formatter: () => value.toFixed(1)
             }
           }
         }
@@ -192,7 +190,7 @@ class GaugeBox extends Component {
               offsetY: 76,
               fontSize: '22px',
               color: undefined,
-              formatter: function() {
+              formatter: () => {
                 // Show actual value instead of percentage
                 return value.toFixed(1);
               }
