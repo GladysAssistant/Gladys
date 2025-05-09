@@ -13,7 +13,10 @@ const event = {
 };
 
 describe('house.partialArm', () => {
-  const house = new House(event);
+  const session = {
+    setTabletModeLocked: fake.resolves(null),
+  };
+  const house = new House(event, {}, session);
   afterEach(() => {
     sinon.reset();
   });
@@ -36,6 +39,7 @@ describe('house.partialArm', () => {
         },
       },
     ]);
+    assert.calledOnce(session.setTabletModeLocked);
   });
   it('should return house not found', async () => {
     const promise = house.partialArm('house-not-found');
