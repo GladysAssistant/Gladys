@@ -3049,6 +3049,14 @@
           "high-risk": "High",
           "unknown": "Unknown"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Low",
+          "1": "Normal",
+          "2": "High",
+          "unknown": "Unknown"
+        }
       }
     }
   },
@@ -3106,6 +3114,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Level sensor",
+      "decimal": "Level sensor",
+      "liquid-state": "Liquid level state",
+      "liquid-level-percent": "Liquid level percent",
+      "liquid-depth": "Liquid depth"
     },
     "camera": {
       "shortCategoryName": "Camera",

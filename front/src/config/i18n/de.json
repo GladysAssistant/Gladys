@@ -3049,6 +3049,14 @@
           "high-risk": "Hoch",
           "unknown": "Unbekannt"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Niedrig",
+          "1": "Normal",
+          "2": "Hoch",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -3106,6 +3114,13 @@
     "distance-sensor": {
       "shortCategoryName": "Abstand",
       "decimal": "Abstand"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Füllstandssensor",
+      "decimal": "Füllstand",
+      "liquid-state": "Flüssigkeitsstand-Status",
+      "liquid-level-percent": "Flüssigkeitspegel in Prozent",
+      "liquid-depth": "Flüssigkeitstiefe"
     },
     "camera": {
       "shortCategoryName": "Kamera",
