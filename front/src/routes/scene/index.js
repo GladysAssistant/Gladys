@@ -76,8 +76,11 @@ class Scene extends Component {
       sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
     }
 
-    // Use `route` to update the URL without reloading the page
-    route(`/dashboard/scene?${urlParams.toString()}`, true);
+    if (urlParams.toString()) {
+      route(`/dashboard/scene?${urlParams.toString()}`, true);
+    } else {
+      route(`/dashboard/scene`, true);
+    }
   };
   search = async e => {
     this.updateURL({
