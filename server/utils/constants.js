@@ -1189,6 +1189,7 @@ const DASHBOARD_BOX_TYPE = {
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',
+  GAUGE: 'gauge',
 };
 
 const ERROR_MESSAGES = {
