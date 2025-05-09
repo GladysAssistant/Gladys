@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import ApexCharts from 'apexcharts';
 import { Text } from 'preact-i18n';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
@@ -71,9 +72,9 @@ class GaugeBox extends Component {
     }
 
     // Get min and max from deviceFeature or use defaults
-    const min = deviceFeature.min !== null ? deviceFeature.min : 0;
-    const max = deviceFeature.max !== null ? deviceFeature.max : 100;
-    const value = deviceFeature.last_value;
+    const min = deviceFeature.min !== undefined ? deviceFeature.min : 0;
+    const max = deviceFeature.max !== undefined ? deviceFeature.max : 100;
+    const value = deviceFeature.last_value !== undefined ? deviceFeature.last_value : 0;
 
     // Calculate percentage for the gauge
     const percentage = max !== min ? Math.round(((value - min) / (max - min)) * 100) : 0;
@@ -81,18 +82,35 @@ class GaugeBox extends Component {
     // Update the chart series with the new percentage
     this.chart.updateSeries([percentage]);
 
-    // Update the value formatter to show the actual value
+    // Update the value formatter to show the actual value with unit if available
     this.chart.updateOptions({
       plotOptions: {
         radialBar: {
           dataLabels: {
             value: {
-              formatter: () => value.toFixed(1)
+              formatter: () => this.formatValueWithUnit(value, deviceFeature.unit)
             }
           }
         }
       }
     });
+  };
+
+  formatValueWithUnit = (value, unit) => {
+    // Format the value to 1 decimal place
+    const formattedValue = value.toFixed(1);
+
+    // If no unit, just return the formatted value
+    if (!unit) {
+      return formattedValue;
+    }
+
+    // Get the unit translation from the dictionary
+    const unitTranslation =
+      this.props.intl && this.props.intl.dictionary ? this.props.intl.dictionary.deviceFeatureUnitShort[unit] : unit;
+
+    // Return the value with the unit
+    return `${formattedValue}${unitTranslation || unit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -191,8 +209,8 @@ class GaugeBox extends Component {
               fontSize: '22px',
               color: undefined,
               formatter: () => {
-                // Show actual value instead of percentage
-                return value.toFixed(1);
+                // Show actual value with unit if available
+                return this.formatValueWithUnit(value, deviceFeature.unit);
               }
             }
           }
@@ -250,4 +268,4 @@ class GaugeBox extends Component {
   }
 }
 
-export default connect('httpClient,session', {})(GaugeBox);
+export default connect('httpClient,session', {})(withIntlAsProp(GaugeBox));
