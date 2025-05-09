@@ -689,7 +689,7 @@ class EditScene extends Component {
     try {
       await this.props.httpClient.delete(`/api/v1/scene/${this.props.scene_selector}`);
       this.setState({ saving: false });
-      route('/dashboard/scene');
+      route(`/dashboard/scene${window.location.search}`);
     } catch (e) {
       this.setState({ saving: false });
     }
