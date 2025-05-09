@@ -1841,7 +1841,10 @@
         "milliseconds": "millisecondes",
         "seconds": "secondes",
         "minutes": "minutes",
-        "hours": "heures"
+        "hours": "heures",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculée",
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant."
       },
       "messageSend": {
         "userLabel": "Utilisateur",

@@ -1841,7 +1841,10 @@
         "milliseconds": "Millisekunden",
         "seconds": "Sekunden",
         "minutes": "Minuten",
-        "hours": "Stunden"
+        "hours": "Stunden",
+        "valueTypeSimple": "Einfach",
+        "valueTypeComputed": "Berechnet",
+        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Gerätewert abrufen' verwenden."
       },
       "messageSend": {
         "userLabel": "Benutzer",
