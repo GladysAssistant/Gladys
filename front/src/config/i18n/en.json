@@ -1769,6 +1769,7 @@
       "deviceTab": "Devices",
       "discoverTab": "Nuki Discovery",
       "setupTab": "Setup",
+      "documentation": "Nuki documentation ",
       "discoverDeviceDescr": "Automatically scan for Nuki devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter your device name",

@@ -1769,6 +1769,7 @@
       "deviceTab": "Geräte",
       "discoverTab": "Nuki-Erkennung",
       "setupTab": "Einrichtung",
+      "documentation": "Nuki-Documentation ",
       "discoverDeviceDescr": "Nuki-Geräte automatisch scannen",
       "nameLabel": "Gerätename",
       "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",

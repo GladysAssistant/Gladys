@@ -28,7 +28,7 @@ class NukiIntegration extends Component {
 
   render(props, {}) {
     return (
-      <NukiPage>
+      <NukiPage user={props.user}>
         <DeviceTab {...props} />
       </NukiPage>
     );

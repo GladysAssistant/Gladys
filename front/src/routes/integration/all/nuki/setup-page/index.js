@@ -26,7 +26,7 @@ class NukiSetupPage extends Component {
 
   render(props, {}) {
     return (
-      <NukiPage>
+      <NukiPage user={props.user}>
         <SetupTab {...props} />
       </NukiPage>
     );
