@@ -69,6 +69,12 @@ class EditChart extends Component {
     });
   };
 
+  toggleAdvancedOptions = () => {
+    this.setState(prevState => ({
+      showAdvancedOptions: !prevState.showAdvancedOptions
+    }));
+  };
+
   updateDefaultInterval = e => {
     if (e.target.value && e.target.value.length) {
       this.props.updateBoxConfig(this.props.x, this.props.y, { interval: e.target.value });
@@ -415,6 +421,7 @@ class EditChart extends Component {
       deviceOptions: [],
       loading: false,
       displayPreview: false,
+      showAdvancedOptions: false,
       chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS]
     };
   }
@@ -431,7 +438,7 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, chartTypeList }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, showAdvancedOptions, chartTypeList }) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
@@ -557,22 +564,34 @@ class EditChart extends Component {
               </>
             )}
             <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.displayAxes" />
-              </label>
-              <select
-                onChange={this.updateDisplayAxes}
-                class="form-control"
-                value={props.box.display_axes ? 'yes' : 'no'}
+              <button 
+                onClick={this.toggleAdvancedOptions} 
+                class="btn btn-sm btn-outline-secondary w-100 mb-3"
               >
-                <option value="yes">
-                  <Text id="dashboard.boxes.chart.yes" />
-                </option>
-                <option value="no">
-                  <Text id="dashboard.boxes.chart.no" />
-                </option>
-              </select>
+                <i class={`fa fa-${showAdvancedOptions ? 'chevron-up' : 'chevron-down'} mr-2`}></i>
+                <Text id={`dashboard.boxes.chart.${showAdvancedOptions ? 'hideAdvancedOptions' : 'showAdvancedOptions'}`} />
+              </button>
             </div>
+
+            {showAdvancedOptions && (
+              <div class="advanced-options">
+                <div class="form-group">
+                  <label>
+                    <Text id="dashboard.boxes.chart.displayAxes" />
+                  </label>
+                  <select
+                    onChange={this.updateDisplayAxes}
+                    class="form-control"
+                    value={props.box.display_axes ? 'yes' : 'no'}
+                  >
+                    <option value="yes">
+                      <Text id="dashboard.boxes.chart.yes" />
+                    </option>
+                    <option value="no">
+                      <Text id="dashboard.boxes.chart.no" />
+                    </option>
+                  </select>
+                </div>
             {props.box.chart_type !== 'timeline' && (
               <div class="form-group">
                 <label>
@@ -699,6 +718,8 @@ class EditChart extends Component {
                 </div>
               )}
             </div>
+            </div>
+            )}
           </div>
         </div>
       </BaseEditBox>

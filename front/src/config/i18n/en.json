@@ -350,6 +350,8 @@
         "lastHour": "Last hour",
         "lastTwelveHours": "Last 12 hours",
         "lastDay": "Last 24 hours",
+        "showAdvancedOptions": "Show Advanced Options",
+        "hideAdvancedOptions": "Hide Advanced Options",
         "lastSevenDays": "Last 7 days",
         "lastThirtyDays": "Last 30 days",
         "lastThreeMonths": "Last 3 months",
