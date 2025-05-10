@@ -944,5 +944,23 @@ module.exports = {
         max: 90,
       },
     },
+    liquid_depth: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH,
+        unit: DEVICE_FEATURE_UNITS.M,
+        min: 0,
+        max: 1000,
+      },
+    },
+    liquid_level_percent: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_LEVEL_PERCENT,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    },
   },
 };

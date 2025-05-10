@@ -12,6 +12,7 @@ const {
   roundDependencies,
   smallerDependencies,
   smallerEqDependencies,
+  randomDependencies,
 } = require('mathjs');
 const set = require('set-value');
 const get = require('get-value');
@@ -40,6 +41,7 @@ const { evaluate } = create({
   modDependencies,
   smallerEqDependencies,
   roundDependencies,
+  randomDependencies,
 });
 
 const actionsFunc = {
@@ -206,27 +208,51 @@ const actionsFunc = {
       }
     });
   },
-  [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
-    new Promise((resolve) => {
-      let timeToWaitMilliseconds;
-      switch (action.unit) {
-        case 'milliseconds':
-          timeToWaitMilliseconds = action.value;
-          break;
-        case 'seconds':
-          timeToWaitMilliseconds = action.value * 1000;
-          break;
-        case 'minutes':
-          timeToWaitMilliseconds = action.value * 1000 * 60;
-          break;
-        case 'hours':
-          timeToWaitMilliseconds = action.value * 1000 * 60 * 60;
-          break;
-        default:
-          throw new Error(`Unit ${action.unit} not recognized`);
+  [ACTIONS.TIME.DELAY]: async (self, action, scope) => {
+    let { value } = action;
+
+    // If the value should be calculated from a formula
+    if (action.evaluate_value !== undefined) {
+      try {
+        value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+      } catch (e) {
+        logger.warn(`Delay: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
       }
-      setTimeout(resolve, timeToWaitMilliseconds);
-    }),
+    }
+
+    if (Number.isNaN(Number(value))) {
+      logger.warn(`Delay: Value is not a number: ${value}`);
+      throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+    }
+
+    // We convert the value to a number
+    const valueInNumber = Number(value);
+
+    let timeToWaitMilliseconds;
+
+    switch (action.unit) {
+      case 'milliseconds':
+        timeToWaitMilliseconds = Math.round(valueInNumber);
+        break;
+      case 'seconds':
+        timeToWaitMilliseconds = Math.round(valueInNumber * 1000);
+        break;
+      case 'minutes':
+        timeToWaitMilliseconds = Math.round(valueInNumber * 1000 * 60);
+        break;
+      case 'hours':
+        timeToWaitMilliseconds = Math.round(valueInNumber * 1000 * 60 * 60);
+        break;
+      default:
+        throw new AbortScene(`Unit ${action.unit} not recognized`);
+    }
+
+    logger.debug(`Delay: Wait ${timeToWaitMilliseconds} milliseconds.`);
+
+    await Promise.delay(timeToWaitMilliseconds);
+  },
 
   [ACTIONS.SCENE.START]: async (self, action, scope) => {
     if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
@@ -248,7 +274,7 @@ const actionsFunc = {
     const image = await self.device.camera.getLiveImage(action.camera);
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
-  [ACTIONS.AI.ASK]: async (self, action, scope) => {
+  [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     let image;
     if (action.camera) {
@@ -266,11 +292,12 @@ const actionsFunc = {
       language: user.language,
       text: textWithVariables,
     };
-    await self.gateway.forwardMessageToOpenAI({
+    const { answer } = await self.gateway.forwardMessageToOpenAI({
       message,
       image,
       context: {},
     });
+    set(scope, path, { answer }, { merge: true });
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);

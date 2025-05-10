@@ -1,42 +1,83 @@
 <h1 align="center">
   <br>
-	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
+  <img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200" alt="Gladys Assistant Logo" />
   <br>
   Gladys Assistant
 </h1>
 
-<h4 align="center">A privacy-first, open-source home assistant</h4>
+<h4 align="center">Your privacy-first, open-source smart home assistant</h4>
 
 <p align="center">
+  <a href="#🚀-try-gladys-assistant">Try It</a> •
+  <a href="#📚-getting-started">Getting Started</a> •
+  <a href="#🤝-contribute">Contribute</a> •
+  <a href="#👥-contributors">Contributors</a> •
+  <a href="#📝-license">License</a>
 </p>
 
 <p align="center">
-  <a href="#try-gladys-assistant">Try</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#contributors">Contributors</a> •
-  <a href="#copyright--license">Copyright & License</a> 
+  <img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" alt="Gladys on multiple devices" />
 </p>
 
-<img src="https://gladysassistant.com/en/img/external/github-gladys-4-mockups-devices.jpg" />
+---
 
-## Try Gladys Assistant
+## 🚀 Try Gladys Assistant
 
-You can try Gladys Assistant on our [demo website](https://demo.gladysassistant.com).
+Spin up a local Gladys Assistant instance in seconds using Docker:
 
-## Getting Started
+```bash
+sudo docker run -d \
+  --log-driver json-file \
+  --log-opt max-size=10m \
+  --cgroupns=host \
+  --restart=always \
+  --privileged \
+  --network=host \
+  --name gladys \
+  -e NODE_ENV=production \
+  -e SERVER_PORT=80 \
+  -e TZ=Europe/Paris \
+  -e SQLITE_FILE_PATH=/var/lib/gladysassistant/gladys-production.db \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/gladysassistant:/var/lib/gladysassistant \
+  -v /dev:/dev \
+  -v /run/udev:/run/udev:ro \
+  gladysassistant/gladys:v4
+```
 
-To get started and install Gladys Assistant, you'll find everything on [our website](https://gladysassistant.com).
+Prefer using Docker Compose? Check out our [Docker Compose installation guide](https://gladysassistant.com/docs/installation/docker-compose/).
 
-## Pull requests are welcome
+## 📚 Getting Started
 
-If you want to help us develop on Gladys Assistant, you need to first setup your development environment locally.
+To install Gladys Assistant on your smart home setup, head over to our [official website](https://gladysassistant.com) for a step-by-step guide.
 
-- [MacOS/Linux instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-mac-linux/)
-- [Windows instructions](https://gladysassistant.com/en/docs/dev/setup-development-environment-windows/)
+Whether you're installing on a mini-PC, a NAS or a Raspberry Pi, we've got you covered with clear instructions tailored to your setup.
 
-Then, read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) to learn more about our GitHub flow.
+---
 
-## Contributors
+## 🤝 Contribute to Gladys
+
+We welcome contributions of all kinds — code, documentation, translations, or feature ideas.
+
+Gladys is built by an open-source community, and **you can be a part of it!**
+
+### 1. Set up your development environment
+
+Follow the guide that matches your system to get started:
+
+- [MacOS / Linux Setup Guide](https://gladysassistant.com/docs/dev/setup-development-environment-mac-linux/)
+- [Windows Setup Guide](https://gladysassistant.com/docs/dev/setup-development-environment-windows/)
+
+### 2. Start developing
+
+Once your environment is ready, dive into our [contributing guide](https://gladysassistant.com/docs/dev/developing-a-service/) to understand the project structure, how to build features, and how to open a pull request.
+
+---
+
+## 🧑‍💻 Contributors
+
+A huge thank you to all our amazing contributors! 💜  
+Gladys wouldn't be where it is today without your help.
 
 Thanks goes to these wonderful people 👏
 
@@ -96,6 +137,8 @@ Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.gi
 - [EN: Hackster.io - Gladys Assistant Is a Privacy-First Smart Home Platform — and Now Installable in Raspberry Pi Imager](https://www.hackster.io/news/gladys-assistant-is-a-privacy-first-smart-home-platform-and-now-installable-in-raspberry-pi-imager-4a84d5559c63)
 - [FR: Framboise 314 - Plus de 500 installations pour l’assistant domotique Gladys !](https://www.framboise314.fr/plus-de-500-installation-pour-lassistant-domotique-gladys/)
 
-## Copyright & License
+## 📄 License
 
-Copyright (c) 2013-2023 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
+
+© 2014–present Gladys Assistant.

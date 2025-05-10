@@ -1875,6 +1875,8 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "deleteText": "Êtes-vous sûr(e) ?",
+    "cancelButton": "Annuler",
     "duplicateButton": "Dupliquer",
     "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
@@ -1886,6 +1888,7 @@
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
     "addActionButton": "Nouvelle action",
+    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
@@ -1899,7 +1902,10 @@
         "milliseconds": "millisecondes",
         "seconds": "secondes",
         "minutes": "minutes",
-        "hours": "heures"
+        "hours": "heures",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculée",
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant."
       },
       "messageSend": {
         "userLabel": "Utilisateur",
@@ -2095,14 +2101,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -2202,6 +2208,9 @@
         "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
+      },
+      "askAi": {
+        "answer": "Réponse de l'IA"
       }
     },
     "triggers": {
@@ -3101,6 +3110,14 @@
           "high-risk": "Élevé",
           "unknown": "Inconnu"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Faible",
+          "1": "Normal",
+          "2": "Élevé",
+          "unknown": "Inconnu"
+        }
       }
     }
   },
@@ -3158,6 +3175,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Capteur de niveau",
+      "decimal": "Capteur de niveau",
+      "liquid-state": "État du niveau",
+      "liquid-level-percent": "Niveau du liquide (Pourcentage)",
+      "liquid-depth": "Profondeur du liquide"
     },
     "camera": {
       "shortCategoryName": "Caméra",

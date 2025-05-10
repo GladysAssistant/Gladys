@@ -1875,6 +1875,8 @@
     "startButton": "Start",
     "saveButton": "Sichern",
     "deleteButton": "Löschen",
+    "deleteText": "Bist du sicher?",
+    "cancelButton": "Abbrechen",
     "duplicateButton": "Duplizieren",
     "moreButton": "Mehr",
     "triggersTitle": "Auslöser",
@@ -1886,6 +1888,7 @@
     "selectActionType": "Wähle einen Aktionstyp aus",
     "selectConditionType": "Wähle eine Bedingungstyp aus",
     "addActionButton": "Aktion hinzufügen",
+    "addActionGroupButton": "Neues Aktionengruppe",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
     "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
@@ -1899,7 +1902,10 @@
         "milliseconds": "Millisekunden",
         "seconds": "Sekunden",
         "minutes": "Minuten",
-        "hours": "Stunden"
+        "hours": "Stunden",
+        "valueTypeSimple": "Einfach",
+        "valueTypeComputed": "Berechnet",
+        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Gerätewert abrufen' verwenden."
       },
       "messageSend": {
         "userLabel": "Benutzer",
@@ -2095,14 +2101,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/mein-topic",
+        "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/mein-topic",
+        "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
@@ -2202,6 +2208,9 @@
         "eventDescription": "Ereignisbeschreibung",
         "eventStart": "Startdatum",
         "eventEnd": "Enddatum"
+      },
+      "askAi": {
+        "answer": "AI Antwort"
       }
     },
     "triggers": {
@@ -3101,6 +3110,14 @@
           "high-risk": "Hoch",
           "unknown": "Unbekannt"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Niedrig",
+          "1": "Normal",
+          "2": "Hoch",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -3158,6 +3175,13 @@
     "distance-sensor": {
       "shortCategoryName": "Abstand",
       "decimal": "Abstand"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Füllstandssensor",
+      "decimal": "Füllstand",
+      "liquid-state": "Flüssigkeitsstand-Status",
+      "liquid-level-percent": "Flüssigkeitspegel in Prozent",
+      "liquid-depth": "Flüssigkeitstiefe"
     },
     "camera": {
       "shortCategoryName": "Kamera",

@@ -45,7 +45,7 @@ class Session {
     }
     this.ws = new WebSocket(websocketUrl);
     this.ws.onopen = () => {
-      this.websocketConnected = true;
+      this.websocketOpened = true;
       this.ws.send(
         JSON.stringify({
           type: 'authenticate.request',
@@ -59,6 +59,7 @@ class Session {
         const { type, payload } = JSON.parse(data);
         // Only dispatch connected websocket message in case we are authenticated
         if (type === WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED) {
+          this.websocketConnected = true;
           this.dispatcher.dispatch('websocket.connected', { connected: true });
         }
         this.dispatcher.dispatch(type, payload);
@@ -69,16 +70,19 @@ class Session {
     };
     this.ws.onclose = e => {
       console.error(e);
-      this.dispatcher.dispatch('websocket.connected', { connected: false });
-      this.websocketConnected = false;
-      if (e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
-        delete this.user.access_token;
-        this.saveUser(this.user);
-        this.refreshAccessToken();
-      } else if (e.code !== 1005 && e.code !== 1000) {
-        setTimeout(() => {
-          this.connect();
-        }, 1000);
+      if (this.websocketOpened) {
+        this.websocketOpened = false;
+        this.websocketConnected = false;
+        this.dispatcher.dispatch('websocket.connected', { connected: false });
+        if (e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
+          delete this.user.access_token;
+          this.saveUser(this.user);
+          this.refreshAccessToken();
+        } else if (e.code !== 1005 && e.code !== 1000) {
+          setTimeout(() => {
+            this.connect();
+          }, 1000);
+        }
       }
     };
   }

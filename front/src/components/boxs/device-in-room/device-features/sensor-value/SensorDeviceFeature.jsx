@@ -14,6 +14,7 @@ import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 import TemperatureSensorDeviceValue from './TemperatureSensorDeviceValue';
+import LevelSensorDeviceValue from './LevelSensorDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
@@ -22,7 +23,8 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.BUTTON]: ButtonClickDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: TemperatureSensorDeviceValue
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: TemperatureSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: LevelSensorDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {

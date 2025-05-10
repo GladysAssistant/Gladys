@@ -140,7 +140,7 @@ class Condition extends Component {
             </div>
           </div>
           <div class="col-md-2">
-            {props.index > 0 && (
+            {props.canDeleteCondition && (
               <div class="form-group">
                 <label class="form-label">
                   <Text id="editScene.actionsCard.onlyContinueIf.removeLabel" />

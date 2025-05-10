@@ -1875,6 +1875,8 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
+    "deleteText": "Are you sure?",
+    "cancelButton": "Cancel",
     "duplicateButton": "Duplicate",
     "moreButton": "More",
     "triggersTitle": "Triggers",
@@ -1886,6 +1888,7 @@
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
     "addActionButton": "Add action",
+    "addActionGroupButton": "Add action group",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",
@@ -1899,7 +1902,10 @@
         "milliseconds": "milliseconds",
         "seconds": "seconds",
         "minutes": "minutes",
-        "hours": "hours"
+        "hours": "hours",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to define a variable before this action."
       },
       "messageSend": {
         "userLabel": "User",
@@ -2095,14 +2101,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -2202,6 +2208,9 @@
         "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
+      },
+      "askAi": {
+        "answer": "AI answer"
       }
     },
     "triggers": {
@@ -3101,6 +3110,14 @@
           "high-risk": "High",
           "unknown": "Unknown"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Low",
+          "1": "Normal",
+          "2": "High",
+          "unknown": "Unknown"
+        }
       }
     }
   },
@@ -3158,6 +3175,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Level sensor",
+      "decimal": "Level sensor",
+      "liquid-state": "Liquid level state",
+      "liquid-level-percent": "Liquid level percent",
+      "liquid-depth": "Liquid depth"
     },
     "camera": {
       "shortCategoryName": "Camera",

@@ -27,7 +27,10 @@ const sleep = promisify(setTimeout);
 function buildService(device, features, categoryMapping, subtype) {
   const { Characteristic, CharacteristicEventTypes, Perms, Service } = this.hap;
 
-  const service = new Service[categoryMapping.service](subtype ? features[0].name : device.name, subtype);
+  const service = new Service[categoryMapping.service](
+    (subtype ? features[0].name : device.name).substring(0, 64),
+    subtype,
+  );
 
   features.forEach((feature) => {
     switch (`${feature.category}:${feature.type}`) {
