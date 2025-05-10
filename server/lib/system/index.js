@@ -22,10 +22,11 @@ const { removeContainer } = require('./system.removeContainer');
 const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
 const { vacuum } = require('./system.vacuum');
+const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
 
 const { shutdown } = require('./system.shutdown');
 
-const System = function System(sequelize, event, config, job) {
+const System = function System(sequelize, event, config, job, variable, user, message, brain) {
   this.downloadUpgradeError = null;
   this.downloadUpgradeFinished = null;
   this.downloadUpgradeLastEvent = null;
@@ -34,6 +35,10 @@ const System = function System(sequelize, event, config, job) {
   this.event = event;
   this.config = config;
   this.job = job;
+  this.variable = variable;
+  this.user = user;
+  this.message = message;
+  this.brain = brain;
   this.dockerode = null;
   this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
   this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
@@ -52,6 +57,7 @@ System.prototype.getGladysContainerId = getGladysContainerId;
 System.prototype.getInfos = getInfos;
 System.prototype.getDiskSpace = getDiskSpace;
 System.prototype.saveLatestGladysVersion = saveLatestGladysVersion;
+System.prototype.checkIfGladysUpgraded = checkIfGladysUpgraded;
 
 System.prototype.pull = pull;
 System.prototype.exec = exec;

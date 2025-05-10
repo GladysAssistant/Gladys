@@ -58,13 +58,13 @@ function Gladys(params = {}) {
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
   const session = new Session(params.jwtSecret, cache);
-  const system = new System(db.sequelize, event, config, job);
-  const http = new Http(system);
   const house = new House(event, stateManager, session);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
   const user = new User(session, stateManager, variable);
+  const system = new System(db.sequelize, event, config, job, variable, user, message, brain);
+  const http = new Http(system);
   const location = new Location(user, event);
   const device = new Device(event, message, stateManager, service, room, variable, job, brain, user);
   const calendar = new Calendar(service);
@@ -172,6 +172,8 @@ function Gladys(params = {}) {
         scheduler.init();
       }
       gateway.init();
+
+      await system.checkIfGladysUpgraded(gateway);
 
       event.emit(EVENTS.TRIGGERS.CHECK, {
         type: EVENTS.SYSTEM.START,
