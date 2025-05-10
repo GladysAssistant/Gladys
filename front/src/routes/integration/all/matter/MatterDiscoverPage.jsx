@@ -66,9 +66,6 @@ class MatterDiscoverPage extends Component {
         <div class="card">
           <div class="card-header">
             <div class="d-flex align-items-center">
-              <button onClick={() => window.history.back()} class="btn btn-secondary mr-2">
-                <Text id="global.backButton" />
-              </button>
               <h3 class="card-title mb-0">
                 <Text id="integration.matter.discover.title" />
               </h3>
