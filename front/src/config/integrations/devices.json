@@ -94,5 +94,10 @@
     "key": "airplay",
     "link": "airplay",
     "img": "/assets/integrations/cover/airplay.jpg"
+  },
+  {
+    "key": "matter",
+    "link": "matter",
+    "img": "/assets/integrations/cover/matter.jpg"
   }
 ]

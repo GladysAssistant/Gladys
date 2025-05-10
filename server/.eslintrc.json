@@ -8,6 +8,7 @@
     "node": true
   },
   "globals": {
+    "BigInt": true,
     "document": false,
     "navigator": false,
     "window": false,

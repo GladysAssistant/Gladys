@@ -230,15 +230,12 @@ body {
   pointer-events: auto;
   cursor: pointer;
 }
-.device-features {
-  min-height: 70px;
-}
 .loading-border {
   animation: borderBlink 2s infinite;
 }
 @keyframes borderBlink {
   50% {
-    border-color: #45aaf2 ;
+    border-color: #45aaf2;
   }
 }
 
@@ -260,7 +257,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  border: 1px solid rgb(73, 80,87);
+  border: 1px solid rgb(73, 80, 87);
   border-radius: 50%;
 }
 .react-clock__hand {
@@ -272,7 +269,7 @@ body {
 }
 .react-clock__hand__body {
   position: absolute;
-  background-color: rgb(73, 80,87);
+  background-color: rgb(73, 80, 87);
   transform: translateX(-50%);
 }
 .react-clock__mark {
@@ -284,7 +281,7 @@ body {
 }
 .react-clock__mark__body {
   position: absolute;
-  background-color: rgb(73, 80,87);
+  background-color: rgb(73, 80, 87);
   transform: translateX(-50%);
 }
 .react-clock__mark__number {
@@ -294,7 +291,7 @@ body {
   text-align: center;
 }
 .react-clock__second-hand__body {
-  background-color: rgb(205,32,31);
+  background-color: rgb(205, 32, 31);
 }
 
 .react-clock {
@@ -311,7 +308,6 @@ body {
 .opacity-60 {
   opacity: 60%;
 }
-
 
 .humidity-slider {
   width: 100%;
@@ -343,7 +339,7 @@ body {
 }
 
 .humidity-slider-track-2 {
-  background: #467fcf ;
+  background: #467fcf;
 }
 
 .humidity-slider .humidity-slider-track {
@@ -357,7 +353,6 @@ body {
   height: 24px;
   line-height: 22px;
 }
-
 
 .temperature-slider {
   width: 100%;

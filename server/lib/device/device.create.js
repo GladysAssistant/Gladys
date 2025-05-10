@@ -3,6 +3,32 @@ const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
 
+const getById = async (id) => {
+  return db.Device.findOne({
+    where: {
+      id,
+    },
+    include: [
+      {
+        model: db.DeviceFeature,
+        as: 'features',
+      },
+      {
+        model: db.DeviceParam,
+        as: 'params',
+      },
+      {
+        model: db.Room,
+        as: 'room',
+      },
+      {
+        model: db.Service,
+        as: 'service',
+      },
+    ],
+  });
+};
+
 const getByExternalId = async (externalId) => {
   return db.Device.findOne({
     where: {
@@ -27,6 +53,29 @@ const getByExternalId = async (externalId) => {
       },
     ],
   });
+};
+
+const getDeviceInDb = async (device) => {
+  if (device.id) {
+    const deviceById = await getById(device.id);
+    if (deviceById) {
+      return deviceById;
+    }
+  }
+  const deviceByExternalId = await getByExternalId(device.external_id);
+  return deviceByExternalId;
+};
+
+const matchFeatureInList = (existingFeature, features) => {
+  // We are matching on both external_id and id, so we can match a device that changed external_id but kept the same id
+  return features.find(
+    (newFeature) => newFeature.id === existingFeature.id || newFeature.external_id === existingFeature.external_id,
+  );
+};
+
+const matchParamInList = (existingParam, params) => {
+  // We are matching on both name & id, so we can match a param that changed name but kept the same id
+  return params.find((newParam) => newParam.id === existingParam.id || newParam.name === existingParam.name);
 };
 
 /**
@@ -73,8 +122,9 @@ async function create(device) {
     if (!device.external_id) {
       throw new BadParameters('A device must have an external_id.');
     }
+
     // first verify that device doesn't already exist
-    let deviceInDb = await getByExternalId(device.external_id);
+    let deviceInDb = await getDeviceInDb(device);
 
     let deviceToReturn = null;
 
@@ -98,14 +148,14 @@ async function create(device) {
 
       // we delete all features which doesn't exist anymore
       await Promise.map(deviceInDb.features, async (existingFeature, index) => {
-        if (!features.find((newFeature) => newFeature.external_id === existingFeature.external_id)) {
+        if (!matchFeatureInList(existingFeature, features)) {
           await existingFeature.destroy({ transaction });
         }
       });
 
       // we delete all params which doesn't exist anymore
       await Promise.map(deviceInDb.params, async (existingParam) => {
-        if (!params.find((newParam) => newParam.name === existingParam.name)) {
+        if (!matchParamInList(existingParam, params)) {
           await existingParam.destroy({ transaction });
         }
       });
@@ -120,11 +170,11 @@ async function create(device) {
     // if we need to create features
     const newFeatures = await Promise.map(features, async (feature) => {
       // if the device feature already exist
-      const featureIndex = deviceToReturn.features.findIndex((f) => f.external_id === feature.external_id);
-      if (featureIndex !== -1) {
+      const matchedFeature = matchFeatureInList(feature, deviceToReturn.features);
+      if (matchedFeature) {
         const deviceFeature = await db.DeviceFeature.findOne({
           where: {
-            id: deviceToReturn.features[featureIndex].id,
+            id: matchedFeature.id,
           },
         });
         await deviceFeature.update(feature, { transaction });
@@ -142,11 +192,11 @@ async function create(device) {
 
     const newParams = await Promise.map(params, async (param) => {
       // if the param already already exist
-      const paramIndex = deviceToReturn.params.findIndex((p) => p.name === param.name);
-      if (paramIndex !== -1) {
+      const matchedParam = matchParamInList(param, deviceToReturn.params);
+      if (matchedParam) {
         const deviceParam = await db.DeviceParam.findOne({
           where: {
-            id: deviceToReturn.params[paramIndex].id,
+            id: matchedParam.id,
           },
         });
         await deviceParam.update(param, { transaction });
