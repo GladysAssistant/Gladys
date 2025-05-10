@@ -53,8 +53,11 @@ class MatterDevices extends Component {
   init = async () => {
     await this.setState({ loading: true });
     await Promise.all([this.loadConfiguration(), this.getHouses()]);
-    // We need to wait before getting all matter devices before being able to load paired devices
-    await this.getPairedDevices();
+    if (this.state.matterEnabled) {
+      await this.getMatterDevices();
+      // We need to wait before getting all matter devices before being able to load paired devices
+      await this.getPairedDevices();
+    }
     await this.setState({
       loading: false
     });
@@ -64,15 +67,17 @@ class MatterDevices extends Component {
     try {
       const { value } = await this.props.httpClient.get('/api/v1/service/matter/variable/MATTER_ENABLED');
       const matterEnabled = value === 'true';
-      this.setState({
+      await this.setState({
         matterEnabled
       });
-      if (matterEnabled) {
-        await this.getMatterDevices();
-      }
     } catch (e) {
       console.error(e);
-      this.setState({ error: RequestStatus.Error });
+      await this.setState({
+        matterEnabled: false
+      });
+      if (e.response && e.response.status !== 404) {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
   };
 

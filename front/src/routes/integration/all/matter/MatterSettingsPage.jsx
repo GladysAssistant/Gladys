@@ -145,7 +145,9 @@ class MatterSettingsPage extends Component {
 
   init = async () => {
     await this.loadConfiguration();
-    await this.loadNodes();
+    if (this.state.matterEnabled) {
+      await this.loadNodes();
+    }
   };
 
   loadConfiguration = async () => {
@@ -153,11 +155,20 @@ class MatterSettingsPage extends Component {
       const { value: matterEnabled } = await this.props.httpClient.get(
         '/api/v1/service/matter/variable/MATTER_ENABLED'
       );
+      await this.setState({
+        matterEnabled: matterEnabled === 'true'
+      });
+    } catch (e) {
+      console.error(e);
+      await this.setState({
+        matterEnabled: false
+      });
+    }
+    try {
       const { has_ipv6: hasIpv6, ipv6_interfaces: ipv6Interfaces } = await this.props.httpClient.get(
         '/api/v1/service/matter/ipv6'
       );
-      this.setState({
-        matterEnabled: matterEnabled === 'true',
+      await this.setState({
         hasIpv6,
         ipv6Interfaces
       });

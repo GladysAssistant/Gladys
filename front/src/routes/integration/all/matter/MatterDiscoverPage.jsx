@@ -32,7 +32,12 @@ class MatterDiscoverPage extends Component {
       });
     } catch (e) {
       console.error(e);
-      this.setState({ error: RequestStatus.Error });
+      if (e.response && e.response.status !== 404) {
+        this.setState({ error: RequestStatus.Error });
+      }
+      this.setState({
+        matterEnabled: false
+      });
     }
   };
 
