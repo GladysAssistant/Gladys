@@ -10,6 +10,7 @@ const { decommission } = require('./matter.decommission');
 const { getNodes } = require('./matter.getNodes');
 const { handleNode } = require('./matter.handleNode');
 const { checkIpv6 } = require('./matter.checkIpv6');
+const { refreshDevices } = require('./matter.refreshDevices');
 
 /**
  * @description Matter handler.
@@ -28,6 +29,7 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.os = os;
   this.devices = [];
   this.nodesMap = new Map();
+  this.stateChangeListeners = new Set();
   this.commissioningController = null;
   process.on('SIGTERM', this.stop);
   process.on('SIGINT', this.stop);
@@ -43,5 +45,6 @@ MatterHandler.prototype.decommission = decommission;
 MatterHandler.prototype.getNodes = getNodes;
 MatterHandler.prototype.handleNode = handleNode;
 MatterHandler.prototype.checkIpv6 = checkIpv6;
+MatterHandler.prototype.refreshDevices = refreshDevices;
 
 module.exports = MatterHandler;

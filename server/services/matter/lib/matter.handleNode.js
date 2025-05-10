@@ -99,7 +99,7 @@ const handleDevice = async (
  * await handleNode(nodeDetail);
  */
 async function handleNode(nodeDetail) {
-  logger.info(`Matter: Handling node ${nodeDetail.nodeId}`);
+  logger.debug(`Matter: Handling node ${nodeDetail.nodeId}`);
   if (!nodeDetail.deviceData) {
     logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data`);
     return;

@@ -12,7 +12,6 @@ const {
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
-const logger = require('../../../utils/logger');
 const { slugify } = require('../../../utils/slugify');
 
 /**
@@ -56,7 +55,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
   if (device.clusterClients) {
     await Promise.each(Array.from(device.clusterClients.entries()), async ([clusterIndex, clusterClient]) => {
-      logger.info(`Matter pairing - Cluster client ${clusterIndex}`);
       const commonNewFeature = {
         name: `${clusterClient.name} - ${clusterClient.endpointId}`,
         selector: slugify(`matter-${device.name}-${clusterClient.name}`, true),
@@ -204,8 +202,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 200,
           });
         }
-      } else {
-        logger.debug(`Matter pairing - Cluster client ${clusterIndex} (${clusterClient.name}) not supported`);
       }
     });
   }

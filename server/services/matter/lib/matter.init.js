@@ -1,6 +1,5 @@
 const path = require('path');
 const fse = require('fs-extra');
-const Promise = require('bluebird');
 
 const logger = require('../../../utils/logger');
 
@@ -13,8 +12,6 @@ async function init() {
   const { CommissioningController } = this.ProjectChipMatter;
 
   // Reset memory
-  this.devices = [];
-  this.nodesMap = new Map();
   this.commissioningController = null;
 
   // Store the matter data in the same folder as the Gladys database
@@ -43,11 +40,7 @@ async function init() {
 
   await this.commissioningController.start();
   logger.info('Matter controller started');
-  const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
-
-  await Promise.each(nodeDetails, async (nodeDetail) => {
-    await this.handleNode(nodeDetail);
-  });
+  await this.refreshDevices();
 }
 
 module.exports = {

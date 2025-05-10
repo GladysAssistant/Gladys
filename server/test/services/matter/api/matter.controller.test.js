@@ -10,6 +10,7 @@ describe('MatterController', () => {
   beforeEach(() => {
     matterHandler = {
       pairDevice: fake.resolves(null),
+      refreshDevices: fake.resolves(null),
       getDevices: fake.returns([{ name: 'toto' }]),
       getNodes: fake.returns([{ name: 'toto' }]),
       checkIpv6: fake.returns({

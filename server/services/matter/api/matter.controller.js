@@ -21,6 +21,7 @@ module.exports = function MatterController(matterHandler) {
    * @apiGroup Matter
    */
   async function getPairedDevices(req, res) {
+    await matterHandler.refreshDevices();
     const devices = matterHandler.getDevices();
     res.json(devices);
   }
