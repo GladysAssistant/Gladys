@@ -270,7 +270,8 @@
       "edf-tempo": "Tempo EDF",
       "clock": "Clock",
       "scene": "Scene",
-      "music": "Music"
+      "music": "Music",
+      "gauge": "Gauge"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -421,6 +422,13 @@
         "displaySecond": "Display seconds?",
         "yes": "Yes",
         "no": "No"
+      },
+      "gauge": {
+        "description": "This widget will display a gauge with the value of the selected feature between its minimum and maximum value.",
+        "selectDeviceLabel": "Select feature to display",
+        "noDeviceFeatureSelector": "No feature selected",
+        "errorLoadingDevice": "An error occured while loading the device",
+        "noDeviceFeatureLastValue": "This feature has not received any value yet"
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",

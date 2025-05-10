@@ -270,7 +270,8 @@
       "edf-tempo": "EDF Tempo",
       "clock": "Horloge",
       "scene": "Scène",
-      "music": "Musique"
+      "music": "Musique",
+      "gauge": "Jauge"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -442,6 +443,13 @@
       },
       "music": {
         "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
+      },
+      "gauge": {
+        "description": "Ce widget affichera une jauge avec la valeur de la fonctionnalité sélectionnée entre sa valeur minimale et maximale.",
+        "selectDeviceLabel": "Sélectionner la fonctionnalité à afficher",
+        "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
+        "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
+        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
       }
     }
   },

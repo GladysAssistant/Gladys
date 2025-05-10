@@ -270,7 +270,8 @@
       "edf-tempo": "EDF Tempo",
       "clock": "Uhr",
       "scene": "Szene",
-      "music": "Musik"
+      "music": "Musik",
+      "gauge": "Messanzeige"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -421,6 +422,13 @@
         "displaySecond": "Sekunden anzeigen?",
         "yes": "Ja",
         "no": "Nein"
+      },
+      "gauge": {
+        "description": "Dieses Widget zeigt eine Messanzeige mit dem Wert der ausgewählten Funktion zwischen ihrem Minimum und Maximum an.",
+        "selectDeviceLabel": "Wählen Sie die Funktion aus, die angezeigt werden soll",
+        "noDeviceFeatureSelector": "Keine Funktion ausgewählt",
+        "errorLoadingDevice": "Ein Fehler ist aufgetreten, während das Gerät geladen wird",
+        "noDeviceFeatureLastValue": "Diese Funktion hat noch keinen Wert empfangen"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
