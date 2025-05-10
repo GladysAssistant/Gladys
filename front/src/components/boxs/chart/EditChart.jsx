@@ -438,7 +438,10 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, showAdvancedOptions, chartTypeList }) {
+  render(
+    props,
+    { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, showAdvancedOptions, chartTypeList }
+  ) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
@@ -564,12 +567,11 @@ class EditChart extends Component {
               </>
             )}
             <div class="form-group">
-              <button 
-                onClick={this.toggleAdvancedOptions} 
-                class="btn btn-sm btn-outline-secondary w-100 mb-3"
-              >
-                <i class={`fa fa-${showAdvancedOptions ? 'chevron-up' : 'chevron-down'} mr-2`}></i>
-                <Text id={`dashboard.boxes.chart.${showAdvancedOptions ? 'hideAdvancedOptions' : 'showAdvancedOptions'}`} />
+              <button onClick={this.toggleAdvancedOptions} class="btn btn-sm btn-outline-secondary w-100 mb-3">
+                <i class={`fa fa-${showAdvancedOptions ? 'chevron-up' : 'chevron-down'} mr-2`} />
+                <Text
+                  id={`dashboard.boxes.chart.${showAdvancedOptions ? 'hideAdvancedOptions' : 'showAdvancedOptions'}`}
+                />
               </button>
             </div>
 
@@ -592,133 +594,133 @@ class EditChart extends Component {
                     </option>
                   </select>
                 </div>
-            {props.box.chart_type !== 'timeline' && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.chart.aggregateFunction" />
-                </label>
-                <select
-                  onChange={this.updateAggregateFunction}
-                  className="form-control"
-                  value={props.box.aggregate_function}
-                >
-                  <option value="avg">
-                    <Text id="dashboard.boxes.chart.aggregateFunctions.avg" />
-                  </option>
-                  <option value="sum">
-                    <Text id="dashboard.boxes.chart.aggregateFunctions.sum" />
-                  </option>
-                  <option value="max">
-                    <Text id="dashboard.boxes.chart.aggregateFunctions.max" />
-                  </option>
-                  <option value="min">
-                    <Text id="dashboard.boxes.chart.aggregateFunctions.min" />
-                  </option>
-                  <option value="count">
-                    <Text id="dashboard.boxes.chart.aggregateFunctions.count" />
-                  </option>
-                </select>
-              </div>
-            )}
-            {props.box.chart_type !== 'timeline' && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.chart.groupByLabel" />
-                </label>
-                <select onChange={this.updateGroupBy} className="form-control" value={props.box.group_by}>
-                  <option value="">
-                    <Text id="dashboard.boxes.chart.groupBy.noGrouping" />
-                  </option>
-                  <option value="hour">
-                    <Text id="dashboard.boxes.chart.groupBy.hour" />
-                  </option>
-                  <option value="day">
-                    <Text id="dashboard.boxes.chart.groupBy.day" />
-                  </option>
-                  <option value="week">
-                    <Text id="dashboard.boxes.chart.groupBy.week" />
-                  </option>
-                  <option value="month">
-                    <Text id="dashboard.boxes.chart.groupBy.month" />
-                  </option>
-                  <option value="year">
-                    <Text id="dashboard.boxes.chart.groupBy.year" />
-                  </option>
-                </select>
-              </div>
-            )}
-            {props.box.chart_type !== 'timeline' && (
-              <div class="form-group">
-                <label>
-                  <Text id="dashboard.boxes.chart.displayVariation" />
-                </label>
-                <select
-                  onChange={this.updateDisplayVariation}
-                  className="form-control"
-                  value={props.box.display_variation ? 'yes' : 'no'}
-                >
-                  <option value="yes">
-                    <Text id="dashboard.boxes.chart.yes" />
-                  </option>
-                  <option value="no">
-                    <Text id="dashboard.boxes.chart.no" />
-                  </option>
-                </select>
-              </div>
-            )}
-            <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.defaultInterval" />
-              </label>
-              <select onChange={this.updateDefaultInterval} class="form-control" value={props.box.interval}>
-                <option>
-                  <Text id="global.emptySelectOption" />
-                </option>
-                <option value="last-hour">
-                  <Text id="dashboard.boxes.chart.lastHour" />
-                </option>
-                <option value="last-twelve-hours">
-                  <Text id="dashboard.boxes.chart.lastTwelveHours" />
-                </option>
-                <option value="last-day">
-                  <Text id="dashboard.boxes.chart.lastDay" />
-                </option>
                 {props.box.chart_type !== 'timeline' && (
-                  <option value="last-week">
-                    <Text id="dashboard.boxes.chart.lastSevenDays" />
-                  </option>
+                  <div class="form-group">
+                    <label>
+                      <Text id="dashboard.boxes.chart.aggregateFunction" />
+                    </label>
+                    <select
+                      onChange={this.updateAggregateFunction}
+                      className="form-control"
+                      value={props.box.aggregate_function}
+                    >
+                      <option value="avg">
+                        <Text id="dashboard.boxes.chart.aggregateFunctions.avg" />
+                      </option>
+                      <option value="sum">
+                        <Text id="dashboard.boxes.chart.aggregateFunctions.sum" />
+                      </option>
+                      <option value="max">
+                        <Text id="dashboard.boxes.chart.aggregateFunctions.max" />
+                      </option>
+                      <option value="min">
+                        <Text id="dashboard.boxes.chart.aggregateFunctions.min" />
+                      </option>
+                      <option value="count">
+                        <Text id="dashboard.boxes.chart.aggregateFunctions.count" />
+                      </option>
+                    </select>
+                  </div>
                 )}
                 {props.box.chart_type !== 'timeline' && (
-                  <option value="last-month">
-                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                  </option>
+                  <div class="form-group">
+                    <label>
+                      <Text id="dashboard.boxes.chart.groupByLabel" />
+                    </label>
+                    <select onChange={this.updateGroupBy} className="form-control" value={props.box.group_by}>
+                      <option value="">
+                        <Text id="dashboard.boxes.chart.groupBy.noGrouping" />
+                      </option>
+                      <option value="hour">
+                        <Text id="dashboard.boxes.chart.groupBy.hour" />
+                      </option>
+                      <option value="day">
+                        <Text id="dashboard.boxes.chart.groupBy.day" />
+                      </option>
+                      <option value="week">
+                        <Text id="dashboard.boxes.chart.groupBy.week" />
+                      </option>
+                      <option value="month">
+                        <Text id="dashboard.boxes.chart.groupBy.month" />
+                      </option>
+                      <option value="year">
+                        <Text id="dashboard.boxes.chart.groupBy.year" />
+                      </option>
+                    </select>
+                  </div>
                 )}
                 {props.box.chart_type !== 'timeline' && (
-                  <option value="last-three-months">
-                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                  </option>
+                  <div class="form-group">
+                    <label>
+                      <Text id="dashboard.boxes.chart.displayVariation" />
+                    </label>
+                    <select
+                      onChange={this.updateDisplayVariation}
+                      className="form-control"
+                      value={props.box.display_variation ? 'yes' : 'no'}
+                    >
+                      <option value="yes">
+                        <Text id="dashboard.boxes.chart.yes" />
+                      </option>
+                      <option value="no">
+                        <Text id="dashboard.boxes.chart.no" />
+                      </option>
+                    </select>
+                  </div>
                 )}
-                {props.box.chart_type !== 'timeline' && (
-                  <option value="last-year">
-                    <Text id="dashboard.boxes.chart.lastYear" />
-                  </option>
-                )}
-              </select>
-            </div>
-            <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.preview" />
-              </label>
-              {displayPreview && <Chart box={props.box} />}
-              {!displayPreview && (
-                <div>
-                  <button class="btn btn-secondary" onClick={this.showPreview}>
-                    <Text id="dashboard.boxes.chart.showPreviewButton" />
-                  </button>
+                <div class="form-group">
+                  <label>
+                    <Text id="dashboard.boxes.chart.defaultInterval" />
+                  </label>
+                  <select onChange={this.updateDefaultInterval} class="form-control" value={props.box.interval}>
+                    <option>
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    <option value="last-hour">
+                      <Text id="dashboard.boxes.chart.lastHour" />
+                    </option>
+                    <option value="last-twelve-hours">
+                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
+                    </option>
+                    <option value="last-day">
+                      <Text id="dashboard.boxes.chart.lastDay" />
+                    </option>
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-week">
+                        <Text id="dashboard.boxes.chart.lastSevenDays" />
+                      </option>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-month">
+                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                      </option>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-three-months">
+                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                      </option>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <option value="last-year">
+                        <Text id="dashboard.boxes.chart.lastYear" />
+                      </option>
+                    )}
+                  </select>
                 </div>
-              )}
-            </div>
-            </div>
+                <div class="form-group">
+                  <label>
+                    <Text id="dashboard.boxes.chart.preview" />
+                  </label>
+                  {displayPreview && <Chart box={props.box} />}
+                  {!displayPreview && (
+                    <div>
+                      <button class="btn btn-secondary" onClick={this.showPreview}>
+                        <Text id="dashboard.boxes.chart.showPreviewButton" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
