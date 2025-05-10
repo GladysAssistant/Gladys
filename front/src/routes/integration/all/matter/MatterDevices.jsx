@@ -400,7 +400,8 @@ class MatterDevices extends Component {
                   </div>
                 )}
                 <div class="row">
-                  {matterDevices && matterDevices.length > 0 ? (
+                  {matterDevices &&
+                    matterDevices.length > 0 &&
                     matterDevices.map((device, index) => (
                       <MatterDeviceBox
                         editable
@@ -412,8 +413,8 @@ class MatterDevices extends Component {
                         nodesIsConnected={nodesIsConnected}
                         housesWithRooms={housesWithRooms}
                       />
-                    ))
-                  ) : (
+                    ))}
+                  {matterDevices && matterDevices.length === 0 && pairedDevices && pairedDevices.length === 0 && (
                     <EmptyState matterEnabled={matterEnabled} />
                   )}
                 </div>
