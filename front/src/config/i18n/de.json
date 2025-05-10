@@ -388,6 +388,15 @@
           "max": "Max",
           "min": "Min",
           "count": "Count"
+        },
+        "groupByLabel": "Gruppieren nach",
+        "groupBy": {
+          "noGrouping": "Keine Gruppierung",
+          "hour": "Stunde",
+          "day": "Tag",
+          "week": "Woche",
+          "month": "Monat",
+          "year": "Jahr"
         }
       },
       "ecowatt": {

@@ -194,6 +194,11 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
         group.period,
       );
       expect(values).to.have.lengthOf(group.expectedResults);
+      expect(values[0]).to.have.property('value');
+      expect(values[0]).to.have.property('max_value');
+      expect(values[0]).to.have.property('min_value');
+      expect(values[0]).to.have.property('sum_value');
+      expect(values[0]).to.have.property('count_value');
     });
   });
   it('should return last day states', async () => {

@@ -129,6 +129,10 @@ class EditChart extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: e.target.value });
   };
 
+  updateGroupBy = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, { group_by: e.target.value ? e.target.value : undefined });
+  };
+
   updateBoxTitle = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
@@ -141,6 +145,12 @@ class EditChart extends Component {
       }
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: undefined });
+    }
+  };
+
+  refreshGroupBy = (firstDeviceSelector = null) => {
+    if (firstDeviceSelector && FEATURE_BINARY[firstDeviceSelector.type]) {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { group_by: undefined });
     }
   };
 
@@ -207,6 +217,7 @@ class EditChart extends Component {
     }
     this.refreshChartTypeList(firstDeviceSelector);
     this.refreshAggregateFunction(firstDeviceSelector);
+    this.refreshGroupBy(firstDeviceSelector);
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
@@ -586,6 +597,33 @@ class EditChart extends Component {
                   </option>
                   <option value="count">
                     <Text id="dashboard.boxes.chart.aggregateFunctions.count" />
+                  </option>
+                </select>
+              </div>
+            )}
+            {props.box.chart_type !== 'timeline' && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.groupByLabel" />
+                </label>
+                <select onChange={this.updateGroupBy} className="form-control" value={props.box.group_by}>
+                  <option value="">
+                    <Text id="dashboard.boxes.chart.groupBy.noGrouping" />
+                  </option>
+                  <option value="hour">
+                    <Text id="dashboard.boxes.chart.groupBy.hour" />
+                  </option>
+                  <option value="day">
+                    <Text id="dashboard.boxes.chart.groupBy.day" />
+                  </option>
+                  <option value="week">
+                    <Text id="dashboard.boxes.chart.groupBy.week" />
+                  </option>
+                  <option value="month">
+                    <Text id="dashboard.boxes.chart.groupBy.month" />
+                  </option>
+                  <option value="year">
+                    <Text id="dashboard.boxes.chart.groupBy.year" />
                   </option>
                 </select>
               </div>

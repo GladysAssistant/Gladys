@@ -30,7 +30,11 @@ const NON_BINARY_QUERY = `
 const GROUPED_QUERY = `
   SELECT
     DATE_TRUNC(?, created_at) AS grouped_date,
-    AVG(value) AS value
+    AVG(value) AS value,
+    MAX(value) AS max_value,
+    MIN(value) AS min_value,
+    SUM(value) AS sum_value,
+    COUNT(value) AS count_value
   FROM
     t_device_feature_state
   WHERE
@@ -113,9 +117,10 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
     values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY, groupBy, deviceFeature.id, intervalDate);
 
     // Rename grouped_date to created_at for consistency with the existing API
-    values = values.map((row) => ({
-      created_at: row.grouped_date,
-      value: row.value,
+    values = values.map((value) => ({
+      ...value,
+      created_at: value.grouped_date,
+      count_value: Number(value.count_value),
     }));
   } else {
     // Use the original non-binary query when no groupBy is specified
