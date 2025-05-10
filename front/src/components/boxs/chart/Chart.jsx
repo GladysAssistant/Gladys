@@ -46,6 +46,23 @@ const notNullNotUndefined = value => {
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
 
+const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
+  if (aggregateFunction === 'min') {
+    return value.min_value;
+  } else if (aggregateFunction === 'max') {
+    return value.max_value;
+  } else if (aggregateFunction === 'sum') {
+    return value.sum_value;
+  } else if (aggregateFunction === 'count') {
+    return value.count_value;
+  } else if (aggregateFunction === 'avg') {
+    return value.value;
+  }
+  // The default is the "avg", as before this feature
+  // we were not defining an aggregate function
+  return value.value;
+};
+
 const roundWith2DecimalIfNeeded = value => {
   if (!notNullNotUndefined(value)) {
     return null;
@@ -238,7 +255,10 @@ class Chartbox extends Component {
             name,
             data: values.map(value => {
               emptySeries = false;
-              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+              return [
+                Math.round(new Date(value.created_at).getTime() / 1000) * 1000,
+                getDeviceValueByAggregateFunction(value, this.props.box.aggregate_function)
+              ];
             })
           };
         });

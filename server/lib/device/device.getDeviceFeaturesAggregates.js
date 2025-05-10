@@ -14,7 +14,11 @@ const NON_BINARY_QUERY = `
     )
     SELECT
         MIN(created_at) AS created_at,
-        AVG(value) AS value
+        AVG(value) AS value,
+        MAX(value) AS max_value,
+        MIN(value) AS min_value,
+        SUM(value) AS sum_value,
+        COUNT(value) AS count_value
     FROM
         intervals
     GROUP BY
@@ -116,6 +120,11 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   } else {
     // Use the original non-binary query when no groupBy is specified
     values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, intervalDate);
+    // Convert BigInt count_value to regular JavaScript Number
+    values = values.map((value) => ({
+      ...value,
+      count_value: Number(value.count_value),
+    }));
   }
 
   return {
