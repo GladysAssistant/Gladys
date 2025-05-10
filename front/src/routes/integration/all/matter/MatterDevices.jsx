@@ -301,8 +301,6 @@ class MatterDevices extends Component {
       }
     });
 
-    console.log({ loading });
-
     return (
       <MatterPage user={props.user}>
         <div class="card">
