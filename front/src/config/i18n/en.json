@@ -1831,7 +1831,8 @@
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
         "noNodesFound": "No Matter nodes found",
-        "disabledWarning": "Matter is not activated. Please activate it in \"Settings\" before using the integration",
+        "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
+        "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
         "enableButton": "Enable Matter",
         "disableButton": "Disable Matter",
         "downloadNodesJson": "Download Nodes JSON"

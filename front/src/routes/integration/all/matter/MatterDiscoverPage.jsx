@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { route } from 'preact-router';
@@ -72,7 +72,7 @@ class MatterDiscoverPage extends Component {
           <div class="card-body">
             {!this.state.matterEnabled && (
               <div class="alert alert-warning">
-                <Text id="integration.matter.settings.disabledWarning" />
+                <MarkupText id="integration.matter.settings.disabledWarning" />
               </div>
             )}
             <div class="alert alert-info">

@@ -342,7 +342,7 @@ class MatterSettingsPage extends Component {
             {!matterEnabled && (
               <>
                 <div class="alert alert-warning">
-                  <Text id="integration.matter.settings.disabledWarning" />
+                  <Text id="integration.matter.settings.disabledWarningSettings" />
                 </div>
                 <div class="form-group">
                   <button onClick={this.enableMatter} class="btn btn-success" disabled={saving}>

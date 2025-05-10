@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
@@ -51,19 +51,24 @@ class MatterDevices extends Component {
   }
 
   init = async () => {
-    await Promise.all([this.loadConfiguration(), this.getHouses(), this.getMatterDevices()]);
+    await Promise.all([this.loadConfiguration(), this.getHouses()]);
     // We need to wait before getting all matter devices before being able to load paired devices
     await this.getPairedDevices();
+    this.setState({
+      loading: false
+    });
   };
 
   loadConfiguration = async () => {
     try {
-      const { value: matterEnabled } = await this.props.httpClient.get(
-        '/api/v1/service/matter/variable/MATTER_ENABLED'
-      );
+      const { value } = await this.props.httpClient.get('/api/v1/service/matter/variable/MATTER_ENABLED');
+      const matterEnabled = value === 'true';
       this.setState({
-        matterEnabled: matterEnabled === 'true'
+        matterEnabled
       });
+      if (matterEnabled) {
+        await this.getMatterDevices();
+      }
     } catch (e) {
       console.error(e);
       this.setState({ error: RequestStatus.Error });
@@ -317,7 +322,7 @@ class MatterDevices extends Component {
           <div class="card-body">
             {!matterEnabled && (
               <div class="alert alert-warning">
-                <Text id="integration.matter.settings.disabledWarning" />
+                <MarkupText id="integration.matter.settings.disabledWarning" />
               </div>
             )}
             {sortedPairedDevices && sortedPairedDevices.length > 0 && (
@@ -405,7 +410,7 @@ class MatterDevices extends Component {
                       />
                     ))
                   ) : (
-                    <EmptyState />
+                    <EmptyState matterEnabled={matterEnabled} />
                   )}
                 </div>
               </div>
