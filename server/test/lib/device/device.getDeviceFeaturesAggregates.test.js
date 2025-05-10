@@ -201,6 +201,21 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
       expect(values[0]).to.have.property('count_value');
     });
   });
+
+  it('should return error, group by function is not supported', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const promise = device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, null, 'blabla');
+    return assert.isRejected(promise, 'Invalid groupBy parameter. Must be one of: hour, day, week, month, year');
+  });
   it('should return last day states', async () => {
     await insertStates(4 * 24 * 60);
     const variable = {
