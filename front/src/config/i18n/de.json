@@ -1830,7 +1830,7 @@
         "nodeDetailsLabel": "Knotendetails",
         "actionsLabel": "Aktionen",
         "decommissionButton": "Stilllegen",
-        "noNodesFound": "Keine Matter-Knoten gefunden",
+        "noNodesFound": "Keine Matter-Knoten gefunden. Du kannst ein Matter-Gerät hinzufügen, indem du auf der Registerkarte \"Gerät hinzufügen\" gehst.",
         "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es in <a href=\"/dashboard/integration/device/matter/settings\">Einstellungen</a> bevor du die Integration verwendest.",
         "disabledWarningSettings": "Matter ist nicht aktiviert, bitte klicke auf den Button unten, um es zu aktivieren.",
         "enableButton": "Matter aktivieren",

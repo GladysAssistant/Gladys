@@ -1830,7 +1830,7 @@
         "nodeDetailsLabel": "Node Details",
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
-        "noNodesFound": "No Matter nodes found",
+        "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
         "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
         "enableButton": "Enable Matter",
