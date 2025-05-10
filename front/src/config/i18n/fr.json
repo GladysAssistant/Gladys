@@ -355,11 +355,13 @@
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
         "lastYear": "Dernière année",
+        "showAdvancedOptions": "Afficher les options avancées",
+        "hideAdvancedOptions": "Masquer les options avancées",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
         "noChartType": "Aucun type de graphique sélectionné",
-        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
-        "editNameLabel": "Entrez le nom de cette box",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition du widget et sélectionner un type de graphique.",
+        "editNameLabel": "Entrez le nom de ce widget",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
         "editRoomLabel": "Sélectionnez une pièce",
@@ -389,6 +391,15 @@
           "max": "Maximum",
           "min": "Minimum",
           "count": "Nombre"
+        },
+        "groupByLabel": "Grouper par",
+        "groupBy": {
+          "noGrouping": "Ne pas grouper",
+          "hour": "Heure",
+          "day": "Jour",
+          "week": "Semaine",
+          "month": "Mois",
+          "year": "Année"
         }
       },
       "ecowatt": {

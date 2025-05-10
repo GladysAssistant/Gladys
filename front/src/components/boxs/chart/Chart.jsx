@@ -192,9 +192,11 @@ class Chartbox extends Component {
     await this.setState({ loading: true });
     try {
       const maxStates = 300;
+
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: maxStates,
+        max_states: this.props.box.group_by ? undefined : maxStates,
+        group_by: this.props.box.group_by,
         device_features: deviceFeatures.join(',')
       });
 

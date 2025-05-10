@@ -22,6 +22,7 @@ const boxesSchema = Joi.array().items(
       title: Joi.string(),
       interval: Joi.string(),
       aggregate_function: Joi.string().valid('avg', 'sum', 'max', 'min', 'count'),
+      group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
       display_axes: Joi.boolean(),
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
