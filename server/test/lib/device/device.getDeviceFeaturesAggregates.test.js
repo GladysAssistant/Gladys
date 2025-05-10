@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const { expect, assert } = require('chai');
+const Promise = require('bluebird');
 const sinon = require('sinon');
 const { fake } = require('sinon');
 const dayjs = require('dayjs');
@@ -138,6 +139,57 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
+  });
+
+  const GROUPS = [
+    {
+      period: 'day',
+      numberOfDaysToInsert: 2,
+      expectedResults: 2,
+    },
+    {
+      period: 'week',
+      numberOfDaysToInsert: 3 * 7,
+      expectedResults: 4,
+    },
+    {
+      period: 'month',
+      numberOfDaysToInsert: 2 * 30,
+      expectedResults: 3,
+    },
+    {
+      period: 'year',
+      numberOfDaysToInsert: 365,
+      expectedResults: 2,
+    },
+  ];
+
+  GROUPS.forEach((group) => {
+    it(`should group by ${group.period}`, async () => {
+      await Promise.each([...Array(group.numberOfDaysToInsert).keys()], async (i) => {
+        const dateFromXDaysAgo = dayjs()
+          .subtract(i, 'day')
+          .toDate();
+        await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', i, dateFromXDaysAgo);
+      });
+      const variable = {
+        getValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          name: 'my-feature',
+        }),
+      };
+      const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+      const { values } = await device.getDeviceFeaturesAggregates(
+        'test-device-feature',
+        group.numberOfDaysToInsert * 24 * 60,
+        null,
+        group.period,
+      );
+      expect(values).to.have.lengthOf(group.expectedResults);
+    });
   });
   it('should return last day states', async () => {
     await insertStates(4 * 24 * 60);
