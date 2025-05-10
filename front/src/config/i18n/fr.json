@@ -380,7 +380,15 @@
         "on": "On",
         "off": "Off",
         "start_date": "Début le : ",
-        "end_date": "Fin le : "
+        "end_date": "Fin le : ",
+        "aggregateFunction": "Fonction d'agrégation",
+        "aggregateFunctions": {
+          "sum": "Somme",
+          "avg": "Moyenne",
+          "max": "Maximum",
+          "min": "Minimum",
+          "count": "Nombre"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",

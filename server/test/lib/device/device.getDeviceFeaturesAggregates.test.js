@@ -123,6 +123,11 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
     const { values } = await deviceInstance.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
     expect(values).to.have.lengthOf(1);
+    expect(values[0]).to.have.property('value');
+    expect(values[0]).to.have.property('max_value');
+    expect(values[0]).to.have.property('min_value');
+    expect(values[0]).to.have.property('sum_value');
+    expect(values[0]).to.have.property('count_value');
   });
   it('should return last day states', async () => {
     await insertStates(48 * 60);

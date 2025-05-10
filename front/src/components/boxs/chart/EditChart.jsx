@@ -125,8 +125,23 @@ class EditChart extends Component {
     }
   };
 
+  updateAggregateFunction = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: e.target.value });
+  };
+
   updateBoxTitle = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
+  };
+
+  refreshAggregateFunction = (firstDeviceSelector = null) => {
+    if (firstDeviceSelector && !FEATURE_BINARY[firstDeviceSelector.type]) {
+      if (!this.props.box.aggregate_function) {
+        // set aggregate function to avg by default if not defined
+        this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: 'avg' });
+      }
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: undefined });
+    }
   };
 
   addDeviceFeature = async selectedDeviceFeatureOption => {
@@ -191,6 +206,7 @@ class EditChart extends Component {
       this.setState({ chart_type: '' });
     }
     this.refreshChartTypeList(firstDeviceSelector);
+    this.refreshAggregateFunction(firstDeviceSelector);
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
@@ -546,6 +562,34 @@ class EditChart extends Component {
                 </option>
               </select>
             </div>
+            {props.box.chart_type !== 'timeline' && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.aggregateFunction" />
+                </label>
+                <select
+                  onChange={this.updateAggregateFunction}
+                  className="form-control"
+                  value={props.box.aggregate_function}
+                >
+                  <option value="avg">
+                    <Text id="dashboard.boxes.chart.aggregateFunctions.avg" />
+                  </option>
+                  <option value="sum">
+                    <Text id="dashboard.boxes.chart.aggregateFunctions.sum" />
+                  </option>
+                  <option value="max">
+                    <Text id="dashboard.boxes.chart.aggregateFunctions.max" />
+                  </option>
+                  <option value="min">
+                    <Text id="dashboard.boxes.chart.aggregateFunctions.min" />
+                  </option>
+                  <option value="count">
+                    <Text id="dashboard.boxes.chart.aggregateFunctions.count" />
+                  </option>
+                </select>
+              </div>
+            )}
             {props.box.chart_type !== 'timeline' && (
               <div class="form-group">
                 <label>
