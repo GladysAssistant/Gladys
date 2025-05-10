@@ -51,10 +51,11 @@ class MatterDevices extends Component {
   }
 
   init = async () => {
+    await this.setState({ loading: true });
     await Promise.all([this.loadConfiguration(), this.getHouses()]);
     // We need to wait before getting all matter devices before being able to load paired devices
     await this.getPairedDevices();
-    this.setState({
+    await this.setState({
       loading: false
     });
   };
@@ -300,6 +301,8 @@ class MatterDevices extends Component {
       }
     });
 
+    console.log({ loading });
+
     return (
       <MatterPage user={props.user}>
         <div class="card">
@@ -317,72 +320,12 @@ class MatterDevices extends Component {
                   searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
                 />
               </Localizer>
+              <button onClick={this.init} class="btn btn-sm btn-outline-primary ml-2">
+                <i class="fe fe-refresh-cw" />
+              </button>
             </div>
           </div>
           <div class="card-body">
-            {!matterEnabled && (
-              <div class="alert alert-warning">
-                <MarkupText id="integration.matter.settings.disabledWarning" />
-              </div>
-            )}
-            {sortedPairedDevices && sortedPairedDevices.length > 0 && (
-              <div class="alert alert-info">
-                <h4 class="alert-heading">
-                  <Text id="integration.matter.device.pairedDevicesTitle" />
-                </h4>
-                <div class="row mt-4">
-                  {sortedPairedDevices.map(device => (
-                    <div class="col-md-6">
-                      <div class="card">
-                        <div class="card-header">
-                          {device.name || device.model}
-                          {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                            <div class="page-options d-flex">
-                              <div class="tag tag-danger">
-                                <Text id="integration.matter.device.nodeDisconnected" />
-                                <span class="tag-addon">
-                                  <i class="fe fe-wifi-off" />
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div class="card-body">
-                          {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                            <div class="alert alert-info">
-                              <Text id="integration.matter.device.deviceAlreadyExist" />
-                            </div>
-                          )}
-                          {device.features && device.features.length > 0 && (
-                            <div class="form-group">
-                              <label class="form-label">
-                                <Text id="integration.matter.featuresLabel" />
-                              </label>
-                              <DeviceFeatures features={device.features} />
-                            </div>
-                          )}
-                          {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                            <div class="form-group">
-                              <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
-                                <Text id="integration.matter.device.replaceExisting" />
-                              </button>
-                            </div>
-                          )}
-                          {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                            <div class="form-group">
-                              <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
-                                <Text id="integration.matter.device.addToGladys" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div
               class={cx('dimmer', {
                 active: loading
@@ -390,6 +333,69 @@ class MatterDevices extends Component {
             >
               <div class="loader" />
               <div class="dimmer-content">
+                {!matterEnabled && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="integration.matter.settings.disabledWarning" />
+                  </div>
+                )}
+                {sortedPairedDevices && sortedPairedDevices.length > 0 && (
+                  <div class="alert alert-info">
+                    <h4 class="alert-heading">
+                      <Text id="integration.matter.device.pairedDevicesTitle" />
+                    </h4>
+                    <div class="row mt-4">
+                      {sortedPairedDevices.map(device => (
+                        <div class="col-md-6">
+                          <div class="card">
+                            <div class="card-header">
+                              {device.name || device.model}
+                              {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                                <div class="page-options d-flex">
+                                  <div class="tag tag-danger">
+                                    <Text id="integration.matter.device.nodeDisconnected" />
+                                    <span class="tag-addon">
+                                      <i class="fe fe-wifi-off" />
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div class="card-body">
+                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                <div class="alert alert-info">
+                                  <Text id="integration.matter.device.deviceAlreadyExist" />
+                                </div>
+                              )}
+                              {device.features && device.features.length > 0 && (
+                                <div class="form-group">
+                                  <label class="form-label">
+                                    <Text id="integration.matter.featuresLabel" />
+                                  </label>
+                                  <DeviceFeatures features={device.features} />
+                                </div>
+                              )}
+                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                <div class="form-group">
+                                  <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
+                                    <Text id="integration.matter.device.replaceExisting" />
+                                  </button>
+                                </div>
+                              )}
+                              {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                <div class="form-group">
+                                  <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
+                                    <Text id="integration.matter.device.addToGladys" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {error && (
                   <div class="alert alert-danger">
                     <Text id="integration.matter.error.getDevicesError" />
