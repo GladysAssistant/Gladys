@@ -64,7 +64,7 @@ describe('Matter.refreshDevices', () => {
     };
   });
 
-  it.only('should refresh devices', async () => {
+  it('should refresh devices', async () => {
     await matterHandler.refreshDevices();
     expect(matterHandler.devices).to.have.lengthOf(2);
     expect(matterHandler.nodesMap.size).to.equal(1);
