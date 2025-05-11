@@ -89,7 +89,7 @@ class NukiDeviceBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <div>
+              <div class="card-body">
                 {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />
@@ -156,45 +156,45 @@ class NukiDeviceBox extends Component {
                   />
                 </div>
 
-                {props.editButton && (
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.nuki.device.protocolLabel" />
+                
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.nuki.device.protocolLabel" />
+                  </label>
+
+                  <div class="form-check form-check-inline">
+                    <label class="custom-control custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        name={`device-protocol-${deviceIndex}`}
+                        value="mqtt"
+                        checked={deviceProtocol === 'mqtt'}
+                        disabled
+                      />
+                      <div class="custom-control-label">
+                        <Text id="integration.nuki.device.protocolMQTT" />
+                      </div>
                     </label>
-
-                    <div class="form-check form-check-inline">
-                      <label class="custom-control custom-radio">
-                        <input
-                          type="radio"
-                          class="custom-control-input"
-                          name={`device-protocol-${deviceIndex}`}
-                          value="mqtt"
-                          checked={deviceProtocol === 'mqtt'}
-                          disabled
-                        />
-                        <div class="custom-control-label">
-                          <Text id="integration.nuki.device.protocolMQTT" />
-                        </div>
-                      </label>
-                    </div>
-
-                    <div class="form-check form-check-inline">
-                      <label class="custom-control custom-radio">
-                        <input
-                          type="radio"
-                          class="custom-control-input"
-                          name={`device-protocol-${deviceIndex}`}
-                          value="http"
-                          checked={deviceProtocol === 'http'}
-                          disabled
-                        />
-                        <div class="custom-control-label">
-                          <Text id="integration.nuki.device.protocolHTTP" />
-                        </div>
-                      </label>
-                    </div>
                   </div>
-                )}
+
+                  <div class="form-check form-check-inline">
+                    <label class="custom-control custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        name={`device-protocol-${deviceIndex}`}
+                        value="http"
+                        checked={deviceProtocol === 'http'}
+                        disabled
+                      />
+                      <div class="custom-control-label">
+                        <Text id="integration.nuki.device.protocolHTTP" />
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                
 
                 {device.features && device.features.length > 0 && (
                   <div class="form-group">
@@ -236,13 +236,6 @@ class NukiDeviceBox extends Component {
                     </button>
                   )}
 
-                  {validModel && props.editButton && (
-                    <Link href={`/dashboard/integration/device/nuki/edit/${device.selector}`}>
-                      <button class="btn btn-secondary float-right">
-                        <Text id="integration.nuki.device.editButton" />
-                      </button>
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>

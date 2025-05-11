@@ -42,7 +42,6 @@ const DeviceTab = ({ children, ...props }) => (
                   editable
                   saveButton
                   deleteButton
-                  editButton
                   device={device}
                   deviceIndex={index}
                   listName="nukiDevices"

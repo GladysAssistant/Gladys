@@ -1764,7 +1764,7 @@
       }
     },
     "nuki": {
-      "title": "nuki",
+      "title": "NUKI",
       "description": "Steuern Sie Ihre Nuki-Geräte.",
       "deviceTab": "Geräte",
       "discoverTab": "Nuki-Erkennung",
@@ -1792,7 +1792,6 @@
         "title": "Nuki-Geräte in Gladys",
         "search": "Geräte suchen",
         "updates": "Nach Updates suchen",
-        "editButton": "Bearbeiten",
         "noDeviceFound": "Kein Nuki-Gerät gefunden. Sie können Geräte mit folgenden Aktionen hinzufügen:",
         "protocolLabel": "Protokoll",
         "protocolMQTT": "MQTT",

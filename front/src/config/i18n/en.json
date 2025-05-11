@@ -1764,7 +1764,7 @@
       }
     },
     "nuki": {
-      "title": "nuki",
+      "title": "NUKI",
       "description": "Control your Nuki devices.",
       "deviceTab": "Devices",
       "discoverTab": "Nuki Discovery",
@@ -1792,7 +1792,6 @@
         "title": "Nuki Devices in Gladys",
         "search": "Search Devices",
         "updates": "Check for Updates",
-        "editButton": "Edit",
         "noDeviceFound": "No Nuki device found. You can add devices with the following actions:",
         "protocolLabel": "Protocol",
         "protocolMQTT": "MQTT",
