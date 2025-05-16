@@ -292,8 +292,11 @@ class Chartbox extends Component {
             }
             const firstElement = values[0];
             const lastElement = values[values.length - 1];
-            const variation = calculateVariation(firstElement.value, lastElement.value);
-            const lastValue = lastElement.value;
+            const variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
+            const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
             variationArray.push(variation);
             lastValuesArray.push(lastValue);
           });
@@ -308,9 +311,14 @@ class Chartbox extends Component {
           if (values.length > 0) {
             const firstElement = values[0];
             const lastElement = values[values.length - 1];
-            newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            newState.variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
             newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
-            newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+            newState.lastValueRounded = roundWith2DecimalIfNeeded(
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
             newState.unit = unit;
           }
         }
