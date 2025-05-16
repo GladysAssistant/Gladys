@@ -21,6 +21,7 @@ before(async function before() {
     disableBrainLoading: false,
     disableSchedulerLoading: true,
     disableDuckDbMigration: true,
+    disableGladysUpgradedCheck: true,
     jwtSecret: 'secret',
   };
   const gladys = Gladys(config);

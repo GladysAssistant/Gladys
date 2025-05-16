@@ -41,6 +41,7 @@ const { EVENTS } = require('../utils/constants');
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
+ * @param {boolean} [params.disableGladysUpgradedCheck] - If true, disable the check if Gladys is upgraded.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
@@ -173,7 +174,9 @@ function Gladys(params = {}) {
       }
       gateway.init();
 
-      await system.checkIfGladysUpgraded(gateway);
+      if (!params.disableGladysUpgradedCheck) {
+        await system.checkIfGladysUpgraded(gateway);
+      }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {
         type: EVENTS.SYSTEM.START,
