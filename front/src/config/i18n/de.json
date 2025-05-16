@@ -1817,7 +1817,7 @@
       },
       "setup": {
         "title": "Nuki-Einrichtung",
-        "nukiDescription": "Sie können Gladys mit Ihrem Nuki-Cloud-Konto verbinden, um die zugehörigen Geräte zu steuern.",
+        "nukiDescription": "Um Ihre Geräte über NukiWeb zu steuern, muss Gladys mit dem Internet verbunden sein und Sie benötigen einen API-Schlüssel. Befolgen Sie diese Schritte:<br><br>1. Gehen Sie auf die <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb-Website</a><br>2. Öffnen Sie das API-Menü und klicken Sie auf „API-Token generieren“, um Ihren API-Schlüssel zu erhalten<br>3. Geben Sie Ihren API-Schlüssel unten ein<br><br>⚠️ Hinweis: Diese Konfiguration ist <u>optional</u>, wenn Ihre Installation mit MQTT eingerichtet ist.",
         "apiKeyLabel": "API-Schlüssel",
         "apiKeyPlaceholder": "Geben Sie den Nuki-Web-API-Schlüssel ein",
         "saveLabel": "Konfiguration speichern",

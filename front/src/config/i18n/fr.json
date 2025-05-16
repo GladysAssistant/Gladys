@@ -1765,12 +1765,12 @@
     },
     "nuki": {
       "title": "NUKI",
-      "description": "Contrôlez vos apareils nuki.",
+      "description": "Contrôlez vos apareils Nuki.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte nuki",
+      "discoverTab": "Découverte Nuki",
       "setupTab": "Configuration",
       "documentation": "Documentation Nuki",
-      "discoverDeviceDescr": "Scanner automatiquement les appareils nuki",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Nuki",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "modelLabel": "Modèle",
@@ -1787,8 +1787,8 @@
         "http": "Id de la serrure connectée sur NukiWeb"
       },
       "status": {
-        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud nuki, plus d'informations sur la ",
-        "setupPageLink": "page de configuration nuki.",
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Nuki, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Nuki.",
         "online": "En ligne",
         "offline": "Hors ligne"
       },
@@ -1821,7 +1821,7 @@
       },
       "setup": {
         "title": "Configuration nuki",
-        "nukiDescription": "Vous pouvez connecter Gladys à votre compte cloud nuki pour commander les appareils associés.",
+        "nukiDescription": "Pour commander vos appareils par le biais de NukiWeb, Gladys doit être connectée à internet et vous devez obtenir une clé API. Suivez ces étapes :<br><br>1. Allez sur le <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">le site NukiWeb</a><br>2. Menu API, puis \"Générer un jeton d'API\" pour obtenir votre clé API<br>3. Entrez votre clé API ci-dessous<br><br>⚠️ Note : Cette configuration est <u>facultative</u> si votre installation est paramétrée avec MQTT.",
         "apiKeyLabel": "Clé API",
         "apiKeyPlaceholder": "Entrez la clé API Nuki web",
         "saveLabel": "Enregistrer la configuration",

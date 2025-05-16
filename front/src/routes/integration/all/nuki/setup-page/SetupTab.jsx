@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { MarkupText, Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -19,9 +19,10 @@ const SetupTab = ({ children, ...props }) => {
         >
           <div class="loader" />
           <div class="dimmer-content">
-            <p>
-              <Text id="integration.nuki.setup.nukiDescription" />
-            </p>
+            <div class="alert alert-info">
+              <MarkupText id="integration.nuki.setup.nukiDescription" />
+           </div>
+            
             {props.nukiConnectionsStatus === RequestStatus.Error && !props.nukiConnectionError && (
               <p class="alert alert-danger">
                 <Text id="integration.nuki.setup.error" />

@@ -25,6 +25,9 @@ class DiscoverTab extends Component {
           </div>
         </div>
         <div class="card-body">
+          <div class="alert alert-secondary">
+            <Text id="integration.nuki.discover.http.description" />
+          </div>
           <div
             class={cx('dimmer', {
               active: props.loading
@@ -37,8 +40,6 @@ class DiscoverTab extends Component {
                   <Text id="integration.nuki.discover.error" />
                 </p>
               )}
-
-              <hr />
               <div class="row">
                 {props.discoveredDevices &&
                   props.discoveredDevices.map((device, index) => (

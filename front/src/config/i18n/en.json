@@ -1817,7 +1817,7 @@
       },
       "setup": {
         "title": "Nuki Setup",
-        "nukiDescription": "You can connect Gladys to your Nuki cloud account to control associated devices.",
+        "nukiDescription": "To control your devices via NukiWeb, Gladys must be connected to the internet and you need to obtain an API key. Follow these steps:<br><br>1. Go to the <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb site</a><br>2. Go to the API menu, then click on “Generate API token” to get your API key<br>3. Enter your API key below<br><br>⚠️ Note: This configuration is <u>optional</u> if your setup is configured with MQTT.",
         "apiKeyLabel": "API Key",
         "apiKeyPlaceholder": "Enter your Nuki Web API key",
         "saveLabel": "Save Configuration",
