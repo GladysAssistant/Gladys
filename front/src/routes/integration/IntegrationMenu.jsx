@@ -1,14 +1,11 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
-const IntegrationMenu = ({ integrationCategories, getIntegrations, intl }) => {
-  const refreshIntegrations = category => () => getIntegrations(intl, category);
-
+const IntegrationMenu = ({ integrationCategories }) => {
   return (
     <div class="list-group list-group-transparent mb-0">
       <Link
         activeClassName="active"
-        onClick={refreshIntegrations(null)}
         href="/dashboard/integration"
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
@@ -20,7 +17,6 @@ const IntegrationMenu = ({ integrationCategories, getIntegrations, intl }) => {
       {integrationCategories.map(category => (
         <Link
           activeClassName="active"
-          onClick={refreshIntegrations(category.type)}
           href={`/dashboard/integration/${category.type}`}
           class="list-group-item list-group-item-action d-flex align-items-center"
         >

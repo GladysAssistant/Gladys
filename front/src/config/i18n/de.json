@@ -478,6 +478,7 @@
       "title": "Integrationen",
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
+      "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
         "device": "Geräte",
