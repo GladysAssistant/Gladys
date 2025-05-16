@@ -1860,10 +1860,10 @@
       },
       "discover": {
         "title": "Ajouter un appareil Matter",
-        "description": "Votre appareil fournit un code d'appairage à 11 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "description": "Votre appareil fournit un code d'appairage à 11 ou 21 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
         "pairingCodeLabel": "Code d'appairage",
-        "pairingCodePlaceholder": "1234-567-9101 ou 12345679101",
-        "pairingCodeHelp": "Entrez le code d'appairage à 11 chiffres fourni par votre appareil Matter",
+        "pairingCodePlaceholder": "Exemple: 1234-567-9101, 12345679101",
+        "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
         "addButton": "Ajouter à Gladys",
         "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
         "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"

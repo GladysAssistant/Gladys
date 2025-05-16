@@ -1836,10 +1836,10 @@
       "documentation": "Dokumentation",
       "discover": {
         "title": "Matter-Gerät hinzufügen",
-        "description": "Dein Matter-Gerät stellt einen 11-stelligen Pairing-Code bereit, den du hier eingeben musst, um es zu Gladys hinzuzufügen. Wenn dein Gerät ein Thread-Gerät ist, muss es mit einem Thread Border Router verbunden sein (Apple TV 4K, Google Home, Alexa).",
+        "description": "Dein Matter-Gerät stellt einen 11- oder 21-stelligen Pairing-Code bereit, den du hier eingeben musst, um es zu Gladys hinzuzufügen. Wenn dein Gerät ein Thread-Gerät ist, muss es mit einem Thread Border Router verbunden sein (Apple TV 4K, Google Home, Alexa).",
         "pairingCodeLabel": "Pairing-Code",
         "pairingCodePlaceholder": "1234-567-9101 oder 12345679101",
-        "pairingCodeHelp": "Gib den 11-stelligen Pairing-Code deines Matter-Geräts ein",
+        "pairingCodeHelp": "Gib den 11- oder 21-stelligen Pairing-Code deines Matter-Geräts ein",
         "addButton": "Zu Gladys hinzufügen",
         "loading": "Verbindung zum Gerät, dies kann einige Minuten dauern.",
         "error": "Es ist nicht möglich, dieses Matter-Gerät zu Gladys hinzuzufügen. Bist du sicher, dass sich dieses Gerät im selben Netzwerk wie Gladys befindet? Wird Gladys mit network=host ausgeführt?"

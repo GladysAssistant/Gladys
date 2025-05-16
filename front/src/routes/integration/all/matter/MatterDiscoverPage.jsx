@@ -112,7 +112,7 @@ class MatterDiscoverPage extends Component {
                         placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
                         value={this.state.pairingCode}
                         onInput={e => this.setState({ pairingCode: e.target.value })}
-                        pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})"
+                        pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})|([0-9]{5}-[0-9]{5}-[0-9]{5}-[0-9]{6})|([0-9]{21})"
                         required
                         disabled={!this.state.matterEnabled}
                       />
