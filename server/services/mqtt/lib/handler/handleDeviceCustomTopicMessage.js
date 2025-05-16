@@ -13,25 +13,32 @@ const { EVENTS } = require('../../../../utils/constants');
  */
 function handleDeviceCustomTopicMessage(topic, message, deviceFeatureId, objectPath) {
   logger.debug(`New value on custom topic ${topic} for device_feature = ${deviceFeatureId}`);
-  // If objectPath is not null, it's supposed to be a JSON
-  if (objectPath) {
-    try {
+  try {
+    const deviceFeature = this.gladys.stateManager.get('deviceFeatureById', deviceFeatureId);
+    if (!deviceFeature) {
+      logger.warn(`handleDeviceCustomTopicMessage: Device feature ${deviceFeatureId} not found`);
+      return;
+    }
+    // If objectPath is not null, it's supposed to be a JSON
+    if (objectPath) {
       const state = get(JSON.parse(message), objectPath);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: this.gladys.stateManager.get('deviceFeatureById', deviceFeatureId).external_id,
+        device_feature_external_id: deviceFeature.external_id,
         state,
       });
-    } catch (e) {
-      logger.warn(`Fail to parse message from custom MQTT topic.`);
-      logger.warn(message);
-      logger.warn(e);
+    } else {
+      // else, it's supposed to be a normal string, send it raw
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: deviceFeature.external_id,
+        state: message,
+      });
     }
-  } else {
-    // else, it's supposed to be a normal string, send it raw
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: this.gladys.stateManager.get('deviceFeatureById', deviceFeatureId).external_id,
-      state: message,
-    });
+  } catch (e) {
+    logger.warn(
+      `handleDeviceCustomTopicMessage: Fail to handle message from custom MQTT topic ${topic}, ${deviceFeatureId}, ${objectPath}`,
+    );
+    logger.warn(message);
+    logger.warn(e);
   }
 }
 

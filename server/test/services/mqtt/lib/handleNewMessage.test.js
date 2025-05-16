@@ -4,26 +4,27 @@ const { assert, fake } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { MockedMqttClient } = require('../mocks.test');
 
-const gladys = {
-  variable: {
-    getValue: fake.resolves('result'),
-  },
-  stateManager: {
-    get: fake.returns({
-      external_id: 'device_feature_external_id',
-    }),
-  },
-  event: {
-    emit: fake.returns(null),
-  },
-};
-
 const MqttHandler = require('../../../../services/mqtt/lib');
 
 describe('Mqtt handle message', () => {
-  const mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+  let mqttHandler;
+  let gladys;
 
   beforeEach(async () => {
+    gladys = {
+      variable: {
+        getValue: fake.resolves('result'),
+      },
+      stateManager: {
+        get: fake.returns({
+          external_id: 'device_feature_external_id',
+        }),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+    mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
     mqttHandler.init();
     await mqttHandler.connect({ mqttUrl: 'url' });
     sinon.reset();
@@ -139,6 +140,7 @@ describe('Mqtt handle message', () => {
       state: 18,
     });
   });
+
   it('handle device with multiple features on same custom topic', () => {
     mqttHandler.deviceFeatureCustomMqttTopics = [
       {
@@ -183,6 +185,27 @@ describe('Mqtt handle message', () => {
       },
     ];
     mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', 'broken-JSON');
+
+    assert.notCalled(gladys.event.emit);
+  });
+  it('handle device with unknown device feature', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.gladys.stateManager.get = fake.returns(null);
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: 18,
+        },
+      }),
+    );
 
     assert.notCalled(gladys.event.emit);
   });
