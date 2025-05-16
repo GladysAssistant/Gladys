@@ -478,6 +478,7 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
+      "noIntegrations": "No integrations found",
       "menu": {
         "all": "All integrations",
         "device": "Devices",
