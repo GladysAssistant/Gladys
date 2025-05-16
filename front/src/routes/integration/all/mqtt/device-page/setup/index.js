@@ -233,14 +233,12 @@ class MqttDeviceSetupPage extends Component {
           }
         }
       });
-      console.log({ deviceBefore: this.state.device, paramsToDelete });
       const deviceToPost = update(this.state.device, {
         params: {
           // The order matters, so we reverse the array to start from the end
           $splice: paramsToDelete.map(index => [index, 1]).reverse()
         }
       });
-      console.log({ deviceToPost });
       const device = await this.props.httpClient.post('/api/v1/device', deviceToPost);
       this.setState({
         saveStatus: RequestStatus.Success,
