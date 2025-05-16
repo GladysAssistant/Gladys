@@ -18,7 +18,7 @@ const DeviceTab = ({ children, ...props }) => (
           <CardFilter
             changeOrderDir={props.changeOrderDir}
             orderValue={props.getNukiOrderDir}
-            search={props.debouncedSearch}
+            search={props.search}
             searchValue={props.nukiSearch}
             searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
           />

@@ -174,10 +174,10 @@ function createActions(store) {
       });
     },
     async search(state, e) {
-      store.setState({
+      await store.setState({
         nukiSearch: e.target.value
       });
-      await actions.getNukiDevices(store.getState());
+      actions.debounceGetNukiDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
@@ -230,8 +230,8 @@ function createActions(store) {
       });
     }
   };
-  actions.debouncedSearch = debounce(actions.search, 200);
-
+  actions.debounceGetNukiDevices = debounce(actions.getNukiDevices, 200);
+  
   return Object.assign({}, houseActions, integrationActions, actions);
 }
 
