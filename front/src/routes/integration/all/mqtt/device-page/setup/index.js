@@ -72,9 +72,24 @@ class MqttDeviceSetupPage extends Component {
   }
 
   deleteFeature(featureIndex) {
-    const device = update(this.state.device, {
+    let device = this.state.device;
+
+    // Remove params if needed
+    const paramsToDelete = [];
+    device.params.forEach((param, paramIndex) => {
+      if (param.name.includes(device.features[featureIndex].id)) {
+        paramsToDelete.push(paramIndex);
+      }
+    });
+
+    // Remove feature and params
+    device = update(device, {
       features: {
         $splice: [[featureIndex, 1]]
+      },
+      params: {
+        // The order matters, so we reverse the array to start from the end
+        $splice: paramsToDelete.map(index => [index, 1]).reverse()
       }
     });
 
@@ -201,7 +216,30 @@ class MqttDeviceSetupPage extends Component {
           // If we are here, it's ok, it means the device does not exist yet
         }
       }
-      const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
+      // Remove params if there are params that exist with a feature that doesn't exist
+      const paramsToDelete = [];
+
+      this.state.device.params.forEach((param, paramIndex) => {
+        if (
+          param.name.includes('mqtt_custom_topic_feature:') ||
+          param.name.includes('mqtt_custom_object_path_feature:')
+        ) {
+          // We verify that the feature exist
+          const featureId = param.name.split(':')[1];
+          const feature = this.state.device.features.find(f => f.id === featureId);
+          if (!feature) {
+            // If the feature doesn't exist, we delete the param
+            paramsToDelete.push(paramIndex);
+          }
+        }
+      });
+      const deviceToPost = update(this.state.device, {
+        params: {
+          // The order matters, so we reverse the array to start from the end
+          $splice: paramsToDelete.map(index => [index, 1]).reverse()
+        }
+      });
+      const device = await this.props.httpClient.post('/api/v1/device', deviceToPost);
       this.setState({
         saveStatus: RequestStatus.Success,
         loading: false,

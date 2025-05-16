@@ -39,6 +39,11 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
   it('should connect to custom mqtt topic', async () => {
     const device = {
       selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+      ],
       params: [
         {
           name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
@@ -61,6 +66,11 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
   it('should connect to custom mqtt topic with custom and custom object path', async () => {
     const device = {
       selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+      ],
       params: [
         {
           name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
@@ -83,9 +93,36 @@ describe('Mqtt.listenToCustomMqttTopicIfNeeded', () => {
       },
     ]);
   });
+  it('should not connect to custom mqtt topic as feature does not exist anymore', async () => {
+    const device = {
+      selector: 'my-device',
+      features: [],
+      params: [
+        {
+          name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'custom_mqtt_topic/test/test',
+        },
+        {
+          name: 'mqtt_custom_object_path_feature:b42d3688-4403-479a-9376-9f5227ab543a',
+          value: 'data.temperature',
+        },
+      ],
+    };
+    await mqttHandler.listenToCustomMqttTopicIfNeeded(device);
+    assert.notCalled(mqttApi.subscribe);
+    expect(mqttHandler.deviceFeatureCustomMqttTopics).to.deep.equal([]);
+  });
   it('should connect to custom mqtt topic with multiple custom and custom object path', async () => {
     const device = {
       selector: 'my-device',
+      features: [
+        {
+          id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        },
+        {
+          id: 'a6dd0aef-9432-4ed4-a313-5d4800acdcfb',
+        },
+      ],
       params: [
         {
           name: 'mqtt_custom_topic_feature:b42d3688-4403-479a-9376-9f5227ab543a',
