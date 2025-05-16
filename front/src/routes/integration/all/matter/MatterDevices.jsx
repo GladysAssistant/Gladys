@@ -30,6 +30,14 @@ const compareDevices = (deviceA, deviceB) => {
       return false;
     }
   }
+  // We compare all features unit
+  const deviceAFeaturesUnitSorted = deviceA.features.map(f => f.unit || 'empty').sort();
+  const deviceBFeaturesUnitSorted = deviceB.features.map(f => f.unit || 'empty').sort();
+  for (let i = 0; i < deviceAFeaturesUnitSorted.length; i++) {
+    if (deviceAFeaturesUnitSorted[i] !== deviceBFeaturesUnitSorted[i]) {
+      return false;
+    }
+  }
   return true;
 };
 
