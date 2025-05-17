@@ -9,7 +9,8 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
 class SetupTab extends Component {
-  showClientSecretTimer = null;
+  showApiKeyTimer = null;
+
   async disconnectTessie(e) {
     e.preventDefault();
 
@@ -28,45 +29,30 @@ class SetupTab extends Component {
       });
     }
   }
-  updateClientId = e => {
-    this.props.updateStateInIndex({ tessieClientId: e.target.value });
-  };
-  updateClientSecret = e => {
-    this.props.updateStateInIndex({ tessieClientSecret: e.target.value });
-  };
-  updateEnergyApi = () => {
-    if (this.props.tessieEnergyApi === true) {
-      this.props.updateStateInIndex({ tessieEnergyApi: false });
-    } else {
-      this.props.updateStateInIndex({ tessieEnergyApi: true });
-    }
-  };
-  updateWeatherApi = () => {
-    if (this.props.tessieWeatherApi === true) {
-      this.props.updateStateInIndex({ tessieWeatherApi: false });
-    } else {
-      this.props.updateStateInIndex({ tessieWeatherApi: true });
-    }
-  };
-  toggleClientSecret = () => {
-    const { showClientSecret } = this.state;
 
-    if (this.showClientSecretTimer) {
-      clearTimeout(this.showClientSecretTimer);
-      this.showClientSecretTimer = null;
+  updateApiKey = e => {
+    this.props.updateStateInIndex({ tessieApiKey: e.target.value });
+  };
+
+  toggleApiKey = () => {
+    const { showApiKey } = this.state;
+
+    if (this.showApiKeyTimer) {
+      clearTimeout(this.showApiKeyTimer);
+      this.showApiKeyTimer = null;
     }
 
-    this.setState({ showClientSecret: !showClientSecret });
+    this.setState({ showApiKey: !showApiKey });
 
-    if (!showClientSecret) {
-      this.showClientSecretTimer = setTimeout(() => this.setState({ showClientSecret: false }), 5000);
+    if (!showApiKey) {
+      this.showApiKeyTimer = setTimeout(() => this.setState({ showApiKey: false }), 5000);
     }
   };
 
   componentWillUnmount() {
-    if (this.showClientSecretTimer) {
-      clearTimeout(this.showClientSecretTimer);
-      this.showClientSecretTimer = null;
+    if (this.showApiKeyTimer) {
+      clearTimeout(this.showApiKeyTimer);
+      this.showApiKeyTimer = null;
     }
   }
 
@@ -90,99 +76,36 @@ class SetupTab extends Component {
               <p>
                 <MarkupText id="integration.tessie.setup.description" />
                 <MarkupText id="integration.tessie.setup.descriptionCreateAccount" />
-                <MarkupText id="integration.tessie.setup.descriptionCreateProject" />
-                <MarkupText id="integration.tessie.setup.descriptionGetKeys" />
-              </p>
-              <p>
-                <label htmlFor="descriptionScopeInformation" className={`form-label ${style.italicText}`}>
-                  <MarkupText id="integration.tessie.setup.descriptionScopeInformation" />
-                </label>
-              </p>
-              <p>
-                <label htmlFor="titleAdditionalInformationEnergyApi" className={`form-label ${style.highlightText}`}>
-                  <MarkupText id="integration.tessie.setup.titleAdditionalInformationEnergyApi" />
-                </label>
-                <MarkupText id="integration.tessie.setup.descriptionAdditionalInformationEnergyApi" />
-              </p>
-              <p>
-                <label htmlFor="titleAdditionalInformationWeatherApi" className={`form-label ${style.highlightText}`}>
-                  <MarkupText id="integration.tessie.setup.titleAdditionalInformationWeatherApi" />
-                </label>
-                <MarkupText id="integration.tessie.setup.descriptionAdditionalInformationWeatherApi" />
+                <MarkupText id="integration.tessie.setup.descriptionGetApiKey" />
               </p>
 
               <form>
                 <div class="form-group">
-                  <label htmlFor="tessieClientId" className="form-label">
-                    <Text id={`integration.tessie.setup.clientIdLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="tessieClientId"
-                      type="text"
-                      placeholder={<Text id="integration.tessie.setup.clientIdPlaceholder" />}
-                      value={props.tessieClientId}
-                      className="form-control"
-                      autocomplete="off"
-                      onInput={this.updateClientId}
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
-                  <label htmlFor="tessieClientSecret" className="form-label">
-                    <Text id={`integration.tessie.setup.clientSecretLabel`} />
+                  <label htmlFor="tessieApiKey" className="form-label">
+                    <Text id={`integration.tessie.setup.apiKeyLabel`} />
                   </label>
                   <div class="input-icon mb-3">
                     <Localizer>
                       <input
-                        id="tessieClientSecret"
-                        name="tessieClientSecret"
-                        type={state.showClientSecret ? 'text' : 'password'}
-                        placeholder={<Text id="integration.tessie.setup.clientSecretPlaceholder" />}
-                        value={props.tessieClientSecret}
+                        id="tessieApiKey"
+                        name="tessieApiKey"
+                        type={state.showApiKey ? 'text' : 'password'}
+                        placeholder={<Text id="integration.tessie.setup.apiKeyPlaceholder" />}
+                        value={props.tessieApiKey}
                         className="form-control"
                         autocomplete="off"
-                        onInput={this.updateClientSecret}
+                        onInput={this.updateApiKey}
                       />
                     </Localizer>
-                    <span class="input-icon-addon cursor-pointer" onClick={this.toggleClientSecret}>
+                    <span class="input-icon-addon cursor-pointer" onClick={this.toggleApiKey}>
                       <i
                         class={cx('fe', {
-                          'fe-eye': !state.showClientSecret,
-                          'fe-eye-off': state.showClientSecret
+                          'fe-eye': !state.showApiKey,
+                          'fe-eye-off': state.showApiKey
                         })}
                       />
                     </span>
                   </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="tessieEnergyApi" className="form-label">
-                    <input
-                      type="checkbox"
-                      name="tessieEnergyApi"
-                      class="custom-switch-input"
-                      checked={props.tessieEnergyApi}
-                      onClick={this.updateEnergyApi}
-                    />
-                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
-                    <Text id={`integration.tessie.setup.energyApiLabel`} />
-                  </label>
-                </div>
-
-                <div class="form-group">
-                  <label class="tessieWeatherApi" className="form-label">
-                    <input
-                      type="checkbox"
-                      name="tessieWeatherApi"
-                      class="custom-switch-input"
-                      checked={props.tessieWeatherApi}
-                      onClick={this.updateWeatherApi}
-                    />
-                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
-                    <Text id={`integration.tessie.setup.weatherApiLabel`} />
-                  </label>
                 </div>
 
                 <div class="form-group">

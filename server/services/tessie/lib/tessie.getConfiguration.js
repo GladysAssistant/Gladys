@@ -12,13 +12,8 @@ async function getConfiguration() {
   logger.debug('Loading Tessie configuration...');
   const { serviceId } = this;
   try {
-    this.configuration.clientId = await this.gladys.variable.getValue(GLADYS_VARIABLES.CLIENT_ID, serviceId);
-    this.configuration.clientSecret = await this.gladys.variable.getValue(GLADYS_VARIABLES.CLIENT_SECRET, serviceId);
-    this.configuration.energyApi =
-      (await this.gladys.variable.getValue(GLADYS_VARIABLES.ENERGY_API, serviceId)) === '1';
-    this.configuration.weatherApi =
-      (await this.gladys.variable.getValue(GLADYS_VARIABLES.WEATHER_API, serviceId)) === '1';
-    logger.debug(`Tessie configuration get: clientId='${this.configuration.clientId}'`);
+    this.configuration.apiKey = await this.gladys.variable.getValue(GLADYS_VARIABLES.API_KEY, serviceId);
+    logger.debug('Tessie configuration loaded successfully');
     return this.configuration;
   } catch (e) {
     this.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });

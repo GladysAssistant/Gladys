@@ -106,11 +106,8 @@ class TessieSetupPage extends Component {
     e.preventDefault();
 
     try {
-      this.props.httpClient.post('/api/v1/service/tessie/configuration', {
-        clientId: this.state.tessieClientId,
-        clientSecret: this.state.tessieClientSecret,
-        energyApi: this.state.tessieEnergyApi,
-        weatherApi: this.state.tessieWeatherApi
+      await this.props.httpClient.post('/api/v1/service/tessie/configuration', {
+        apiKey: this.state.tessieApiKey
       });
       await this.setState({
         tessieSaveSettingsStatus: RequestStatus.Success
@@ -164,10 +161,7 @@ class TessieSetupPage extends Component {
       await this.setState({ errored: true });
     } finally {
       await this.setState({
-        tessieClientId: configuration.clientId,
-        tessieClientSecret: configuration.clientSecret,
-        tessieEnergyApi: configuration.energyApi,
-        tessieWeatherApi: configuration.weatherApi,
+        tessieApiKey: configuration.apiKey,
         clientSecretChanges: false
       });
     }

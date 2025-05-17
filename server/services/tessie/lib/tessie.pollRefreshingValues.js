@@ -6,7 +6,7 @@ const logger = require('../../../utils/logger');
  * @description Poll values of Tessie devices.
  * @example refreshNetatmoValues();
  */
-async function refreshNetatmoValues() {
+async function refreshTessieValues() {
   logger.debug('Looking for Tessie devices values...');
   await this.saveStatus({ statusType: STATUS.GET_DEVICES_VALUES, message: null });
 
@@ -44,7 +44,7 @@ async function refreshNetatmoValues() {
 function pollRefreshingValues() {
   this.pollRefreshValues = setInterval(async () => {
     try {
-      await this.refreshNetatmoValues();
+      await this.refreshTessieValues();
     } catch (error) {
       logger.error('Error refreshing Tessie values: ', error);
     }
@@ -53,5 +53,5 @@ function pollRefreshingValues() {
 
 module.exports = {
   pollRefreshingValues,
-  refreshNetatmoValues,
+  refreshTessieValues,
 };

@@ -1,13 +1,13 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function NetatmoController(netatmoHandler) {
+module.exports = function TessieController(tessieHandler) {
   /**
    * @api {get} /api/v1/service/tessie/configuration Get Tessie Configuration.
    * @apiName getConfiguration
    * @apiGroup Tessie
    */
   async function getConfiguration(req, res) {
-    const configuration = await netatmoHandler.getConfiguration();
+    const configuration = await tessieHandler.getConfiguration();
     res.json(configuration);
   }
 
@@ -17,7 +17,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function getStatus(req, res) {
-    const result = await netatmoHandler.getStatus();
+    const result = await tessieHandler.getStatus();
     res.json(result);
   }
 
@@ -27,7 +27,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function saveConfiguration(req, res) {
-    const result = await netatmoHandler.saveConfiguration(req.body);
+    const result = await tessieHandler.saveConfiguration(req.body);
     res.json({
       success: result,
     });
@@ -39,7 +39,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function saveStatus(req, res) {
-    const result = await netatmoHandler.saveStatus(req.body);
+    const result = await tessieHandler.saveStatus(req.body);
     res.json({
       success: result,
     });
@@ -51,8 +51,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function connect(req, res) {
-    await netatmoHandler.getConfiguration();
-    const result = await netatmoHandler.connect();
+    await tessieHandler.getConfiguration();
+    const result = await tessieHandler.connect();
     res.json(result);
   }
 
@@ -62,8 +62,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function retrieveTokens(req, res) {
-    await netatmoHandler.getConfiguration();
-    const result = await netatmoHandler.retrieveTokens(req.body);
+    await tessieHandler.getConfiguration();
+    const result = await tessieHandler.retrieveTokens(req.body);
     res.json(result);
   }
 
@@ -73,7 +73,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Tessie
    */
   async function disconnect(req, res) {
-    await netatmoHandler.disconnect();
+    await tessieHandler.disconnect();
     res.json({
       success: true,
     });
@@ -86,11 +86,11 @@ module.exports = function NetatmoController(netatmoHandler) {
    */
   async function discover(req, res) {
     let devices;
-    if (!netatmoHandler.discoveredDevices || req.query.refresh === 'true') {
-      devices = await netatmoHandler.discoverDevices();
+    if (!tessieHandler.discoveredDevices || req.query.refresh === 'true') {
+      devices = await tessieHandler.discoverDevices();
     } else {
-      devices = netatmoHandler.discoveredDevices.filter((device) => {
-        const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
+      devices = tessieHandler.discoveredDevices.filter((device) => {
+        const existInGladys = tessieHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
         return existInGladys === null;
       });
     }

@@ -1,11 +1,11 @@
 const logger = require('../../utils/logger');
-const netatmoController = require('./api/tessie.controller');
+const tessieController = require('./api/tessie.controller');
 
-const NetatmoHandler = require('./lib');
+const TessieHandler = require('./lib');
 const { STATUS } = require('./lib/utils/tessie.constants');
 
-module.exports = function NetatmoService(gladys, serviceId) {
-  const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+module.exports = function TessieService(gladys, serviceId) {
+  const tessieHandler = new TessieHandler(gladys, serviceId);
 
   /**
    * @public
@@ -15,7 +15,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Tessie service', serviceId);
-    await netatmoHandler.init();
+    await tessieHandler.init();
   }
 
   /**
@@ -26,7 +26,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping Tessie service');
-    await netatmoHandler.disconnect();
+    await tessieHandler.disconnect();
   }
 
   /**
@@ -37,14 +37,14 @@ module.exports = function NetatmoService(gladys, serviceId) {
    *  const used = await gladys.services.tessie.isUsed();
    */
   async function isUsed() {
-    return netatmoHandler.status === STATUS.CONNECTED;
+    return tessieHandler.status === STATUS.CONNECTED;
   }
 
   return Object.freeze({
     start,
     stop,
     isUsed,
-    device: netatmoHandler,
-    controllers: netatmoController(netatmoHandler),
+    device: tessieHandler,
+    controllers: tessieController(tessieHandler),
   });
 };

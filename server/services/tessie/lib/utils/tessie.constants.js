@@ -1,31 +1,19 @@
 const GLADYS_VARIABLES = {
-  CLIENT_ID: 'TESSIE_CLIENT_ID',
-  CLIENT_SECRET: 'TESSIE_CLIENT_SECRET',
-
-  ENERGY_API: 'TESSIE_ENERGY_API',
-  WEATHER_API: 'TESSIE_WEATHER_API',
-
-  ACCESS_TOKEN: 'TESSIE_ACCESS_TOKEN',
-  REFRESH_TOKEN: 'TESSIE_REFRESH_TOKEN',
-  EXPIRE_IN_TOKEN: 'TESSIE_EXPIRE_IN_TOKEN',
+  API_KEY: 'TESSIE_API_KEY',
 };
 
 const SCOPES = {
-  ENERGY: {
-    read: 'read_thermostat',
-    write: 'write_thermostat',
+  VEHICLE: {
+    read: 'read_vehicle',
+    write: 'write_vehicle',
+    control: 'control_vehicle',
   },
-  HOME_SECURITY: {
-    read_camera: 'read_camera',
-    read_presence: 'read_presence',
-    read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
-    read_smokedetector: 'read_smokedetector',
+  TELEMETRY: {
+    read: 'read_telemetry',
   },
-  WEATHER: {
-    read_station: 'read_station',
-  },
-  AIRCARE: {
-    read_homecoach: 'read_homecoach',
+  DRIVER: {
+    read: 'read_driver',
+    write: 'write_driver',
   },
 };
 
@@ -41,11 +29,11 @@ const STATUS = {
     PROCESSING_TOKEN: 'error processing token',
     DISCONNECTING: 'error disconnecting',
     CONNECTED: 'error connected',
-    SET_DEVICES_VALUES: 'error set devices values',
-    GET_DEVICES_VALUES: 'error get devices values',
+    SET_VEHICLE_VALUES: 'error set vehicle values',
+    GET_VEHICLE_VALUES: 'error get vehicle values',
   },
-  GET_DEVICES_VALUES: 'get devices values',
-  DISCOVERING_DEVICES: 'discovering',
+  GET_VEHICLE_VALUES: 'get vehicle values',
+  DISCOVERING_VEHICLES: 'discovering',
 };
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
@@ -54,45 +42,51 @@ const API = {
   HEADER: {
     ACCEPT: 'application/json',
     HOST: 'api.tessie.com',
-    CONTENT_TYPE: 'application/x-www-form-urlencoded;charset=UTF-8',
+    CONTENT_TYPE: 'application/json',
   },
   OAUTH2: `${BASE_API}/oauth2/authorize`,
   TOKEN: `${BASE_API}/oauth2/token`,
-  GET_THERMOSTATS: `${BASE_API}/api/getthermostatsdata`,
-  GET_WEATHER_STATIONS: `${BASE_API}/api/getstationsdata?get_favorites=false`,
-  POST_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
-  HOMESDATA: `${BASE_API}/api/homesdata`,
-  HOMESTATUS: `${BASE_API}/api/homestatus`,
-  GET_ROOM_MEASURE: `${BASE_API}/api/getroommeasure`,
-  SET_ROOM_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
-  SET_THERM_MODE: `${BASE_API}/api/setthermmode`,
-  GET_MEASURE: `${BASE_API}/api/getmeasure`,
+  VEHICLES: `${BASE_API}/vehicles`,
+  VEHICLE_STATE: `/state`,
+  VEHICLE_COMMAND: `/command`,
+  VEHICLE_CHARGING: `/charging`,
+  VEHICLE_LOCATION: `/location`,
+  VEHICLE_BATTERY: `/battery`,
+  VEHICLE_BATTERY_HEALTH: `/battery/health`,
+  VEHICLE_FIRMWARE: `/firmware/alerts`,
+  VEHICLE_CONSUMPTION: `/consumption`,
+  VEHICLE_WEATHER: `/weather`,
+  VEHICLE_DRIVES: `/drives`,
+  VEHICLE_CHARGES: `/charges`,
+  VEHICLE_TIRES: `/tires`,
+  VEHICLE_LICENSE: `/license`,
+  VEHICLE_TELEMETRY: `/telemetry`,
+  DRIVERS: `${BASE_API}/drivers`,
+  DRIVER_INVITATIONS: `${BASE_API}/drivers/invitations`,
 };
 
 const SUPPORTED_CATEGORY_TYPE = {
-  ENERGY: 'Energy',
-  WEATHER: 'Weather',
+  VEHICLE: 'Vehicle',
+  CHARGING: 'Charging',
+  LOCATION: 'Location',
+  BATTERY: 'Battery',
+  DRIVER: 'Driver',
+  TELEMETRY: 'Telemetry',
   UNKNOWN: 'unknown',
 };
 
 const SUPPORTED_MODULE_TYPE = {
-  THERMOSTAT: 'NATherm1',
-  PLUG: 'NAPlug',
-  NRV: 'NRV',
-  NAMAIN: 'NAMain',
-  NAMODULE1: 'NAModule1',
-  NAMODULE2: 'NAModule2',
-  NAMODULE3: 'NAModule3',
-  NAMODULE4: 'NAModule4',
+  TESLA_MODEL_S: 'ModelS',
+  TESLA_MODEL_3: 'Model3',
+  TESLA_MODEL_X: 'ModelX',
+  TESLA_MODEL_Y: 'ModelY',
 };
 
 const PARAMS = {
-  HOME_ID: 'home_id',
-  ROOM_ID: 'room_id',
-  ROOM_NAME: 'room_name',
-  PLUG_ID: 'plug_id',
-  PLUG_NAME: 'plug_name',
-  MODULES_BRIDGE_ID: 'modules_bridge_id',
+  VEHICLE_ID: 'vehicle_id',
+  VEHICLE_NAME: 'vehicle_name',
+  VEHICLE_VIN: 'vehicle_vin',
+  VEHICLE_STATE: 'vehicle_state',
 };
 
 module.exports = {
