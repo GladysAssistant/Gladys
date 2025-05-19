@@ -12,7 +12,6 @@ describe('nuki.status command', () => {
     const gladys = { event };
     const nukiService = NukiService(gladys, serviceId);
     const result = nukiService.device.getStatus();
-    // TODO : complete
     expect(result).deep.eq(null);
   });
 });
