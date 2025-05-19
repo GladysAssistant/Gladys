@@ -122,9 +122,10 @@ describe('Matter.listenToStateChange', () => {
   });
   it('should listen to state change (IlluminanceMeasurement)', async () => {
     const clusterClients = new Map();
+    // Matter: Illuminance attribute changed to 21327 (Converted to 136 lux)
     clusterClients.set(IlluminanceMeasurement.Complete.id, {
       addMeasuredValueAttributeListener: (callback) => {
-        callback(1000);
+        callback(21327);
       },
     });
     const device = {
@@ -134,7 +135,7 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1024',
-      state: 100,
+      state: 136,
     });
   });
   it('should listen to state change (TemperatureMeasurement)', async () => {

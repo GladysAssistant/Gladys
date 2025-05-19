@@ -60,10 +60,11 @@ async function listenToStateChange(nodeId, devicePath, device) {
     this.stateChangeListeners.add(illuminance);
     // Subscribe to IlluminanceMeasurement attribute changes
     illuminance.addMeasuredValueAttributeListener((value) => {
-      logger.debug(`Matter: Illuminance attribute changed to ${value}`);
+      const luxValue = Math.round(10 ** ((value - 1) / 10000));
+      logger.debug(`Matter: Illuminance attribute changed to ${value} (Converted to ${luxValue} lux)`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${IlluminanceMeasurement.Complete.id}`,
-        state: Math.round(value / 10),
+        state: luxValue,
       });
     });
   }
