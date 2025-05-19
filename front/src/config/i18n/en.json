@@ -247,6 +247,15 @@
       "private": "private",
       "public": "public"
     },
+    "editDashboardType": "Type",
+    "types": {
+      "main": "Standard",
+      "electric-vehicle": "Electric vehicle"
+    },
+    "electricVehicleDashboardType": {
+      "standardConfigurationTitle": "Standard configuration",
+      "electricVehicleConfigurationTitle": "Device configuration - electric vehicle"
+    },
     "editDashboardAddColumnButton": "Add a column on dashboard",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
@@ -3165,7 +3174,7 @@
     },
     "battery": {
       "shortCategoryName": "Battery",
-      "integer": "Battery"
+      "integer": "Autonomy"
     },
     "battery-low": {
       "shortCategoryName": "Low Battery",
@@ -3314,7 +3323,17 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Temperature"
+      "temperature": "Temperature",
+      "target-temperature": "Target temperature"
+    },
+    "charger": {
+      "shortCategoryName": "Charger",
+      "binary": "Switch",
+      "power": "Power",
+      "energy": "Energy",
+      "current": "Current",
+      "voltage": "Voltage",
+      "target-current": "Current setpoint"
     },
     "heater": {
       "shortCategoryName": "Heating",

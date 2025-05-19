@@ -247,6 +247,15 @@
       "private": "privé",
       "public": "public"
     },
+    "editDashboardType": "Type",
+    "types": {
+      "main": "Standard",
+      "electric-vehicle": "Véhicule électrique"
+    },
+    "electricVehicleDashboardType": {
+      "standardConfigurationTitle": "Configuration standard",
+      "electricVehicleConfigurationTitle": "Configuration des appareils - véhicule électrique"
+    },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
@@ -3165,7 +3174,7 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Batterie"
+      "integer": "Autonomie"
     },
     "battery-low": {
       "shortCategoryName": "Batterie faible",
@@ -3314,7 +3323,17 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température"
+      "temperature": "Température",
+      "target-temperature": "Température de consigne"
+    },
+    "charger": {
+      "shortCategoryName": "Charge",
+      "binary": "Commutateur",
+      "power": "Puissance",
+      "energy": "Energie",
+      "current": "Intensité",
+      "voltage": "Tension",
+      "target-current": "Intensité de consigne"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

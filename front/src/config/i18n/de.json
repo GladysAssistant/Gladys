@@ -247,6 +247,15 @@
       "private": "privat",
       "public": "öffentlich"
     },
+    "editDashboardType": "Typ",
+    "types": {
+      "main": "Standard",
+      "electric-vehicle": "Elektrofahrzeug"
+    },
+    "electricVehicleDashboardType": {
+      "standardConfigurationTitle": "Standardkonfiguration",
+      "electricVehicleConfigurationTitle": "Gerätekonfiguration - Elektrofahrzeug"
+    },
     "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
@@ -3165,7 +3174,7 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Batterie"
+      "integer": "Laufzeit"
     },
     "battery-low": {
       "shortCategoryName": "Niedriger Batteriestand",
@@ -3314,7 +3323,17 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "target-temperature": "Temperatur"
+      "temperature": "Temperatur",
+      "target-temperature": "Solltemperatur"
+    },
+    "charger": {
+      "shortCategoryName": "Ladegerät",
+      "binary": "Schalter",
+      "power": "Leistung",
+      "energy": "Energie",
+      "current": "Strom",
+      "voltage": "Spannung",
+      "target-current": "Sollstrom"
     },
     "heater": {
       "shortCategoryName": "Heizung",
