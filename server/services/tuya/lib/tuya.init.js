@@ -13,6 +13,7 @@ async function init() {
     accessId: configuration.accessKey,
     accessKey: configuration.secretKey,
     url: configuration.wsEndpoint,
+    env: configuration.serverTuyaEnv,
     maxRetryTimes: 3000,
   });
   this.ws.start();

@@ -12,6 +12,7 @@ class SetupTab extends Component {
 
   async getTuyaConfiguration() {
     let tuyaEndpoint = '';
+    let tuyaServerEnv = 'prod';
     let tuyaAccessKey = '';
     let tuyaSecretKey = '';
     let tuyaAppAccountId = '';
@@ -19,6 +20,7 @@ class SetupTab extends Component {
     this.setState({
       tuyaGetSettingsStatus: RequestStatus.Getting,
       tuyaEndpoint,
+      tuyaServerEnv,
       tuyaAccessKey,
       tuyaSecretKey,
       tuyaAppAccountId
@@ -26,6 +28,11 @@ class SetupTab extends Component {
     try {
       const { value: endpoint } = await this.props.httpClient.get('/api/v1/service/tuya/variable/TUYA_ENDPOINT');
       tuyaEndpoint = endpoint;
+
+      const { value: currentEnv } = await this.props.httpClient.get(
+        '/api/v1/service/tuya/variable/TUYA_SERVER_ENVIRONMENT'
+      );
+      tuyaServerEnv = currentEnv;
 
       const { value: accessKey } = await this.props.httpClient.get('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY');
       tuyaAccessKey = accessKey;
@@ -41,6 +48,7 @@ class SetupTab extends Component {
       this.setState({
         tuyaGetSettingsStatus: RequestStatus.Success,
         tuyaEndpoint,
+        tuyaServerEnv,
         tuyaAccessKey,
         tuyaSecretKey,
         tuyaAppAccountId
@@ -60,6 +68,10 @@ class SetupTab extends Component {
     try {
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
         value: this.state.tuyaEndpoint
+      });
+
+      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SERVER_ENVIRONMENT', {
+        value: this.state.tuyaServerEnv
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
@@ -145,6 +157,21 @@ class SetupTab extends Component {
                     </option>
                     <option value="india">
                       <Text id="integration.tuya.setup.endpoints.india" />
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <select
+                    className="form-control"
+                    name="tuyaServerEnv"
+                    value={state.tuyaServerEnv}
+                    onChange={this.updateConfiguration}
+                  >
+                    <option value="prod">
+                      <Text id="integration.tuya.setup.tuyaServerEnv.prod" />
+                    </option>
+                    <option value="test">
+                      <Text id="integration.tuya.setup.tuyaServerEnv.test" />
                     </option>
                   </select>
                 </div>

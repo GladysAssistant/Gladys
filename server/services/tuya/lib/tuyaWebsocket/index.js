@@ -2,6 +2,7 @@
 const EventEmitter = require('events');
 const WebSocket = require('ws');
 const { getTopicUrl, buildQuery, buildPassword, decrypt } = require('./utils');
+const { getTuyaEnvConfig } = require('../utils/tuya.constants');
 
 class TuyaMessageSubscribeWebsocket {
   static data = 'TUTA_DATA';
@@ -79,11 +80,11 @@ class TuyaMessageSubscribeWebsocket {
   }
 
   _connect(isInit = true) {
-    const { accessId, accessKey, url } = this.config;
+    const { accessId, accessKey, url, env } = this.config;
     const topicUrl = getTopicUrl(
       url,
       accessId,
-      'event-test',
+      getTuyaEnvConfig(env).value,
       `?${buildQuery({ subscriptionType: 'Failover', ackTimeoutMillis: 30000 })}`,
     );
     const password = buildPassword(accessId, accessKey);

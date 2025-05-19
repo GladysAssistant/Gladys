@@ -6,6 +6,7 @@ const GLADYS_VARIABLES = {
   ACCESS_TOKEN: 'TUYA_ACCESS_TOKEN',
   REFRESH_TOKEN: 'TUYA_REFRESH_TOKEN',
   APP_ACCOUNT_UID: 'TUYA_APP_ACCOUNT_UID',
+  TUYA_SERVER_ENVIRONMENT: 'TUYA_SERVER_ENVIRONMENT',
 };
 
 const TUYA_ENDPOINTS = {
@@ -25,6 +26,27 @@ const TUYA_WS_ENDPOINTS = {
   westernEurope: 'wss://mqe.tuyaeu.com:8285/',
   india: 'wss://mqe.tuyain.com:8285/',
 };
+const TUYA_SERVER_ENV = {
+  PROD: 'prod',
+  TEST: 'test',
+};
+
+const TuyaEnvConfig = Object.freeze({
+  [TUYA_SERVER_ENV.PROD]: {
+    name: TUYA_SERVER_ENV.PROD,
+    value: 'event',
+    desc: 'online environment',
+  },
+  [TUYA_SERVER_ENV.TEST]: {
+    name: TUYA_SERVER_ENV.TEST,
+    value: 'event-test',
+    desc: 'test environment',
+  },
+});
+
+function getTuyaEnvConfig(env) {
+  return TuyaEnvConfig[env];
+}
 
 const STATUS = {
   NOT_INITIALIZED: 'not_initialized',
@@ -60,4 +82,7 @@ module.exports = {
   TUYA_WS_ENDPOINTS,
   INFRARED_CATEGORIES,
   INFRARED_MODELS,
+  TUYA_PASULAR_ENV,
+  TuyaEnvConfig,
+  getTuyaEnvConfig,
 };
