@@ -21,8 +21,8 @@ const SetupTab = ({ children, ...props }) => {
           <div class="dimmer-content">
             <div class="alert alert-info">
               <MarkupText id="integration.nuki.setup.nukiDescription" />
-           </div>
-            
+            </div>
+
             {props.nukiConnectionsStatus === RequestStatus.Error && !props.nukiConnectionError && (
               <p class="alert alert-danger">
                 <Text id="integration.nuki.setup.error" />

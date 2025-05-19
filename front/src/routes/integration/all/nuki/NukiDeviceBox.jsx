@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import { Link } from 'preact-router';
 import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
@@ -156,7 +155,6 @@ class NukiDeviceBox extends Component {
                   />
                 </div>
 
-                
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="integration.nuki.device.protocolLabel" />
@@ -194,7 +192,6 @@ class NukiDeviceBox extends Component {
                     </label>
                   </div>
                 </div>
-                
 
                 {device.features && device.features.length > 0 && (
                   <div class="form-group">
@@ -235,7 +232,6 @@ class NukiDeviceBox extends Component {
                       <Text id="integration.nuki.unmanagedModelButton" />
                     </button>
                   )}
-
                 </div>
               </div>
             </div>

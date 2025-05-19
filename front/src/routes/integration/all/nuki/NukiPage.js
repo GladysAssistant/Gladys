@@ -14,7 +14,6 @@ const NukiPage = ({ children, user }) => (
               </h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
-                  
                   <Link
                     href="/dashboard/integration/device/nuki"
                     activeClassName="active"

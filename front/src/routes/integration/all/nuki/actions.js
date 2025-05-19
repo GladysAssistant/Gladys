@@ -231,7 +231,7 @@ function createActions(store) {
     }
   };
   actions.debounceGetNukiDevices = debounce(actions.getNukiDevices, 200);
-  
+
   return Object.assign({}, houseActions, integrationActions, actions);
 }
 

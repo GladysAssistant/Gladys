@@ -1784,20 +1784,20 @@ const data = {
         },
         {
           category: 'lock',
-          type: 'binary',
+          type: 'binary'
         },
         {
           category: 'lock',
-          type: 'state',
-        },
+          type: 'state'
+        }
       ],
       params: [
         {
           name: 'protocol',
-          value: 'mqtt',
-        },
-      ],
-    },
+          value: 'mqtt'
+        }
+      ]
+    }
   ],
   'get /api/v1/service/nuki/discover/mqtt': [
     {
@@ -1811,19 +1811,19 @@ const data = {
         },
         {
           category: 'lock',
-          type: 'binary',
+          type: 'binary'
         },
         {
           category: 'lock',
-          type: 'state',
-        },
+          type: 'state'
+        }
       ],
       params: [
         {
           name: 'protocol',
-          value: 'mqtt',
-        },
-      ],
+          value: 'mqtt'
+        }
+      ]
     }
   ],
   'get /api/v1/service/nuki/discover/http': [
@@ -1838,19 +1838,19 @@ const data = {
         },
         {
           category: 'lock',
-          type: 'binary',
+          type: 'binary'
         },
         {
           category: 'lock',
-          type: 'state',
-        },
+          type: 'state'
+        }
       ],
-       params: [
+      params: [
         {
           name: 'protocol',
-          value: 'http',
-        },
-      ],
+          value: 'http'
+        }
+      ]
     }
   ],
   'get /api/v1/service/tasmota': {},
