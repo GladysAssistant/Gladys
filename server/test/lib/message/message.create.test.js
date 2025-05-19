@@ -128,9 +128,9 @@ describe('message.create', () => {
       },
       message,
       previousQuestions: [
-        { answer: 'Spontaneous message 3', question: null },
-        { answer: 'Answer 2', question: 'Question 2' },
         { answer: 'Answer 1', question: 'Question 1' },
+        { answer: 'Answer 2', question: 'Question 2' },
+        { answer: 'Spontaneous message 3', question: null },
       ],
     });
   });

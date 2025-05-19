@@ -71,9 +71,6 @@ async function create(message) {
       }
     });
 
-    // Reverse the array to have most recent exchanges first
-    previousQuestions.reverse();
-
     this.event.emit(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, { message, previousQuestions, context });
   }
 
