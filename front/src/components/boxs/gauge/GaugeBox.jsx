@@ -110,7 +110,7 @@ class GaugeBox extends Component {
       this.props.intl && this.props.intl.dictionary ? this.props.intl.dictionary.deviceFeatureUnitShort[unit] : unit;
 
     // Return the value with the unit
-    return `${formattedValue}${unitTranslation || unit}`;
+    return `${formattedValue} ${unitTranslation || unit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -202,10 +202,10 @@ class GaugeBox extends Component {
             name: {
               fontSize: '16px',
               color: undefined,
-              offsetY: 120
+              offsetY: 95
             },
             value: {
-              offsetY: 76,
+              offsetY: 0,
               fontSize: '22px',
               color: undefined,
               formatter: () => {
@@ -230,7 +230,7 @@ class GaugeBox extends Component {
       stroke: {
         dashArray: 4
       },
-      labels: [boxName || 'Value']
+      labels: [`${boxName} - ${deviceFeature.name}` || 'Value']
     };
 
     // Create and render the chart
