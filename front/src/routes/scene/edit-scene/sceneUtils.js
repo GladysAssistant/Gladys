@@ -5,7 +5,7 @@ import get from 'get-value';
 const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
   // if the targetPath is smaller than the sourcePath, it means that
   // the variable is not in the same branch
-  if (variableSourcePath.length > targetPath.length) {
+  if (variableSourcePath.split('.').length > targetPath.split('.').length) {
     return false;
   }
 
