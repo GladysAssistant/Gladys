@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "@tuya/tuya-connector-nodejs": "^2.1.2"
+    "@tuya/tuya-connector-nodejs": "^2.1.2",
+    "crypto-js": "^4.2.0"
   }
 }

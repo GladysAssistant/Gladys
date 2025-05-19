@@ -12,7 +12,9 @@ const { INFRARED_CATEGORIES } = require('../utils/tuya.constants');
  */
 function convertDevice(tuyaDevice) {
   const { name, product_name: model, id, gateway_id, specifications = {}, keys = [] } = tuyaDevice;
-  const externalId = [INFRARED_CATEGORIES.INFRARED_AC, INFRARED_CATEGORIES.INFRARED_TV].includes(specifications.category)
+  const externalId = [INFRARED_CATEGORIES.INFRARED_AC, INFRARED_CATEGORIES.INFRARED_TV].includes(
+    specifications.category,
+  )
     ? `tuya:${id}_${gateway_id}`
     : `tuya:${id}`;
   const { functions = [], status = [] } = specifications;
@@ -23,7 +25,7 @@ function convertDevice(tuyaDevice) {
 
   if (
     gateway_id.length > 0 &&
-    ([INFRARED_CATEGORIES.INFRARED_AC, INFRARED_CATEGORIES.INFRARED_TV].includes(specifications.category))
+    [INFRARED_CATEGORIES.INFRARED_AC, INFRARED_CATEGORIES.INFRARED_TV].includes(specifications.category)
   ) {
     if (specifications.category === INFRARED_CATEGORIES.INFRARED_AC) {
       groups['power'] = {
@@ -101,8 +103,8 @@ function convertDevice(tuyaDevice) {
     selector: externalId,
     model,
     service_id: this.serviceId,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
-    should_poll: specifications.category === INFRARED_CATEGORIES.INFRARED_TV ? false : true,
+    poll_frequency: null,
+    should_poll: false,
   };
   return device;
 }

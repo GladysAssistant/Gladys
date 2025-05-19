@@ -10,7 +10,7 @@ const { discoverDevices } = require('./tuya.discoverDevices');
 const { loadDevices } = require('./tuya.loadDevices');
 const { loadDeviceDetails } = require('./tuya.loadDeviceDetails');
 const { setValue } = require('./tuya.setValue');
-const { poll } = require('./tuya.poll');
+const { handleFeedbackFromTuya } = require('./tuya.handleFeedbackFromTuya');
 
 const { STATUS } = require('./utils/tuya.constants');
 
@@ -20,6 +20,7 @@ const TuyaHandler = function TuyaHandler(gladys, serviceId) {
 
   this.connector = null;
   this.status = STATUS.NOT_INITIALIZED;
+  this.ws = null;
 };
 
 TuyaHandler.prototype.init = init;
@@ -34,6 +35,6 @@ TuyaHandler.prototype.discoverDevices = discoverDevices;
 TuyaHandler.prototype.loadDevices = loadDevices;
 TuyaHandler.prototype.loadDeviceDetails = loadDeviceDetails;
 TuyaHandler.prototype.setValue = setValue;
-TuyaHandler.prototype.poll = poll;
+TuyaHandler.prototype.handleFeedbackFromTuya = handleFeedbackFromTuya;
 
 module.exports = TuyaHandler;

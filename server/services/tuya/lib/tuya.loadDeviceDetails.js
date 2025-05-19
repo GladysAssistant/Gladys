@@ -18,15 +18,21 @@ async function loadDeviceDetails(tuyaDevice) {
   });
   const { result } = responsePage;
 
-  if([INFRARED_CATEGORIES.INFRARED_TV, INFRARED_CATEGORIES.INFRARED_AC].includes(responsePage.result.category)) {
+  if ([INFRARED_CATEGORIES.INFRARED_TV, INFRARED_CATEGORIES.INFRARED_AC].includes(responsePage.result.category)) {
     const getListOfKeys = await this.connector.request({
       method: 'GET',
       path: `${API.VERSION_2_0}/infrareds/${tuyaDevice.gateway_id}/remotes/${deviceId}/keys`,
     });
-    return { ...tuyaDevice, specifications: result, keys: getListOfKeys.result.key_list.filter((key) => key.standard_key).map((key) => ({
-      ...key,
-      category_id: getListOfKeys.result.category_id,
-    }))};
+    return {
+      ...tuyaDevice,
+      specifications: result,
+      keys: getListOfKeys.result.key_list
+        .filter((key) => key.standard_key)
+        .map((key) => ({
+          ...key,
+          category_id: getListOfKeys.result.category_id,
+        })),
+    };
   }
 
   return { ...tuyaDevice, specifications: result };
