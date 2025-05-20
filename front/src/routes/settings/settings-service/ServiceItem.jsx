@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import { RequestStatus } from '../../../utils/consts';
 import { SERVICE_STATUS } from '../../../../../server/utils/constants';
+import { integrations } from '../../../config/integrations';
 
 const STARTED_STATUS = [SERVICE_STATUS.RUNNING];
 const HIDDEN_ACTION_STATUS = [SERVICE_STATUS.UNKNOWN, SERVICE_STATUS.DISABLED];
@@ -30,7 +31,7 @@ class ServiceItem extends Component {
     }
   };
 
-  render({ service, integrations = [] }, { changeStatus }) {
+  render({ service }, { changeStatus }) {
     const started = STARTED_STATUS.includes(service.status);
     const displayAction = !HIDDEN_ACTION_STATUS.includes(service.status);
     const integrationPage = integrations.find(

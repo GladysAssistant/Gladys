@@ -165,6 +165,11 @@ import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-pag
 import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
 import ZwaveJSUISetupPage from '../routes/integration/all/zwavejs-ui/setup-page';
 
+// Matter integration
+import MatterDevices from '../routes/integration/all/matter/MatterDevices';
+import MatterDiscoverPage from '../routes/integration/all/matter/MatterDiscoverPage';
+import MatterSettingsPage from '../routes/integration/all/matter/MatterSettingsPage';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
@@ -319,6 +324,10 @@ const AppRouter = connect(
         <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
         <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
         <ZwaveJSUISetupPage path="/dashboard/integration/device/zwavejs-ui/setup" />
+
+        <MatterDevices path="/dashboard/integration/device/matter" />
+        <MatterDiscoverPage path="/dashboard/integration/device/matter/discover" />
+        <MatterSettingsPage path="/dashboard/integration/device/matter/settings" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />

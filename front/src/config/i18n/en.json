@@ -270,7 +270,8 @@
       "edf-tempo": "Tempo EDF",
       "clock": "Clock",
       "scene": "Scene",
-      "music": "Music"
+      "music": "Music",
+      "gauge": "Gauge"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -350,6 +351,8 @@
         "lastHour": "Last hour",
         "lastTwelveHours": "Last 12 hours",
         "lastDay": "Last 24 hours",
+        "showAdvancedOptions": "Show Advanced Options",
+        "hideAdvancedOptions": "Hide Advanced Options",
         "lastSevenDays": "Last 7 days",
         "lastThirtyDays": "Last 30 days",
         "lastThreeMonths": "Last 3 months",
@@ -357,8 +360,8 @@
         "noValue": "No values recorded on this interval.",
         "noValueWarning": "Warning: if you just configured this device, it may take some time before you see something here as Gladys needs some time to collect enough data. For interval superior to 24h, it may take up to 24h before you see something here.",
         "noChartType": "No chart type selected",
-        "noChartTypeWarning": "If you just configured this device, please go back to the box edit page and select a chart type.",
-        "editNameLabel": "Enter the name of this box",
+        "noChartTypeWarning": "If you just configured this device, please go back to the widget edit page and select a chart type.",
+        "editNameLabel": "Enter the name of this widget",
         "editDeviceFeaturesLabel": "Select the device you want to display here",
         "editRoomLabel": "Select the room you want to display here",
         "editNamePlaceholder": "Name displayed on the dashboard",
@@ -380,7 +383,24 @@
         "on": "On",
         "off": "Off",
         "start_date": "Start date: ",
-        "end_date": "End date: "
+        "end_date": "End date: ",
+        "aggregateFunction": "Aggregate function",
+        "aggregateFunctions": {
+          "sum": "Sum",
+          "avg": "Average",
+          "max": "Max",
+          "min": "Min",
+          "count": "Count"
+        },
+        "groupByLabel": "Group by",
+        "groupBy": {
+          "noGrouping": "No grouping",
+          "hour": "Hour",
+          "day": "Day",
+          "week": "Week",
+          "month": "Month",
+          "year": "Year"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -413,6 +433,13 @@
         "displaySecond": "Display seconds?",
         "yes": "Yes",
         "no": "No"
+      },
+      "gauge": {
+        "description": "This widget will display a gauge with the value of the selected feature between its minimum and maximum value.",
+        "selectDeviceLabel": "Select feature to display",
+        "noDeviceFeatureSelector": "No feature selected",
+        "errorLoadingDevice": "An error occured while loading the device",
+        "noDeviceFeatureLastValue": "This feature has not received any value yet"
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
@@ -451,6 +478,7 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
+      "noIntegrations": "No integrations found",
       "menu": {
         "all": "All integrations",
         "device": "Devices",
@@ -1868,6 +1896,68 @@
         "saved": "Configuration saved!",
         "error": "Error while saving configuration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Add and manage your Matter devices.",
+      "deviceTab": "Devices",
+      "addTab": "Add Device",
+      "settingsTab": "Settings",
+      "documentation": "Documentation",
+      "discover": {
+        "title": "Add Matter Device",
+        "description": "Your Matter device provides an 11- or 21-digit pairing code that you need to enter here to add it to Gladys. If your device is a Thread device, it must be connected to a Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Pairing Code",
+        "pairingCodePlaceholder": "Example: 1234-567-9101 or 12345679101",
+        "pairingCodeHelp": "Enter the 11- or 21-digit pairing code provided by your Matter device",
+        "addButton": "Add to Gladys",
+        "loading": "Connecting to device, this may take a few minutes.",
+        "error": "Impossible to add this Matter device to Gladys, are you sure this device is on the same network as Gladys? Is Gladys launched with network=host?"
+      },
+      "settings": {
+        "title": "Matter Settings",
+        "ipv6Enabled": "An IPv6 interface is available on this machine ✅",
+        "ipv6NotEnabled": "Matter requires IPv6 to function, but no IPv6 interface was detected on this machine ❌",
+        "description": "Enable or disable the Matter integration in Gladys. When enabled, Gladys will be able to communicate with your Matter devices.",
+        "enableIntegration": "Enable Matter Integration",
+        "saveButton": "Save",
+        "error": "An error occurred while saving settings",
+        "nodesTitle": "Matter Nodes",
+        "nodeIdLabel": "Node ID",
+        "nodeDetailsLabel": "Node Details",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Decommission",
+        "noNodesFound": "No Matter nodes found. You can add a Matter device by going to the \"Add Device\" tab.",
+        "disabledWarning": "Matter is not activated. Please activate it in <a href=\"/dashboard/integration/device/matter/settings\">Settings</a> before using the integration",
+        "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
+        "enableButton": "Enable Matter",
+        "disableButton": "Disable Matter",
+        "downloadNodesJson": "Download Nodes JSON"
+      },
+      "device": {
+        "title": "Matter Devices",
+        "noDeviceFound": "No Matter devices found",
+        "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
+        "addToGladys": "Add to Gladys",
+        "deviceAlreadyExist": "A device with the same unique identifier already exists. You can update it using the button below.",
+        "replaceExisting": "Update existing device",
+        "nodeDisconnected": "Disconnected"
+      },
+      "discoverDeviceDescr": "Add a new Matter device",
+      "nameLabel": "Name",
+      "namePlaceholder": "My Matter Device",
+      "roomLabel": "Room",
+      "featuresLabel": "Features",
+      "noFeaturesHandled": "No features are handled by this device",
+      "alreadyCreatedButton": "Device already added",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "error": {
+        "defaultError": "An error occurred while saving the device",
+        "conflictError": "A device with this name already exists",
+        "defaultDeletionError": "An error occurred while deleting the device",
+        "getDevicesError": "An error occurred while getting the devices list"
+      }
     }
   },
   "editScene": {
@@ -1896,6 +1986,7 @@
     "selectActionType": "Select an action type",
     "selectConditionType": "Select a condition type",
     "addActionButton": "Add action",
+    "addActionGroupButton": "Add action group",
     "noTriggersYet": "No trigger added yet. It's not mandatory to have a trigger in a scene.",
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",
@@ -1909,7 +2000,10 @@
         "milliseconds": "milliseconds",
         "seconds": "seconds",
         "minutes": "minutes",
-        "hours": "hours"
+        "hours": "hours",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to define a variable before this action."
       },
       "messageSend": {
         "userLabel": "User",
@@ -2105,14 +2199,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -2212,6 +2306,9 @@
         "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
+      },
+      "askAi": {
+        "answer": "AI answer"
       }
     },
     "triggers": {
@@ -3111,6 +3208,14 @@
           "high-risk": "High",
           "unknown": "Unknown"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Low",
+          "1": "Normal",
+          "2": "High",
+          "unknown": "Unknown"
+        }
       }
     }
   },
@@ -3168,6 +3273,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Level sensor",
+      "decimal": "Level sensor",
+      "liquid-state": "Liquid level state",
+      "liquid-level-percent": "Liquid level percent",
+      "liquid-depth": "Liquid depth"
     },
     "camera": {
       "shortCategoryName": "Camera",

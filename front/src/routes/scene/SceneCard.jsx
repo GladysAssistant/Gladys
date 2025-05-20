@@ -6,6 +6,31 @@ import style from './style.css';
 import { MAX_LENGTH_TAG } from './constant';
 
 class SceneCard extends Component {
+  getSceneUrl = () => {
+    const urlParams = new URLSearchParams();
+
+    // If there is a search
+    if (this.props.sceneSearch) {
+      urlParams.set('search', this.props.sceneSearch);
+    }
+
+    // If there is an order dir
+    if (this.props.orderDir) {
+      urlParams.set('order_dir', this.props.orderDir);
+    }
+
+    // If there are tags
+    if (this.props.sceneTagSearch && this.props.sceneTagSearch.length > 0) {
+      this.props.sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
+    }
+    // Redirect to the scene with the url params
+    if (urlParams.toString()) {
+      return `/dashboard/scene/${this.props.scene.selector}?${urlParams.toString()}`;
+    }
+    // Redirect to the scene without url params
+    return `/dashboard/scene/${this.props.scene.selector}`;
+  };
+
   startScene = async () => {
     try {
       await this.setState({ saving: true });
@@ -37,7 +62,7 @@ class SceneCard extends Component {
             <i class={`fe fe-${props.scene.icon}`} />
           </a>
           <a
-            href={`/dashboard/scene/${props.scene.selector}`}
+            href={this.getSceneUrl()}
             class={cx('col', {
               [style.disabledSceneRow]: !props.scene.active
             })}
@@ -113,7 +138,7 @@ class SceneCard extends Component {
               <div class="mt-auto">
                 <div class="card-footer">
                   <div class="btn-list text-center">
-                    <Link href={`/dashboard/scene/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
+                    <Link href={this.getSceneUrl()} class="btn btn-outline-primary btn-sm">
                       <i class="fe fe-edit" />
                       <Text id="scene.editButton" />
                     </Link>

@@ -12,6 +12,19 @@ import EditScenePage from './EditScenePage';
 
 import { ACTIONS } from '../../../../../server/utils/constants';
 
+const VARIABLES_ATTRIBUTES_IN_ACTION = {
+  [ACTIONS.MESSAGE.SEND]: ['text'],
+  [ACTIONS.AI.ASK]: ['text'],
+  [ACTIONS.MESSAGE.SEND_CAMERA]: ['text'],
+  [ACTIONS.SMS.SEND]: ['text'],
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: ['text'],
+  [ACTIONS.MQTT.SEND]: ['message'],
+  [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
+  [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
+  [ACTIONS.HTTP.REQUEST]: ['body'],
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
+};
+
 // Helper function to merge update objects
 const deepMergeUpdates = (target, source) => {
   if (!source) return target;
@@ -230,6 +243,125 @@ class EditScene extends Component {
     const newState = update(this.state, updates);
 
     await this.setState(newState);
+  };
+
+  addActionGroupAfter = async index => {
+    // Update variable paths for all actions after the inserted group
+    await this.setState(prevState => {
+      const newVariables = { ...prevState.variables };
+
+      const pathToUpdateInVariables = [];
+
+      // Iterate through all variables and update their paths
+      Object.entries(prevState.variables).forEach(([path, value]) => {
+        const pathSegments = path.split('.');
+
+        // Handle both root level paths and nested paths in then/else
+        if (pathSegments.length >= 2) {
+          // Check if this is a root level path (e.g., "1.0")
+          if (pathSegments.length === 2) {
+            const groupIndex = parseInt(pathSegments[0], 10);
+
+            // If this path is after the inserted group, increment index
+            if (groupIndex >= index + 1) {
+              const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
+              newVariables[newPath] = value;
+              delete newVariables[path];
+              pathToUpdateInVariables.push({ prevPath: path, newPath });
+            }
+          } else {
+            // Handle nested paths (e.g., "1.0.then.0.0" or "1.0.else.0.0")
+            // Find the root group index which is the first segment
+            const rootGroupIndex = parseInt(pathSegments[0], 10);
+
+            // Only update if the root group index is affected by the insertion
+            if (rootGroupIndex >= index + 1) {
+              // Create a new path with incremented root group index
+              const newPathSegments = [...pathSegments];
+              newPathSegments[0] = (rootGroupIndex + 1).toString();
+              const newPath = newPathSegments.join('.');
+
+              newVariables[newPath] = value;
+              delete newVariables[path];
+              pathToUpdateInVariables.push({ prevPath: path, newPath });
+            }
+          }
+        }
+      });
+
+      const newScene = update(prevState.scene, {
+        actions: {
+          $splice: [[index + 1, 0, []]]
+        }
+      });
+
+      // Update variable paths for all actions after the inserted group
+      pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
+        // Recursive function to process all actions, including nested ones in if/then/else blocks
+        const processActions = actions => {
+          if (!Array.isArray(actions)) return;
+
+          actions.forEach(actionGroup => {
+            if (!Array.isArray(actionGroup)) return;
+
+            actionGroup.forEach(action => {
+              if (!action) return;
+
+              // Process the current action
+              if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
+                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
+                  // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
+                  if (attribute.includes('.')) {
+                    // We split the attribute path
+                    const attributePath = attribute.split('.');
+                    // If the first part is an array (e.g., conditions[])
+                    if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
+                      // We loop through the array
+                      action[attributePath[0].slice(0, -2)].forEach(subAction => {
+                        if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
+                          // And replace the second part if it is a variable
+                          // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
+                          subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
+                        }
+                      });
+                    }
+                  } else if (action[attribute]) {
+                    // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
+                    action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
+                  }
+                });
+              }
+
+              // Check for nested actions in if/then/else blocks
+              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+                // Process 'if' branch if it exists
+                if (Array.isArray(action.if)) {
+                  processActions([action.if]);
+                }
+
+                // Process 'then' branch if it exists
+                if (Array.isArray(action.then)) {
+                  processActions(action.then);
+                }
+
+                // Process 'else' branch if it exists
+                if (Array.isArray(action.else)) {
+                  processActions(action.else);
+                }
+              }
+            });
+          });
+        };
+
+        // Start processing from the root actions
+        processActions(prevState.scene.actions);
+      });
+
+      return {
+        variables: newVariables,
+        scene: newScene
+      };
+    });
   };
 
   addAction = async (path, options = {}) => {
@@ -557,7 +689,7 @@ class EditScene extends Component {
     try {
       await this.props.httpClient.delete(`/api/v1/scene/${this.props.scene_selector}`);
       this.setState({ saving: false });
-      route('/dashboard/scene');
+      route(`/dashboard/scene${window.location.search}`);
     } catch (e) {
       this.setState({ saving: false });
     }
@@ -1033,6 +1165,7 @@ class EditScene extends Component {
               duplicateScene={this.duplicateScene}
               setTags={this.setTags}
               updateSceneIcon={this.updateSceneIcon}
+              addActionGroupAfter={this.addActionGroupAfter}
               askDeleteScene={askDeleteScene}
               askDeleteCurrentScene={this.askDeleteCurrentScene}
               cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}

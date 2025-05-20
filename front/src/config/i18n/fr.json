@@ -270,7 +270,8 @@
       "edf-tempo": "EDF Tempo",
       "clock": "Horloge",
       "scene": "Scène",
-      "music": "Musique"
+      "music": "Musique",
+      "gauge": "Jauge"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -354,11 +355,13 @@
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
         "lastYear": "Dernière année",
+        "showAdvancedOptions": "Afficher les options avancées",
+        "hideAdvancedOptions": "Masquer les options avancées",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
         "noChartType": "Aucun type de graphique sélectionné",
-        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
-        "editNameLabel": "Entrez le nom de cette box",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition du widget et sélectionner un type de graphique.",
+        "editNameLabel": "Entrez le nom de ce widget",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
         "editRoomLabel": "Sélectionnez une pièce",
@@ -380,7 +383,24 @@
         "on": "On",
         "off": "Off",
         "start_date": "Début le : ",
-        "end_date": "Fin le : "
+        "end_date": "Fin le : ",
+        "aggregateFunction": "Fonction d'agrégation",
+        "aggregateFunctions": {
+          "sum": "Somme",
+          "avg": "Moyenne",
+          "max": "Maximum",
+          "min": "Minimum",
+          "count": "Nombre"
+        },
+        "groupByLabel": "Grouper par",
+        "groupBy": {
+          "noGrouping": "Ne pas grouper",
+          "hour": "Heure",
+          "day": "Jour",
+          "week": "Semaine",
+          "month": "Mois",
+          "year": "Année"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -434,6 +454,13 @@
       },
       "music": {
         "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
+      },
+      "gauge": {
+        "description": "Ce widget affichera une jauge avec la valeur de la fonctionnalité sélectionnée entre sa valeur minimale et maximale.",
+        "selectDeviceLabel": "Sélectionner la fonctionnalité à afficher",
+        "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
+        "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
+        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
       }
     }
   },
@@ -451,6 +478,7 @@
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
+      "noIntegrations": "Aucune intégration trouvée",
       "menu": {
         "all": "Toutes les intégrations",
         "device": "Appareils",
@@ -1872,6 +1900,68 @@
         "saved": "Configuration sauvegardée !",
         "error": "Erreur lors de la sauvegarde de la configuration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Ajoutez et gérez vos appareils Matter.",
+      "deviceTab": "Appareils",
+      "addTab": "Ajouter un appareil",
+      "settingsTab": "Paramètres",
+      "documentation": "Documentation",
+      "device": {
+        "title": "Appareils Matter",
+        "noDeviceFound": "Aucun appareil Matter trouvé",
+        "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
+        "addToGladys": "Ajouter à Gladys",
+        "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
+        "replaceExisting": "Mettre à jour l'appareil existant",
+        "nodeDisconnected": "Déconnecté"
+      },
+      "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Mon appareil Matter",
+      "roomLabel": "Pièce",
+      "featuresLabel": "Fonctionnalités",
+      "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
+      "alreadyCreatedButton": "Appareil déjà ajouté",
+      "saveButton": "Enregistrer",
+      "deleteButton": "Supprimer",
+      "error": {
+        "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
+        "conflictError": "Un appareil avec ce nom existe déjà",
+        "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
+        "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
+      },
+      "discover": {
+        "title": "Ajouter un appareil Matter",
+        "description": "Votre appareil fournit un code d'appairage à 11 ou 21 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Code d'appairage",
+        "pairingCodePlaceholder": "Exemple: 1234-567-9101, 12345679101",
+        "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
+        "addButton": "Ajouter à Gladys",
+        "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
+      },
+      "settings": {
+        "title": "Paramètres Matter",
+        "ipv6Enabled": "Une interface IPv6 est disponible sur cette machine ✅",
+        "ipv6NotEnabled": "Matter nécessite une connectivité IPv6, mais aucune interface IPv6 n'a été détectée sur cette machine ❌",
+        "description": "Activez ou désactivez l'intégration Matter dans Gladys. Lorsqu'elle est activée, Gladys pourra communiquer avec vos appareils Matter.",
+        "enableIntegration": "Activer l'intégration Matter",
+        "saveButton": "Enregistrer",
+        "error": "Une erreur est survenue lors de l'enregistrement des paramètres",
+        "nodesTitle": "Nœuds Matter",
+        "nodeIdLabel": "ID du nœud",
+        "nodeDetailsLabel": "Détails du nœud",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Décommissionner",
+        "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
+        "disabledWarning": "Matter n'est pas activé, veuillez l'activer dans <a href=\"/dashboard/integration/device/matter/settings\">Paramètres</a> pour commencer à utiliser l'intégration.",
+        "disabledWarningSettings": "Matter n'est activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
+        "enableButton": "Activer Matter",
+        "disableButton": "Désactiver Matter",
+        "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
+      }
     }
   },
   "editScene": {
@@ -1900,6 +1990,7 @@
     "selectActionType": "Sélectionnez un type d'action",
     "selectConditionType": "Sélectionner un type de condition",
     "addActionButton": "Nouvelle action",
+    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
@@ -1913,7 +2004,10 @@
         "milliseconds": "millisecondes",
         "seconds": "secondes",
         "minutes": "minutes",
-        "hours": "heures"
+        "hours": "heures",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculée",
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant."
       },
       "messageSend": {
         "userLabel": "Utilisateur",
@@ -2109,14 +2203,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -2216,6 +2310,9 @@
         "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
+      },
+      "askAi": {
+        "answer": "Réponse de l'IA"
       }
     },
     "triggers": {
@@ -3115,6 +3212,14 @@
           "high-risk": "Élevé",
           "unknown": "Inconnu"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Faible",
+          "1": "Normal",
+          "2": "Élevé",
+          "unknown": "Inconnu"
+        }
       }
     }
   },
@@ -3172,6 +3277,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Capteur de niveau",
+      "decimal": "Capteur de niveau",
+      "liquid-state": "État du niveau",
+      "liquid-level-percent": "Niveau du liquide (Pourcentage)",
+      "liquid-depth": "Profondeur du liquide"
     },
     "camera": {
       "shortCategoryName": "Caméra",

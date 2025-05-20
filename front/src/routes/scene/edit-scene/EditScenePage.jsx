@@ -161,6 +161,24 @@ const EditScenePage = ({ children, ...props }) => (
                   setVariables={props.setVariables}
                 />
               </div>
+
+              {index + 1 < props.scene.actions.length && (
+                <div class="row mb-4">
+                  <div class="col-lg-12">
+                    <div class="text-center">
+                      <button
+                        onClick={() => props.addActionGroupAfter(index)}
+                        class="btn btn-sm btn-outline-secondary"
+                        disabled={props.saving}
+                      >
+                        <i class="fe fe-plus-circle" />{' '}
+                        <Text id="editScene.addActionGroupButton">Add action group</Text>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {index + 1 < props.scene.actions.length && (
                 <div class={cx('row mb-4', style.arrowDown)}>
                   <div class="col-lg-12">

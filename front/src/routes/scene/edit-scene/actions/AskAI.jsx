@@ -2,7 +2,9 @@ import Select from 'react-select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Localizer, Text } from 'preact-i18n';
+import get from 'get-value';
 
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 class AskAI extends Component {
@@ -67,6 +69,18 @@ class AskAI extends Component {
     }
     this.setState({ selectedUserOption, selectedCameraOption });
   };
+  setVariables = () => {
+    const ASK_AI_ANSWER_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.askAi.answer');
+    this.props.setVariables(this.props.path, [
+      {
+        name: 'answer',
+        type: 'askAi',
+        ready: true,
+        label: ASK_AI_ANSWER_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -76,6 +90,7 @@ class AskAI extends Component {
   }
   componentDidMount() {
     this.getOptions();
+    this.setVariables();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
@@ -147,4 +162,4 @@ class AskAI extends Component {
   }
 }
 
-export default connect('httpClient', {})(AskAI);
+export default connect('httpClient', {})(withIntlAsProp(AskAI));

@@ -1,0 +1,6 @@
+[
+  {
+    "label": "gladys-upgraded.success",
+    "answers": ["Gladys has been upgraded to version {{ gladysVersion }}! ✅"]
+  }
+]

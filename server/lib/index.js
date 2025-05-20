@@ -41,6 +41,7 @@ const { EVENTS } = require('../utils/constants');
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
+ * @param {boolean} [params.disableGladysUpgradedCheck] - If true, disable the check if Gladys is upgraded.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
@@ -58,13 +59,13 @@ function Gladys(params = {}) {
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
   const session = new Session(params.jwtSecret, cache);
-  const system = new System(db.sequelize, event, config, job);
-  const http = new Http(system);
   const house = new House(event, stateManager, session);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
   const user = new User(session, stateManager, variable);
+  const system = new System(db.sequelize, event, config, job, variable, user, message, brain);
+  const http = new Http(system);
   const location = new Location(user, event);
   const device = new Device(event, message, stateManager, service, room, variable, job, brain, user);
   const calendar = new Calendar(service);
@@ -172,6 +173,10 @@ function Gladys(params = {}) {
         scheduler.init();
       }
       gateway.init();
+
+      if (!params.disableGladysUpgradedCheck) {
+        await system.checkIfGladysUpgraded(gateway);
+      }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {
         type: EVENTS.SYSTEM.START,

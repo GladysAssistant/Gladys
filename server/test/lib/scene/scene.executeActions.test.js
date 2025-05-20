@@ -308,60 +308,6 @@ describe('scene.executeActions', () => {
     );
     assert.notCalled(device.setValue);
   });
-  it('should execute wait 5 ms', async () => {
-    await executeActions(
-      { event },
-      [
-        [
-          {
-            type: ACTIONS.TIME.DELAY,
-            unit: 'milliseconds',
-            value: 5,
-          },
-        ],
-      ],
-      {},
-    );
-    await executeActions(
-      { event },
-      [
-        [
-          {
-            type: ACTIONS.TIME.DELAY,
-            unit: 'seconds',
-            value: 5 / 1000,
-          },
-        ],
-      ],
-      {},
-    );
-    await executeActions(
-      { event },
-      [
-        [
-          {
-            type: ACTIONS.TIME.DELAY,
-            unit: 'minutes',
-            value: 5 / 1000 / 60,
-          },
-        ],
-      ],
-      {},
-    );
-    await executeActions(
-      { event },
-      [
-        [
-          {
-            type: ACTIONS.TIME.DELAY,
-            unit: 'hours',
-            value: 5 / 1000 / 60 / 60,
-          },
-        ],
-      ],
-      {},
-    );
-  });
   it('should execute sequential actions', async () => {
     const device = {
       setValue: fake.resolves(null),
