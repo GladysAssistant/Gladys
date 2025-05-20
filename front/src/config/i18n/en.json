@@ -1810,6 +1810,10 @@
       "unmanagedModelButton": "Unsupported or unavailable model",
       "mqttDiscoverTab": "MQTT Discovery",
       "httpDiscoverTab": "Web Discovery",
+      "protocolLabels": {
+        "mqtt": "MQTT topic of the connected lock",
+        "http": "ID of the connected lock on NukiWeb"
+      },
       "status": {
         "notConnected": "Gladys failed to connect to the Nuki cloud account. More information on the ",
         "setupPageLink": "Nuki setup page.",

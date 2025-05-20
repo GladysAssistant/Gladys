@@ -1810,6 +1810,10 @@
       "unmanagedModelButton": "Nicht unterstütztes oder nicht verfügbares Modell",
       "mqttDiscoverTab": "MQTT-Erkennung",
       "httpDiscoverTab": "Web-Erkennung",
+      "protocolLabels": {
+        "mqtt": "MQTT-Topic des verbundenen Schlosses",
+        "http": "ID des verbundenen Schlosses auf NukiWeb"
+      },
       "status": {
         "notConnected": "Gladys konnte keine Verbindung zum Nuki-Cloud-Konto herstellen. Weitere Informationen auf der ",
         "setupPageLink": "Nuki-Einrichtungsseite.",
