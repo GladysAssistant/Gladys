@@ -621,7 +621,6 @@ const DEVICE_FEATURE_TYPES = {
   AIR_CONDITIONING: {
     BINARY: 'binary',
     MODE: 'mode',
-    TEMPERATURE: 'temperature',
     TARGET_TEMPERATURE: 'target-temperature',
   },
   HEATER: {
