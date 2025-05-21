@@ -247,15 +247,6 @@
       "private": "privat",
       "public": "öffentlich"
     },
-    "editDashboardType": "Typ",
-    "types": {
-      "main": "Standard",
-      "electric-vehicle": "Elektrofahrzeug"
-    },
-    "electricVehicleDashboardType": {
-      "standardConfigurationTitle": "Standardkonfiguration",
-      "electricVehicleConfigurationTitle": "Gerätekonfiguration - Elektrofahrzeug"
-    },
     "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
@@ -2819,6 +2810,7 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Blindleistung (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
+    "watt-hour-km": "Wattstunde pro Kilometer (Wh/km)",
     "mm": "Millimeter (mm)",
     "cm": "Zentimeter (cm)",
     "m": "Meter (m)",
@@ -2897,6 +2889,7 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-km": "Wh/km",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
@@ -3174,7 +3167,7 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Laufzeit"
+      "integer": "Batterie"
     },
     "battery-low": {
       "shortCategoryName": "Niedriger Batteriestand",
@@ -3323,17 +3316,28 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "temperature": "Temperatur",
       "target-temperature": "Solltemperatur"
     },
-    "charger": {
-      "shortCategoryName": "Ladegerät",
-      "binary": "Schalter",
-      "power": "Leistung",
-      "energy": "Energie",
+    "electrical-vehicle": {
+      "shortCategoryName": "Elektrofahrzeug",
+      "alarm": "Alarm",
+      "battery": "Laufzeit",
+      "charging": "Laden",
+      "climate-on": "Klimaanlage",
+      "consumption": "Verbrauch",
       "current": "Strom",
+      "door-open": "Türen offen",
+      "energy": "Energie",
+      "lock": "Verriegelung",
+      "name": "Name",
+      "odometer": "Kilometerzähler",
+      "plugged": "Angeschlossen",
+      "power": "Leistung",
+      "target-current": "Sollstrom",
+      "target-temperature": "Solltemperatur",
+      "temperature": "Temperatur",
       "voltage": "Spannung",
-      "target-current": "Sollstrom"
+      "window-open": "Fenster offen"
     },
     "heater": {
       "shortCategoryName": "Heizung",

@@ -247,15 +247,6 @@
       "private": "private",
       "public": "public"
     },
-    "editDashboardType": "Type",
-    "types": {
-      "main": "Standard",
-      "electric-vehicle": "Electric vehicle"
-    },
-    "electricVehicleDashboardType": {
-      "standardConfigurationTitle": "Standard configuration",
-      "electricVehicleConfigurationTitle": "Device configuration - electric vehicle"
-    },
     "editDashboardAddColumnButton": "Add a column on dashboard",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
@@ -2819,6 +2810,7 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Voltampere reactive (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
+    "watt-hour-km": "Watt hour per kilometer (Wh/km)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
     "m": "Meter (m)",
@@ -2897,6 +2889,7 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-km": "Wh/km",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
@@ -3174,7 +3167,7 @@
     },
     "battery": {
       "shortCategoryName": "Battery",
-      "integer": "Autonomy"
+      "integer": "Battery"
     },
     "battery-low": {
       "shortCategoryName": "Low Battery",
@@ -3326,14 +3319,26 @@
       "temperature": "Temperature",
       "target-temperature": "Target temperature"
     },
-    "charger": {
-      "shortCategoryName": "Charger",
-      "binary": "Switch",
-      "power": "Power",
-      "energy": "Energy",
+    "electrical-vehicle": {
+      "shortCategoryName": "Electric vehicle",
+      "alarm": "Alarm",
+      "battery": "Range",
+      "charging": "Charging",
+      "climate-on": "Air conditioning",
+      "consumption": "Consumption",
       "current": "Current",
+      "door-open": "Doors open",
+      "energy": "Energy",
+      "lock": "Lock",
+      "name": "Name",
+      "odometer": "Odometer",
+      "plugged": "Plugged",
+      "power": "Power",
+      "target-current": "Target current",
+      "target-temperature": "Target temperature",
+      "temperature": "Temperature",
       "voltage": "Voltage",
-      "target-current": "Current setpoint"
+      "window-open": "Windows open"
     },
     "heater": {
       "shortCategoryName": "Heating",

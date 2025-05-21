@@ -496,7 +496,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
-  CHARGER: 'charger',
+  ELECTRICAL_VEHICLE: 'electrical-vehicle',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -808,13 +808,25 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
-  CHARGER: {
-    BINARY: 'binary',
-    POWER: 'power',
-    ENERGY: 'energy',
-    VOLTAGE: 'voltage',
-    CURRENT: 'current',
-    TARGET_CURRENT: 'target-current',
+  ELECTRICAL_VEHICLE: {
+    ALARM: 'alarm', // binary - command
+    BATTERY: 'battery', // integer - sensor
+    CHARGING: 'charging', // binary - command
+    CLIMATE_ON: 'climate-on', // binary - command
+    CONSUMPTION: 'consumption', // integer - sensor
+    CHARGER_CURRENT: 'charger-current', // integer - sensor
+    DOOR_OPEN: 'door-open', // binary - sensor
+    ENERGY: 'energy', // integer - sensor
+    LOCK: 'lock', // binary - command
+    NAME: 'name', // text - fixed
+    ODOMETER: 'odometer', // integer - sensor
+    PLUGGED: 'plugged', // binary - sensor
+    POWER: 'power', // integer - sensor
+    TARGET_CURRENT: 'target-current', // integer - command
+    TARGET_TEMPERATURE: 'target-temperature', // integer - command
+    TEMPERATURE: 'temperature', // integer - sensor
+    VOLTAGE: 'voltage', // integer - sensor
+    WINDOW_OPEN: 'window-open', // binary - sensor
   },
 };
 
@@ -849,6 +861,7 @@ const DEVICE_FEATURE_UNITS = {
   KILOVOLT_AMPERE: 'kilovolt-ampere',
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
+  WATT_HOUR_KM: 'watt-hour-km',
   // Length units
   MM: 'mm',
   CM: 'cm',
@@ -930,11 +943,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
-  [DEVICE_FEATURE_CATEGORIES.BATTERY]: [
-    DEVICE_FEATURE_UNITS.PERCENT, 
-    DEVICE_FEATURE_UNITS.KM,
-    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  ],
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [
@@ -983,7 +992,9 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
   ],
-  [DEVICE_FEATURE_CATEGORIES.CHARGER]: [
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE]: [
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.KM,
     DEVICE_FEATURE_UNITS.MILLI_AMPERE,
     DEVICE_FEATURE_UNITS.AMPERE,
     DEVICE_FEATURE_UNITS.MILLI_VOLT,
@@ -996,6 +1007,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_KM,
   ],
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: [
     DEVICE_FEATURE_UNITS.LITER,
@@ -1198,7 +1210,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
 
 const DASHBOARD_TYPE = {
   MAIN: 'main',
-  ELECTRIC_VEHICLE: 'electric-vehicle',
 };
 
 const DASHBOARD_VISIBILITY = {

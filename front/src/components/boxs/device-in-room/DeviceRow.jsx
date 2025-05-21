@@ -37,7 +37,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SIREN.MELODY]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: PushDeviceFeature,
-  [DEVICE_FEATURE_TYPES.CHARGER.TARGET_CURRENT]: CurrentSetpointDeviceFeature
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE.TARGET_CURRENT]: CurrentSetpointDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {

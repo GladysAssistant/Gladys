@@ -166,7 +166,6 @@ class EditDashboard extends Component {
   };
 
   updateCurrentDashboardType = e => {
-    console.log('updateCurrentDashboardType', e.target.value);
     const newState = update(this.state, {
       currentDashboard: {
         type: {

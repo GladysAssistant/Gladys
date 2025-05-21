@@ -247,15 +247,6 @@
       "private": "privé",
       "public": "public"
     },
-    "editDashboardType": "Type",
-    "types": {
-      "main": "Standard",
-      "electric-vehicle": "Véhicule électrique"
-    },
-    "electricVehicleDashboardType": {
-      "standardConfigurationTitle": "Configuration standard",
-      "electricVehicleConfigurationTitle": "Configuration des appareils - véhicule électrique"
-    },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bords",
@@ -2819,6 +2810,7 @@
     "volt-ampere": "Voltampère (VA)",
     "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
+    "watt-hour-km": "Watt heure par kilomètre (Wh/km)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
     "m": "Mètre (m)",
@@ -2897,6 +2889,7 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-km": "Wh/km",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
@@ -3174,7 +3167,7 @@
     },
     "battery": {
       "shortCategoryName": "Batterie",
-      "integer": "Autonomie"
+      "integer": "Batterie"
     },
     "battery-low": {
       "shortCategoryName": "Batterie faible",
@@ -3323,17 +3316,28 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "temperature": "Température",
       "target-temperature": "Température de consigne"
     },
-    "charger": {
-      "shortCategoryName": "Charge",
-      "binary": "Commutateur",
-      "power": "Puissance",
-      "energy": "Energie",
+    "electrical-vehicle": {
+      "shortCategoryName": "Véhicule électrique",
+      "alarm": "Alarme",
+      "battery": "Autonomie",
+      "charging": "Charge",
+      "climate-on": "Climatisation",
+      "consumption": "Consommation",
       "current": "Intensité",
+      "door-open": "Portes ouvertes",
+      "energy": "Energie",
+      "lock": "Verrouillage",
+      "name": "Nom",
+      "odometer": "Odometre",
+      "plugged": "Prise connectée",
+      "power": "Puissance",
+      "target-current": "Intensité de consigne",
+      "target-temperature": "Température de consigne",
+      "temperature": "Température",
       "voltage": "Tension",
-      "target-current": "Intensité de consigne"
+      "window-open": "Fenêtres ouvertes"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

@@ -10,7 +10,7 @@ import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import style from './style.css';
 import stylePrimary from '../style.css';
-import { DASHBOARD_VISIBILITY_LIST, DASHBOARD_TYPE, DASHBOARD_TYPE_LIST } from '../../../../../server/utils/constants';
+import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const maxBoxes = 3;
@@ -89,44 +89,6 @@ const EditBoxColumns = ({ children, ...props }) => (
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-8">
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="dashboard.editDashboardType" />
-          </label>
-          <Localizer>
-            <select
-              value={props.homeDashboard.type}
-              onChange={props.updateCurrentDashboardType}
-              class="form-control"
-            >
-              {DASHBOARD_TYPE_LIST.map(dashboardType => (
-                <option value={dashboardType}>
-                  <Text id={`dashboard.types.${dashboardType}`} />
-                </option>
-              ))}
-            </select>
-          </Localizer>
-        </div>
-      </div>
-    </div>
-    {props.homeDashboard.type === DASHBOARD_TYPE.ELECTRIC_VEHICLE && (
-      <div class="mx-4">
-        <h4 class="d-flex justify-content-center text-center">
-          <Text id="dashboard.electricVehicleDashboardType.electricVehicleConfigurationTitle" />
-        </h4>
-        <div class="row">
-        </div>
-      </div>
-    )}
-    {props.homeDashboard.type === DASHBOARD_TYPE.ELECTRIC_VEHICLE && (
-      <div class="mx-4">
-        <h4 class="d-flex justify-content-center text-center">
-          <Text id="dashboard.electricVehicleDashboardType.standardConfigurationTitle" />
-        </h4>
-      </div>
-    )}
     <div class="row mb-4">
       <div class="col-md-12">
         <Text id="dashboard.editDashboardExplanation" />
@@ -240,3 +202,4 @@ const EditBoxColumns = ({ children, ...props }) => (
 );
 
 export default EditBoxColumns;
+

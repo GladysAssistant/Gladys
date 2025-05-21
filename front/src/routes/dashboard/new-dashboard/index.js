@@ -4,7 +4,7 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import { DASHBOARD_TYPE, DASHBOARD_TYPE_LIST, DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
+import { DASHBOARD_TYPE, DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
 import style from './style.css';
 
 const NewDashboardPage = ({ children, ...props }) => (
@@ -81,20 +81,7 @@ const NewDashboardPage = ({ children, ...props }) => (
                     </select>
                   </Localizer>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="dashboard.editDashboardType" />
-                  </label>
-                  <Localizer>
-                    <select value={props.type} onChange={props.updateType} class="form-control">
-                      {DASHBOARD_TYPE_LIST.map(type => (
-                        <option value={type}>
-                          <Text id={`dashboard.types.${type}`} />
-                        </option>
-                      ))}
-                    </select>
-                  </Localizer>
-                </div>
+
                 <div class="form-footer">
                   <button onClick={props.createDashboard} class="btn btn-primary btn-block">
                     <Text id="newDashboard.createDashboardButton" />
@@ -116,9 +103,6 @@ class Dashboard extends Component {
   updateVisibility = e => {
     this.setState({ visibility: e.target.value });
   };
-  updateType = e => {
-    this.setState({ type: e.target.value });
-  };
   goBack = () => {
     this.props.history.go(-1);
   };
@@ -133,7 +117,7 @@ class Dashboard extends Component {
       const newDashboard = {
         name: this.state.name,
         visibility: this.state.visibility,
-        type: this.state.type || DASHBOARD_TYPE.MAIN,
+        type: DASHBOARD_TYPE.MAIN,
         boxes: [[], [], []]
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
@@ -155,22 +139,19 @@ class Dashboard extends Component {
     this.state = {
       name: '',
       visibility: 'private',
-      type: DASHBOARD_TYPE.MAIN,
       loading: false
     };
   }
-  render(props, { name, visibility, type, loading, dashboardAlreadyExistError, unknownError }) {
+  render(props, { name, visibility, loading, dashboardAlreadyExistError, unknownError }) {
     return (
       <NewDashboardPage
         name={name}
         visibility={visibility}
-        type={type}
         loading={loading}
         dashboardAlreadyExistError={dashboardAlreadyExistError}
         unknownError={unknownError}
         updateName={this.updateName}
         updateVisibility={this.updateVisibility}
-        updateType={this.updateType}
         createDashboard={this.createDashboard}
         goBack={this.goBack}
         prev={props.prev}
