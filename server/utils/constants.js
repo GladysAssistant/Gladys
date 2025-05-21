@@ -496,7 +496,6 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
-  ELECTRICAL_VEHICLE: 'electrical-vehicle',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -508,6 +507,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
   DURATION: 'duration',
+  ELECTRICAL_VEHICLE: 'electrical-vehicle',
   ENERGY_SENSOR: 'energy-sensor',
   HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
@@ -811,21 +811,30 @@ const DEVICE_FEATURE_TYPES = {
   ELECTRICAL_VEHICLE: {
     ALARM: 'alarm', // binary - command
     BATTERY: 'battery', // integer - sensor
-    CHARGING: 'charging', // binary - command
+    BATTERY_POWER: 'battery-power', // integer - sensor
+    BATTERY_RANGE_EST: 'battery-range-est', // integer - sensor
+    BATTERY_TEMP: 'battery-temp', // integer - sensor
+    BATTERY_VOLTAGE: 'battery-voltage', // integer - sensor
+    CHARGE_CURRENT: 'charge-current', // integer - sensor
+    CHARGE_ENERGY_ADDED: 'charge-energy-added', // integer - sensor
+    CHARGE_ENERGY_CONSUMPTION: 'charge-energy-consumption', // integer - sensor
+    CHARGE_ON: 'charge-on', // binary - command
+    CHARGE_POWER: 'charge-power', // integer - sensor
+    CHARGE_VOLTAGE: 'charge-voltage', // integer - sensor
     CLIMATE_ON: 'climate-on', // binary - command
-    CONSUMPTION: 'consumption', // integer - sensor
-    CHARGER_CURRENT: 'charger-current', // integer - sensor
     DOOR_OPEN: 'door-open', // binary - sensor
-    ENERGY: 'energy', // integer - sensor
+    ENERGY_CONSUMPTION: 'energy-consumption', // integer - sensor
+    ENERGY_CONSUMPTION_TOTAL: 'energy-consumption-total', // integer - sensor
+    ENERGY_REMAINING: 'energy-remaining', // integer - sensor
+    INDOOR_TEMP: 'indoor-temp', // integer - sensor
     LOCK: 'lock', // binary - command
     NAME: 'name', // text - fixed
     ODOMETER: 'odometer', // integer - sensor
     PLUGGED: 'plugged', // binary - sensor
-    POWER: 'power', // integer - sensor
+    TARGET_CHARGE_LIMIT_SOC: 'target-charge-limit-soc', // integer - command
     TARGET_CURRENT: 'target-current', // integer - command
     TARGET_TEMPERATURE: 'target-temperature', // integer - command
-    TEMPERATURE: 'temperature', // integer - sensor
-    VOLTAGE: 'voltage', // integer - sensor
+    VIN: 'vin', // text - fixed
     WINDOW_OPEN: 'window-open', // binary - sensor
   },
 };
@@ -862,6 +871,7 @@ const DEVICE_FEATURE_UNITS = {
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
   WATT_HOUR_KM: 'watt-hour-km',
+  KILOWATT_HOUR_KM_PER_100_KM: 'kilowatt-hour-per-100-km',
   // Length units
   MM: 'mm',
   CM: 'cm',
@@ -994,20 +1004,15 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE]: [
     DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.CELSIUS,
     DEVICE_FEATURE_UNITS.KM,
-    DEVICE_FEATURE_UNITS.MILLI_AMPERE,
     DEVICE_FEATURE_UNITS.AMPERE,
-    DEVICE_FEATURE_UNITS.MILLI_VOLT,
     DEVICE_FEATURE_UNITS.VOLT,
-    DEVICE_FEATURE_UNITS.WATT,
     DEVICE_FEATURE_UNITS.KILOWATT,
-    DEVICE_FEATURE_UNITS.WATT_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
-    DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
-    DEVICE_FEATURE_UNITS.VOLT_AMPERE,
-    DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
     DEVICE_FEATURE_UNITS.WATT_HOUR_KM,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR_KM_PER_100_KM,
   ],
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: [
     DEVICE_FEATURE_UNITS.LITER,
@@ -1076,6 +1081,14 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
+};
+
+const DEVICE_FEATURE_TYPES_STRING = {
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE]: [
+    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE.NAME,
+    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE.VIN,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: [DEVICE_FEATURE_TYPES.TEXT.NAME],
 };
 
 const ACTIONS_STATUS = {
@@ -1322,6 +1335,7 @@ const USER_ROLE_LIST = createList(USER_ROLE);
 const AVAILABLE_LANGUAGES_LIST = createList(AVAILABLE_LANGUAGES);
 const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
+const DEVICE_FEATURE_TYPES_STRING_LIST = createList(DEVICE_FEATURE_TYPES_STRING);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_VISIBILITY_LIST = createList(DASHBOARD_VISIBILITY);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
@@ -1373,6 +1387,9 @@ module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
 
 module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGORY;
+
+module.exports.DEVICE_FEATURE_TYPES_STRING = DEVICE_FEATURE_TYPES_STRING;
+module.exports.DEVICE_FEATURE_TYPES_STRING_LIST = DEVICE_FEATURE_TYPES_STRING_LIST;
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);

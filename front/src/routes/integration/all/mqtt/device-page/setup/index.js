@@ -10,7 +10,10 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_TYPES_STRING } from '../../../../../../../../server/utils/constants';
+
+const isStringFeature = (category, type) =>
+  DEVICE_FEATURE_TYPES_STRING[category] && DEVICE_FEATURE_TYPES_STRING[category].includes(type);
 
 class MqttDeviceSetupPage extends Component {
   selectFeature(selectedFeatureOption) {
@@ -36,8 +39,7 @@ class MqttDeviceSetupPage extends Component {
       defaultValues.min = 0;
       defaultValues.max = 1;
     }
-
-    if (featureData[1] === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
+    if (isStringFeature(featureData[0], featureData[1])) {
       defaultValues.min = 0;
       defaultValues.max = 0;
       defaultValues.keep_history = false;

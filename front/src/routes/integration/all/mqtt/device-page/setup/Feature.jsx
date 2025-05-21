@@ -2,11 +2,15 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  DEVICE_FEATURE_CATEGORIES
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES_STRING
 } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
 import get from 'get-value';
+
+const isStringFeature = (category, type) =>
+  DEVICE_FEATURE_TYPES_STRING[category] && DEVICE_FEATURE_TYPES_STRING[category].includes(type);
 
 const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
   return (
@@ -49,7 +53,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
             </Localizer>
           </div>
 
-          {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
+          {!isStringFeature(feature.category, feature.type) && (
             <div class="form-group">
               <label class="form-label" for={`externalid_${featureIndex}`}>
                 <Text id="editDeviceForm.unitLabel" />
@@ -75,7 +79,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
             </div>
           )}
 
-          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
+          {!isStringFeature(feature.category, feature.type) && (
             <div class="form-group">
               <label class="form-label" for={`min_${featureIndex}`}>
                 <Text id="integration.mqtt.feature.minLabel" />
@@ -92,7 +96,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               </Localizer>
             </div>
           )}
-          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
+          {!isStringFeature(feature.category, feature.type) && (
             <div class="form-group">
               <label class="form-label" for={`max_${featureIndex}`}>
                 <Text id="integration.mqtt.feature.maxLabel" />
@@ -109,7 +113,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               </Localizer>
             </div>
           )}
-          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
+          {!isStringFeature(feature.category, feature.type) && (
             <div class="page-options d-flex">
               <div class="form-group">
                 <div class="form-label">
@@ -291,7 +295,7 @@ class MqttFeatureBoxComponent extends Component {
   };
   getMqttTopic = () => {
     let publishMqttTopic;
-    if (this.props.feature.category === DEVICE_FEATURE_CATEGORIES.TEXT) {
+    if (isStringFeature(this.props.feature.category, this.props.feature.type)) {
       publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/text`;
     } else {
       publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
