@@ -2,7 +2,6 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES_STRING
 } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';

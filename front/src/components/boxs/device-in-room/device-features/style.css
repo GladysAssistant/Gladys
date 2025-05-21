@@ -47,6 +47,15 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   display: none;
 }
 
+.percentSetpointHorizontalControls {
+  display: flex;
+  min-width: 7rem;
+}
+
+.percentSetpointVerticalControls {
+  display: none;
+}
+
 @media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
   .thermostatVerticalControls {
     display: block;
@@ -60,6 +69,13 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
     min-width: 5rem;
   }
   .currentSetpointHorizontalControls {
+    display: none;
+  }
+  .percentSetpointVerticalControls {
+    display: block;
+    min-width: 5rem;
+  }
+  .percentSetpointHorizontalControls {
     display: none;
   }
 }

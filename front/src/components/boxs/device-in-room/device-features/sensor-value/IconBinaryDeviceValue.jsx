@@ -19,7 +19,7 @@ const ICON_MAP = {
     [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE.WINDOW_OPEN]: {
       0: 'lock',
       1: 'unlock'
-    },
+    }
   }
 };
 

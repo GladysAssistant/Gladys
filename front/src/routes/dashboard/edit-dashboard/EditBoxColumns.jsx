@@ -202,4 +202,3 @@ const EditBoxColumns = ({ children, ...props }) => (
 );
 
 export default EditBoxColumns;
-
