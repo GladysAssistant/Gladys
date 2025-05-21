@@ -49,13 +49,10 @@ class OnlyContinueIf extends Component {
         // If we find an action at this path
         if (action) {
           variableOptions.push({
-            label: `${convertPathToText(
-              variablePath
-                .split('.')
-                .slice(0, -1)
-                .join('.'),
-              this.props.intl.dictionary
-            )} ${get(this, `props.intl.dictionary.editScene.actions.${action.type}`)}`,
+            label: `${convertPathToText(variablePath, this.props.intl.dictionary)} ${get(
+              this,
+              `props.intl.dictionary.editScene.actions.${action.type}`
+            )}`,
             options: props.variables[variablePath].map(option => ({
               label: option.label,
               value: `${variablePath}.${option.name}`,
