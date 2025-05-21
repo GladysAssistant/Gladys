@@ -422,3 +422,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.INPUT.BINARY]: 'arrow-right'
   }
 };
+
+export const DeviceFeatureTypesString = [
+  DEVICE_FEATURE_TYPES.TEXT.TEXT
+];
