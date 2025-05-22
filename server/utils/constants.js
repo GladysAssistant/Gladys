@@ -824,6 +824,7 @@ const DEVICE_FEATURE_TYPES = {
     DOOR_OPEN: 'door-open', // binary - sensor
     ENERGY_CONSUMPTION: 'energy-consumption', // integer - sensor
     ENERGY_CONSUMPTION_TOTAL: 'energy-consumption-total', // integer - sensor
+    ENERGY_EFFICIENCY: 'energy-efficiency', // integer - sensor
     ENERGY_REMAINING: 'energy-remaining', // integer - sensor
     INDOOR_TEMP: 'indoor-temp', // integer - sensor
     LOCK: 'lock', // binary - command
@@ -871,6 +872,8 @@ const DEVICE_FEATURE_UNITS = {
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
   WATT_HOUR_KM: 'watt-hour-km',
   KILOWATT_HOUR_KM_PER_100_KM: 'kilowatt-hour-per-100-km',
+  // Efficiency units
+  KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
   // Length units
   MM: 'mm',
   CM: 'cm',
@@ -1012,6 +1015,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
     DEVICE_FEATURE_UNITS.WATT_HOUR_KM,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_KM_PER_100_KM,
+    DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR,
   ],
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: [
     DEVICE_FEATURE_UNITS.LITER,
