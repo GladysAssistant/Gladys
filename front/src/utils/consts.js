@@ -423,6 +423,4 @@ export const DeviceFeatureCategoriesIcon = {
   }
 };
 
-export const DeviceFeatureTypesString = [
-  DEVICE_FEATURE_TYPES.TEXT.TEXT
-];
+export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT];
