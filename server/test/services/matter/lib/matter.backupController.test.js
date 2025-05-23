@@ -20,6 +20,7 @@ describe('Matter.backupController', () => {
   let newMatterPath;
 
   beforeEach(async () => {
+    backupContent = null;
     previousMatterPath = process.env.MATTER_FOLDER_PATH;
     newMatterPath = '/tmp/gladysmattertest';
     process.env.MATTER_FOLDER_PATH = newMatterPath;
@@ -104,6 +105,6 @@ describe('Matter.backupController', () => {
     matterHandler.commissioningController = null;
     await matterHandler.backupController('job-1');
     assert.notCalled(matterHandler.gladys.job.updateProgress);
-    expect(backupContent).to.equal(undefined);
+    expect(backupContent).to.equal(null);
   });
 });
