@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -6,7 +7,11 @@ describe('Matter.getDevices', () => {
   let matterHandler;
 
   beforeEach(() => {
-    const gladys = {};
+    const gladys = {
+      job: {
+        wrapper: fake.returns(null),
+      },
+    };
     const MatterMain = {};
     const ProjectChipMatter = {};
 
