@@ -21,6 +21,10 @@ const compareDevices = (deviceA, deviceB) => {
   if (deviceA.features.length !== deviceB.features.length) {
     return false;
   }
+  // Compare device params
+  if (deviceA.params.length !== deviceB.params.length) {
+    return false;
+  }
   // We sort all features by external_id
   const deviceAFeaturesExternalIdSorted = deviceA.features.map(f => f.external_id).sort();
   const deviceBFeaturesExternalIdSorted = deviceB.features.map(f => f.external_id).sort();
@@ -35,6 +39,16 @@ const compareDevices = (deviceA, deviceB) => {
   const deviceBFeaturesUnitSorted = deviceB.features.map(f => f.unit || 'empty').sort();
   for (let i = 0; i < deviceAFeaturesUnitSorted.length; i++) {
     if (deviceAFeaturesUnitSorted[i] !== deviceBFeaturesUnitSorted[i]) {
+      return false;
+    }
+  }
+  // We compare all params name & value
+  for (let i = 0; i < deviceA.params.length; i++) {
+    const sameParamInDeviceB = deviceB.params.find(p => p.name === deviceA.params[i].name);
+    if (!sameParamInDeviceB) {
+      return false;
+    }
+    if (deviceA.params[i].value !== sameParamInDeviceB.value) {
       return false;
     }
   }

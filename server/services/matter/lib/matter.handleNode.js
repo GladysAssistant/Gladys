@@ -22,6 +22,7 @@ const handleDevice = async (
     productLabel: deviceBasicInformation.productLabel,
     productName: deviceBasicInformation.productName,
     uniqueId: deviceBasicInformation.uniqueId,
+    serialNumber: deviceBasicInformation.serialNumber,
   };
 
   // If we have this cluster, it means we are in a bridge device
@@ -54,6 +55,11 @@ const handleDevice = async (
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'uniqueId')) {
       const uniqueId = await bridgedDeviceBasicInformationClusterClient.attributes.uniqueId.get();
       childInformations.uniqueId = uniqueId;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'serialNumber')) {
+      const serialNumber = await bridgedDeviceBasicInformationClusterClient.attributes.serialNumber.get();
+      childInformations.serialNumber = serialNumber;
     }
   }
 

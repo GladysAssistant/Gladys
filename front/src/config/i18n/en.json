@@ -1880,6 +1880,11 @@
       "roomLabel": "Room",
       "featuresLabel": "Features",
       "noFeaturesHandled": "No features are handled by this device",
+      "displayDeviceInfo": "Display device informations",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Serial Number",
+        "UNIQUE_ID": "Unique ID"
+      },
       "alreadyCreatedButton": "Device already added",
       "saveButton": "Save",
       "deleteButton": "Delete",

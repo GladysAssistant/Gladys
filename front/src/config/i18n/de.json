@@ -1879,6 +1879,11 @@
       "namePlaceholder": "Mein Matter-Gerät",
       "roomLabel": "Raum",
       "featuresLabel": "Funktionen",
+      "displayDeviceInfo": "Geräteinformationen anzeigen",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Seriennummer",
+        "UNIQUE_ID": "Eindeutige ID"
+      },
       "noFeaturesHandled": "Dieses Gerät unterstützt keine Funktionen",
       "alreadyCreatedButton": "Gerät bereits hinzugefügt",
       "saveButton": "Speichern",
