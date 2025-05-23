@@ -2587,7 +2587,8 @@
       "vacuum": "Database cleaning",
       "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
-      "device-state-purge-all-sqlite-states": "Purge all SQLite states"
+      "device-state-purge-all-sqlite-states": "Purge all SQLite states",
+      "service-matter-backup": "Matter backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."

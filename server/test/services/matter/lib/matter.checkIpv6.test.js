@@ -7,7 +7,11 @@ describe('Matter.checkIpv6', () => {
   let matterHandler;
 
   beforeEach(() => {
-    const gladys = {};
+    const gladys = {
+      job: {
+        wrapper: sinon.fake.returns(null),
+      },
+    };
     const MatterMain = {};
     const ProjectChipMatter = {};
 
