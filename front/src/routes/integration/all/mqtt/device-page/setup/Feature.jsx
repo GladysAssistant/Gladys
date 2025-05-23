@@ -296,6 +296,7 @@ class MqttFeatureBoxComponent extends Component {
     } else {
       publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
     }
+
     const listenMqttTopic = `gladys/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
     return {
       publishMqttTopic,

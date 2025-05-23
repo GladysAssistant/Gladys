@@ -3322,36 +3322,55 @@
       "mode": "Modus",
       "target-temperature": "Solltemperatur"
     },
-    "electrical-vehicle": {
-      "shortCategoryName": "Elektrofahrzeug",
-      "alarm": "Alarm",
-      "battery": "Laufzeit",
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Elektrofahrzeug - Batterie",
+      "battery-energy-remaining": "Verbleibende Energie",
+      "battery-level": "Batteriestand",
       "battery-power": "Batterieleistung",
       "battery-range-est": "Geschätzte Reichweite",
-      "battery-temp": "Batterietemperatur",
-      "battery-voltage": "Batteriespannung",
+      "battery-temperature": "Batterietemperatur",
+      "battery-voltage": "Batteriespannung"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Elektrofahrzeug - Laden",
       "charge-current": "Ladestrom",
-      "charge-energy-added": "Geladene Energie",
-      "charge-energy-consumption": "Ladeenergieverbrauch",
+      "charge-energy-added-total": "Gesamt zugefügte Energie",
+      "charge-energy-consumption-total": "Gesamt verbrauchte Energie",
       "charge-on": "Ladeschalter",
       "charge-power": "Ladeleistung",
       "charge-voltage": "Ladespannung",
-      "climate-on": "Klimaanlage",
-      "door-open": "Türen offen",
-      "energy-consumption": "Momentanverbrauch",
-      "energy-consumption-total": "Gesamtenergieverbrauch",
-      "energy-efficiency": "Energieeffizienz",
-      "energy-remaining": "Verbleibende Energie",
-      "indoor-temp": "Innentemperatur",
-      "lock": "Verriegelung",
-      "name": "Name",
-      "odometer": "Kilometerzähler",
+      "last-charge-energy-added": "Zugefügte Energie",
+      "last-charge-energy-consumption": "Verbrauchte Energie",
       "plugged": "Angeschlossen",
-      "target-charge-limit-soc": "Ladegrenze",
-      "target-current": "Sollstrom",
-      "target-temperature": "Solltemperatur",
-      "vin": "VIN",
-      "window-open": "Fenster offen"
+      "target-charge-limit": "Ladegrenze",
+      "target-current": "Zielstrom"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Elektrofahrzeug - Klima",
+      "climate-on": "Klimaanlagenschalter",
+      "indoor-temperature": "Innentemperatur",
+      "target-temperature": "Zieltemperatur"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Elektrofahrzeug - Steuerung",
+      "alarm": "Alarm",
+      "lock": "Verriegelung"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Elektrofahrzeug - Fahrt",
+      "drive-energy-consumption-total": "Gesamt verbrauchte Energie",
+      "speed": "Geschwindigkeit"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Elektrofahrzeug - Verbrauch",
+      "energy-consumption": "Momentanverbrauch",
+      "energy-efficiency": "Energieeffizienz"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Elektrofahrzeug - Status",
+      "door-open": "Tür geöffnet",
+      "odometer": "Kilometerzähler",
+      "window-open": "Fenster geöffnet"
     },
     "heater": {
       "shortCategoryName": "Heizung",

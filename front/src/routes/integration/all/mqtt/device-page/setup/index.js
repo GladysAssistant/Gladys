@@ -36,6 +36,7 @@ class MqttDeviceSetupPage extends Component {
       defaultValues.min = 0;
       defaultValues.max = 1;
     }
+
     if (featureData[1] === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
       defaultValues.min = 0;
       defaultValues.max = 0;

@@ -3322,36 +3322,55 @@
       "mode": "Mode",
       "target-temperature": "Target temperature"
     },
-    "electrical-vehicle": {
-      "shortCategoryName": "Electric vehicle",
-      "alarm": "Alarm",
-      "battery": "Range",
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Electric Vehicle - Battery",
+      "battery-energy-remaining": "Remaining energy",
+      "battery-level": "Battery level",
       "battery-power": "Battery power",
       "battery-range-est": "Estimated range",
-      "battery-temp": "Battery temperature",
-      "battery-voltage": "Battery voltage",
-      "charge-current": "Charge current",
-      "charge-energy-added": "Energy added",
-      "charge-energy-consumption": "Charge energy consumption",
+      "battery-temperature": "Battery temperature",
+      "battery-voltage": "Battery voltage"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Electric Vehicle - Charging",
+      "charge-current": "Charging current",
+      "charge-energy-added-total": "Total energy added",
+      "charge-energy-consumption-total": "Total energy consumed",
       "charge-on": "Charge switch",
-      "charge-power": "Charge power",
-      "charge-voltage": "Charge voltage",
-      "climate-on": "Air conditioning",
-      "door-open": "Doors open",
+      "charge-power": "Charging power",
+      "charge-voltage": "Charging voltage",
+      "last-charge-energy-added": "Energy added",
+      "last-charge-energy-consumption": "Energy consumed",
+      "plugged": "Plugged in",
+      "target-charge-limit": "Charge limit",
+      "target-current": "Target current"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Electric Vehicle - Climate",
+      "climate-on": "Climate switch",
+      "indoor-temperature": "Indoor temperature",
+      "target-temperature": "Target temperature"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Electric Vehicle - Command",
+      "alarm": "Alarm",
+      "lock": "Lock"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Electric Vehicle - Drive",
+      "drive-energy-consumption-total": "Total energy consumed",
+      "speed": "Speed"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Electric Vehicle - Consumption",
       "energy-consumption": "Instant consumption",
-      "energy-consumption-total": "Total energy consumed",
-      "energy-efficiency": "Energy efficiency",
-      "energy-remaining": "Remaining energy",
-      "indoor-temp": "Indoor temperature",
-      "lock": "Lock",
-      "name": "Name",
+      "energy-efficiency": "Energy efficiency"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Electric Vehicle - Status",
+      "door-open": "Door open",
       "odometer": "Odometer",
-      "plugged": "Plugged",
-      "target-charge-limit-soc": "Charge limit",
-      "target-current": "Target current",
-      "target-temperature": "Target temperature",
-      "vin": "VIN",
-      "window-open": "Windows open"
+      "window-open": "Window open"
     },
     "heater": {
       "shortCategoryName": "Heating",
