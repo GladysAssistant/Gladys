@@ -205,6 +205,15 @@ describe('Matter.init', () => {
       config: {
         storage: config.test.storage,
       },
+      scheduler: {
+        scheduleJob: fake.returns(null),
+      },
+      job: {
+        wrapper: (type, fn) => fn,
+      },
+      variable: {
+        getValue: fake.resolves(null),
+      },
     };
 
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
