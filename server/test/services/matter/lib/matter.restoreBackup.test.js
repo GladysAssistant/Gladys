@@ -101,4 +101,13 @@ describe('Matter.restoreBackup', () => {
     const filesInFolder = await fse.readdir(newMatterPath);
     expect(filesInFolder).to.deep.equal(['matter-controller-data']);
   });
+  it('should not restore, backup is empty', async () => {
+    matterHandler.gladys.variable.getValue = fake.returns(null);
+    // Create empty folder instead of existing folder
+    await fse.remove(newMatterPath);
+    await fse.ensureDir(newMatterPath);
+    await matterHandler.restoreBackup();
+    const filesInFolder = await fse.readdir(newMatterPath);
+    expect(filesInFolder).to.deep.equal([]);
+  });
 });

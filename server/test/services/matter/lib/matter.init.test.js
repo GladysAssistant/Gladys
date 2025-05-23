@@ -1,11 +1,12 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 
 const config = require('../../../../config/config');
 
 const MatterHandler = require('../../../../services/matter/lib');
+const { VARIABLES } = require('../../../../services/matter/utils/constants');
 
 describe('Matter.init', () => {
   let matterHandler;
@@ -13,8 +14,12 @@ describe('Matter.init', () => {
   let storageService;
   let commissioningController;
   let clusterClients;
+  let previousMatterPath;
 
   beforeEach(() => {
+    previousMatterPath = process.env.MATTER_FOLDER_PATH;
+    process.env.MATTER_FOLDER_PATH = '/tmp/gladysmattertest';
+
     // Mock environment and storage service
     environment = {
       get: fake.returns({
@@ -219,7 +224,9 @@ describe('Matter.init', () => {
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
   });
 
-  afterEach(() => {});
+  afterEach(() => {
+    process.env.MATTER_FOLDER_PATH = previousMatterPath;
+  });
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
@@ -527,6 +534,30 @@ describe('Matter.init', () => {
     };
     matterHandler.ProjectChipMatter = ProjectChipMatter;
     await matterHandler.init();
+    expect(matterHandler.devices).to.have.lengthOf(0);
+    expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+  it('should init and restore backup', async () => {
+    commissioningController = {
+      start: fake.resolves(null),
+      getCommissionedNodesDetails: fake.returns([]),
+      getNode: fake.resolves({
+        getDevices: fake.returns([]),
+      }),
+    };
+    const ProjectChipMatter = {
+      CommissioningController: fake.returns(commissioningController),
+    };
+    matterHandler.ProjectChipMatter = ProjectChipMatter;
+    matterHandler.gladys.variable.getValue = (variable) => {
+      if (variable === VARIABLES.MATTER_BACKUP) {
+        return 'lala';
+      }
+      return null;
+    };
+    matterHandler.restoreBackup = fake.resolves(null);
+    await matterHandler.init();
+    assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
   });

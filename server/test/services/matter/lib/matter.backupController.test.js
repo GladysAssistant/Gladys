@@ -100,4 +100,10 @@ describe('Matter.backupController', () => {
     assert.called(matterHandler.gladys.job.updateProgress);
     expect(backupContent).to.have.lengthOf.above(0);
   });
+  it('should not backup the matter controller, commissioning controller is not initialized', async () => {
+    matterHandler.commissioningController = null;
+    await matterHandler.backupController('job-1');
+    assert.notCalled(matterHandler.gladys.job.updateProgress);
+    expect(backupContent).to.equal(undefined);
+  });
 });
