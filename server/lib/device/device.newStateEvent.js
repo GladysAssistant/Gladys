@@ -1,9 +1,6 @@
 const { NotFoundError } = require('../../utils/coreErrors');
-const { DEVICE_FEATURE_TYPES_STRING } = require('../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
-
-const isStringFeature = (category, type) =>
-  DEVICE_FEATURE_TYPES_STRING[category] && DEVICE_FEATURE_TYPES_STRING[category].includes(type);
 
 /**
  * @description Receive a new state event and save the new state.
@@ -28,7 +25,10 @@ async function newStateEvent(event) {
     // If there is a "text" property in the even, we save as string
     if (event.text) {
       await this.saveStringState(device, deviceFeature, event.text);
-    } else if (isStringFeature(deviceFeature.category, deviceFeature.type)) {
+    } else if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+    ) {
       // If the feature is a text, we save as string
       await this.saveStringState(device, deviceFeature, event.state);
     } else if (event.created_at) {

@@ -165,17 +165,6 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
-  updateCurrentDashboardType = e => {
-    const newState = update(this.state, {
-      currentDashboard: {
-        type: {
-          $set: e.target.value
-        }
-      }
-    });
-    this.setState(newState);
-  };
-
   updateBoxConfig = (x, y, data) => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -426,7 +415,6 @@ class EditDashboard extends Component {
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
-        updateCurrentDashboardType={this.updateCurrentDashboardType}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}
