@@ -1,4 +1,7 @@
 const sinon = require('sinon');
+const path = require('path');
+const fse = require('fs-extra');
+const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
@@ -11,8 +14,18 @@ describe('Matter.backupController', () => {
   let matterHandler;
   let environment;
   let storageService;
+  let backupContent;
+  let gladys;
+  let previousMatterPath;
+  let newMatterPath;
 
   beforeEach(async () => {
+    previousMatterPath = process.env.MATTER_FOLDER_PATH;
+    newMatterPath = '/tmp/gladysmattertest';
+    process.env.MATTER_FOLDER_PATH = newMatterPath;
+    await fse.remove(newMatterPath);
+    await fse.ensureDir(newMatterPath);
+    await fse.writeFile(path.join(newMatterPath, 'matter-controller-data'), 'test');
     // Mock environment and storage service
     environment = {
       get: fake.returns({
@@ -33,14 +46,23 @@ describe('Matter.backupController', () => {
         getDevices: fake.returns([]),
       }),
     };
-    const gladys = {
+    gladys = {
       job: {
         wrapper: (type, fn) => fn,
         updateProgress: fake.resolves(null),
       },
       variable: {
-        getValue: fake.resolves('true'),
-        setValue: fake.resolves(null),
+        getValue: (variable) => {
+          if (variable === VARIABLES.MATTER_BACKUP) {
+            return backupContent;
+          }
+          return null;
+        },
+        setValue: (variable, value) => {
+          if (variable === VARIABLES.MATTER_BACKUP) {
+            backupContent = value;
+          }
+        },
       },
       config: {
         storage: config.test.storage,
@@ -68,9 +90,14 @@ describe('Matter.backupController', () => {
     await matterHandler.init();
   });
 
+  afterEach(async () => {
+    await fse.remove(newMatterPath);
+    process.env.MATTER_FOLDER_PATH = previousMatterPath;
+  });
+
   it('should backup the matter controller', async () => {
     await matterHandler.backupController('job-1');
     assert.called(matterHandler.gladys.job.updateProgress);
-    assert.calledWith(matterHandler.gladys.variable.setValue, VARIABLES.MATTER_BACKUP);
+    expect(backupContent).to.have.lengthOf.above(0);
   });
 });
