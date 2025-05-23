@@ -1849,6 +1849,11 @@
       "namePlaceholder": "Mon appareil Matter",
       "roomLabel": "Pièce",
       "featuresLabel": "Fonctionnalités",
+      "displayDeviceInfo": "Afficher les détails",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Numéro de série",
+        "UNIQUE_ID": "ID unique"
+      },
       "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
       "alreadyCreatedButton": "Appareil déjà ajouté",
       "saveButton": "Enregistrer",
