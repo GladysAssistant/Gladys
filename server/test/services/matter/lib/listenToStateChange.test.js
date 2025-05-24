@@ -28,6 +28,9 @@ describe('Matter.listenToStateChange', () => {
       event: {
         emit: fake.returns(null),
       },
+      job: {
+        wrapper: fake.returns(null),
+      },
     };
     const MatterMain = {};
     const ProjectChipMatter = {};

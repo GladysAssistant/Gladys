@@ -96,6 +96,13 @@ describe('message.create', () => {
       is_read: true,
       created_at: new Date('2023-02-09T09:58:05.766Z'),
     });
+    await db.Message.create({
+      text: 'Spontaneous message 3',
+      sender_id: null,
+      receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      is_read: true,
+      created_at: new Date('2023-02-09T10:00:05.766Z'),
+    });
     const messageHandler = new MessageHandler(event, brain, service, {}, variable);
     const message = {
       text: 'Turn on the light in the kitchen',
@@ -120,7 +127,11 @@ describe('message.create', () => {
         },
       },
       message,
-      previousQuestions: [{ answer: 'Answer 2', question: 'Question 2' }],
+      previousQuestions: [
+        { answer: 'Answer 1', question: 'Question 1' },
+        { answer: 'Answer 2', question: 'Question 2' },
+        { answer: 'Spontaneous message 3', question: null },
+      ],
     });
   });
 });

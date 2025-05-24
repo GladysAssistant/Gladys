@@ -465,3 +465,5 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPEN]: 'square'
   }
 };
+
+export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT];

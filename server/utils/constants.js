@@ -1412,6 +1412,7 @@ const JOB_TYPES = {
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
+  SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
 };
 

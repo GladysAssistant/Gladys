@@ -9,7 +9,11 @@ describe('Matter.decommission', () => {
   let matterHandler;
 
   beforeEach(() => {
-    const gladys = {};
+    const gladys = {
+      job: {
+        wrapper: fake.returns(null),
+      },
+    };
     const MatterMain = {};
     const ProjectChipMatter = {};
 
