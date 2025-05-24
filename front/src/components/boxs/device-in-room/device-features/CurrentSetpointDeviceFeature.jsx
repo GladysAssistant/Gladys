@@ -11,7 +11,7 @@ const isNullOrUndefined = val => val === null || val === undefined;
 const DEFAULT_CURRENT_IN_CASE_EMPTY = 0;
 
 const CurrentSetpointDeviceFeature = ({ children, ...props }) => {
-  const CURRENT_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE ? 1 : 0.5;
+  const CURRENT_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE ? 1 : 0.5;
 
   function updateValue(value) {
     props.updateValueWithDebounce(props.deviceFeature, value);
