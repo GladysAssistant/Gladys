@@ -1,4 +1,3 @@
-import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
