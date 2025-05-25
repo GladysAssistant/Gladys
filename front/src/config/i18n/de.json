@@ -3337,57 +3337,7 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "target-temperature": "Solltemperatur"
-    },
-    "electrical-vehicle-battery": {
-      "shortCategoryName": "Elektrofahrzeug - Batterie",
-      "battery-energy-remaining": "Verbleibende Energie",
-      "battery-level": "Batteriestand",
-      "battery-power": "Batterieleistung",
-      "battery-range-est": "Geschätzte Reichweite",
-      "battery-temperature": "Batterietemperatur",
-      "battery-voltage": "Batteriespannung"
-    },
-    "electrical-vehicle-charge": {
-      "shortCategoryName": "Elektrofahrzeug - Laden",
-      "charge-current": "Ladestrom",
-      "charge-energy-added-total": "Gesamt zugefügte Energie",
-      "charge-energy-consumption-total": "Gesamt verbrauchte Energie",
-      "charge-on": "Ladeschalter",
-      "charge-power": "Ladeleistung",
-      "charge-voltage": "Ladespannung",
-      "last-charge-energy-added": "Zugefügte Energie",
-      "last-charge-energy-consumption": "Verbrauchte Energie",
-      "plugged": "Angeschlossen",
-      "target-charge-limit": "Ladegrenze",
-      "target-current": "Zielstrom"
-    },
-    "electrical-vehicle-climate": {
-      "shortCategoryName": "Elektrofahrzeug - Klima",
-      "climate-on": "Klimaanlagenschalter",
-      "indoor-temperature": "Innentemperatur",
-      "target-temperature": "Zieltemperatur"
-    },
-    "electrical-vehicle-command": {
-      "shortCategoryName": "Elektrofahrzeug - Steuerung",
-      "alarm": "Alarm",
-      "lock": "Verriegelung"
-    },
-    "electrical-vehicle-drive": {
-      "shortCategoryName": "Elektrofahrzeug - Fahrt",
-      "drive-energy-consumption-total": "Gesamt verbrauchte Energie",
-      "speed": "Geschwindigkeit"
-    },
-    "electrical-vehicle-consumption": {
-      "shortCategoryName": "Elektrofahrzeug - Verbrauch",
-      "energy-consumption": "Momentanverbrauch",
-      "energy-efficiency": "Energieeffizienz"
-    },
-    "electrical-vehicle-state": {
-      "shortCategoryName": "Elektrofahrzeug - Status",
-      "door-open": "Tür geöffnet",
-      "odometer": "Kilometerzähler",
-      "window-open": "Fenster geöffnet"
+      "target-temperature": "Temperatur"
     },
     "heater": {
       "shortCategoryName": "Heizung",

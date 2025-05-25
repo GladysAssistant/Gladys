@@ -3337,57 +3337,7 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Target temperature"
-    },
-    "electrical-vehicle-battery": {
-      "shortCategoryName": "Electric Vehicle - Battery",
-      "battery-energy-remaining": "Remaining energy",
-      "battery-level": "Battery level",
-      "battery-power": "Battery power",
-      "battery-range-est": "Estimated range",
-      "battery-temperature": "Battery temperature",
-      "battery-voltage": "Battery voltage"
-    },
-    "electrical-vehicle-charge": {
-      "shortCategoryName": "Electric Vehicle - Charging",
-      "charge-current": "Charging current",
-      "charge-energy-added-total": "Total energy added",
-      "charge-energy-consumption-total": "Total energy consumed",
-      "charge-on": "Charge switch",
-      "charge-power": "Charging power",
-      "charge-voltage": "Charging voltage",
-      "last-charge-energy-added": "Energy added",
-      "last-charge-energy-consumption": "Energy consumed",
-      "plugged": "Plugged in",
-      "target-charge-limit": "Charge limit",
-      "target-current": "Target current"
-    },
-    "electrical-vehicle-climate": {
-      "shortCategoryName": "Electric Vehicle - Climate",
-      "climate-on": "Climate switch",
-      "indoor-temperature": "Indoor temperature",
-      "target-temperature": "Target temperature"
-    },
-    "electrical-vehicle-command": {
-      "shortCategoryName": "Electric Vehicle - Command",
-      "alarm": "Alarm",
-      "lock": "Lock"
-    },
-    "electrical-vehicle-drive": {
-      "shortCategoryName": "Electric Vehicle - Drive",
-      "drive-energy-consumption-total": "Total energy consumed",
-      "speed": "Speed"
-    },
-    "electrical-vehicle-consumption": {
-      "shortCategoryName": "Electric Vehicle - Consumption",
-      "energy-consumption": "Instant consumption",
-      "energy-efficiency": "Energy efficiency"
-    },
-    "electrical-vehicle-state": {
-      "shortCategoryName": "Electric Vehicle - Status",
-      "door-open": "Door open",
-      "odometer": "Odometer",
-      "window-open": "Window open"
+      "target-temperature": "Temperature"
     },
     "heater": {
       "shortCategoryName": "Heating",

@@ -3337,57 +3337,7 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température de consigne"
-    },
-    "electrical-vehicle-battery": {
-      "shortCategoryName": "Véhicule électrique - Batterie",
-      "battery-energy-remaining": "Énergie restante",
-      "battery-level": "Niveau batterie",
-      "battery-power": "Puissance batterie",
-      "battery-range-est": "Autonomie estimée",
-      "battery-temperature": "Température batterie",
-      "battery-voltage": "Tension batterie"
-    },
-    "electrical-vehicle-charge": {
-      "shortCategoryName": "Véhicule électrique - Charge",
-      "charge-current": "Intensité charge",
-      "charge-energy-added-total": "Énergie totale ajoutée",
-      "charge-energy-consumption-total": "Énergie totale consommée",
-      "charge-on": "Commutateur charge",
-      "charge-power": "Puissance charge",
-      "charge-voltage": "Tension charge",
-      "last-charge-energy-added": "Énergie ajoutée",
-      "last-charge-energy-consumption": "Énergie consommée",
-      "plugged": "Prise connectée",
-      "target-charge-limit": "Limite de charge",
-      "target-current": "Intensité de consigne"
-    },
-    "electrical-vehicle-climate": {
-      "shortCategoryName": "Véhicule électrique - Climatisation",
-      "climate-on": "Commutateur climatisation",
-      "indoor-temperature": "Température intérieure",
-      "target-temperature": "Température de consigne"
-    },
-    "electrical-vehicle-command": {
-      "shortCategoryName": "Véhicule électrique - Commande",
-      "alarm": "Alarme",
-      "lock": "Verrouillage"
-    },
-    "electrical-vehicle-drive": {
-      "shortCategoryName": "Véhicule électrique - Conduite",
-      "drive-energy-consumption-total": "Énergie totale consommée",
-      "speed": "Vitesse"
-    },
-    "electrical-vehicle-consumption": {
-      "shortCategoryName": "Véhicule électrique - Consommation",
-      "energy-consumption": "Consommation instantanée",
-      "energy-efficiency": "Efficacité énergétique"
-    },
-    "electrical-vehicle-state": {
-      "shortCategoryName": "Véhicule électrique - État",
-      "door-open": "Porte ouverte",
-      "odometer": "Odomètre",
-      "window-open": "Fenêtre ouverte"
+      "target-temperature": "Température"
     },
     "heater": {
       "shortCategoryName": "Chauffage",
