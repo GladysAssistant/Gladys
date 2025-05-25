@@ -1,9 +1,8 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
-import { convertUnitDistance } from '../../../../../../../server/utils/units';
 
-import { DEVICE_FEATURE_CATEGORIES, DISTANCE_UNITS } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import RawDeviceValue from './RawDeviceValue';
 
 const colorLowAsGreen = (value, safeLimit, warnLimit) => {
@@ -80,28 +79,15 @@ const BADGE_VALUE_CONVERTERS = {
 };
 
 const BadgeNumberDeviceValue = props => {
-  const { user, deviceFeature } = props;
-  const { category, type, last_value: lastValue = null, unit } = deviceFeature;
-
-  const userUnit = user.distance_unit_preference;
+  const { category, type, last_value: lastValue = null, unit } = props.deviceFeature;
 
   const colorMethod = BADGE_CATEGORIES[category];
   if (!colorMethod) {
     return <RawDeviceValue {...props} />;
   }
 
+  let value = lastValue === null ? -1 : lastValue;
   let valueIsEnum = false;
-
-  let value = lastValue;
-  let displayUnit = unit;
-
-  const isDistanceUnit = DISTANCE_UNITS.DEVICE_FEATURE_UNITS.includes(displayUnit);
-  // Conversion if necessary (and if user is present)
-  if (value !== null && isDistanceUnit) {
-    const conversion = convertUnitDistance(lastValue, unit, userUnit);
-    value = conversion.value;
-    displayUnit = conversion.unit;
-  }
   const valued = value !== -1;
 
   // If the category is an enum
@@ -118,8 +104,8 @@ const BadgeNumberDeviceValue = props => {
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       {valued && !valueIsEnum && (
         <span>
-          {`${value} `}
-          <Text id={`deviceFeatureUnitShort.${displayUnit}`} />
+          {`${lastValue} `}
+          <Text id={`deviceFeatureUnitShort.${unit}`} />
         </span>
       )}
       {valued && valueIsEnum && (
