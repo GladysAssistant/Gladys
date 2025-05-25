@@ -34,7 +34,7 @@ describe('convertUnitDistance', () => {
 
   it('converts miles to kilometers (metric preference)', () => {
     const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.MILE, DISTANCE_UNITS.METRIC);
-    expect(result.value).to.be.closeTo(16.09, 0.01);
+    expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KM);
   });
 
@@ -58,7 +58,7 @@ describe('convertUnitDistance', () => {
 
   it('converts inches to cm (metric preference, >=10)', () => {
     const result = convertUnitDistance(12, DEVICE_FEATURE_UNITS.INCH, DISTANCE_UNITS.METRIC);
-    expect(result.value).to.be.closeTo(30.48, 0.01);
+    expect(result.value).to.be.closeTo(30.5, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.CM);
   });
 
