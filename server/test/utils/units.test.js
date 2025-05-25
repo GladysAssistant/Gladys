@@ -1,5 +1,11 @@
 const { expect } = require('chai');
-const { hslToRgb, celsiusToFahrenheit, fahrenheitToCelsius, convertUnitDistance, smartRound } = require('../../utils/units');
+const {
+  hslToRgb,
+  celsiusToFahrenheit,
+  fahrenheitToCelsius,
+  convertUnitDistance,
+  smartRound,
+} = require('../../utils/units');
 const { DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 
 const DISTANCE_UNITS = { US: 'us', METRIC: 'metric' };
