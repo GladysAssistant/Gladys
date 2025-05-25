@@ -4,7 +4,6 @@ import get from 'get-value';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
 
-import BatteryLevelFeature from './BatteryLevelFeature';
 import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
 import MotionSensorDeviceValue from './MotionSensorDeviceValue';
@@ -34,7 +33,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPEN]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_ENERGY_REMAINING]: BadgeNumberDeviceValue,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_LEVEL]: BatteryLevelFeature,
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_LEVEL]: BadgeNumberDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_POWER]: BadgeNumberDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_TEMPERATURE]: TemperatureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_VOLTAGE]: BadgeNumberDeviceValue,

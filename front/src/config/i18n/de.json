@@ -2990,28 +2990,6 @@
           "other": "Schließen"
         }
       },
-      "electrical-vehicle-command": {
-        "alarm": {
-          "stateLiveFinished": {
-            "0": "Deaktiviert",
-            "1": "Aktiviert"
-          },
-          "state": {
-            "0": "Aktivieren",
-            "1": "Deaktivieren"
-          }
-        },
-        "lock": {
-          "stateLiveFinished": {
-            "0": "Entriegelt",
-            "1": "Verriegelt"
-          },
-          "state": {
-            "0": "Verriegeln",
-            "1": "Entriegeln"
-          }
-        }
-      },
       "air-conditioning": {
         "mode": {
           "auto": "Automatisch",
@@ -3191,22 +3169,6 @@
           "1": "Normal",
           "2": "Hoch",
           "unknown": "Unbekannt"
-        }
-      },
-      "electrical-vehicle-state": {
-        "door-open": {
-          "0": "Geschlossen",
-          "1": "Offen"
-        },
-        "window-open": {
-          "0": "Geschlossen",
-          "1": "Offen"
-        }
-      },
-      "electrical-vehicle-charge": {
-        "plugged": {
-          "0": "Nicht geladen",
-          "1": "Geladen"
         }
       }
     }
