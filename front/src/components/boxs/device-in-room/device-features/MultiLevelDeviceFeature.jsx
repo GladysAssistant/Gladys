@@ -22,7 +22,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
       <td>{props.rowName}</td>
 
       <td class="text-right py-0">
-        <div class="col d-flex align-items-center justify-content-end">
+        <div class="col">
           <input
             type="range"
             value={props.deviceFeature.last_value}
@@ -31,18 +31,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
-            style={{ flex: 1 }}
           />
-          <span class="ml-2 text-right">
-            {props.deviceFeature.unit ? (
-              <span>
-                {`${props.deviceFeature.last_value} `}
-                <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
-              </span>
-            ) : (
-              <span>{props.deviceFeature.last_value}</span>
-            )}
-          </span>
         </div>
       </td>
     </tr>
