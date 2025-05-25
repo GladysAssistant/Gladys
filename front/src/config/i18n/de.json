@@ -2811,19 +2811,10 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Blindleistung (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
-    "watt-hour-km": "Wattstunde pro Kilometer (Wh/km)",
-    "kilowatt-hour-per-100-km": "Kilowattstunde pro 100 Kilometer (kWh/100km)",
-    "watt-hour-mile": "Wattstunde pro Meile (Wh/mi)",
-    "kilowatt-hour-per-100-mile": "Kilowattstunde pro 100 Meilen (kWh/100mi)",
-    "km-per-kilowatt-hour": "Kilometer pro Kilowattstunde (km/kWh)",
-    "mile-per-kilowatt-hour": "Meile pro Kilowattstunde (mi/kWh)",
     "mm": "Millimeter (mm)",
     "cm": "Zentimeter (cm)",
     "m": "Meter (m)",
     "km": "Kilometer (km)",
-    "inch": "Zoll (in)",
-    "feet": "Fuß (ft)",
-    "mile": "Meile (mi)",
     "degree": "Winkelgrad (°)",
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
@@ -2837,8 +2828,6 @@
     "pound-sterling": "Britisches Pfund (£)",
     "meter-per-second": "Meter pro Sekunde (m/s)",
     "kilometer-per-hour": "Kilometer pro Stunde (km/h)",
-    "feet-per-second": "Fuß pro Sekunde (ft/s)",
-    "mile-per-hour": "Meile pro Stunde (mi/h)",
     "millimeter-per-hour": "Millimeter pro Stunde (mm/h)",
     "millimeter-per-day": "Millimeter pro Tag (mm/d)",
     "uv-index": "UV-Index",
@@ -2900,19 +2889,10 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "watt-hour-km": "Wh/km",
-    "kilowatt-hour-per-100-km": "kWh/100km",
-    "watt-hour-mile": "Wh/mi",
-    "kilowatt-hour-per-100-mile": "kWh/100mi",
-    "km-per-kilowatt-hour": "km/kWh",
-    "mile-per-kilowatt-hour": "mi/kWh",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
     "km": "km",
-    "inch": "in",
-    "feet": "ft",
-    "mile": "mi",
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
@@ -2926,8 +2906,6 @@
     "pound-sterling": "£",
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
-    "feet-per-second": "ft/s",
-    "mile-per-hour": "mi/h",
     "millimeter-per-hour": "mm/h",
     "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
@@ -3269,7 +3247,8 @@
       "dimmer": "Schalter: Dimmer",
       "burglar": "Schalter: Einbruch",
       "power": "Leistungsverbrauch",
-      "energy": "Energieverbrauch"
+      "energy": "Energieverbrauch",
+      "target-current": "Sollstrom"
     },
     "siren": {
       "shortCategoryName": "Sirene",
@@ -3338,56 +3317,6 @@
       "binary": "Schalter ein/aus",
       "mode": "Modus",
       "target-temperature": "Solltemperatur"
-    },
-    "electrical-vehicle-battery": {
-      "shortCategoryName": "Elektrofahrzeug - Batterie",
-      "battery-energy-remaining": "Verbleibende Energie",
-      "battery-level": "Batteriestand",
-      "battery-power": "Batterieleistung",
-      "battery-range-est": "Geschätzte Reichweite",
-      "battery-temperature": "Batterietemperatur",
-      "battery-voltage": "Batteriespannung"
-    },
-    "electrical-vehicle-charge": {
-      "shortCategoryName": "Elektrofahrzeug - Laden",
-      "charge-current": "Ladestrom",
-      "charge-energy-added-total": "Gesamt zugefügte Energie",
-      "charge-energy-consumption-total": "Gesamt verbrauchte Energie",
-      "charge-on": "Ladeschalter",
-      "charge-power": "Ladeleistung",
-      "charge-voltage": "Ladespannung",
-      "last-charge-energy-added": "Zugefügte Energie",
-      "last-charge-energy-consumption": "Verbrauchte Energie",
-      "plugged": "Angeschlossen",
-      "target-charge-limit": "Ladegrenze",
-      "target-current": "Zielstrom"
-    },
-    "electrical-vehicle-climate": {
-      "shortCategoryName": "Elektrofahrzeug - Klima",
-      "climate-on": "Klimaanlagenschalter",
-      "indoor-temperature": "Innentemperatur",
-      "target-temperature": "Zieltemperatur"
-    },
-    "electrical-vehicle-command": {
-      "shortCategoryName": "Elektrofahrzeug - Steuerung",
-      "alarm": "Alarm",
-      "lock": "Verriegelung"
-    },
-    "electrical-vehicle-drive": {
-      "shortCategoryName": "Elektrofahrzeug - Fahrt",
-      "drive-energy-consumption-total": "Gesamt verbrauchte Energie",
-      "speed": "Geschwindigkeit"
-    },
-    "electrical-vehicle-consumption": {
-      "shortCategoryName": "Elektrofahrzeug - Verbrauch",
-      "energy-consumption": "Momentanverbrauch",
-      "energy-efficiency": "Energieeffizienz"
-    },
-    "electrical-vehicle-state": {
-      "shortCategoryName": "Elektrofahrzeug - Status",
-      "door-open": "Tür geöffnet",
-      "odometer": "Kilometerzähler",
-      "window-open": "Fenster geöffnet"
     },
     "heater": {
       "shortCategoryName": "Heizung",
