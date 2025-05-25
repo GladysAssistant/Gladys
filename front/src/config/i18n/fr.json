@@ -3195,12 +3195,12 @@
       },
       "electrical-vehicle-state": {
         "door-open": {
-          "0": "Fermé",
-          "1": "Ouvert"
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
         },
         "window-open": {
-          "0": "Fermé",
-          "1": "Ouvert"
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
         }
       },
       "electrical-vehicle-charge": {
