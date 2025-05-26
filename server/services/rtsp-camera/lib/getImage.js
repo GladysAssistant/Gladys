@@ -72,7 +72,7 @@ async function getImage(device) {
       'ffmpeg',
       args,
       {
-        timeout: 10 * 1000, // 10 second max
+        timeout: 20 * 1000, // 20 second max
       },
       async (error, stdout, stderr) => {
         if (error) {
