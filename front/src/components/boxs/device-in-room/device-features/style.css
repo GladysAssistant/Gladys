@@ -38,6 +38,15 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   display: none;
 }
 
+.currentSetpointHorizontalControls {
+  display: flex;
+  min-width: 7rem;
+}
+
+.currentSetpointVerticalControls {
+  display: none;
+}
+
 @media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
   .thermostatVerticalControls {
     display: block;
@@ -46,8 +55,14 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   .thermostatHorizontalControls {
     display: none;
   }
+  .currentSetpointVerticalControls {
+    display: block;
+    min-width: 5rem;
+  }
+  .currentSetpointHorizontalControls {
+    display: none;
+  }
 }
-
 .btnLoading {
   &::after {
     border: 2px solid #5eba00;

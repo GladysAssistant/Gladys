@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
 const DANGER_ON_VALUE_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
@@ -10,10 +10,24 @@ const DANGER_ON_VALUE_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
   DEVICE_FEATURE_CATEGORIES.TAMPER
 ];
+const DANGER_ON_VALUE_SENSORS_TYPES = [
+  DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPEN,
+  DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPEN
+];
+
+const BINARY_CATEGORIES_TYPES_CUSTOM = {
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: [
+    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPEN,
+    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPEN
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]
+};
 
 const BinaryDeviceValue = ({ deviceFeature }) => {
-  const { category, last_value: lastValue = null } = deviceFeature;
-  const reverseColors = DANGER_ON_VALUE_SENSORS.includes(category);
+  const { category, type, last_value: lastValue = null } = deviceFeature;
+  const reverseColors = DANGER_ON_VALUE_SENSORS.includes(category) || DANGER_ON_VALUE_SENSORS_TYPES.includes(type);
+  const customText =
+    BINARY_CATEGORIES_TYPES_CUSTOM[category] && BINARY_CATEGORIES_TYPES_CUSTOM[category].includes(type);
 
   const value = lastValue === null ? -1 : lastValue;
   const valued = value !== -1;
@@ -30,7 +44,8 @@ const BinaryDeviceValue = ({ deviceFeature }) => {
       })}
     >
       <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
-        <Text id="deviceFeatureValue.type.binary" plural={value} />
+        {!customText && <Text id="deviceFeatureValue.type.binary" plural={value} />}
+        {customText && <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />}
       </Text>
     </span>
   );
