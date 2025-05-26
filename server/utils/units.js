@@ -1,4 +1,4 @@
-const { DISTANCE_UNIT_CONVERSIONS } = require('./constants');
+const { DISTANCE_UNIT_CONVERSIONS } = require('./unit-conversions');
 
 /**
  * @description Convert celsius to fahrenheit.
