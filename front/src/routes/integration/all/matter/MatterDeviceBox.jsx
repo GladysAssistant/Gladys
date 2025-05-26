@@ -5,12 +5,14 @@ import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
+import style from './style.css';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      device: this.props.device
+      device: this.props.device,
+      showParams: false
     };
   }
 
@@ -96,9 +98,15 @@ class MatterDeviceBox extends Component {
     });
   };
 
+  toggleParams = () => {
+    this.setState({
+      showParams: !this.state.showParams
+    });
+  };
+
   render(
     { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber, showParams }
   ) {
     const validModel = device.features && device.features.length > 0;
     const nodeId = device.external_id.split(':')[1];
@@ -195,6 +203,48 @@ class MatterDeviceBox extends Component {
                 {(!device.features || device.features.length === 0) && (
                   <div class="alert alert-warning">
                     <Text id="integration.matter.noFeaturesHandled" />
+                  </div>
+                )}
+
+                {device.params && device.params.length > 0 && (
+                  <div class="form-group">
+                    <button onClick={this.toggleParams} class="btn btn-sm btn-outline-secondary mb-2" type="button">
+                      <i class={`fe fe-chevron-${showParams ? 'up' : 'down'} mr-2`} />
+                      <Text id="integration.matter.displayDeviceInfo" default="Display device informations" />
+                    </button>
+                    {showParams && (
+                      <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                          <thead>
+                            <tr>
+                              <th>
+                                <Text id="integration.matter.paramName" default="Name" />
+                              </th>
+                              <th>
+                                <Text id="integration.matter.paramValue" default="Value" />
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {device.params.map(param => (
+                              <tr key={param.name}>
+                                <td>
+                                  <code>
+                                    <Text
+                                      id={`integration.matter.matterParamsNames.${param.name}`}
+                                      default={param.name}
+                                    />
+                                  </code>
+                                </td>
+                                <td class={style.scrollableCell}>
+                                  <code>{param.value}</code>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 )}
 
