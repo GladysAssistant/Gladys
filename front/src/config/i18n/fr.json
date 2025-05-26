@@ -1849,6 +1849,11 @@
       "namePlaceholder": "Mon appareil Matter",
       "roomLabel": "Pièce",
       "featuresLabel": "Fonctionnalités",
+      "displayDeviceInfo": "Afficher les détails",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Numéro de série",
+        "UNIQUE_ID": "ID unique"
+      },
       "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
       "alreadyCreatedButton": "Appareil déjà ajouté",
       "saveButton": "Enregistrer",
@@ -3099,7 +3104,19 @@
           "69": "Triple sur les deux",
           "70": "Maintenu Gauche",
           "71": "Maintenu Droit",
-          "72": "Maintenu sur les deux"
+          "72": "Maintenu sur les deux",
+          "73": "Clic simple Plus",
+          "74": "Clic simple Centre",
+          "75": "Clic simple Moins",
+          "76": "Double clic Plus",
+          "77": "Double clic Centre",
+          "78": "Double clic Moins",
+          "79": "Maintien Plus",
+          "80": "Maintien Centre",
+          "81": "Maintien Moins",
+          "82": "Relâchement Plus",
+          "83": "Relâchement Centre",
+          "84": "Relâchement Moins"
         }
       },
       "heater": {

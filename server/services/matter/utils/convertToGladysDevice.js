@@ -48,6 +48,12 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         value: nodeDetailDeviceDataBasicInformation.uniqueId,
       });
     }
+    if (nodeDetailDeviceDataBasicInformation.serialNumber) {
+      gladysDevice.params.push({
+        name: 'SERIAL_NUMBER',
+        value: nodeDetailDeviceDataBasicInformation.serialNumber,
+      });
+    }
   }
 
   // Add endpoint number to the name so the user can identify the device
