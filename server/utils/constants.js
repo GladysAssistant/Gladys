@@ -826,47 +826,54 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_DEPTH: 'liquid-depth',
   },
   ELECTRICAL_VEHICLE_BATTERY: {
-    BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // integer - sensor
-    BATTERY_LEVEL: 'battery-level', // integer - sensor
-    BATTERY_POWER: 'battery-power', // integer - sensor
-    BATTERY_RANGE_EST: 'battery-range-est', // integer - sensor
-    BATTERY_TEMPERATURE: 'battery-temperature', // integer - sensor
-    BATTERY_VOLTAGE: 'battery-voltage', // integer - sensor
+    // Features related to the battery state and metrics of the vehicle
+    BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // Remaining energy in the battery in kWh (integer - sensor)
+    BATTERY_LEVEL: 'battery-level', // Battery state of charge in percent (integer - sensor)
+    BATTERY_POWER: 'battery-power', // Instantaneous battery power in W (integer - sensor)
+    BATTERY_RANGE_ESTIMATE: 'battery-range-estimate', // Estimated remaining range in km or miles (integer - sensor)
+    BATTERY_TEMPERATURE: 'battery-temperature', // Battery temperature in °C (integer - sensor)
+    BATTERY_VOLTAGE: 'battery-voltage', // Battery voltage in V (integer - sensor)
   },
   ELECTRICAL_VEHICLE_CHARGE: {
-    CHARGE_CURRENT: 'charge-current', // integer - sensor
-    CHARGE_ENERGY_ADDED_TOTAL: 'charge-energy-added-total', // integer - sensor
-    CHARGE_ENERGY_CONSUMPTION_TOTAL: 'charge-energy-consumption-total', // integer - sensor
-    CHARGE_ON: 'charge-on', // binary - command
-    CHARGE_POWER: 'charge-power', // integer - sensor
-    CHARGE_VOLTAGE: 'charge-voltage', // integer - sensor
-    LAST_CHARGE_ENERGY_ADDED: 'last-charge-energy-added', // integer - sensor
-    LAST_CHARGE_ENERGY_CONSUMPTION: 'last-charge-energy-consumption', // integer - sensor
-    PLUGGED: 'plugged', // binary - sensor
-    TARGET_CHARGE_LIMIT: 'target-charge-limit', // integer - command (SOC charge limit)
-    TARGET_CURRENT: 'target-current', // integer - command (current)
+    // Features related to the charging process and charge control
+    CHARGE_CURRENT: 'charge-current', // Current delivered during charging in A (integer - sensor)
+    CHARGE_ENERGY_ADDED_TOTAL: 'charge-energy-added-total', // Total energy added during all charge sessions in kWh (integer - sensor)
+    CHARGE_ENERGY_CONSUMPTION_TOTAL: 'charge-energy-consumption-total', // Total energy consumed during all charge sessions in kWh (integer - sensor)
+    CHARGE_ON: 'charge-on', // Charging state (binary - command with return status)
+    CHARGE_POWER: 'charge-power', // Instantaneous charging power in W (integer - sensor)
+    CHARGE_VOLTAGE: 'charge-voltage', // Charging voltage in V (integer - sensor)
+    LAST_CHARGE_ENERGY_ADDED: 'last-charge-energy-added', // Energy added in the last charge session in kWh (integer - sensor)
+    LAST_CHARGE_ENERGY_CONSUMPTION: 'last-charge-energy-consumption', // Energy consumed in the last charge session in kWh (integer - sensor)
+    PLUGGED: 'plugged', // Whether the vehicle is plugged in (binary - sensor)
+    TARGET_CHARGE_LIMIT: 'target-charge-limit', // Target state of charge limit in percent (integer - command)
+    TARGET_CURRENT: 'target-current', // Target charging current in A (integer - command)
   },
   ELECTRICAL_VEHICLE_CLIMATE: {
-    CLIMATE_ON: 'climate-on', // binary - command
-    INDOOR_TEMPERATURE: 'indoor-temperature', // integer - sensor
-    TARGET_TEMPERATURE: 'target-temperature', // integer - command
+    // Features related to the vehicle's climate control
+    CLIMATE_ON: 'climate-on', // Climate system activation (binary - command with return status)
+    INDOOR_TEMPERATURE: 'indoor-temperature', // Cabin temperature in °C (integer - sensor)
+    TARGET_TEMPERATURE: 'target-temperature', // Desired cabin temperature in °C (integer - command)
   },
   ELECTRICAL_VEHICLE_COMMAND: {
-    ALARM: 'alarm', // binary - command
-    LOCK: 'lock', // binary - command
+    // General remote commands for the vehicle
+    ALARM: 'alarm', // Enable/Disable alarm (binary - command with return status)
+    LOCK: 'lock', // Lock/unlock the vehicle (binary - command with return status)
   },
   ELECTRICAL_VEHICLE_DRIVE: {
-    DRIVE_ENERGY_CONSUMPTION_TOTAL: 'drive-energy-consumption-total', // integer - sensor
-    SPEED: 'speed', // integer - sensor
+    // Features related to driving and trip statistics
+    DRIVE_ENERGY_CONSUMPTION_TOTAL: 'drive-energy-consumption-total', // Total energy consumed while all trips in kWh (integer - sensor)
+    SPEED: 'speed', // Current speed of the vehicle in km/h or mi/h (integer - sensor)
   },
   ELECTRICAL_VEHICLE_CONSUMPTION: {
-    ENERGY_CONSUMPTION: 'energy-consumption', // integer - sensor
-    ENERGY_EFFICIENCY: 'energy-efficiency', // integer - sensor
+    // Features related to energy consumption and efficiency
+    ENERGY_CONSUMPTION: 'energy-consumption', // Instantaneous or average energy consumption in kWh (integer - sensor)
+    ENERGY_EFFICIENCY: 'energy-efficiency', // Energy efficiency metric in km/kWh or mi/kWh (integer - sensor)
   },
   ELECTRICAL_VEHICLE_STATE: {
-    DOOR_OPEN: 'door-open', // binary - sensor
-    ODOMETER: 'odometer', // integer - sensor
-    WINDOW_OPEN: 'window-open', // binary - sensor
+    // Features related to the physical state of the vehicle
+    DOOR_OPENED: 'door-opened', // Door open state (binary - sensor)
+    ODOMETER: 'odometer', // Total distance traveled in km or miles (integer - sensor)
+    WINDOW_OPENED: 'window-opened', // Window open state (binary - sensor)
   },
 };
 
@@ -901,9 +908,9 @@ const DEVICE_FEATURE_UNITS = {
   KILOVOLT_AMPERE: 'kilovolt-ampere',
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
-  WATT_HOUR_KM: 'watt-hour-km',
+  WATT_HOUR_PER_KM: 'watt-hour-per-km',
   KILOWATT_HOUR_PER_100_KM: 'kilowatt-hour-per-100-km',
-  WATT_HOUR_MILE: 'watt-hour-mile',
+  WATT_HOUR_PER_MILE: 'watt-hour-per-mile',
   KILOWATT_HOUR_PER_100_MILE: 'kilowatt-hour-per-100-mile',
   // Efficiency units
   KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
@@ -1069,14 +1076,14 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MILE_PER_HOUR,
     DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-    DEVICE_FEATURE_UNITS.WATT_HOUR_KM,
-    DEVICE_FEATURE_UNITS.WATT_HOUR_MILE,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE,
   ],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: [
-    DEVICE_FEATURE_UNITS.WATT_HOUR_KM,
-    DEVICE_FEATURE_UNITS.WATT_HOUR_MILE,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE,
     DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR,

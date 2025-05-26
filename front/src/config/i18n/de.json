@@ -2816,9 +2816,9 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Blindleistung (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
-    "watt-hour-km": "Wattstunde pro Kilometer (Wh/km)",
+    "watt-hour-per-km": "Wattstunde pro Kilometer (Wh/km)",
     "kilowatt-hour-per-100-km": "Kilowattstunde pro 100 Kilometer (kWh/100km)",
-    "watt-hour-mile": "Wattstunde pro Meile (Wh/mi)",
+    "watt-hour-per-mile": "Wattstunde pro Meile (Wh/mi)",
     "kilowatt-hour-per-100-mile": "Kilowattstunde pro 100 Meilen (kWh/100mi)",
     "km-per-kilowatt-hour": "Kilometer pro Kilowattstunde (km/kWh)",
     "mile-per-kilowatt-hour": "Meile pro Kilowattstunde (mi/kWh)",
@@ -2905,9 +2905,9 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "watt-hour-km": "Wh/km",
+    "watt-hour-per-km": "Wh/km",
     "kilowatt-hour-per-100-km": "kWh/100km",
-    "watt-hour-mile": "Wh/mi",
+    "watt-hour-per-mile": "Wh/mi",
     "kilowatt-hour-per-100-mile": "kWh/100mi",
     "km-per-kilowatt-hour": "km/kWh",
     "mile-per-kilowatt-hour": "mi/kWh",
@@ -3361,7 +3361,7 @@
       "battery-energy-remaining": "Verbleibende Energie",
       "battery-level": "Batteriestand",
       "battery-power": "Batterieleistung",
-      "battery-range-est": "Geschätzte Reichweite",
+      "battery-range-estimate": "Geschätzte Reichweite",
       "battery-temperature": "Batterietemperatur",
       "battery-voltage": "Batteriespannung"
     },
@@ -3402,9 +3402,9 @@
     },
     "electrical-vehicle-state": {
       "shortCategoryName": "Elektrofahrzeug - Status",
-      "door-open": "Tür geöffnet",
+      "door-opened": "Tür geöffnet",
       "odometer": "Kilometerzähler",
-      "window-open": "Fenster geöffnet"
+      "window-opened": "Fenster geöffnet"
     },
     "heater": {
       "shortCategoryName": "Heizung",
