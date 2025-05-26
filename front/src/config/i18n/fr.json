@@ -3264,7 +3264,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "target-current": "Intensité de consigne"
     },
     "siren": {
       "shortCategoryName": "Sirène",
@@ -3332,7 +3333,7 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température"
+      "target-temperature": "Température de consigne"
     },
     "heater": {
       "shortCategoryName": "Chauffage",
