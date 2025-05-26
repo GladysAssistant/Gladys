@@ -3077,7 +3077,19 @@
           "69": "Triple Both",
           "70": "Hold Left",
           "71": "Hold Right",
-          "72": "Hold Both"
+          "72": "Hold Both",
+          "73": "Simple Click Plus",
+          "74": "Simple Click Center",
+          "75": "Simple Click Minus",
+          "76": "Double Click Plus",
+          "77": "Double Click Center",
+          "78": "Double Click Minus",
+          "79": "Hold Plus",
+          "80": "Hold Center",
+          "81": "Hold Minus",
+          "82": "Release Plus (Aqara W100)",
+          "83": "Release Center (Aqara W100)",
+          "84": "Release Minus (Aqara W100)"
         }
       },
       "heater": {
