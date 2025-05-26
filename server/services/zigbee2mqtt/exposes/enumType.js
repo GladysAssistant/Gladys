@@ -103,6 +103,20 @@ addMapping('action', BUTTON_STATUS.HOLD_LEFT, 'hold_left');
 addMapping('action', BUTTON_STATUS.HOLD_RIGHT, 'hold_right');
 addMapping('action', BUTTON_STATUS.HOLD_BOTH, 'hold_both');
 
+// Add mappings for Aqara W100 temperature
+addMapping('action', BUTTON_STATUS.SINGLE_PLUS, 'single_plus');
+addMapping('action', BUTTON_STATUS.SINGLE_CENTER, 'single_center');
+addMapping('action', BUTTON_STATUS.SINGLE_MINUS, 'single_minus');
+addMapping('action', BUTTON_STATUS.DOUBLE_PLUS, 'double_plus');
+addMapping('action', BUTTON_STATUS.DOUBLE_CENTER, 'double_center');
+addMapping('action', BUTTON_STATUS.DOUBLE_MINUS, 'double_minus');
+addMapping('action', BUTTON_STATUS.HOLD_PLUS, 'hold_plus');
+addMapping('action', BUTTON_STATUS.HOLD_CENTER, 'hold_center');
+addMapping('action', BUTTON_STATUS.HOLD_MINUS, 'hold_minus');
+addMapping('action', BUTTON_STATUS.RELEASE_PLUS, 'release_plus');
+addMapping('action', BUTTON_STATUS.RELEASE_CENTER, 'release_center');
+addMapping('action', BUTTON_STATUS.RELEASE_MINUS, 'release_minus');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
