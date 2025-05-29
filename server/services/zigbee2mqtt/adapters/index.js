@@ -1,12 +1,12 @@
 const CONFIG_KEYS = {
   DECONZ: 'deconz',
-  EZSP: 'ezsp',
+  EMBER: 'ember',
   NONE: 'none',
 };
 
 const ADAPTERS_BY_CONFIG_KEY = {
   [CONFIG_KEYS.DECONZ]: ['ConBee', 'ConBee II', 'RaspBee', 'RaspBee II'],
-  [CONFIG_KEYS.EZSP]: [
+  [CONFIG_KEYS.EMBER]: [
     'CoolKit ZB-GW04 USB dongle (a.k.a. easyiot stick)',
     'Elelabs ELU013 and Popp ZB-STICK',
     'Elelabs Zigbee Raspberry Pi Shield/Popp ZB-Shield',
