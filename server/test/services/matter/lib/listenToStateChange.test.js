@@ -8,6 +8,7 @@ const {
   LevelControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  Pm25ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -173,6 +174,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1029',
       state: 50,
+    });
+  });
+  it('should listen to state change (Pm25ConcentrationMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(Pm25ConcentrationMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(100);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1066',
+      state: 100,
     });
   });
   it('should listen to state change (Thermostat heating)', async () => {
