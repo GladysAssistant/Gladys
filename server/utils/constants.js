@@ -867,7 +867,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   ELECTRICAL_VEHICLE_CONSUMPTION: {
     // Features related to energy consumption and efficiency
-    ENERGY_CONSUMPTION: 'energy-consumption', // Instantaneous or average energy consumption in kWh (integer - sensor)
+    ENERGY_CONSUMPTION: 'energy-consumption', // Instantaneous or average energy consumption in Wh/km, Wh/mi, kWh/100km, kWh/100mi (integer - sensor)
     ENERGY_EFFICIENCY: 'energy-efficiency', // Energy efficiency metric in km/kWh or mi/kWh (integer - sensor)
   },
   ELECTRICAL_VEHICLE_STATE: {
