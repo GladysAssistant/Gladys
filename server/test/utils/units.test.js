@@ -105,9 +105,9 @@ describe('convertUnitDistance', () => {
   });
 
   it('converts Wh/km to Wh/mi (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_KM, DISTANCE_UNITS.US);
+    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM, DISTANCE_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
-    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_MILE);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE);
   });
 
   it('converts mph to km/h (metric preference)', () => {
@@ -135,9 +135,9 @@ describe('convertUnitDistance', () => {
   });
 
   it('converts Wh/mi to Wh/km (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_MILE, DISTANCE_UNITS.METRIC);
+    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE, DISTANCE_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
-    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_KM);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM);
   });
 
   it('returns the original value if no conversion', () => {
