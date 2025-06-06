@@ -3286,7 +3286,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "target-current": "Target current"
     },
     "siren": {
       "shortCategoryName": "Siren",
@@ -3354,7 +3355,7 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Temperature"
+      "target-temperature": "Target temperature"
     },
     "heater": {
       "shortCategoryName": "Heating",

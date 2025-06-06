@@ -8,10 +8,21 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/consta
 import style from './style.css';
 
 const isNullOrUndefined = val => val === null || val === undefined;
-const DEFAULT_TEMPERATURE_IN_CASE_EMPTY = 18;
 
-const ThermostatDeviceFeature = ({ children, ...props }) => {
-  const TEMPERATURE_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING ? 1 : 0.5;
+const SETPOINT_STEP_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: 1,
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: 1
+};
+
+const DEFAULT_VALUE_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: 18,
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: 18,
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: 0
+};
+
+const SetpointDeviceFeature = ({ children, ...props }) => {
+  const SETPOINT_STEP = SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
+  const DEFAULT_VALUE_IN_CASE_EMPTY = DEFAULT_VALUE_BY_CATEGORY[props.deviceFeature.category] || 0;
 
   function updateValue(value) {
     props.updateValueWithDebounce(props.deviceFeature, value);
@@ -23,16 +34,16 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
 
   function add() {
     const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
-      ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
+      ? DEFAULT_VALUE_IN_CASE_EMPTY
       : props.deviceFeature.last_value;
-    updateValue(prevValue + TEMPERATURE_STEP);
+    updateValue(prevValue + SETPOINT_STEP);
   }
 
   function substract() {
     const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
-      ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
+      ? DEFAULT_VALUE_IN_CASE_EMPTY
       : props.deviceFeature.last_value;
-    updateValue(prevValue - TEMPERATURE_STEP);
+    updateValue(prevValue - SETPOINT_STEP);
   }
 
   return (
@@ -51,7 +62,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
       <td class="py-0">
         <div class="d-flex justify-content-end">
           <div class="d-flex">
-            <div class={cx('input-group', style.thermostatHorizontalControls)}>
+            <div class={cx('input-group', style.setpointHorizontalControls)}>
               <div class="input-group-prepend">
                 <button class="btn btn-outline-secondary" type="button" onClick={substract}>
                   <Text id="dashboard.boxes.devicesInRoom.substractButton" />
@@ -62,7 +73,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
                 value={props.deviceFeature.last_value}
                 class={cx('form-control text-center', style.removeNumberArrow)}
                 onChange={updateValueEvent}
-                step={TEMPERATURE_STEP}
+                step={SETPOINT_STEP}
                 min={props.deviceFeature.min}
                 max={props.deviceFeature.max}
               />
@@ -72,7 +83,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
                 </button>
               </div>
             </div>
-            <div class={cx('input-group input-group-sm', style.thermostatVerticalControls)}>
+            <div class={cx('input-group input-group-sm', style.setpointVerticalControls)}>
               <div class="d-flex flex-column mt-2 mb-2">
                 <div class="mb-1">
                   <button class="btn btn-block btn-sm btn-outline-secondary" type="button" onClick={add}>
@@ -85,7 +96,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
                     value={props.deviceFeature.last_value}
                     class={cx('form-control text-center input-sm', style.removeNumberArrow)}
                     onChange={updateValueEvent}
-                    step={TEMPERATURE_STEP}
+                    step={SETPOINT_STEP}
                     min={props.deviceFeature.min}
                     max={props.deviceFeature.max}
                   />
@@ -104,4 +115,4 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
   );
 };
 
-export default ThermostatDeviceFeature;
+export default SetpointDeviceFeature;
