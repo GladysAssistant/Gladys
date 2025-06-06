@@ -1849,6 +1849,11 @@
       "namePlaceholder": "Mon appareil Matter",
       "roomLabel": "Pièce",
       "featuresLabel": "Fonctionnalités",
+      "displayDeviceInfo": "Afficher les détails",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Numéro de série",
+        "UNIQUE_ID": "ID unique"
+      },
       "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
       "alreadyCreatedButton": "Appareil déjà ajouté",
       "saveButton": "Enregistrer",
@@ -2811,9 +2816,9 @@
     "volt-ampere": "Voltampère (VA)",
     "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
-    "watt-hour-km": "Watt heure par kilomètre (Wh/km)",
+    "watt-hour-per-km": "Watt heure par kilomètre (Wh/km)",
     "kilowatt-hour-per-100-km": "Kilowatt heure aux 100 kilomètres (kWh/100km)",
-    "watt-hour-mile": "Watt heure par mile (Wh/mi)",
+    "watt-hour-per-mile": "Watt heure par mile (Wh/mi)",
     "kilowatt-hour-per-100-mile": "Kilowatt heure aux 100 miles (kWh/100mi)",
     "km-per-kilowatt-hour": "Kilomètre par kilowatt heure (km/kWh)",
     "mile-per-kilowatt-hour": "Mile par kilowatt heure (mi/kWh)",
@@ -2900,9 +2905,9 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "watt-hour-km": "Wh/km",
+    "watt-hour-per-km": "Wh/km",
     "kilowatt-hour-per-100-km": "kWh/100km",
-    "watt-hour-mile": "Wh/mi",
+    "watt-hour-per-mile": "Wh/mi",
     "kilowatt-hour-per-100-mile": "kWh/100mi",
     "km-per-kilowatt-hour": "km/kWh",
     "mile-per-kilowatt-hour": "mi/kWh",
@@ -3121,7 +3126,19 @@
           "69": "Triple sur les deux",
           "70": "Maintenu Gauche",
           "71": "Maintenu Droit",
-          "72": "Maintenu sur les deux"
+          "72": "Maintenu sur les deux",
+          "73": "Clic simple Plus",
+          "74": "Clic simple Centre",
+          "75": "Clic simple Moins",
+          "76": "Double clic Plus",
+          "77": "Double clic Centre",
+          "78": "Double clic Moins",
+          "79": "Maintien Plus",
+          "80": "Maintien Centre",
+          "81": "Maintien Moins",
+          "82": "Relâchement Plus",
+          "83": "Relâchement Centre",
+          "84": "Relâchement Moins"
         }
       },
       "heater": {
@@ -3307,7 +3324,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "target-current": "Intensité de consigne"
     },
     "siren": {
       "shortCategoryName": "Sirène",
@@ -3382,7 +3400,7 @@
       "battery-energy-remaining": "Énergie restante",
       "battery-level": "Niveau batterie",
       "battery-power": "Puissance batterie",
-      "battery-range-est": "Autonomie estimée",
+      "battery-range-estimate": "Autonomie estimée",
       "battery-temperature": "Température batterie",
       "battery-voltage": "Tension batterie"
     },
@@ -3394,9 +3412,9 @@
       "charge-on": "Commutateur charge",
       "charge-power": "Puissance charge",
       "charge-voltage": "Tension charge",
-      "last-charge-energy-added": "Énergie ajoutée",
-      "last-charge-energy-consumption": "Énergie consommée",
-      "plugged": "Prise connectée",
+      "last-charge-energy-added": "Énergie ajoutée (dernière charge)",
+      "last-charge-energy-consumption": "Énergie consommée (dernière charge)",
+      "plugged": "Véhicule branché",
       "target-charge-limit": "Limite de charge",
       "target-current": "Intensité de consigne"
     },
@@ -3423,9 +3441,9 @@
     },
     "electrical-vehicle-state": {
       "shortCategoryName": "Véhicule électrique - État",
-      "door-open": "Porte ouverte",
+      "door-opened": "Porte ouverte",
       "odometer": "Odomètre",
-      "window-open": "Fenêtre ouverte"
+      "window-opened": "Fenêtre ouverte"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

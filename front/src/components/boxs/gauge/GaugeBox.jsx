@@ -4,8 +4,7 @@ import ApexCharts from 'apexcharts';
 import { Text } from 'preact-i18n';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
-import { WEBSOCKET_MESSAGE_TYPES, DISTANCE_UNITS } from '../../../../../server/utils/constants';
-import { convertUnitDistance } from '../../../../../server/utils/units';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 class GaugeBox extends Component {
   state = {
@@ -98,34 +97,20 @@ class GaugeBox extends Component {
   };
 
   formatValueWithUnit = (value, unit) => {
-    const { user } = this.props;
-    let displayUnit = unit;
-
-    const isDistanceUnit = DISTANCE_UNITS.DEVICE_FEATURE_UNITS.includes(displayUnit);
-    // Conversion if necessary (and if user is present)
-    if (user && value !== null && isDistanceUnit) {
-      const userUnit = user.distance_unit_preference;
-      const conversion = convertUnitDistance(value, displayUnit, userUnit);
-      value = conversion.value;
-      displayUnit = conversion.unit;
-    }
-
     // Format the value to 1 decimal place
     const formattedValue = value.toFixed(1);
 
     // If no unit, just return the formatted value
-    if (!displayUnit) {
+    if (!unit) {
       return formattedValue;
     }
 
     // Get the unit translation from the dictionary
     const unitTranslation =
-      this.props.intl && this.props.intl.dictionary
-        ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit]
-        : displayUnit;
+      this.props.intl && this.props.intl.dictionary ? this.props.intl.dictionary.deviceFeatureUnitShort[unit] : unit;
 
     // Return the value with the unit
-    return `${formattedValue}${unitTranslation || displayUnit}`;
+    return `${formattedValue}${unitTranslation || unit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -283,4 +268,4 @@ class GaugeBox extends Component {
   }
 }
 
-export default connect('httpClient,session,user', {})(withIntlAsProp(GaugeBox));
+export default connect('httpClient,session', {})(withIntlAsProp(GaugeBox));

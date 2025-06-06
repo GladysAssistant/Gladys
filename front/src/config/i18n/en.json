@@ -1880,6 +1880,11 @@
       "roomLabel": "Room",
       "featuresLabel": "Features",
       "noFeaturesHandled": "No features are handled by this device",
+      "displayDeviceInfo": "Display device informations",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Serial Number",
+        "UNIQUE_ID": "Unique ID"
+      },
       "alreadyCreatedButton": "Device already added",
       "saveButton": "Save",
       "deleteButton": "Delete",
@@ -2811,9 +2816,9 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Voltampere reactive (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
-    "watt-hour-km": "Watt hour per kilometer (Wh/km)",
+    "watt-hour-per-km": "Watt hour per kilometer (Wh/km)",
     "kilowatt-hour-per-100-km": "Kilowatt hour per 100 kilometers (kWh/100km)",
-    "watt-hour-mile": "Watt hour per mile (Wh/mi)",
+    "watt-hour-per-mile": "Watt hour per mile (Wh/mi)",
     "kilowatt-hour-per-100-mile": "Kilowatt hour per 100 miles (kWh/100mi)",
     "km-per-kilowatt-hour": "Kilometer per kilowatt hour (km/kWh)",
     "mile-per-kilowatt-hour": "Mile per kilowatt hour (mi/kWh)",
@@ -2900,9 +2905,9 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "watt-hour-km": "Wh/km",
+    "watt-hour-per-km": "Wh/km",
     "kilowatt-hour-per-100-km": "kWh/100km",
-    "watt-hour-mile": "Wh/mi",
+    "watt-hour-per-mile": "Wh/mi",
     "kilowatt-hour-per-100-mile": "kWh/100mi",
     "km-per-kilowatt-hour": "km/kWh",
     "mile-per-kilowatt-hour": "mi/kWh",
@@ -3121,7 +3126,19 @@
           "69": "Triple Both",
           "70": "Hold Left",
           "71": "Hold Right",
-          "72": "Hold Both"
+          "72": "Hold Both",
+          "73": "Simple Click Plus",
+          "74": "Simple Click Center",
+          "75": "Simple Click Minus",
+          "76": "Double Click Plus",
+          "77": "Double Click Center",
+          "78": "Double Click Minus",
+          "79": "Hold Plus",
+          "80": "Hold Center",
+          "81": "Hold Minus",
+          "82": "Release Plus (Aqara W100)",
+          "83": "Release Center (Aqara W100)",
+          "84": "Release Minus (Aqara W100)"
         }
       },
       "heater": {
@@ -3307,7 +3324,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "target-current": "Target current"
     },
     "siren": {
       "shortCategoryName": "Siren",
@@ -3382,7 +3400,7 @@
       "battery-energy-remaining": "Remaining energy",
       "battery-level": "Battery level",
       "battery-power": "Battery power",
-      "battery-range-est": "Estimated range",
+      "battery-range-estimate": "Estimated range",
       "battery-temperature": "Battery temperature",
       "battery-voltage": "Battery voltage"
     },
@@ -3394,9 +3412,9 @@
       "charge-on": "Charge switch",
       "charge-power": "Charging power",
       "charge-voltage": "Charging voltage",
-      "last-charge-energy-added": "Energy added",
-      "last-charge-energy-consumption": "Energy consumed",
-      "plugged": "Plugged in",
+      "last-charge-energy-added": "Energy added (last charge)",
+      "last-charge-energy-consumption": "Energy consumed (last charge)",
+      "plugged": "Vehicle plugged",
       "target-charge-limit": "Charge limit",
       "target-current": "Target current"
     },
@@ -3423,9 +3441,9 @@
     },
     "electrical-vehicle-state": {
       "shortCategoryName": "Electric Vehicle - Status",
-      "door-open": "Door open",
+      "door-opened": "Door open",
       "odometer": "Odometer",
-      "window-open": "Window open"
+      "window-opened": "Window open"
     },
     "heater": {
       "shortCategoryName": "Heating",
