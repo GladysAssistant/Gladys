@@ -9,6 +9,7 @@ import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
+import { formatHttpError } from '../../../utils/formatErrors';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const TWELVE_HOURS_IN_MINUTES = 12 * 60;
@@ -189,7 +190,7 @@ class Chartbox extends Component {
       });
       return;
     }
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, error: null, errorDetail: null });
     try {
       const maxStates = 300;
 
@@ -326,6 +327,12 @@ class Chartbox extends Component {
       await this.setState(newState);
     } catch (e) {
       console.error(e);
+      const { errorString, errorDetailString } = formatHttpError(e);
+      this.setState({
+        loading: false,
+        error: errorString,
+        errorDetail: errorDetailString
+      });
     }
   };
   updateDeviceStateWebsocket = payload => {
@@ -396,7 +403,9 @@ class Chartbox extends Component {
       interval,
       emptySeries,
       unit,
-      nbFeaturesDisplayed
+      nbFeaturesDisplayed,
+      error,
+      errorDetail
     }
   ) {
     const { box } = this.props;
@@ -618,6 +627,15 @@ class Chartbox extends Component {
                 <div class={style.smallTextEmptyState}>
                   <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
+              </div>
+            )}
+            {error && (
+              <div class={cx('text-center', style.bigEmptyState)}>
+                <div>
+                  <i class="fe fe-alert-circle mr-2" />
+                  {error}
+                </div>
+                {errorDetail && <div>{errorDetail}</div>}
               </div>
             )}
             {props.box.chart_type && (
