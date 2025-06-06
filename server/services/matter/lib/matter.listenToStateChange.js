@@ -8,6 +8,7 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  Pm25ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -168,6 +169,22 @@ async function listenToStateChange(nodeId, devicePath, device) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${RelativeHumidityMeasurement.Complete.id}`,
         state: value / 100,
+      });
+    });
+  }
+
+  const pm25ConcentrationMeasurement = device.clusterClients.get(Pm25ConcentrationMeasurement.Complete.id);
+  if (pm25ConcentrationMeasurement && !this.stateChangeListeners.has(pm25ConcentrationMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for Pm25ConcentrationMeasurement cluster ${pm25ConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(pm25ConcentrationMeasurement);
+    // Subscribe to Pm25ConcentrationMeasurement attribute changes
+    pm25ConcentrationMeasurement.addMeasuredValueAttributeListener((value) => {
+      logger.debug(`Matter: Pm25ConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${Pm25ConcentrationMeasurement.Complete.id}`,
+        state: value,
       });
     });
   }

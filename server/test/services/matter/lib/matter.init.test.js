@@ -1,3 +1,8 @@
+const {
+  Pm25ConcentrationMeasurement,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
+
 const sinon = require('sinon');
 const { expect } = require('chai');
 
@@ -152,6 +157,18 @@ describe('Matter.init', () => {
       commands: {},
       addOccupiedHeatingSetpointAttributeListener: fake.returns(null),
       addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
+    });
+
+    // PM2.5 concentration measurement
+    clusterClients.set(Pm25ConcentrationMeasurement.Complete.id, {
+      id: Pm25ConcentrationMeasurement.Complete.id,
+      name: 'Pm25ConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
     });
 
     // Mock commissioning controller
@@ -376,6 +393,18 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:1066',
+            has_feedback: true,
+            max: 1500,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
         ],
         params: [],
       },
@@ -513,6 +542,18 @@ describe('Matter.init', () => {
             selector: matterHandler.devices[1].features[10].selector,
             min: -100,
             max: 200,
+          },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1066',
+            has_feedback: true,
+            max: 1500,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
           },
         ],
         params: [],
