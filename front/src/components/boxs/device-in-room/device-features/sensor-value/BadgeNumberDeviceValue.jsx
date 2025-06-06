@@ -102,7 +102,7 @@ const BadgeNumberDeviceValue = props => {
     value = conversion.value;
     displayUnit = conversion.unit;
   }
-  const valued = value !== -1;
+  const valued = value !== null;
 
   // If the category is an enum
   // We need to convert the string to text
