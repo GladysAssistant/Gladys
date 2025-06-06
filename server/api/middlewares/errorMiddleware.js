@@ -65,7 +65,7 @@ module.exports = function errorMiddleware(error, req, res, next) {
   } else if (error instanceof TooManyRequests) {
     responseError = new Error429({ time_before_next: error.timeBeforeNext });
   } else {
-    logger.trace(error);
+    logger.warn(error);
     responseError = new Error500(error);
   }
 
