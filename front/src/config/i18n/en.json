@@ -3374,9 +3374,9 @@
       "charge-on": "Charge switch",
       "charge-power": "Charging power",
       "charge-voltage": "Charging voltage",
-      "last-charge-energy-added": "Energy added",
-      "last-charge-energy-consumption": "Energy consumed",
-      "plugged": "Plugged in",
+      "last-charge-energy-added": "Energy added (last charge)",
+      "last-charge-energy-consumption": "Energy consumed (last charge)",
+      "plugged": "Vehicle plugged",
       "target-charge-limit": "Charge limit",
       "target-current": "Target current"
     },
