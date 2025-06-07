@@ -125,7 +125,7 @@ class GaugeBox extends Component {
         : displayUnit;
 
     // Return the value with the unit
-    return `${formattedValue}${unitTranslation || displayUnit}`;
+    return `${formattedValue} ${unitTranslation || displayUnit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {
