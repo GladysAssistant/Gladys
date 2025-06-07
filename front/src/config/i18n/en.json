@@ -3211,11 +3211,11 @@
         }
       },
       "electrical-vehicle-state": {
-        "door-open": {
+        "door-opened": {
           "0": "Closed",
           "1": "Open"
         },
-        "window-open": {
+        "window-opened": {
           "0": "Closed",
           "1": "Open"
         }
