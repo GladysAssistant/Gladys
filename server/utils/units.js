@@ -106,13 +106,21 @@ function smartRound(value) {
  * // result = { value: 6.21, unit: 'mile' }
  */
 function checkAndConvertUnit(value, fromUnit, userPreference) {
-  const conversions = UNIT_CONVERSIONS[userPreference];
-  if (conversions && conversions[fromUnit] && value !== null) {
-    const conversion = conversions[fromUnit];
-    // Convert the value and apply smart rounding
-    const convertedValue = smartRound(conversion.convert(value));
-    const unit = conversion.unit(value);
-    return { value: convertedValue, unit };
+  const unitsConvertUserPreference = UNIT_CONVERSIONS[userPreference];
+  const unitConversionParams = unitsConvertUserPreference[fromUnit];
+  if (unitsConvertUserPreference && unitConversionParams) {
+    if (value !== null) {
+      // Convert the value and apply smart rounding
+      const convertedValue = smartRound(unitConversionParams.convert(value));
+      const unit = unitConversionParams.unit(convertedValue);
+      return { value: convertedValue, unit };
+    } else {
+      // When value is null, we still want to get the correct unit format
+      // This is particularly useful for charts where some data points might be null in DB
+      // but we still want to display the correct unit format
+      const unit = unitConversionParams.unit(0);
+      return { value, unit };
+    }
   }
   // No conversion: keep the original value and unit
   return { value, unit: fromUnit };
