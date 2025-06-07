@@ -1,4 +1,4 @@
-const { DISTANCE_UNIT_CONVERSIONS } = require('./unit-conversions');
+const { UNIT_CONVERSIONS } = require('./unit-conversions');
 
 /**
  * @description Convert celsius to fahrenheit.
@@ -102,18 +102,24 @@ function smartRound(value) {
  * @param {string} userPreference - User preference ('us' or 'metric').
  * @returns {{ value: number, unit: string }} Object containing the converted value and the target unit.
  * @example
- * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, DISTANCE_UNITS.US);
+ * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, SYSTEM_UNITS.US);
  * // result = { value: 6.21, unit: 'mile' }
  */
-function convertUnitDistance(value, fromUnit, userPreference) {
-  const conversions = DISTANCE_UNIT_CONVERSIONS[userPreference];
-  if (conversions && conversions[fromUnit]) {
-    const conversion = conversions[fromUnit];
-    // Convert the value and apply smart rounding
-    const convertedValue = smartRound(conversion.convert(value));
-    // Choose the target unit (function or string)
-    const unit = typeof conversion.unit === 'function' ? conversion.unit(value) : conversion.unit;
-    return { value: convertedValue, unit };
+function checkAndConvertUnit(value, fromUnit, userPreference) {
+  const unitsConvertUserPreference = UNIT_CONVERSIONS[userPreference];
+  const unitConversionParams = unitsConvertUserPreference[fromUnit];
+  if (unitsConvertUserPreference && unitConversionParams) {
+    if (value !== null) {
+      // Convert the value and apply smart rounding
+      const convertedValue = smartRound(unitConversionParams.convert(value));
+      const unit = unitConversionParams.unit(convertedValue);
+      return { value: convertedValue, unit };
+    }
+    // When value is null, we still want to get the correct unit format
+    // This is particularly useful for charts where some data points might be null in DB
+    // but we still want to display the correct unit format
+    const unit = unitConversionParams.unit(0);
+    return { value, unit };
   }
   // No conversion: keep the original value and unit
   return { value, unit: fromUnit };
@@ -123,6 +129,6 @@ module.exports = {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   hslToRgb,
-  convertUnitDistance,
+  checkAndConvertUnit,
   smartRound,
 };

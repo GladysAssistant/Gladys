@@ -1,25 +1,21 @@
 import { Text } from 'preact-i18n';
-import { convertUnitDistance } from '../../../../../../../server/utils/units';
+import { checkAndConvertUnit } from '../../../../../../../server/utils/units';
 
 const DistanceSensorDeviceValue = ({ deviceFeature, user }) => {
   const { last_value: lastValue = null, unit } = deviceFeature;
-  const userUnit = user.distance_unit_preference;
-  let value = lastValue;
-  let displayUnit = unit;
+  const userUnitPreference = user.distance_unit_preference;
 
   // Convert the value to the user unit if needed
-  if (displayUnit !== userUnit) {
-    const conversion = convertUnitDistance(value, displayUnit, userUnit);
-    value = conversion.value;
-    displayUnit = conversion.unit;
-  }
+  const conversion = checkAndConvertUnit(lastValue, unit, userUnitPreference);
+  const displayValue = conversion.value;
+  const displayUnit = conversion.unit;
 
   return (
     <div>
-      {lastValue === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-      {lastValue !== null && (
+      {displayValue === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+      {displayValue !== null && (
         <span>
-          {`${value} `}
+          {`${displayValue} `}
           <Text id={`deviceFeatureUnitShort.${displayUnit}`} />
         </span>
       )}

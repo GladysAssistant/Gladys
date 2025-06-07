@@ -3,12 +3,12 @@ const {
   hslToRgb,
   celsiusToFahrenheit,
   fahrenheitToCelsius,
-  convertUnitDistance,
+  checkAndConvertUnit,
   smartRound,
 } = require('../../utils/units');
 const { DEVICE_FEATURE_UNITS } = require('../../utils/constants');
 
-const DISTANCE_UNITS = { US: 'us', METRIC: 'metric' };
+const SYSTEM_UNITS = { US: 'us', METRIC: 'metric' };
 
 describe('celsiusToFahrenheit', () => {
   it('should convert celsius to fahrenheit', () => {
@@ -31,117 +31,117 @@ describe('hslToRgb', () => {
   });
 });
 
-describe('convertUnitDistance', () => {
+describe('checkAndConvertUnit', () => {
   it('converts kilometers to miles (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.KM, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.MILE);
   });
 
   it('converts miles to kilometers (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.MILE, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.MILE, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KM);
   });
 
   it('converts meters to feet (US preference)', () => {
-    const result = convertUnitDistance(2, DEVICE_FEATURE_UNITS.M, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(2, DEVICE_FEATURE_UNITS.M, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.56, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.FEET);
   });
 
   it('converts feet to meters (metric preference)', () => {
-    const result = convertUnitDistance(3, DEVICE_FEATURE_UNITS.FEET, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(3, DEVICE_FEATURE_UNITS.FEET, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(0.91, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.M);
   });
 
   it('converts mm to inches (US preference, <10)', () => {
-    const result = convertUnitDistance(2, DEVICE_FEATURE_UNITS.MM, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(2, DEVICE_FEATURE_UNITS.MM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(0.08, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.INCH);
   });
 
   it('converts inches to mm (metric preference, <10)', () => {
-    const result = convertUnitDistance(2, DEVICE_FEATURE_UNITS.INCH, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(2, DEVICE_FEATURE_UNITS.INCH, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(50.8, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.MM);
   });
 
   it('converts cm to inches (US preference, >999)', () => {
-    const result = convertUnitDistance(1000, DEVICE_FEATURE_UNITS.CM, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(1000, DEVICE_FEATURE_UNITS.CM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(393.7, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.INCH);
   });
 
   it('converts inches to cm (metric preference, >=10)', () => {
-    const result = convertUnitDistance(12, DEVICE_FEATURE_UNITS.INCH, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(12, DEVICE_FEATURE_UNITS.INCH, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(30.5, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.CM);
   });
 
   it('converts km/h to mph (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.MILE_PER_HOUR);
   });
 
   it('converts m/s to ft/s (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.METER_PER_SECOND, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.METER_PER_SECOND, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(32.8, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.FEET_PER_SECOND);
   });
 
   it('converts km/kWh to mi/kWh (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.MILE_PER_KILOWATT_HOUR);
   });
 
   it('converts kWh/100km to kWh/100mi (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE);
   });
 
   it('converts Wh/km to Wh/mi (US preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM, DISTANCE_UNITS.US);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE);
   });
 
   it('converts mph to km/h (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.MILE_PER_HOUR, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.MILE_PER_HOUR, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR);
   });
 
   it('converts ft/s to m/s (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.FEET_PER_SECOND, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.FEET_PER_SECOND, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(3.05, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.METER_PER_SECOND);
   });
 
   it('converts mi/kWh to km/kWh (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.MILE_PER_KILOWATT_HOUR, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.MILE_PER_KILOWATT_HOUR, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR);
   });
 
   it('converts kWh/100mi to kWh/100km (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM);
   });
 
   it('converts Wh/mi to Wh/km (metric preference)', () => {
-    const result = convertUnitDistance(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE, DISTANCE_UNITS.METRIC);
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(16.1, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM);
   });
 
   it('returns the original value if no conversion', () => {
-    const result = convertUnitDistance(5, DEVICE_FEATURE_UNITS.KM, 'unknown');
+    const result = checkAndConvertUnit(5, DEVICE_FEATURE_UNITS.KM, 'unknown');
     expect(result.value).to.equal(5);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KM);
   });
