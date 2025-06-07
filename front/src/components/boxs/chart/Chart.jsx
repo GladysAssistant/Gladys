@@ -277,10 +277,7 @@ class Chartbox extends Component {
                 displayValue = conversion.value;
               }
 
-              return [
-                Math.round(new Date(value.created_at).getTime() / 1000) * 1000,
-                displayValue
-              ];
+              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, displayValue];
             })
           };
         });
@@ -318,7 +315,7 @@ class Chartbox extends Component {
               return;
             }
             let firstElement = values[0];
-            let lastElement = values[values.length - 1];        
+            let lastElement = values[values.length - 1];
             // Convert the value if it is a convertible unit
             if (userUnit && firstElement !== null && lastElement !== null && isConvertibleUnit) {
               const conversionFirstElement = convertUnitDistance(firstElement.value, displayUnit, userUnit);
@@ -554,8 +551,7 @@ class Chartbox extends Component {
                 <div class="d-flex align-items-baseline">
                   {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                     <div class="h1 mb-0 mr-2">
-                      {lastValueRounded}{' '}
-                      {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+                      {lastValueRounded} {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
                     </div>
                   )}
                   <div
