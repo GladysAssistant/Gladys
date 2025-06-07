@@ -107,22 +107,26 @@ function smartRound(value) {
  */
 function checkAndConvertUnit(value, fromUnit, userPreference) {
   const unitsConvertUserPreference = UNIT_CONVERSIONS[userPreference];
-  const unitConversionParams = unitsConvertUserPreference[fromUnit];
-  if (unitsConvertUserPreference && unitConversionParams) {
-    if (value !== null) {
-      // Convert the value and apply smart rounding
-      const convertedValue = smartRound(unitConversionParams.convert(value));
-      const unit = unitConversionParams.unit(convertedValue);
-      return { value: convertedValue, unit };
-    }
-    // When value is null, we still want to get the correct unit format
-    // This is particularly useful for charts where some data points might be null in DB
-    // but we still want to display the correct unit format
-    const unit = unitConversionParams.unit(0);
-    return { value, unit };
+  if (!unitsConvertUserPreference) {
+    // No conversion: keep the original value and unit
+    return { value, unit: fromUnit };
   }
-  // No conversion: keep the original value and unit
-  return { value, unit: fromUnit };
+  const unitConversionParams = unitsConvertUserPreference[fromUnit];
+  if (!unitConversionParams) {
+    // No conversion: keep the original value and unit
+    return { value, unit: fromUnit };
+  }
+  if (value !== null) {
+    // Convert the value and apply smart rounding
+    const convertedValue = smartRound(unitConversionParams.convert(value));
+    const unit = unitConversionParams.unit(value);
+    return { value: convertedValue, unit };
+  }
+  // When value is null, we still want to get the correct unit format
+  // This is particularly useful for charts where some data points might be null in DB
+  // but we still want to display the correct unit format
+  const unit = unitConversionParams.unit(0);
+  return { value, unit };
 }
 
 module.exports = {

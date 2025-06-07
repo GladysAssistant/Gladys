@@ -29,12 +29,12 @@ const DISTANCE_UNIT_CONVERSIONS = {
   },
   [SYSTEM_UNITS.METRIC]: {
     [DEVICE_FEATURE_UNITS.INCH]: {
-      unit: (value) => (value < 10 ? DEVICE_FEATURE_UNITS.MM : DEVICE_FEATURE_UNITS.CM),
-      convert: (inch) => (inch < 10 ? inch * 25.4 : inch * 2.54),
+      unit: (_value) => DEVICE_FEATURE_UNITS.MM,
+      convert: (inch) => inch * 25.4,
     },
     [DEVICE_FEATURE_UNITS.FEET]: {
-      unit: (value) => (value < 1 ? DEVICE_FEATURE_UNITS.CM : DEVICE_FEATURE_UNITS.M),
-      convert: (feet) => (feet < 1 ? feet * 30.48 : feet * 0.3048),
+      unit: (_value) => DEVICE_FEATURE_UNITS.M,
+      convert: (feet) => feet * 0.3048,
     },
     [DEVICE_FEATURE_UNITS.MILE]: { unit: (_value) => DEVICE_FEATURE_UNITS.KM, convert: (mile) => mile * 1.60934 },
     [DEVICE_FEATURE_UNITS.MILE_PER_HOUR]: {

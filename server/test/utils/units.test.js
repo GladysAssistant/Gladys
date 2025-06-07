@@ -62,22 +62,16 @@ describe('checkAndConvertUnit', () => {
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.INCH);
   });
 
-  it('converts inches to mm (metric preference, <10)', () => {
+  it('converts inches to mm (metric preference)', () => {
     const result = checkAndConvertUnit(2, DEVICE_FEATURE_UNITS.INCH, SYSTEM_UNITS.METRIC);
     expect(result.value).to.be.closeTo(50.8, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.MM);
   });
 
-  it('converts cm to inches (US preference, >999)', () => {
+  it('converts cm to inches (US preference)', () => {
     const result = checkAndConvertUnit(1000, DEVICE_FEATURE_UNITS.CM, SYSTEM_UNITS.US);
     expect(result.value).to.be.closeTo(393.7, 0.01);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.INCH);
-  });
-
-  it('converts inches to cm (metric preference, >=10)', () => {
-    const result = checkAndConvertUnit(12, DEVICE_FEATURE_UNITS.INCH, SYSTEM_UNITS.METRIC);
-    expect(result.value).to.be.closeTo(30.5, 0.01);
-    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.CM);
   });
 
   it('converts km/h to mph (US preference)', () => {
@@ -140,10 +134,22 @@ describe('checkAndConvertUnit', () => {
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM);
   });
 
-  it('returns the original value if no conversion', () => {
+  it('returns the original value if null with converts (metric preference)', () => {
+    const result = checkAndConvertUnit(null, DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE, SYSTEM_UNITS.METRIC);
+    expect(result.value).to.equal(null);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM);
+  });
+
+  it('returns the original value if unknown user system preference', () => {
     const result = checkAndConvertUnit(5, DEVICE_FEATURE_UNITS.KM, 'unknown');
     expect(result.value).to.equal(5);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.KM);
+  });
+
+  it('returns the original value if no unit conversion rules', () => {
+    const result = checkAndConvertUnit(5, DEVICE_FEATURE_UNITS.SECONDS, SYSTEM_UNITS.METRIC);
+    expect(result.value).to.equal(5);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.SECONDS);
   });
 });
 
