@@ -4,8 +4,8 @@ import ApexCharts from 'apexcharts';
 import { Text } from 'preact-i18n';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
-import { WEBSOCKET_MESSAGE_TYPES, DISTANCE_UNITS } from '../../../../../server/utils/constants';
-import { convertUnitDistance } from '../../../../../server/utils/units';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { checkAndConvertUnit } from '../../../../../server/utils/units';
 
 class GaugeBox extends Component {
   state = {
@@ -99,19 +99,15 @@ class GaugeBox extends Component {
 
   formatValueWithUnit = (value, unit) => {
     const { user } = this.props;
-    let displayUnit = unit;
 
-    const isDistanceUnit = DISTANCE_UNITS.DEVICE_FEATURE_UNITS.includes(displayUnit);
     // Conversion if necessary (and if user is present)
-    if (user && value !== null && isDistanceUnit) {
-      const userUnit = user.distance_unit_preference;
-      const conversion = convertUnitDistance(value, displayUnit, userUnit);
-      value = conversion.value;
-      displayUnit = conversion.unit;
-    }
+    const userUnitPreference = user.distance_unit_preference;
+    const conversion = checkAndConvertUnit(value, unit, userUnitPreference);
+    const displayValue = conversion.value;
+    const displayUnit = conversion.unit;
 
     // Format the value to 1 decimal place
-    const formattedValue = value.toFixed(1);
+    const formattedValue = displayValue.toFixed(1);
 
     // If no unit, just return the formatted value
     if (!displayUnit) {

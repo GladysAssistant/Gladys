@@ -4,8 +4,8 @@ import cx from 'classnames';
 
 import { Text } from 'preact-i18n';
 import style from './style.css';
-import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS, DISTANCE_UNITS } from '../../../../../server/utils/constants';
-import { convertUnitDistance } from '../../../../../server/utils/units';
+import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
+import { checkAndConvertUnit } from '../../../../../server/utils/units';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
@@ -249,16 +249,11 @@ class Chartbox extends Component {
       } else {
         series = data.map((oneFeature, index) => {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-          // Convert distance units if necessary
-          let displayUnit = oneUnit;
-          const userUnit = this.props.user.distance_unit_preference;
-          const isConvertibleUnit = DISTANCE_UNITS.DEVICE_FEATURE_UNITS.includes(displayUnit);
+          // Convert unit display format if necessary (using 0 as a dummy value since we only need the unit)
+          const userUnitPreference = this.props.user.distance_unit_preference;
+          const conversion = checkAndConvertUnit(0, oneUnit, userUnitPreference);
+          const displayUnit = conversion.unit;
 
-          // Convert unit display format (using 0 as a dummy value since we only need the unit)
-          if (userUnit && isConvertibleUnit) {
-            const conversion = convertUnitDistance(0, displayUnit, userUnit);
-            displayUnit = conversion.unit;
-          }
           const oneUnitTranslated = displayUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit] : null;
           const { values, deviceFeature, device } = oneFeature;
           const deviceFeatureName = deviceFeatureNames
@@ -272,10 +267,8 @@ class Chartbox extends Component {
               let displayValue = getDeviceValueByAggregateFunction(value, this.props.box.aggregate_function);
 
               // Convert the value if it is a convertible unit
-              if (userUnit && displayValue !== null && isConvertibleUnit) {
-                const conversion = convertUnitDistance(displayValue, oneUnit, userUnit);
-                displayValue = conversion.value;
-              }
+              const conversion = checkAndConvertUnit(displayValue, oneUnit, userUnitPreference);
+              displayValue = conversion.value;
 
               return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, displayValue];
             })
@@ -296,10 +289,8 @@ class Chartbox extends Component {
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
 
         // Convert distance units if necessary
+        const userUnitPreference = this.props.user.distance_unit_preference;
         let displayUnit = unit;
-        const userUnit = this.props.user.distance_unit_preference;
-
-        const isConvertibleUnit = DISTANCE_UNITS.DEVICE_FEATURE_UNITS.includes(displayUnit);
 
         // We check if all deviceFeatures selected are in the same unit
         const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
@@ -317,13 +308,12 @@ class Chartbox extends Component {
             let firstElement = values[0];
             let lastElement = values[values.length - 1];
             // Convert the value if it is a convertible unit
-            if (userUnit && firstElement !== null && lastElement !== null && isConvertibleUnit) {
-              const conversionFirstElement = convertUnitDistance(firstElement.value, displayUnit, userUnit);
-              const conversionLastElement = convertUnitDistance(lastElement.value, displayUnit, userUnit);
-              firstElement.value = conversionFirstElement.value;
-              lastElement.value = conversionLastElement.value;
-              displayUnit = conversionFirstElement.unit;
-            }
+            const conversionFirstElement = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const conversionLastElement = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = conversionFirstElement.value;
+            lastElement.value = conversionLastElement.value;
+            displayUnit = conversionFirstElement.unit;
+
             const variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
               getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
@@ -343,14 +333,14 @@ class Chartbox extends Component {
           if (values.length > 0) {
             let firstElement = values[0];
             let lastElement = values[values.length - 1];
+
             // Convert the value if it is a convertible unit
-            if (userUnit && firstElement !== null && lastElement !== null && isConvertibleUnit) {
-              const conversionFirstElement = convertUnitDistance(firstElement.value, displayUnit, userUnit);
-              const conversionLastElement = convertUnitDistance(lastElement.value, displayUnit, userUnit);
-              firstElement.value = conversionFirstElement.value;
-              lastElement.value = conversionLastElement.value;
-              displayUnit = conversionFirstElement.unit;
-            }
+            const conversionFirstElement = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const conversionLastElement = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = conversionFirstElement.value;
+            lastElement.value = conversionLastElement.value;
+            displayUnit = conversionFirstElement.unit;
+
             newState.variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
               getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)

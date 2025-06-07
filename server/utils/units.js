@@ -1,4 +1,4 @@
-const { DISTANCE_UNIT_CONVERSIONS } = require('./unit-conversions');
+const { UNIT_CONVERSIONS } = require('./unit-conversions');
 
 /**
  * @description Convert celsius to fahrenheit.
@@ -102,17 +102,16 @@ function smartRound(value) {
  * @param {string} userPreference - User preference ('us' or 'metric').
  * @returns {{ value: number, unit: string }} Object containing the converted value and the target unit.
  * @example
- * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, DISTANCE_UNITS.US);
+ * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, SYSTEM_UNITS.US);
  * // result = { value: 6.21, unit: 'mile' }
  */
-function convertUnitDistance(value, fromUnit, userPreference) {
-  const conversions = DISTANCE_UNIT_CONVERSIONS[userPreference];
-  if (conversions && conversions[fromUnit]) {
+function checkAndConvertUnit(value, fromUnit, userPreference) {
+  const conversions = UNIT_CONVERSIONS[userPreference];
+  if (conversions && conversions[fromUnit] && value !== null) {
     const conversion = conversions[fromUnit];
     // Convert the value and apply smart rounding
     const convertedValue = smartRound(conversion.convert(value));
-    // Choose the target unit (function or string)
-    const unit = typeof conversion.unit === 'function' ? conversion.unit(value) : conversion.unit;
+    const unit = conversion.unit(value);
     return { value: convertedValue, unit };
   }
   // No conversion: keep the original value and unit
@@ -123,6 +122,6 @@ module.exports = {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   hslToRgb,
-  convertUnitDistance,
+  checkAndConvertUnit,
   smartRound,
 };
