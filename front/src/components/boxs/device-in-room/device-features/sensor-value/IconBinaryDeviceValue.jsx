@@ -8,8 +8,8 @@ const ICON_MAP = {
     1: 'lock'
   },
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: {
-    0: 'unlock',
-    1: 'lock'
+    0: 'lock',
+    1: 'unlock'
   }
 };
 
