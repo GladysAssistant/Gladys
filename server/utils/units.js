@@ -114,13 +114,12 @@ function checkAndConvertUnit(value, fromUnit, userPreference) {
       const convertedValue = smartRound(unitConversionParams.convert(value));
       const unit = unitConversionParams.unit(convertedValue);
       return { value: convertedValue, unit };
-    } else {
-      // When value is null, we still want to get the correct unit format
-      // This is particularly useful for charts where some data points might be null in DB
-      // but we still want to display the correct unit format
-      const unit = unitConversionParams.unit(0);
-      return { value, unit };
     }
+    // When value is null, we still want to get the correct unit format
+    // This is particularly useful for charts where some data points might be null in DB
+    // but we still want to display the correct unit format
+    const unit = unitConversionParams.unit(0);
+    return { value, unit };
   }
   // No conversion: keep the original value and unit
   return { value, unit: fromUnit };
