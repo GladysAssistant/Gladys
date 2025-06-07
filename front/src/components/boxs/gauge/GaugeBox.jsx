@@ -110,7 +110,7 @@ class GaugeBox extends Component {
       this.props.intl && this.props.intl.dictionary ? this.props.intl.dictionary.deviceFeatureUnitShort[unit] : unit;
 
     // Return the value with the unit
-    return `${formattedValue}${unitTranslation || unit}`;
+    return `${formattedValue} ${unitTranslation || displayUnit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {

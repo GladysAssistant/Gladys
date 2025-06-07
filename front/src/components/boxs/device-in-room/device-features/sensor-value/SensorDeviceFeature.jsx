@@ -9,6 +9,7 @@ import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
 import MotionSensorDeviceValue from './MotionSensorDeviceValue';
 import BadgeNumberDeviceValue from './BadgeNumberDeviceValue';
+import DistanceSensorDeviceValue from './DistanceSensorDeviceValue';
 import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
@@ -25,7 +26,12 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.BUTTON]: ButtonClickDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: TemperatureSensorDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: LevelSensorDeviceValue
+  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: LevelSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_DRIVE]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: DistanceSensorDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {
@@ -38,7 +44,9 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_POWER]: BadgeNumberDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_TEMPERATURE]: TemperatureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_VOLTAGE]: BadgeNumberDeviceValue,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.INDOOR_TEMPERATURE]: TemperatureSensorDeviceValue
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.INDOOR_TEMPERATURE]: TemperatureSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
