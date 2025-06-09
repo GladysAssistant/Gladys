@@ -56,6 +56,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  child_lock: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+      type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+    },
+  },
   state: {
     types: {
       light: {
