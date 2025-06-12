@@ -1,7 +1,7 @@
 const CONFIG_KEYS = {
   DECONZ: 'deconz',
   EZSP: 'ezsp',
-  NONE: 'none',
+  ZSTACK: 'zstack',
 };
 
 const ADAPTERS_BY_CONFIG_KEY = {
@@ -14,7 +14,7 @@ const ADAPTERS_BY_CONFIG_KEY = {
     'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"',
     'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator',
   ],
-  [CONFIG_KEYS.NONE]: [
+  [CONFIG_KEYS.ZSTACK]: [
     "CircuitSetup's CC2652P2 USB Coordinator",
     'cod.m Zigbee CC2652P RPi Module',
     'cod.m ZigBee CC2652P2 TCP Coordinator',
@@ -50,4 +50,4 @@ const ADAPTERS = Object.values(ADAPTERS_BY_CONFIG_KEY)
   .flatMap((values) => values)
   .sort((a, b) => a.localeCompare(b));
 
-module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.NONE };
+module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.ZSTACK };
