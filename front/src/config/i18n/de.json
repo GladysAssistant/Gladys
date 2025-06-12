@@ -2021,7 +2021,8 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
+        "valueError": "Der Wert muss eine Zahl sein"
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
