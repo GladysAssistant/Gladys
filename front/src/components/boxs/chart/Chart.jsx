@@ -306,7 +306,11 @@ class Chartbox extends Component {
             let firstElement = values[0];
             let lastElement = values[values.length - 1];
             // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
             const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
             firstElement.value = firstElementValue;
             lastElement.value = lastElementValue;
@@ -333,7 +337,11 @@ class Chartbox extends Component {
             let lastElement = values[values.length - 1];
 
             // Convert the value if it is a convertible unit
-            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
             const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
             firstElement.value = firstElementValue;
             lastElement.value = lastElementValue;
