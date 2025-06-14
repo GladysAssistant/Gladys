@@ -96,9 +96,9 @@ function smartRound(value) {
 }
 
 /**
- * @description Converts a value from one distance unit to another according to the user's preference.
+ * @description Converts a value from one unit to another according to the user's preference.
  * @param {number} value - Value to convert.
- * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', ...).
+ * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', 'km/h', ...).
  * @param {string} userPreference - User preference ('us' or 'metric').
  * @returns {{ value: number, unit: string }} Object containing the converted value and the target unit.
  * @example
@@ -119,14 +119,10 @@ function checkAndConvertUnit(value, fromUnit, userPreference) {
   if (value !== null) {
     // Convert the value and apply smart rounding
     const convertedValue = smartRound(unitConversionParams.convert(value));
-    const unit = unitConversionParams.unit(value);
-    return { value: convertedValue, unit };
+    return { value: convertedValue, unit: unitConversionParams.unit };
   }
   // When value is null, we still want to get the correct unit format
-  // This is particularly useful for charts where some data points might be null in DB
-  // but we still want to display the correct unit format
-  const unit = unitConversionParams.unit(0);
-  return { value, unit };
+  return { value, unit: unitConversionParams.unit };
 }
 
 module.exports = {

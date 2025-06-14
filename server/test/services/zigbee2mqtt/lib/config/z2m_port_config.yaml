@@ -5,6 +5,7 @@ mqtt:
   server: mqtt://localhost:1884
 serial:
   port: /dev/ttyACM0
+  adapter: zstack
 map_options:
   graphviz:
     colors:
