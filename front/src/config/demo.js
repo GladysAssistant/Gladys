@@ -168,6 +168,7 @@ const data = {
       [
         {
           type: 'chart',
+          chart_type: 'line',
           device_features: ['temperature-sensor-1'],
           interval: 'last-month',
           unit: 'celsius',
@@ -3833,7 +3834,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device_feature/aggregated_states?interval=43200&max_states=100&device_features=temperature-sensor-1': [
+  'get /api/v1/device_feature/aggregated_states?interval=43200&max_states=300&group_by=undefined&device_features=temperature-sensor-1': [
     {
       device: {
         name: 'Kitchen temperature'
