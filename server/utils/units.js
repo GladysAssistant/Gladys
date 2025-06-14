@@ -119,14 +119,10 @@ function checkAndConvertUnit(value, fromUnit, userPreference) {
   if (value !== null) {
     // Convert the value and apply smart rounding
     const convertedValue = smartRound(unitConversionParams.convert(value));
-    const unit = unitConversionParams.unit;
-    return { value: convertedValue, unit };
+    return { value: convertedValue, unit: unitConversionParams.unit };
   }
   // When value is null, we still want to get the correct unit format
-  // This is particularly useful for charts where some data points might be null in DB
-  // but we still want to display the correct unit format
-  const unit = unitConversionParams.unit;
-  return { value, unit };
+  return { value, unit: unitConversionParams.unit };
 }
 
 module.exports = {

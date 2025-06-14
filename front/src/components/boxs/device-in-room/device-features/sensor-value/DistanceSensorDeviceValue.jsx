@@ -3,12 +3,10 @@ import { checkAndConvertUnit } from '../../../../../../../server/utils/units';
 
 const DistanceSensorDeviceValue = ({ deviceFeature, user }) => {
   const { last_value: lastValue = null, unit } = deviceFeature;
-  const userUnitPreference = user.distance_unit_preference;
+  const { distance_unit_preference: userUnitPreference } = user;
 
   // Convert the value to the user unit if needed
-  const conversion = checkAndConvertUnit(lastValue, unit, userUnitPreference);
-  const displayValue = conversion.value;
-  const displayUnit = conversion.unit;
+  const { value: displayValue, unit: displayUnit } = checkAndConvertUnit(lastValue, unit, userUnitPreference);
 
   return (
     <div>

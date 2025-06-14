@@ -101,10 +101,8 @@ class GaugeBox extends Component {
     const { user } = this.props;
 
     // Conversion if necessary (and if user is present)
-    const userUnitPreference = user.distance_unit_preference;
-    const conversion = checkAndConvertUnit(value, unit, userUnitPreference);
-    const displayValue = conversion.value;
-    const displayUnit = conversion.unit;
+    const { distance_unit_preference: userUnitPreference } = user;
+    const { value: displayValue, unit: displayUnit } = checkAndConvertUnit(value, unit, userUnitPreference);
 
     // Format the value to 1 decimal place
     const formattedValue = displayValue.toFixed(1);

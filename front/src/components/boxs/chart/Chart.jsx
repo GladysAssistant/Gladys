@@ -251,8 +251,7 @@ class Chartbox extends Component {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
           // Convert unit display format if necessary (using 0 as a dummy value since we only need the unit)
           const userUnitPreference = this.props.user.distance_unit_preference;
-          const conversion = checkAndConvertUnit(0, oneUnit, userUnitPreference);
-          const displayUnit = conversion.unit;
+          const { unit: displayUnit } = checkAndConvertUnit(0, oneUnit, userUnitPreference);
 
           const oneUnitTranslated = displayUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit] : null;
           const { values, deviceFeature, device } = oneFeature;
@@ -262,15 +261,14 @@ class Chartbox extends Component {
           const name = oneUnitTranslated ? `${deviceFeatureName} (${oneUnitTranslated})` : deviceFeatureName;
           return {
             name,
-            data: values.map(value => {
+            data: values.map(dataPoint => {
               emptySeries = false;
-              let displayValue = getDeviceValueByAggregateFunction(value, this.props.box.aggregate_function);
+              const rawValue = getDeviceValueByAggregateFunction(dataPoint, this.props.box.aggregate_function);
 
               // Convert the value if it is a convertible unit
-              const conversion = checkAndConvertUnit(displayValue, oneUnit, userUnitPreference);
-              displayValue = conversion.value;
+              const { value: displayValue } = checkAndConvertUnit(rawValue, oneUnit, userUnitPreference);
 
-              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, displayValue];
+              return [Math.round(new Date(dataPoint.created_at).getTime() / 1000) * 1000, displayValue];
             })
           };
         });
@@ -308,11 +306,11 @@ class Chartbox extends Component {
             let firstElement = values[0];
             let lastElement = values[values.length - 1];
             // Convert the value if it is a convertible unit
-            const conversionFirstElement = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
-            const conversionLastElement = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = conversionFirstElement.value;
-            lastElement.value = conversionLastElement.value;
-            displayUnit = conversionFirstElement.unit;
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
 
             const variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
@@ -335,11 +333,11 @@ class Chartbox extends Component {
             let lastElement = values[values.length - 1];
 
             // Convert the value if it is a convertible unit
-            const conversionFirstElement = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
-            const conversionLastElement = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
-            firstElement.value = conversionFirstElement.value;
-            lastElement.value = conversionLastElement.value;
-            displayUnit = conversionFirstElement.unit;
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(firstElement.value, unit, userUnitPreference);
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
 
             newState.variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
