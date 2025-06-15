@@ -10,7 +10,7 @@
 <p align="center">
   <a href="#-try-gladys-assistant">Try It</a> •
   <a href="#-getting-started">Getting Started</a> •
-  <a href="#-contribute">Contribute</a> •
+  <a href="#-contribute-to-gladys">Contribute</a> •
   <a href="#-contributors">Contributors</a> •
   <a href="#-license">License</a>
 </p>
