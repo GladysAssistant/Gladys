@@ -28,6 +28,8 @@ async function partialArm(selector) {
 
   // Update database
   await house.update({ alarm_mode: ALARM_MODES.PARTIALLY_ARMED });
+  // Lock all tablets in this house
+  await this.session.setTabletModeLocked(house.id);
   // Check scene triggers
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.PARTIAL_ARM,

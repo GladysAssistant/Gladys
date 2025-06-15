@@ -54,16 +54,15 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   }
 
   // Setup adapter
-  const adapterKey = Object.values(CONFIG_KEYS).find((configKey) =>
+  let adapterKey = Object.values(CONFIG_KEYS).find((configKey) =>
     ADAPTERS_BY_CONFIG_KEY[configKey].includes(config.z2mDongleName),
   );
-  const adapterSetup = adapterKey && adapterKey !== DEFAULT_KEY;
   const { serial = {} } = loadedConfig;
 
-  if (!adapterSetup && serial.adapter) {
-    delete loadedConfig.serial.adapter;
-    configChanged = true;
-  } else if (adapterSetup && serial.adapter !== adapterKey) {
+  // Set default adapter if not found
+  adapterKey = adapterKey || DEFAULT_KEY;
+
+  if (serial.adapter !== adapterKey) {
     loadedConfig.serial.adapter = adapterKey;
     configChanged = true;
   }

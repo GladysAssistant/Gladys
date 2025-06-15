@@ -63,6 +63,10 @@
   margin-bottom: 1.5rem;
 }
 
+.btnAddNewBoxAtPosition {
+  height: 24px;
+}
+
 @media (min-width: 1280px) {
   .columnAddButton {
     position: relative;

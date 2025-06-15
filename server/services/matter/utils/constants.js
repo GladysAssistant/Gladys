@@ -1,0 +1,8 @@
+const VARIABLES = {
+  MATTER_ENABLED: 'MATTER_ENABLED',
+  MATTER_BACKUP: 'MATTER_BACKUP',
+};
+
+module.exports = {
+  VARIABLES,
+};

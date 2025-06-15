@@ -6,6 +6,7 @@ import get from 'get-value';
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import { getDeviceFeatureName } from '../../../../utils/device';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { DeviceFeatureTypesString } from '../../../../utils/consts';
 
 class DeviceGetValue extends Component {
   onDeviceFeatureChange = (deviceFeature, device) => {
@@ -21,9 +22,14 @@ class DeviceGetValue extends Component {
 
   setVariables = (device, deviceFeature) => {
     const DEFAULT_VARIABLE_NAME = get(this.props.intl.dictionary, 'editScene.variables.device.get-value.last_value');
+    let name = 'last_value';
+    if (device && DeviceFeatureTypesString.includes(deviceFeature.type)) {
+      name = 'last_value_string';
+    }
+
     this.props.setVariables(this.props.path, [
       {
-        name: 'last_value',
+        name,
         type: 'device_feature',
         ready: device && deviceFeature,
         label:

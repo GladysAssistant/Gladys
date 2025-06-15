@@ -20,19 +20,23 @@ function createActions(store) {
         loginStatus: LoginStatus.Processing
       });
       try {
-        const user = await state.httpClient.post('/api/v1/login', {
+        // Login
+        const userFromLogin = await state.httpClient.post('/api/v1/login', {
           email: state.loginFormEmailValue,
           password: state.loginFormPasswordValue
         });
+        state.session.saveUser(userFromLogin);
+        state.session.init();
+        // Get full user from backend
+        const user = await state.httpClient.get('/api/v1/me');
         store.setState({
           user,
           loginStatus: LoginStatus.LoginSuccess,
           loginFormEmailValue: '',
           loginFormPasswordValue: ''
         });
-        state.session.saveUser(user);
-        state.session.init();
         actionsProfilePicture.loadProfilePicture(state);
+        // redirect to dashboard
         route('/dashboard');
       } catch (e) {
         store.setState({

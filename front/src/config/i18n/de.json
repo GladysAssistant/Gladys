@@ -270,7 +270,8 @@
       "edf-tempo": "EDF Tempo",
       "clock": "Uhr",
       "scene": "Szene",
-      "music": "Musik"
+      "music": "Musik",
+      "gauge": "Messanzeige"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -354,11 +355,13 @@
         "lastThirtyDays": "Letzte 30 Tage",
         "lastThreeMonths": "Letzte 3 Monate",
         "lastYear": "Letztes Jahr",
+        "showAdvancedOptions": "Erweiterte Optionen anzeigen",
+        "hideAdvancedOptions": "Erweiterte Optionen verbergen",
         "noValue": "Keine Werte in diesem Intervall aufgezeichnet.",
         "noValueWarning": "Warnung: Wenn du dieses Gerät gerade konfiguriert hast, kann es einige Zeit dauern, bis hier etwas angezeigt wird: Gladys benötigt etwas Zeit, um genügend Daten zu sammeln. Bei Intervallen über 24 Stunden kann es bis zu 24 Stunden dauern, bis hier etwas angezeigt wird.",
         "noChartType": "Kein Diagrammtyp ausgewählt",
         "noChartTypeWarning": "Wenn du dieses Gerät gerade konfiguriert hast, bitte gehe zurück zur Seite der Box-Bearbeitung und wähle einen Diagrammtyp aus.",
-        "editNameLabel": "Gib den Namen dieser Box ein",
+        "editNameLabel": "Gib den Namen dieser Widget ein",
         "editDeviceFeaturesLabel": "Wähle das Gerät aus, das hier angezeigt werden soll",
         "editRoomLabel": "Wähle den Raum aus, der hier angezeigt werden soll",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
@@ -380,7 +383,24 @@
         "on": "An",
         "off": "Aus",
         "start_date": "Startdatum: ",
-        "end_date": "Enddatum: "
+        "end_date": "Enddatum: ",
+        "aggregateFunction": "Aggregationsfunktion",
+        "aggregateFunctions": {
+          "sum": "Summe",
+          "avg": "Durchschnitt",
+          "max": "Max",
+          "min": "Min",
+          "count": "Count"
+        },
+        "groupByLabel": "Gruppieren nach",
+        "groupBy": {
+          "noGrouping": "Keine Gruppierung",
+          "hour": "Stunde",
+          "day": "Tag",
+          "week": "Woche",
+          "month": "Monat",
+          "year": "Jahr"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -413,6 +433,13 @@
         "displaySecond": "Sekunden anzeigen?",
         "yes": "Ja",
         "no": "Nein"
+      },
+      "gauge": {
+        "description": "Dieses Widget zeigt eine Messanzeige mit dem Wert der ausgewählten Funktion zwischen ihrem Minimum und Maximum an.",
+        "selectDeviceLabel": "Wählen Sie die Funktion aus, die angezeigt werden soll",
+        "noDeviceFeatureSelector": "Keine Funktion ausgewählt",
+        "errorLoadingDevice": "Ein Fehler ist aufgetreten, während das Gerät geladen wird",
+        "noDeviceFeatureLastValue": "Diese Funktion hat noch keinen Wert empfangen"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
@@ -451,6 +478,7 @@
       "title": "Integrationen",
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
+      "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
         "device": "Geräte",
@@ -1799,6 +1827,73 @@
         "saved": "Konfiguration gespeichert!",
         "error": "Fehler beim Speichern der Konfiguration"
       }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Füge deine Matter-Geräte hinzu und verwalte sie.",
+      "deviceTab": "Geräte",
+      "addTab": "Gerät hinzufügen",
+      "settingsTab": "Einstellungen",
+      "documentation": "Dokumentation",
+      "discover": {
+        "title": "Matter-Gerät hinzufügen",
+        "description": "Dein Matter-Gerät stellt einen 11- oder 21-stelligen Pairing-Code bereit, den du hier eingeben musst, um es zu Gladys hinzuzufügen. Wenn dein Gerät ein Thread-Gerät ist, muss es mit einem Thread Border Router verbunden sein (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Pairing-Code",
+        "pairingCodePlaceholder": "1234-567-9101 oder 12345679101",
+        "pairingCodeHelp": "Gib den 11- oder 21-stelligen Pairing-Code deines Matter-Geräts ein",
+        "addButton": "Zu Gladys hinzufügen",
+        "loading": "Verbindung zum Gerät, dies kann einige Minuten dauern.",
+        "error": "Es ist nicht möglich, dieses Matter-Gerät zu Gladys hinzuzufügen. Bist du sicher, dass sich dieses Gerät im selben Netzwerk wie Gladys befindet? Wird Gladys mit network=host ausgeführt?"
+      },
+      "settings": {
+        "title": "Matter-Einstellungen",
+        "ipv6Enabled": "Eine IPv6-Schnittstelle ist auf diesem Gerät verfügbar ✅",
+        "ipv6NotEnabled": "Matter benötigt IPv6, aber auf diesem Gerät wurde keine IPv6-Schnittstelle erkannt ❌",
+        "description": "Aktiviere oder deaktiviere die Matter-Integration in Gladys. Wenn aktiviert, kann Gladys mit deinen Matter-Geräten kommunizieren.",
+        "enableIntegration": "Matter-Integration aktivieren",
+        "saveButton": "Speichern",
+        "error": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten",
+        "nodesTitle": "Matter-Knoten",
+        "nodeIdLabel": "Knoten-ID",
+        "nodeDetailsLabel": "Knotendetails",
+        "actionsLabel": "Aktionen",
+        "decommissionButton": "Stilllegen",
+        "noNodesFound": "Keine Matter-Knoten gefunden. Du kannst ein Matter-Gerät hinzufügen, indem du auf der Registerkarte \"Gerät hinzufügen\" gehst.",
+        "disabledWarning": "Matter ist nicht aktiviert. Bitte aktiviere es in <a href=\"/dashboard/integration/device/matter/settings\">Einstellungen</a> bevor du die Integration verwendest.",
+        "disabledWarningSettings": "Matter ist nicht aktiviert, bitte klicke auf den Button unten, um es zu aktivieren.",
+        "enableButton": "Matter aktivieren",
+        "disableButton": "Matter deaktivieren",
+        "downloadNodesJson": "Knoten-JSON herunterladen"
+      },
+      "device": {
+        "title": "Matter-Geräte",
+        "noDeviceFound": "Keine Matter-Geräte gefunden",
+        "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
+        "addToGladys": "Zu Gladys hinzufügen",
+        "deviceAlreadyExist": "Ein Gerät mit derselben eindeutigen Kennung existiert bereits. Du kannst es mit dem untenstehenden Button aktualisieren.",
+        "replaceExisting": "Vorhandenes Gerät aktualisieren",
+        "nodeDisconnected": "Nicht verbunden"
+      },
+      "discoverDeviceDescr": "Ein neues Matter-Gerät hinzufügen",
+      "nameLabel": "Name",
+      "namePlaceholder": "Mein Matter-Gerät",
+      "roomLabel": "Raum",
+      "featuresLabel": "Funktionen",
+      "displayDeviceInfo": "Geräteinformationen anzeigen",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Seriennummer",
+        "UNIQUE_ID": "Eindeutige ID"
+      },
+      "noFeaturesHandled": "Dieses Gerät unterstützt keine Funktionen",
+      "alreadyCreatedButton": "Gerät bereits hinzugefügt",
+      "saveButton": "Speichern",
+      "deleteButton": "Löschen",
+      "error": {
+        "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten",
+        "conflictError": "Ein Gerät mit diesem Namen existiert bereits",
+        "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten",
+        "getDevicesError": "Beim Abrufen der Geräteliste ist ein Fehler aufgetreten"
+      }
     }
   },
   "editScene": {
@@ -1814,6 +1909,8 @@
     "startButton": "Start",
     "saveButton": "Sichern",
     "deleteButton": "Löschen",
+    "deleteText": "Bist du sicher?",
+    "cancelButton": "Abbrechen",
     "duplicateButton": "Duplizieren",
     "moreButton": "Mehr",
     "triggersTitle": "Auslöser",
@@ -1825,6 +1922,7 @@
     "selectActionType": "Wähle einen Aktionstyp aus",
     "selectConditionType": "Wähle eine Bedingungstyp aus",
     "addActionButton": "Aktion hinzufügen",
+    "addActionGroupButton": "Neues Aktionengruppe",
     "noTriggersYet": "Du hast noch keine Auslöser hinzugefügt. Eine Szene muss nicht zwingend einen Auslöser haben.",
     "noActionsYet": "Du hast noch keine Aktionen hinzugefügt. Klicke auf \"+\", um eine Aktion zu dieser Szene hinzuzufügen.",
     "triggersDescription": "Auslöser sind unabhängig voneinander. Wenn du mehrere Auslöser festgelegt hast, reicht es, wenn einer ausgelöst wird, um die Szene auszuführen.",
@@ -1838,7 +1936,10 @@
         "milliseconds": "Millisekunden",
         "seconds": "Sekunden",
         "minutes": "Minuten",
-        "hours": "Stunden"
+        "hours": "Stunden",
+        "valueTypeSimple": "Einfach",
+        "valueTypeComputed": "Berechnet",
+        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Gerätewert abrufen' verwenden."
       },
       "messageSend": {
         "userLabel": "Benutzer",
@@ -1920,7 +2021,8 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
+        "valueError": "Der Wert muss eine Zahl sein"
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
@@ -2034,14 +2136,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/mein-topic",
+        "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/mein-topic",
+        "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
@@ -2141,6 +2243,9 @@
         "eventDescription": "Ereignisbeschreibung",
         "eventStart": "Startdatum",
         "eventEnd": "Enddatum"
+      },
+      "askAi": {
+        "answer": "AI Antwort"
       }
     },
     "triggers": {
@@ -2488,7 +2593,8 @@
       "vacuum": "Datenbank reinigen",
       "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
-      "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte"
+      "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte",
+      "service-matter-backup": "Matter backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
@@ -2711,10 +2817,19 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Blindleistung (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
+    "watt-hour-per-km": "Wattstunde pro Kilometer (Wh/km)",
+    "kilowatt-hour-per-100-km": "Kilowattstunde pro 100 Kilometer (kWh/100km)",
+    "watt-hour-per-mile": "Wattstunde pro Meile (Wh/mi)",
+    "kilowatt-hour-per-100-mile": "Kilowattstunde pro 100 Meilen (kWh/100mi)",
+    "km-per-kilowatt-hour": "Kilometer pro Kilowattstunde (km/kWh)",
+    "mile-per-kilowatt-hour": "Meile pro Kilowattstunde (mi/kWh)",
     "mm": "Millimeter (mm)",
     "cm": "Zentimeter (cm)",
     "m": "Meter (m)",
     "km": "Kilometer (km)",
+    "inch": "Zoll (in)",
+    "feet": "Fuß (ft)",
+    "mile": "Meile (mi)",
     "degree": "Winkelgrad (°)",
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
@@ -2728,6 +2843,8 @@
     "pound-sterling": "Britisches Pfund (£)",
     "meter-per-second": "Meter pro Sekunde (m/s)",
     "kilometer-per-hour": "Kilometer pro Stunde (km/h)",
+    "feet-per-second": "Fuß pro Sekunde (ft/s)",
+    "mile-per-hour": "Meile pro Stunde (mi/h)",
     "millimeter-per-hour": "Millimeter pro Stunde (mm/h)",
     "millimeter-per-day": "Millimeter pro Tag (mm/d)",
     "uv-index": "UV-Index",
@@ -2789,10 +2906,19 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-per-km": "Wh/km",
+    "kilowatt-hour-per-100-km": "kWh/100km",
+    "watt-hour-per-mile": "Wh/mi",
+    "kilowatt-hour-per-100-mile": "kWh/100mi",
+    "km-per-kilowatt-hour": "km/kWh",
+    "mile-per-kilowatt-hour": "mi/kWh",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
     "km": "km",
+    "inch": "in",
+    "feet": "ft",
+    "mile": "mi",
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
@@ -2806,6 +2932,8 @@
     "pound-sterling": "£",
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
+    "feet-per-second": "ft/s",
+    "mile-per-hour": "mi/h",
     "millimeter-per-hour": "mm/h",
     "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
@@ -2977,7 +3105,19 @@
           "69": "Dreifach Beide",
           "70": "Halten Links",
           "71": "Halten Rechts",
-          "72": "Halten Beide"
+          "72": "Halten Beide",
+          "73": "Einfacher Klick Plus",
+          "74": "Einfacher Klick Mitte",
+          "75": "Einfacher Klick Minus",
+          "76": "Doppelklick Plus",
+          "77": "Doppelklick Mitte",
+          "78": "Doppelklick Minus",
+          "79": "Halten Plus",
+          "80": "Halten Mitte",
+          "81": "Halten Minus",
+          "82": "Loslassen Plus",
+          "83": "Loslassen Mitte",
+          "84": "Loslassen Minus"
         }
       },
       "heater": {
@@ -3040,6 +3180,14 @@
           "high-risk": "Hoch",
           "unknown": "Unbekannt"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Niedrig",
+          "1": "Normal",
+          "2": "Hoch",
+          "unknown": "Unbekannt"
+        }
       }
     }
   },
@@ -3098,6 +3246,13 @@
       "shortCategoryName": "Abstand",
       "decimal": "Abstand"
     },
+    "level-sensor": {
+      "shortCategoryName": "Füllstandssensor",
+      "decimal": "Füllstand",
+      "liquid-state": "Flüssigkeitsstand-Status",
+      "liquid-level-percent": "Flüssigkeitspegel in Prozent",
+      "liquid-depth": "Flüssigkeitstiefe"
+    },
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera"
@@ -3132,7 +3287,8 @@
       "dimmer": "Schalter: Dimmer",
       "burglar": "Schalter: Einbruch",
       "power": "Leistungsverbrauch",
-      "energy": "Energieverbrauch"
+      "energy": "Energieverbrauch",
+      "target-current": "Sollstrom"
     },
     "siren": {
       "shortCategoryName": "Sirene",
@@ -3200,7 +3356,57 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "target-temperature": "Temperatur"
+      "target-temperature": "Solltemperatur"
+    },
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Elektrofahrzeug - Batterie",
+      "battery-energy-remaining": "Verbleibende Energie",
+      "battery-level": "Batteriestand",
+      "battery-power": "Batterieleistung",
+      "battery-range-estimate": "Geschätzte Reichweite",
+      "battery-temperature": "Batterietemperatur",
+      "battery-voltage": "Batteriespannung"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Elektrofahrzeug - Laden",
+      "charge-current": "Ladestrom",
+      "charge-energy-added-total": "Gesamt zugefügte Energie",
+      "charge-energy-consumption-total": "Gesamt verbrauchte Energie",
+      "charge-on": "Ladeschalter",
+      "charge-power": "Ladeleistung",
+      "charge-voltage": "Ladespannung",
+      "last-charge-energy-added": "Zugefügte Energie (letzte Ladung)",
+      "last-charge-energy-consumption": "Verbrauchte Energie (letzte Ladung)",
+      "plugged": "Fahrzeug angeschlossen",
+      "target-charge-limit": "Ladegrenze",
+      "target-current": "Zielstrom"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Elektrofahrzeug - Klima",
+      "climate-on": "Klimaanlagenschalter",
+      "indoor-temperature": "Innentemperatur",
+      "target-temperature": "Zieltemperatur"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Elektrofahrzeug - Steuerung",
+      "alarm": "Alarm",
+      "lock": "Verriegelung"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Elektrofahrzeug - Fahrt",
+      "drive-energy-consumption-total": "Gesamt verbrauchte Energie",
+      "speed": "Geschwindigkeit"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Elektrofahrzeug - Verbrauch",
+      "energy-consumption": "Momentanverbrauch",
+      "energy-efficiency": "Energieeffizienz"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Elektrofahrzeug - Status",
+      "door-opened": "Tür geöffnet",
+      "odometer": "Kilometerzähler",
+      "window-opened": "Fenster geöffnet"
     },
     "heater": {
       "shortCategoryName": "Heizung",

@@ -11,6 +11,15 @@ async function listenToCustomMqttTopicIfNeeded(device) {
   deviceCustomTopicParams.forEach((deviceCustomTopicParam) => {
     const paramName = deviceCustomTopicParam.name;
     const deviceFeatureId = paramName.split(':')[1];
+    // We verify that the device feature exist before listening to it
+    const deviceFeature = device.features.find((f) => f.id === deviceFeatureId);
+    if (!deviceFeature) {
+      logger.warn(
+        `listenToCustomMqttTopicIfNeeded: Device feature ${deviceFeatureId} not found for device ${device.selector}. Not listening.`,
+      );
+      return;
+    }
+    // If the feature exists, we add custom listener
     logger.debug(`Adding custom listener for device ${device.selector}, feature = ${deviceFeatureId}`);
     const deviceCustomObjectPathParam = device.params.find((p) =>
       p.name.includes(`mqtt_custom_object_path_feature:${deviceFeatureId}`),

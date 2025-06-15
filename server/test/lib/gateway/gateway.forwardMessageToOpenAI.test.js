@@ -173,6 +173,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
           sourceText: 'living room',
         },
       ],
+      answer: 'Light are being turned on.',
       intent: 'light.turn-on',
     });
   });
@@ -184,6 +185,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     });
     const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     expect(classification).to.deep.equal({
+      answer: 'Jules Verne is a famous writer.',
       intent: 'info.get-info',
     });
   });
@@ -202,6 +204,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
           sourceText: 'living room',
         },
       ],
+      answer: 'Getting the temperature...',
       intent: 'temperature-sensor.get-in-room',
     });
   });
@@ -214,6 +217,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     expect(classification).to.deep.equal({
       intent: undefined,
+      answer: '',
     });
     assert.notCalled(messageManager.reply);
   });
@@ -233,6 +237,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
           sourceText: 'woodfire',
         },
       ],
+      answer: 'Starting scene..',
       intent: 'scene.start',
     });
   });
@@ -254,6 +259,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
           sourceText: 'camera-1',
         },
       ],
+      answer: 'Voilà ce que je vois:',
       intent: 'camera.get-image',
     });
   });

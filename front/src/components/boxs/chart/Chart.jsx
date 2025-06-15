@@ -9,6 +9,7 @@ import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
+import { formatHttpError } from '../../../utils/formatErrors';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const TWELVE_HOURS_IN_MINUTES = 12 * 60;
@@ -45,6 +46,23 @@ const notNullNotUndefined = value => {
 };
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
+
+const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
+  if (aggregateFunction === 'min') {
+    return value.min_value;
+  } else if (aggregateFunction === 'max') {
+    return value.max_value;
+  } else if (aggregateFunction === 'sum') {
+    return value.sum_value;
+  } else if (aggregateFunction === 'count') {
+    return value.count_value;
+  } else if (aggregateFunction === 'avg') {
+    return value.value;
+  }
+  // The default is the "avg", as before this feature
+  // we were not defining an aggregate function
+  return value.value;
+};
 
 const roundWith2DecimalIfNeeded = value => {
   if (!notNullNotUndefined(value)) {
@@ -172,12 +190,14 @@ class Chartbox extends Component {
       });
       return;
     }
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, error: null, errorDetail: null });
     try {
       const maxStates = 300;
+
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: maxStates,
+        max_states: this.props.box.group_by ? undefined : maxStates,
+        group_by: this.props.box.group_by,
         device_features: deviceFeatures.join(',')
       });
 
@@ -238,7 +258,10 @@ class Chartbox extends Component {
             name,
             data: values.map(value => {
               emptySeries = false;
-              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+              return [
+                Math.round(new Date(value.created_at).getTime() / 1000) * 1000,
+                getDeviceValueByAggregateFunction(value, this.props.box.aggregate_function)
+              ];
             })
           };
         });
@@ -270,8 +293,11 @@ class Chartbox extends Component {
             }
             const firstElement = values[0];
             const lastElement = values[values.length - 1];
-            const variation = calculateVariation(firstElement.value, lastElement.value);
-            const lastValue = lastElement.value;
+            const variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
+            const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
             variationArray.push(variation);
             lastValuesArray.push(lastValue);
           });
@@ -286,9 +312,14 @@ class Chartbox extends Component {
           if (values.length > 0) {
             const firstElement = values[0];
             const lastElement = values[values.length - 1];
-            newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            newState.variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
             newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
-            newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+            newState.lastValueRounded = roundWith2DecimalIfNeeded(
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
             newState.unit = unit;
           }
         }
@@ -296,6 +327,12 @@ class Chartbox extends Component {
       await this.setState(newState);
     } catch (e) {
       console.error(e);
+      const { errorString, errorDetailString } = formatHttpError(e);
+      this.setState({
+        loading: false,
+        error: errorString,
+        errorDetail: errorDetailString
+      });
     }
   };
   updateDeviceStateWebsocket = payload => {
@@ -366,7 +403,9 @@ class Chartbox extends Component {
       interval,
       emptySeries,
       unit,
-      nbFeaturesDisplayed
+      nbFeaturesDisplayed,
+      error,
+      errorDetail
     }
   ) {
     const { box } = this.props;
@@ -588,6 +627,15 @@ class Chartbox extends Component {
                 <div class={style.smallTextEmptyState}>
                   <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
+              </div>
+            )}
+            {error && (
+              <div class={cx('text-center', style.bigEmptyState)}>
+                <div>
+                  <i class="fe fe-alert-circle mr-2" />
+                  {error}
+                </div>
+                {errorDetail && <div>{errorDetail}</div>}
               </div>
             )}
             {props.box.chart_type && (

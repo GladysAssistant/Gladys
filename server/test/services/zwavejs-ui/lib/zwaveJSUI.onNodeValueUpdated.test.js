@@ -1618,4 +1618,117 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       state: STATE.ON,
     });
   });
+
+  it('should set meter to the value received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:6',
+        features: [
+          {
+            external_id: 'zwavejs-ui:6:0:meter:value:electric_a_consumed',
+          },
+          {
+            external_id: 'zwavejs-ui:6:0:meter:value:electric_kwh_consumed',
+          },
+          {
+            external_id: 'zwavejs-ui:6:0:meter:value:electric_v_consumed',
+          },
+          {
+            external_id: 'zwavejs-ui:6:0:meter:value:electric_w_consumed',
+          },
+        ],
+      },
+    ];
+    zwaveJSUIHandler.zwaveJSDevices = [
+      {
+        id: 6,
+        deviceClass: {
+          basic: 4,
+          generic: 17,
+          specific: 1,
+        },
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Meter',
+          commandClass: 50,
+          property: 'value',
+          propertyName: 'value',
+          propertyKey: 'electric_w_consumed',
+          propertyKeyName: 'electric_w_consumed',
+          prevValue: 2262.291,
+          newValue: 2264.711,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:meter:value:electric_w_consumed',
+      state: 2264.711,
+    });
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Meter',
+          commandClass: 50,
+          property: 'value',
+          propertyName: 'value',
+          propertyKey: 'electric_kwh_consumed',
+          propertyKeyName: 'electric_kwh_consumed',
+          prevValue: 16133.081,
+          newValue: 16133.452,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:meter:value:electric_kwh_consumed',
+      state: 16133.452,
+    });
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Meter',
+          commandClass: 50,
+          property: 'value',
+          propertyName: 'value',
+          propertyKey: 'electric_v_consumed',
+          propertyKeyName: 'electric_v_consumed',
+          prevValue: 200,
+          newValue: 0,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:meter:value:electric_v_consumed',
+      state: 0,
+    });
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 6 },
+        {
+          commandClassName: 'Meter',
+          commandClass: 50,
+          property: 'value',
+          propertyName: 'value',
+          propertyKey: 'electric_a_consumed',
+          propertyKeyName: 'electric_a_consumed',
+          prevValue: 0,
+          newValue: 1,
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:6:0:meter:value:electric_a_consumed',
+      state: 1,
+    });
+  });
 });

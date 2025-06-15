@@ -43,17 +43,34 @@ async function create(message) {
         [Op.or]: [{ sender_id: message.user.id }, { receiver_id: message.user.id }],
       },
       order: [['created_at', 'desc']],
-      limit: 10,
+      limit: 8,
     });
-    const lastUserQuestion = previousMessages.find((msg) => msg.sender_id !== null);
-    const lastGladysAnswer = previousMessages.find((msg) => msg.sender_id === null);
+
     const previousQuestions = [];
-    if (lastUserQuestion && lastGladysAnswer) {
-      previousQuestions.push({
-        question: lastUserQuestion.text,
-        answer: lastGladysAnswer.text,
-      });
-    }
+    let currentExchange = null;
+
+    // Process messages in chronological order to group exchanges
+    previousMessages.reverse().forEach((msg) => {
+      if (msg.sender_id !== null) {
+        // This is a user question
+        currentExchange = {
+          question: msg.text,
+          answer: null,
+        };
+      } else if (msg.sender_id === null && currentExchange && currentExchange.question && !currentExchange.answer) {
+        // This is an AI answer to the current question
+        currentExchange.answer = msg.text;
+        // Add the complete exchange to our list
+        previousQuestions.push({ ...currentExchange });
+        currentExchange = null;
+      } else if (msg.sender_id === null) {
+        previousQuestions.push({
+          question: null,
+          answer: msg.text,
+        });
+      }
+    });
+
     this.event.emit(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, { message, previousQuestions, context });
   }
 

@@ -27,8 +27,27 @@ class Condition extends Component {
   };
 
   handleValueChange = value => {
-    const newValue = !isNaN(Number.parseFloat(value)) ? Number.parseFloat(value) : undefined;
-    const evalValue = isNaN(newValue) && value ? value : undefined;
+    this.setState({ valueErrored: false });
+    let newValue;
+    let evalValue;
+    // We handle the case where it's a variable
+    if (value.includes('{')) {
+      newValue = undefined;
+      evalValue = value;
+    } else if (value === '') {
+      newValue = undefined;
+      evalValue = undefined;
+    } else if (value.endsWith('.')) {
+      newValue = value;
+      evalValue = undefined;
+    } else if (!Number.isNaN(Number.parseFloat(value))) {
+      newValue = Number.parseFloat(value);
+      evalValue = undefined;
+    } else {
+      newValue = value;
+      evalValue = undefined;
+      this.setState({ valueErrored: true });
+    }
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
@@ -57,7 +76,7 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  render(props, {}) {
+  render(props, { valueErrored }) {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
@@ -126,7 +145,7 @@ class Condition extends Component {
                 <TextWithVariablesInjected
                   text={
                     props.condition.value !== undefined
-                      ? Number(props.condition.value).toString()
+                      ? props.condition.value.toString()
                       : props.condition.evaluate_value
                   }
                   triggersVariables={props.triggersVariables}
@@ -134,9 +153,13 @@ class Condition extends Component {
                   variables={props.variables}
                   path={props.path}
                   updateText={this.handleValueChange}
-                  class={style.conditionTagify}
+                  singleLineInput
+                  class={`${valueErrored ? 'is-invalid' : ''} ${style.conditionTagify}`}
                 />
               </Localizer>
+              <div class="invalid-feedback">
+                <Text id="editScene.actionsCard.onlyContinueIf.valueError" />
+              </div>
             </div>
           </div>
           <div class="col-md-2">
