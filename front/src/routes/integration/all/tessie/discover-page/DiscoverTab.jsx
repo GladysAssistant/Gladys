@@ -41,6 +41,7 @@ class DiscoverTab extends Component {
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/tessie/discover');
+      console.log('discoveredDevices', discoveredDevices);
       this.setState({
         discoveredDevices,
         loading: false,

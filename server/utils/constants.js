@@ -1287,6 +1287,14 @@ const WEBSOCKET_MESSAGE_TYPES = {
   NODERED: {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
+  }, 
+  TESSIE: {
+    STATUS: 'tessie.status',
+    ERROR: {
+      CONNECTED: 'tessie.error-connected',
+      CONNECTING: 'tessie.error-connecting',
+      PROCESSING_TOKEN: 'tessie.error-processing-token',
+    },
   },
 };
 

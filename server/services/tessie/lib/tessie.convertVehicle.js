@@ -11,11 +11,15 @@ const { SUPPORTED_MODULE_TYPE } = require('./utils/tessie.constants');
 function convertVehicle(vehicle) {
     logger.debug(`Converting Tessie vehicle ${vehicle.id} to Gladys device format`);
 
+    const carType = vehicle.last_state.vehicle_config?.car_type;
+    const exteriorColor = vehicle.last_state.vehicle_config?.exterior_color?.toLowerCase();
+    const carSpecialType = vehicle.last_state.vehicle_config?.car_special_type;
+    const model = `tesla-${carType}_${carSpecialType}-${exteriorColor}`;
     const device = {
         name: vehicle.display_name || `Tesla ${vehicle.model}`,
-        external_id: `tessie:${vehicle.id}`,
-        selector: `tessie-${vehicle.id}`,
-        model: vehicle.model,
+        external_id: `tessie:${vehicle.vin}`,
+        selector: `tessie-${vehicle.vin}`,
+        model,
         features: [],
         params: [
             {

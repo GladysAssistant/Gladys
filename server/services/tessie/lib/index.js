@@ -13,13 +13,20 @@ const { saveStatus } = require('./tessie.saveStatus');
 const { setValue } = require('./tessie.setValue');
 const { updateValues } = require('./tessie.updateValues');
 
-const { STATUS } = require('./utils/tessie.constants');
+const { STATUS, SCOPES } = require('./utils/tessie.constants');
+const buildScopesConfig = require('./utils/tessie.buildScopesConfig');
 
 const TessieHandler = function TessieHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.configuration = {
     apiKey: null,
+    clientId: null,
+    clientSecret: null,
+    vehiclesApi: null,
+    driversApi: null,
+    telemetryApi: null,
+    scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
   this.connected = false;
@@ -31,6 +38,7 @@ const TessieHandler = function TessieHandler(gladys, serviceId) {
   this.status = STATUS.NOT_INITIALIZED;
   this.pollRefreshToken = undefined;
   this.pollRefreshValues = undefined;
+  this.vehicles = [];
 };
 
 TessieHandler.prototype.init = init;

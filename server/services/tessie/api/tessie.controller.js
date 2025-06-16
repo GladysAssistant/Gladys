@@ -57,17 +57,6 @@ module.exports = function TessieController(tessieHandler) {
   }
 
   /**
-   * @api {post} /api/v1/service/tessie/token Retrieve access and refresh Tokens tessie with code of return
-   * @apiName retrieveTokens
-   * @apiGroup Tessie
-   */
-  async function retrieveTokens(req, res) {
-    await tessieHandler.getConfiguration();
-    const result = await tessieHandler.retrieveTokens(req.body);
-    res.json(result);
-  }
-
-  /**
    * @api {post} /api/v1/service/tessie/disconnect Disconnect tessie
    * @apiName disconnect
    * @apiGroup Tessie
@@ -117,10 +106,6 @@ module.exports = function TessieController(tessieHandler) {
     'post /api/v1/service/tessie/connect': {
       authenticated: true,
       controller: asyncMiddleware(connect),
-    },
-    'post /api/v1/service/tessie/token': {
-      authenticated: true,
-      controller: asyncMiddleware(retrieveTokens),
     },
     'post /api/v1/service/tessie/disconnect': {
       authenticated: true,

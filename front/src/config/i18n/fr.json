@@ -52,7 +52,23 @@
   "device": {
     "searchPlaceHolder": "Chercher un appareil",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "vehicle": {
+      "tesla": {
+        "modely": {
+          "tesla-modely_standard": "Tesla Model Y Standard",
+          "tesla-modely_long": "Tesla Model Y Long Range",
+          "tesla-modely_awd": "Tesla Model Y Traction intégrale (AWD)",
+          "tesla-modely_performance": "Tesla Model Y Performance"
+        },
+        "model3": {
+          "tesla-model3_standard": "Tesla Model 3 standard",
+          "tesla-model3_long": "Tesla Model 3 Long Range",
+          "tesla-model3_awd": "Tesla Model 3 Traction intégrale (AWD)",
+          "tesla-model3_performance": "Tesla Model 3 Performance"
+        }
+      }
+    }
   },
   "login": {
     "title": "Gladys Assistant",

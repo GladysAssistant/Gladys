@@ -1,36 +1,16 @@
-const logger = require('../../../utils/logger');
-const { STATUS } = require('./utils/tessie.constants');
-const { getConfiguration } = require('./tessie.getConfiguration');
-
 /**
- * @description Initialize Tessie service.
- * @returns {Promise} The result of the initialization.
- * @example
- * await init();
+ * @description Initialize service with properties and connect to devices.
+ * @example tessie.init();
  */
 async function init() {
-  logger.debug('Initializing Tessie service...');
-  await this.saveStatus({ statusType: STATUS.INITIALIZING, message: null });
+  await this.getConfiguration();
+  this.configured = true;
+  await this.connect();
+  console.log('Tessiethis.vehicles', this.vehicles);
 
-  try {
-    // Récupérer la configuration
-    const configuration = await getConfiguration.call(this);
-
-    if (!configuration.apiKey) {
-      await this.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
-      return false;
-    }
-
-    // Sauvegarder la configuration
-    this.configuration = configuration;
-
-    await this.saveStatus({ statusType: STATUS.INITIALIZED, message: null });
-    logger.debug('Tessie service initialized successfully');
-    return true;
-  } catch (e) {
-    logger.error('Error initializing Tessie service:', e);
-    await this.saveStatus({ statusType: STATUS.ERROR.INITIALIZING, message: e.message });
-    throw e;
+  if (this.vehicles && this.vehicles.length > 0) {
+    // await this.refreshTessieValues();
+    // await this.pollRefreshingValues();
   }
 }
 

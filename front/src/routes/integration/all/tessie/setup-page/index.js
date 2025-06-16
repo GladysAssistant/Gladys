@@ -124,11 +124,23 @@ class TessieSetupPage extends Component {
         connected: false,
         configured: true
       });
-      await this.getRedirectUri();
-      const redirectUri = this.state.redirectUri;
-      const regex = /dashboard|integration|device|tessie|setup/;
-      if (redirectUri && regex.test(this.state.redirectUri)) {
-        window.location.href = this.state.redirectUri;
+
+      try {
+        const result = await this.props.httpClient.post('/api/v1/service/tessie/connect');
+        console.log('result', result);
+        // const redirectUri = `${result.authUrl}&redirect_uri=${encodeURIComponent(this.state.redirectUriTessieSetup)}`;
+        // await this.setState({
+        //   redirectUri
+        // });
+      } catch (e) {
+        console.error(e);
+        await this.setState({ errored: true });
+      }
+      // await this.getRedirectUri();
+      // const redirectUri = this.state.redirectUri;
+      // const regex = /dashboard|integration|device|tessie|setup/;
+      if (result) {
+        // window.location.href = this.state.redirectUri;
         await this.setState({
           connectTessieStatus: RequestStatus.Success,
           connected: false,

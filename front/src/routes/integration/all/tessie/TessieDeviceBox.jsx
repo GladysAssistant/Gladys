@@ -191,7 +191,8 @@ class TessieDeviceBox extends Component {
     const sidDevice = device.external_id.replace('tessie:', '') || (device.deviceTessie && device.deviceTessie.id);
     const saveButtonCondition =
       (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
-    const modelImage = `/assets/integrations/devices/tessie/tessie-${device.model}.jpg`;
+    const model = device.model.split('-')[1];
+    const modelImage = `/assets/integrations/devices/vehicle/tesla/${model}/${device.model}.jpg`;
     return (
       <div class="col-md-6">
         <div class="card">

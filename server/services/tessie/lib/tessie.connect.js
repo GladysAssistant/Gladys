@@ -21,28 +21,39 @@ async function connect() {
   logger.debug('Connecting to Tessie...');
   console.log('apiKey', apiKey);
   try {
-    const response = await fetch(API.TOKEN, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
-        'Content-Type': API.HEADER.CONTENT_TYPE,
-        Host: API.HEADER.HOST,
-      },
-      body: new URLSearchParams(authentificationForm).toString(),
-    });
-    const rawBody = await response.text();
+    // const response = await fetch(API.TOKEN, {
+    //   method: 'POST',
+    //   headers: {
+    //     Authorization: `Bearer ${this.accessToken}`,
+    //     'Content-Type': API.HEADER.CONTENT_TYPE,
+    //     Host: API.HEADER.HOST,
+    //   },
+    //   body: new URLSearchParams(authentificationForm).toString(),
+    // });
+    // const rawBody = await response.text();
     // Test de la connexion en récupérant la liste des véhicules
-    const response = await this.gladys.httpClient.get(`${API.VEHICLES}`, {
+    const response = await fetch(`${API.VEHICLES}`, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        ...API.HEADER
+        'accept': API.HEADER.ACCEPT,
       }
     });
 
     if (response.status === 200) {
+      const rawBody = await response.text();
+      const parsedBody = JSON.parse(rawBody);
+      const vehicles = parsedBody.results.map(vehicle => ({
+        vin: vehicle.vin,
+        name: vehicle.last_state.vehicle_state?.vehicle_name,
+        type: vehicle.last_state.vehicle_config?.car_type,
+        isActive: vehicle.is_active,
+        vehicle
+      }));
+      this.vehicles = vehicles;
       await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
       this.configured = true;
-      return { status: 'connected' };
+      return { vehicles };
     } else {
       throw new Error('Failed to connect to Tessie');
     }

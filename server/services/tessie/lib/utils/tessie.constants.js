@@ -1,4 +1,15 @@
 const GLADYS_VARIABLES = {
+  CLIENT_ID: 'TESSIE_CLIENT_ID',
+  CLIENT_SECRET: 'TESSIE_CLIENT_SECRET',
+
+  VEHICLES_API: 'TESSIE_VEHICLES_API',
+  DRIVERS_API: 'TESSIE_DRIVERS_API',
+  TELEMETRY_API: 'TESSIE_TELEMETRY_API',
+
+  ACCESS_TOKEN: 'TESSIE_ACCESS_TOKEN',
+  REFRESH_TOKEN: 'TESSIE_REFRESH_TOKEN',
+  EXPIRE_IN_TOKEN: 'TESSIE_EXPIRE_IN_TOKEN',
+  
   API_KEY: 'TESSIE_API_KEY',
 };
 
@@ -46,7 +57,7 @@ const API = {
   },
   OAUTH2: `${BASE_API}/oauth2/authorize`,
   TOKEN: `${BASE_API}/oauth2/token`,
-  VEHICLES: `${BASE_API}/vehicles`,
+  VEHICLES: `${BASE_API}/vehicles?only_active=false`,
   VEHICLE_STATE: `/state`,
   VEHICLE_COMMAND: `/command`,
   VEHICLE_CHARGING: `/charging`,
@@ -87,6 +98,13 @@ const PARAMS = {
   VEHICLE_NAME: 'vehicle_name',
   VEHICLE_VIN: 'vehicle_vin',
   VEHICLE_STATE: 'vehicle_state',
+};
+
+const CAR_SPECIAL_TYPE = {
+  STANDARD: 'standard',
+  LONG_RANGE: 'long_range',
+  AWD: 'awd',
+  PERFORMANCE: 'performance',
 };
 
 module.exports = {
