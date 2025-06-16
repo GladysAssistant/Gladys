@@ -2,14 +2,14 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
-import RawDeviceValue from './RawDeviceValue';
+import DistanceSensorDeviceValue from './DistanceSensorDeviceValue';
 
 const LevelSensorLiquidStateDeviceValue = props => {
   const { type, last_value: lastValue = null } = props.deviceFeature;
   const valued = lastValue !== null;
 
   if (type !== DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE) {
-    return <RawDeviceValue {...props} />;
+    return <DistanceSensorDeviceValue {...props} />;
   }
 
   return (

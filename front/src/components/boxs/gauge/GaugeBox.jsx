@@ -5,6 +5,7 @@ import { Text } from 'preact-i18n';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { checkAndConvertUnit } from '../../../../../server/utils/units';
 
 class GaugeBox extends Component {
   state = {
@@ -97,20 +98,28 @@ class GaugeBox extends Component {
   };
 
   formatValueWithUnit = (value, unit) => {
+    const { user } = this.props;
+
+    // Conversion if necessary (and if user is present)
+    const { distance_unit_preference: userUnitPreference } = user;
+    const { value: displayValue, unit: displayUnit } = checkAndConvertUnit(value, unit, userUnitPreference);
+
     // Format the value to 1 decimal place
-    const formattedValue = value.toFixed(1);
+    const formattedValue = displayValue.toFixed(1);
 
     // If no unit, just return the formatted value
-    if (!unit) {
+    if (!displayUnit) {
       return formattedValue;
     }
 
     // Get the unit translation from the dictionary
     const unitTranslation =
-      this.props.intl && this.props.intl.dictionary ? this.props.intl.dictionary.deviceFeatureUnitShort[unit] : unit;
+      this.props.intl && this.props.intl.dictionary
+        ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit]
+        : displayUnit;
 
     // Return the value with the unit
-    return `${formattedValue}${unitTranslation || unit}`;
+    return `${formattedValue} ${unitTranslation || displayUnit}`;
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -268,4 +277,4 @@ class GaugeBox extends Component {
   }
 }
 
-export default connect('httpClient,session', {})(withIntlAsProp(GaugeBox));
+export default connect('httpClient,session,user', {})(withIntlAsProp(GaugeBox));

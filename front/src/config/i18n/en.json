@@ -2880,6 +2880,7 @@
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "kPa": "Kilopascal (kPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
     "milli-bar": "Millibar (mbar)",
@@ -2969,6 +2970,7 @@
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "kPa": "kPa",
     "bar": "bar",
     "milli-bar": "mbar",
     "psi": "psi",
@@ -3487,6 +3489,7 @@
       "shortCategoryName": "Electric Vehicle - Status",
       "door-opened": "Door open",
       "odometer": "Odometer",
+      "tire-pressure": "Tire pressure",
       "window-opened": "Window open"
     },
     "heater": {
