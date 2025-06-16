@@ -31,7 +31,7 @@ describe('hslToRgb', () => {
   });
 });
 
-describe('checkAndConvertUnit', () => {
+describe('checkAndConvertUnit distances', () => {
   it('converts kilometers to miles (US preference)', () => {
     const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KM, MEASUREMENT_UNITS.US);
     expect(result.value).to.be.closeTo(6.21, 0.01);
@@ -150,6 +150,34 @@ describe('checkAndConvertUnit', () => {
     const result = checkAndConvertUnit(5, DEVICE_FEATURE_UNITS.SECONDS, MEASUREMENT_UNITS.METRIC);
     expect(result.value).to.equal(5);
     expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.SECONDS);
+  });
+});
+
+describe('checkAndConvertUnit pressure', () => {
+  it('converts bar to psi (US preference)', () => {
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.BAR, MEASUREMENT_UNITS.US);
+    expect(result.value).to.be.closeTo(145.0, 0.1);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.PSI);
+  });
+  it('converts psi to bar (metric preference)', () => {
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.PSI, MEASUREMENT_UNITS.METRIC);
+    expect(result.value).to.be.closeTo(0.69, 0.01);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.BAR);
+  });
+  it('converts kPa to bar (metric preference)', () => {
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILO_PASCAL, MEASUREMENT_UNITS.METRIC);
+    expect(result.value).to.be.closeTo(0.1, 0.01);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.BAR);
+  });
+  it('converts kPa to psi (US preference)', () => {
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.KILO_PASCAL, MEASUREMENT_UNITS.US);
+    expect(result.value).to.be.closeTo(1.45, 0.01);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.PSI);
+  });
+  it('converts mbar to psi (US preference)', () => {
+    const result = checkAndConvertUnit(10, DEVICE_FEATURE_UNITS.MILLIBAR, MEASUREMENT_UNITS.US);
+    expect(result.value).to.be.closeTo(0.145, 0.01);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.PSI);
   });
 });
 
