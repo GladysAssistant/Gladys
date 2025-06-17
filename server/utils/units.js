@@ -1,3 +1,5 @@
+const { UNIT_CONVERSIONS } = require('./unit-conversions');
+
 /**
  * @description Convert celsius to fahrenheit.
  * @param {number} celsius - Temperature to convert.
@@ -66,8 +68,67 @@ function hslToRgb(h, s, l) {
   ];
 }
 
+/**
+ * @description Smart rounding for display:
+ * - No rounding if value < 1 (keep full precision)
+ * - 2 decimals if value < 10
+ * - 1 decimal if value < 1000
+ * - No decimals (integer) if value >= 1000.
+ * @param {number} value - Value to round.
+ * @returns {number} Rounded value.
+ * @example
+ * smartRound(0.123); // returns 0.123
+ * smartRound(2.54321); // returns 2.54
+ * smartRound(45.67); // returns 45.7
+ * smartRound(1234.56); // returns 1235
+ */
+function smartRound(value) {
+  if (Math.abs(value) < 1) {
+    return value; // No rounding for very small values
+  }
+  if (Math.abs(value) < 10) {
+    return Math.round(value * 100) / 100; // 2 decimals
+  }
+  if (Math.abs(value) < 1000) {
+    return Math.round(value * 10) / 10; // 1 decimal
+  }
+  return Math.round(value); // Integer for large values
+}
+
+/**
+ * @description Converts a value from one unit to another according to the user's preference.
+ * @param {number} value - Value to convert.
+ * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', 'km/h', ...).
+ * @param {string} userPreference - User preference ('us' or 'metric').
+ * @returns {{ value: number, unit: string }} Object containing the converted value and the target unit.
+ * @example
+ * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, SYSTEM_UNITS.US);
+ * // result = { value: 6.21, unit: 'mile' }
+ */
+function checkAndConvertUnit(value, fromUnit, userPreference) {
+  const unitsConvertUserPreference = UNIT_CONVERSIONS[userPreference];
+  if (!unitsConvertUserPreference) {
+    // No conversion: keep the original value and unit
+    return { value, unit: fromUnit };
+  }
+  const unitConversionParams = unitsConvertUserPreference[fromUnit];
+  if (!unitConversionParams) {
+    // No conversion: keep the original value and unit
+    return { value, unit: fromUnit };
+  }
+  if (value !== null) {
+    // Convert the value and apply smart rounding
+    const convertedValue = smartRound(unitConversionParams.convert(value));
+    return { value: convertedValue, unit: unitConversionParams.unit };
+  }
+  // When value is null, we still want to get the correct unit format
+  return { value, unit: unitConversionParams.unit };
+}
+
 module.exports = {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   hslToRgb,
+  checkAndConvertUnit,
+  smartRound,
 };

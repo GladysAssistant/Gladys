@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
+import { checkAndConvertUnit } from '../../../../../server/utils/units';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
@@ -248,7 +249,11 @@ class Chartbox extends Component {
       } else {
         series = data.map((oneFeature, index) => {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          // Convert unit display format if necessary (using 0 as a dummy value since we only need the unit)
+          const userUnitPreference = this.props.user.distance_unit_preference;
+          const { unit: displayUnit } = checkAndConvertUnit(0, oneUnit, userUnitPreference);
+
+          const oneUnitTranslated = displayUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit] : null;
           const { values, deviceFeature, device } = oneFeature;
           const deviceFeatureName = deviceFeatureNames
             ? deviceFeatureNames[index]
@@ -256,12 +261,14 @@ class Chartbox extends Component {
           const name = oneUnitTranslated ? `${deviceFeatureName} (${oneUnitTranslated})` : deviceFeatureName;
           return {
             name,
-            data: values.map(value => {
+            data: values.map(dataPoint => {
               emptySeries = false;
-              return [
-                Math.round(new Date(value.created_at).getTime() / 1000) * 1000,
-                getDeviceValueByAggregateFunction(value, this.props.box.aggregate_function)
-              ];
+              const rawValue = getDeviceValueByAggregateFunction(dataPoint, this.props.box.aggregate_function);
+
+              // Convert the value if it is a convertible unit
+              const { value: displayValue } = checkAndConvertUnit(rawValue, oneUnit, userUnitPreference);
+
+              return [Math.round(new Date(dataPoint.created_at).getTime() / 1000) * 1000, displayValue];
             })
           };
         });
@@ -278,6 +285,11 @@ class Chartbox extends Component {
         // Before now, there was a "unit" attribute in this box instead of "units",
         // so we need to support "unit" as some users may already have the box with that param
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
+
+        // Convert distance units if necessary
+        const userUnitPreference = this.props.user.distance_unit_preference;
+        let displayUnit = unit;
+
         // We check if all deviceFeatures selected are in the same unit
         const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
 
@@ -291,8 +303,19 @@ class Chartbox extends Component {
             if (values.length === 0) {
               return;
             }
-            const firstElement = values[0];
-            const lastElement = values[values.length - 1];
+            let firstElement = values[0];
+            let lastElement = values[values.length - 1];
+            // Convert the value if it is a convertible unit
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
+
             const variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
               getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
@@ -302,16 +325,28 @@ class Chartbox extends Component {
             lastValuesArray.push(lastValue);
           });
           newState.variation = average(variationArray);
-          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
+          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
           newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
-          newState.unit = unit;
+          newState.unit = displayUnit;
         } else {
           // If not, we only display the first value
           const oneFeature = data[0];
           const { values } = oneFeature;
           if (values.length > 0) {
-            const firstElement = values[0];
-            const lastElement = values[values.length - 1];
+            let firstElement = values[0];
+            let lastElement = values[values.length - 1];
+
+            // Convert the value if it is a convertible unit
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
+
             newState.variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
               getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
@@ -320,7 +355,7 @@ class Chartbox extends Component {
             newState.lastValueRounded = roundWith2DecimalIfNeeded(
               getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
             );
-            newState.unit = unit;
+            newState.unit = displayUnit;
           }
         }
       }
@@ -512,8 +547,7 @@ class Chartbox extends Component {
                 <div class="d-flex align-items-baseline">
                   {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                     <div class="h1 mb-0 mr-2">
-                      {lastValueRounded}
-                      {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+                      {lastValueRounded} {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
                     </div>
                   )}
                   <div
