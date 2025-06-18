@@ -3506,6 +3506,7 @@
       "shortCategoryName": "Electric Vehicle - Climate",
       "climate-on": "Climate switch",
       "indoor-temperature": "Indoor temperature",
+      "outside-temperature": "Outside temperature",
       "target-temperature": "Target temperature"
     },
     "electrical-vehicle-command": {

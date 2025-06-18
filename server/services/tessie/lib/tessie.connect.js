@@ -1,5 +1,3 @@
-const crypto = require('crypto');
-
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
@@ -21,17 +19,6 @@ async function connect() {
   logger.debug('Connecting to Tessie...');
   console.log('apiKey', apiKey);
   try {
-    // const response = await fetch(API.TOKEN, {
-    //   method: 'POST',
-    //   headers: {
-    //     Authorization: `Bearer ${this.accessToken}`,
-    //     'Content-Type': API.HEADER.CONTENT_TYPE,
-    //     Host: API.HEADER.HOST,
-    //   },
-    //   body: new URLSearchParams(authentificationForm).toString(),
-    // });
-    // const rawBody = await response.text();
-    // Test de la connexion en récupérant la liste des véhicules
     const response = await fetch(`${API.VEHICLES}`, {
       method: 'GET',
       headers: {
@@ -47,6 +34,7 @@ async function connect() {
         vin: vehicle.vin,
         name: vehicle.last_state.vehicle_state?.vehicle_name,
         type: vehicle.last_state.vehicle_config?.car_type,
+        specialType: vehicle.last_state.vehicle_config?.car_special_type,
         isActive: vehicle.is_active,
         vehicle
       }));

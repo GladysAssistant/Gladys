@@ -853,6 +853,7 @@ const DEVICE_FEATURE_TYPES = {
     // Features related to the vehicle's climate control
     CLIMATE_ON: 'climate-on', // Climate system activation (binary - command with return status)
     INDOOR_TEMPERATURE: 'indoor-temperature', // Cabin temperature in °C (integer - sensor)
+    OUTSIDE_TEMPERATURE: 'outside-temperature', // Outside temperature in °C (integer - sensor)
     TARGET_TEMPERATURE: 'target-temperature', // Desired cabin temperature in °C (integer - command)
   },
   ELECTRICAL_VEHICLE_COMMAND: {

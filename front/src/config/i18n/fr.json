@@ -56,16 +56,16 @@
     "vehicle": {
       "tesla": {
         "modely": {
-          "tesla-modely_standard": "Tesla Model Y Standard",
-          "tesla-modely_long": "Tesla Model Y Long Range",
-          "tesla-modely_awd": "Tesla Model Y Traction intégrale (AWD)",
-          "tesla-modely_performance": "Tesla Model Y Performance"
+          "tesla-modely-standard": "Tesla Model Y Standard",
+          "tesla-modely-long": "Tesla Model Y Long Range",
+          "tesla-modely-awd": "Tesla Model Y Traction intégrale (AWD)",
+          "tesla-modely-performance": "Tesla Model Y Performance"
         },
         "model3": {
-          "tesla-model3_standard": "Tesla Model 3 standard",
-          "tesla-model3_long": "Tesla Model 3 Long Range",
-          "tesla-model3_awd": "Tesla Model 3 Traction intégrale (AWD)",
-          "tesla-model3_performance": "Tesla Model 3 Performance"
+          "tesla-model3-standard": "Tesla Model 3 standard",
+          "tesla-model3-long": "Tesla Model 3 Long Range",
+          "tesla-model3-awd": "Tesla Model 3 Traction intégrale (AWD)",
+          "tesla-model3-performance": "Tesla Model 3 Performance"
         }
       }
     }
@@ -3524,6 +3524,7 @@
       "shortCategoryName": "Véhicule électrique - Climatisation",
       "climate-on": "Commutateur climatisation",
       "indoor-temperature": "Température intérieure",
+      "outside-temperature": "Température extérieure",
       "target-temperature": "Température de consigne"
     },
     "electrical-vehicle-command": {

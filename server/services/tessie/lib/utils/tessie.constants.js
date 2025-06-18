@@ -1,31 +1,8 @@
 const GLADYS_VARIABLES = {
-  CLIENT_ID: 'TESSIE_CLIENT_ID',
-  CLIENT_SECRET: 'TESSIE_CLIENT_SECRET',
-
+  API_KEY: 'TESSIE_API_KEY',
   VEHICLES_API: 'TESSIE_VEHICLES_API',
   DRIVERS_API: 'TESSIE_DRIVERS_API',
   TELEMETRY_API: 'TESSIE_TELEMETRY_API',
-
-  ACCESS_TOKEN: 'TESSIE_ACCESS_TOKEN',
-  REFRESH_TOKEN: 'TESSIE_REFRESH_TOKEN',
-  EXPIRE_IN_TOKEN: 'TESSIE_EXPIRE_IN_TOKEN',
-  
-  API_KEY: 'TESSIE_API_KEY',
-};
-
-const SCOPES = {
-  VEHICLE: {
-    read: 'read_vehicle',
-    write: 'write_vehicle',
-    control: 'control_vehicle',
-  },
-  TELEMETRY: {
-    read: 'read_telemetry',
-  },
-  DRIVER: {
-    read: 'read_driver',
-    write: 'write_driver',
-  },
 };
 
 const STATUS = {
@@ -52,7 +29,6 @@ const BASE_API = 'https://api.tessie.com';
 const API = {
   HEADER: {
     ACCEPT: 'application/json',
-    HOST: 'api.tessie.com',
     CONTENT_TYPE: 'application/json',
   },
   OAUTH2: `${BASE_API}/oauth2/authorize`,
@@ -86,11 +62,141 @@ const SUPPORTED_CATEGORY_TYPE = {
   UNKNOWN: 'unknown',
 };
 
-const SUPPORTED_MODULE_TYPE = {
+const SUPPORTED_MODULE_MODEL = {
   TESLA_MODEL_S: 'ModelS',
   TESLA_MODEL_3: 'Model3',
   TESLA_MODEL_X: 'ModelX',
   TESLA_MODEL_Y: 'ModelY',
+};
+
+const SUPPORTED_MODULE_TYPE = {
+  BASE: 'base',
+};
+
+const SUPPORTED_MODULE_VERSION = {
+  BASE: 'base',
+  LONG_RANGE: 'long_range',
+  AWD: 'awd',
+  PERFORMANCE: 'performance',
+  STANDARD: 'standard',
+};
+
+const EFFICIENCY_PACKAGE_YEAR = {
+  MY2021: '2021',
+  MY2022: '2022',
+  MY2023: '2023',
+  MY2024: '2024',
+};
+
+const BATTERY_CAPACITY = {
+  MODELS: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 300,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
+  MODEL3: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 300,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
+  HIGHLAND: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 300,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
+  MODELY: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 523,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
+  JUNIPER: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 300,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
+  MODELX: {
+    STANDARD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    AWD: {
+      BATTERY_CAPACITY: 60,
+      BATTERY_RANGE: 250,
+    },
+    LONG_RANGE: {
+      BATTERY_CAPACITY: 74,
+      BATTERY_RANGE: 300,
+    },
+    PERFORMANCE: {
+      BATTERY_CAPACITY: 82,
+      BATTERY_RANGE: 300,
+    },
+  },
 };
 
 const PARAMS = {
@@ -109,11 +215,15 @@ const CAR_SPECIAL_TYPE = {
 
 module.exports = {
   GLADYS_VARIABLES,
-  SCOPES,
   STATUS,
   GITHUB_BASE_URL,
+  BASE_API,
   API,
   SUPPORTED_CATEGORY_TYPE,
+  SUPPORTED_MODULE_MODEL,
   SUPPORTED_MODULE_TYPE,
+  SUPPORTED_MODULE_VERSION,
   PARAMS,
+  EFFICIENCY_PACKAGE_YEAR,
+  BATTERY_CAPACITY,
 };

@@ -4,15 +4,15 @@ const logger = require('../../../utils/logger');
 
 /**
  * @description Poll values of Tessie devices.
- * @example refreshNetatmoValues();
+ * @example refreshTessieValues();
  */
 async function refreshTessieValues() {
   logger.debug('Looking for Tessie devices values...');
   await this.saveStatus({ statusType: STATUS.GET_DEVICES_VALUES, message: null });
 
-  let devicesNetatmo = [];
+  let devicesTessie = [];
   try {
-    devicesNetatmo = await this.loadDevices();
+    devicesTessie = await this.loadVehicles();
   } catch (e) {
     await this.saveStatus({
       statusType: STATUS.ERROR.GET_DEVICES_VALUES,
@@ -21,15 +21,14 @@ async function refreshTessieValues() {
     logger.error('Unable to load Tessie devices', e);
   }
   await Promise.map(
-    devicesNetatmo,
+    devicesTessie,
     async (device) => {
-      const id = device.id || device._id;
-      const externalId = `tessie:${id}`;
+      const externalId = `tessie:${device.vin}`;
       const deviceExistInGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
       if (deviceExistInGladys) {
-        await this.updateValues(deviceExistInGladys, device, externalId);
+        await this.updateValues(deviceExistInGladys, device, externalId, device.vin);
       } else {
-        logger.info(`device ${externalId} - ${device.type} does not exist in Gladys`);
+        logger.info(`device ${externalId} does not exist in Gladys`);
       }
     },
     { concurrency: 2 },
@@ -48,7 +47,7 @@ function pollRefreshingValues() {
     } catch (error) {
       logger.error('Error refreshing Tessie values: ', error);
     }
-  }, 120 * 1000);
+  }, 30 * 1000);
 }
 
 module.exports = {

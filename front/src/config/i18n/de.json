@@ -3425,6 +3425,7 @@
       "shortCategoryName": "Elektrofahrzeug - Klima",
       "climate-on": "Klimaanlagenschalter",
       "indoor-temperature": "Innentemperatur",
+      "outside-temperature": "Außentemperatur",
       "target-temperature": "Zieltemperatur"
     },
     "electrical-vehicle-command": {
