@@ -1,6 +1,14 @@
+import { Text } from 'preact-i18n';
+import cx from 'classnames';
+
 const BinaryDeviceType = ({ children, ...props }) => {
+  const { category, type, last_value: lastValue } = props.deviceFeature;
+  const { dictionary } = props.intl;
+  const customText =
+    dictionary.deviceFeatureAction.category[category] && dictionary.deviceFeatureAction.category[category][type];
+
   function updateValue() {
-    props.updateValue(props.deviceFeature, props.deviceFeature.last_value === 0 ? 1 : 0);
+    props.updateValue(props.deviceFeature, lastValue === 0 ? 1 : 0);
   }
 
   return (
@@ -10,17 +18,48 @@ const BinaryDeviceType = ({ children, ...props }) => {
       </td>
       <td>{props.rowName}</td>
       <td class="text-right">
-        <label class="custom-switch">
-          <input
-            type="radio"
-            name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}
-            value="1"
-            class="custom-switch-input"
-            checked={props.deviceFeature.last_value}
-            onClick={updateValue}
-          />
-          <span class="custom-switch-indicator" />
-        </label>
+        {!customText ? (
+          <label class="custom-switch">
+            <input
+              type="radio"
+              name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}
+              value="1"
+              class="custom-switch-input"
+              checked={lastValue}
+              onClick={updateValue}
+            />
+            <span class="custom-switch-indicator" />
+          </label>
+        ) : (
+          <div class="btn-group" role="group">
+            <button
+              class={cx('btn btn-sm btn-secondary', {
+                active: lastValue === 0
+              })}
+              onClick={updateValue}
+              disabled={lastValue === 0}
+            >
+              {lastValue === 0 ? (
+                <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
+              ) : (
+                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${lastValue}`} />
+              )}
+            </button>
+            <button
+              class={cx('btn btn-sm', 'btn-secondary', {
+                active: lastValue === 1
+              })}
+              onClick={updateValue}
+              disabled={lastValue === 1}
+            >
+              {lastValue === 1 ? (
+                <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
+              ) : (
+                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${lastValue}`} />
+              )}
+            </button>
+          </div>
+        )}
       </td>
     </tr>
   );

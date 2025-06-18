@@ -2998,6 +2998,28 @@
           "other": "Fermer"
         }
       },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Désactivée",
+            "1": "Activée"
+          },
+          "state": {
+            "0": "Activer",
+            "1": "Désactiver"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",
@@ -3189,6 +3211,22 @@
           "1": "Normal",
           "2": "Élevé",
           "unknown": "Inconnu"
+        }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        },
+        "window-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Déconnecté",
+          "1": "Connecté"
         }
       }
     }

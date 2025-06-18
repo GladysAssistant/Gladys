@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Promise from 'bluebird';
 import get from 'get-value';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../utils/consts';
 import {
   WEBSOCKET_MESSAGE_TYPES,
@@ -228,9 +229,10 @@ class DevicesComponent extends Component {
         updateValue={this.updateValue}
         updateValueWithDebounce={this.updateValueWithDebounce}
         changeAllLightsStatusRoom={this.changeAllLightsStatusRoom}
+        intl={this.props.intl}
       />
     );
   }
 }
 
-export default connect('session,httpClient,user', {})(DevicesComponent);
+export default withIntlAsProp(connect('session,httpClient,user', {})(DevicesComponent));
