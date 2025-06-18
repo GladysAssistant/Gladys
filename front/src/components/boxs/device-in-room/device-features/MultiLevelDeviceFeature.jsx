@@ -1,7 +1,10 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
+import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+
+import style from './style.css';
 
 const MultiLevelDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
@@ -27,11 +30,10 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             type="range"
             value={props.deviceFeature.last_value}
             onChange={updateValue}
-            class="custom-range"
+            class={cx('custom-range', style.rangeInput)}
             step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
-            style={{ flex: 1 }}
           />
           <span class="ml-2 text-right">
             {props.deviceFeature.unit ? (

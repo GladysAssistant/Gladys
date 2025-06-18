@@ -10,24 +10,22 @@ const DANGER_ON_VALUE_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
   DEVICE_FEATURE_CATEGORIES.TAMPER
 ];
-const DANGER_ON_VALUE_SENSORS_TYPES = [
-  DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED,
-  DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED
-];
-
-const BINARY_CATEGORIES_TYPES_CUSTOM = {
+const DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES = {
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: [
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED,
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED
-  ],
-  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]
+  ]
 };
 
-const BinaryDeviceValue = ({ deviceFeature }) => {
+const BinaryDeviceValue = ({ deviceFeature, intl }) => {
   const { category, type, last_value: lastValue = null } = deviceFeature;
-  const reverseColors = DANGER_ON_VALUE_SENSORS.includes(category) || DANGER_ON_VALUE_SENSORS_TYPES.includes(type);
+  const reverseColors =
+    DANGER_ON_VALUE_SENSORS.includes(category) ||
+    (DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category] &&
+      DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category].includes(type));
+  const { dictionary } = intl;
   const customText =
-    BINARY_CATEGORIES_TYPES_CUSTOM[category] && BINARY_CATEGORIES_TYPES_CUSTOM[category].includes(type);
+    dictionary.deviceFeatureValue.category[category] && dictionary.deviceFeatureValue.category[category][type];
 
   const value = lastValue === null ? -1 : lastValue;
   const valued = value !== -1;

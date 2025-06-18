@@ -1,18 +1,11 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
-
-const BINARY_CATEGORIES_TYPES_CUSTOM = {
-  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_COMMAND]: [
-    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.ALARM,
-    DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK
-  ]
-};
 
 const BinaryDeviceType = ({ children, ...props }) => {
   const { category, type, last_value: lastValue } = props.deviceFeature;
+  const { dictionary } = props.intl;
   const customText =
-    BINARY_CATEGORIES_TYPES_CUSTOM[category] && BINARY_CATEGORIES_TYPES_CUSTOM[category].includes(type);
+    dictionary.deviceFeatureAction.category[category] && dictionary.deviceFeatureAction.category[category][type];
 
   function updateValue() {
     props.updateValue(props.deviceFeature, lastValue === 0 ? 1 : 0);
