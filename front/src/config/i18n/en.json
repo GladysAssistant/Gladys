@@ -3079,6 +3079,28 @@
           "other": "Close"
         }
       },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Disabled",
+            "1": "Enabled"
+          },
+          "state": {
+            "0": "Enable",
+            "1": "Disable"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Unlocked",
+            "1": "Locked"
+          },
+          "state": {
+            "0": "Unlock",
+            "1": "Lock"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",
@@ -3270,6 +3292,22 @@
           "1": "Normal",
           "2": "High",
           "unknown": "Unknown"
+        }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Closed",
+          "1": "Open"
+        },
+        "window-opened": {
+          "0": "Closed",
+          "1": "Open"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Unplugged",
+          "1": "Plugged"
         }
       }
     }

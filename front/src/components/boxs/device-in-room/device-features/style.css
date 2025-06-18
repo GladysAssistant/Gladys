@@ -52,3 +52,7 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
     border: 2px solid #5eba00;
   }
 }
+
+.rangeInput {
+  flex: 1;
+}
