@@ -52,14 +52,30 @@ const DeviceRow = ({ children, ...props }) => {
 
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
-    return <SensorDeviceFeature user={props.user} device={device} deviceFeature={deviceFeature} rowName={rowName} />;
+    return (
+      <SensorDeviceFeature
+        user={props.user}
+        device={device}
+        deviceFeature={deviceFeature}
+        rowName={rowName}
+        intl={props.intl}
+      />
+    );
   }
 
   const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
 
   if (!elementType) {
     // if no related components, we display the device as a sensor
-    return <SensorDeviceFeature user={props.user} device={device} deviceFeature={deviceFeature} rowName={rowName} />;
+    return (
+      <SensorDeviceFeature
+        user={props.user}
+        device={device}
+        deviceFeature={deviceFeature}
+        rowName={rowName}
+        intl={props.intl}
+      />
+    );
   }
 
   return createElement(elementType, { ...props, rowName });
