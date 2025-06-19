@@ -134,7 +134,7 @@ function buildFeatureCharge(externalId, category, chargeState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: chargeState.charging_state !== "Disconnected" ? 1 : 0,
+      last_value: chargeState.charging_state !== 'Disconnected' ? 1 : 0,
     },
     {
       name: 'Target charge limit',
@@ -163,7 +163,7 @@ function buildFeatureCharge(externalId, category, chargeState) {
       min: 0,
       max: chargeState.charge_current_request_max,
       last_value: chargeState.charge_current_request,
-    }
+    },
   ];
 }
 

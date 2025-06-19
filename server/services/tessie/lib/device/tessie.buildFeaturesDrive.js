@@ -41,7 +41,7 @@ function buildFeatureDrive(externalId, category, driveState) {
       min: 0,
       max: 250,
       last_value: driveState.speed,
-    }
+    },
   ];
 }
 

@@ -100,15 +100,15 @@ class TessieDiscoverPage extends Component {
     this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.CONNECTING, this.updateStatusError);
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.PROCESSING_TOKEN,
-      this.updateStatus
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.PROCESSING_TOKEN, this.updateStatus);
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS, this.updateStatus);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.CONNECTING, this.updateStatusError);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.CONNECTING,
+      this.updateStatusError
+    );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.PROCESSING_TOKEN,
       this.updateStatus

@@ -1,6 +1,6 @@
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
-const { SUPPORTED_MODULE_TYPE, API } = require('./utils/tessie.constants');
+const { API, BASE_API } = require('./utils/tessie.constants');
 
 /**
  * @description Update all vehicle values.
@@ -8,101 +8,75 @@ const { SUPPORTED_MODULE_TYPE, API } = require('./utils/tessie.constants');
  * @example
  * await updateValues();
  */
-async function updateValues() {
+async function updateValues(device, vehicle, externalId, vin) {
   logger.debug('Updating Tessie vehicle values...');
 
   try {
-    // Récupérer la liste des véhicules
-    const response = await fetch(API.VEHICLES, {
+    // Get vehicle states
+    const vehicleStateResponse = await fetch(`${BASE_API}/${vin}${API.VEHICLE_STATE}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.configuration.apiKey}`,
+        Authorization: `Bearer ${this.configuration.apiKey}`,
         'Content-Type': API.HEADER.CONTENT_TYPE,
-        'Accept': API.HEADER.ACCEPT,
+        Accept: API.HEADER.ACCEPT,
       },
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('Tessie API error:', response.status, errorText);
-      throw new Error(`Tessie API error: ${response.status}`);
+    if (vehicleStateResponse.status !== 200) {
+      logger.error(`Error getting state for vehicle ${vin}:`, await vehicleStateResponse.text());
+      return;
     }
 
-    const data = await response.json();
-    const vehicles = data.results || [];
+    const vehicleState = await vehicleStateResponse.json();
+    console.log('vehicleState', vehicleState);
 
-    // Mettre à jour chaque véhicule
-    for (const vehicle of vehicles) {
-      try {
-        // Récupérer l'état du véhicule
-        const stateResponse = await fetch(`${API.VEHICLES}/${vehicle.id}${API.VEHICLE_STATE}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${this.configuration.apiKey}`,
-            'Content-Type': API.HEADER.CONTENT_TYPE,
-            'Accept': API.HEADER.ACCEPT,
-          },
-        });
+    // Update features in Gladys
+    if (device) {
+      // Update battery
+      await this.updateBattery(device, vehicleState, vin, externalId);
 
-        if (!stateResponse.ok) {
-          logger.error(`Error getting state for vehicle ${vehicle.id}:`, await stateResponse.text());
-          continue;
-        }
+      // Update charge
+      await this.updateCharge(device, vehicleState, vin, externalId);
 
-        const stateData = await stateResponse.json();
+      // Update climate
+      await this.updateClimate(device, vehicleState, vin, externalId);
 
-        // Mettre à jour les features dans Gladys
-        const device = this.gladys.stateManager.get('deviceByExternalId', `tessie:${vehicle.id}`);
-        if (device) {
-          // Mettre à jour la batterie
-          const batteryFeature = device.features.find(f => f.external_id === `tessie:${vehicle.id}:battery`);
-          if (batteryFeature) {
-            await this.gladys.stateManager.setState('deviceFeature', batteryFeature.selector, {
-              value: stateData.battery_level,
-            });
-          }
+      // Update charging state
+      // const chargingFeature = device.features.find(f => f.external_id === `${externalId}:charging`);
+      // if (chargingFeature) {
+      //   await this.gladys.stateManager.setState('deviceFeature', chargingFeature.selector, {
+      //     value: stateData.charging_state === 'Charging' ? 1 : 0,
+      //   });
+      // }
 
-          // Mettre à jour l'état de charge
-          const chargingFeature = device.features.find(f => f.external_id === `tessie:${vehicle.id}:charging`);
-          if (chargingFeature) {
-            await this.gladys.stateManager.setState('deviceFeature', chargingFeature.selector, {
-              value: stateData.charging_state === 'Charging' ? 1 : 0,
-            });
-          }
+      // // Update temperatures
+      // const insideTempFeature = device.features.find(f => f.external_id === `${externalId}:inside_temp`);
+      // if (insideTempFeature) {
+      //   await this.gladys.stateManager.setState('deviceFeature', insideTempFeature.selector, {
+      //     value: stateData.inside_temp,
+      //   });
+      // }
 
-          // Mettre à jour les températures
-          const insideTempFeature = device.features.find(f => f.external_id === `tessie:${vehicle.id}:inside_temp`);
-          if (insideTempFeature) {
-            await this.gladys.stateManager.setState('deviceFeature', insideTempFeature.selector, {
-              value: stateData.inside_temp,
-            });
-          }
+      // const outsideTempFeature = device.features.find(f => f.external_id === `${externalId}:outside_temp`);
+      // if (outsideTempFeature) {
+      //   await this.gladys.stateManager.setState('deviceFeature', outsideTempFeature.selector, {
+      //     value: stateData.outside_temp,
+      //   });
+      // }
 
-          const outsideTempFeature = device.features.find(f => f.external_id === `tessie:${vehicle.id}:outside_temp`);
-          if (outsideTempFeature) {
-            await this.gladys.stateManager.setState('deviceFeature', outsideTempFeature.selector, {
-              value: stateData.outside_temp,
-            });
-          }
-
-          // Mettre à jour l'état du véhicule
-          const stateFeature = device.features.find(f => f.external_id === `tessie:${vehicle.id}:state`);
-          if (stateFeature) {
-            await this.gladys.stateManager.setState('deviceFeature', stateFeature.selector, {
-              value: stateData.state,
-            });
-          }
-        }
-      } catch (e) {
-        logger.error(`Error updating vehicle ${vehicle.id}:`, e);
-      }
+      // // Update vehicle state
+      // const stateFeature = device.features.find(f => f.external_id === `${externalId}:state`);
+      // if (stateFeature) {
+      //   await this.gladys.stateManager.setState('deviceFeature', stateFeature.selector, {
+      //     value: stateData.state,
+      //   });
+      // }
     }
-
-    logger.debug('Tessie vehicle values updated successfully');
   } catch (e) {
-    logger.error('Error updating Tessie vehicle values:', e);
-    throw e;
+    logger.error(`Error updating vehicle ${vehicle.id}:`, e);
   }
+
+  logger.debug('Tessie vehicle values updated successfully');
 }
 
 module.exports = {

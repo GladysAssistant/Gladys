@@ -40,7 +40,7 @@ function buildFeatureCommand(externalId, category, vehicleState) {
       min: 0,
       max: 1,
       last_value: vehicleState.locked ? 1 : 0,
-    }
+    },
   ];
 }
 

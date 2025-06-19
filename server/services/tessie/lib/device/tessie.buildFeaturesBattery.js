@@ -38,7 +38,7 @@ function buildFeatureBattery(externalId, category, batteryCapacity, batteryRange
       selector: `${externalId}-battery-energy-remaining`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].BATTERY_ENERGY_REMAINING,
-      unit: DEVICE_FEATURE_UNITS.KILOWATT_HOURS,
+      unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       read_only: true,
       has_feedback: false,
       keep_history: true,
@@ -52,7 +52,7 @@ function buildFeatureBattery(externalId, category, batteryCapacity, batteryRange
       selector: `${externalId}-battery-range-estimate`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].BATTERY_RANGE_ESTIMATE,
-      unit: DEVICE_FEATURE_UNITS.KILOMETERS,
+      unit: DEVICE_FEATURE_UNITS.KM,
       read_only: true,
       has_feedback: false,
       keep_history: true,
@@ -115,7 +115,7 @@ function buildFeatureBattery(externalId, category, batteryCapacity, batteryRange
       min: 0,
       max: 1000,
       last_value: chargeState?.pack_voltage,
-    }
+    },
   ];
 }
 

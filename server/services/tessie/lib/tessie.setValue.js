@@ -31,7 +31,7 @@ async function setValue(device, feature, value) {
         if (feature.name === 'Charging State') {
           endpoint = `${API.VEHICLES}/${vehicleId}${API.VEHICLE_COMMAND}`;
           body = {
-            command: value === 1 ? 'start_charging' : 'stop_charging'
+            command: value === 1 ? 'start_charging' : 'stop_charging',
           };
         }
         break;
@@ -63,9 +63,9 @@ async function setValue(device, feature, value) {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.configuration.apiKey}`,
+        Authorization: `Bearer ${this.configuration.apiKey}`,
         'Content-Type': API.HEADER.CONTENT_TYPE,
-        'Accept': API.HEADER.ACCEPT,
+        Accept: API.HEADER.ACCEPT,
       },
       body: JSON.stringify(body),
     });

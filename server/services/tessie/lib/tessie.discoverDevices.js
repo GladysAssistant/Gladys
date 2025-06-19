@@ -1,6 +1,12 @@
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
-const { STATUS, SUPPORTED_CATEGORY_TYPE, EFFICIENCY_PACKAGE_YEAR, TRIM_BADGING_TO_VERSION, BATTERY_CAPACITY } = require('./utils/tessie.constants');
+const {
+  STATUS,
+  SUPPORTED_CATEGORY_TYPE,
+  EFFICIENCY_PACKAGE_YEAR,
+  TRIM_BADGING_TO_VERSION,
+  BATTERY_CAPACITY,
+} = require('./utils/tessie.constants');
 
 /**
  * @description Discover Tessie vehicles.
@@ -26,14 +32,15 @@ async function discoverDevices() {
   }
   if (vehicles.length > 0) {
     this.discoveredDevices = vehicles.map((vehicle) => {
-
       const carType = vehicle.last_state.vehicle_config?.car_type?.toUpperCase();
       const efficiencyPackage = vehicle.last_state.vehicle_config?.efficiency_package;
       const year = efficiencyPackage?.split(carType)[1]?.match(/\d{4}/)?.[0] || '2024';
       const trimBadging = vehicle.last_state.vehicle_config?.trim_badging;
-      const version = trimBadging?.startsWith('P') ? 'performance' :
-        trimBadging?.startsWith('7') || trimBadging?.startsWith('8') || trimBadging?.startsWith('9') ? 'long_range' :
-          'standard';
+      const version = trimBadging?.startsWith('P')
+        ? 'performance'
+        : trimBadging?.startsWith('7') || trimBadging?.startsWith('8') || trimBadging?.startsWith('9')
+        ? 'long_range'
+        : 'standard';
 
       const vehicleData = {
         vin: vehicle.vin,
@@ -46,7 +53,7 @@ async function discoverDevices() {
         batteryCapacity: BATTERY_CAPACITY[carType]?.[version?.toUpperCase()]?.BATTERY_CAPACITY || 60,
         batteryRangeMax: BATTERY_CAPACITY[carType]?.[version?.toUpperCase()]?.BATTERY_RANGE || 250,
         isActive: vehicle.is_active,
-        vehicle
+        vehicle,
       };
       const discoveredDevice = this.convertVehicle(vehicleData);
 

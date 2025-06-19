@@ -67,7 +67,7 @@ function buildFeatureClimate(externalId, category, climateState) {
       min: climateState.min_avail_temp,
       max: climateState.max_avail_temp,
       last_value: climateState.target_temp,
-    }
+    },
   ];
 }
 

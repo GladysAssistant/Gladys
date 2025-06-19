@@ -11,6 +11,9 @@ const { saveConfiguration } = require('./tessie.saveConfiguration');
 const { saveStatus } = require('./tessie.saveStatus');
 const { setValue } = require('./tessie.setValue');
 const { updateValues } = require('./tessie.updateValues');
+const { updateBattery } = require('./update/tessie.updateBattery');
+const { updateCharge } = require('./update/tessie.updateCharge');
+const { updateClimate } = require('./update/tessie.updateClimate');
 
 const { STATUS } = require('./utils/tessie.constants');
 
@@ -41,5 +44,8 @@ TessieHandler.prototype.saveConfiguration = saveConfiguration;
 TessieHandler.prototype.saveStatus = saveStatus;
 TessieHandler.prototype.setValue = setValue;
 TessieHandler.prototype.updateValues = updateValues;
+TessieHandler.prototype.updateBattery = updateBattery;
+TessieHandler.prototype.updateCharge = updateCharge;
+TessieHandler.prototype.updateClimate = updateClimate;
 
 module.exports = TessieHandler;
