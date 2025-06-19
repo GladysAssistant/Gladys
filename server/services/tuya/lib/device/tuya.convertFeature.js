@@ -9,7 +9,7 @@ const { mappings } = require('./tuya.deviceMapping');
  * @example
  * convertFeature({ code: 'switch', type: 'Boolean', values: '{}' }, 'tuya:device_id');
  */
-function convertFeature(tuyaFunctions, externalId) {
+function convertFeature(tuyaFunctions, externalId, value) {
   const { code, values, name, readOnly } = tuyaFunctions;
 
   const featuresCategoryAndType = mappings[code];
@@ -19,12 +19,14 @@ function convertFeature(tuyaFunctions, externalId) {
   }
 
   let valuesObject = {};
-  try {
-    valuesObject = JSON.parse(values);
-  } catch (e) {
-    logger.error(
-      `Tuya function as unmappable "${values}" values on "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type with "${code}" code`,
-    );
+  if (values) {
+    try {
+      valuesObject = JSON.parse(values);
+    } catch (e) {
+      logger.error(
+        `Tuya function as unmappable "${values}" values on "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type with "${code}" code`,
+      );
+    }
   }
 
   const feature = {
@@ -32,18 +34,20 @@ function convertFeature(tuyaFunctions, externalId) {
     external_id: `${externalId}:${code}`,
     selector: `${externalId}:${code}`,
     read_only: readOnly,
-    has_feedback: false,
+    has_feedback: true,
     min: 0,
     max: 1,
+    value,
     ...featuresCategoryAndType,
   };
   if ('min' in valuesObject) {
-    feature.min = valuesObject.min;
+    const minValue = Number(valuesObject.min);
+    feature.min = Number.isFinite(minValue) ? minValue : 0;
   }
   if ('max' in valuesObject) {
-    feature.max = valuesObject.max;
+    const maxValue = Number(valuesObject.max);
+    feature.max = Number.isFinite(maxValue) ? maxValue : 1;
   }
-
   return feature;
 }
 

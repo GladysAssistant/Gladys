@@ -1,9 +1,9 @@
 const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 
 /**
- * @description Convert Tuya unit into Gladys unit.
+ * @description Convert Tuya unit into gladys unit.
  * @param {string} tuyaUnit - Tuya unit.
- * @returns {string} Gladys unit.
+ * @returns {string} gladys unit.
  * @example
  * convertUnit(tuyaUnit);
  */

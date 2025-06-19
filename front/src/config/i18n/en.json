@@ -1061,6 +1061,10 @@
           "westernEurope": "Western Europe",
           "india": "India"
         },
+        "tuyaServerEnv": {
+          "prod": "Production",
+          "test": "Test"
+        },
         "endpoint": "Endpoint",
         "accessKey": "Access Key",
         "accessKeyPlaceholder": "Enter Tuya access key",
