@@ -63,7 +63,8 @@ class MatterDevices extends Component {
       orderDir: 'asc',
       matterDevices: [],
       pairedDevices: [],
-      loading: true,
+      getGladysDevicesLoading: true,
+      getPairedDevicesLoading: true,
       error: null,
       matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
@@ -73,16 +74,12 @@ class MatterDevices extends Component {
   }
 
   init = async () => {
-    await this.setState({ loading: true });
     await Promise.all([this.loadConfiguration(), this.getHouses()]);
     if (this.state.matterEnabled) {
       await this.getMatterDevices();
       // We need to wait before getting all matter devices before being able to load paired devices
       await this.getPairedDevices();
     }
-    await this.setState({
-      loading: false
-    });
   };
 
   loadConfiguration = async () => {
@@ -108,10 +105,8 @@ class MatterDevices extends Component {
   }
 
   getMatterDevices = async () => {
-    this.setState({
-      loading: true
-    });
     try {
+      await this.setState({ getGladysDevicesLoading: true });
       const options = {
         order_dir: this.state.orderDir || 'asc'
       };
@@ -122,21 +117,22 @@ class MatterDevices extends Component {
       const matterDevices = await this.props.httpClient.get('/api/v1/service/matter/device', options);
       this.setState({
         matterDevices,
-        loading: false,
-        error: null
+        error: null,
+        getGladysDevicesLoading: false
       });
       this.getNodes();
     } catch (e) {
       console.error(e);
       this.setState({
-        loading: false,
-        error: RequestStatus.Error
+        error: RequestStatus.Error,
+        getGladysDevicesLoading: false
       });
     }
   };
 
   getPairedDevices = async () => {
     try {
+      await this.setState({ getPairedDevicesLoading: true });
       const pairedDevices = await this.props.httpClient.get('/api/v1/service/matter/paired-device');
 
       // Filter out devices that are already in Gladys
@@ -181,9 +177,14 @@ class MatterDevices extends Component {
         });
       });
 
-      this.setState({ pairedDevices: filteredPairedDevices, devicesThatAlreadyExistButWithDifferentNodeId });
+      this.setState({
+        pairedDevices: filteredPairedDevices,
+        devicesThatAlreadyExistButWithDifferentNodeId,
+        getPairedDevicesLoading: false
+      });
     } catch (e) {
       console.error(e);
+      this.setState({ getPairedDevicesLoading: false });
     }
   };
 
@@ -207,6 +208,7 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
+      await this.setState({ loading: false });
     } catch (e) {
       console.error(e);
     }
@@ -245,6 +247,7 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
+      await this.setState({ loading: false });
     } catch (e) {
       console.error(e);
     }
@@ -291,7 +294,8 @@ class MatterDevices extends Component {
     {
       orderDir,
       search,
-      loading,
+      getGladysDevicesLoading,
+      getPairedDevicesLoading,
       error,
       matterDevices,
       pairedDevices,
@@ -353,7 +357,7 @@ class MatterDevices extends Component {
           <div class="card-body">
             <div
               class={cx('dimmer', {
-                active: loading
+                active: getGladysDevicesLoading
               })}
             >
               <div class="loader" />
@@ -361,6 +365,17 @@ class MatterDevices extends Component {
                 {!matterEnabled && (
                   <div class="alert alert-warning">
                     <MarkupText id="integration.matter.settings.disabledWarning" />
+                  </div>
+                )}
+                {getPairedDevicesLoading && (
+                  <div class="alert alert-info">
+                    <h4 class="alert-heading text-center">
+                      <Text id="integration.matter.device.refreshMatterDevices" />
+                    </h4>
+                    <div class="dimmer active">
+                      <div class="loader" />
+                      <div class="dimmer-content" style={{ height: '5rem' }}></div>
+                    </div>
                   </div>
                 )}
                 {sortedPairedDevices && sortedPairedDevices.length > 0 && (

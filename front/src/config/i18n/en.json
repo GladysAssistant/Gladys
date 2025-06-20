@@ -1867,6 +1867,7 @@
       },
       "device": {
         "title": "Matter Devices",
+        "refreshMatterDevices": "Refreshing Matter devices...",
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
         "addToGladys": "Add to Gladys",

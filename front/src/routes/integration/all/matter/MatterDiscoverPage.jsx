@@ -13,6 +13,7 @@ class MatterDiscoverPage extends Component {
     this.state = {
       pairingCode: '',
       loading: false,
+      getDataLoading: true,
       matterEnabled: null,
       error: null
     };
@@ -24,19 +25,22 @@ class MatterDiscoverPage extends Component {
 
   loadConfiguration = async () => {
     try {
+      await this.setState({ getDataLoading: true });
       const { value: matterEnabled } = await this.props.httpClient.get(
         '/api/v1/service/matter/variable/MATTER_ENABLED'
       );
-      this.setState({
-        matterEnabled: matterEnabled === 'true'
+      await this.setState({
+        matterEnabled: matterEnabled === 'true',
+        getDataLoading: false
       });
     } catch (e) {
       console.error(e);
       if (e.response && e.response.status !== 404) {
         this.setState({ error: RequestStatus.Error });
       }
-      this.setState({
-        matterEnabled: false
+      await this.setState({
+        matterEnabled: false,
+        getDataLoading: false
       });
     }
   };
@@ -71,67 +75,70 @@ class MatterDiscoverPage extends Component {
               </h3>
             </div>
           </div>
-          <div class="card-body">
-            {!this.state.matterEnabled && (
-              <div class="alert alert-warning">
-                <MarkupText id="integration.matter.settings.disabledWarning" />
-              </div>
-            )}
-            <div class="alert alert-info">
-              <Text id="integration.matter.discover.description" />
-            </div>
-
-            {this.state.error && (
-              <>
-                <div class="alert alert-danger">
-                  <Text id="integration.matter.discover.error" />
-                </div>
-                <div class="alert alert-danger">{this.state.error}</div>
-              </>
-            )}
-
-            <div class={this.state.loading ? 'dimmer active' : 'dimmer'}>
-              {this.state.loading && (
-                <div>
-                  <div class="loader" />
-                  <div class={style.loadingText}>
-                    <Text id="integration.matter.discover.loading" />
-                  </div>
+          <div class={cx('card-body dimmer', { active: this.state.getDataLoading })}>
+            <div class="loader" />
+            <div class="dimmer-content">
+              {!this.state.matterEnabled && (
+                <div class="alert alert-warning">
+                  <MarkupText id="integration.matter.settings.disabledWarning" />
                 </div>
               )}
-              <div class="dimmer-content">
-                <form onSubmit={this.handleSubmit}>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.matter.discover.pairingCodeLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
-                        value={this.state.pairingCode}
-                        onInput={e => this.setState({ pairingCode: e.target.value })}
-                        pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})|([0-9]{5}-[0-9]{5}-[0-9]{5}-[0-9]{6})|([0-9]{21})"
-                        required
-                        disabled={!this.state.matterEnabled}
-                      />
-                    </Localizer>
-                    <small class="form-text text-muted">
-                      <Text id="integration.matter.discover.pairingCodeHelp" />
-                    </small>
-                  </div>
+              <div class="alert alert-info">
+                <Text id="integration.matter.discover.description" />
+              </div>
 
-                  <div class="form-group">
-                    <button
-                      type="submit"
-                      class={cx('btn btn-primary', { loading: this.state.loading })}
-                      disabled={this.state.loading || !this.state.matterEnabled}
-                    >
-                      <Text id="integration.matter.discover.addButton" />
-                    </button>
+              {this.state.error && (
+                <>
+                  <div class="alert alert-danger">
+                    <Text id="integration.matter.discover.error" />
                   </div>
-                </form>
+                  <div class="alert alert-danger">{this.state.error}</div>
+                </>
+              )}
+
+              <div class={this.state.loading ? 'dimmer active' : 'dimmer'}>
+                {this.state.loading && (
+                  <div>
+                    <div class="loader" />
+                    <div class={style.loadingText}>
+                      <Text id="integration.matter.discover.loading" />
+                    </div>
+                  </div>
+                )}
+                <div class="dimmer-content">
+                  <form onSubmit={this.handleSubmit}>
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="integration.matter.discover.pairingCodeLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
+                          value={this.state.pairingCode}
+                          onInput={e => this.setState({ pairingCode: e.target.value })}
+                          pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})|([0-9]{5}-[0-9]{5}-[0-9]{5}-[0-9]{6})|([0-9]{21})"
+                          required
+                          disabled={!this.state.matterEnabled}
+                        />
+                      </Localizer>
+                      <small class="form-text text-muted">
+                        <Text id="integration.matter.discover.pairingCodeHelp" />
+                      </small>
+                    </div>
+
+                    <div class="form-group">
+                      <button
+                        type="submit"
+                        class={cx('btn btn-primary', { loading: this.state.loading })}
+                        disabled={this.state.loading || !this.state.matterEnabled}
+                      >
+                        <Text id="integration.matter.discover.addButton" />
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
