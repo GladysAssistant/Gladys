@@ -98,12 +98,12 @@ function smartRound(value) {
 /**
  * @description Converts a value from one unit to another according to the user's preference.
  * @param {number} value - Value to convert.
- * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', 'km/h', ...).
+ * @param {string} fromUnit - Original unit (e.g. 'km', 'mile', 'km/h', 'bar', 'psi', 'kPa', ...).
  * @param {string} userPreference - User preference ('us' or 'metric').
  * @returns {{ value: number, unit: string }} Object containing the converted value and the target unit.
  * @example
  * const result = convertUnit(10, DEVICE_FEATURE_UNITS.KM, SYSTEM_UNITS.US);
- * // result = { value: 6.21, unit: 'mile' }
+ * // returns = { value: 6.21, unit: 'mile' }
  */
 function checkAndConvertUnit(value, fromUnit, userPreference) {
   const unitsConvertUserPreference = UNIT_CONVERSIONS[userPreference];

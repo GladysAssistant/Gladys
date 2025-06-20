@@ -17,6 +17,7 @@ import TextDeviceValue from './TextDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 import TemperatureSensorDeviceValue from './TemperatureSensorDeviceValue';
 import LevelSensorDeviceValue from './LevelSensorDeviceValue';
+import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
@@ -27,6 +28,7 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: TemperatureSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: PressureSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_DRIVE]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: DistanceSensorDeviceValue
@@ -46,7 +48,8 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_VOLTAGE]: BadgeNumberDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.INDOOR_TEMPERATURE]: TemperatureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DistanceSensorDeviceValue,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
