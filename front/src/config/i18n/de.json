@@ -1868,6 +1868,7 @@
       "device": {
         "title": "Matter-Geräte",
         "refreshMatterDevices": "Matter-Geräte aktualisieren...",
+        "refreshMatterDevicesDescription": "Dies kann einige Minuten dauern, wenn Sie nicht erreichbare Geräte haben.",
         "noDeviceFound": "Keine Matter-Geräte gefunden",
         "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
         "addToGladys": "Zu Gladys hinzufügen",

@@ -1868,6 +1868,7 @@
       "device": {
         "title": "Matter Devices",
         "refreshMatterDevices": "Refreshing Matter devices...",
+        "refreshMatterDevicesDescription": "This may take a few minutes if you have unreachable devices.",
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
         "addToGladys": "Add to Gladys",

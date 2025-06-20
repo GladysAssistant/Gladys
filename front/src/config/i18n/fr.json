@@ -1838,6 +1838,7 @@
       "device": {
         "title": "Appareils Matter",
         "refreshMatterDevices": "Rafraîchissement des appareils Matter en cours...",
+        "refreshMatterDevicesDescription": "Cela peut prendre quelques minutes si vous avez des appareils injoignables.",
         "noDeviceFound": "Aucun appareil Matter trouvé",
         "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
         "addToGladys": "Ajouter à Gladys",

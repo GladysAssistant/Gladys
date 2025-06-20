@@ -11,6 +11,7 @@ import MatterDeviceBox from './MatterDeviceBox';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam } from '../../../../utils/device';
+import style from './style.css';
 
 const compareDevices = (deviceA, deviceB) => {
   // If external_id is different, it's not the same device
@@ -120,7 +121,7 @@ class MatterDevices extends Component {
         error: null,
         getGladysDevicesLoading: false
       });
-      this.getNodes();
+      await this.getNodes();
     } catch (e) {
       console.error(e);
       this.setState({
@@ -372,9 +373,12 @@ class MatterDevices extends Component {
                     <h4 class="alert-heading text-center">
                       <Text id="integration.matter.device.refreshMatterDevices" />
                     </h4>
+                    <p class="text-center">
+                      <Text id="integration.matter.device.refreshMatterDevicesDescription" />
+                    </p>
                     <div class="dimmer active">
                       <div class="loader" />
-                      <div class="dimmer-content" style={{ height: '5rem' }}></div>
+                      <div class={cx('dimmer-content', style.pairedDeviceLoadingContent)} />
                     </div>
                   </div>
                 )}
