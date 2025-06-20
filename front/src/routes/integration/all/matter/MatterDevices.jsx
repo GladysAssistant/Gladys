@@ -209,7 +209,6 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
-      await this.setState({ loading: false });
     } catch (e) {
       console.error(e);
     }
@@ -248,7 +247,6 @@ class MatterDevices extends Component {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
-      await this.setState({ loading: false });
     } catch (e) {
       console.error(e);
     }
