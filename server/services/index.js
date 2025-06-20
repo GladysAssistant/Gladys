@@ -32,3 +32,4 @@ module.exports['zwavejs-ui'] = require('./zwavejs-ui');
 module.exports['google-cast'] = require('./google-cast');
 module.exports.airplay = require('./airplay');
 module.exports['free-mobile'] = require('./free-mobile');
+module.exports.tessie = require('./tessie');

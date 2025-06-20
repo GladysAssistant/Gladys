@@ -853,6 +853,7 @@ const DEVICE_FEATURE_TYPES = {
     // Features related to the vehicle's climate control
     CLIMATE_ON: 'climate-on', // Climate system activation (binary - command with return status)
     INDOOR_TEMPERATURE: 'indoor-temperature', // Cabin temperature in °C (integer - sensor)
+    OUTSIDE_TEMPERATURE: 'outside-temperature', // Outside temperature in °C (integer - sensor)
     TARGET_TEMPERATURE: 'target-temperature', // Desired cabin temperature in °C (integer - command)
   },
   ELECTRICAL_VEHICLE_COMMAND: {
@@ -1307,6 +1308,14 @@ const WEBSOCKET_MESSAGE_TYPES = {
   NODERED: {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
+  },
+  TESSIE: {
+    STATUS: 'tessie.status',
+    ERROR: {
+      CONNECTED: 'tessie.error-connected',
+      CONNECTING: 'tessie.error-connecting',
+      PROCESSING_TOKEN: 'tessie.error-processing-token',
+    },
   },
 };
 

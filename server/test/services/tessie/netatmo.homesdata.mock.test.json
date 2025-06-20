@@ -1,0 +1,181 @@
+{
+  "homes": [
+    {
+      "id": "5e1xxxxxxxxxxxxxxxxx",
+      "name": "Maison Stark",
+      "altitude": 122,
+      "coordinates": [0.3289786995650213, 49.60009176402246],
+      "country": "FR",
+      "timezone": "Europe/Paris",
+      "rooms": [
+        {
+          "id": "1234567890",
+          "name": "Garage Test",
+          "type": "garage",
+          "module_ids": ["01:00:00:xx:xx:xx"]
+        },
+        {
+          "id": "0987654321",
+          "name": "Maison Test",
+          "type": "livingroom",
+          "module_ids": ["04:00:00:xx:xx:xx"]
+        },
+        {
+          "id": "8765432109",
+          "name": "Extérieur",
+          "type": "outdoor",
+          "module_ids": [
+            "70:ee:00:xx:xx:xx",
+            "02:00:00:xx:xx:xx",
+            "05:00:00:xx:xx:xx",
+            "06:00:00:xx:xx:xx",
+            "09:00:00:xx:xx:xx"
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "id": "70:ee:00:xx:xx:xx",
+          "type": "NOC",
+          "name": "Outdoor Parking Camera",
+          "setup_date": 1608493953,
+          "room_id": "8765432109"
+        },
+        {
+          "id": "70:ee:50:xx:xx:xx",
+          "type": "NAPlug",
+          "name": "Relais Test",
+          "setup_date": 1580000000,
+          "room_id": "1234567890",
+          "modules_bridged": ["04:00:00:xx:xx:xx", "02:00:00:xx:xx:xx"]
+        },
+        {
+          "id": "04:00:00:xx:xx:xx",
+          "type": "NATherm1",
+          "name": "Thermostat Test",
+          "setup_date": 1580500000,
+          "room_id": "0987654321",
+          "bridge": "70:ee:50:xx:xx:xx"
+        },
+        {
+          "id": "70:ee:50:yy:yy:yy",
+          "type": "NAPlug",
+          "name": "Relais Salon Test",
+          "setup_date": 1578496638
+        },
+        {
+          "id": "09:00:00:xx:xx:xx",
+          "type": "NRV",
+          "name": "Valve Test",
+          "setup_date": 1705912152,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:yy:yy:yy"
+        },
+        {
+          "id": "70:ee:50:jj:jj:jj",
+          "type": "NAMain",
+          "name": "Weather Station Test",
+          "setup_date": 1605564990,
+          "room_id": "8765432109",
+          "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"]
+        },
+        {
+          "id": "02:00:00:xx:xx:xx",
+          "type": "NAModule1",
+          "name": "Outdoor Hygrometer",
+          "setup_date": 1605564992,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
+          "id": "06:00:00:yy:yy:yy",
+          "type": "NAModule2",
+          "name": "Anemometer STARK Home",
+          "setup_date": 1605604559,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
+          "id": "05:00:00:yy:yy:yy",
+          "type": "NAModule3",
+          "name": "STARK House Rain Gauge",
+          "setup_date": 1605604312,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
+          "id": "03:00:00:xx:xx:xx",
+          "type": "NAModule4",
+          "name": "STARK House kitchen hygrometer",
+          "setup_date": 1605564990,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
+        }
+      ],
+      "temperature_control_mode": "heating",
+      "therm_mode": "schedule",
+      "therm_setpoint_default_duration": 180,
+      "persons": [
+        {
+          "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "pseudo": "Tony",
+          "url": "https://netatmocameraimage.blob.core.windows.net/production/xxx?sv=2010-01-01&sr=b&se=2023-12-31T00:01:00Z&sp=r&spr=https&sig=xxxxxx"
+        }
+      ],
+      "schedules": [
+        {
+          "timetable": [
+            {
+              "zone_id": 1,
+              "m_offset": 0
+            },
+            {
+              "zone_id": 6,
+              "m_offset": 345
+            }
+          ],
+          "zones": [
+            {
+              "name": "Confort",
+              "id": 0,
+              "type": 0,
+              "rooms_temp": [
+                {
+                  "room_id": "1234567890",
+                  "temp": 17
+                },
+                {
+                  "room_id": "0987654321",
+                  "temp": 20
+                }
+              ],
+              "rooms": [
+                {
+                  "id": "1456430165",
+                  "therm_setpoint_temperature": 17
+                },
+                {
+                  "id": "3416175565",
+                  "therm_setpoint_temperature": 17
+                }
+              ]
+            }
+          ],
+          "name": "Standard",
+          "default": false,
+          "away_temp": 17,
+          "hg_temp": 8,
+          "id": "5e147b4da11ec5d9f86b25a3",
+          "type": "therm"
+        }
+      ]
+    },
+    {
+      "id": "7e2xxxxxxxxxxxxxxxxx",
+      "name": "Secondary House Stark",
+      "altitude": 1220,
+      "country": "US",
+      "modules": []
+    }
+  ]
+}

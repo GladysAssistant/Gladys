@@ -99,5 +99,10 @@
     "key": "matter",
     "link": "matter",
     "img": "/assets/integrations/cover/matter.jpg"
+  },
+  {
+    "key": "tessie",
+    "link": "tessie",
+    "img": "/assets/integrations/cover/tessie.jpg"
   }
 ]
