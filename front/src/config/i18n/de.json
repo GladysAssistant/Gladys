@@ -2799,6 +2799,7 @@
     "percent": "Prozent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hektopascal (hPa)",
+    "kPa": "Kilopascal (kPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
     "milli-bar": "Millibar (mbar)",
@@ -2888,6 +2889,7 @@
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "kPa": "kPa",
     "bar": "bar",
     "milli-bar": "mbar",
     "psi": "psi",
@@ -2994,6 +2996,28 @@
           "zero": "Stopp",
           "one": "Öffnen",
           "other": "Schließen"
+        }
+      },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Deaktiviert",
+            "1": "Aktiviert"
+          },
+          "state": {
+            "0": "Aktivieren",
+            "1": "Deaktivieren"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Entriegelt",
+            "1": "Verriegelt"
+          },
+          "state": {
+            "0": "Verriegeln",
+            "1": "Entriegeln"
+          }
         }
       },
       "air-conditioning": {
@@ -3187,6 +3211,22 @@
           "1": "Normal",
           "2": "Hoch",
           "unknown": "Unbekannt"
+        }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Geschlossen",
+          "1": "Offen"
+        },
+        "window-opened": {
+          "0": "Geschlossen",
+          "1": "Offen"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Nicht geladen",
+          "1": "Geladen"
         }
       }
     }
@@ -3406,6 +3446,7 @@
       "shortCategoryName": "Elektrofahrzeug - Status",
       "door-opened": "Tür geöffnet",
       "odometer": "Kilometerzähler",
+      "tire-pressure": "Reifendruck",
       "window-opened": "Fenster geöffnet"
     },
     "heater": {
