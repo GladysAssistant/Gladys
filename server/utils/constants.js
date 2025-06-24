@@ -587,6 +587,11 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  TEMPERATURE_SENSOR: {
+    MIN: 'min',
+    MAX: 'max',
+    AVERAGE: 'average',
+  },
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',

@@ -50,6 +50,22 @@ describe('Netatmo device mapping', () => {
       expect(mappingFunction(valueFromDevice)).to.equal(20.5);
     });
 
+    it('should correctly transform TEMPERATURE_SENSOR.MIN value from Netatmo to Gladys', () => {
+      const valueFromDevice = 20.5;
+      const mappingFunction =
+        readValues[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR][DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN];
+
+      expect(mappingFunction(valueFromDevice)).to.equal(20.5);
+    });
+
+    it('should correctly transform TEMPERATURE_SENSOR.MAX value from Netatmo to Gladys', () => {
+      const valueFromDevice = 20.5;
+      const mappingFunction =
+        readValues[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR][DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX];
+
+      expect(mappingFunction(valueFromDevice)).to.equal(20.5);
+    });
+
     it('should correctly transform SIGNAL.QUALITY value from Netatmo to Gladys', () => {
       const valueFromDevice = 76;
       const valueFromDeviceFloat = 76.5;

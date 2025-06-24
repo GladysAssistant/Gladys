@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const logger = require('../../../utils/logger');
 const db = require('../../../models');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 
 const DEFAULT_PARAMETERS = {
@@ -36,6 +36,7 @@ async function getTemperatureInRoom(roomId, options) {
     ],
     where: {
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       last_value: {
         [Op.not]: null,
       },
