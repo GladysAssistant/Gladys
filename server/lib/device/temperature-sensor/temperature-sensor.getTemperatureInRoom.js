@@ -36,7 +36,9 @@ async function getTemperatureInRoom(roomId, options) {
     ],
     where: {
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      type: {
+        [Op.or]: [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.AVERAGE],
+      },
       last_value: {
         [Op.not]: null,
       },
