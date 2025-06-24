@@ -9,7 +9,12 @@ async function init() {
 
   if (this.vehicles && this.vehicles.length > 0) {
     await this.refreshTessieValues();
-    await this.pollRefreshingValues();
+    await this.startPolling();
+
+    // Initialiser les connexions WebSocket si activé
+    if (this.configuration.websocketEnabled && this.configuration.apiKey) {
+      await this.initWebSocketConnections();
+    }
   }
 }
 

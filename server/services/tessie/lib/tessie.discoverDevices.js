@@ -39,7 +39,7 @@ async function discoverDevices() {
       const version = trimBadging?.startsWith('P')
         ? 'performance'
         : trimBadging?.startsWith('7') || trimBadging?.startsWith('8') || trimBadging?.startsWith('9')
-        ? 'long_range'
+        ? 'long-range'
         : 'standard';
 
       const vehicleData = {

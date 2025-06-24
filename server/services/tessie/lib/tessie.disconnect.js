@@ -12,12 +12,24 @@ async function disconnect() {
   await this.saveStatus({ statusType: STATUS.DISCONNECTING, message: null });
 
   try {
+    // Arrêter le polling s'il est actif
+    if (this.pollRefreshValues) {
+      clearInterval(this.pollRefreshValues);
+      this.pollRefreshValues = undefined;
+      this.currentPollingInterval = null;
+      logger.debug('Polling stopped');
+    }
+
+    // Déconnecter tous les WebSockets
+    await this.disconnectAllWebSockets();
+
     // Supprimer l'API key
     await this.gladys.variable.destroy(this.serviceId, 'TESSIE_API_KEY');
 
     // Réinitialiser la configuration
     this.configuration = {
       apiKey: null,
+      websocketEnabled: false,
     };
 
     await this.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });

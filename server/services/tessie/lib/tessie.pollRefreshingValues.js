@@ -37,20 +37,66 @@ async function refreshTessieValues() {
 }
 
 /**
- * @description Poll values of Tessie devices.
- * @example pollRefreshingValues();
+ * @description Poll values of Tessie devices with dynamic interval.
+ * @param {number} interval - Polling interval in milliseconds.
+ * @example pollRefreshingValues(60000);
  */
-function pollRefreshingValues() {
+function pollRefreshingValues(interval = 60 * 1000) {
+  // Arrêter le polling existant s'il y en a un
+  if (this.pollRefreshValues) {
+    clearInterval(this.pollRefreshValues);
+  }
+
   this.pollRefreshValues = setInterval(async () => {
     try {
-      await this.refreshTessieValues();
+      await refreshTessieValues.call(this);
+      // Vérifier l'état du véhicule après chaque refresh pour ajuster l'intervalle
+      await adjustPollingInterval.call(this);
     } catch (error) {
       logger.error('Error refreshing Tessie values: ', error);
     }
-  }, 30 * 1000);
+  }, interval);
+
+  logger.debug(`Polling started with interval: ${interval}ms`);
+}
+
+/**
+ * @description Start polling with initial interval and dynamic adjustment.
+ * @example startPolling();
+ */
+async function startPolling() {
+  // Démarrer avec l'intervalle par défaut (60s)
+  pollRefreshingValues.call(this, 10 * 1000);
+}
+
+/**
+ * @description Adjust polling interval based on vehicle state.
+ * @example adjustPollingInterval();
+ */
+async function adjustPollingInterval() {
+  const fastInterval = 5 * 1000; // 5 secondes
+  const normalInterval = 5 * 60 * 1000; // 60 secondes
+  console.log('this.stateVehicle', this.stateVehicle);
+  // Vérifier si le véhicule est en train de charger ou de conduire
+  if (this.stateVehicle === STATUS.VEHICLE_STATE.CHARGING ||
+    this.stateVehicle === STATUS.VEHICLE_STATE.DRIVING && !this.configuration.websocketEnabled) {
+    // Si on n'est pas déjà en mode rapide, redémarrer avec l'intervalle rapide et si websocket est désactivé
+    if (this.currentPollingInterval !== fastInterval) {
+      logger.debug(`Vehicle state changed to ${this.stateVehicle}, switching to fast polling (5s)`);
+      this.currentPollingInterval = fastInterval;
+      pollRefreshingValues.call(this, fastInterval);
+    }
+  } else {
+    // Si on n'est pas déjà en mode normal, redémarrer avec l'intervalle normal
+    if (this.currentPollingInterval !== normalInterval) {
+      logger.debug(`Vehicle state changed to ${this.stateVehicle}, switching to normal polling (60s)`);
+      this.currentPollingInterval = normalInterval;
+      pollRefreshingValues.call(this, normalInterval);
+    }
+  }
 }
 
 module.exports = {
-  pollRefreshingValues,
   refreshTessieValues,
+  startPolling,
 };

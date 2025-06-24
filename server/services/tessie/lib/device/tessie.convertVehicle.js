@@ -4,7 +4,7 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { SUPPORTED_MODULE_TYPE } = require('../utils/tessie.constants');
+const { SUPPORTED_MODULE_TYPE, PARAMS } = require('../utils/tessie.constants');
 const { buildFeatureBattery } = require('./tessie.buildFeaturesBattery');
 const { buildFeatureCharge } = require('./tessie.buildFeaturesCharge');
 const { buildFeatureClimate } = require('./tessie.buildFeaturesClimate');
@@ -44,8 +44,12 @@ function convertVehicle(vehicleData) {
     features: [],
     params: [
       {
-        name: 'vin',
+        name: PARAMS.VEHICLE_VIN,
         value: vehicle.vin,
+      },
+      {
+        name: PARAMS.VEHICLE_VERSION,
+        value: version,
       },
     ],
   };

@@ -1,6 +1,6 @@
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
-const { API, BASE_API } = require('./utils/tessie.constants');
+const { API, BASE_API, STATUS } = require('./utils/tessie.constants');
 
 /**
  * @description Update all vehicle values.
@@ -28,7 +28,19 @@ async function updateValues(device, vehicle, externalId, vin) {
     }
 
     const vehicleState = await vehicleStateResponse.json();
-    console.log('vehicleState', vehicleState);
+
+    const { charge_state: chargeState, drive_state: driveState } = vehicleState;
+    if (
+      chargeState.charging_state === 'Disconnected' && 
+      driveState.shift_state === 'P' &&
+      this.stateVehicle !== STATUS.VEHICLE_STATE.PARKING
+    ) {
+      this.stateVehicle = STATUS.VEHICLE_STATE.PARKING;
+    } else if (chargeState.charging_state === 'Charging' && this.stateVehicle !== STATUS.VEHICLE_STATE.CHARGING) {
+      this.stateVehicle = STATUS.VEHICLE_STATE.CHARGING;
+    } else if (driveState.shift_state !== 'P' && this.stateVehicle !== STATUS.VEHICLE_STATE.DRIVING) {
+      this.stateVehicle = STATUS.VEHICLE_STATE.DRIVING;
+    }
 
     // Update features in Gladys
     if (device) {
@@ -37,40 +49,22 @@ async function updateValues(device, vehicle, externalId, vin) {
 
       // Update charge
       await this.updateCharge(device, vehicleState, vin, externalId);
-
+      
       // Update climate
-      await this.updateClimate(device, vehicleState, vin, externalId);
+      await this.updateClimate(device, vehicleState, externalId);
 
-      // Update charging state
-      // const chargingFeature = device.features.find(f => f.external_id === `${externalId}:charging`);
-      // if (chargingFeature) {
-      //   await this.gladys.stateManager.setState('deviceFeature', chargingFeature.selector, {
-      //     value: stateData.charging_state === 'Charging' ? 1 : 0,
-      //   });
-      // }
+      // Update command
+      await this.updateCommand(device, vehicleState, externalId);
 
-      // // Update temperatures
-      // const insideTempFeature = device.features.find(f => f.external_id === `${externalId}:inside_temp`);
-      // if (insideTempFeature) {
-      //   await this.gladys.stateManager.setState('deviceFeature', insideTempFeature.selector, {
-      //     value: stateData.inside_temp,
-      //   });
-      // }
+      // Update consumption
+      await this.updateConsumption(device, vin, externalId);
 
-      // const outsideTempFeature = device.features.find(f => f.external_id === `${externalId}:outside_temp`);
-      // if (outsideTempFeature) {
-      //   await this.gladys.stateManager.setState('deviceFeature', outsideTempFeature.selector, {
-      //     value: stateData.outside_temp,
-      //   });
-      // }
+        // Update drive
+        await this.updateDrive(device, vehicleState, vin, externalId);
 
-      // // Update vehicle state
-      // const stateFeature = device.features.find(f => f.external_id === `${externalId}:state`);
-      // if (stateFeature) {
-      //   await this.gladys.stateManager.setState('deviceFeature', stateFeature.selector, {
-      //     value: stateData.state,
-      //   });
-      // }
+      // Update state
+      await this.updateState(device, vehicleState, externalId);
+
     }
   } catch (e) {
     logger.error(`Error updating vehicle ${vehicle.id}:`, e);

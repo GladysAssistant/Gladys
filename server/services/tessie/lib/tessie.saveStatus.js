@@ -93,7 +93,36 @@ function saveStatus(status) {
         this.connected = true;
         break;
 
+      case STATUS.WEBSOCKET_CONNECTING:
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS,
+          payload: { status: STATUS.WEBSOCKET_CONNECTING },
+        });
+        break;
+      case STATUS.WEBSOCKET_CONNECTED:
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS,
+          payload: { status: STATUS.WEBSOCKET_CONNECTED },
+        });
+        break;
+      case STATUS.WEBSOCKET_DISCONNECTED:
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS,
+          payload: { status: STATUS.WEBSOCKET_DISCONNECTED },
+        });
+        break;
+      case STATUS.ERROR.WEBSOCKET:
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.TESSIE.ERROR.WEBSOCKET,
+          payload: { statusType: STATUS.ERROR.WEBSOCKET, status: status.message },
+        });
+        break;
       default:
+        this.status = status.statusType;
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.TESSIE.STATUS,
+          payload: { status: status.statusType },
+        });
         break;
     }
     logger.debug('Status Tessie well changed');

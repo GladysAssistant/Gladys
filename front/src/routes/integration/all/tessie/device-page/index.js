@@ -5,6 +5,7 @@ import TessiePage from '../TessiePage';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { STATUS } from '../../../../../../../server/services/tessie/lib/utils/tessie.constants';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 class DevicePage extends Component {
   loadStatus = async () => {
@@ -128,10 +129,11 @@ class DevicePage extends Component {
           loading={loading}
           loadProps={this.loadProps}
           updateStateInIndex={this.handleStateUpdateFromChild}
+          intl={this.props.intl}
         />
       </TessiePage>
     );
   }
 }
 
-export default connect('user,session,httpClient', {})(DevicePage);
+export default withIntlAsProp(connect('user,session,httpClient', {})(DevicePage));

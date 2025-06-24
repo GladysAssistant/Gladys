@@ -1315,6 +1315,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
       CONNECTED: 'tessie.error-connected',
       CONNECTING: 'tessie.error-connecting',
       PROCESSING_TOKEN: 'tessie.error-processing-token',
+      WEBSOCKET: 'tessie.error-websocket',
     },
   },
 };

@@ -16,7 +16,7 @@ function buildFeatureClimate(externalId, category, climateState) {
     {
       name: 'Climate on',
       external_id: `${externalId}:climate_on`,
-      selector: `tessie-${externalId}-climate-on`,
+      selector: `${externalId}-climate-on`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].CLIMATE_ON,
       read_only: false,
@@ -29,7 +29,7 @@ function buildFeatureClimate(externalId, category, climateState) {
     {
       name: 'Indoor temperature',
       external_id: `${externalId}:indoor_temperature`,
-      selector: `tessie-${externalId}-indoor-temperature`,
+      selector: `${externalId}-indoor-temperature`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].INDOOR_TEMPERATURE,
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -43,7 +43,7 @@ function buildFeatureClimate(externalId, category, climateState) {
     {
       name: 'Outside temperature',
       external_id: `${externalId}:outside_temperature`,
-      selector: `tessie-${externalId}-outside-temperature`,
+      selector: `${externalId}-outside-temperature`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].OUTSIDE_TEMPERATURE,
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -57,7 +57,7 @@ function buildFeatureClimate(externalId, category, climateState) {
     {
       name: 'Target temperature',
       external_id: `${externalId}:target_temperature`,
-      selector: `tessie-${externalId}-target-temperature`,
+      selector: `${externalId}-target-temperature`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].TARGET_TEMPERATURE,
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -66,7 +66,7 @@ function buildFeatureClimate(externalId, category, climateState) {
       has_feedback: true,
       min: climateState.min_avail_temp,
       max: climateState.max_avail_temp,
-      last_value: climateState.target_temp,
+      last_value: climateState.driver_temp_setting,
     },
   ];
 }

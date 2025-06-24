@@ -34,6 +34,10 @@ class SetupTab extends Component {
     this.props.updateStateInIndex({ tessieApiKey: e.target.value });
   };
 
+  updateWebsocketEnabled = e => {
+    this.props.updateStateInIndex({ tessieWebsocketEnabled: e.target.checked });
+  };
+
   toggleApiKey = () => {
     const { showApiKey } = this.state;
 
@@ -105,6 +109,25 @@ class SetupTab extends Component {
                         })}
                       />
                     </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label htmlFor="tessieWebsocketEnabled" className="form-label">
+                    <Text id="integration.tessie.setup.websocketLabel" />
+                  </label>
+                  <div class="form-check form-switch">
+                    <input
+                      id="tessieWebsocketEnabled"
+                      name="tessieWebsocketEnabled"
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={props.tessieWebsocketEnabled}
+                      onChange={this.updateWebsocketEnabled}
+                    />
+                    <label className="form-check-label" htmlFor="tessieWebsocketEnabled">
+                      <Text id="integration.tessie.setup.websocketDescription" />
+                    </label>
                   </div>
                 </div>
 

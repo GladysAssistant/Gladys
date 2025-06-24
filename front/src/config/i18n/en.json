@@ -758,13 +758,19 @@
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Tessie account information and that the account is not banned or disabled <a href=\"https://dev.tessie.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
-        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices."
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices.",
+        "descriptionGetApiKey": "You will then need to get your API key from your Tessie account.",
+        "apiKeyLabel": "Tessie API Key",
+        "apiKeyPlaceholder": "Enter your Tessie API key",
+        "websocketLabel": "Enable WebSocket",
+        "websocketDescription": "Enable WebSocket connection to receive real-time telemetry data",
+        "connectionInfoLabel": "Connection Information"
       },
       "device": {
         "title": "Tessie Devices in Gladys",
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Tessie API limitation).",
         "noDeviceFound": "No Tessie devices have been added yet.",
-        "sidLabel": "Tessie device SID",
+        "vinLabel": "Vehicle VIN",
         "nameLabel": "Device name",
         "namePlaceholder": "Enter your device name",
         "modelLabel": "Model",

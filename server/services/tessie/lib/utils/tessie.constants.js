@@ -1,5 +1,6 @@
 const GLADYS_VARIABLES = {
   API_KEY: 'TESSIE_API_KEY',
+  WEBSOCKET_ENABLED: 'TESSIE_WEBSOCKET_ENABLED',
   VEHICLES_API: 'TESSIE_VEHICLES_API',
   DRIVERS_API: 'TESSIE_DRIVERS_API',
   TELEMETRY_API: 'TESSIE_TELEMETRY_API',
@@ -12,6 +13,9 @@ const STATUS = {
   PROCESSING_TOKEN: 'processing token',
   CONNECTED: 'connected',
   DISCONNECTED: 'disconnected',
+  WEBSOCKET_CONNECTING: 'websocket connecting',
+  WEBSOCKET_CONNECTED: 'websocket connected',
+  WEBSOCKET_DISCONNECTED: 'websocket disconnected',
   ERROR: {
     CONNECTING: 'error connecting',
     PROCESSING_TOKEN: 'error processing token',
@@ -19,9 +23,15 @@ const STATUS = {
     CONNECTED: 'error connected',
     SET_VEHICLE_VALUES: 'error set vehicle values',
     GET_VEHICLE_VALUES: 'error get vehicle values',
+    WEBSOCKET: 'error websocket',
   },
   GET_VEHICLE_VALUES: 'get vehicle values',
   DISCOVERING_VEHICLES: 'discovering',
+  VEHICLE_STATE: {
+    DRIVING: 'driving',
+    PARKING: 'parking',
+    CHARGING: 'charging',
+  },
 };
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
@@ -37,19 +47,19 @@ const API = {
   VEHICLE_STATE: `/state?use_cache=true`,
   VEHICLE_COMMAND: `/command`,
   VEHICLE_CHARGING: `/charges`,
-  VEHICLE_LOCATION: `/location`,
+  // VEHICLE_LOCATION: `/location`,
   VEHICLE_BATTERY: `/battery`,
-  VEHICLE_BATTERY_HEALTH: `/battery/health`,
-  VEHICLE_FIRMWARE: `/firmware/alerts`,
-  VEHICLE_CONSUMPTION: `/consumption`,
-  VEHICLE_WEATHER: `/weather`,
+  // VEHICLE_BATTERY_HEALTH: `/battery/health`,
+  // VEHICLE_FIRMWARE: `/firmware/alerts`,
+  VEHICLE_CONSUMPTION: `/consumption_since_charge`,
+  // VEHICLE_WEATHER: `/weather`,
   VEHICLE_DRIVES: `/drives`,
   VEHICLE_CHARGES: `/charges`,
-  VEHICLE_TIRES: `/tires`,
-  VEHICLE_LICENSE: `/license`,
-  VEHICLE_TELEMETRY: `/telemetry`,
-  DRIVERS: `${BASE_API}/drivers`,
-  DRIVER_INVITATIONS: `${BASE_API}/drivers/invitations`,
+  // VEHICLE_TIRES: `/tires`,
+  // VEHICLE_LICENSE: `/license`,
+  // VEHICLE_TELEMETRY: `/telemetry`,
+  // DRIVERS: `${BASE_API}/drivers`,
+  // DRIVER_INVITATIONS: `${BASE_API}/drivers/invitations`,
 };
 
 const SUPPORTED_CATEGORY_TYPE = {
@@ -75,7 +85,7 @@ const SUPPORTED_MODULE_TYPE = {
 
 const SUPPORTED_MODULE_VERSION = {
   BASE: 'base',
-  LONG_RANGE: 'long_range',
+  LONG_RANGE: 'long-range',
   AWD: 'awd',
   PERFORMANCE: 'performance',
   STANDARD: 'standard',
@@ -204,13 +214,26 @@ const PARAMS = {
   VEHICLE_NAME: 'vehicle_name',
   VEHICLE_VIN: 'vehicle_vin',
   VEHICLE_STATE: 'vehicle_state',
+  VEHICLE_VERSION: 'vehicle_version',
 };
 
 const CAR_SPECIAL_TYPE = {
   STANDARD: 'standard',
-  LONG_RANGE: 'long_range',
+  LONG_RANGE: 'long-range',
   AWD: 'awd',
   PERFORMANCE: 'performance',
+};
+
+const WEBSOCKET = {
+  BASE_URL: 'wss://streaming.tessie.com',
+  RECONNECT_INTERVAL: 5 * 1000,
+  MAX_RECONNECT_ATTEMPTS: 5,
+};
+
+const UPDATE_THRESHOLDS = {
+  DEFAULT: 5 * 60 * 1000,
+  BATTERY: 10 * 60 * 1000,
+  DRIVE: 10 * 60 * 1000,
 };
 
 module.exports = {
@@ -226,4 +249,7 @@ module.exports = {
   PARAMS,
   EFFICIENCY_PACKAGE_YEAR,
   BATTERY_CAPACITY,
+  CAR_SPECIAL_TYPE,
+  WEBSOCKET,
+  UPDATE_THRESHOLDS,
 };

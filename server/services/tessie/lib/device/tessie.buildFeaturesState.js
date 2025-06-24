@@ -18,7 +18,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Front driver door opened',
       external_id: `${externalId}:door_df_opened`,
-      selector: `tessie-${externalId}-door-df-opened`,
+      selector: `${externalId}-door-df-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -31,7 +31,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Front passenger door opened',
       external_id: `${externalId}:door_pf_opened`,
-      selector: `tessie-${externalId}-door-pf-opened`,
+      selector: `${externalId}-door-pf-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -39,12 +39,12 @@ function buildFeatureState(externalId, category, vehicleState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: vehicleState.pf ? 1 : 0,
+      last_value: vehicleState.pf ? 1 : 0,  
     },
     {
       name: 'Rear driver door opened',
       external_id: `${externalId}:door_dr_opened`,
-      selector: `tessie-${externalId}-door-dr-opened`,
+      selector: `${externalId}-door-dr-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -57,7 +57,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Rear passenger door opened',
       external_id: `${externalId}:door_pr_opened`,
-      selector: `tessie-${externalId}-door-pr-opened`,
+      selector: `${externalId}-door-pr-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -70,7 +70,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Frunk opened',
       external_id: `${externalId}:door_ft_opened`,
-      selector: `tessie-${externalId}-door-ft-opened`,
+      selector: `${externalId}-door-ft-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -83,7 +83,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Rear trunk opened',
       external_id: `${externalId}:door_rt_opened`,
-      selector: `tessie-${externalId}-door-rt-opened`,
+      selector: `${externalId}-door-rt-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].DOOR_OPENED,
       read_only: true,
@@ -96,7 +96,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Odometer',
       external_id: `${externalId}:odometer`,
-      selector: `tessie-${externalId}-odometer`,
+      selector: `${externalId}-odometer`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].ODOMETER,
       unit: DEVICE_FEATURE_UNITS.MILE,
@@ -110,7 +110,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Front left tire pressure',
       external_id: `${externalId}:tire_pressure_fl`,
-      selector: `tessie-${externalId}-tire-pressure-fl`,
+      selector: `${externalId}-tire-pressure-fl`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].TIRE_PRESSURE,
       unit: DEVICE_FEATURE_UNITS.BAR,
@@ -124,7 +124,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Front right tire pressure',
       external_id: `${externalId}:tire_pressure_fr`,
-      selector: `tessie-${externalId}-tire-pressure-fr`,
+      selector: `${externalId}-tire-pressure-fr`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].TIRE_PRESSURE,
       unit: DEVICE_FEATURE_UNITS.BAR,
@@ -138,7 +138,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Rear left tire pressure',
       external_id: `${externalId}:tire_pressure_rl`,
-      selector: `tessie-${externalId}-tire-pressure-rl`,
+      selector: `${externalId}-tire-pressure-rl`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].TIRE_PRESSURE,
       unit: DEVICE_FEATURE_UNITS.BAR,
@@ -152,7 +152,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Rear right tire pressure',
       external_id: `${externalId}:tire_pressure_rr`,
-      selector: `tessie-${externalId}-tire-pressure-rr`,
+      selector: `${externalId}-tire-pressure-rr`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].TIRE_PRESSURE,
       unit: DEVICE_FEATURE_UNITS.BAR,
@@ -166,7 +166,7 @@ function buildFeatureState(externalId, category, vehicleState) {
     {
       name: 'Front driver window opened',
       external_id: `${externalId}:window_fd_opened`,
-      selector: `tessie-${externalId}-window-fd-opened`,
+      selector: `${externalId}-window-fd-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].WINDOW_OPENED,
       read_only: true,
@@ -174,12 +174,12 @@ function buildFeatureState(externalId, category, vehicleState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: vehicleState.fd ? 1 : 0,
+      last_value: vehicleState.fd_window ? 1 : 0,
     },
     {
       name: 'Front passenger window opened',
       external_id: `${externalId}:window_fp_opened`,
-      selector: `tessie-${externalId}-window-fp-opened`,
+      selector: `${externalId}-window-fp-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].WINDOW_OPENED,
       read_only: true,
@@ -187,12 +187,12 @@ function buildFeatureState(externalId, category, vehicleState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: vehicleState.fp ? 1 : 0,
+      last_value: vehicleState.fp_window ? 1 : 0,
     },
     {
       name: 'Rear driver window opened',
       external_id: `${externalId}:window_rd_opened`,
-      selector: `tessie-${externalId}-window-rd-opened`,
+      selector: `${externalId}-window-rd-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].WINDOW_OPENED,
       read_only: true,
@@ -200,12 +200,12 @@ function buildFeatureState(externalId, category, vehicleState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: vehicleState.rd ? 1 : 0,
+      last_value: vehicleState.rd_window ? 1 : 0,
     },
     {
       name: 'Rear passenger window opened',
       external_id: `${externalId}:window_rp_opened`,
-      selector: `tessie-${externalId}-window-rp-opened`,
+      selector: `${externalId}-window-rp-opened`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].WINDOW_OPENED,
       read_only: true,
@@ -213,7 +213,7 @@ function buildFeatureState(externalId, category, vehicleState) {
       keep_history: true,
       min: 0,
       max: 1,
-      last_value: vehicleState.rp ? 1 : 0,
+      last_value: vehicleState.rp_window ? 1 : 0,
     },
   ];
 }

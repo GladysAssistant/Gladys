@@ -41,6 +41,18 @@ async function connect() {
       this.vehicles = vehicles;
       await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
       this.configured = true;
+
+      // Démarrer le polling si des véhicules sont disponibles
+      if (vehicles.length > 0) {
+        await this.refreshTessieValues();
+        await this.startPolling();
+
+        // Initialiser les connexions WebSocket si activé
+        if (this.configuration.websocketEnabled) {
+          await this.initWebSocketConnections();
+        }
+      }
+
       return { vehicles };
     } else {
       throw new Error('Failed to connect to Tessie');

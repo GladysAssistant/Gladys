@@ -107,7 +107,8 @@ class TessieSetupPage extends Component {
 
     try {
       await this.props.httpClient.post('/api/v1/service/tessie/configuration', {
-        apiKey: this.state.tessieApiKey
+        apiKey: this.state.tessieApiKey,
+        websocketEnabled: this.state.tessieWebsocketEnabled
       });
       await this.setState({
         tessieSaveSettingsStatus: RequestStatus.Success
@@ -174,6 +175,7 @@ class TessieSetupPage extends Component {
     } finally {
       await this.setState({
         tessieApiKey: configuration.apiKey,
+        tessieWebsocketEnabled: configuration.websocketEnabled || false,
         clientSecretChanges: false
       });
     }

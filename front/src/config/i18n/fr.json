@@ -56,10 +56,10 @@
     "vehicle": {
       "tesla": {
         "modely": {
-          "tesla-modely-standard": "Tesla Model Y Standard",
-          "tesla-modely-long": "Tesla Model Y Long Range",
-          "tesla-modely-awd": "Tesla Model Y Traction intégrale (AWD)",
-          "tesla-modely-performance": "Tesla Model Y Performance"
+          "standard": "Tesla Model Y Standard",
+          "long-range": "Tesla Model Y Long Range",
+          "awd": "Tesla Model Y Traction intégrale (AWD)",
+          "performance": "Tesla Model Y Performance"
         },
         "model3": {
           "tesla-model3-standard": "Tesla Model 3 standard",
@@ -910,7 +910,7 @@
         "title": "Appareils Tessie dans Gladys",
         "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Tessie).",
         "noDeviceFound": "Aucun appareil Tessie n'a encore été ajouté.",
-        "sidLabel": "SID Tessie de l'appareil",
+        "vinLabel": "VIN du véhicule",
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
         "modelLabel": "Modèle",
@@ -954,7 +954,12 @@
         "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Tessie)",
         "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Tessie)",
         "saveLabel": "Sauvegarder et connecter",
-        "disconnectLabel": "Déconnecter"
+        "disconnectLabel": "Déconnecter",
+        "descriptionGetApiKey": "Vous devrez ensuite obtenir votre clé API depuis votre compte Tessie.",
+        "apiKeyLabel": "Clé API Tessie",
+        "apiKeyPlaceholder": "Entrez votre clé API Tessie",
+        "websocketLabel": "Activer le WebSocket",
+        "websocketDescription": "Activer la connexion WebSocket pour recevoir les données de télémétrie en temps réel"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

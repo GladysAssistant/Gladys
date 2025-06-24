@@ -18,7 +18,7 @@ function buildFeatureCommand(externalId, category, vehicleState) {
     {
       name: 'Alarm',
       external_id: `${externalId}:alarm`,
-      selector: `tessie-${externalId}-alarm`,
+      selector: `${externalId}-alarm`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].ALARM,
       read_only: false,
@@ -31,7 +31,7 @@ function buildFeatureCommand(externalId, category, vehicleState) {
     {
       name: 'Lock',
       external_id: `${externalId}:lock`,
-      selector: `tessie-${externalId}-lock`,
+      selector: `${externalId}-lock`,
       category: DEVICE_FEATURE_CATEGORIES[category],
       type: DEVICE_FEATURE_TYPES[category].LOCK,
       read_only: false,

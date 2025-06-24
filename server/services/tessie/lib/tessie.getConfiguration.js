@@ -13,6 +13,7 @@ async function getConfiguration() {
   const { serviceId } = this;
   try {
     this.configuration.apiKey = await this.gladys.variable.getValue(GLADYS_VARIABLES.API_KEY, serviceId);
+    this.configuration.websocketEnabled = await this.gladys.variable.getValue(GLADYS_VARIABLES.WEBSOCKET_ENABLED, serviceId);
     logger.debug('Tessie configuration loaded successfully');
     return this.configuration;
   } catch (e) {
