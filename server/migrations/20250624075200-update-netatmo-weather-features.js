@@ -16,15 +16,10 @@ module.exports = {
       return;
     }
     logger.info(`Netatmo migration: Found service netatmo = ${service.id}`);
-    const zigbee2mqttDevices = await db.Device.findAll({
-      where: {
-        service_id: service.id,
-      },
-    });
-    logger.info(`Netatmo migration: Found ${zigbee2mqttDevices.length} netatmo devices`);
 
     const netatmoDevices = await db.Device.findAll({
       where: {
+        service_id: service.id,
         model: {
           [Sequelize.Op.or]: ['NAModule1', 'NAMain', 'NAModule4'],
         },

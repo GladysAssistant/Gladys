@@ -3259,7 +3259,7 @@
       "decimal": "Temperatur",
       "min": "Minimale Temperatur",
       "max": "Maximale Temperatur",
-      "average": "Durchschnittliche Temperatur"
+      "average": "Mitteltemperatur Temperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
