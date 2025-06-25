@@ -1061,6 +1061,10 @@
           "westernEurope": "Westeuropa",
           "india": "Indien"
         },
+        "tuyaServerEnv": {
+          "prod": "Production",
+          "test": "Test"
+        },
         "endpoint": "Endpunkt",
         "accessKey": "Access Key",
         "accessKeyPlaceholder": "Tuya Zugangsschlüssel eingeben",
