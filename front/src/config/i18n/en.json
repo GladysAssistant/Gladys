@@ -735,6 +735,93 @@
         "conflictError": "Current topic is already in use."
       }
     },
+    "tessie": {
+      "title": "Tessie",
+      "description": "Control Tessie devices",
+      "deviceTab": "Devices",
+      "documentation": "Tessie documentation",
+      "discoverDeviceDescr": "Automatically scan Tessie devices",
+      "status": {
+        "notConfigured": "The Tessie service is not configured",
+        "disconnect": "Gladys is not connected to Tessie",
+        "notConnected": "Gladys failed to connect to the Tessie account, please verify your credentials on the ",
+        "setupPageLink": "Tessie Setup Page.",
+        "connect": "Gladys is connected to Tessie",
+        "connecting": "Configuration saved. Connecting to your Tessie account...",
+        "processingToken": "Connecting to your Tessie account... Retrieving access token.",
+        "getDevicesValues": "Data recovery in progress...",
+        "dicoveringDevices": "Device recovery in progress...",
+        "errorConnecting": {
+          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
+          "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
+          "invalid_client": "Invalid client ID. Please verify your Tessie account information and that the account is not banned or disabled on <a href=\"https://dev.tessie.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Tessie account information and that the account is not banned or disabled <a href=\"https://dev.tessie.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
+        },
+        "weatherApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Weather\" API in order to have access to the full information of your station.",
+        "energyApiNotConfigured": "Please go to the \"Configuration\" tab to activate access to the \"Energy\" API in order to have access to the full information of your devices.",
+        "descriptionGetApiKey": "You will then need to get your API key from your Tessie account.",
+        "apiKeyLabel": "Tessie API Key",
+        "apiKeyPlaceholder": "Enter your Tessie API key",
+        "websocketLabel": "Enable WebSocket",
+        "websocketDescription": "Enable WebSocket connection to receive real-time telemetry data",
+        "connectionInfoLabel": "Connection Information"
+      },
+      "device": {
+        "title": "Tessie Devices in Gladys",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Tessie API limitation).",
+        "noDeviceFound": "No Tessie devices have been added yet.",
+        "vinLabel": "Vehicle VIN",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter your device name",
+        "modelLabel": "Model",
+        "roomLabel": "Room",
+        "connectedPlugLabel": "Connected to bridge",
+        "roomTessieApiLabel": "Room in Tessie API",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "saveNotAllowButton": "Save not possible",
+        "deleteButton": "Delete",
+        "noValueReceived": "No value received."
+      },
+      "discover": {
+        "title": "Your Tessie Devices Compatible with Gladys",
+        "description": "Your Tessie devices must be added to your Tessie account before being added to Gladys, which currently only supports Thermostats and the valves associated with their Plug (API Energy) as well as weather stations and their modules (API Weather). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
+        "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Tessie API limitation).",
+        "noDeviceFound": "No Tessie devices were found. If you are certain that you have a Tessie device supported by Gladys, have you completed all the steps in the documentation to register your devices on the Tessie API?",
+        "alreadyCreatedButton": "Already Created",
+        "unmanagedModelButton": "Unsupported model",
+        "updateButton": "Update",
+        "scan": "Scan",
+        "refresh": "Refresh"
+      },
+      "setup": {
+        "title": "Tessie Setup",
+        "description": "You can connect Gladys to your Tessie account to control the associated devices.",
+        "descriptionCreateAccount": "You need to create an account on <a href=\"https://developer.tessie.com/reference/getting-started\" target=\"_blank\" rel=\"noopener noreferrer\">Tessie Connect</a>.",
+        "descriptionCreateProject": "You will then need to create an \"application\" in your Tessie developer account via the <a href=\"https://dash.tessie.com/settings/api\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+        "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
+        "descriptionScopeInformation": "When you connect Gladys to your dedicated Tessie App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
+        "titleAdditionalInformationEnergyApi": "Additional Information on the Operation of the \"Energy\" API:",
+        "descriptionAdditionalInformationEnergyApi": "You must select the \"Energy\" API at the bottom of the page to access the corresponding devices. Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "titleAdditionalInformationWeatherApi": "Additional Information on the Operation of the \"Weather\" API:",
+        "descriptionAdditionalInformationWeatherApi": "You must select the \"Weather\" API at the bottom of the page to access the corresponding devices. If you also have devices belonging to the \"Energy\" API (Plug, thermostat or valve) you will have access to an additional functionality on indoor hygrometer devices to obtain the average temperature of the corresponding room. So don't forget to select the \"Energy\" API to access this functionality.",
+        "clientIdLabel": "Client ID",
+        "clientIdPlaceholder": "Client ID from My Apps in Tessie Connect",
+        "clientSecretLabel": "Client Secret",
+        "clientSecretPlaceholder": "Client secret from My Apps in Tessie Connect",
+        "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Tessie API when you click on these buttons.",
+        "energyApiLabel": "Enable \"Energy\" API (retrieve Tessie Plug, Thermostat, and Valve devices)",
+        "weatherApiLabel": "Enable \"Weather\" API (retrieve Tessie Weather Station devices)",
+        "saveLabel": "Save and connect",
+        "disconnectLabel": "Disconnect"
+      },
+      "error": {
+        "defaultError": "An error occurred while registering the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
     "tpLink": {
       "title": "TP-Link",
       "description": "Control TP-Link Bulbs and Plugs in Gladys",
@@ -3430,6 +3517,7 @@
       "shortCategoryName": "Electric Vehicle - Climate",
       "climate-on": "Climate switch",
       "indoor-temperature": "Indoor temperature",
+      "outside-temperature": "Outside temperature",
       "target-temperature": "Target temperature"
     },
     "electrical-vehicle-command": {

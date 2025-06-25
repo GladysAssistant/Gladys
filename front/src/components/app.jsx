@@ -142,6 +142,11 @@ import NetatmoPage from '../routes/integration/all/netatmo/device-page';
 import NetatmoSetupPage from '../routes/integration/all/netatmo/setup-page';
 import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page';
 
+// Tessie integration
+import TessiePage from '../routes/integration/all/tessie/device-page';
+import TessieSetupPage from '../routes/integration/all/tessie/setup-page';
+import TessieDiscoverPage from '../routes/integration/all/tessie/discover-page';
+
 // Sonos integration
 import SonosDevicePage from '../routes/integration/all/sonos/device-page';
 import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
@@ -305,6 +310,10 @@ const AppRouter = connect(
         <NetatmoPage path="/dashboard/integration/device/netatmo" />
         <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
         <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />
+
+        <TessiePage path="/dashboard/integration/device/tessie" />
+        <TessieDiscoverPage path="/dashboard/integration/device/tessie/discover" />
+        <TessieSetupPage path="/dashboard/integration/device/tessie/setup" />
 
         <SonosDevicePage path="/dashboard/integration/device/sonos" />
         <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />

@@ -193,7 +193,7 @@
       "validationError": "Der Name des Zuhauses muss zwischen 1 und 40 Zeichen lang sein",
       "validationErrorRoom": "Der Raumname muss zwischen 1 und 40 Zeichen lang sein",
       "alarmTitle": "Alarm",
-      "alarmDescription": "Wenn du den Alarmmodus in Gladys verwendest, kannst du den Deaktivierungscode und die Verzögerung vor der Scharfschaltung des Alarms hier konfigurieren. Diese Verzögerung gilt nur im Fall einer manueller Auslösung und nicht in Szenen.",
+      "alarmDescription": "Wenn du den Alarmmodus in Gladys verwendest, kannst du den Deaktivierungscode und die Verzögerung vor der Scharfschaltung des Alarms hier konfigurieren. Diese Verzögerung gilt nur im Fall einer manuellen Auslösung und nicht in Szenen.",
       "alarmCodeLabel": "Deaktivierungscode",
       "alarmCodePlaceholder": "Gib einen numerischen Code zwischen 4 und 8 Ziffern ein",
       "alarmDelayBeforeArmingLabel": "Verzögerung vor Scharfschaltung des Alarms",
@@ -3430,6 +3430,7 @@
       "shortCategoryName": "Elektrofahrzeug - Klima",
       "climate-on": "Klimaanlagenschalter",
       "indoor-temperature": "Innentemperatur",
+      "outside-temperature": "Außentemperatur",
       "target-temperature": "Zieltemperatur"
     },
     "electrical-vehicle-command": {

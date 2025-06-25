@@ -52,7 +52,23 @@
   "device": {
     "searchPlaceHolder": "Chercher un appareil",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "vehicle": {
+      "tesla": {
+        "modely": {
+          "standard": "Tesla Model Y Standard",
+          "long-range": "Tesla Model Y Long Range",
+          "awd": "Tesla Model Y Traction intégrale (AWD)",
+          "performance": "Tesla Model Y Performance"
+        },
+        "model3": {
+          "tesla-model3-standard": "Tesla Model 3 standard",
+          "tesla-model3-long": "Tesla Model 3 Long Range",
+          "tesla-model3-awd": "Tesla Model 3 Traction intégrale (AWD)",
+          "tesla-model3-performance": "Tesla Model 3 Performance"
+        }
+      }
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -861,6 +877,94 @@
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "Le topic actuel est déjà utilisé."
+      }
+    },
+    "tessie": {
+      "title": "Tessie",
+      "description": "Contrôler les équipements Tessie",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Tessie",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Tessie",
+      "discoverDeviceDescription": "Scanner automatiquement les appareils Tessie",
+      "status": {
+        "notConfigured": "Le service Tessie n'est pas configuré",
+        "disconnect": "Gladys n'est pas connectée à Tessie",
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte Tessie, veuillez vérifier vos informations d'identification sur la page de configuration.",
+        "setupPageLink": "Page de configuration Tessie.",
+        "connect": "Gladys est connectée à Tessie",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte Tessie en cours...",
+        "processingToken": "Connexion à votre compte Tessie... Récupération du token d'accès.",
+        "getDevicesValues": "Récupération des données en cours...",
+        "dicoveringDevices": "Récupération des appareils en cours...",
+        "errorConnecting": {
+          "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
+          "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
+          "invalid_client": "Identifiant client invalide. Veuillez vérifier les informations de votre compte Tessie et que le compte n'est pas bani ou désactivé <a href=\"https://dev.tessie.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Tessie et que le compte n'est pas bani ou désactivé <a href=\"https://dev.tessie.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
+        },
+        "weatherApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Weather\" dans le but d'avoir accès à la totalité des informations de votre station.",
+        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils."
+      },
+      "device": {
+        "title": "Appareils Tessie dans Gladys",
+        "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Tessie).",
+        "noDeviceFound": "Aucun appareil Tessie n'a encore été ajouté.",
+        "vinLabel": "VIN du véhicule",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "connectedPlugLabel": "Connecté au pont",
+        "roomTessieApiLabel": "Pièce dans l'API Tessie",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "saveNotAllowButton": "Sauvegarde impossible",
+        "deleteButton": "Supprimer",
+        "noValueReceived": "Aucune valeur reçue."
+      },
+      "discover": {
+        "title": "Vos appareils Tessie compatibles avec Gladys",
+        "description": "Vos appareils Tessie doivent être ajoutés à votre compte Tessie avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats et les vannes associés à leur Plug (API Energy) ainsi que les stations météo et leurs modules (API Weather). S'il vous manque des appareils, veuillez vérifier que vous avez bien sélectionné les bonnes API dans la page de configuration. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
+        "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Tessie).",
+        "noDeviceFound": "Aucun appareil Tessie n'a été trouvé. Si vous êtes certains de posséder un appareil Tessie supporté par Gladys, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Tessie ?",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "unmanagedModelButton": "Modèle non pris en charge",
+        "scan": "Scanner",
+        "refresh": "Rafraîchir"
+      },
+      "setup": {
+        "title": "Configuration Tessie",
+        "description": "Vous pouvez connecter Gladys à votre compte Tessie pour commander les appareils associés.",
+        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://developer.tessie.com/reference/getting-started\" target=\"_blank\" rel=\"noopener noreferrer\">Tessie Connect</a>.",
+        "descriptionCreateProject": "Vous devrez ensuite créer une \"application\" dans votre compte développeur Tessie via le menu <a href=\"https://dash.tessie.com/settings/api\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+        "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
+        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Tessie dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configurer, ces scopes sont automatiquement intégrés et vous seront exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposée.",
+        "titleAdditionalInformationEnergyApi": "Informations complémentaires sur le fonctionnement de l'API \"Energy\" :",
+        "descriptionAdditionalInformationEnergyApi": "Vous devez sélectionner l'API \"Energy\" en bas de page pour accéder aux appareils correspondants. Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
+        "titleAdditionalInformationWeatherApi": "Informations complémentaires sur le fonctionnement de l'API \"Weather\" :",
+        "descriptionAdditionalInformationWeatherApi": "Vous devez sélectionner l'API \"Weather\" en bas de page pour accéder aux appareils correspondants. Si vous avez également des appareils appartenant à l'API \"Energy\" (Plug, thermostat ou vanne) vous aurez accès à une fonctionnalité supplémentaire sur les appareils hygromètres intérieurs pour obtenir la température moyenne de la pièce correspondante. N'oubliez donc pas de sélectionner l'API \"Energy\" pour accéder à cette fonctionnalité.",
+        "clientIdLabel": "Identifiant client",
+        "clientIdPlaceholder": "client ID de My Apps dans Tessie Connect",
+        "clientSecretLabel": "Secret client",
+        "clientSecretPlaceholder": "client secret de My Apps dans Tessie Connect",
+        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d'accès. Une nouvelle demande de connexion sera donc faite à l'API Tessie lorsque vous cliquerez sur ces boutons.",
+        "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Tessie)",
+        "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Tessie)",
+        "saveLabel": "Sauvegarder et connecter",
+        "disconnectLabel": "Déconnecter",
+        "descriptionGetApiKey": "Vous devrez ensuite obtenir votre clé API depuis votre compte Tessie.",
+        "apiKeyLabel": "Clé API Tessie",
+        "apiKeyPlaceholder": "Entrez votre clé API Tessie",
+        "websocketLabel": "Activer le WebSocket",
+        "websocketDescription": "Activer la connexion WebSocket pour recevoir les données de télémétrie en temps réel"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
     "tpLink": {
@@ -3430,6 +3534,7 @@
       "shortCategoryName": "Véhicule électrique - Climatisation",
       "climate-on": "Commutateur climatisation",
       "indoor-temperature": "Température intérieure",
+      "outside-temperature": "Température extérieure",
       "target-temperature": "Température de consigne"
     },
     "electrical-vehicle-command": {
