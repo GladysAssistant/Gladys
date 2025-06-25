@@ -3256,7 +3256,10 @@
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperatursensor",
-      "decimal": "Temperatur"
+      "decimal": "Temperatur",
+      "min": "Minimale Temperatur",
+      "max": "Maximale Temperatur",
+      "average": "Mitteltemperatur Temperatur"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Gerätetemperatursensor",
