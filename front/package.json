@@ -71,7 +71,7 @@
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
-    "react-big-calendar": "^1.6.9",
+    "react-big-calendar": "^1.19.4",
     "react-clock": "^4.5.0",
     "react-datepicker": "^3.8.0",
     "react-dnd": "^16.0.1",
