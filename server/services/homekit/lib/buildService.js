@@ -199,6 +199,38 @@ function buildService(device, features, categoryMapping, subtype) {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
           callback(undefined, coverStateMapping[updatedFeatures.find((feat) => feat.id === feature.id).last_value]);
         });
+
+        if (
+          !features.find((f) =>
+            [
+              `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`,
+              `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`,
+            ].includes(`${f.category}:${f.type}`),
+          )
+        ) {
+          const targetPosCharacteristic = service.getCharacteristic(
+            Characteristic[categoryMapping.capabilities[DEVICE_FEATURE_TYPES.CURTAIN.POSITION].characteristics[1]],
+          );
+          targetPosCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: Math.round(
+                normalize(
+                  value,
+                  targetPosCharacteristic.props.minValue,
+                  targetPosCharacteristic.props.maxValue,
+                  feature.min,
+                  feature.max,
+                ),
+              ),
+              device: device.selector,
+              device_feature: feature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          });
+        }
         break;
       }
       default:
