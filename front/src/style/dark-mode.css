@@ -36,9 +36,13 @@ body.dark-mode {
 
 /* Make sure primary elements look good */
 .dark-mode .bg-primary,
-.dark-mode .btn-primary,
 .dark-mode .nav-pills .nav-link.active {
   filter: hue-rotate(180deg); /* Ensure primary colors still look good */
+}
+
+/* Preserve primary button color in dark mode */
+.dark-mode .btn-primary {
+  filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original color */
 }
 
 /* Dark mode toggle button */
