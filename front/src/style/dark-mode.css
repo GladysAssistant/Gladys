@@ -20,13 +20,18 @@ body.dark-mode {
 }
 
 /* Double-invert back to normal for media elements */
-.dark-mode img:not(.keep-dark),
+.dark-mode img:not(.keep-dark):not(.white-bg),
 .dark-mode video:not(.keep-dark),
 .dark-mode .avatar:not(.keep-dark),
-.dark-mode [style*="background-image"]:not(.keep-dark),
+.dark-mode [style*='background-image']:not(.keep-dark),
 .dark-mode iframe:not(.keep-dark),
 .dark-mode .header-brand-img {
   filter: invert(100%) hue-rotate(180deg); /* This will invert them back to normal */
+}
+
+/* Convert white pixels to black in images */
+.dark-mode img.white-bg {
+  filter: brightness(0.8) contrast(1.2) invert(0.9) hue-rotate(180deg);
 }
 
 /* Fix icons appearance */
