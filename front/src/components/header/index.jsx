@@ -5,6 +5,7 @@ import get from 'get-value';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
+import DarkModeToggle from '../darkmode/DarkModeToggle';
 
 const PAGES_WITHOUT_HEADER = [
   '/login',
@@ -70,6 +71,7 @@ class Header extends Component {
                 </span>
               </a>
               <div class="d-flex order-lg-2 ml-auto">
+                <DarkModeToggle />
                 <div class={cx('dropdown', { show: props.showDropDown })} ref={this.dropdownRef}>
                   <a onClick={props.toggleDropDown} class="nav-link pr-0 leading-none" data-toggle="dropdown">
                     <span class="avatar" style={`background-image: url(${props.profilePicture})`} />

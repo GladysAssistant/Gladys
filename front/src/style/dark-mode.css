@@ -1,0 +1,62 @@
+/* Dark mode styles - inversion approach with fixed scrolling */
+
+/* Apply dark mode to html and body, with forced background color */
+html.dark-mode {
+  filter: invert(100%) hue-rotate(180deg);
+  background-color: #000 !important;
+}
+
+/* Force background color on body to prevent white flashes during scroll */
+body.dark-mode {
+  background-color: #fff !important; /* Inverted to black by the html filter */
+  min-height: 100vh;
+}
+
+/* Force background on key containers to prevent scroll issues */
+.dark-mode .page,
+.dark-mode .page-main,
+.dark-mode .page-content {
+  background-color: #fff !important; /* Inverted to black by parent filter */
+}
+
+/* Double-invert back to normal for media elements */
+.dark-mode img:not(.keep-dark),
+.dark-mode video:not(.keep-dark),
+.dark-mode .avatar:not(.keep-dark),
+.dark-mode [style*="background-image"]:not(.keep-dark),
+.dark-mode iframe:not(.keep-dark),
+.dark-mode .header-brand-img {
+  filter: invert(100%) hue-rotate(180deg); /* This will invert them back to normal */
+}
+
+/* Fix icons appearance */
+.dark-mode .fe {
+  filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
+}
+
+/* Make sure primary elements look good */
+.dark-mode .bg-primary,
+.dark-mode .btn-primary,
+.dark-mode .nav-pills .nav-link.active {
+  filter: hue-rotate(180deg); /* Ensure primary colors still look good */
+}
+
+/* Dark mode toggle button */
+.mode-toggle {
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: #adb5bd;
+}
+
+.mode-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .mode-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Keep the same in dark mode due to global inversion */
+}
