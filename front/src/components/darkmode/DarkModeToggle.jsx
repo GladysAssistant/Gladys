@@ -38,19 +38,19 @@ class DarkModeToggle extends Component {
   }
   
   handleSystemPreferenceChange = (event) => {
-    const savedMode = localStorage.getItem('dark-mode');
+    // Always update based on system preference, overriding user choice
+    this.setState({ isDarkMode: event.matches });
     
-    // Only update if user hasn't set a preference
-    if (savedMode === null) {
-      this.setState({ isDarkMode: event.matches });
-      
-      if (event.matches) {
-        document.documentElement.classList.add('dark-mode');
-        document.body.classList.add('dark-mode');
-      } else {
-        document.documentElement.classList.remove('dark-mode');
-        document.body.classList.remove('dark-mode');
-      }
+    // Save to localStorage to remember the system preference
+    localStorage.setItem('dark-mode', event.matches);
+    
+    // Apply or remove dark mode class
+    if (event.matches) {
+      document.documentElement.classList.add('dark-mode');
+      document.body.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      document.body.classList.remove('dark-mode');
     }
   };
 
