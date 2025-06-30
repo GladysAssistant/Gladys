@@ -55,7 +55,7 @@ function createActionsDarkMode(store) {
     /**
      * Update dark mode based on system preference
      */
-    updateDarkModeFromSystem(state) {
+    updateDarkModeFromSystem() {
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
       // Save to localStorage

@@ -37,8 +37,6 @@ function getDefaultState() {
     const savedMode = localStorage.getItem('dark-mode');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     darkMode = savedMode !== null ? savedMode === 'true' : systemPrefersDark.matches;
-
-    console.log({ defaultDarkMode: darkMode });
   } catch (e) {}
 
   const state = {

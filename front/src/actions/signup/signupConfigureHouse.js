@@ -32,14 +32,14 @@ function createActions(store) {
 
       // Use the global dark mode state
       const isDarkMode = store.getState().darkMode;
-      
+
       // Use dark tiles if dark mode is active, otherwise use light tiles
       // Force new tile layer by adding timestamp to URL to prevent caching
       const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
       const timestamp = new Date().getTime();
-      
+
       const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
-      
+
       leaflet
         .tileLayer(tileUrl, {
           attribution:

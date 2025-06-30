@@ -394,7 +394,7 @@ class MainApp extends Component {
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
   }
 
-  handleSystemPreferenceChange = event => {
+  handleSystemPreferenceChange = () => {
     // Use the global action to update dark mode state based on system preference
     this.props.updateDarkModeFromSystem();
   };
