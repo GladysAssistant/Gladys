@@ -1856,7 +1856,8 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud nuki...",
         "connected": "Connexion réussie au compte cloud nuki !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disabledWarning" : "Le service n'est pas encore activé. Pour commencer à utiliser le service, vous pouvez : <ul><li>soit <a href=\"/dashboard/integration/device/mqtt/settings\">connecter Gladys à un broker MQTT</a></li><li>soit renseigner une clé API dans l'onglet <a href=\"/dashboard/integration/device/nuki/setup\">Configuration</a></li></ul>"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

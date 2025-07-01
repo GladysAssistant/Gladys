@@ -1770,6 +1770,10 @@ const data = {
   },
   'get /api/v1/service/nuki': {},
   'get /api/v1/service/nuki/config': {},
+  'get /api/v1/service/nuki/status': {
+    mqttOk: true,
+    webOk: true,
+  },
   'get /api/v1/service/nuki/device': [
     {
       external_id: 'nuki:398172f4',

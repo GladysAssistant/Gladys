@@ -8,7 +8,12 @@ const logger = require('../../../../utils/logger');
  */
 function getStatus() {
   logger.debug(`Nuki: status`);
-  return null;
+  const mqttConfigured = true;
+  const nukiWebConfigured = true;
+  return {
+    mqttOk: mqttConfigured,
+    webOk: nukiWebConfigured,
+  };
 }
 
 module.exports = {
