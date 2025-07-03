@@ -86,7 +86,7 @@ body.dark-mode {
 }
 
 .dark-mode input:not([type='range']),
-.dark-mode .form-control,
+.dark-mode .form-control:not([type='range']),
 .dark-mode .input-group-text {
   background-color: #101827 !important; /* Inverted to a darker gray by parent filter */
   color: #aab1b8 !important;
