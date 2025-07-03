@@ -75,6 +75,7 @@ body.dark-mode {
 .dark-mode .input-group-text {
   background-color: #101827 !important; /* Inverted to a darker gray by parent filter */
   color: #aab1b8 !important;
+  border-color: #374151 !important;
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
 }
 
