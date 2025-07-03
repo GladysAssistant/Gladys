@@ -89,12 +89,9 @@ body.dark-mode {
 .dark-mode .btn-primary,
 .dark-mode .btn-danger,
 .dark-mode .btn-success,
-.dark-mode .stamp.bg-red,
-.dark-mode .stamp.bg-green,
-.dark-mode .stamp.bg-blue,
-.dark-mode .stamp.bg-yellow,
-.dark-mode .stamp.bg-purple,
-.dark-mode .stamp.stamp-md,
+.dark-mode .tag,
+.dark-mode .badge,
+.dark-mode .stamp,
 .dark-mode .emoji-no-invert {
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
 }
