@@ -60,6 +60,7 @@ body.dark-mode {
 .dark-mode select,
 .dark-mode textarea,
 .dark-mode checkbox,
+.dark-mode .btn-secondary,
 .dark-mode .custom-file-input,
 .dark-mode .custom-file-label,
 .dark-mode .react-select__control,
@@ -68,6 +69,10 @@ body.dark-mode {
 .dark-mode .list-group-item,
 .dark-mode .fixed-bottom {
   background-color: #e1e8f7 !important; /* Inverted to a darker gray by parent filter */
+}
+
+.dark-mode .btn-secondary:hover {
+  background-color: #e1e8f779 !important; /* Inverted to a darker gray by parent filter */
 }
 
 .dark-mode input,
