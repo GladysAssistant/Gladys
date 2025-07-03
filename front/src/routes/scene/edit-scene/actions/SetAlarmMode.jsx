@@ -99,6 +99,8 @@ class SetAlarmMode extends Component {
             class="scene-check-alarm-mode-choose-house"
             value={selectedHouseOption}
             onChange={this.handleHouseChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -113,6 +115,8 @@ class SetAlarmMode extends Component {
             class="scene-check-alarm-mode-choose-alarm-mode"
             value={selectedAlarmModeOption}
             onChange={this.handleAlarmModeChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>
