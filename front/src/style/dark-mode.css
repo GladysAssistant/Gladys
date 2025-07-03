@@ -59,7 +59,9 @@ body.dark-mode {
 
 .dark-mode input,
 .dark-mode select,
+.dark-mode textarea,
 .dark-mode checkbox,
+.dark-mode .form-control,
 .dark-mode .custom-file-input,
 .dark-mode .custom-file-label,
 .dark-mode .react-select__control,
