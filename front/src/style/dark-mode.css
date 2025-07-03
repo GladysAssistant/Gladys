@@ -39,6 +39,11 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
+/* Fix z-index issue for input icon addons */
+.dark-mode .input-icon-addon {
+  z-index: 2 !important;
+}
+
 /* Make sure primary elements look good */
 .dark-mode .bg-primary,
 .dark-mode .nav-pills .nav-link.active {
