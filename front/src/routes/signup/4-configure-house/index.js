@@ -12,6 +12,11 @@ class ConfigureHouse extends Component {
   componentDidMount() {
     this.props.initLeafletMap();
   }
+  componentDidUpdate(prevProps) {
+    if (prevProps.darkMode !== this.props.darkMode) {
+      this.props.initLeafletMap();
+    }
+  }
   render(props, {}) {
     return (
       <SignupLayout currentUrl="/signup/configure-house">
@@ -22,6 +27,6 @@ class ConfigureHouse extends Component {
 }
 
 export default connect(
-  'signupRooms,signupNewHouseName,signupNewRoomName,signupConfigureHouseErrors',
+  'signupRooms,signupNewHouseName,signupNewRoomName,signupConfigureHouseErrors,darkMode',
   actions
 )(ConfigureHouse);

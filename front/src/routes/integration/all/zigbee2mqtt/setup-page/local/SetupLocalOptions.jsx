@@ -139,6 +139,8 @@ class SetupLocalOptions extends Component {
                 options={usbPorts}
                 isLoading={loadUsbPortsStatus === RequestStatus.Getting}
                 placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDriverPathPlaceholder" />}
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
             </div>
             <div class="col-1 d-none d-sm-block">
@@ -165,6 +167,8 @@ class SetupLocalOptions extends Component {
                 isLoading={loadZigbeeAdaptersStatus === RequestStatus.Getting}
                 placeholder={<Text id="integration.zigbee2mqtt.setup.modes.local.usbDongleNamePlaceholder" />}
                 isClearable
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
             </div>
             <div class="col-1 d-none d-sm-block">

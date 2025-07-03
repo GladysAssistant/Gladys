@@ -9,15 +9,18 @@
   },
   {
     "key": "alexa",
-    "img": "/assets/integrations/cover/alexa.jpg"
+    "img": "/assets/integrations/cover/alexa.jpg",
+    "whiteBackground": true
   },
   {
     "key": "googleHome",
-    "img": "/assets/integrations/cover/google-home.jpg"
+    "img": "/assets/integrations/cover/google-home.jpg",
+    "whiteBackground": true
   },
   {
     "key": "homekit",
-    "img": "/assets/integrations/cover/homekit.jpg"
+    "img": "/assets/integrations/cover/homekit.jpg",
+    "whiteBackground": true
   },
   {
     "key": "openai",
@@ -26,7 +29,8 @@
   {
     "key": "free-mobile",
     "link": "free-mobile",
-    "img": "/assets/integrations/cover/free-mobile.jpg"
+    "img": "/assets/integrations/cover/free-mobile.jpg",
+    "whiteBackground": true
   },
   {
     "key": "callmebot",

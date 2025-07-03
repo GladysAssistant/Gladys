@@ -54,6 +54,8 @@ class SelectPilotWireMode extends Component {
         onChange={this.handleValueChange}
         options={deviceFeatureOptions}
         placeholder={<Text id="global.selectPlaceholder" />}
+        className="react-select-container"
+        classNamePrefix="react-select"
       />
     );
   }

@@ -59,7 +59,13 @@ class StartSceneParams extends Component {
         <label class="form-label">
           <Text id="editScene.actionsCard.scene.label" />
         </label>
-        <Select value={selectedOption} onChange={this.handleChange} options={scenes} />
+        <Select
+          value={selectedOption}
+          onChange={this.handleChange}
+          options={scenes}
+          className="react-select-container"
+          classNamePrefix="react-select"
+        />
       </div>
     );
   }

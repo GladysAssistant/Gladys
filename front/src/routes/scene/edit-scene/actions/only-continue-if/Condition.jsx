@@ -97,6 +97,8 @@ class Condition extends Component {
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
             </div>
           </div>

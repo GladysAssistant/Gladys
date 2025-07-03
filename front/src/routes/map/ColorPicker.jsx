@@ -129,6 +129,8 @@ class ColorPicker extends Component {
         styles={colourStyles}
         value={value}
         onChange={this.onChange}
+        className="react-select-container"
+        classNamePrefix="react-select"
       />
     );
   }

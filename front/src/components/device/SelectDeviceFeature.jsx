@@ -124,6 +124,8 @@ class SelectDeviceFeature extends Component {
         onChange={this.handleChange}
         options={deviceOptions}
         styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
+        className="react-select-container"
+        classNamePrefix="react-select"
       />
     );
   }
