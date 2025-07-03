@@ -57,6 +57,16 @@ body.dark-mode {
   background-color: #ced8e6 !important; /* Inverted to a darker gray by parent filter */
 }
 
+/* Custom switch indicator when toggle is off */
+.dark-mode .custom-switch:not(.custom-switch-checked) .custom-switch-indicator:before {
+  background-color: #4c525d !important;
+}
+
+/* Custom switch indicator when toggle is checked */
+.dark-mode .custom-switch-input:checked + .custom-switch-indicator:before {
+  background-color: #ced8e6 !important;
+}
+
 .dark-mode select,
 .dark-mode textarea,
 .dark-mode checkbox,
