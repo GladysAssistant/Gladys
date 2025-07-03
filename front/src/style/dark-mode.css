@@ -78,6 +78,12 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
 }
 
+.dark-mode input::placeholder,
+.dark-mode .form-control::placeholder,
+.dark-mode .input-group-text::placeholder {
+  color: #979eaa6b !important;
+}
+
 /* Preserve button and UI element colors in dark mode */
 .dark-mode .btn-primary,
 .dark-mode .btn-danger,
