@@ -3,12 +3,12 @@
 /* Apply dark mode to html and body, with forced background color */
 html.dark-mode {
   filter: invert(100%) hue-rotate(180deg);
-  background-color: #000 !important;
+  background-color: #111827 !important;
 }
 
 /* Force background color on body to prevent white flashes during scroll */
 body.dark-mode {
-  background-color: #fff !important; /* Inverted to black by the html filter */
+  background-color: #e1e8f7 !important; /* Inverted to a dark gray by the html filter */
   min-height: 100vh;
 }
 
@@ -16,7 +16,7 @@ body.dark-mode {
 .dark-mode .page,
 .dark-mode .page-main,
 .dark-mode .page-content {
-  background-color: #fff !important; /* Inverted to black by parent filter */
+  background-color: #e1e8f7 !important; /* Inverted to a dark gray by parent filter */
 }
 
 /* Double-invert back to normal for media elements */
@@ -43,6 +43,28 @@ body.dark-mode {
 .dark-mode .bg-primary,
 .dark-mode .nav-pills .nav-link.active {
   filter: hue-rotate(180deg); /* Ensure primary colors still look good */
+}
+
+/* Header and card backgrounds in dark mode */
+.dark-mode .card,
+.dark-mode .card-header,
+.dark-mode .card-body,
+.dark-mode .header,
+.dark-mode .dropdown-menu,
+.dark-mode .btn-secondary,
+.dark-mode .custom-control-input,
+.dark-mode .custom-switch-indicator:before,
+.dark-mode .custom-file-input,
+.dark-mode .custom-file-label,
+.dark-mode .react-select__control,
+.dark-mode .react-select__menu,
+.dark-mode .custom-file,
+.dark-mode .dropdown,
+.dark-mode .input-group-text,
+.dark-mode select,
+.dark-mode checkbox,
+.dark-mode input {
+  background-color: #ced8e6 !important; /* Inverted to a darker gray by parent filter */
 }
 
 /* Preserve button and UI element colors in dark mode */
