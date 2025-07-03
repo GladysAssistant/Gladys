@@ -65,7 +65,11 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
               <div class="col">
                 {currentHourPeakState === 'peak-hour' && (
                   <div
-                    class={cx(style.hourDisplay, style.peakHour, 'd-flex align-items-center justify-content-center')}
+                    class={cx(
+                      style.hourDisplay,
+                      style.peakHour,
+                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
+                    )}
                   >
                     <i class="fe fe-sun mr-4" />
                     <Text id="dashboard.boxes.edfTempo.peakHour" />
@@ -73,7 +77,11 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
                 )}
                 {currentHourPeakState === 'off-peak-hour' && (
                   <div
-                    class={cx(style.hourDisplay, style.offPeakHour, 'd-flex align-items-center justify-content-center')}
+                    class={cx(
+                      style.hourDisplay,
+                      style.offPeakHour,
+                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
+                    )}
                   >
                     <i class="fe fe-moon mr-4" />
                     <Text id="dashboard.boxes.edfTempo.offPeakHour" />
