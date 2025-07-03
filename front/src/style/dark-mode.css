@@ -80,7 +80,8 @@ body.dark-mode {
 .dark-mode .stamp.bg-blue,
 .dark-mode .stamp.bg-yellow,
 .dark-mode .stamp.bg-purple,
-.dark-mode .stamp.stamp-md {
+.dark-mode .stamp.stamp-md,
+.dark-mode .emoji-no-invert {
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
 }
 
