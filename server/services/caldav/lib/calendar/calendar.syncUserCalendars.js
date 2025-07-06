@@ -1,8 +1,6 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
-const dav = require('dav-request');
-const { typeOf } = require('mathjs');
 
 /**
  * @description Start user's calendars synchronization.
@@ -23,8 +21,8 @@ async function syncUserCalendars(userId) {
     throw new ServiceNotConfiguredError('CALDAV_NOT_CONFIGURED');
   }
 
-  const xhr = new dav.transport.Basic(
-    new dav.Credentials({
+  const xhr = new this.dav.transport.Basic(
+    new this.dav.Credentials({
       username: CALDAV_USERNAME,
       password: CALDAV_PASSWORD,
     }),

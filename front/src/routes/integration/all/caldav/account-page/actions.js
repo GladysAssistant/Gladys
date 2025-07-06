@@ -23,7 +23,6 @@ const actions = store => ({
     });
   },
   updateCaldavCheckSSL(state, e) {
-    console.log(e.target.checked);
     store.setState({
       caldavCheckSSL: e.target.checked
     });
