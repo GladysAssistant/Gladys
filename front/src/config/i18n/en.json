@@ -1641,6 +1641,7 @@
           "name": "Synology Calendar",
           "url": "Synology CalDAV URL",
           "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
+          "verifySSL": "Verify SSL certificate",
           "username": "Synology username",
           "usernameInfo": "Enter your username.",
           "password": "Password",
@@ -1649,6 +1650,7 @@
         "other": {
           "name": "Other",
           "url": "CalDAV URL",
+          "verifySSL": "Verify SSL certificate",
           "username": "CalDAV Username",
           "password": "CalDAV Password"
         }
