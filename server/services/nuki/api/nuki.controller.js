@@ -7,7 +7,7 @@ module.exports = function NukiController(nukiHandler) {
    * @apiGroup Nuki
    */
   async function getStatus(req, res) {
-    const response = nukiHandler.getStatus();
+    const response = await nukiHandler.getStatus();
     res.json(response);
   }
 

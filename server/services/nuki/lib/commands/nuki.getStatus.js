@@ -6,10 +6,13 @@ const logger = require('../../../../utils/logger');
  * @example
  * nuki.getStatus();
  */
-function getStatus() {
-  logger.debug(`Nuki: status`);
-  const mqttConfigured = true;
-  const nukiWebConfigured = true;
+async function getStatus() {
+  logger.debug(`Nuki: get service status`);
+  const mqtt = this.gladys.service.getService('mqtt');
+  const mqttConfigured = await mqtt.isUsed();
+  const { apiKey } = await this.getConfiguration();
+  const nukiWebConfigured = apiKey && true;
+  logger.debug(`Nuki: get service status -> Web : ${nukiWebConfigured} - MQTT: ${mqttConfigured}`);
   return {
     mqttOk: mqttConfigured,
     webOk: nukiWebConfigured,
