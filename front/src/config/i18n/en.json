@@ -1804,7 +1804,6 @@
       "modelLabel": "Model",
       "roomLabel": "Room",
       "saveButton": "Save",
-      "updateButton": "Update",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Unsupported or unavailable model",
@@ -1856,7 +1855,8 @@
         "error": "An error occurred while saving the configuration.",
         "connecting": "Configuration saved. Connecting to your Nuki cloud account...",
         "connected": "Successfully connected to the Nuki cloud account!",
-        "connectionError": "Connection error, please check your configuration."
+        "connectionError": "Connection error, please check your configuration.",
+        "disabledWarning": "The service is not yet activated. To start using the service, you can: <ul><li>either <a href=\"/dashboard/integration/device/mqtt/setup\">connect Gladys to an MQTT broker</a></li><li>or enter an API key in the <a href=\"/dashboard/integration/device/nuki/setup\">Configuration</a> tab</li></ul>"
       },
       "error": {
         "defaultError": "An error occurred while saving the device.",

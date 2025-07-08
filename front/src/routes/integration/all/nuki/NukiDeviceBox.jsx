@@ -4,21 +4,30 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import { connect } from 'unistore/preact';
 
 class NukiDeviceBox extends Component {
-  updateName = e => {
-    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'name', e.target.value);
-
+  componentWillMount() {
     this.setState({
-      loading: false
+      device: this.props.device
+    });
+  }
+
+  updateName = e => {
+    this.setState({
+      device: {
+        ...this.state.device,
+        name: e.target.value
+      }
     });
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
-
     this.setState({
-      loading: false
+      device: {
+        ...this.state.device,
+        room_id: e.target.value
+      }
     });
   };
 
@@ -28,7 +37,14 @@ class NukiDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
+      const deviceDidNotExist = this.state.device.id === undefined;
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      if (deviceDidNotExist) {
+        savedDevice.alreadyExist = true;
+      }
+      this.setState({
+        device: savedDevice
+      });
     } catch (e) {
       let errorMessage = 'integration.nuki.error.defaultError';
       if (e.response.status === 409) {
@@ -51,7 +67,10 @@ class NukiDeviceBox extends Component {
       statesNumber: undefined
     });
     try {
-      await this.props.deleteDevice(this.props.deviceIndex);
+      if (this.state.device.created_at) {
+        await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
+      }
+      this.props.getNukiDevices();
     } catch (e) {
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
@@ -70,10 +89,10 @@ class NukiDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, device, housesWithRooms, editable, ...props },
-    { loading, errorMessage, tooMuchStatesError, statesNumber }
+    { deviceIndex, editable, deleteButton, housesWithRooms },
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
-    const validModel = device.features.length > 0;
+    const validModel = device.features && device.features.length > 0;
     // default value is 'mqtt'
     const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
 
@@ -116,31 +135,33 @@ class NukiDeviceBox extends Component {
                   </Localizer>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.nuki.roomLabel" />
-                  </label>
-                  <select
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    id={`room_${deviceIndex}`}
-                    disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
+                {housesWithRooms && (
+                  <div class="form-group">
+                    <label class="form-label" for={`room_${deviceIndex}`}>
+                      <Text id="integration.nuki.roomLabel" />
+                    </label>
+                    <select
+                      id={`room_${deviceIndex}`}
+                      onChange={this.updateRoom}
+                      class="form-control"
+                      disabled={!editable || !validModel}
+                    >
+                      <option value="">
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {housesWithRooms &&
+                        housesWithRooms.map(house => (
+                          <optgroup label={house.name}>
+                            {house.rooms.map(room => (
+                              <option selected={room.id === device.room_id} value={room.id}>
+                                {room.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                    </select>
+                  </div>
+                )}
 
                 <div class="form-group">
                   <label class="form-label" for={`topic_${deviceIndex}`}>
@@ -203,25 +224,19 @@ class NukiDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {validModel && props.alreadyCreatedButton && (
+                  {device.alreadyExist && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.nuki.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {validModel && props.updateButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.nuki.updateButton" />
-                    </button>
-                  )}
-
-                  {validModel && props.saveButton && (
+                  {!device.alreadyExist && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.nuki.saveButton" />
                     </button>
                   )}
 
-                  {validModel && props.deleteButton && (
+                  {validModel && deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.nuki.deleteButton" />
                     </button>
@@ -242,4 +257,4 @@ class NukiDeviceBox extends Component {
   }
 }
 
-export default NukiDeviceBox;
+export default connect('httpClient', {})(NukiDeviceBox);

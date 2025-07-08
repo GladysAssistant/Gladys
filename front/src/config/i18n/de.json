@@ -1804,7 +1804,6 @@
       "modelLabel": "Modell",
       "roomLabel": "Raum",
       "saveButton": "Speichern",
-      "updateButton": "Aktualisieren",
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
       "unmanagedModelButton": "Nicht unterstütztes oder nicht verfügbares Modell",
@@ -1856,7 +1855,8 @@
         "error": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "connecting": "Konfiguration gespeichert. Verbindung zu Ihrem Nuki-Cloud-Konto wird hergestellt...",
         "connected": "Erfolgreich mit dem Nuki-Cloud-Konto verbunden!",
-        "connectionError": "Verbindungsfehler. Bitte überprüfen Sie Ihre Konfiguration."
+        "connectionError": "Verbindungsfehler. Bitte überprüfen Sie Ihre Konfiguration.",
+        "disabledWarning": "Der Dienst ist noch nicht aktiviert. Um den Dienst zu nutzen, können Sie: <ul><li>entweder <a href=\"/dashboard/integration/device/mqtt/setup\">Gladys mit einem MQTT-Broker verbinden</a></li><li>oder einen API-Schlüssel im Tab <a href=\"/dashboard/integration/device/nuki/setup\">Konfiguration</a> eingeben</li></ul>"
       },
       "error": {
         "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten.",
