@@ -6,6 +6,7 @@ import { route } from 'preact-router';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { wrapEmojisJSX } from '../../../utils/emojiWrapper';
 
 const DASHBOARD_LIST_ITEM_TYPE = 'DASHBOARD_LIST_ITEM';
 
@@ -51,7 +52,7 @@ const DashboardListItem = ({ children, ...props }) => {
         backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     >
-      <i ref={drag} style={{ cursor: 'move' }} class="fe fe-list mr-2" /> {props.name}
+      <i ref={drag} style={{ cursor: 'move' }} class="fe fe-list mr-2" /> {wrapEmojisJSX(props.name)}
     </li>
   );
 };

@@ -100,7 +100,13 @@ class UserPresenceTrigger extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
+          <Select
+            options={userOptions}
+            value={selectedOption}
+            onChange={this.handleChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">
@@ -109,7 +115,13 @@ class UserPresenceTrigger extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={areaOptions} value={selectedAreaOption} onChange={this.handleAreaChange} />
+          <Select
+            options={areaOptions}
+            value={selectedAreaOption}
+            onChange={this.handleAreaChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
       </div>
     );

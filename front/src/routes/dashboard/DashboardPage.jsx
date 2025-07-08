@@ -5,6 +5,7 @@ import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
 import SetTabletMode from './SetTabletMode';
 import { JOB_STATUS } from '../../../../server/utils/constants';
+import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 
 import style from './style.css';
 
@@ -21,7 +22,7 @@ const DashboardPage = ({ children, ...props }) => (
                   {!props.dashboardListEmpty && (
                     <div class="dropdown">
                       <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
-                        {props.currentDashboard && props.currentDashboard.name}
+                        {props.currentDashboard && wrapEmojisJSX(props.currentDashboard.name)}
                       </button>
                       <div
                         class={cx('dropdown-menu', {
@@ -34,7 +35,7 @@ const DashboardPage = ({ children, ...props }) => (
                             href={`/dashboard/${dashboard.selector}`}
                             onClick={props.redirectToDashboard}
                           >
-                            {dashboard.name}
+                            {wrapEmojisJSX(dashboard.name)}
                           </Link>
                         ))}
                       </div>

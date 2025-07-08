@@ -93,6 +93,8 @@ class Settings extends Component {
                         formatCreateLabel={inputValue => (
                           <Text id="editScene.createTag" fields={{ tagName: inputValue }} />
                         )}
+                        className="react-select-container"
+                        classNamePrefix="react-select"
                       />
                     </Localizer>
                   </div>

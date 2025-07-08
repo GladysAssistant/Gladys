@@ -471,7 +471,14 @@ class EditChart extends Component {
                 <label>
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
-                <Select onChange={this.addDeviceFeature} value={[]} options={deviceOptions} maxMenuHeight={220} />
+                <Select
+                  onChange={this.addDeviceFeature}
+                  value={[]}
+                  options={deviceOptions}
+                  maxMenuHeight={220}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                />
               </div>
             )}
             <div class="form-group">
@@ -525,6 +532,8 @@ class EditChart extends Component {
                     onChange={({ value }) => this.updateChartColor(i, value)}
                     options={colorOptions}
                     styles={colorSelectorStyles}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
                   />
                 </div>
               ))}
@@ -545,6 +554,8 @@ class EditChart extends Component {
                     onChange={({ value }) => this.updateChartColor(0, value)}
                     options={colorOptions}
                     styles={colorSelectorStyles}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
                   />
                 </div>
                 <div class="form-group">
@@ -562,6 +573,8 @@ class EditChart extends Component {
                     onChange={({ value }) => this.updateChartColor(1, value)}
                     options={colorOptions}
                     styles={colorSelectorStyles}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
                   />
                 </div>
               </>

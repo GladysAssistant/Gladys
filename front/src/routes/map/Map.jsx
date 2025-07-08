@@ -15,12 +15,24 @@ class MapComponent extends Component {
       this.leafletMap.remove();
     }
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
+
+    // Use the global dark mode state from props
+    const isDarkMode = this.props.darkMode;
+
+    // Use dark tiles if dark mode is active, otherwise use light tiles
+    // Force new tile layer by adding timestamp to URL to prevent caching
+    const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
+    const timestamp = new Date().getTime();
+
+    const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
+
     leaflet
-      .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+      .tileLayer(tileUrl, {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
-        maxZoom: 19
+        maxZoom: 19,
+        noCache: true
       })
       .addTo(this.leafletMap);
     this.displayAll(this.props);
@@ -140,8 +152,14 @@ class MapComponent extends Component {
     window.addEventListener('resize', this.updateDimensions.bind(this));
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.displayAll(nextProps);
+  componentDidUpdate(prevProps) {
+    // If dark mode state has changed, reinitialize the map
+    if (prevProps.darkMode !== this.props.darkMode) {
+      this.initMap();
+    } else {
+      // If other props changed, update markers
+      this.displayAll(this.props);
+    }
   }
 
   componentWillUnmount() {
@@ -169,4 +187,4 @@ class MapComponent extends Component {
   }
 }
 
-export default connect('httpClient', {})(MapComponent);
+export default connect('httpClient,darkMode', {})(MapComponent);

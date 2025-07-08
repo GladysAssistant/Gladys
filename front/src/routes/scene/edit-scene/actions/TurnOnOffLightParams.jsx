@@ -77,6 +77,8 @@ class TurnOnOffLight extends Component {
           value={selectedOptions}
           onChange={this.handleChange}
           options={deviceOptions}
+          className="react-select-container"
+          classNamePrefix="react-select"
         />
       </div>
     );

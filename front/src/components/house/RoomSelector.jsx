@@ -80,6 +80,8 @@ class RoomSelector extends Component {
           // Fixes the overlapping problem
           menu: provided => ({ ...provided, zIndex: 100 })
         }}
+        className="react-select-container"
+        classNamePrefix="react-select"
       />
     );
   }
