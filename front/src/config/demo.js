@@ -1772,7 +1772,7 @@ const data = {
   'get /api/v1/service/nuki/config': {},
   'get /api/v1/service/nuki/status': {
     mqttOk: true,
-    webOk: true,
+    webOk: true
   },
   'get /api/v1/service/nuki/device': [
     {
@@ -1808,6 +1808,30 @@ const data = {
       name: 'Smart Lock 2.0 Pro Plus',
       external_id: 'nuki:398172f6',
       created_at: '2025-02-12T07:49:07.556Z',
+      features: [
+        {
+          category: 'battery',
+          type: 'integer'
+        },
+        {
+          category: 'lock',
+          type: 'binary'
+        },
+        {
+          category: 'lock',
+          type: 'state'
+        }
+      ],
+      params: [
+        {
+          name: 'protocol',
+          value: 'mqtt'
+        }
+      ]
+    },
+    {
+      name: 'Some un-added Smart Lock',
+      external_id: 'nuki:una',
       features: [
         {
           category: 'battery',
