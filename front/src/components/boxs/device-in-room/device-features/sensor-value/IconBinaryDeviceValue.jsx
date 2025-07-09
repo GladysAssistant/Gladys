@@ -7,6 +7,14 @@ const ICON_MAP = {
     0: 'unlock',
     1: 'lock'
   },
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: {
+    0: 'unlock',
+    1: 'lock'
+  },
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: {
+    0: 'unlock',
+    1: 'lock'
+  },
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
     0: 'x-octagon', //'uncalibrated'
     1: 'lock', //'locked',

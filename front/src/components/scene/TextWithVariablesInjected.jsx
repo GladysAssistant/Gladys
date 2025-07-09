@@ -127,6 +127,18 @@ class TextWithVariablesInjected extends Component {
       this.tagify.loadOriginalValues(nextProps.text);
       this.setState({ text: nextProps.text });
     }
+    if (nextProps.class !== this.props.class) {
+      this.props.class.split(' ').forEach(oldClass => {
+        if (oldClass) {
+          this.tagify.toggleClass(oldClass);
+        }
+      });
+      nextProps.class.split(' ').forEach(newClass => {
+        if (newClass) {
+          this.tagify.toggleClass(newClass);
+        }
+      });
+    }
   }
   componentWillUnmount() {
     if (this.tagify) {

@@ -22,6 +22,11 @@ const actions = store => ({
       caldavUrl: e.target.value
     });
   },
+  updateCaldavCheckSSL(state, e) {
+    store.setState({
+      caldavCheckSSL: e.target.checked
+    });
+  },
   updateCaldavUsername(state, e) {
     store.setState({
       caldavUsername: e.target.value
@@ -39,12 +44,14 @@ const actions = store => ({
 
     let caldavHost = 'other';
     let caldavUrl = '';
+    let caldavCheckSSL = true;
     let caldavUsername = '';
     let caldavPassword = '';
 
     store.setState({
       caldavHost,
       caldavUrl,
+      caldavCheckSSL,
       caldavUsername,
       caldavPassword
     });
@@ -70,6 +77,15 @@ const actions = store => ({
       });
       caldavPassword = password;
 
+      try {
+        const { value: checkSSL } = await state.httpClient.get('/api/v1/service/caldav/variable/CALDAV_CHECK_SSL', {
+          userRelated: true
+        });
+        caldavCheckSSL = checkSSL !== '0';
+      } catch (e) {
+        caldavCheckSSL = true;
+      }
+
       store.setState({
         caldavGetSettingsStatus: CalDAVStatus.Success
       });
@@ -82,6 +98,7 @@ const actions = store => ({
     store.setState({
       caldavHost,
       caldavUrl,
+      caldavCheckSSL,
       caldavUsername,
       caldavPassword
     });
@@ -96,6 +113,11 @@ const actions = store => ({
       // save caldav host
       await state.httpClient.post('/api/v1/service/caldav/variable/CALDAV_HOST', {
         value: state.caldavHost,
+        userRelated: true
+      });
+      // save caldav check SSL boolean
+      await state.httpClient.post('/api/v1/service/caldav/variable/CALDAV_CHECK_SSL', {
+        value: state.caldavCheckSSL,
         userRelated: true
       });
       // save caldav url

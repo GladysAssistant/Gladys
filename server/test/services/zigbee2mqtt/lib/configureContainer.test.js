@@ -161,7 +161,7 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.be.eq(true);
   });
 
-  it('it should remove serial adapter (adapter is not set)', async () => {
+  it('it set default adapt to zstack', async () => {
     // PREPARE
     fs.copyFileSync(ezspConfigFilePath, configFilePath);
     const config = {};
@@ -174,11 +174,11 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.be.eq(true);
   });
 
-  it('it should remove serial adapter (adapter is expliclty none)', async () => {
+  it('it should set default adapt to zstack', async () => {
     // PREPARE
     fs.copyFileSync(ezspConfigFilePath, configFilePath);
     const config = {
-      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.NONE][0],
+      z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.ZSTACK][0],
     };
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);

@@ -89,7 +89,7 @@ class NukiDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms },
+    { deviceIndex, editable, alreadyCreatedButton, deleteButton, housesWithRooms },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -224,13 +224,13 @@ class NukiDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {device.alreadyExist && (
+                  {(alreadyCreatedButton || device.alreadyExist) && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.nuki.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {!device.alreadyExist && (
+                  {(!device.alreadyExist && editable) && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.nuki.saveButton" />
                     </button>

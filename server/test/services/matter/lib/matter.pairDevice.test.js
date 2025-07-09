@@ -11,7 +11,11 @@ describe('Matter.pairDevice', () => {
   let matterHandler;
 
   beforeEach(() => {
-    const gladys = {};
+    const gladys = {
+      job: {
+        wrapper: fake.returns(null),
+      },
+    };
     const MatterMain = {};
     const ProjectChipMatter = {};
 
@@ -84,6 +88,9 @@ describe('Matter.pairDevice', () => {
         uniqueId: {
           get: fake.resolves('uniqueId'),
         },
+        serialNumber: {
+          get: fake.resolves('serialNumber'),
+        },
       },
     });
     matterHandler.commissioningController = {
@@ -95,6 +102,8 @@ describe('Matter.pairDevice', () => {
             basicInformation: {
               vendorName: 'Test Vendor',
               productName: 'Test Product',
+              serialNumber: 'serialNumber',
+              uniqueId: 'uniqueId',
             },
           },
         },
@@ -134,9 +143,11 @@ describe('Matter.pairDevice', () => {
     };
     await matterHandler.pairDevice(pairingCode);
     expect(matterHandler.devices).to.have.lengthOf(2);
-    expect(matterHandler.devices[0].params).to.have.lengthOf(1);
+    expect(matterHandler.devices[0].params).to.have.lengthOf(2);
     expect(matterHandler.devices[0].params[0]).to.have.property('name', 'UNIQUE_ID');
     expect(matterHandler.devices[0].params[0]).to.have.property('value', 'uniqueId');
+    expect(matterHandler.devices[0].params[1]).to.have.property('name', 'SERIAL_NUMBER');
+    expect(matterHandler.devices[0].params[1]).to.have.property('value', 'serialNumber');
     expect(matterHandler.devices[0].features).to.have.lengthOf(1);
     expect(matterHandler.nodesMap.size).to.equal(1);
     expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label) 2');

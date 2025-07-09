@@ -76,6 +76,18 @@ const BUTTON_STATUS = {
   HOLD_LEFT: 70,
   HOLD_RIGHT: 71,
   HOLD_BOTH: 72,
+  SINGLE_PLUS: 73,
+  SINGLE_CENTER: 74,
+  SINGLE_MINUS: 75,
+  DOUBLE_PLUS: 76,
+  DOUBLE_CENTER: 77,
+  DOUBLE_MINUS: 78,
+  HOLD_PLUS: 79,
+  HOLD_CENTER: 80,
+  HOLD_MINUS: 81,
+  RELEASE_PLUS: 82,
+  RELEASE_CENTER: 83,
+  RELEASE_MINUS: 84,
 };
 
 const COVER_STATE = {
@@ -512,6 +524,13 @@ const DEVICE_FEATURE_CATEGORIES = {
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
   DURATION: 'duration',
+  ELECTRICAL_VEHICLE_BATTERY: 'electrical-vehicle-battery',
+  ELECTRICAL_VEHICLE_CHARGE: 'electrical-vehicle-charge',
+  ELECTRICAL_VEHICLE_DRIVE: 'electrical-vehicle-drive',
+  ELECTRICAL_VEHICLE_CONSUMPTION: 'electrical-vehicle-consumption',
+  ELECTRICAL_VEHICLE_STATE: 'electrical-vehicle-state',
+  ELECTRICAL_VEHICLE_CLIMATE: 'electrical-vehicle-climate',
+  ELECTRICAL_VEHICLE_COMMAND: 'electrical-vehicle-command',
   ENERGY_SENSOR: 'energy-sensor',
   HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
@@ -574,6 +593,11 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  TEMPERATURE_SENSOR: {
+    MIN: 'min',
+    MAX: 'max',
+    AVERAGE: 'average',
+  },
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
@@ -582,6 +606,7 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     BURGLAR: 'burglar',
     DIMMER: 'dimmer',
+    TARGET_CURRENT: 'target-current',
   },
   LOCK: {
     BINARY: 'binary',
@@ -817,6 +842,57 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
+  ELECTRICAL_VEHICLE_BATTERY: {
+    // Features related to the battery state and metrics of the vehicle
+    BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // Remaining energy in the battery in kWh (integer - sensor)
+    BATTERY_LEVEL: 'battery-level', // Battery state of charge in percent (integer - sensor)
+    BATTERY_POWER: 'battery-power', // Instantaneous battery power in W (integer - sensor)
+    BATTERY_RANGE_ESTIMATE: 'battery-range-estimate', // Estimated remaining range in km or miles (integer - sensor)
+    BATTERY_TEMPERATURE: 'battery-temperature', // Battery temperature in °C (integer - sensor)
+    BATTERY_VOLTAGE: 'battery-voltage', // Battery voltage in V (integer - sensor)
+  },
+  ELECTRICAL_VEHICLE_CHARGE: {
+    // Features related to the charging process and charge control
+    CHARGE_CURRENT: 'charge-current', // Current delivered during charging in A (integer - sensor)
+    CHARGE_ENERGY_ADDED_TOTAL: 'charge-energy-added-total', // Total energy added during all charge sessions in kWh (integer - sensor)
+    CHARGE_ENERGY_CONSUMPTION_TOTAL: 'charge-energy-consumption-total', // Total energy consumed during all charge sessions in kWh (integer - sensor)
+    CHARGE_ON: 'charge-on', // Charging state (binary - command with return status)
+    CHARGE_POWER: 'charge-power', // Instantaneous charging power in W (integer - sensor)
+    CHARGE_VOLTAGE: 'charge-voltage', // Charging voltage in V (integer - sensor)
+    LAST_CHARGE_ENERGY_ADDED: 'last-charge-energy-added', // Energy added in the last charge session in kWh (integer - sensor)
+    LAST_CHARGE_ENERGY_CONSUMPTION: 'last-charge-energy-consumption', // Energy consumed in the last charge session in kWh (integer - sensor)
+    PLUGGED: 'plugged', // Whether the vehicle is plugged in (binary - sensor)
+    TARGET_CHARGE_LIMIT: 'target-charge-limit', // Target state of charge limit in percent (integer - command)
+    TARGET_CURRENT: 'target-current', // Target charging current in A (integer - command)
+  },
+  ELECTRICAL_VEHICLE_CLIMATE: {
+    // Features related to the vehicle's climate control
+    CLIMATE_ON: 'climate-on', // Climate system activation (binary - command with return status)
+    INDOOR_TEMPERATURE: 'indoor-temperature', // Cabin temperature in °C (integer - sensor)
+    TARGET_TEMPERATURE: 'target-temperature', // Desired cabin temperature in °C (integer - command)
+  },
+  ELECTRICAL_VEHICLE_COMMAND: {
+    // General remote commands for the vehicle
+    ALARM: 'alarm', // Enable/Disable alarm (binary - command with return status)
+    LOCK: 'lock', // Lock/unlock the vehicle (binary - command with return status)
+  },
+  ELECTRICAL_VEHICLE_DRIVE: {
+    // Features related to driving and trip statistics
+    DRIVE_ENERGY_CONSUMPTION_TOTAL: 'drive-energy-consumption-total', // Total energy consumed while all trips in kWh (integer - sensor)
+    SPEED: 'speed', // Current speed of the vehicle in km/h or mi/h (integer - sensor)
+  },
+  ELECTRICAL_VEHICLE_CONSUMPTION: {
+    // Features related to energy consumption and efficiency
+    ENERGY_CONSUMPTION: 'energy-consumption', // Instantaneous or average energy consumption in Wh/km, Wh/mi, kWh/100km, kWh/100mi (integer - sensor)
+    ENERGY_EFFICIENCY: 'energy-efficiency', // Energy efficiency metric in km/kWh or mi/kWh (integer - sensor)
+  },
+  ELECTRICAL_VEHICLE_STATE: {
+    // Features related to the physical state of the vehicle
+    DOOR_OPENED: 'door-opened', // Door open state (binary - sensor)
+    ODOMETER: 'odometer', // Total distance traveled in km or miles (integer - sensor)
+    TIRE_PRESSURE: 'tire-pressure', // Tire pressure in bar (decimal - sensor)
+    WINDOW_OPENED: 'window-opened', // Window open state (binary - sensor)
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -829,6 +905,7 @@ const DEVICE_FEATURE_UNITS = {
   // Pressure units
   PASCAL: 'pascal',
   HECTO_PASCAL: 'hPa',
+  KILO_PASCAL: 'kPa',
   BAR: 'bar',
   PSI: 'psi',
   MILLIBAR: 'milli-bar',
@@ -850,11 +927,21 @@ const DEVICE_FEATURE_UNITS = {
   KILOVOLT_AMPERE: 'kilovolt-ampere',
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
+  WATT_HOUR_PER_KM: 'watt-hour-per-km',
+  KILOWATT_HOUR_PER_100_KM: 'kilowatt-hour-per-100-km',
+  WATT_HOUR_PER_MILE: 'watt-hour-per-mile',
+  KILOWATT_HOUR_PER_100_MILE: 'kilowatt-hour-per-100-mile',
+  // Efficiency units
+  KM_PER_KILOWATT_HOUR: 'km-per-kilowatt-hour',
+  MILE_PER_KILOWATT_HOUR: 'mile-per-kilowatt-hour',
   // Length units
   MM: 'mm',
   CM: 'cm',
   M: 'm',
   KM: 'km',
+  INCH: 'inch',
+  FEET: 'feet',
+  MILE: 'mile',
   // surface units
   SQUARE_CENTIMETER: 'square-centimeter',
   SQUARE_METER: 'square-meter',
@@ -876,6 +963,8 @@ const DEVICE_FEATURE_UNITS = {
   // Speed units
   METER_PER_SECOND: 'meter-per-second',
   KILOMETER_PER_HOUR: 'kilometer-per-hour',
+  FEET_PER_SECOND: 'feet-per-second',
+  MILE_PER_HOUR: 'mile-per-hour',
   // Precipitation units
   MILLIMETER_PER_HOUR: 'millimeter-per-hour',
   MILLIMETER_PER_DAY: 'millimeter-per-day',
@@ -939,12 +1028,18 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.CM,
     DEVICE_FEATURE_UNITS.M,
     DEVICE_FEATURE_UNITS.KM,
+    DEVICE_FEATURE_UNITS.INCH,
+    DEVICE_FEATURE_UNITS.FEET,
+    DEVICE_FEATURE_UNITS.MILE,
   ],
   [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: [
     DEVICE_FEATURE_UNITS.MM,
     DEVICE_FEATURE_UNITS.CM,
     DEVICE_FEATURE_UNITS.M,
     DEVICE_FEATURE_UNITS.KM,
+    DEVICE_FEATURE_UNITS.INCH,
+    DEVICE_FEATURE_UNITS.FEET,
+    DEVICE_FEATURE_UNITS.MILE,
     DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
@@ -953,6 +1048,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
     DEVICE_FEATURE_UNITS.PASCAL,
     DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+    DEVICE_FEATURE_UNITS.KILO_PASCAL,
     DEVICE_FEATURE_UNITS.BAR,
     DEVICE_FEATURE_UNITS.PSI,
     DEVICE_FEATURE_UNITS.MILLIBAR,
@@ -979,6 +1075,52 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.KM,
+    DEVICE_FEATURE_UNITS.MILE,
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.VOLT,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: [
+    DEVICE_FEATURE_UNITS.AMPERE,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.VOLT,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CLIMATE]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_DRIVE]: [
+    DEVICE_FEATURE_UNITS.MILE_PER_HOUR,
+    DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: [
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_KM,
+    DEVICE_FEATURE_UNITS.WATT_HOUR_PER_MILE,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_MILE,
+    DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.MILE_PER_KILOWATT_HOUR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: [
+    DEVICE_FEATURE_UNITS.KM,
+    DEVICE_FEATURE_UNITS.MILE,
+    DEVICE_FEATURE_UNITS.BAR,
+    DEVICE_FEATURE_UNITS.PSI,
+    DEVICE_FEATURE_UNITS.KILO_PASCAL,
   ],
   [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: [
     DEVICE_FEATURE_UNITS.LITER,
@@ -1038,6 +1180,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.GIGABYTES_PER_SECOND,
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
@@ -1046,6 +1189,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
+};
+
+const MEASUREMENT_UNITS = {
+  US: 'us',
+  METRIC: 'metric',
 };
 
 const ACTIONS_STATUS = {
@@ -1242,6 +1390,7 @@ const JOB_TYPES = {
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
+  SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
 };
 
@@ -1324,6 +1473,7 @@ module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
 module.exports.INTENTS = INTENTS;
 module.exports.DEVICE_FEATURE_CATEGORIES = DEVICE_FEATURE_CATEGORIES;
 module.exports.DEVICE_FEATURE_TYPES = DEVICE_FEATURE_TYPES;
+module.exports.MEASUREMENT_UNITS = MEASUREMENT_UNITS;
 module.exports.ACTIONS_STATUS = ACTIONS_STATUS;
 module.exports.USER_ROLE = USER_ROLE;
 module.exports.AVAILABLE_LANGUAGES = AVAILABLE_LANGUAGES;

@@ -280,7 +280,7 @@
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
+        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
         "editModeLabel": "Mode d'affichage :",
@@ -525,6 +525,7 @@
           "name": "Calendrier Synology",
           "url": "URL CalDAV Synology",
           "urlInfo": "Dans l'application Calendrier, cliquez sur 'Compte CalDAV' et copiez l'URL 'macOS/iOS'.",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur Synology",
           "usernameInfo": "Entrez votre nom d'utilisateur.",
           "password": "Mot de passe",
@@ -533,6 +534,7 @@
         "other": {
           "name": "Autre",
           "url": "URL CalDAV",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur CalDAV",
           "password": "Mot de passe CalDAV"
         }
@@ -1910,6 +1912,8 @@
       "documentation": "Documentation",
       "device": {
         "title": "Appareils Matter",
+        "refreshMatterDevices": "Rafraîchissement des appareils Matter en cours...",
+        "refreshMatterDevicesDescription": "Cela peut prendre quelques minutes si vous avez des appareils injoignables.",
         "noDeviceFound": "Aucun appareil Matter trouvé",
         "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
         "addToGladys": "Ajouter à Gladys",
@@ -1922,6 +1926,11 @@
       "namePlaceholder": "Mon appareil Matter",
       "roomLabel": "Pièce",
       "featuresLabel": "Fonctionnalités",
+      "displayDeviceInfo": "Afficher les détails",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Numéro de série",
+        "UNIQUE_ID": "ID unique"
+      },
       "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
       "alreadyCreatedButton": "Appareil déjà ajouté",
       "saveButton": "Enregistrer",
@@ -2089,7 +2098,8 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
-        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition.",
+        "valueError": "La valeur doit-être un nombre"
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
@@ -2660,7 +2670,8 @@
       "vacuum": "Nettoyage de la base de données",
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
-      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
+      "service-matter-backup": "Sauvegarde Matter"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2865,6 +2876,7 @@
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "kPa": "Kilopascal (kPa)",
     "bar": "Bar",
     "psi": "Livre-force par pouce carré (psi)",
     "milli-bar": "Millibar (mbar)",
@@ -2883,10 +2895,19 @@
     "volt-ampere": "Voltampère (VA)",
     "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
+    "watt-hour-per-km": "Watt heure par kilomètre (Wh/km)",
+    "kilowatt-hour-per-100-km": "Kilowatt heure aux 100 kilomètres (kWh/100km)",
+    "watt-hour-per-mile": "Watt heure par mile (Wh/mi)",
+    "kilowatt-hour-per-100-mile": "Kilowatt heure aux 100 miles (kWh/100mi)",
+    "km-per-kilowatt-hour": "Kilomètre par kilowatt heure (km/kWh)",
+    "mile-per-kilowatt-hour": "Mile par kilowatt heure (mi/kWh)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
     "m": "Mètre (m)",
     "km": "Kilomètre (km)",
+    "inch": "Pouce (in)",
+    "feet": "Pied (ft)",
+    "mile": "Mile (mi)",
     "degree": "Degré d'angle (°)",
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
@@ -2900,6 +2921,8 @@
     "pound-sterling": "livre sterling (£)",
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
+    "feet-per-second": "Pied par seconde (ft/s)",
+    "mile-per-hour": "Mile par heure (mi/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
     "millimeter-per-day": "Millimètre par jour (mm/j)",
     "uv-index": "Indice UV",
@@ -2943,6 +2966,7 @@
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "kPa": "kPa",
     "bar": "bar",
     "psi": "psi",
     "milli-bar": "mbar",
@@ -2961,10 +2985,19 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-per-km": "Wh/km",
+    "kilowatt-hour-per-100-km": "kWh/100km",
+    "watt-hour-per-mile": "Wh/mi",
+    "kilowatt-hour-per-100-mile": "kWh/100mi",
+    "km-per-kilowatt-hour": "km/kWh",
+    "mile-per-kilowatt-hour": "mi/kWh",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
     "km": "km",
+    "inch": "in",
+    "feet": "ft",
+    "mile": "mi",
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
@@ -2978,6 +3011,8 @@
     "pound-sterling": "£",
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
+    "feet-per-second": "ft/s",
+    "mile-per-hour": "mi/h",
     "millimeter-per-hour": "mm/h",
     "millimeter-per-day": "mm/j",
     "uv-index": "Indice UV",
@@ -3038,6 +3073,28 @@
           "zero": "Arrêter",
           "one": "Ouvrir",
           "other": "Fermer"
+        }
+      },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Désactivée",
+            "1": "Activée"
+          },
+          "state": {
+            "0": "Activer",
+            "1": "Désactiver"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
         }
       },
       "air-conditioning": {
@@ -3149,7 +3206,19 @@
           "69": "Triple sur les deux",
           "70": "Maintenu Gauche",
           "71": "Maintenu Droit",
-          "72": "Maintenu sur les deux"
+          "72": "Maintenu sur les deux",
+          "73": "Clic simple Plus",
+          "74": "Clic simple Centre",
+          "75": "Clic simple Moins",
+          "76": "Double clic Plus",
+          "77": "Double clic Centre",
+          "78": "Double clic Moins",
+          "79": "Maintien Plus",
+          "80": "Maintien Centre",
+          "81": "Maintien Moins",
+          "82": "Relâchement Plus",
+          "83": "Relâchement Centre",
+          "84": "Relâchement Moins"
         }
       },
       "heater": {
@@ -3220,6 +3289,22 @@
           "2": "Élevé",
           "unknown": "Inconnu"
         }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        },
+        "window-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Déconnecté",
+          "1": "Connecté"
+        }
       }
     }
   },
@@ -3246,7 +3331,10 @@
     },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
-      "decimal": "Température"
+      "decimal": "Température",
+      "min": "Température minimale",
+      "max": "Température maximale",
+      "average": "Température moyenne"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Température de l'appareil",
@@ -3319,7 +3407,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "target-current": "Intensité de consigne"
     },
     "siren": {
       "shortCategoryName": "Sirène",
@@ -3387,7 +3476,58 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température"
+      "target-temperature": "Température de consigne"
+    },
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Véhicule électrique - Batterie",
+      "battery-energy-remaining": "Énergie restante",
+      "battery-level": "Niveau batterie",
+      "battery-power": "Puissance batterie",
+      "battery-range-estimate": "Autonomie estimée",
+      "battery-temperature": "Température batterie",
+      "battery-voltage": "Tension batterie"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Véhicule électrique - Charge",
+      "charge-current": "Intensité charge",
+      "charge-energy-added-total": "Énergie totale ajoutée",
+      "charge-energy-consumption-total": "Énergie totale consommée",
+      "charge-on": "Commutateur charge",
+      "charge-power": "Puissance charge",
+      "charge-voltage": "Tension charge",
+      "last-charge-energy-added": "Énergie ajoutée (dernière charge)",
+      "last-charge-energy-consumption": "Énergie consommée (dernière charge)",
+      "plugged": "Véhicule branché",
+      "target-charge-limit": "Limite de charge",
+      "target-current": "Intensité de consigne"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Véhicule électrique - Climatisation",
+      "climate-on": "Commutateur climatisation",
+      "indoor-temperature": "Température intérieure",
+      "target-temperature": "Température de consigne"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Véhicule électrique - Commande",
+      "alarm": "Alarme",
+      "lock": "Verrouillage"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Véhicule électrique - Conduite",
+      "drive-energy-consumption-total": "Énergie totale consommée",
+      "speed": "Vitesse"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Véhicule électrique - Consommation",
+      "energy-consumption": "Consommation instantanée",
+      "energy-efficiency": "Efficacité énergétique"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Véhicule électrique - État",
+      "door-opened": "Porte ouverte",
+      "odometer": "Odomètre",
+      "tire-pressure": "Pression des pneus",
+      "window-opened": "Fenêtre ouverte"
     },
     "heater": {
       "shortCategoryName": "Chauffage",

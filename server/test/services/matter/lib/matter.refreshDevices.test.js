@@ -10,7 +10,11 @@ describe('Matter.refreshDevices', () => {
   let clusterClients;
 
   beforeEach(() => {
-    const gladys = {};
+    const gladys = {
+      job: {
+        wrapper: fake.returns(null),
+      },
+    };
     const MatterMain = {};
     const ProjectChipMatter = {};
 

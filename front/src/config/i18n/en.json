@@ -1641,6 +1641,7 @@
           "name": "Synology Calendar",
           "url": "Synology CalDAV URL",
           "urlInfo": "In calendar application, click on 'CalDAV Account' and copy 'macOS/iOS' URL.",
+          "verifySSL": "Verify SSL certificate",
           "username": "Synology username",
           "usernameInfo": "Enter your username.",
           "password": "Password",
@@ -1649,6 +1650,7 @@
         "other": {
           "name": "Other",
           "url": "CalDAV URL",
+          "verifySSL": "Verify SSL certificate",
           "username": "CalDAV Username",
           "password": "CalDAV Password"
         }
@@ -1940,6 +1942,8 @@
       },
       "device": {
         "title": "Matter Devices",
+        "refreshMatterDevices": "Refreshing Matter devices...",
+        "refreshMatterDevicesDescription": "This may take a few minutes if you have unreachable devices.",
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
         "addToGladys": "Add to Gladys",
@@ -1953,6 +1957,11 @@
       "roomLabel": "Room",
       "featuresLabel": "Features",
       "noFeaturesHandled": "No features are handled by this device",
+      "displayDeviceInfo": "Display device informations",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Serial Number",
+        "UNIQUE_ID": "Unique ID"
+      },
       "alreadyCreatedButton": "Device already added",
       "saveButton": "Save",
       "deleteButton": "Delete",
@@ -2089,7 +2098,8 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
-        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "valueError": "Value must be a number"
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
@@ -2660,7 +2670,8 @@
       "vacuum": "Database cleaning",
       "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
-      "device-state-purge-all-sqlite-states": "Purge all SQLite states"
+      "device-state-purge-all-sqlite-states": "Purge all SQLite states",
+      "service-matter-backup": "Matter backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -2865,6 +2876,7 @@
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "kPa": "Kilopascal (kPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
     "milli-bar": "Millibar (mbar)",
@@ -2883,10 +2895,19 @@
     "volt-ampere": "Voltampere (VA)",
     "volt-ampere-reactive": "Voltampere reactive (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
+    "watt-hour-per-km": "Watt hour per kilometer (Wh/km)",
+    "kilowatt-hour-per-100-km": "Kilowatt hour per 100 kilometers (kWh/100km)",
+    "watt-hour-per-mile": "Watt hour per mile (Wh/mi)",
+    "kilowatt-hour-per-100-mile": "Kilowatt hour per 100 miles (kWh/100mi)",
+    "km-per-kilowatt-hour": "Kilometer per kilowatt hour (km/kWh)",
+    "mile-per-kilowatt-hour": "Mile per kilowatt hour (mi/kWh)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
     "m": "Meter (m)",
     "km": "Kilometer (km)",
+    "inch": "Inch (in)",
+    "feet": "Feet (ft)",
+    "mile": "Mile (mi)",
     "degree": "Angular degree (°)",
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
@@ -2900,6 +2921,8 @@
     "pound-sterling": "Pound sterling (£)",
     "meter-per-second": "Meter per second (m/s)",
     "kilometer-per-hour": "Kilometer per hour (km/h)",
+    "feet-per-second": "Feet per second (ft/s)",
+    "mile-per-hour": "Mile per hour (mi/h)",
     "millimeter-per-hour": "Millimeter per hour (mm/h)",
     "millimeter-per-day": "Millimeter per day (mm/d)",
     "uv-index": "UV Index",
@@ -2943,6 +2966,7 @@
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "kPa": "kPa",
     "bar": "bar",
     "milli-bar": "mbar",
     "psi": "psi",
@@ -2961,10 +2985,19 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-per-km": "Wh/km",
+    "kilowatt-hour-per-100-km": "kWh/100km",
+    "watt-hour-per-mile": "Wh/mi",
+    "kilowatt-hour-per-100-mile": "kWh/100mi",
+    "km-per-kilowatt-hour": "km/kWh",
+    "mile-per-kilowatt-hour": "mi/kWh",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
     "km": "km",
+    "inch": "in",
+    "feet": "ft",
+    "mile": "mi",
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
@@ -2978,6 +3011,8 @@
     "pound-sterling": "£",
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
+    "feet-per-second": "ft/s",
+    "mile-per-hour": "mi/h",
     "millimeter-per-hour": "mm/h",
     "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
@@ -3038,6 +3073,28 @@
           "zero": "Stop",
           "one": "Open",
           "other": "Close"
+        }
+      },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Disabled",
+            "1": "Enabled"
+          },
+          "state": {
+            "0": "Enable",
+            "1": "Disable"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Unlocked",
+            "1": "Locked"
+          },
+          "state": {
+            "0": "Unlock",
+            "1": "Lock"
+          }
         }
       },
       "air-conditioning": {
@@ -3149,7 +3206,19 @@
           "69": "Triple Both",
           "70": "Hold Left",
           "71": "Hold Right",
-          "72": "Hold Both"
+          "72": "Hold Both",
+          "73": "Simple Click Plus",
+          "74": "Simple Click Center",
+          "75": "Simple Click Minus",
+          "76": "Double Click Plus",
+          "77": "Double Click Center",
+          "78": "Double Click Minus",
+          "79": "Hold Plus",
+          "80": "Hold Center",
+          "81": "Hold Minus",
+          "82": "Release Plus (Aqara W100)",
+          "83": "Release Center (Aqara W100)",
+          "84": "Release Minus (Aqara W100)"
         }
       },
       "heater": {
@@ -3220,6 +3289,22 @@
           "2": "High",
           "unknown": "Unknown"
         }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Closed",
+          "1": "Open"
+        },
+        "window-opened": {
+          "0": "Closed",
+          "1": "Open"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Unplugged",
+          "1": "Plugged"
+        }
       }
     }
   },
@@ -3246,7 +3331,10 @@
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
-      "decimal": "Temperature"
+      "decimal": "Temperature",
+      "min": "Minimum temperature",
+      "max": "Maximum temperature",
+      "average": "Average temperature"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Device temperature sensor",
@@ -3319,7 +3407,8 @@
       "dimmer": "Switch Dimmer",
       "burglar": "Switch Burglar",
       "power": "Power consumption",
-      "energy": "Energy consumption"
+      "energy": "Energy consumption",
+      "target-current": "Target current"
     },
     "siren": {
       "shortCategoryName": "Siren",
@@ -3387,7 +3476,58 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Temperature"
+      "target-temperature": "Target temperature"
+    },
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Electric Vehicle - Battery",
+      "battery-energy-remaining": "Remaining energy",
+      "battery-level": "Battery level",
+      "battery-power": "Battery power",
+      "battery-range-estimate": "Estimated range",
+      "battery-temperature": "Battery temperature",
+      "battery-voltage": "Battery voltage"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Electric Vehicle - Charging",
+      "charge-current": "Charging current",
+      "charge-energy-added-total": "Total energy added",
+      "charge-energy-consumption-total": "Total energy consumed",
+      "charge-on": "Charge switch",
+      "charge-power": "Charging power",
+      "charge-voltage": "Charging voltage",
+      "last-charge-energy-added": "Energy added (last charge)",
+      "last-charge-energy-consumption": "Energy consumed (last charge)",
+      "plugged": "Vehicle plugged",
+      "target-charge-limit": "Charge limit",
+      "target-current": "Target current"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Electric Vehicle - Climate",
+      "climate-on": "Climate switch",
+      "indoor-temperature": "Indoor temperature",
+      "target-temperature": "Target temperature"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Electric Vehicle - Command",
+      "alarm": "Alarm",
+      "lock": "Lock"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Electric Vehicle - Drive",
+      "drive-energy-consumption-total": "Total energy consumed",
+      "speed": "Speed"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Electric Vehicle - Consumption",
+      "energy-consumption": "Instant consumption",
+      "energy-efficiency": "Energy efficiency"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Electric Vehicle - Status",
+      "door-opened": "Door open",
+      "odometer": "Odometer",
+      "tire-pressure": "Tire pressure",
+      "window-opened": "Window open"
     },
     "heater": {
       "shortCategoryName": "Heating",

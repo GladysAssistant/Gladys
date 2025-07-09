@@ -1,11 +1,17 @@
+const {
+  Pm25ConcentrationMeasurement,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
+
 const sinon = require('sinon');
 const { expect } = require('chai');
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 
 const config = require('../../../../config/config');
 
 const MatterHandler = require('../../../../services/matter/lib');
+const { VARIABLES } = require('../../../../services/matter/utils/constants');
 
 describe('Matter.init', () => {
   let matterHandler;
@@ -13,8 +19,12 @@ describe('Matter.init', () => {
   let storageService;
   let commissioningController;
   let clusterClients;
+  let previousMatterPath;
 
   beforeEach(() => {
+    previousMatterPath = process.env.MATTER_FOLDER_PATH;
+    process.env.MATTER_FOLDER_PATH = '/tmp/gladysmattertest';
+
     // Mock environment and storage service
     environment = {
       get: fake.returns({
@@ -149,6 +159,18 @@ describe('Matter.init', () => {
       addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
     });
 
+    // PM2.5 concentration measurement
+    clusterClients.set(Pm25ConcentrationMeasurement.Complete.id, {
+      id: Pm25ConcentrationMeasurement.Complete.id,
+      name: 'Pm25ConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -205,12 +227,23 @@ describe('Matter.init', () => {
       config: {
         storage: config.test.storage,
       },
+      scheduler: {
+        scheduleJob: fake.returns(null),
+      },
+      job: {
+        wrapper: (type, fn) => fn,
+      },
+      variable: {
+        getValue: fake.resolves(null),
+      },
     };
 
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
   });
 
-  afterEach(() => {});
+  afterEach(() => {
+    process.env.MATTER_FOLDER_PATH = previousMatterPath;
+  });
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
@@ -360,6 +393,18 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:1066',
+            has_feedback: true,
+            max: 1500,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
         ],
         params: [],
       },
@@ -498,6 +543,18 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1066',
+            has_feedback: true,
+            max: 1500,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
         ],
         params: [],
       },
@@ -518,6 +575,30 @@ describe('Matter.init', () => {
     };
     matterHandler.ProjectChipMatter = ProjectChipMatter;
     await matterHandler.init();
+    expect(matterHandler.devices).to.have.lengthOf(0);
+    expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+  it('should init and restore backup', async () => {
+    commissioningController = {
+      start: fake.resolves(null),
+      getCommissionedNodesDetails: fake.returns([]),
+      getNode: fake.resolves({
+        getDevices: fake.returns([]),
+      }),
+    };
+    const ProjectChipMatter = {
+      CommissioningController: fake.returns(commissioningController),
+    };
+    matterHandler.ProjectChipMatter = ProjectChipMatter;
+    matterHandler.gladys.variable.getValue = (variable) => {
+      if (variable === VARIABLES.MATTER_BACKUP) {
+        return 'lala';
+      }
+      return null;
+    };
+    matterHandler.restoreBackup = fake.resolves(null);
+    await matterHandler.init();
+    assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
   });

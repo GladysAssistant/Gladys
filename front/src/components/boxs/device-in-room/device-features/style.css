@@ -29,27 +29,30 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   -moz-appearance: textfield;
 }
 
-.thermostatHorizontalControls {
+.setpointHorizontalControls {
   display: flex;
   min-width: 7rem;
 }
 
-.thermostatVerticalControls {
+.setpointVerticalControls {
   display: none;
 }
 
 @media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
-  .thermostatVerticalControls {
+  .setpointVerticalControls {
     display: block;
     min-width: 5rem;
   }
-  .thermostatHorizontalControls {
+  .setpointHorizontalControls {
     display: none;
   }
 }
-
 .btnLoading {
   &::after {
     border: 2px solid #5eba00;
   }
+}
+
+.rangeInput {
+  flex: 1;
 }

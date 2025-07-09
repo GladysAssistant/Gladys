@@ -74,6 +74,7 @@ const DeviceCard = ({ children, ...props }) => {
                       deviceFeatureIndex={deviceFeatureIndex}
                       updateValue={props.updateValue}
                       updateValueWithDebounce={props.updateValueWithDebounce}
+                      intl={props.intl}
                     />
                   ))}
             </tbody>

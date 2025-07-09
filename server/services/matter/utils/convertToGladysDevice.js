@@ -8,6 +8,7 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  Pm25ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -46,6 +47,12 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       gladysDevice.params.push({
         name: 'UNIQUE_ID',
         value: nodeDetailDeviceDataBasicInformation.uniqueId,
+      });
+    }
+    if (nodeDetailDeviceDataBasicInformation.serialNumber) {
+      gladysDevice.params.push({
+        name: 'SERIAL_NUMBER',
+        value: nodeDetailDeviceDataBasicInformation.serialNumber,
       });
     }
   }
@@ -202,6 +209,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 200,
           });
         }
+      } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 1500,
+        });
       }
     });
   }

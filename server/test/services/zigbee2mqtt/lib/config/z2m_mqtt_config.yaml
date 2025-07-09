@@ -7,6 +7,7 @@ mqtt:
   password: mqtt-password
 serial:
   port: /dev/ttyACM0
+  adapter: zstack
 map_options:
   graphviz:
     colors:

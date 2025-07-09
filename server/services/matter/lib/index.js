@@ -1,5 +1,6 @@
 const os = require('os');
 
+const { JOB_TYPES } = require('../../../utils/constants');
 const { init } = require('./matter.init');
 const { stop } = require('./matter.stop');
 const { pairDevice } = require('./matter.pairDevice');
@@ -11,6 +12,8 @@ const { getNodes } = require('./matter.getNodes');
 const { handleNode } = require('./matter.handleNode');
 const { checkIpv6 } = require('./matter.checkIpv6');
 const { refreshDevices } = require('./matter.refreshDevices');
+const { backupController } = require('./matter.backupController');
+const { restoreBackup } = require('./matter.restoreBackup');
 
 /**
  * @description Matter handler.
@@ -31,6 +34,7 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.nodesMap = new Map();
   this.stateChangeListeners = new Set();
   this.commissioningController = null;
+  this.backupController = gladys.job.wrapper(JOB_TYPES.SERVICE_MATTER_BACKUP, this.backupController.bind(this));
   process.on('SIGTERM', this.stop);
   process.on('SIGINT', this.stop);
 };
@@ -46,5 +50,7 @@ MatterHandler.prototype.getNodes = getNodes;
 MatterHandler.prototype.handleNode = handleNode;
 MatterHandler.prototype.checkIpv6 = checkIpv6;
 MatterHandler.prototype.refreshDevices = refreshDevices;
+MatterHandler.prototype.backupController = backupController;
+MatterHandler.prototype.restoreBackup = restoreBackup;
 
 module.exports = MatterHandler;
