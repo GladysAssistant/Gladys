@@ -1,4 +1,5 @@
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../utils/nuki.constants');
+const { getDeviceParam } = require('../../../../utils/device');
 
 /**
  * @description Get Nuki protocol used by device, default is MQTT.
@@ -8,13 +9,11 @@ const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../utils/nuki.constan
  * nuki.getProtocolFromDevice({});
  */
 function getProtocolFromDevice(device) {
-  const protocolParam = device.params.find((p) => p.name === DEVICE_PARAM_NAME.PROTOCOL);
-  if (protocolParam) {
-    return protocolParam.value;
+  const protocol = getDeviceParam(device, DEVICE_PARAM_NAME.PROTOCOL);
+  if (!protocol) {
+    return DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT;
   }
-
-  // Default is mqtt.
-  return DEVICE_PARAM_VALUE[DEVICE_PARAM_NAME.PROTOCOL].MQTT;
+  return protocol;
 }
 
 module.exports = {
