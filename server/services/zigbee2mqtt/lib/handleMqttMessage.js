@@ -56,7 +56,8 @@ async function handleMqttMessage(topic, message) {
     }
     case 'zigbee2mqtt/bridge/response/permit_join': {
       const config = JSON.parse(message);
-      this.z2mPermitJoin = config.data.value;
+      // If time is 0, permit join is disabled
+      this.z2mPermitJoin = config.data.time !== undefined && config.data.time > 0;
 
       logger.debug('Getting permit_joint :', this.z2mPermitJoin);
 
