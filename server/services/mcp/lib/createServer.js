@@ -22,7 +22,6 @@ async function createServer() {
   );
 
   (await this.getAllTools()).map(({ intent, config, cb }) => {
-    console.log('Registering tool', intent, config.title);
     return mcpServer.registerTool(intent.replace('.', '_'), config, cb);
   });
 

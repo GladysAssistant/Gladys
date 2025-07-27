@@ -1,4 +1,24 @@
 const { z } = require('zod');
+const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+
+const featureCategories = [
+  DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.VOC_SENSOR,
+];
 
 /**
  * @description Get all tools available in the MCP service.
@@ -9,54 +29,18 @@ const { z } = require('zod');
 async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
   const scenes = (await this.gladys.scene.get()).map(({ selector }) => selector);
+  let devices = (await this.gladys.device.get()).filter(device => {
+    return device.features.some(feature => featureCategories.includes(feature.category));
+  });
+  devices = devices.map(device => {
+    device.features = device.features.filter(feature => featureCategories.includes(feature.category));
+    return device;
+  });
+  const availableFeatureCategories = [...new Set(devices.map(device => {
+    return device.features.map(feature => feature.category);
+  }).flat())];
 
   return [
-    {
-      intent: 'temperature-sensor.get-in-room',
-      config: {
-        title: 'Get temperature in room',
-        description: 'Get the temperature in a specific room.',
-        inputSchema: {
-          room: z.enum(rooms).describe('Room to get temperature from.'),
-        },
-      },
-      cb: async ({ room }) => {
-        const { id } = await this.gladys.room.getBySelector(room);
-
-        const temperature = await this.gladys.device.temperatureSensorManager.getTemperatureInRoom(id);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(temperature),
-            },
-          ],
-        };
-      },
-    },
-    {
-      intent: 'humidity-sensor.get-in-room',
-      config: {
-        title: 'Get himidity in room',
-        description: 'Get the himidity in a specific room.',
-        inputSchema: {
-          room: z.enum(rooms).describe('Room to get himidity from.'),
-        },
-      },
-      cb: async ({ room }) => {
-        const { id } = await this.gladys.room.getBySelector(room);
-
-        const himidity = await this.gladys.device.humiditySensorManager.getHumidityInRoom(id);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(himidity),
-            },
-          ],
-        };
-      },
-    },
     {
       intent: 'camera.get-image',
       config: {
@@ -155,6 +139,61 @@ async function getAllTools() {
 
         return {
           content: [{ type: 'text', text: 'scene.start command sent' }],
+        };
+      },
+    },
+    {
+      intent: 'device.get-state',
+      config: {
+        title: 'Get states from devices',
+        description: 'Get last state of specific device type or in a specific room.',
+        inputSchema: {
+          room: z.enum(rooms).describe('Room to get information from.').optional(),
+          sensor_type: z.array(z.enum(availableFeatureCategories)).describe('Type of sensor to query, empty array to retrieve all sensors.').optional(),
+        },
+      },
+      cb: async ({ room, feature_categories: featCategories }) => {
+        const states = [];
+
+        let selectedDevices = devices;
+
+        if (room && room !== '') {
+          selectedDevices = selectedDevices.filter(device => device.room.selector === room);
+        }
+
+        if (featCategories && featCategories.length > 0) {
+          selectedDevices = selectedDevices.filter(device => {
+            return device.features.some(feature => featCategories.includes(feature.category));
+          });
+        }
+
+        await Promise.all(selectedDevices.map(async (device) => {
+          const deviceLastState = await this.gladys.device.getBySelector(device.selector);
+          return device.features.map(feature => {
+            if (!featCategories || featCategories.length === 0 || featCategories.includes(feature.category)) {
+              const featureLastState = deviceLastState.features.find(feat => feat.id === feature.id);
+
+              states.push({
+                room: device.room.name,
+                device: device.name,
+                feature: featureLastState.name,
+                category: featureLastState.category,
+                value: featureLastState.last_value,
+                unit: featureLastState.unit,
+              });
+
+              return true;
+            }
+
+            return false;
+          });
+        }));
+
+        return {
+          content: states.map(state => ({
+            type: 'text',
+            text: JSON.stringify(state),
+          })),
         };
       },
     },
