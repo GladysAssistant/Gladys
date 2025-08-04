@@ -121,7 +121,7 @@ class Settings extends Component {
                                 value={icon}
                                 className={styles.iconInput}
                               />
-                              <i class={`fe fe-${icon}`} />
+                              <i class={`dark-mode-fe-none-filter fe fe-${icon}`} />
                             </label>
                           </div>
                         </div>

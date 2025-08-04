@@ -142,6 +142,10 @@ body.dark-mode {
   filter: none;
 }
 
+.dark-mode .dark-mode-fe-none-filter {
+  filter: none;
+}
+
 /* Dark mode toggle button */
 .mode-toggle {
   padding: 0.5rem;
