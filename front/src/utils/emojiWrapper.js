@@ -13,7 +13,6 @@ export const wrapEmojisJSX = text => {
 
   const parts = text.split(emojiRegex);
   const result = [];
-  let lastIndex = 0;
 
   for (let i = 0; i < parts.length; i++) {
     if (parts[i]) {
