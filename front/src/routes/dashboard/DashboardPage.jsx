@@ -15,7 +15,7 @@ const DashboardPage = ({ children, ...props }) => (
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
-          <div class="my-3 my-md-5">
+          <div class="my-3 my-md-5 dashboard">
             <div class={cx('container')}>
               <div class="page-header">
                 <div>

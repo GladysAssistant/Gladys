@@ -39,6 +39,10 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
+.dark-mode .dashboard .fe {
+  filter: none;
+}
+
 /* Fix z-index issue for input icon addons */
 .dark-mode .input-icon-addon {
   z-index: 2 !important;
