@@ -39,7 +39,13 @@ body.dark-mode {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
+/** Should not invert icon on dashboard **/
 .dark-mode .dashboard .fe {
+  filter: none;
+}
+
+/** Should not invert icon inside btn-outline-danger **/
+.dark-mode .btn-outline-danger .fe {
   filter: none;
 }
 
@@ -124,6 +130,11 @@ body.dark-mode {
 .dark-mode .emoji-no-invert,
 .dark-mode .dark-mode-no-invert {
   filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
+}
+
+/** Do not invert btn-outline-danger in input-group-append or it becomes unreadable**/
+.dark-mode .input-group-append .btn-outline-danger {
+  filter: none;
 }
 
 /** EDF Tempo icon for example **/
