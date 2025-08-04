@@ -89,7 +89,6 @@ describe('Scene view', () => {
 
       cy.get('@houseControl')
         .get('[class*="-menu"]')
-        .find('[class*="-option"]')
         .filter(`:contains("My House")`)
         .click(0, 0, { force: true });
     });
