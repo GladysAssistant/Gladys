@@ -1,5 +1,6 @@
 const { createServer } = require('./createServer');
 const { getAllTools } = require('./getAllTools');
+const { formatValue } = require('./formatValue');
 
 /**
  * @description Add ability to connect to MCP.
@@ -18,5 +19,6 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp) {
 
 MCPHandler.prototype.createServer = createServer;
 MCPHandler.prototype.getAllTools = getAllTools;
+MCPHandler.prototype.formatValue = formatValue;
 
 module.exports = MCPHandler;
