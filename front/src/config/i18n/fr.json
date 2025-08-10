@@ -1898,6 +1898,14 @@
         "disableButton": "Désactiver Matter",
         "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
       }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Connectez votre agent IA à Gladys.",
+      "documentation": "Documentation MCP",
+      "longDescription": "MCP est un protocol permettant d'ajouter des fonctionnalités du monde réel à votre agent. Cette intégration fait office de serveur MCP et permet à vos agents IA compatible MCP d'intéragire avec votre maison connectée. Votre agent et votre instance Gladys doivent être sur le même réseau.",
+      "urlLabel": "URL du serveur MCP",
+      "urlInstruction": "Copiez cette URL dans la configuration de votre agent."
     }
   },
   "editScene": {
