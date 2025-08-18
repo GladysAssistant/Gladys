@@ -3101,11 +3101,11 @@
         "binary": {
           "stateLiveFinished": {
             "0": "Verriegelt",
-            "1": "Entriegelt"            
+            "1": "Entriegelt"
           },
           "state": {
             "0": "Entriegeln",
-            "1": "Verriegeln"            
+            "1": "Verriegeln"
           }
         }
       },

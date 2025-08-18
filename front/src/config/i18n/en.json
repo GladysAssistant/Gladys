@@ -3101,11 +3101,11 @@
         "binary": {
           "stateLiveFinished": {
             "0": "Locked",
-            "1": "Unlocked"            
+            "1": "Unlocked"
           },
           "state": {
             "0": "Lock",
-            "1": "Unlock"            
+            "1": "Unlock"
           }
         }
       },
