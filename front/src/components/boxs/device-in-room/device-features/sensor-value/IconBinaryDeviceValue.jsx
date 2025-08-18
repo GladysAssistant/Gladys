@@ -16,7 +16,7 @@ const ICON_MAP = {
     1: 'lock'
   },
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
-    0: 'x-octagon', //'uncalibrated'
+    0: 'x-circle', //'uncalibrated'
     1: 'lock', //'locked',
     2: 'activity', //'unlocking',
     3: 'unlock', //'unlocked',
