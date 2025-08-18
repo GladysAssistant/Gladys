@@ -3100,12 +3100,12 @@
       "lock": {
         "binary": {
           "stateLiveFinished": {
-            "0": "Entriegelt",
-            "1": "Verriegelt"
+            "0": "Verriegelt",
+            "1": "Entriegelt"            
           },
           "state": {
-            "0": "Verriegeln",
-            "1": "Entriegeln"
+            "0": "Entriegeln",
+            "1": "Verriegeln"            
           }
         }
       },

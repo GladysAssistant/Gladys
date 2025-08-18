@@ -3100,12 +3100,12 @@
       "lock": {
         "binary": {
           "stateLiveFinished": {
-            "0": "Déverrouillée",
-            "1": "Verrouillée"
+            "0": "Verrouillée",
+            "1": "Déverrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
