@@ -3097,6 +3097,18 @@
           }
         }
       },
+      "lock": {
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",

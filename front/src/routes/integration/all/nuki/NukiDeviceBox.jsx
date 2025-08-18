@@ -230,7 +230,7 @@ class NukiDeviceBox extends Component {
                     </button>
                   )}
 
-                  {(!device.alreadyExist && editable) && (
+                  {!device.alreadyExist && editable && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.nuki.saveButton" />
                     </button>

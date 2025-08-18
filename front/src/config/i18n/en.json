@@ -3097,6 +3097,18 @@
           }
         }
       },
+      "lock": {
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Unlocked",
+            "1": "Locked"
+          },
+          "state": {
+            "0": "Unlock",
+            "1": "Lock"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",
