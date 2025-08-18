@@ -25,7 +25,7 @@
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
   },
   "overrides": {
-    "esm": "npm:esm-wallaby"
+    "esm": "npm:esm-wallaby@3.2.35"
   },
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",
