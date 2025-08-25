@@ -36,6 +36,7 @@ const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyPriceModel = require('./energy_price');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -61,6 +62,7 @@ const models = {
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),
