@@ -64,14 +64,20 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   energyPrice.beforeValidate((item) => {
-    // Keep default behavior: slugify provided selector or name
-    addSelectorBeforeValidateHook(item);
     // If selector still missing (no name field on this model), generate from key fields
     if (item.isNewRecord && !item.selector) {
-      const base = [item.contract, item.price_type, item.start_date, item.day_type || 'any']
-        .filter(Boolean)
-        .join('-');
-      item.selector = slugify(base || `energy-price-${item.id || ''}`);
+      const base = [
+        item.contract,
+        item.price_type,
+        item.currency,
+        item.start_date,
+        item.day_type || 'any',
+        item.electric_meter_device_id,
+        item.hour_slots,
+        item.subscribed_power,
+        item.day_type,
+      ].join('-');
+      item.selector = slugify(base, true);
     }
   });
 
