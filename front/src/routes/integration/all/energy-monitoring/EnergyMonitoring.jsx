@@ -99,7 +99,7 @@ class EnergyMonitoringPage extends Component {
     const { rootFeatures, childrenById, allFeatures } = this.getTree();
     const { loadingDevices, error } = state;
 
-    const getDescendantIds = (id) => {
+    const getDescendantIds = id => {
       const stack = [id];
       const visited = new Set();
       visited.add(id);
@@ -107,7 +107,7 @@ class EnergyMonitoringPage extends Component {
       while (stack.length) {
         const current = stack.pop();
         const children = childrenById.get(current) || [];
-        children.forEach((c) => {
+        children.forEach(c => {
           if (!visited.has(c.id)) {
             visited.add(c.id);
             result.add(c.id);
@@ -120,7 +120,9 @@ class EnergyMonitoringPage extends Component {
 
     const renderFeature = (feature, depth = 0) => {
       const paddingLeft = 8 + depth * 16;
-      const label = `${feature.__device ? feature.__device.name : ''} - ${feature.name || feature.selector || feature.id}`;
+      const label = `${feature.__device ? feature.__device.name : ''} - ${feature.name ||
+        feature.selector ||
+        feature.id}`;
       const levelColors = ['#5c7cfa', '#40c057', '#fab005', '#fa5252', '#12b886', '#7950f2'];
       const color = levelColors[depth % levelColors.length];
       const descendantIds = getDescendantIds(feature.id);
@@ -142,12 +144,14 @@ class EnergyMonitoringPage extends Component {
                   <select
                     class="form-control form-control-sm"
                     value={feature.energy_parent_id || ''}
-                    onChange={(e) => this.setParentLocal(feature.id, e.target.value || null)}
+                    onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
                   >
-                    <option value="">— Root (no parent)</option>
+                    <option value="">
+                      <Text id="integration.energyMonitoring.rootNotParent" />
+                    </option>
                     {allFeatures
-                      .filter((f) => f.id !== feature.id && !descendantIds.has(f.id))
-                      .map((f) => (
+                      .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
+                      .map(f => (
                         <option key={f.id} value={f.id}>
                           {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
                         </option>
