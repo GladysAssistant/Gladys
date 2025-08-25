@@ -1898,6 +1898,11 @@
         "disableButton": "Désactiver Matter",
         "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
       }
+    },
+    "energyMonitoring": {
+      "title": "Suivi énergétique",
+      "description": "Suivez votre consommation d'électricité dans Gladys",
+      "documentation": "Documentation"
     }
   },
   "editScene": {
