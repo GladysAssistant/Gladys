@@ -22,6 +22,14 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      energy_parent_id: {
+        allowNull: true,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_device_feature',
+          key: 'id',
+        },
+      },
       name: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -113,6 +121,17 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'device_feature_id',
       sourceKey: 'id',
       as: 'device_feature_states',
+    });
+    // self-referential energy hierarchy
+    deviceFeature.belongsTo(models.DeviceFeature, {
+      foreignKey: 'energy_parent_id',
+      targetKey: 'id',
+      as: 'energy_parent',
+    });
+    deviceFeature.hasMany(models.DeviceFeature, {
+      foreignKey: 'energy_parent_id',
+      sourceKey: 'id',
+      as: 'energy_children',
     });
   };
 

@@ -129,6 +129,16 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {patch} /api/v1/device_feature/:device_feature_selector updateDeviceFeature
+   * @apiName updateDeviceFeature
+   * @apiGroup Device
+   */
+  async function updateDeviceFeature(req, res) {
+    const feature = await gladys.device.updateFeature(req.params.device_feature_selector, req.body);
+    res.json(feature);
+  }
+
+  /**
    * @api {get} /api/v1/device/duckdb_migration_state getDuckDbMigrationState
    * @apiName getDuckDbMigrationState
    * @apiGroup Device
@@ -150,5 +160,6 @@ module.exports = function DeviceController(gladys) {
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
+    updateDeviceFeature: asyncMiddleware(updateDeviceFeature),
   });
 };

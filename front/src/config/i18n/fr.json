@@ -1902,7 +1902,10 @@
     "energyMonitoring": {
       "title": "Suivi énergétique",
       "description": "Suivez votre consommation d'électricité dans Gladys",
-      "documentation": "Documentation"
+      "documentation": "Documentation",
+      "myDevicesTab": "Mes appareils",
+      "energyPriceTab": "Prix de l'énergie",
+      "hierarchicalListDescription": "Cette liste représente la hiérarchie des appareils de votre maison en fonction de leur parenté énergétique. Par exemple, si vous avez une machine à laver, elle même branchée sur une prise connectée, elle même connectée à un compteur électrique, vous avez 3 niveaux de profondeurs, et pour éviter la double comptabilisation, vous pouvez définir ces niveaux ici."
     }
   },
   "editScene": {
