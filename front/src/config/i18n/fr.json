@@ -502,6 +502,7 @@
     },
     "energyMonitoring": {
       "title": "Suivi de l'énergie",
+      "description": "Suivez votre consommation d'électricité dans Gladys",
       "myDevicesTab": "Mes appareils",
       "energyPriceTab": "Tarifs d'énergie",
       "documentation": "Documentation",
