@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "bluebird": "^3.7.2"
+    "bluebird": "^3.7.2",
+    "dayjs": "^1.11.15"
   }
 }

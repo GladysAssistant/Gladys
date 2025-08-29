@@ -1,7 +1,19 @@
 const Promise = require('bluebird');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ENERGY_PRICE_TYPES } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  ENERGY_PRICE_TYPES,
+  SYSTEM_VARIABLE_NAMES,
+} = require('../../../utils/constants');
 const contracts = require('../contracts/contracts.calculateCost');
 
 /**
@@ -12,6 +24,8 @@ const contracts = require('../contracts/contracts.calculateCost');
  * calculateCostFrom(new Date());
  */
 async function calculateCostFrom(startAt) {
+  const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+  logger.info(`Calculating cost in timezone ${systemTimezone}`);
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
@@ -57,8 +71,8 @@ async function calculateCostFrom(startAt) {
             // We only keep consumption prices (no subscription)
             price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
             // We only keep prices that are valid for this date
-            new Date(price.start_date) <= deviceFeatureState.created_at &&
-            (price.end_date === null || new Date(price.end_date) >= deviceFeatureState.created_at),
+            dayjs.tz(price.start_date, systemTimezone) <= deviceFeatureState.created_at &&
+            (price.end_date === null || dayjs.tz(price.end_date, systemTimezone) >= deviceFeatureState.created_at),
         );
         if (energyPricesForDate.length === 0) {
           logger.debug(
@@ -69,11 +83,11 @@ async function calculateCostFrom(startAt) {
         // We take the contract from the first price.
         // It's not possible to have multiple contracts for the same electrical meter device.
         const { contract } = energyPricesForDate[0];
-
+        const valueCreatedAtWithTimezone = dayjs.tz(deviceFeatureState.created_at, systemTimezone).toDate();
         // Calculate the cost per contract
         const cost = await contracts[contract](
           energyPricesForDate,
-          deviceFeatureState.created_at,
+          valueCreatedAtWithTimezone,
           deviceFeatureState.value,
         );
         // Save the cost if not exists

@@ -14,6 +14,7 @@ module.exports = {
     return cost;
   },
   [ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
+    // Get the hour in the same timezone
     const consumptionDateHour = consumptionDate.getHours();
     // We find the price for this hour
     const price = energyPricesAtConsumptionDate.find((p) => {
