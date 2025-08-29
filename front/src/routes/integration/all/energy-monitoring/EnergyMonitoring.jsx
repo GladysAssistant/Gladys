@@ -109,7 +109,7 @@ class EnergyMonitoringPage extends Component {
           end_date: p.end_date || '',
           electric_meter_device_id: p.electric_meter_device_id || '',
           day_type: p.day_type || 'any',
-          price: p.price || '',
+          price: p.price != null && p.price !== '' ? p.price / 10000 : '',
           hour_slots: p.hour_slots || '',
           subscribed_power: p.subscribed_power || ''
         }
@@ -146,6 +146,17 @@ class EnergyMonitoringPage extends Component {
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
         const ordered = Array.from(this.state.wizardHourSlots).sort((a, b) => a - b);
         payload.hour_slots = ordered.join(',');
+      }
+      // Scale price to integer with 4 decimals (x10000) before saving
+      if (payload.price !== undefined && payload.price !== null && payload.price !== '') {
+        const n = Number(payload.price);
+        if (Number.isFinite(n)) {
+          payload.price = Math.round(n * 10000);
+        } else {
+          delete payload.price;
+        }
+      } else {
+        delete payload.price;
       }
       if (this.state.wizardEditingId) {
         const existing = (this.state.prices || []).find(p => p.id === this.state.wizardEditingId);
@@ -370,7 +381,7 @@ class EnergyMonitoringPage extends Component {
                     <strong>
                       <Text id="global.price" defaultMessage="Price" />:
                     </strong>{' '}
-                    {p.price}
+                    {p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : '-'}
                   </div>
                   <div class="col-md-4">
                     <strong><Text id="integration.energyMonitoring.dayType" />:</strong>{' '}
