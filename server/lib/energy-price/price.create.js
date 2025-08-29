@@ -6,6 +6,7 @@ const db = require('../../models');
  * @returns {Promise<object>} Created row.
  * @example
  * await create({
+ *   electrical_meter_device_id: '17488546-e1b8-4cb9-bd75-e20526a94a99',
  *   contract: 'base',
  *   price_type: 'consumption',
  *   currency: 'euro',

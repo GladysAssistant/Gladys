@@ -1386,6 +1386,7 @@ const JOB_TYPES = {
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
+  ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES: 'energy-monitoring-cost-calculation-thirty-minutes',
 };
 
 const JOB_STATUS = {
@@ -1414,6 +1415,20 @@ const ALARM_MODES = {
   ARMED: 'armed',
   PARTIALLY_ARMED: 'partially-armed',
   PANIC: 'panic',
+};
+
+const ENERGY_CONTRACT_TYPES = {
+  // Generic base contract
+  BASE: 'base',
+  // Generic peak off peak contract
+  PEAK_OFF_PEAK: 'peak-off-peak',
+  // EDF Tempo
+  EDF_TEMPO: 'edf-tempo',
+};
+
+const ENERGY_PRICE_TYPES = {
+  CONSUMPTION: 'consumption',
+  SUBSCRIPTION: 'subscription',
 };
 
 const createList = (obj) => {
@@ -1449,6 +1464,8 @@ const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
+const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
+const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -1529,3 +1546,8 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
+
+module.exports.ENERGY_CONTRACT_TYPES = ENERGY_CONTRACT_TYPES;
+module.exports.ENERGY_CONTRACT_TYPES_LIST = ENERGY_CONTRACT_TYPES_LIST;
+module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
+module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
