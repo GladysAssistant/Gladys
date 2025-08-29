@@ -1,4 +1,8 @@
-const { ENERGY_CONTRACT_TYPES_LIST, ENERGY_PRICE_TYPES_LIST } = require('../utils/constants');
+const {
+  ENERGY_CONTRACT_TYPES_LIST,
+  ENERGY_PRICE_TYPES_LIST,
+  ENERGY_PRICE_DAY_TYPES_LIST,
+} = require('../utils/constants');
 const { slugify } = require('../utils/slugify');
 
 module.exports = (sequelize, DataTypes) => {
@@ -52,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       day_type: {
         allowNull: true,
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM(...ENERGY_PRICE_DAY_TYPES_LIST),
       },
       selector: {
         allowNull: false,

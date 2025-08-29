@@ -1431,6 +1431,12 @@ const ENERGY_PRICE_TYPES = {
   SUBSCRIPTION: 'subscription',
 };
 
+const ENERGY_PRICE_DAY_TYPES = {
+  RED: 'red',
+  BLUE: 'blue',
+  WHITE: 'white',
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1466,6 +1472,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
+const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -1551,3 +1558,5 @@ module.exports.ENERGY_CONTRACT_TYPES = ENERGY_CONTRACT_TYPES;
 module.exports.ENERGY_CONTRACT_TYPES_LIST = ENERGY_CONTRACT_TYPES_LIST;
 module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
 module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
+module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
+module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;

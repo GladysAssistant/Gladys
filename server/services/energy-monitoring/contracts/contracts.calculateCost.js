@@ -9,8 +9,8 @@ module.exports = {
     if (!price) {
       throw new NotFoundError('No price found for this contract');
     }
-    // Price are stored as integer so we need to divide by 100
-    const cost = (price.price / 100) * consumptionValue;
+    // Price are stored as integer with 4 decimals
+    const cost = (price.price / 10000) * consumptionValue;
     return cost;
   },
   [ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
@@ -24,8 +24,8 @@ module.exports = {
     if (!price) {
       throw new NotFoundError('No price found for this hour');
     }
-    // Price are stored as integer so we need to divide by 100
-    const cost = (price.price / 100) * consumptionValue;
+    // Price are stored as integer with 4 decimals
+    const cost = (price.price / 10000) * consumptionValue;
     return cost;
   },
   [ENERGY_CONTRACT_TYPES.EDF_TEMPO]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
@@ -45,12 +45,12 @@ module.exports = {
       const hourSlots = p.hour_slots.split(',');
       return hourSlots.includes(consumptionDateHour.toString());
     });
-    logger.debug(`Found price: ${price}`);
     if (!price) {
       throw new NotFoundError('No price found for this hour');
     }
-    // Price are stored as integer so we need to divide by 100
-    const cost = (price.price / 100) * consumptionValue;
+    logger.debug(`Found price: ${price.price / 10000}${price.currency}/kWh`);
+    // Price are stored as integer with 4 decimals
+    const cost = (price.price / 10000) * consumptionValue;
     return cost;
   },
 };

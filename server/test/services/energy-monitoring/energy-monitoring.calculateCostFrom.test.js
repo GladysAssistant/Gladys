@@ -15,6 +15,7 @@ const {
   DEVICE_FEATURE_TYPES,
   ENERGY_CONTRACT_TYPES,
   ENERGY_PRICE_TYPES,
+  ENERGY_PRICE_DAY_TYPES,
   SYSTEM_VARIABLE_NAMES,
 } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
@@ -125,8 +126,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
       currency: 'euro',
       start_date: '2025-01-01',
-      // 0,18€/kwh stored as integer in cents
-      price: 18,
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
     });
     await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
       {
@@ -159,8 +160,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
       currency: 'euro',
       start_date: '2025-01-01',
-      // 0,15€/kwh stored as integer in cents
-      price: 15,
+      // 0,15€/kwh stored as integer with 4 decimals
+      price: 1500,
       // Off peak time
       hour_slots: '1,2,3,4,5,6,22,23',
     });
@@ -170,8 +171,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
       currency: 'euro',
       start_date: '2025-01-01',
-      // 0,25€/kwh stored as integer in cents
-      price: 25,
+      // 0,25€/kwh stored as integer with 4 decimals
+      price: 2500,
       // Peak time
       hour_slots: '7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
     });
@@ -200,5 +201,117 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.15);
     // Price should be equal to 0.25€/kwh * 20kwh
     expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.25);
+  });
+  it('should calculate cost from a specific date for a edf-tempo contract', async () => {
+    // BLUE
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1288,
+      hour_slots: '1,2,3,4,5,22,23',
+      day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1552,
+      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
+    });
+    // WHITE
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1447,
+      hour_slots: '1,2,3,4,5,22,23',
+      day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1792,
+      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
+    });
+    // RED
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1518,
+      hour_slots: '1,2,3,4,5,22,23',
+      day_type: ENERGY_PRICE_DAY_TYPES.RED,
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.EDF_TEMPO,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 6586,
+      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      day_type: ENERGY_PRICE_DAY_TYPES.RED,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        // RED day, off peak
+        created_at: dayjs.tz('2025-01-03T05:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // RED day, peak
+        created_at: dayjs.tz('2025-01-03T10:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // WHITE day, off peak
+        created_at: dayjs.tz('2025-01-04T05:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // WHITE day, peak
+        created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // BLUE day, off peak
+        created_at: dayjs.tz('2025-01-05T05:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // BLUE day, peak
+        created_at: dayjs.tz('2025-01-05T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-01-01T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(6);
+    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1518);
+    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.6586);
+    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1447);
+    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1792);
+    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1288);
+    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1552);
   });
 });
