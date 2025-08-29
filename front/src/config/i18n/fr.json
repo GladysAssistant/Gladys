@@ -3573,7 +3573,10 @@
       "power": "Puissance",
       "energy": "Energie",
       "index": "Index",
-      "daily-consumption": "Consommation journalière"
+      "daily-consumption": "Consommation journalière",
+      "daily-consumption-cost": "Coût journalier",
+      "thirty-minutes-consumption": "Consommation 30 minutes",
+      "thirty-minutes-consumption-cost": "Coût 30 minutes"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
