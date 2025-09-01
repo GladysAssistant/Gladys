@@ -15,6 +15,10 @@ class EnergyMonitoringPage extends Component {
     prices: [],
     loadingPrices: false,
     priceError: null,
+    // Settings state
+    calculatingFromBeginning: false,
+    settingsSuccess: null,
+    settingsError: null,
     // UI state for collapsible price items
     expandedPriceIds: new Set(),
     // Wizard state
@@ -32,6 +36,21 @@ class EnergyMonitoringPage extends Component {
       price: '',
       hour_slots: '',
       subscribed_power: ''
+    }
+  };
+
+  calculateFromBeginning = async () => {
+    try {
+      this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
+      await this.props.httpClient.post(
+        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
+        {}
+      );
+      this.setState({ settingsSuccess: 'ok' });
+    } catch (e) {
+      this.setState({ settingsError: e });
+    } finally {
+      this.setState({ calculatingFromBeginning: false });
     }
   };
 
@@ -57,6 +76,11 @@ class EnergyMonitoringPage extends Component {
   isEditPriceRoute() {
     const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
     return path.includes('/prices/edit');
+  }
+
+  isSettingsRoute() {
+    const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
+    return path.startsWith('/dashboard/integration/device/energy-monitoring') && path.includes('/settings');
   }
 
   // ----- PRICES DATA -----
@@ -757,6 +781,47 @@ class EnergyMonitoringPage extends Component {
       </div>
     );
 
+    const renderSettings = () => (
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title">
+              <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
+            </h1>
+          </div>
+          <div class="card-body">
+            {state.settingsError && (
+              <div class="alert alert-danger" role="alert">
+                <Text id="integration.energyMonitoring.calculateFromBeginningError" defaultMessage="An error occurred while starting the calculation." />
+              </div>
+            )}
+            {state.settingsSuccess && (
+              <div class="alert alert-success" role="alert">
+                <Text id="integration.energyMonitoring.calculateFromBeginningStarted" defaultMessage="Calculation started. You can follow progress in Jobs." />
+              </div>
+            )}
+            <button
+              class="btn btn-primary"
+              disabled={state.calculatingFromBeginning}
+              onClick={this.calculateFromBeginning}
+            >
+              {state.calculatingFromBeginning ? (
+                <span>
+                  <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                  <Text id="integration.energyMonitoring.calculatingFromBeginning" defaultMessage="Starting calculation..." />
+                </span>
+              ) : (
+                <span>
+                  <i class="fe fe-play mr-2" />
+                  <Text id="integration.energyMonitoring.calculateCostFromBeginning" defaultMessage="Calculate cost from beginning" />
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+
     const renderPrices = () => (
       <div>
         <div class="card">
@@ -785,6 +850,7 @@ class EnergyMonitoringPage extends Component {
 
     const showingWizard = this.isCreatePriceRoute() || this.isEditPriceRoute();
     const showingPrices = this.isPricesRoute() || this.isCreatePriceRoute() || this.isEditPriceRoute();
+    const showingSettings = this.isSettingsRoute();
 
     return (
       <div class="page">
@@ -820,6 +886,17 @@ class EnergyMonitoringPage extends Component {
                         <Text id="integration.energyMonitoring.energyPriceTab" />
                       </Link>
 
+                      <Link
+                        href="/dashboard/integration/device/energy-monitoring/settings"
+                        activeClassName="active"
+                        class="list-group-item list-group-item-action d-flex align-items-center"
+                      >
+                        <span class="icon mr-3">
+                          <i class="fe fe-settings" />
+                        </span>
+                        <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
+                      </Link>
+
                       <DeviceConfigurationLink
                         user={props.user}
                         configurationKey="integrations"
@@ -836,7 +913,7 @@ class EnergyMonitoringPage extends Component {
                 </div>
 
                 <div class="col-lg-9">
-                  {!showingPrices && (
+                  {!showingPrices && !showingSettings && (
                     <div class="card">
                       <div class="card-header">
                         <h1 class="card-title">
@@ -873,6 +950,7 @@ class EnergyMonitoringPage extends Component {
 
                   {showingPrices && !showingWizard && renderPrices()}
                   {showingWizard && renderWizard()}
+                  {showingSettings && renderSettings()}
                 </div>
               </div>
             </div>

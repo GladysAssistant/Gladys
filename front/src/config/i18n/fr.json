@@ -557,7 +557,12 @@
       },
       "errorLoadingPrices": "Erreur lors du chargement des tarifs.",
       "errorLoadingDevices": "Erreur lors du chargement des appareils.",
-      "noDeviceFeaturesFound": "Aucune fonctionnalité d'appareil trouvée."
+      "noDeviceFeaturesFound": "Aucune fonctionnalité d'appareil trouvée.",
+      "settings": "Paramètres",
+      "calculateCostFromBeginning": "Calculer le coût depuis le début",
+      "calculatingFromBeginning": "Calcul en cours...",
+      "calculateFromBeginningStarted": "Le calcul a été lancé. Vous pouvez suivre le progrès dans les tâches en arrière-plan.",
+      "calculateFromBeginningError": "Une erreur est survenue lors du lancement du calcul."
     },
     "caldav": {
       "title": "CalDAV",

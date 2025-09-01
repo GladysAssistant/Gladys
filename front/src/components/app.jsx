@@ -290,6 +290,7 @@ const AppRouter = connect(
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
