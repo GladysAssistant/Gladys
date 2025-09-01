@@ -314,4 +314,73 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1288);
     expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1552);
   });
+  it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
+    // We create a new device with consumption & consumption cost
+    await device.create({
+      id: '53e69a3d-b15f-4e6a-973d-9d815d02e507',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Power plug 2',
+      external_id: 'power-plug-2',
+      features: [
+        {
+          id: '700ed79b-ebee-4501-8bbd-19e223f92fa5',
+          selector: 'power-plug-consumption-2',
+          external_id: 'power-plug-consumption-2',
+          name: 'Power plug Consumption 2',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+        },
+        {
+          id: '351e7c5e-50e6-48f2-a197-b3b0104053d3',
+          selector: 'power-plug-consumption-cost-2',
+          external_id: 'power-plug-consumption-cost-2',
+          name: 'Power plug Consumption Cost 2',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+        },
+      ],
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('700ed79b-ebee-4501-8bbd-19e223f92fa5', [
+      {
+        value: 100,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 200,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost-2',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(2);
+    // Price should be equal to 0.18€/kwh * 100kwh
+    expect(deviceFeatureState[0]).to.have.property('value', 100 * 0.18);
+    // Price should be equal to 0.18€/kwh * 200kwh
+    expect(deviceFeatureState[1]).to.have.property('value', 200 * 0.18);
+  });
 });
