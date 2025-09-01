@@ -58,27 +58,31 @@ async function calculateCostFrom(startAt, jobId) {
           });
         }
       }
-      // Find energy consumption feature daily
-      const energyConsumptionDailyfeature = getDeviceFeature(
-        energyDevice,
-        DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-      );
-      if (!energyConsumptionDailyfeature) {
-        logger.debug(`Device ${energyDevice.name} has no daily consumption feature`);
-      } else {
-        const energyConsumptionDailyCostFeature = getDeviceFeature(
+
+      // Find energy consumption feature daily, only if there are no thirty minutes consumption features
+      // Otherwise, we'll calculate daily based on thirty minutes consumption features * 12
+      if (energyConsumptionFeatures.length === 0) {
+        const energyConsumptionDailyfeature = getDeviceFeature(
           energyDevice,
           DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
         );
-        if (!energyConsumptionDailyCostFeature) {
-          logger.debug(`Device ${energyDevice.name} has no daily consumption cost feature`);
+        if (!energyConsumptionDailyfeature) {
+          logger.debug(`Device ${energyDevice.name} has no daily consumption feature`);
         } else {
-          energyConsumptionFeatures.push({
-            consumptionFeature: energyConsumptionDailyfeature,
-            consumptionCostFeature: energyConsumptionDailyCostFeature,
-          });
+          const energyConsumptionDailyCostFeature = getDeviceFeature(
+            energyDevice,
+            DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+          );
+          if (!energyConsumptionDailyCostFeature) {
+            logger.debug(`Device ${energyDevice.name} has no daily consumption cost feature`);
+          } else {
+            energyConsumptionFeatures.push({
+              consumptionFeature: energyConsumptionDailyfeature,
+              consumptionCostFeature: energyConsumptionDailyCostFeature,
+            });
+          }
         }
       }
 
