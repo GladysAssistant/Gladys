@@ -19,18 +19,19 @@ const contracts = require('../contracts/contracts.calculateCost');
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
+ * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateCostFrom(new Date());
+ * calculateCostFrom(new Date(), '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateCostFrom(startAt) {
+async function calculateCostFrom(startAt, jobId) {
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
   logger.info(`Found ${energyDevices.length} energy devices`);
-  await Promise.each(energyDevices, async (energyDevice) => {
+  await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
       const energyConsumptionFeatures = [];
 
@@ -132,6 +133,8 @@ async function calculateCostFrom(startAt) {
     } catch (e) {
       logger.error(e);
     }
+    // Update the progress in percentage
+    await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / energyDevices.length) * 100));
   });
   return null;
 }

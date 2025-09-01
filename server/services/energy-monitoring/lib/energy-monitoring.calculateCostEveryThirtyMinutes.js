@@ -1,12 +1,18 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const dayjs = require('dayjs');
 
 /**
  * @description Calculate energy monitoring cost every thirty minutes.
- * @returns {null} Return when finished.
+ * @param {string} jobId - The job id.
+ * @returns {Promise<null>} Return when finished.
  * @example
- * calculateCostEveryThirtyMinutes();
+ * calculateCostEveryThirtyMinutes('12345678-1234-1234-1234-1234567890ab');
  */
-function calculateCostEveryThirtyMinutes() {}
+async function calculateCostEveryThirtyMinutes(jobId) {
+  const thirtyMinutesAgo = dayjs()
+    .subtract(30, 'minute')
+    .toDate();
+  await this.calculateCostFrom(thirtyMinutesAgo, jobId);
+}
 
 module.exports = {
   calculateCostEveryThirtyMinutes,

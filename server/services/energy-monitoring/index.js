@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const EnergyMonitoringHandler = require('./lib');
+const EnergyMonitoringController = require('./api/energy-monitoring.controller');
 
 module.exports = function EnergyMonitoringService(gladys, serviceId) {
   const energyMonitoringHandler = new EnergyMonitoringHandler(gladys, serviceId);
@@ -29,5 +30,6 @@ module.exports = function EnergyMonitoringService(gladys, serviceId) {
     start,
     stop,
     device: energyMonitoringHandler,
+    controllers: EnergyMonitoringController(energyMonitoringHandler),
   });
 };
