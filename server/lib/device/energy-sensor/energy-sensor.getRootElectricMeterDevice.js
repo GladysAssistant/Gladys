@@ -19,7 +19,7 @@ function getRootElectricMeterDevice(deviceFeature) {
     }
     return cursor;
   }
-  return null;
+  return deviceFeature;
 }
 
 module.exports = {
