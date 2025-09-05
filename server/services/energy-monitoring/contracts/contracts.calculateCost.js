@@ -30,9 +30,15 @@ module.exports = {
   },
   [ENERGY_CONTRACT_TYPES.EDF_TEMPO]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
     const consumptionDateHour = consumptionDate.getHours();
-    const consumptionDateYear = consumptionDate.getFullYear();
-    const consumptionDateDay = consumptionDate.toISOString().split('T')[0];
-    logger.debug(`Getting tempo data for date: ${consumptionDate}`);
+    const dateForColor = consumptionDate;
+    // For hours before 6AM strictly, we use the previous day to get the color
+    if (consumptionDateHour < 6) {
+      dateForColor.setDate(dateForColor.getDate() - 1);
+    }
+    const consumptionDateDay = dateForColor.toISOString().split('T')[0];
+    const consumptionDateYear = consumptionDateDay.split('-')[0];
+
+    logger.debug(`Getting tempo data for date ${consumptionDateDay} at year ${consumptionDateYear}`);
 
     // Find tempo data for this day in the local dataset
     const tempoDayData = tempoData[consumptionDateYear].find((d) => d.date === consumptionDateDay);
@@ -48,9 +54,11 @@ module.exports = {
     if (!price) {
       throw new NotFoundError('No price found for this hour');
     }
-    logger.debug(`Found price: ${price.price / 10000}${price.currency}/kWh`);
     // Price are stored as integer with 4 decimals
     const cost = (price.price / 10000) * consumptionValue;
+    logger.debug(
+      `Found price: ${price.price / 10000}${price.currency}/kWh for hour ${consumptionDateHour}, cost: ${cost}`,
+    );
     return cost;
   },
 };

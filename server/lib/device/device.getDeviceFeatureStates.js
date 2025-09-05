@@ -8,8 +8,9 @@ const GET_DEVICE_FEATURES_STATES_QUERY = `
   FROM
       t_device_feature_state
   WHERE device_feature_id = ?
-  AND created_at >= ?
-  AND created_at <= ?
+  AND created_at >= CAST(? AS TIMESTAMPTZ)
+  AND created_at <= CAST(? AS TIMESTAMPTZ)
+  ORDER BY created_at ASC
 `;
 
 /**
@@ -27,18 +28,11 @@ async function getDeviceFeatureStates(deviceFeatureSelector, startAt, endAt) {
     throw new NotFoundError('DeviceFeature not found');
   }
 
-  // Convert dates to UTC to match the database
-  const startAtUtc = new Date(startAt);
-  startAtUtc.setMinutes(startAtUtc.getMinutes() - startAtUtc.getTimezoneOffset());
-
-  const endAtUtc = new Date(endAt);
-  endAtUtc.setMinutes(endAtUtc.getMinutes() - endAtUtc.getTimezoneOffset());
-
   const values = await db.duckDbReadConnectionAllAsync(
     GET_DEVICE_FEATURES_STATES_QUERY,
     deviceFeature.id,
-    startAtUtc,
-    endAtUtc,
+    startAt.toISOString(),
+    endAt.toISOString(),
   );
 
   return values;

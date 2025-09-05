@@ -88,31 +88,36 @@ async function calculateCostFrom(startAt, jobId) {
 
       // For each energy consumption feature
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
+        // Get the feature of the root electrical meter device
+        const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
+          ecf.consumptionFeature,
+        );
+        // Get the energy prices from this electrical meter device
+        const energyPrices = await this.gladys.energyPrice.get({
+          electric_meter_device_id: electricMeterFeature.device_id,
+        });
+        logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
           ecf.consumptionFeature.selector,
           startAt,
           new Date(),
         );
+        logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
         // For each state
         await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
-          // Get the feature of the root electrical meter device
-          const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
-            ecf.consumptionFeature,
-          );
-          // Get the energy prices from this electrical meter device
-          const energyPrices = await this.gladys.energyPrice.get({
-            electric_meter_device_id: electricMeterFeature.device_id,
-          });
-          logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
+          const createdAtRemoved30Minutes = dayjs(deviceFeatureState.created_at)
+            .subtract(30, 'minutes')
+            .toDate();
           // Get the prices for this date
           const energyPricesForDate = energyPrices.filter(
             (price) =>
               // We only keep consumption prices (no subscription)
               price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
               // We only keep prices that are valid for this date
-              dayjs.tz(price.start_date, systemTimezone) <= deviceFeatureState.created_at &&
-              (price.end_date === null || dayjs.tz(price.end_date, systemTimezone) >= deviceFeatureState.created_at),
+              dayjs.tz(price.start_date, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
+              (price.end_date === null ||
+                dayjs.tz(price.end_date, systemTimezone).toDate() >= createdAtRemoved30Minutes),
           );
           if (energyPricesForDate.length === 0) {
             logger.debug(
@@ -123,11 +128,10 @@ async function calculateCostFrom(startAt, jobId) {
           // We take the contract from the first price.
           // It's not possible to have multiple contracts for the same electrical meter device.
           const { contract } = energyPricesForDate[0];
-          const valueCreatedAtWithTimezone = dayjs.tz(deviceFeatureState.created_at, systemTimezone).toDate();
           // Calculate the cost per contract
           const cost = await contracts[contract](
             energyPricesForDate,
-            valueCreatedAtWithTimezone,
+            createdAtRemoved30Minutes,
             deviceFeatureState.value,
           );
           // Save the cost if not exists
