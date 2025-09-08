@@ -42,7 +42,7 @@ const variable = {
   },
 };
 
-describe('EnergyMonitoring.calculateCostFrom', function Describe() {
+describe.only('EnergyMonitoring.calculateCostFrom', function Describe() {
   this.timeout(120 * 1000);
   let stateManager;
   let serviceManager;
@@ -82,8 +82,9 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       }
       return Math.round(n * 10000);
     };
-    const offPeak = '0,1,2,3,4,5,22,23';
-    const peak = '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21';
+    const offPeak = '00:00,00:30,01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30';
+    const peak =
+      '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30';
 
     // Build period start dates from rows where P_SOUSCRITE = '6'
     const sixKvaStartDates = [];
@@ -280,11 +281,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
         // RED day, peak
         created_at: dayjs.tz('2025-01-03T10:30:00.000Z', 'Europe/Paris').toDate(),
       },
-      {
-        value: 10,
-        // WHITE day, off peak
-        created_at: dayjs.tz('2025-01-04T05:30:00.000Z', 'Europe/Paris').toDate(),
-      },
+
       {
         value: 10,
         // WHITE day, peak
@@ -292,13 +289,18 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       },
       {
         value: 10,
-        // BLUE day, off peak
-        created_at: dayjs.tz('2025-01-05T05:30:00.000Z', 'Europe/Paris').toDate(),
+        // WHITE day, off peak
+        created_at: dayjs.tz('2025-01-04T22:30:00.000Z', 'Europe/Paris').toDate(),
       },
       {
         value: 10,
         // BLUE day, peak
         created_at: dayjs.tz('2025-01-05T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // BLUE day, off peak
+        created_at: dayjs.tz('2025-01-05T22:30:00.000Z', 'Europe/Paris').toDate(),
       },
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
@@ -312,10 +314,10 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     expect(deviceFeatureState).to.have.lengthOf(6);
     expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1568);
     expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.7562);
-    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1486);
-    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1894);
-    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1296);
-    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1609);
+    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1894);
+    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1486);
+    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1609);
+    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1296);
   });
 
   it('should calculate cost from Pierre-Gilles dataset', async () => {

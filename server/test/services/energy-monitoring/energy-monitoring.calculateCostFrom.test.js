@@ -164,7 +164,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       // 0,15€/kwh stored as integer with 4 decimals
       price: 1500,
       // Off peak time
-      hour_slots: '1,2,3,4,5,6,22,23',
+      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,06:00,06:30,22:00,22:30,23:00,23:30',
     });
     await energyPrice.create({
       electric_meter_device_id: electricalMeterDevice.id,
@@ -175,7 +175,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       // 0,25€/kwh stored as integer with 4 decimals
       price: 2500,
       // Peak time
-      hour_slots: '7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      hour_slots:
+        '07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
     });
     await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
       {
@@ -212,7 +213,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 1288,
-      hour_slots: '1,2,3,4,5,22,23',
+      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
       day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
     });
     await energyPrice.create({
@@ -222,7 +223,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 1552,
-      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      hour_slots:
+        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
       day_type: ENERGY_PRICE_DAY_TYPES.BLUE,
     });
     // WHITE
@@ -233,7 +235,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 1447,
-      hour_slots: '1,2,3,4,5,22,23',
+      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
       day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
     });
     await energyPrice.create({
@@ -243,7 +245,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 1792,
-      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      hour_slots:
+        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
       day_type: ENERGY_PRICE_DAY_TYPES.WHITE,
     });
     // RED
@@ -254,7 +257,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 1518,
-      hour_slots: '1,2,3,4,5,22,23',
+      hour_slots: '01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,22:00,22:30,23:00,23:30',
       day_type: ENERGY_PRICE_DAY_TYPES.RED,
     });
     await energyPrice.create({
@@ -264,7 +267,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       currency: 'euro',
       start_date: '2025-01-01',
       price: 6586,
-      hour_slots: '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21',
+      hour_slots:
+        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30',
       day_type: ENERGY_PRICE_DAY_TYPES.RED,
     });
     await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
@@ -280,23 +284,23 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       },
       {
         value: 10,
-        // WHITE day, off peak
-        created_at: dayjs.tz('2025-01-04T05:30:00.000Z', 'Europe/Paris').toDate(),
-      },
-      {
-        value: 10,
         // WHITE day, peak
         created_at: dayjs.tz('2025-01-04T15:30:00.000Z', 'Europe/Paris').toDate(),
       },
       {
         value: 10,
-        // BLUE day, off peak
-        created_at: dayjs.tz('2025-01-05T05:30:00.000Z', 'Europe/Paris').toDate(),
+        // WHITE day, off peak
+        created_at: dayjs.tz('2025-01-04T22:30:00.000Z', 'Europe/Paris').toDate(),
       },
       {
         value: 10,
         // BLUE day, peak
         created_at: dayjs.tz('2025-01-05T15:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+      {
+        value: 10,
+        // BLUE day, off peak
+        created_at: dayjs.tz('2025-01-05T22:30:00.000Z', 'Europe/Paris').toDate(),
       },
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
@@ -310,10 +314,10 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState).to.have.lengthOf(6);
     expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1518);
     expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.6586);
-    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1447);
-    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1792);
-    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1288);
-    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1552);
+    expect(deviceFeatureState[2]).to.have.property('value', 10 * 0.1792);
+    expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1447);
+    expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1552);
+    expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1288);
   });
   it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
     // We create a new device with consumption & consumption cost

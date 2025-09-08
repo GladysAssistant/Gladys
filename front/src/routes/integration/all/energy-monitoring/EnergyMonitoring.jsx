@@ -39,6 +39,57 @@ class EnergyMonitoringPage extends Component {
     }
   };
 
+  // ----- TIME SLOT HELPERS -----
+  slotIndexToLabel = slot => {
+    if (!Number.isInteger(slot) || slot < 0 || slot > 47) return '';
+    const hour = Math.floor(slot / 2);
+    const minutes = slot % 2 === 1 ? '30' : '00';
+    const hh = hour < 10 ? `0${hour}` : `${hour}`;
+    return `${hh}:${minutes}`;
+  };
+
+  labelToSlotIndex = label => {
+    if (!label) return null;
+    const s = String(label).trim();
+    // Legacy numeric formats
+    if (/^\d{1,2}$/.test(s)) {
+      const n = parseInt(s, 10);
+      if (Number.isInteger(n)) {
+        if (n >= 0 && n <= 23) return n * 2; // map legacy hour to HH:00 slot
+        if (n >= 0 && n <= 47) return n; // if someone already stored half-hour index
+      }
+      return null;
+    }
+    // HH:MM format
+    const m = s.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    const hour = parseInt(m[1], 10);
+    const minutes = parseInt(m[2], 10);
+    if (!Number.isInteger(hour) || hour < 0 || hour > 23) return null;
+    if (minutes !== 0 && minutes !== 30) return null;
+    return hour * 2 + (minutes === 30 ? 1 : 0);
+  };
+
+  parseHourSlotsToSet = raw => {
+    const set = new Set();
+    if (!raw) return set;
+    const parts = String(raw)
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    parts.forEach(p => {
+      const idx = this.labelToSlotIndex(p);
+      if (idx !== null) set.add(idx);
+    });
+    return set;
+  };
+
+  formatSetToHourSlots = set => {
+    const arr = Array.from(set || []).filter(n => Number.isInteger(n));
+    arr.sort((a, b) => a - b);
+    return arr.map(this.slotIndexToLabel).join(',');
+  };
+
   calculateFromBeginning = async () => {
     try {
       this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
@@ -111,16 +162,8 @@ class EnergyMonitoringPage extends Component {
   startEditPrice = price => {
     const p = price && price.id ? price : (this.state.prices || []).find(x => x.id === price);
     if (p) {
-      // Parse hour slots to a Set of integers
-      const slots = new Set(
-        (p.hour_slots || '')
-          .toString()
-          .split(',')
-          .map(s => s.trim())
-          .filter(s => s !== '')
-          .map(s => parseInt(s, 10))
-          .filter(n => Number.isInteger(n) && n >= 0 && n <= 23)
-      );
+      // Parse hour slots (supports legacy numeric formats and HH:MM)
+      const slots = this.parseHourSlotsToSet(p.hour_slots || '');
       this.setState({
         wizardEditingId: p.id,
         wizardStep: 0,
@@ -166,10 +209,9 @@ class EnergyMonitoringPage extends Component {
   savePrice = async () => {
     try {
       const payload = { ...this.state.newPrice };
-      // Save hour slots from wizardHourSlots as comma-separated string
+      // Save hour slots from wizardHourSlots as comma-separated HH:MM string
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
-        const ordered = Array.from(this.state.wizardHourSlots).sort((a, b) => a - b);
-        payload.hour_slots = ordered.join(',');
+        payload.hour_slots = this.formatSetToHourSlots(this.state.wizardHourSlots);
       }
       // Scale price to integer with 4 decimals (x10000) before saving
       if (payload.price !== undefined && payload.price !== null && payload.price !== '') {
@@ -368,6 +410,14 @@ class EnergyMonitoringPage extends Component {
       const fmt = d => (d && d !== 'Invalid date' ? d : '');
       const dates = [fmt(p.start_date), fmt(p.end_date)].filter(Boolean);
       const period = dates.join(' → ');
+      const formatStoredSlots = value => {
+        if (!value) return '';
+        const s = String(value);
+        if (s.includes(':')) return s; // already HH:MM list
+        // Legacy numeric list
+        const set = this.parseHourSlotsToSet(s);
+        return this.formatSetToHourSlots(set);
+      };
       return (
         <div class="card mb-2" key={p.id}>
           <div class="card-body py-2 px-3">
@@ -421,7 +471,7 @@ class EnergyMonitoringPage extends Component {
                 </div>
                 <div class="row mt-2">
                   <div class="col-md-6">
-                    <strong><Text id="integration.energyMonitoring.hourSlots" />:</strong> {p.hour_slots || '-'}
+                    <strong><Text id="integration.energyMonitoring.hourSlots" />:</strong> {formatStoredSlots(p.hour_slots) || '-'}
                   </div>
                   <div class="col-md-6">
                     <strong><Text id="integration.energyMonitoring.meter" />:</strong> {p.electric_meter_device_id || '-'}
@@ -643,7 +693,7 @@ class EnergyMonitoringPage extends Component {
                             type="button"
                             class="btn btn-sm btn-outline-secondary mr-2"
                             onClick={() =>
-                              this.setState({ wizardHourSlots: new Set(Array.from({ length: 13 }, (_, i) => i + 8)) })
+                              this.setState({ wizardHourSlots: new Set(Array.from({ length: 24 }, (_, i) => i + 16)) })
                             }
                           >
                             <Text id="integration.energyMonitoring.daytime820" />
@@ -658,33 +708,46 @@ class EnergyMonitoringPage extends Component {
                         </div>
                       </div>
                       <div class="row">
-                        {Array.from({ length: 24 }, (_, hour) => (
-                          <div class="col-2 mb-2" key={hour}>
+                        {Array.from({ length: 48 }, (_, slot) => (
+                          <div class="col-3 col-sm-2 mb-2" key={slot}>
                             <button
                               type="button"
                               class={cx(
                                 'btn btn-sm btn-block text-center py-2 text-nowrap',
-                                state.wizardHourSlots.has(hour) ? 'btn-primary' : 'btn-outline-secondary'
+                                state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
                               )}
                               onClick={() =>
                                 this.setState(({ wizardHourSlots }) => {
                                   const next = new Set(wizardHourSlots);
-                                  if (next.has(hour)) next.delete(hour);
-                                  else next.add(hour);
+                                  if (next.has(slot)) next.delete(slot);
+                                  else next.add(slot);
                                   return { wizardHourSlots: next };
                                 })
                               }
                             >
-                              <span class="text-monospace font-weight-bold">{(hour < 10 ? `0${hour}` : hour) + ':00'}</span>
+                              {(() => {
+                                const hour = Math.floor(slot / 2);
+                                const m = slot % 2 === 1 ? '30' : '00';
+                                const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                                return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
+                              })()}
                             </button>
                           </div>
                         ))}
                       </div>
                       <div class="small text-muted mt-2">
                         <Text id="integration.energyMonitoring.selected" />{' '}
-                        {Array.from(state.wizardHourSlots)
-                          .sort((a, b) => a - b)
-                          .join(', ') || <Text id="integration.energyMonitoring.none" />}
+                        {(() => {
+                          const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
+                          if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
+                          const toLabel = slot => {
+                            const hour = Math.floor(slot / 2);
+                            const m = slot % 2 === 1 ? '30' : '00';
+                            const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                            return `${hh}:${m}`;
+                          };
+                          return arr.map(toLabel).join(', ');
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -735,11 +798,18 @@ class EnergyMonitoringPage extends Component {
                       </div>
                       <div>
                         <strong><Text id="integration.energyMonitoring.slots" />:</strong>{' '}
-                        {Array.from(state.wizardHourSlots)
-                          .sort((a, b) => a - b)
-                          .join(', ') ||
-                          state.newPrice.hour_slots ||
-                          '-'}
+                        {(() => {
+                          const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
+                          const toLabel = slot => {
+                            const hour = Math.floor(slot / 2);
+                            const m = slot % 2 === 1 ? '30' : '00';
+                            const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                            return `${hh}:${m}`;
+                          };
+                          return arr.length
+                            ? arr.map(toLabel).join(', ')
+                            : state.newPrice.hour_slots || '-';
+                        })()}
                       </div>
                     </div>
                   </div>
