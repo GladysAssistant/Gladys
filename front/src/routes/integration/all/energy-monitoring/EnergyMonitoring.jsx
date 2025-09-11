@@ -1,4 +1,4 @@
-import { Text, MarkupText } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
