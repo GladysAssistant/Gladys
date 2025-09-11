@@ -1,10 +1,10 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
-const { LOCK_STATES } = require('../utils/nuki.constants');
+const { NUKI_LOCK_STATES } = require('../utils/nuki.constants');
 
 /**
  * @description Get device values through HTTP.
- * @param {object} device - Galdys device.
+ * @param {object} device - Gladys device.
  * @example
  * nukiHttpHandler.getValue(device);
  */
@@ -30,7 +30,7 @@ async function getValue(device) {
   });
 
   // Update button state
-  const binaryValue = LOCK_STATES[state] === 'locked' ? 0 : 1;
+  const binaryValue = NUKI_LOCK_STATES[state] === 'locked' ? 0 : 1;
   gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: `${device.external_id}:button`,
     state: binaryValue,

@@ -1,7 +1,6 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-
-const { LOCK_STATES, TRIGGER } = require('../utils/nuki.constants');
+const { LOCK, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { NUKI_LOCK_STATES, NUKI_LOCK_ACTIONS, TRIGGER } = require('../utils/nuki.constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -35,9 +34,9 @@ function handleMessage(topic, message) {
       case 'state': {
         // 3.3 Lock States
         const state = Math.round(message);
-        logger.info(`Lock state has changed : ${LOCK_STATES[state]}`);
+        logger.info(`Lock state has changed : ${NUKI_LOCK_STATES[state]}`);
         externalId = `${main}:${deviceType}:button`;
-        const binaryValue = LOCK_STATES[state] === 'locked' ? 0 : 1;
+        const binaryValue = NUKI_LOCK_STATES[state] === 'locked' ? LOCK.STATE.LOCKED : LOCK.STATE.UNLOCKED;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
           state: binaryValue,
@@ -74,7 +73,7 @@ function handleMessage(topic, message) {
         logger.debug(
           `Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`,
         );
-        const binaryValue = lockAction === 2 ? 1 : 0;
+        const binaryValue = lockAction === NUKI_LOCK_ACTIONS.LOCK ? LOCK.STATE.LOCKED : LOCK.STATE.UNLOCKED;
         const newState = {
           device_feature_external_id: `${main}:${deviceType}:button`,
           state: binaryValue,

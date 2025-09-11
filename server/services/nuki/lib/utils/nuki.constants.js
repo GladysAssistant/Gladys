@@ -31,7 +31,7 @@ const TOPICS = {
 };
 
 // 3.3 Lock States (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
-const LOCK_STATES = {
+const NUKI_LOCK_STATES = {
   0: 'uncalibrated',
   1: 'locked',
   2: 'unlocking',
@@ -46,7 +46,7 @@ const LOCK_STATES = {
 };
 
 // 3.4 Lock Actions (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
-const LOCK_ACTIONS = {
+const NUKI_LOCK_ACTIONS = {
   UNLOCK: 1,
   LOCK: 2,
   UNLATCH: 3,
@@ -77,7 +77,7 @@ module.exports = {
   DEVICE_PARAM_VALUE,
   TRIGGER,
   DISCOVERY_TOPIC,
-  LOCK_ACTIONS,
+  NUKI_LOCK_ACTIONS,
   TOPICS,
-  LOCK_STATES,
+  NUKI_LOCK_STATES,
 };

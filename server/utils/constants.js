@@ -96,9 +96,16 @@ const COVER_STATE = {
   CLOSE: -1,
 };
 
-const LOCK_STATE = {
-  UNLOCK: 0,
-  LOCK: 1,
+const LOCK = {
+  ACTION: {
+    UNLOCK: 0,
+    LOCK: 1,
+  },
+  STATE: {
+    ERROR: -1,
+    LOCKED: 0,
+    UNLOCKED: 1,
+  },
 };
 
 const SIREN_LMH_VOLUME = {
@@ -1459,7 +1466,7 @@ const ALARM_MODES_LIST = createList(ALARM_MODES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
-module.exports.LOCK_STATE = LOCK_STATE;
+module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
