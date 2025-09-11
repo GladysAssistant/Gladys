@@ -951,7 +951,9 @@
         "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface, available here:",
         "connectedToUsagePointds": "Successfully connected to Enedis! The first sync will take from 2 to 3 hours depending on the volume of request on Enedis API. No need to keep this tab open during this time.",
         "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years.",
-        "dailyConsumptionFeatureName": "Daily consumption"
+        "dailyConsumptionFeatureName": "Daily consumption",
+        "consumptionLoadCurveFeatureName": "Consumption 30 minutes",
+        "consumptionLoadCurveCostFeatureName": "Consumption 30 minutes cost"
       },
       "usagePoints": {
         "title": "My meters",

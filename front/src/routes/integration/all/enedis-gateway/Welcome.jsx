@@ -117,6 +117,34 @@ class EnedisWelcomePageComponent extends Component {
           read_only: true,
           has_feedback: false,
           keep_history: true
+        },
+        {
+          id: uuid.v4(),
+          name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveFeatureName'),
+          selector: `enedis-${usagePointId}-consumption-load-curve`,
+          min: 0,
+          max: 1000000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          external_id: `enedis:${usagePointId}:consumption-load-curve`,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true
+        },
+        {
+          id: uuid.v4(),
+          name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveCostFeatureName'),
+          selector: `enedis-${usagePointId}-consumption-load-curve-cost`,
+          min: 0,
+          max: 1000000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          external_id: `enedis:${usagePointId}:consumption-load-curve-cost`,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          unit: DEVICE_FEATURE_UNITS.EURO,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true
         }
       ]
     };
