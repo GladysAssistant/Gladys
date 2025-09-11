@@ -3,10 +3,7 @@ import { connect } from 'unistore/preact';
 // import actions from '../actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage.js';
 import UpdateDevice from '../../../../../components/device';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
-} from '../../../../../../../server/utils/constants.js';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants.js';
 
 const ZIGBEE2MQTT_PAGE_PATH = '/dashboard/integration/device/zigbee2mqtt';
 
