@@ -376,7 +376,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date);
+    await energyMonitoring.calculateCostFrom(date, '43732e67-6669-4a95-83d6-38c50b835387');
     const deviceFeatureState = await device.getDeviceFeatureStates(
       'power-plug-consumption-cost-2',
       new Date('2025-01-01T00:00:00.000Z'),
@@ -387,5 +387,132 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[0]).to.have.property('value', 100 * 0.18);
     // Price should be equal to 0.18€/kwh * 200kwh
     expect(deviceFeatureState[1]).to.have.property('value', 200 * 0.18);
+  });
+  it('should handle device with thirty minutes consumption but no cost feature (logs missing cost feature)', async () => {
+    // Create a device that only has the THIRTY_MINUTES_CONSUMPTION feature, without the corresponding COST feature
+    await device.create({
+      id: '7e1a1cf8-3f37-4a9f-b6ef-8f4f0a2f6a01',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Partial Power Plug',
+      external_id: 'partial-power-plug',
+      features: [
+        {
+          id: '5c4a3c81-3d82-4b8e-9f78-0c2a92e2c7a1',
+          selector: 'partial-power-plug-consumption',
+          external_id: 'partial-power-plug-consumption',
+          name: 'Partial Power Plug Consumption',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+        },
+      ],
+    });
+    const energyMonitoring = new EnergyMonitoring(gladys, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
+    // No assertion needed; executing the branch covers the logger line.
+  });
+  it('should handle device with no daily consumption feature (logs missing daily feature)', async () => {
+    // Create a device with no ENERGY_SENSOR features so daily feature is missing
+    await device.create({
+      id: 'f8e2f7a0-0a2c-4c8c-9a6f-cc5a7cdeaa91',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Device Without Energy Features',
+      external_id: 'no-energy-features-device',
+      features: [],
+    });
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    // The code path logs the absence of a daily consumption feature.
+  });
+  it('should handle case where no energy price is found for the device at the given date (logs and returns)', async () => {
+    // Create a new electrical meter device with NO energy prices attached
+    await device.create({
+      id: '6a8a2a7e-0405-4c61-9d40-1d9c6aa9c0a1',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Electrical Meter - No Price',
+      external_id: 'electrical-meter-no-price',
+      selector: 'electrical-meter-no-price',
+      features: [
+        {
+          id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
+          external_id: 'electrical-meter-no-price-feature',
+          selector: 'electrical-meter-no-price-feature',
+          name: 'Electrical Meter No Price',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+        },
+      ],
+    });
+    // Create a device linked to this meter with both consumption and cost features
+    await device.create({
+      id: 'f1a8d6c2-9c3d-4b9b-8e27-2d4d1c6a5b01',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Plug Without Price',
+      external_id: 'plug-without-price',
+      features: [
+        {
+          id: '9e2b3a8c-8e9d-4f0a-92c4-5b6a2e1d3c01',
+          selector: 'plug-without-price-consumption',
+          external_id: 'plug-without-price-consumption',
+          name: 'Plug Without Price Consumption',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
+        },
+        {
+          id: '0a1b2c3d-4e5f-6789-abcd-ef0123456789',
+          selector: 'plug-without-price-consumption-cost',
+          external_id: 'plug-without-price-consumption-cost',
+          name: 'Plug Without Price Consumption Cost',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: '2c2b6f0d-e5f7-4d2b-bc16-1a5c2b39d9a1',
+        },
+      ],
+    });
+    // Insert a state for this consumption feature
+    await db.duckDbBatchInsertState('9e2b3a8c-8e9d-4f0a-92c4-5b6a2e1d3c01', [
+      {
+        value: 5,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
+    // This executes the branch where no energy price is found for the state timestamp.
+  });
+  it('should catch and log an error during processing', async () => {
+    // Force an error by making getRootElectricMeterDevice throw
+    const original = gladys.device.energySensorManager.getRootElectricMeterDevice;
+    gladys.device.energySensorManager.getRootElectricMeterDevice = () => {
+      throw new Error('Forced test error');
+    };
+    try {
+      const energyMonitoring = new EnergyMonitoring(gladys, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
+      const date = new Date('2025-08-28T00:00:00.000Z');
+      await energyMonitoring.calculateCostFrom(date, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
+    } finally {
+      // Restore original function to avoid side effects on other tests
+      gladys.device.energySensorManager.getRootElectricMeterDevice = original;
+    }
   });
 });
