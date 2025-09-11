@@ -42,7 +42,7 @@ const variable = {
   },
 };
 
-describe.only('EnergyMonitoring.calculateCostFrom', function Describe() {
+describe('EnergyMonitoring.calculateCostFrom', function Describe() {
   this.timeout(120 * 1000);
   let stateManager;
   let serviceManager;
