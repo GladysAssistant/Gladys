@@ -7,6 +7,7 @@ const tempoData = require('../data/tempo');
  * @description Convert a Date to an HH:MM slot label at 30-minute granularity.
  * @param {Date} date - The date of the consumption sample.
  * @returns {string} The label formatted as HH:MM (minutes are 00 or 30).
+ * @example formatDateToSlotLabel(new Date('2025-09-11T17:14:57+02:00'));
  */
 function formatDateToSlotLabel(date) {
   const hour = date.getHours();

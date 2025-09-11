@@ -22,7 +22,7 @@ const BATCH_TYPES = {
  * @param {string} externalId - Enedis usage point external id.
  * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
  * @param {string} after - Get data after this date.
- * @returns {Promise<Object>} - Resolve with last date.
+ * @returns {Promise<object>} - Resolve with last date.
  * @example await recursiveBatchCall('usage-point');
  */
 async function recursiveBatchCall(gladys, batchType, externalId, syncDelayBetweenCallsInMs, after = '2000-01-01') {
