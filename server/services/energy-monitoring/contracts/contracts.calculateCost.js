@@ -1,3 +1,8 @@
+const dayjs = require('dayjs');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(timezone);
+
 const { ENERGY_CONTRACT_TYPES } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
@@ -6,12 +11,14 @@ const tempoData = require('../data/tempo');
 /**
  * @description Convert a Date to an HH:MM slot label at 30-minute granularity.
  * @param {Date} date - The date of the consumption sample.
+ * @param {string} systemTimezone - The timezone of the system.
  * @returns {string} The label formatted as HH:MM (minutes are 00 or 30).
- * @example formatDateToSlotLabel(new Date('2025-09-11T17:14:57+02:00'));
+ * @example formatDateToSlotLabel(new Date('2025-09-11T17:14:57+02:00'), 'Europe/Paris');
  */
-function formatDateToSlotLabel(date) {
-  const hour = date.getHours();
-  const minutes = date.getMinutes() >= 30 ? '30' : '00';
+function formatDateToSlotLabel(date, systemTimezone) {
+  const dayjsDate = dayjs(date).tz(systemTimezone);
+  const hour = dayjsDate.hour();
+  const minutes = dayjsDate.minute() >= 30 ? '30' : '00';
   const hh = hour < 10 ? `0${hour}` : `${hour}`;
   return `${hh}:${minutes}`;
 }
@@ -26,9 +33,14 @@ module.exports = {
     const cost = (price.price / 10000) * consumptionValue;
     return cost;
   },
-  [ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
+  [ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+  ) => {
     // Compute the HH:MM slot label
-    const label = formatDateToSlotLabel(consumptionDate);
+    const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
     // Find the price for this time slot
     const price = energyPricesAtConsumptionDate.find((p) => {
       const hourSlots = (p.hour_slots || '')
@@ -44,8 +56,15 @@ module.exports = {
     const cost = (price.price / 10000) * consumptionValue;
     return cost;
   },
-  [ENERGY_CONTRACT_TYPES.EDF_TEMPO]: async (energyPricesAtConsumptionDate, consumptionDate, consumptionValue) => {
-    const consumptionDateHour = consumptionDate.getHours();
+  [ENERGY_CONTRACT_TYPES.EDF_TEMPO]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+  ) => {
+    const consumptionDateHour = dayjs(consumptionDate)
+      .tz(systemTimezone)
+      .hour();
     const dateForColor = consumptionDate;
     // For hours before 6AM strictly, we use the previous day to get the color
     if (consumptionDateHour < 6) {
@@ -63,7 +82,7 @@ module.exports = {
     }
     // Find the price list for the day color
     const energyPricesAtDay = energyPricesAtConsumptionDate.filter((p) => p.day_type === tempoDayData.color);
-    const label = formatDateToSlotLabel(consumptionDate);
+    const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
     const price = energyPricesAtDay.find((p) => {
       const hourSlots = (p.hour_slots || '')
         .split(',')

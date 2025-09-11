@@ -106,7 +106,8 @@ async function calculateCostFrom(startAt, jobId) {
         logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
         // For each state
         await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
-          const createdAtRemoved30Minutes = dayjs(deviceFeatureState.created_at)
+          const createdAtRemoved30Minutes = dayjs
+            .tz(deviceFeatureState.created_at, systemTimezone)
             .subtract(30, 'minutes')
             .toDate();
           // Get the prices for this date
@@ -133,6 +134,7 @@ async function calculateCostFrom(startAt, jobId) {
             energyPricesForDate,
             createdAtRemoved30Minutes,
             deviceFeatureState.value,
+            systemTimezone,
           );
           // Save the cost if not exists
           await this.gladys.device.saveHistoricalState(ecf.consumptionCostFeature, cost, deviceFeatureState.created_at);
