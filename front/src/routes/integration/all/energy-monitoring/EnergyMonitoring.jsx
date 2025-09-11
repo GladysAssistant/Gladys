@@ -93,10 +93,7 @@ class EnergyMonitoringPage extends Component {
   calculateFromBeginning = async () => {
     try {
       this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
-      await this.props.httpClient.post(
-        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
-        {}
-      );
+      await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {});
       this.setState({ settingsSuccess: 'ok' });
     } catch (e) {
       this.setState({ settingsError: e });
@@ -458,23 +455,37 @@ class EnergyMonitoringPage extends Component {
                     {p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : '-'}
                   </div>
                   <div class="col-md-4">
-                    <strong><Text id="integration.energyMonitoring.dayType" />:</strong>{' '}
+                    <strong>
+                      <Text id="integration.energyMonitoring.dayType" />:
+                    </strong>{' '}
                     {p.day_type ? (
-                      <Text id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`} defaultMessage={p.day_type} />
+                      <Text
+                        id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`}
+                        defaultMessage={p.day_type}
+                      />
                     ) : (
                       '-'
                     )}
                   </div>
                   <div class="col-md-4">
-                    <strong><Text id="integration.energyMonitoring.subscribedPower" />:</strong> {p.subscribed_power || '-'}
+                    <strong>
+                      <Text id="integration.energyMonitoring.subscribedPower" />:
+                    </strong>{' '}
+                    {p.subscribed_power || '-'}
                   </div>
                 </div>
                 <div class="row mt-2">
                   <div class="col-md-6">
-                    <strong><Text id="integration.energyMonitoring.hourSlots" />:</strong> {formatStoredSlots(p.hour_slots) || '-'}
+                    <strong>
+                      <Text id="integration.energyMonitoring.hourSlots" />:
+                    </strong>{' '}
+                    {formatStoredSlots(p.hour_slots) || '-'}
                   </div>
                   <div class="col-md-6">
-                    <strong><Text id="integration.energyMonitoring.meter" />:</strong> {p.electric_meter_device_id || '-'}
+                    <strong>
+                      <Text id="integration.energyMonitoring.meter" />:
+                    </strong>{' '}
+                    {p.electric_meter_device_id || '-'}
                   </div>
                 </div>
               </div>
@@ -531,11 +542,15 @@ class EnergyMonitoringPage extends Component {
             </div>
             {state.wizardStep === 0 && (
               <div>
-                <h5 class="mb-3"><Text id="integration.energyMonitoring.wizard.basics" /></h5>
+                <h5 class="mb-3">
+                  <Text id="integration.energyMonitoring.wizard.basics" />
+                </h5>
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.contract" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.contract" />
+                      </label>
                       <select
                         class="form-control"
                         value={state.newPrice.contract}
@@ -555,7 +570,9 @@ class EnergyMonitoringPage extends Component {
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.priceType" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.priceType" />
+                      </label>
                       <select
                         class="form-control"
                         value={state.newPrice.price_type}
@@ -572,7 +589,9 @@ class EnergyMonitoringPage extends Component {
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.currency" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.currency" />
+                      </label>
                       <select
                         class="form-control"
                         value={state.newPrice.currency}
@@ -592,11 +611,15 @@ class EnergyMonitoringPage extends Component {
             )}
             {state.wizardStep === 1 && (
               <div>
-                <h5 class="mb-3"><Text id="integration.energyMonitoring.wizard.periodScope" /></h5>
+                <h5 class="mb-3">
+                  <Text id="integration.energyMonitoring.wizard.periodScope" />
+                </h5>
                 <div class="row">
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.startDate" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.startDate" />
+                      </label>
                       <input
                         type="date"
                         class="form-control"
@@ -607,7 +630,9 @@ class EnergyMonitoringPage extends Component {
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.endDate" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.endDate" />
+                      </label>
                       <input
                         type="date"
                         class="form-control"
@@ -618,7 +643,9 @@ class EnergyMonitoringPage extends Component {
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.dayType" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.dayType" />
+                      </label>
                       <select
                         class="form-control"
                         value={state.newPrice.day_type}
@@ -641,7 +668,9 @@ class EnergyMonitoringPage extends Component {
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.electricMeter" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.electricMeter" />
+                      </label>
                       <select
                         class="form-control"
                         value={state.newPrice.electric_meter_device_id || ''}
@@ -649,7 +678,9 @@ class EnergyMonitoringPage extends Component {
                       >
                         <option value="">—</option>
                         {state.devices
-                          .filter(d => Array.isArray(d.features) && d.features.some(f => f && f.category === 'energy-sensor'))
+                          .filter(
+                            d => Array.isArray(d.features) && d.features.some(f => f && f.category === 'energy-sensor')
+                          )
                           .map(d => (
                             <option key={d.id} value={d.id}>
                               {d.name || d.selector || d.id}
@@ -666,11 +697,15 @@ class EnergyMonitoringPage extends Component {
             )}
             {state.wizardStep === 2 && (
               <div>
-                <h5 class="mb-3"><Text id="integration.energyMonitoring.priceAndTimeSlots" /></h5>
+                <h5 class="mb-3">
+                  <Text id="integration.energyMonitoring.priceAndTimeSlots" />
+                </h5>
                 <div class="row">
                   <div class="col-12 col-md-6">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.price" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.price" />
+                      </label>
                       <input
                         type="number"
                         class="form-control"
@@ -683,7 +718,9 @@ class EnergyMonitoringPage extends Component {
                 <div class="row">
                   <div class="col-12">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.hourSlots" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.hourSlots" />
+                      </label>
                       <div class="mb-2 d-flex justify-content-between align-items-center">
                         <div class="small text-muted">
                           <Text id="integration.energyMonitoring.selectHoursHelp" />
@@ -755,7 +792,9 @@ class EnergyMonitoringPage extends Component {
                 <div class="row">
                   <div class="col-12 col-md-6">
                     <div class="form-group">
-                      <label><Text id="integration.energyMonitoring.subscribedPower" /></label>
+                      <label>
+                        <Text id="integration.energyMonitoring.subscribedPower" />
+                      </label>
                       <input
                         type="text"
                         class="form-control"
@@ -766,38 +805,64 @@ class EnergyMonitoringPage extends Component {
                   </div>
                 </div>
                 <div class="border-top pt-3 mt-3 mb-4">
-                  <div class="small text-muted mb-2"><Text id="integration.energyMonitoring.summary" /></div>
+                  <div class="small text-muted mb-2">
+                    <Text id="integration.energyMonitoring.summary" />
+                  </div>
                   <div class="row">
                     <div class="col-md-6">
                       <div>
-                        <strong><Text id="integration.energyMonitoring.contract" />:</strong>{' '}
-                        <Text id={`integration.energyMonitoring.contractTypes.${state.newPrice.contract}`} defaultMessage={state.newPrice.contract} />
+                        <strong>
+                          <Text id="integration.energyMonitoring.contract" />:
+                        </strong>{' '}
+                        <Text
+                          id={`integration.energyMonitoring.contractTypes.${state.newPrice.contract}`}
+                          defaultMessage={state.newPrice.contract}
+                        />
                       </div>
                       <div>
-                        <strong><Text id="integration.energyMonitoring.type" />:</strong>{' '}
-                        <Text id={`integration.energyMonitoring.priceTypes.${state.newPrice.price_type}`} defaultMessage={state.newPrice.price_type} />
+                        <strong>
+                          <Text id="integration.energyMonitoring.type" />:
+                        </strong>{' '}
+                        <Text
+                          id={`integration.energyMonitoring.priceTypes.${state.newPrice.price_type}`}
+                          defaultMessage={state.newPrice.price_type}
+                        />
                       </div>
                       <div>
-                        <strong><Text id="integration.energyMonitoring.currency" />:</strong>{' '}
-                        <Text id={`integration.energyMonitoring.currencies.${state.newPrice.currency}`} defaultMessage={state.newPrice.currency} />
+                        <strong>
+                          <Text id="integration.energyMonitoring.currency" />:
+                        </strong>{' '}
+                        <Text
+                          id={`integration.energyMonitoring.currencies.${state.newPrice.currency}`}
+                          defaultMessage={state.newPrice.currency}
+                        />
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div>
-                        <strong><Text id="integration.energyMonitoring.period" />:</strong>{' '}
+                        <strong>
+                          <Text id="integration.energyMonitoring.period" />:
+                        </strong>{' '}
                         {(state.newPrice.start_date || '') +
                           (state.newPrice.end_date ? ` → ${state.newPrice.end_date}` : '')}
                       </div>
                       <div>
-                        <strong><Text id="integration.energyMonitoring.dayType" />:</strong>{' '}
+                        <strong>
+                          <Text id="integration.energyMonitoring.dayType" />:
+                        </strong>{' '}
                         {state.newPrice.day_type ? (
-                          <Text id={`integration.energyMonitoring.dayTypeOptions.${state.newPrice.day_type}`} defaultMessage={state.newPrice.day_type} />
+                          <Text
+                            id={`integration.energyMonitoring.dayTypeOptions.${state.newPrice.day_type}`}
+                            defaultMessage={state.newPrice.day_type}
+                          />
                         ) : (
                           '-'
                         )}
                       </div>
                       <div>
-                        <strong><Text id="integration.energyMonitoring.slots" />:</strong>{' '}
+                        <strong>
+                          <Text id="integration.energyMonitoring.slots" />:
+                        </strong>{' '}
                         {(() => {
                           const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
                           const toLabel = slot => {
@@ -806,9 +871,7 @@ class EnergyMonitoringPage extends Component {
                             const hh = hour < 10 ? `0${hour}` : `${hour}`;
                             return `${hh}:${m}`;
                           };
-                          return arr.length
-                            ? arr.map(toLabel).join(', ')
-                            : state.newPrice.hour_slots || '-';
+                          return arr.length ? arr.map(toLabel).join(', ') : state.newPrice.hour_slots || '-';
                         })()}
                       </div>
                     </div>
@@ -862,12 +925,18 @@ class EnergyMonitoringPage extends Component {
           <div class="card-body">
             {state.settingsError && (
               <div class="alert alert-danger" role="alert">
-                <Text id="integration.energyMonitoring.calculateFromBeginningError" defaultMessage="An error occurred while starting the calculation." />
+                <Text
+                  id="integration.energyMonitoring.calculateFromBeginningError"
+                  defaultMessage="An error occurred while starting the calculation."
+                />
               </div>
             )}
             {state.settingsSuccess && (
               <div class="alert alert-success" role="alert">
-                <Text id="integration.energyMonitoring.calculateFromBeginningStarted" defaultMessage="Calculation started. You can follow progress in Jobs." />
+                <Text
+                  id="integration.energyMonitoring.calculateFromBeginningStarted"
+                  defaultMessage="Calculation started. You can follow progress in Jobs."
+                />
               </div>
             )}
             <button
@@ -878,12 +947,18 @@ class EnergyMonitoringPage extends Component {
               {state.calculatingFromBeginning ? (
                 <span>
                   <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                  <Text id="integration.energyMonitoring.calculatingFromBeginning" defaultMessage="Starting calculation..." />
+                  <Text
+                    id="integration.energyMonitoring.calculatingFromBeginning"
+                    defaultMessage="Starting calculation..."
+                  />
                 </span>
               ) : (
                 <span>
                   <i class="fe fe-play mr-2" />
-                  <Text id="integration.energyMonitoring.calculateCostFromBeginning" defaultMessage="Calculate cost from beginning" />
+                  <Text
+                    id="integration.energyMonitoring.calculateCostFromBeginning"
+                    defaultMessage="Calculate cost from beginning"
+                  />
                 </span>
               )}
             </button>
