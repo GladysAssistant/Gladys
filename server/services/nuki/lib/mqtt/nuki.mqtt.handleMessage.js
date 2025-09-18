@@ -1,6 +1,11 @@
 const logger = require('../../../../utils/logger');
 const { LOCK, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { NUKI_LOCK_STATES, NUKI_LOCK_ACTIONS, TRIGGER } = require('../utils/nuki.constants');
+const {
+  MAPPING_STATES_NUKI_TO_GLADYS,
+  NUKI_LOCK_STATES,
+  NUKI_LOCK_ACTIONS,
+  TRIGGER,
+} = require('../utils/nuki.constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -44,7 +49,7 @@ function handleMessage(topic, message) {
         externalId = `${main}:${deviceType}:state`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
-          state,
+          state: MAPPING_STATES_NUKI_TO_GLADYS[state],
         });
         break;
       }

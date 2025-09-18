@@ -102,9 +102,10 @@ const LOCK = {
     LOCK: 1,
   },
   STATE: {
-    ERROR: -1,
+    ERROR: 255,
     LOCKED: 0,
     UNLOCKED: 1,
+    ACTIVITY: 2,
   },
 };
 

@@ -15,21 +15,14 @@ const ICON_MAP = {
     0: 'unlock',
     1: 'lock'
   },
+  // server/utils/constants LOCK.STATE
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
-    0: 'x-circle', //'uncalibrated'
-    1: 'lock', //'locked',
-    2: 'activity', //'unlocking',
-    3: 'unlock', //'unlocked',
-    4: 'activity', //'locking',
-    5: 'unlocked', // 'unlatched',
-    6: 'unlocked', // 'unlocked (lock ‘n’ go)',
-    7: 'activity', //'unlatching opening',
-    253: 'cpu', //'boot run'
-    254: 'alert-triangle', // 'motor blocked'
-    255: 'alert-circle' //'undefined'
+    255: 'alert-triangle', // 'uncalibrated', 'undefined', 'motor blocked', 'boot run'
+    0: 'lock', // 'locked'
+    1: 'unlock', //'unlocked', 'unlatched', 'unlocked (lock ‘n’ go)'
+    2: 'activity' // 'unlocking', 'locking', 'unlatching opening'
   }
 };
-
 const IconBinaryDeviceValue = ({ deviceFeature }) => {
   const { category, last_value: lastValue = null } = deviceFeature;
   const icon = get(ICON_MAP, `${category}.${lastValue}`);

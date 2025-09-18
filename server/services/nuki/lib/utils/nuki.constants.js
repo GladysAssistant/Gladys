@@ -1,3 +1,5 @@
+const { LOCK } = require('../../../../utils/constants');
+
 const CONFIGURATION = {
   NUKI_API_KEY: 'NUKI_API_KEY',
 };
@@ -45,6 +47,27 @@ const NUKI_LOCK_STATES = {
   255: 'undefined',
 };
 
+// mapping between Nuki states (labels) and Gladys
+const NUKI_TO_GLADYS_MAP = {
+  uncalibrated: LOCK.STATE.ERROR,
+  locked: LOCK.STATE.LOCKED,
+  unlocking: LOCK.STATE.ACTIVITY,
+  unlocked: LOCK.STATE.UNLOCKED,
+  locking: LOCK.STATE.ACTIVITY,
+  unlatched: LOCK.STATE.UNLOCKED,
+  'unlocked (lock ‘n’ go)': LOCK.STATE.UNLOCKED,
+  'unlatching opening': LOCK.STATE.ACTIVITY,
+  'boot run': LOCK.STATE.ERROR,
+  'motor blocked': LOCK.STATE.ERROR,
+  undefined: LOCK.STATE.ERROR,
+};
+
+// helper that generate the final mapping final based on int codes
+const MAPPING_STATES_NUKI_TO_GLADYS = Object.entries(NUKI_LOCK_STATES).reduce((acc, [code, label]) => {
+  acc[code] = NUKI_TO_GLADYS_MAP[label];
+  return acc;
+}, {});
+
 // 3.4 Lock Actions (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
 const NUKI_LOCK_ACTIONS = {
   UNLOCK: 1,
@@ -80,4 +103,5 @@ module.exports = {
   NUKI_LOCK_ACTIONS,
   TOPICS,
   NUKI_LOCK_STATES,
+  MAPPING_STATES_NUKI_TO_GLADYS,
 };
