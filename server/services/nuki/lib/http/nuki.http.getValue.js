@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
-const { NUKI_LOCK_STATES } = require('../utils/nuki.constants');
+const { NUKI_LOCK_STATES, MAPPING_STATES_NUKI_TO_GLADYS } = require('../utils/nuki.constants');
 
 /**
  * @description Get device values through HTTP.
@@ -26,7 +26,7 @@ async function getValue(device) {
   logger.debug(`Lock ${device.external_id} is in ${state} state`);
   gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: `${device.external_id}:state`,
-    state,
+    state: MAPPING_STATES_NUKI_TO_GLADYS[state],
   });
 
   // Update button state
