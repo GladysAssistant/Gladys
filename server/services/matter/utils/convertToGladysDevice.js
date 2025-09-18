@@ -235,7 +235,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 1500,
         });
       }
-      
     });
   }
   return gladysDevice;

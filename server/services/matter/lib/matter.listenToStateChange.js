@@ -9,7 +9,7 @@ const {
   RelativeHumidityMeasurement,
   Thermostat,
   Pm25ConcentrationMeasurement,
-  Pm10ConcentrationMeasurement
+  Pm10ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
