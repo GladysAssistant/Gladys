@@ -1,9 +1,14 @@
+const chai = require('chai');
+
+const { expect } = chai;
+
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
+const { MAPPING_STATES_NUKI_TO_GLADYS } = require('../../../../../services/nuki/lib/utils/nuki.constants');
 
 const gladys = {
   variable: {
@@ -57,6 +62,11 @@ describe('Nuki - MQTT - Handle message', () => {
     nukiHandler.handleMessage('nuki/my_device/state', '0');
     assert.notCalled(mqttService.device.publish);
     assert.calledTwice(gladys.event.emit);
+    const expectedDeviceState = {
+      device_feature_external_id: 'nuki:my_device:state',
+      state: MAPPING_STATES_NUKI_TO_GLADYS[0],
+    };
+    expect(gladys.event.emit.getCall(1).args[1]).to.deep.equal(expectedDeviceState);
   });
 
   it('should handle NUKI commandResponse', () => {
