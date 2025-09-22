@@ -9,6 +9,7 @@ const {
   RelativeHumidityMeasurement,
   Thermostat,
   Pm25ConcentrationMeasurement,
+  Pm10ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -213,6 +214,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 1500,
+        });
+      } else if (clusterIndex === Pm10ConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           has_feedback: true,
