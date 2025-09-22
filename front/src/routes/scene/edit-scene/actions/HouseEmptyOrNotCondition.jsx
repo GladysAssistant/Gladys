@@ -78,6 +78,8 @@ class HouseEmptyOrNotCondition extends Component {
             class="scene-house-empty-or-not-choose-house"
             value={selectedHouseOption}
             onChange={this.handleHouseChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>

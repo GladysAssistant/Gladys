@@ -1,0 +1,167 @@
+/* Dark mode styles - inversion approach with fixed scrolling */
+
+/* Apply dark mode to html and body, with forced background color */
+html.dark-mode {
+  filter: invert(100%) hue-rotate(180deg);
+  background-color: #111827 !important;
+}
+
+/* Force background color on body to prevent white flashes during scroll */
+body.dark-mode {
+  background-color: #e1e8f7 !important; /* Inverted to a dark gray by the html filter */
+  min-height: 100vh;
+}
+
+/* Force background on key containers to prevent scroll issues */
+.dark-mode .page,
+.dark-mode .page-main,
+.dark-mode .page-content {
+  background-color: #e1e8f7 !important; /* Inverted to a dark gray by parent filter */
+}
+
+/* Double-invert back to normal for media elements */
+.dark-mode img:not(.keep-dark):not(.white-bg),
+.dark-mode video:not(.keep-dark),
+.dark-mode .avatar:not(.keep-dark),
+.dark-mode [style*='background-image']:not(.keep-dark),
+.dark-mode iframe:not(.keep-dark),
+.dark-mode .header-brand-img {
+  filter: invert(100%) hue-rotate(180deg); /* This will invert them back to normal */
+}
+
+/* Convert white pixels to black in images */
+.dark-mode img.white-bg {
+  filter: brightness(0.8) contrast(1.2) invert(0.9) hue-rotate(180deg);
+}
+
+/* Fix icons appearance */
+.dark-mode .fe {
+  filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
+}
+
+/** Should not invert icon on dashboard **/
+.dark-mode .dashboard .fe {
+  filter: none;
+}
+
+/** Should not invert icon inside btn-outline-danger **/
+.dark-mode .btn-outline-danger .fe {
+  filter: none;
+}
+
+/* Fix z-index issue for input icon addons */
+.dark-mode .input-icon-addon {
+  z-index: 2 !important;
+}
+
+/* Make sure primary elements look good */
+.dark-mode .bg-primary,
+.dark-mode .nav-pills .nav-link.active {
+  filter: hue-rotate(180deg); /* Ensure primary colors still look good */
+}
+
+/* Header and card backgrounds in dark mode */
+.dark-mode .card,
+.dark-mode .card-header,
+.dark-mode .card-body,
+.dark-mode .header,
+.dark-mode .dropdown-menu,
+.dark-mode .btn-secondary,
+.dark-mode .custom-control-input,
+.dark-mode .custom-switch-indicator:before {
+  background-color: #ced8e6 !important; /* Inverted to a darker gray by parent filter */
+}
+
+/* Custom switch indicator when toggle is off */
+.dark-mode .custom-switch:not(.custom-switch-checked) .custom-switch-indicator:before {
+  background-color: #4c525d !important;
+}
+
+/* Custom switch indicator when toggle is checked */
+.dark-mode .custom-switch-input:checked + .custom-switch-indicator:before {
+  background-color: #ced8e6 !important;
+}
+
+.dark-mode select,
+.dark-mode textarea,
+.dark-mode checkbox,
+.dark-mode .btn-secondary,
+.dark-mode .custom-file-input,
+.dark-mode .custom-file-label,
+.dark-mode .react-select__control,
+.dark-mode .react-select__menu,
+.dark-mode .custom-file,
+.dark-mode .list-group-item,
+.dark-mode .fixed-bottom {
+  background-color: #e1e8f7 !important; /* Inverted to a darker gray by parent filter */
+}
+
+.dark-mode .btn-secondary:hover {
+  background-color: #e1e8f779 !important; /* Inverted to a darker gray by parent filter */
+}
+
+.dark-mode input:not([type='range']),
+.dark-mode .form-control:not([type='range']),
+.dark-mode .input-group-text {
+  background-color: #101827 !important; /* Inverted to a darker gray by parent filter */
+  color: #aab1b8 !important;
+  border-color: #374151 !important;
+  filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
+}
+
+.dark-mode input::placeholder,
+.dark-mode .form-control::placeholder,
+.dark-mode .input-group-text::placeholder {
+  color: #979eaa6b !important;
+}
+
+/* Preserve button and UI element colors in dark mode */
+.dark-mode .btn-primary,
+.dark-mode .btn-danger,
+.dark-mode .btn-success,
+.dark-mode .btn-outline-danger,
+.dark-mode .btn-outline-success,
+.dark-mode .btn-outline-primary,
+.dark-mode .btn-outline-warning,
+.dark-mode .btn-outline-info,
+.dark-mode .tag,
+.dark-mode .badge,
+.dark-mode .stamp,
+.dark-mode .emoji-no-invert,
+.dark-mode .dark-mode-no-invert {
+  filter: invert(100%) hue-rotate(180deg); /* Double inversion cancels out, preserving original colors */
+}
+
+/** Do not invert btn-outline-danger in input-group-append or it becomes unreadable**/
+.dark-mode .input-group-append .btn-outline-danger {
+  filter: none;
+}
+
+/** EDF Tempo icon for example **/
+.dark-mode .dark-mode-no-invert .fe {
+  filter: none;
+}
+
+.dark-mode .dark-mode-fe-none-filter {
+  filter: none;
+}
+
+/* Dark mode toggle button */
+.mode-toggle {
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: #adb5bd;
+}
+
+.mode-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .mode-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Keep the same in dark mode due to global inversion */
+}

@@ -1,6 +1,7 @@
 [
   {
     "key": "openWeather",
-    "img": "/assets/integrations/cover/openweather.jpg"
+    "img": "/assets/integrations/cover/openweather.jpg",
+    "whiteBackground": true
   }
 ]

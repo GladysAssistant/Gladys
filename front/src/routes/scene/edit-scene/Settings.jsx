@@ -93,6 +93,8 @@ class Settings extends Component {
                         formatCreateLabel={inputValue => (
                           <Text id="editScene.createTag" fields={{ tagName: inputValue }} />
                         )}
+                        className="react-select-container"
+                        classNamePrefix="react-select"
                       />
                     </Localizer>
                   </div>
@@ -119,7 +121,7 @@ class Settings extends Component {
                                 value={icon}
                                 className={styles.iconInput}
                               />
-                              <i class={`fe fe-${icon}`} />
+                              <i class={`dark-mode-fe-none-filter fe fe-${icon}`} />
                             </label>
                           </div>
                         </div>
