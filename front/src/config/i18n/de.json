@@ -1641,6 +1641,7 @@
           "name": "Synology-Kalender",
           "url": "Synology CalDAV URL",
           "urlInfo": "Klicke im Kalenderprogramm auf \"CalDAV-Account\" und kopiere die \"macOS/iOS\"-URL.",
+          "verifySSL": "SSL-Zertifikat überprüfen",
           "username": "Synology-Benutzername",
           "usernameInfo": "Gib deinen Benutzernamen ein.",
           "password": "Passwort",
@@ -1649,6 +1650,7 @@
         "other": {
           "name": "Andere",
           "url": "CalDAV-URL",
+          "verifySSL": "SSL-Zertifikat überprüfen",
           "username": "CalDAV-Benutzername",
           "password": "CalDAV-Passwort"
         }
@@ -3375,6 +3377,10 @@
     "pm25-sensor": {
       "shortCategoryName": "PM2.5-Sensor",
       "decimal": "PM2.5 (Dezimal)"
+    },
+    "pm10-sensor": {
+      "shortCategoryName": "PM10-Sensor",
+      "decimal": "PM10 (Dezimal)"
     },
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd-Sensor",

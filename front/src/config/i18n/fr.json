@@ -525,6 +525,7 @@
           "name": "Calendrier Synology",
           "url": "URL CalDAV Synology",
           "urlInfo": "Dans l'application Calendrier, cliquez sur 'Compte CalDAV' et copiez l'URL 'macOS/iOS'.",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur Synology",
           "usernameInfo": "Entrez votre nom d'utilisateur.",
           "password": "Mot de passe",
@@ -533,6 +534,7 @@
         "other": {
           "name": "Autre",
           "url": "URL CalDAV",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur CalDAV",
           "password": "Mot de passe CalDAV"
         }
@@ -3375,6 +3377,10 @@
     "pm25-sensor": {
       "shortCategoryName": "Capteur de PM2.5",
       "decimal": "PM2.5 (Décimale)"
+    },
+    "pm10-sensor": {
+      "shortCategoryName": "Capteur de PM10",
+      "decimal": "PM10 (Décimale)"
     },
     "formaldehyd-sensor": {
       "shortCategoryName": "Capteur Formaldéhyde",

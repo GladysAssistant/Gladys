@@ -1,5 +1,4 @@
 const Promise = require('bluebird');
-const get = require('get-value');
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/coreErrors');
 
@@ -15,6 +14,8 @@ async function syncUserCalendars(userId) {
   const CALDAV_HOME_URL = await this.gladys.variable.getValue('CALDAV_HOME_URL', this.serviceId, userId);
   const CALDAV_USERNAME = await this.gladys.variable.getValue('CALDAV_USERNAME', this.serviceId, userId);
   const CALDAV_PASSWORD = await this.gladys.variable.getValue('CALDAV_PASSWORD', this.serviceId, userId);
+  const DISABLE_SSL_CHECK =
+    ((await this.gladys.variable.getValue('CALDAV_CHECK_SSL', this.serviceId, userId)) || '1') === '0';
 
   if (!CALDAV_HOST || !CALDAV_HOME_URL || !CALDAV_USERNAME || !CALDAV_PASSWORD) {
     throw new ServiceNotConfiguredError('CALDAV_NOT_CONFIGURED');
@@ -25,6 +26,9 @@ async function syncUserCalendars(userId) {
       username: CALDAV_USERNAME,
       password: CALDAV_PASSWORD,
     }),
+    {
+      disableSSLCheck: DISABLE_SSL_CHECK,
+    },
   );
 
   // Get list of calendars
@@ -112,10 +116,10 @@ async function syncUserCalendars(userId) {
       await Promise.map(
         jsonEvents,
         async (jsonEvent) => {
-          if (get(jsonEvent, 'rrule.options.until') && jsonEvent.href) {
+          if (jsonEvent?.rrule?.options?.until && jsonEvent.href) {
             await this.gladys.calendar.destroyEvents(calendarToUpdate.id, {
               url: jsonEvent.href,
-              from: get(jsonEvent, 'rrule.options.until'),
+              from: jsonEvent?.rrule?.options?.until,
             });
           }
         },
