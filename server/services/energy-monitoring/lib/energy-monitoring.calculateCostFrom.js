@@ -12,9 +12,11 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   ENERGY_PRICE_TYPES,
+  ENERGY_CONTRACT_TYPES,
   SYSTEM_VARIABLE_NAMES,
 } = require('../../../utils/constants');
 const contracts = require('../contracts/contracts.calculateCost');
+const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDayMap');
 
 /**
  * @description Calculate energy monitoring cost from a specific date.
@@ -31,6 +33,7 @@ async function calculateCostFrom(startAt, jobId) {
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
   logger.info(`Found ${energyDevices.length} energy devices`);
+  let edfTempoHistoricalMap = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
       const energyConsumptionFeatures = [];
@@ -96,6 +99,14 @@ async function calculateCostFrom(startAt, jobId) {
         const energyPrices = await this.gladys.energyPrice.get({
           electric_meter_device_id: electricMeterFeature.device_id,
         });
+        const hasTempo = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.EDF_TEMPO);
+        if (hasTempo && !edfTempoHistoricalMap) {
+          logger.info(
+            `Device ${electricMeterFeature.device_id} has tempo prices and Map is empty, getting EDF tempo historical`,
+          );
+          const startDateAsDayString = dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD');
+          edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
+        }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
@@ -135,6 +146,7 @@ async function calculateCostFrom(startAt, jobId) {
             createdAtRemoved30Minutes,
             deviceFeatureState.value,
             systemTimezone,
+            { edfTempoHistoricalMap },
           );
           // Save the cost if not exists
           await this.gladys.device.saveHistoricalState(ecf.consumptionCostFeature, cost, deviceFeatureState.created_at);

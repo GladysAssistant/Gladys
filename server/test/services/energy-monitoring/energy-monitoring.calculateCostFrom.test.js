@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const historicalTempoData = require('./data/tempo_mock');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -57,6 +58,9 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       variable,
       device,
       energyPrice,
+      gateway: {
+        getEdfTempoHistorical: fake.resolves(historicalTempoData),
+      },
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,

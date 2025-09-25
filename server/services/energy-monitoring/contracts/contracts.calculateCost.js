@@ -6,7 +6,6 @@ dayjs.extend(timezone);
 const { ENERGY_CONTRACT_TYPES } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
-const tempoData = require('../data/tempo');
 
 /**
  * @description Convert a Date to an HH:MM slot label at 30-minute granularity.
@@ -61,6 +60,7 @@ module.exports = {
     consumptionDate,
     consumptionValue,
     systemTimezone,
+    { edfTempoHistoricalMap },
   ) => {
     const consumptionDateHour = dayjs(consumptionDate)
       .tz(systemTimezone)
@@ -76,12 +76,12 @@ module.exports = {
     logger.debug(`Getting tempo data for date ${consumptionDateDay} at year ${consumptionDateYear}`);
 
     // Find tempo data for this day in the local dataset
-    const tempoDayData = tempoData[consumptionDateYear].find((d) => d.date === consumptionDateDay);
-    if (!tempoDayData) {
+    const tempoDayDayType = edfTempoHistoricalMap.get(consumptionDateDay);
+    if (!tempoDayDayType) {
       throw new NotFoundError('No tempo data found for this day');
     }
     // Find the price list for the day color
-    const energyPricesAtDay = energyPricesAtConsumptionDate.filter((p) => p.day_type === tempoDayData.color);
+    const energyPricesAtDay = energyPricesAtConsumptionDate.filter((p) => p.day_type === tempoDayDayType);
     const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
     const price = energyPricesAtDay.find((p) => {
       const hourSlots = (p.hour_slots || '')
@@ -96,9 +96,9 @@ module.exports = {
     // Price are stored as integer with 4 decimals
     const cost = (price.price / 10000) * consumptionValue;
     logger.debug(
-      `Found price: ${price.price / 10000}${price.currency}/kWh for time slot ${label} on day ${
-        tempoDayData.color
-      }, cost: ${cost}`,
+      `Found price: ${price.price / 10000}${
+        price.currency
+      }/kWh for time slot ${label} on day ${tempoDayDayType}, cost: ${cost}`,
     );
     return cost;
   },
