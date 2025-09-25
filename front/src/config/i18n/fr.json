@@ -30,7 +30,9 @@
     "noData": "Aucune donnée",
     "price": "Prix",
     "collapse": "Réduire",
-    "expand": "Développer"
+    "expand": "Développer",
+    "loading": "Chargement...",
+    "preview": "Aperçu"
   },
   "color": {
     "aqua": "Aqua",
@@ -281,7 +283,8 @@
       "clock": "Horloge",
       "scene": "Scène",
       "music": "Musique",
-      "gauge": "Jauge"
+      "gauge": "Jauge",
+      "energy-consumption": "Consommation Énergétique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -471,6 +474,18 @@
         "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
         "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
         "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
+      },
+      "energyConsumption": {
+        "editTitle": "Titre du widget (optionnel)",
+        "editTitlePlaceholder": "Nom affiché sur le tableau de bord",
+        "editDeviceFeatures": "Sélectionner les appareils de consommation énergétique",
+        "year": "Année",
+        "month": "Mois",
+        "day": "Jour",
+        "consumptionCost": "Coût de Consommation",
+        "totalConsumption": "Consommation totale sur la période",
+        "error": "Erreur lors du chargement des données de consommation énergétique",
+        "noData": "Aucune donnée de consommation énergétique disponible pour cette période"
       }
     }
   },

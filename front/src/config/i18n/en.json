@@ -20,7 +20,9 @@
     "milesPerHour": "m/h",
     "selectPlaceholder": "Select...",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "loading": "Loading...",
+    "preview": "Preview"
   },
   "color": {
     "aqua": "Aqua",
@@ -271,7 +273,8 @@
       "clock": "Clock",
       "scene": "Scene",
       "music": "Music",
-      "gauge": "Gauge"
+      "gauge": "Gauge",
+      "energy-consumption": "Energy Consumption"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -440,6 +443,18 @@
         "noDeviceFeatureSelector": "No feature selected",
         "errorLoadingDevice": "An error occured while loading the device",
         "noDeviceFeatureLastValue": "This feature has not received any value yet"
+      },
+      "energyConsumption": {
+        "editTitle": "Widget Title (optional)",
+        "editTitlePlaceholder": "Name displayed on the dashboard",
+        "editDeviceFeatures": "Select energy consumption devices",
+        "year": "Year",
+        "month": "Month", 
+        "day": "Day",
+        "consumptionCost": "Consumption Cost",
+        "totalConsumption": "Total Consumption Cost",
+        "error": "Error loading energy consumption data",
+        "noData": "No energy consumption data available for this period"
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",

@@ -1351,6 +1351,7 @@ const DASHBOARD_BOX_TYPE = {
   SCENE: 'scene',
   MUSIC: 'music',
   GAUGE: 'gauge',
+  ENERGY_CONSUMPTION: 'energy-consumption',
 };
 
 const ERROR_MESSAGES = {
