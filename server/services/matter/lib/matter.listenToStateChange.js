@@ -9,6 +9,7 @@ const {
   RelativeHumidityMeasurement,
   Thermostat,
   Pm25ConcentrationMeasurement,
+  Pm10ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -184,6 +185,22 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: Pm25ConcentrationMeasurement attribute changed to ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${Pm25ConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const pm10ConcentrationMeasurement = device.clusterClients.get(Pm10ConcentrationMeasurement.Complete.id);
+  if (pm10ConcentrationMeasurement && !this.stateChangeListeners.has(pm10ConcentrationMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for Pm10ConcentrationMeasurement cluster ${pm10ConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(pm10ConcentrationMeasurement);
+    // Subscribe to Pm10ConcentrationMeasurement attribute changes
+    pm10ConcentrationMeasurement.addMeasuredValueAttributeListener((value) => {
+      logger.debug(`Matter: Pm10ConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${Pm10ConcentrationMeasurement.Complete.id}`,
         state: value,
       });
     });
