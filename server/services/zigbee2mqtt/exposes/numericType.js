@@ -908,6 +908,15 @@ module.exports = {
         max: 999,
       },
     },
+    pm10: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+        min: 0,
+        max: 999,
+      },
+    },
     formaldehyd: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR,

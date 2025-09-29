@@ -50,7 +50,13 @@ class SettingsSystemTimezone extends Component {
             <p>
               <Text id="systemSettings.timezoneText" />
             </p>
-            <Select options={timezones} onChange={this.updateTimezone} value={selectedTimezone} />
+            <Select
+              options={timezones}
+              onChange={this.updateTimezone}
+              value={selectedTimezone}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
           </form>
         </div>
       </div>

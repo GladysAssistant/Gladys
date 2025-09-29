@@ -9,6 +9,7 @@ const {
   RelativeHumidityMeasurement,
   Thermostat,
   Pm25ConcentrationMeasurement,
+  Pm10ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -190,6 +191,23 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1066',
+      state: 100,
+    });
+  });
+  it('should listen to state change (Pm10ConcentrationMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(Pm10ConcentrationMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(100);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1069',
       state: 100,
     });
   });

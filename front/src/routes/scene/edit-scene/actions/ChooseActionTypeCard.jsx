@@ -77,6 +77,8 @@ class ChooseActionType extends Component {
             onChange={this.handleChange}
             value={currentAction}
             options={options}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>

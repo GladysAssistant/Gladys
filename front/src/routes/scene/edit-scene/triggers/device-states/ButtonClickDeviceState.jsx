@@ -42,7 +42,13 @@ class ButtonClickDeviceState extends Component {
         </div>
         <div class="col-10 col-md-5">
           <div class="form-group">
-            <Select defaultValue={defaultValue || ''} onChange={this.handleValueChange} options={options} />
+            <Select
+              defaultValue={defaultValue || ''}
+              onChange={this.handleValueChange}
+              options={options}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
           </div>
         </div>
       </Fragment>

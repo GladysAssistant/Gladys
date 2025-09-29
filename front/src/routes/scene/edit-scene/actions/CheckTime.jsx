@@ -111,6 +111,8 @@ class CheckTime extends Component {
             value={selectedWeekDaysOptions}
             onChange={this.handleDayOfTheWeekChange}
             options={daysOfTheWeekOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>
