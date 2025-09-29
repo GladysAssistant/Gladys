@@ -47,8 +47,8 @@ async function saveMultipleHistoricalStates(deviceFeatureId, states) {
 
   // Save last state in cache and propagate value to front if needed
   const lastState = statesWithDeviceFeatureId[statesWithDeviceFeatureId.length - 1];
-  const deviceFeature = this.stateManager.get('deviceFeature', deviceFeatureId);
-  await this.saveHistoricalStates(deviceFeature, lastState.value, lastState.created_at);
+  const deviceFeature = this.stateManager.get('deviceFeatureById', deviceFeatureId);
+  await this.saveHistoricalState(deviceFeature, lastState.value, lastState.created_at);
 }
 
 module.exports = {
