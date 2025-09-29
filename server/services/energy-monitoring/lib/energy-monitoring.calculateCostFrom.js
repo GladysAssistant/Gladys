@@ -114,6 +114,7 @@ async function calculateCostFrom(startAt, jobId) {
           startAt,
           new Date(),
         );
+        const deviceFeatureCostStatesToInsert = [];
         logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
         // For each state
         await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
@@ -137,6 +138,7 @@ async function calculateCostFrom(startAt, jobId) {
             );
             return;
           }
+
           // We take the contract from the first price.
           // It's not possible to have multiple contracts for the same electrical meter device.
           const { contract } = energyPricesForDate[0];
@@ -148,9 +150,17 @@ async function calculateCostFrom(startAt, jobId) {
             systemTimezone,
             { edfTempoHistoricalMap },
           );
-          // Save the cost if not exists
-          await this.gladys.device.saveHistoricalState(ecf.consumptionCostFeature, cost, deviceFeatureState.created_at);
+          deviceFeatureCostStatesToInsert.push({
+            value: cost,
+            created_at: deviceFeatureState.created_at,
+          });
         });
+
+        // Save all the cost in DB at once
+        await this.gladys.device.saveMultipleHistoricalStates(
+          ecf.consumptionCostFeature.id,
+          deviceFeatureCostStatesToInsert,
+        );
       });
     } catch (e) {
       logger.error(e);
