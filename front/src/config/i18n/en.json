@@ -21,6 +21,16 @@
     "selectPlaceholder": "Select...",
     "yes": "Yes",
     "no": "No",
+    "edit": "Edit",
+    "delete": "Delete",
+    "next": "Next",
+    "back": "Back",
+    "create": "Create",
+    "cancel": "Cancel",
+    "noData": "No data",
+    "price": "Price",
+    "collapse": "Collapse",
+    "expand": "Expand",
     "loading": "Loading...",
     "preview": "Preview"
   },
@@ -449,7 +459,7 @@
         "editTitlePlaceholder": "Name displayed on the dashboard",
         "editDeviceFeatures": "Select energy consumption devices",
         "year": "Year",
-        "month": "Month", 
+        "month": "Month",
         "day": "Day",
         "consumptionCost": "Consumption Cost",
         "totalConsumption": "Total Consumption Cost",
@@ -1622,6 +1632,70 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "energyMonitoring": {
+      "title": "Energy Monitoring",
+      "description": "Track your electricity consumption in Gladys",
+      "myDevicesTab": "My Devices",
+      "energyPriceTab": "Energy Rates",
+      "documentation": "Documentation",
+      "hierarchicalListDescription": "Here is the hierarchical list of energy sensors. You can define parent/child relationships to aggregate consumption.",
+      "rootNotParent": "No parent (root)",
+      "level": "Level {{depth}}",
+      "wizard": {
+        "basics": "Information",
+        "periodScope": "Period & Scope",
+        "priceAndSlots": "Price & Time Slots"
+      },
+      "contract": "Contract",
+      "priceType": "Price Type",
+      "currency": "Currency",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "dayType": "Day Type",
+      "dayTypeOptions": {
+        "any": "any",
+        "red": "red",
+        "white": "white",
+        "weekend": "weekend"
+      },
+      "electricMeter": "Electric Meter",
+      "leaveEndDateEmpty": "Leave the end date empty for an open period.",
+      "priceAndTimeSlots": "Price & Time Slots",
+      "price": "Price",
+      "hourSlots": "Time Slots",
+      "selectHoursHelp": "Select the hours when this price applies.",
+      "daytime820": "Daytime 8-20",
+      "clear": "Clear",
+      "selected": "Selected:",
+      "none": "none",
+      "subscribedPower": "Subscribed Power",
+      "summary": "Summary",
+      "type": "Type",
+      "period": "Period",
+      "slots": "Slots",
+      "meter": "Meter",
+      "contractTypes": {
+        "base": "base",
+        "peak_offpeak": "peak/off-peak hours",
+        "edf_tempo": "EDF Tempo"
+      },
+      "priceTypes": {
+        "consumption": "consumption",
+        "subscription": "subscription"
+      },
+      "currencies": {
+        "euro": "euro",
+        "dollar": "dollar"
+      },
+      "errorLoadingPrices": "Error loading rates.",
+      "errorLoadingDevices": "Error loading devices.",
+      "noDeviceFeaturesFound": "No device features found.",
+      "settings": "Settings",
+      "calculateCostFromBeginning": "Calculate cost from the beginning",
+      "calculatingFromBeginning": "Calculating...",
+      "calculateFromBeginningStarted": "The calculation has been started. You can follow the progress in background tasks.",
+      "calculateFromBeginningError": "An error occurred while starting the calculation."
     },
     "caldav": {
       "title": "CalDAV",
