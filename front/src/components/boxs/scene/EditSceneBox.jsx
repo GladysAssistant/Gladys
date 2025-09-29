@@ -107,6 +107,8 @@ class EditSceneBox extends Component {
                   isMulti
                   onChange={this.updateScenes}
                   maxMenuHeight={220}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
               </div>
             )}

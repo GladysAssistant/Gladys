@@ -85,6 +85,8 @@ class PlayNotification extends Component {
             options={devicesOptions}
             value={selectedDeviceFeatureOption}
             onChange={this.handleDeviceChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">

@@ -22,6 +22,8 @@ const UserPresenceBox = ({ children, ...props }) => (
             isMulti
             onChange={props.updateUsers}
             options={props.users}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>

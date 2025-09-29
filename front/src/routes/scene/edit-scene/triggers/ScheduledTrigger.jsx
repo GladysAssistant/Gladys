@@ -232,6 +232,8 @@ class TurnOnLight extends Component {
                   isMulti
                   value={selectedWeekDaysOptions}
                   onChange={this.handleDayOfTheWeekChange}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                   options={[
                     {
                       value: 'monday',

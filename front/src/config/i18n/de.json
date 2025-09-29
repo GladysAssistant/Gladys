@@ -3463,6 +3463,10 @@
       "shortCategoryName": "PM2.5-Sensor",
       "decimal": "PM2.5 (Dezimal)"
     },
+    "pm10-sensor": {
+      "shortCategoryName": "PM10-Sensor",
+      "decimal": "PM10 (Dezimal)"
+    },
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd-Sensor",
       "decimal": "Formaldehyd (Dezimal)"
