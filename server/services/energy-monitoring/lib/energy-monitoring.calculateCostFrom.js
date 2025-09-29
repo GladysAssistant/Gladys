@@ -123,15 +123,16 @@ async function calculateCostFrom(startAt, jobId) {
             .subtract(30, 'minutes')
             .toDate();
           // Get the prices for this date
-          const energyPricesForDate = energyPrices.filter(
-            (price) =>
-              // We only keep consumption prices (no subscription)
+          const energyPricesForDate = energyPrices.filter((price) => {
+            // We only keep consumption prices (no subscription)
+            return (
               price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
               // We only keep prices that are valid for this date
-              dayjs.tz(price.start_date, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
+              dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
               (price.end_date === null ||
-                dayjs.tz(price.end_date, systemTimezone).toDate() >= createdAtRemoved30Minutes),
-          );
+                dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).toDate() >= createdAtRemoved30Minutes)
+            );
+          });
           if (energyPricesForDate.length === 0) {
             logger.debug(
               `No energy price found for device ${electricMeterFeature.device_id} at ${deviceFeatureState.created_at}`,
