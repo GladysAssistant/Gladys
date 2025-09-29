@@ -8871,4 +8871,16 @@ module.exports = [
     created_at: '2025-09-26',
     day_type: 'blue',
   },
+  {
+    created_at: '2025-09-27',
+    day_type: 'blue',
+  },
+  {
+    created_at: '2025-09-28',
+    day_type: 'blue',
+  },
+  {
+    created_at: '2025-09-29',
+    day_type: 'blue',
+  },
 ];
