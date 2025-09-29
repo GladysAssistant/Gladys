@@ -219,6 +219,61 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     }
     await Promise.all(createPromises);
   };
+  // Import all EDF Base prices from GitHub API and create one entry per period
+  const importAllBasePricesFromCsv = async (electricMeterDeviceId, energyPriceInstance, subscribedPower) => {
+    // Fetch latest release from GitHub API
+    const releaseResponse = await fetch(
+      'https://api.github.com/repos/GladysAssistant/energy-contracts/releases/latest',
+    );
+    if (!releaseResponse.ok) {
+      throw new Error(`Failed to fetch latest release: ${releaseResponse.statusText}`);
+    }
+    const releaseData = await releaseResponse.json();
+
+    // Find contracts.json asset
+    const contractsAsset = releaseData.assets.find((asset) => asset.name === 'contracts.json');
+    if (!contractsAsset) {
+      throw new Error('contracts.json asset not found in latest release');
+    }
+
+    // Download contracts.json
+    const contractsResponse = await fetch(contractsAsset.browser_download_url);
+    if (!contractsResponse.ok) {
+      throw new Error(`Failed to download contracts.json: ${contractsResponse.statusText}`);
+    }
+    const contractsData = await contractsResponse.json();
+
+    // Get EDF Base pricing data for the specified subscribed power
+    const edfBaseData = contractsData['edf-base'];
+    if (!edfBaseData) {
+      throw new Error('edf-base contract not found in contracts.json');
+    }
+
+    const subscribedPowerData = edfBaseData[subscribedPower];
+    if (!subscribedPowerData) {
+      throw new Error(`Subscribed power ${subscribedPower} not found in edf-base contract`);
+    }
+
+    // Get the prices array
+    const prices = subscribedPowerData.prices || subscribedPowerData;
+    if (!Array.isArray(prices)) {
+      throw new Error('Prices array not found for the specified subscribed power');
+    }
+
+    const createPromises = [];
+    for (let i = 0; i < prices.length; i += 1) {
+      const priceEntry = prices[i];
+
+      // Base pricing has only one price for the whole day
+      createPromises.push(
+        energyPriceInstance.create({
+          electric_meter_device_id: electricMeterDeviceId,
+          ...priceEntry,
+        }),
+      );
+    }
+    await Promise.all(createPromises);
+  };
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
     stateManager = new StateManager(event);
