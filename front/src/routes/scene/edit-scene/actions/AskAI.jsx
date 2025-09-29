@@ -140,6 +140,8 @@ class AskAI extends Component {
             options={userOptions}
             value={selectedUserOption}
             onChange={this.handleUserChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -155,6 +157,8 @@ class AskAI extends Component {
             value={selectedCameraOption}
             onChange={this.handleCameraChange}
             isClearable
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>

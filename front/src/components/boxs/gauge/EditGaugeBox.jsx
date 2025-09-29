@@ -84,6 +84,8 @@ class EditGaugeBoxComponent extends Component {
             value={selectedDeviceFeatureOptions}
             onChange={this.updateDeviceFeature}
             options={deviceOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </BaseEditBox>

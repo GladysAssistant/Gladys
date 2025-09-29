@@ -98,6 +98,8 @@ class SendMessageCameraParams extends Component {
             options={userOptions}
             value={selectedUserOption}
             onChange={this.handleUserChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -115,6 +117,8 @@ class SendMessageCameraParams extends Component {
             options={cameraOptions}
             value={selectedCameraOption}
             onChange={this.handleCameraChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">

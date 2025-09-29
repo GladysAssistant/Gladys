@@ -383,6 +383,22 @@ class MainApp extends Component {
     this.props.checkSession();
   }
 
+  componentDidMount() {
+    // Listen for system preference change
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+    prefersDarkMode.addEventListener('change', this.handleSystemPreferenceChange);
+  }
+
+  componentWillUnmount() {
+    // Remove event listener to prevent memory leaks
+    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
+  }
+
+  handleSystemPreferenceChange = () => {
+    // Use the global action to update dark mode state based on system preference
+    this.props.updateDarkModeFromSystem();
+  };
+
   render({ user }, {}) {
     const translationDefinition = get(translations, user.language, { default: translations.en });
     return (
