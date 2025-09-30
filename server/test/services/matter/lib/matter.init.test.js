@@ -13,6 +13,7 @@ const config = require('../../../../config/config');
 
 const MatterHandler = require('../../../../services/matter/lib');
 const { VARIABLES } = require('../../../../services/matter/utils/constants');
+const { convertMeasurementUnitToDeviceFeatureUnits } = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.init', () => {
   let matterHandler;
@@ -645,4 +646,39 @@ describe('Matter.init', () => {
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
   });
+
+  it('should return PPM for 0', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(0)).to.equal('ppm');
+  });
+  it('should return PPB for 1', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(1)).to.equal('ppb');
+  });
+  it('should return PPT for 2', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(2)).to.equal('ppt');
+  });
+  it('should return MILLIGRAM_PER_CUBIC_METER for 3', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(3)).to.equal('milligram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for 4', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(4)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return NANOGRAM_PER_CUBIC_METER for 5', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(5)).to.equal('nanogram-per-cubic-meter');
+  });
+  it('should return PARTICLES_PER_CUBIC_METER for 6', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(6)).to.equal('particles-per-cubic-meter');
+  });
+  it('should return BECQUEREL_PER_CUBIC_METER for 7', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(7)).to.equal('becquerel-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for unknown value', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(42)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for undefined', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(undefined)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for null', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(null)).to.equal('microgram-per-cubic-meter');
+  });
+  
 });

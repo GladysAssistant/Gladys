@@ -23,7 +23,7 @@ const { slugify } = require('../../../utils/slugify');
  * @returns {string} The device feature unit.
  */
 function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
-  if (measurementUnit) {
+  if (measurementUnit !== undefined && measurementUnit !== null) {
     switch (measurementUnit) {
       case 0:
         return DEVICE_FEATURE_UNITS.PPM;
@@ -245,8 +245,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
         const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
-        const minMeasuredValue = await clusterClient.getMinMeasuredValueAttribute();
-        const maxMeasuredValue = await clusterClient.getMaxMeasuredValueAttribute();
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
@@ -261,8 +261,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       } else if (clusterIndex === Pm10ConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
         const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
-        const minMeasuredValue = await clusterClient.getMinMeasuredValueAttribute();
-        const maxMeasuredValue = await clusterClient.getMaxMeasuredValueAttribute();
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
@@ -282,4 +282,5 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
 module.exports = {
   convertToGladysDevice,
+  convertMeasurementUnitToDeviceFeatureUnits,
 };
