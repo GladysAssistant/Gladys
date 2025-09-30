@@ -10,7 +10,7 @@ function postDelete(device) {
   logger.debug(`Post delete of ${device.external_id}`);
   const mqttService = this.gladys.service.getService('mqtt');
   const topic = `nuki/${device.external_id.split(':')[1]}/#`;
-  // Subscribe to Nuki device topics
+  // Unsubscribe to Nuki device topics
   mqttService.device.unsubscribe(topic);
 }
 
