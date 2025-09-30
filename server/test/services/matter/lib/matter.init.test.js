@@ -170,6 +170,9 @@ describe('Matter.init', () => {
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
     });
 
     // PM10 concentration measurement
@@ -182,6 +185,9 @@ describe('Matter.init', () => {
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
     });
 
     // Mock commissioning controller
@@ -410,7 +416,7 @@ describe('Matter.init', () => {
             category: 'pm25-sensor',
             external_id: 'matter:12345:1:1066',
             has_feedback: true,
-            max: 1500,
+            max: 999,
             min: 0,
             name: 'Pm25ConcentrationMeasurement - 1',
             read_only: true,
@@ -422,7 +428,7 @@ describe('Matter.init', () => {
             category: 'pm10-sensor',
             external_id: 'matter:12345:1:1069',
             has_feedback: true,
-            max: 1500,
+            max: 999,
             min: 0,
             name: 'Pm10ConcentrationMeasurement - 1',
             read_only: true,
@@ -572,7 +578,7 @@ describe('Matter.init', () => {
             category: 'pm25-sensor',
             external_id: 'matter:12345:1:child_endpoint:2:1066',
             has_feedback: true,
-            max: 1500,
+            max: 999,
             min: 0,
             name: 'Pm25ConcentrationMeasurement - 1',
             read_only: true,
@@ -584,7 +590,7 @@ describe('Matter.init', () => {
             category: 'pm10-sensor',
             external_id: 'matter:12345:1:child_endpoint:2:1069',
             has_feedback: true,
-            max: 1500,
+            max: 999,
             min: 0,
             name: 'Pm10ConcentrationMeasurement - 1',
             read_only: true,

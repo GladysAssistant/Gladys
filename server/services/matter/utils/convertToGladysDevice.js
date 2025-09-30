@@ -17,6 +17,38 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } 
 const { slugify } = require('../../../utils/slugify');
 
 /**
+ * @description Convert the Matter measurement unit attribute to Gladys attribute.
+ * @param {any} measurementUnit - Attribute sent by Matter.
+ * @example const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+ * @returns {string} The device feature unit.
+ */
+function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
+  if (measurementUnit) {
+    switch (measurementUnit) {
+      case 0:
+        return DEVICE_FEATURE_UNITS.PPM;
+      case 1:
+        return DEVICE_FEATURE_UNITS.PPB;
+      case 2:
+        return DEVICE_FEATURE_UNITS.PPT;
+      case 3:
+        return DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER;
+      case 4:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+      case 5:
+        return DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER;
+      case 6:
+        return DEVICE_FEATURE_UNITS.PARTICLES_PER_CUBIC_METER;
+      case 7:
+        return DEVICE_FEATURE_UNITS.BECQUEREL_PER_CUBIC_METER;
+      default:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+    }
+  }
+  return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+}
+
+/**
  * @description Convert a Matter device to a Gladys device.
  * @param {string} serviceId - The service ID.
  * @param {bigint} nodeId - The node ID of the device.
@@ -211,28 +243,36 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           });
         }
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = await clusterClient.getMinMeasuredValueAttribute();
+        const maxMeasuredValue = await clusterClient.getMaxMeasuredValueAttribute();
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           has_feedback: true,
-          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          unit: deviceFeatureUnit,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 1500,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
         });
       } else if (clusterIndex === Pm10ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = await clusterClient.getMinMeasuredValueAttribute();
+        const maxMeasuredValue = await clusterClient.getMaxMeasuredValueAttribute();
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           has_feedback: true,
-          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          unit: deviceFeatureUnit,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 1500,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
         });
       }
     });
