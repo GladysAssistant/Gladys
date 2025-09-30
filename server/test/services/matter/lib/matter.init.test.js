@@ -13,7 +13,9 @@ const config = require('../../../../config/config');
 
 const MatterHandler = require('../../../../services/matter/lib');
 const { VARIABLES } = require('../../../../services/matter/utils/constants');
-const { convertMeasurementUnitToDeviceFeatureUnits } = require('../../../../services/matter/utils/convertToGladysDevice');
+const {
+  convertMeasurementUnitToDeviceFeatureUnits,
+} = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.init', () => {
   let matterHandler;
@@ -680,5 +682,4 @@ describe('Matter.init', () => {
   it('should return MICROGRAM_PER_CUBIC_METER for null', () => {
     expect(convertMeasurementUnitToDeviceFeatureUnits(null)).to.equal('microgram-per-cubic-meter');
   });
-  
 });
