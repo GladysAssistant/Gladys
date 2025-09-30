@@ -211,7 +211,14 @@ class EditDevices extends Component {
                 <label>
                   <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
-                <Select onChange={this.addDeviceFeature} value={[]} options={deviceOptions} maxMenuHeight={220} />
+                <Select
+                  onChange={this.addDeviceFeature}
+                  value={[]}
+                  options={deviceOptions}
+                  maxMenuHeight={220}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                />
               </div>
             )}
           </div>

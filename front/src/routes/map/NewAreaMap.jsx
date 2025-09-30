@@ -1,23 +1,50 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
+import { connect } from 'unistore/preact';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
 class MapComponent extends Component {
-  initMap = () => {
+  initMap = (options = {}) => {
+    // Prepare center coordinates - can be array [lat, lng] or LatLng object
+    let centerCoords = DEFAULT_COORDS; // Default coordinates as array
+    let zoomLevel = 2; // Default zoom level
+
+    if (options.center) {
+      centerCoords = options.center;
+    }
+
+    if (options.zoom !== undefined) {
+      zoomLevel = options.zoom;
+    }
+
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
-    this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
+
+    this.leafletMap = leaflet.map(this.map).setView(centerCoords, zoomLevel);
+
+    // Use the global dark mode state from props
+    const isDarkMode = this.props.darkMode;
+
+    // Use dark tiles if dark mode is active, otherwise use light tiles
+    // Force new tile layer by adding timestamp to URL to prevent caching
+    const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
+    const timestamp = new Date().getTime();
+
+    const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
+
     leaflet
-      .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+      .tileLayer(tileUrl, {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
-        maxZoom: 19
+        maxZoom: 19,
+        noCache: true
       })
       .addTo(this.leafletMap);
+
     this.leafletMap.on('click', this.onClickOnMap);
   };
 
@@ -47,7 +74,7 @@ class MapComponent extends Component {
     this.map = map;
   };
 
-  displayHouses = props => {
+  displayHouses = (props, options = {}) => {
     if (props.houses) {
       props.houses.forEach(house => {
         if (this.houseMarkers[house.id]) {
@@ -66,7 +93,7 @@ class MapComponent extends Component {
           this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
-      if (this.markerArray.length > 0 && props.creationMode) {
+      if (this.markerArray.length > 0 && props.creationMode && !options.doNotFitBounds) {
         const group = leaflet.featureGroup(this.markerArray);
         this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
       }
@@ -81,8 +108,48 @@ class MapComponent extends Component {
   }
 
   componentDidMount() {
-    this.initMap(this.props);
+    // Initialize map with default values
+    this.initMap();
     this.displayHouses(this.props);
+  }
+
+  componentDidUpdate(prevProps) {
+    // If dark mode state has changed, reinitialize the map
+    if (prevProps.darkMode !== this.props.darkMode) {
+      // Save current area state if it exists
+      let hadArea = false;
+      let currentArea = null;
+
+      // Save the current map view (center and zoom)
+      const center = this.leafletMap.getCenter();
+      const zoom = this.leafletMap.getZoom();
+
+      if (this.areaCircle) {
+        hadArea = true;
+        const latlng = this.areaCircle.getLatLng();
+        const radius = this.areaCircle.getRadius();
+        currentArea = {
+          latitude: latlng.lat,
+          longitude: latlng.lng,
+          radius,
+          color: this.props.color || '#3498db' // Use current color or default
+        };
+      }
+
+      // Reinitialize the map with the current view settings
+      this.initMap({
+        center: [center.lat, center.lng], // Pass as array format which Leaflet expects
+        zoom
+      });
+
+      // Redisplay houses
+      this.displayHouses(this.props, { doNotFitBounds: true });
+
+      // Restore the area if it existed
+      if (hadArea && currentArea) {
+        this.setPinMap(currentArea);
+      }
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -113,4 +180,4 @@ class MapComponent extends Component {
   }
 }
 
-export default MapComponent;
+export default connect('darkMode', {})(MapComponent);

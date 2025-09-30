@@ -59,6 +59,8 @@ class EditMusicBoxComponent extends Component {
             value={optionSelected}
             onChange={this.updateDevice}
             options={musicDevicesOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </BaseEditBox>

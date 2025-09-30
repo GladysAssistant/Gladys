@@ -181,6 +181,8 @@ class CheckTime extends Component {
                 isMulti
                 onChange={this.updateCalendars}
                 options={calendarsOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
             </div>
           </div>

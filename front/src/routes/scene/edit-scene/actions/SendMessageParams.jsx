@@ -75,6 +75,8 @@ class SendMessageParams extends Component {
             options={userOptions}
             value={selectedOption}
             onChange={this.handleChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
