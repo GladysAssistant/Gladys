@@ -62,7 +62,7 @@ async function getAllTools() {
       intent: 'camera.get-image',
       config: {
         title: 'Get image from camera',
-        description: 'Get image from specific camera or specific room.',
+        description: 'Get image from camera in specific room.',
         inputSchema: {
           room: z.enum(rooms).describe('Room to get image from.'),
         },
@@ -113,11 +113,11 @@ async function getAllTools() {
         title: 'Get states from devices',
         description: 'Get last state of specific device type or in a specific room.',
         inputSchema: {
-          room: z.enum(rooms).describe('Room to get information from.').optional(),
-          sensor_type: z.array(z.enum([availableSensorFeatureCategories])).describe('Type of sensor to query, empty array to retrieve all sensors.').optional(),
+          room: z.enum(rooms).optional().describe('Room to get information from, leave empty to select multiple rooms.'),
+          sensor_type: z.enum(availableSensorFeatureCategories).optional().describe('Type of sensor to query, leave empty to retrieve all devices.'),
         },
       },
-      cb: async ({ room, feature_categories: featCategories }) => {
+      cb: async ({ room, sensor_type: sensorType }) => {
         const states = [];
 
         let selectedDevices = sensorDevices;
@@ -126,16 +126,16 @@ async function getAllTools() {
           selectedDevices = selectedDevices.filter(device => device.room.selector === room);
         }
 
-        if (featCategories && featCategories.length > 0) {
+        if (sensorType && sensorType.length > 0) {
           selectedDevices = selectedDevices.filter(device => {
-            return device.features.some(feature => featCategories.includes(feature.category));
+            return device.features.some(feature => sensorType.includes(feature.category));
           });
         }
 
         await Promise.all(selectedDevices.map(async (device) => {
           const deviceLastState = await this.gladys.device.getBySelector(device.selector);
           return device.features.map(feature => {
-            if (!featCategories || featCategories.length === 0 || featCategories.includes(feature.category)) {
+            if (!sensorType || sensorType.length === 0 || sensorType.includes(feature.category)) {
               const featureLastState = deviceLastState.features.find(feat => feat.id === feature.id);
 
               states.push({
@@ -165,12 +165,12 @@ async function getAllTools() {
       intent: 'device.turn-on-off',
       config: {
         title: 'Turn on/off devices',
-        description: 'Turn on/off specific device selected either by the name if we now it else by it room and it device type.',
+        description: 'Turn on/off specific device selected either by the name if we know it else by it room and it device type.',
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
           device: z.enum(switchableDevices.map(d => d.selector)).describe('Device name to turn on/off.').optional(),
           room: z.enum(rooms).describe("Device's room only if we don't know it name.").optional(),
-          device_category: z.enum(availableSwitchableFeatureCategories).describe('Type of device to turn on/off only if we don\'t know it name.').optional(),
+          device_category: z.enum(availableSwitchableFeatureCategories).describe("Type of device to turn on/off only if we don't know it name.").optional(),
         }
       },
       cb: async ({ action, device, room, device_category: deviceCategory }) => {

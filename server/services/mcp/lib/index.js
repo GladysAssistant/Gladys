@@ -15,6 +15,7 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp) {
   this.serviceId = serviceId;
   this.mcp = mcp;
   this.server = null;
+  this.transports = {};
 };
 
 MCPHandler.prototype.createServer = createServer;
