@@ -36,15 +36,16 @@ const getAqiColor = value => {
   return 'danger';
 };
 
+const VOC_INDEX_COLOR = {
+  0: 'secondary',
+  1: 'success',
+  2: 'warning',
+  3: 'orange',
+  4: 'danger',
+};
+
 const getVocIndexColor = value => {
-  if (value <= 3) {
-    return 'success';
-  } else if (value <= 6) {
-    return 'warning';
-  } else if (value <= 8) {
-    return 'orange';
-  }
-  return 'danger';
+  return VOC_INDEX_COLOR[value];
 };
 
 const RISK_COLORS = {

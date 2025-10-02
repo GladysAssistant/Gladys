@@ -239,7 +239,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR,
-          type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR,
+          type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR.INTEGER,
           read_only: true,
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
