@@ -453,7 +453,7 @@ describe('Matter.init', () => {
             read_only: true,
             selector: matterHandler.devices[0].features[13].selector,
             type: {
-              "INTEGER": "integer"
+              INTEGER: 'integer',
             },
           },
         ],
@@ -628,7 +628,7 @@ describe('Matter.init', () => {
             read_only: true,
             selector: matterHandler.devices[1].features[13].selector,
             type: {
-              "INTEGER": "integer"
+              INTEGER: 'integer',
             },
           },
         ],
