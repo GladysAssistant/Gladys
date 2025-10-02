@@ -10,6 +10,7 @@ const {
   Thermostat,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  ConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -25,21 +26,21 @@ const { slugify } = require('../../../utils/slugify');
 function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
   if (measurementUnit !== undefined && measurementUnit !== null) {
     switch (measurementUnit) {
-      case 0:
+      case ConcentrationMeasurement.MeasurementUnit.Ppm:
         return DEVICE_FEATURE_UNITS.PPM;
-      case 1:
+      case ConcentrationMeasurement.MeasurementUnit.Ppb:
         return DEVICE_FEATURE_UNITS.PPB;
-      case 2:
+      case ConcentrationMeasurement.MeasurementUnit.Ppt:
         return DEVICE_FEATURE_UNITS.PPT;
-      case 3:
+      case ConcentrationMeasurement.MeasurementUnit.Mgm3:
         return DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER;
-      case 4:
+      case ConcentrationMeasurement.MeasurementUnit.Ugm3:
         return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
-      case 5:
+      case ConcentrationMeasurement.MeasurementUnit.Ngm3:
         return DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER;
-      case 6:
+      case ConcentrationMeasurement.MeasurementUnit.Pm3:
         return DEVICE_FEATURE_UNITS.PARTICLES_PER_CUBIC_METER;
-      case 7:
+      case ConcentrationMeasurement.MeasurementUnit.Bqm3:
         return DEVICE_FEATURE_UNITS.BECQUEREL_PER_CUBIC_METER;
       default:
         return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
