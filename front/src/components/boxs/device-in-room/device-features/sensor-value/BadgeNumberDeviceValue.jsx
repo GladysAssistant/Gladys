@@ -37,11 +37,11 @@ const getAqiColor = value => {
 };
 
 const getVocIndexColor = value => {
-  if (value < 150) {
+  if (value <= 3) {
     return 'success';
-  } else if (value < 250) {
+  } else if (value <= 6) {
     return 'warning';
-  } else if (value < 400) {
+  } else if (value <= 8) {
     return 'orange';
   }
   return 'danger';

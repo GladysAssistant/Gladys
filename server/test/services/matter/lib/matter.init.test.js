@@ -1,6 +1,7 @@
 const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -182,6 +183,18 @@ describe('Matter.init', () => {
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
+    });
+
+    // VOC concentration measurement
+    clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
+      id: TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
+      name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        levelValue: {},
+      },
+      commands: {},
+      addLevelValueAttributeListener: fake.returns(null),
     });
 
     // Mock commissioning controller
@@ -430,6 +443,19 @@ describe('Matter.init', () => {
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
+          {
+            category: 'voc-index-sensor',
+            external_id: 'matter:12345:1:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[13].selector,
+            type: {
+              "INTEGER": "integer"
+            },
+          },
         ],
         params: [],
       },
@@ -591,6 +617,19 @@ describe('Matter.init', () => {
             selector: matterHandler.devices[1].features[12].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'voc-index-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[13].selector,
+            type: {
+              "INTEGER": "integer"
+            },
           },
         ],
         params: [],
