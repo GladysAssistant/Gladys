@@ -41,7 +41,7 @@ const VOC_INDEX_COLOR = {
   1: 'success',
   2: 'warning',
   3: 'orange',
-  4: 'danger',
+  4: 'danger'
 };
 
 const getVocIndexColor = value => {
