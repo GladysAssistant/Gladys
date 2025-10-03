@@ -564,6 +564,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOC_INDEX_SENSOR: 'voc-index-sensor',
+  VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
   INPUT: 'input',
@@ -792,6 +793,9 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
   },
   VOC_INDEX_SENSOR: {
+    INTEGER: 'integer',
+  },
+  VOC_MATTER_INDEX_SENSOR: {
     INTEGER: 'integer',
   },
   SHUTTER: {
