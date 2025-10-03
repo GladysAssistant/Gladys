@@ -1658,7 +1658,7 @@
         "any": "any",
         "red": "red",
         "white": "white",
-        "weekend": "weekend"
+        "blue": "blue"
       },
       "electricMeter": "Electric Meter",
       "leaveEndDateEmpty": "Leave the end date empty for an open period.",

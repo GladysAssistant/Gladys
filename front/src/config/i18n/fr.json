@@ -540,7 +540,7 @@
         "any": "tous",
         "red": "rouge",
         "white": "blanc",
-        "weekend": "week-end"
+        "blue": "bleu"
       },
       "electricMeter": "Compteur électrique",
       "leaveEndDateEmpty": "Laissez la date de fin vide pour une période ouverte.",
