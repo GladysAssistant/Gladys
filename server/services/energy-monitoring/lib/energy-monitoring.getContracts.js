@@ -28,7 +28,13 @@ async function getContracts() {
     const contractsResponse = await axios.get(contractsAsset.browser_download_url);
     const contracts = contractsResponse.data;
 
-    logger.debug(`Successfully fetched ${contracts.length} energy contracts`);
+    // Validate that contracts is a valid JavaScript object
+    if (!contracts || typeof contracts !== 'object') {
+      throw new Error('contracts.json must be a valid JSON object');
+    }
+
+    const contractCount = Object.keys(contracts).length;
+    logger.debug(`Successfully fetched ${contractCount} energy contracts`);
 
     return contracts;
   } catch (error) {
