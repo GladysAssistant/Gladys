@@ -10,12 +10,45 @@ const {
   Thermostat,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
+
+/**
+ * @description Convert the Matter measurement unit attribute to Gladys attribute.
+ * @param {any} measurementUnit - Attribute sent by Matter.
+ * @example const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+ * @returns {string} The device feature unit.
+ */
+function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
+  if (measurementUnit !== undefined && measurementUnit !== null) {
+    switch (measurementUnit) {
+      case ConcentrationMeasurement.MeasurementUnit.Ppm:
+        return DEVICE_FEATURE_UNITS.PPM;
+      case ConcentrationMeasurement.MeasurementUnit.Ppb:
+        return DEVICE_FEATURE_UNITS.PPB;
+      case ConcentrationMeasurement.MeasurementUnit.Ppt:
+        return DEVICE_FEATURE_UNITS.PPT;
+      case ConcentrationMeasurement.MeasurementUnit.Mgm3:
+        return DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Ugm3:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Ngm3:
+        return DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Pm3:
+        return DEVICE_FEATURE_UNITS.PARTICLES_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Bqm3:
+        return DEVICE_FEATURE_UNITS.BECQUEREL_PER_CUBIC_METER;
+      default:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+    }
+  }
+  return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+}
 
 /**
  * @description Convert a Matter device to a Gladys device.
@@ -212,28 +245,36 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           });
         }
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           has_feedback: true,
-          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          unit: deviceFeatureUnit,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 1500,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
         });
       } else if (clusterIndex === Pm10ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
           has_feedback: true,
-          unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+          unit: deviceFeatureUnit,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: 0,
-          max: 1500,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
         });
       } else if (clusterIndex === TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id) {
         gladysDevice.features.push({
@@ -254,4 +295,5 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
 module.exports = {
   convertToGladysDevice,
+  convertMeasurementUnitToDeviceFeatureUnits,
 };
