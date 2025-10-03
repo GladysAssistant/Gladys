@@ -146,6 +146,13 @@ body.dark-mode {
   filter: none;
 }
 
+/* Fix warning badges in dark mode - make them darker and readable */
+.dark-mode .badge.bg-warning {
+  background-color: #8b6914 !important; /* Dark yellow/gold that will be inverted */
+  color: #ffffff !important;
+  filter: none; /* Don't apply the double invert */
+}
+
 /** EDF Tempo icon for example **/
 .dark-mode .dark-mode-no-invert .fe {
   filter: none;
