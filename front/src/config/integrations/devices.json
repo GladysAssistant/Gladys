@@ -114,7 +114,7 @@
     "key": "matter",
     "link": "matter",
     "img": "/assets/integrations/cover/matter.jpg",
-     "invertInDarkMode": true
+    "invertInDarkMode": true
   },
   {
     "key": "energyMonitoring",

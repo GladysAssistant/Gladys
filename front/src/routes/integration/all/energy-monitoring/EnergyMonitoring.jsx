@@ -445,7 +445,10 @@ class EnergyMonitoringPage extends Component {
                 {p.day_type && p.day_type !== 'any' && (
                   <>
                     {' · '}
-                    <Text id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`} defaultMessage={p.day_type} />
+                    <Text
+                      id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`}
+                      defaultMessage={p.day_type}
+                    />
                   </>
                 )}
                 <div class="small text-muted">{period}</div>
