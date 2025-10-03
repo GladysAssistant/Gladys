@@ -171,6 +171,7 @@ class EnergyMonitoringPage extends Component {
     if (p) {
       // Parse hour slots (supports legacy numeric formats and HH:MM)
       const slots = this.parseHourSlotsToSet(p.hour_slots || '');
+      console.log({ price: p });
       this.setState({
         wizardEditingId: p.id,
         wizardStep: 0,
@@ -405,7 +406,8 @@ class EnergyMonitoringPage extends Component {
         {withButton && (
           <div class="page-options d-flex">
             <button class="btn btn-outline-secondary ml-2" onClick={this.startImportPrices}>
-              <Text id="integration.energyMonitoring.importPrices" defaultMessage="Import" /> <i class="fe fe-download" />
+              <Text id="integration.energyMonitoring.importPrices" defaultMessage="Import" />{' '}
+              <i class="fe fe-download" />
             </button>
             <button class="btn btn-outline-primary ml-2" onClick={this.startCreatePrice}>
               <Text id="global.create" defaultMessage="Create" /> <i class="fe fe-plus" />
@@ -440,6 +442,12 @@ class EnergyMonitoringPage extends Component {
                 <Text id={`integration.energyMonitoring.priceTypes.${p.price_type}`} defaultMessage={p.price_type} />
                 {' · '}
                 <Text id={`integration.energyMonitoring.currencies.${p.currency}`} defaultMessage={p.currency} />
+                {p.day_type && p.day_type !== 'any' && (
+                  <>
+                    {' · '}
+                    <Text id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`} defaultMessage={p.day_type} />
+                  </>
+                )}
                 <div class="small text-muted">{period}</div>
               </div>
               <div>
@@ -673,8 +681,8 @@ class EnergyMonitoringPage extends Component {
                         <option value="white">
                           <Text id="integration.energyMonitoring.dayTypeOptions.white" />
                         </option>
-                        <option value="weekend">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.weekend" />
+                        <option value="blue">
+                          <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
                         </option>
                       </select>
                     </div>
