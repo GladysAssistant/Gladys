@@ -54,6 +54,11 @@
     "whiteBackground": true
   },
   {
+    "key": "nuki",
+    "link": "nuki",
+    "img": "/assets/integrations/cover/nuki.png"
+  },
+  {
     "key": "enedis",
     "img": "/assets/integrations/cover/enedis.jpg",
     "whiteBackground": true
