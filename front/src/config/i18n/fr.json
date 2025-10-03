@@ -3607,6 +3607,10 @@
       "shortCategoryName": "Indice COV",
       "integer": "Indice COV (entier)"
     },
+    "voc-matter-index-sensor": {
+      "shortCategoryName": "Indice COV-Matter",
+      "integer": "Indice COV-Matter (entier)"
+    },
     "shutter": {
       "shortCategoryName": "Volet",
       "state": "Etat du volet",

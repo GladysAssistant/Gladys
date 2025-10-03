@@ -3607,6 +3607,10 @@
       "shortCategoryName": "VOC-Index",
       "integer": "VOC-Index (ganze Zahl)"
     },
+    "voc-matter-index-sensor": {
+      "shortCategoryName": "VOC-Matter Index",
+      "integer": "VOC-Matter Index (ganze Zahl)"
+    },
     "shutter": {
       "shortCategoryName": "Jalousie",
       "state": "Jalousie: Zustand",

@@ -36,16 +36,15 @@ const getAqiColor = value => {
   return 'danger';
 };
 
-const VOC_INDEX_COLOR = {
-  0: 'secondary',
-  1: 'success',
-  2: 'warning',
-  3: 'orange',
-  4: 'danger'
-};
-
 const getVocIndexColor = value => {
-  return VOC_INDEX_COLOR[value];
+  if (value < 150) {
+    return 'success';
+  } else if (value < 250) {
+    return 'warning';
+  } else if (value < 400) {
+    return 'orange';
+  }
+  return 'danger';
 };
 
 const RISK_COLORS = {
@@ -60,10 +59,23 @@ const getRiskColor = value => {
   return RISK_COLORS[value];
 };
 
+const VOC_MATTER_INDEX_COLOR = {
+  0: 'secondary',
+  1: 'success',
+  2: 'warning',
+  3: 'orange',
+  4: 'danger'
+};
+
+const getVocMatterIndexColor = value => {
+  return VOC_MATTER_INDEX_COLOR[value];
+};
+
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
   [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: value => getVocIndexColor(value),
+  [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: value => getVocMatterIndexColor(value),
   [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: value => colorLowAsGreen(value, 30, 50),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 15, 25),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),

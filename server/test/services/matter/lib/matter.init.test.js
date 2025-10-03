@@ -444,7 +444,7 @@ describe('Matter.init', () => {
             unit: 'microgram-per-cubic-meter',
           },
           {
-            category: 'voc-index-sensor',
+            category: 'voc-matter-index-sensor',
             external_id: 'matter:12345:1:1070',
             has_feedback: true,
             max: 100,
@@ -617,7 +617,7 @@ describe('Matter.init', () => {
             unit: 'microgram-per-cubic-meter',
           },
           {
-            category: 'voc-index-sensor',
+            category: 'voc-matter-index-sensor',
             external_id: 'matter:12345:1:child_endpoint:2:1070',
             has_feedback: true,
             max: 100,
