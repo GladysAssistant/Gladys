@@ -4,6 +4,7 @@ import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import ImportPricesPage from './ImportPrices';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 class EnergyMonitoringPage extends Component {
@@ -131,6 +132,11 @@ class EnergyMonitoringPage extends Component {
     return path.startsWith('/dashboard/integration/device/energy-monitoring') && path.includes('/settings');
   }
 
+  isImportPricesRoute() {
+    const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
+    return path.includes('/prices/import');
+  }
+
   // ----- PRICES DATA -----
   async loadPrices() {
     try {
@@ -154,6 +160,10 @@ class EnergyMonitoringPage extends Component {
       newPrice: { ...this.state.newPrice, hour_slots: '' }
     });
     route('/dashboard/integration/device/energy-monitoring/prices/create');
+  };
+
+  startImportPrices = () => {
+    route('/dashboard/integration/device/energy-monitoring/prices/import');
   };
 
   startEditPrice = price => {
@@ -394,6 +404,9 @@ class EnergyMonitoringPage extends Component {
         </h1>
         {withButton && (
           <div class="page-options d-flex">
+            <button class="btn btn-outline-secondary ml-2" onClick={this.startImportPrices}>
+              <Text id="integration.energyMonitoring.importPrices" defaultMessage="Import" /> <i class="fe fe-download" />
+            </button>
             <button class="btn btn-outline-primary ml-2" onClick={this.startCreatePrice}>
               <Text id="global.create" defaultMessage="Create" /> <i class="fe fe-plus" />
             </button>
@@ -994,7 +1007,8 @@ class EnergyMonitoringPage extends Component {
     );
 
     const showingWizard = this.isCreatePriceRoute() || this.isEditPriceRoute();
-    const showingPrices = this.isPricesRoute() || this.isCreatePriceRoute() || this.isEditPriceRoute();
+    const showingImport = this.isImportPricesRoute();
+    const showingPrices = this.isPricesRoute() || this.isCreatePriceRoute() || this.isEditPriceRoute() || showingImport;
     const showingSettings = this.isSettingsRoute();
 
     return (
@@ -1093,8 +1107,9 @@ class EnergyMonitoringPage extends Component {
                     </div>
                   )}
 
-                  {showingPrices && !showingWizard && renderPrices()}
+                  {showingPrices && !showingWizard && !showingImport && renderPrices()}
                   {showingWizard && renderWizard()}
+                  {showingImport && <ImportPricesPage {...props} />}
                   {showingSettings && renderSettings()}
                 </div>
               </div>

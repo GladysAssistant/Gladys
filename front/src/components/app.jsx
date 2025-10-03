@@ -289,6 +289,7 @@ const AppRouter = connect(
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/import" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
         <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 

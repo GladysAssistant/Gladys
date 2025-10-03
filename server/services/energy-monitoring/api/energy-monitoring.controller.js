@@ -13,10 +13,24 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/energy-monitoring/contracts Get energy contracts
+   * @apiName getContracts
+   * @apiGroup EnergyMonitoring
+   */
+  async function getContracts(req, res) {
+    const contracts = await energyMonitoringHandler.getContracts();
+    res.json(contracts);
+  }
+
   return {
     'post /api/v1/service/energy-monitoring/calculate-cost-from-beginning': {
       authenticated: true,
       controller: asyncMiddleware(calculateCostFromBeginning),
+    },
+    'get /api/v1/service/energy-monitoring/contracts': {
+      authenticated: true,
+      controller: asyncMiddleware(getContracts),
     },
   };
 };
