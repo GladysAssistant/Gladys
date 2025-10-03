@@ -75,7 +75,7 @@
     "undici": "^7.5.0"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "4.15.0",
+    "@gladysassistant/gladys-gateway-js": "^4.19.0",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "@nlpjs/similarity": "^4.26.1",

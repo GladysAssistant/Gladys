@@ -951,7 +951,9 @@
         "notOnGladysGateway": "Diese Integration ist in Gladys Plus enthalten. Um dich zu verbinden bzw. neu zu verbinden, gehe zur Gladys-Plus-Benutzeroberfläche:",
         "connectedToUsagePointds": "Du hast dich erfolgreich mit Enedis verbunden! Die erste Synchronisierung dauert je nach Anzahl der Anfragen an die Enedis-API zwei bis drei Stunden. Du musst diesen Tab während dieser Zeit nicht geöffnet lassen.",
         "reconnectInfo": "Wenn du deinen Zugriffsschlüssel aktualisieren möchtest, kannst du den Login-Vorgang wiederholen. Du musst dich alle zwei Jahre erneut einloggen.",
-        "dailyConsumptionFeatureName": "Täglicher Verbrauch"
+        "dailyConsumptionFeatureName": "Täglicher Verbrauch",
+        "consumptionLoadCurveFeatureName": "Verbrauch 30 Minuten",
+        "consumptionLoadCurveCostFeatureName": "Kosten 30 Minuten"
       },
       "usagePoints": {
         "title": "Meine Zähler",

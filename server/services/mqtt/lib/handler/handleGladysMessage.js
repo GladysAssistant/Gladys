@@ -25,6 +25,15 @@ function handleGladysMessage(topic, message) {
         text: message,
       };
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+    } else if (topic.endsWith('/historical')) {
+      // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/historical
+      const historical = JSON.parse(message);
+      const event = {
+        device_feature_external_id: parsedTopic[5],
+        state: parseFloat(historical.state),
+        created_at: historical.created_at,
+      };
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
     } else {
       // Or a float state
       // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state

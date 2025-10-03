@@ -5,6 +5,7 @@ module.exports.callmebot = require('./callmebot');
 module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
 module.exports.ecowatt = require('./ecowatt');
+module.exports['energy-monitoring'] = require('./energy-monitoring');
 module.exports['edf-tempo'] = require('./edf-tempo');
 module.exports.mqtt = require('./mqtt');
 module.exports['philips-hue'] = require('./philips-hue');

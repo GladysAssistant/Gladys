@@ -19,6 +19,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const EnergyPriceController = require('./controllers/energy-price.controller');
 
 /**
  * @description Return object of routes.
@@ -49,6 +50,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const energyPriceController = EnergyPriceController(gladys);
 
   const routes = {};
 
@@ -230,6 +232,10 @@ function getRoutes(gladys) {
     'post /api/v1/device_feature/:device_feature_selector/value': {
       authenticated: true,
       controller: deviceController.setValueFeature,
+    },
+    'patch /api/v1/device_feature/:device_feature_selector': {
+      authenticated: true,
+      controller: deviceController.updateDeviceFeature,
     },
     'get /api/v1/device_feature/aggregated_states': {
       authenticated: true,
@@ -577,6 +583,23 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    // energy price
+    'get /api/v1/energy_price': {
+      authenticated: true,
+      controller: energyPriceController.get,
+    },
+    'post /api/v1/energy_price': {
+      authenticated: true,
+      controller: energyPriceController.create,
+    },
+    'patch /api/v1/energy_price/:selector': {
+      authenticated: true,
+      controller: energyPriceController.update,
+    },
+    'delete /api/v1/energy_price/:selector': {
+      authenticated: true,
+      controller: energyPriceController.destroy,
     },
   };
 

@@ -2,7 +2,9 @@ const { fake, assert, stub } = require('sinon');
 const { expect } = require('chai');
 const Enedis = require('../../../services/enedis/lib');
 
-const getDailyConsumptionArray = (size) => {
+const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+
+const getConsumptionLoadCurveArray = (size) => {
   const date = new Date('2022-08-01');
   const arr = [];
   for (let i = 0; i < size; i += 1) {
@@ -16,7 +18,7 @@ const getDailyConsumptionArray = (size) => {
   return arr;
 };
 
-describe('enedis.sync', () => {
+describe('enedis.sync.loadConsumptionCurve', () => {
   it('should sync with only 1 page', async () => {
     const gladys = {
       device: {
@@ -28,7 +30,7 @@ describe('enedis.sync', () => {
               {
                 external_id: 'enedis:16401220101758',
                 category: 'energy-sensor',
-                type: 'daily-consumption',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
               },
             ],
           },
@@ -39,7 +41,7 @@ describe('enedis.sync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(4)),
+        enedisGetConsumptionLoadCurve: fake.resolves(getConsumptionLoadCurveArray(4)),
       },
     };
     const enedisService = new Enedis(gladys);
@@ -49,9 +51,9 @@ describe('enedis.sync', () => {
     assert.calledOnce(gladys.device.setParam);
   });
   it('should sync with 2 pages', async () => {
-    const dailyConsumptionStub = stub();
-    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    const consumptionLoadCurveStub = stub();
+    consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -62,7 +64,7 @@ describe('enedis.sync', () => {
               {
                 external_id: 'enedis:16401220101758',
                 category: 'energy-sensor',
-                type: 'daily-consumption',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
               },
             ],
           },
@@ -73,7 +75,7 @@ describe('enedis.sync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: dailyConsumptionStub,
+        enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
     };
     const enedisService = new Enedis(gladys);
@@ -83,9 +85,9 @@ describe('enedis.sync', () => {
     assert.calledOnce(gladys.device.setParam);
   });
   it('should not do anything, feature not found', async () => {
-    const dailyConsumptionStub = stub();
-    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    const consumptionLoadCurveStub = stub();
+    consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -102,46 +104,7 @@ describe('enedis.sync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: dailyConsumptionStub,
-      },
-    };
-    const enedisService = new Enedis(gladys);
-    enedisService.syncDelayBetweenCallsInMs = 0;
-    const syncResult = await enedisService.sync(false);
-    expect(syncResult).to.deep.equal([null]);
-  });
-  it('should sync from one week ago', async () => {
-    const dailyConsumptionStub = stub();
-    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
-    const gladys = {
-      device: {
-        get: fake.resolves([
-          {
-            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
-            external_id: 'enedis:16401220101758',
-            features: [
-              {
-                external_id: 'enedis:16401220101758',
-                category: 'energy-sensor',
-                type: 'daily-consumption',
-              },
-            ],
-            params: [
-              {
-                name: 'LAST_DATE_SYNCED',
-                value: '2022-05-20',
-              },
-            ],
-          },
-        ]),
-        setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
-      },
-      gateway: {
-        enedisGetDailyConsumption: dailyConsumptionStub,
+        enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
     };
     const enedisService = new Enedis(gladys);
@@ -149,17 +112,15 @@ describe('enedis.sync', () => {
     const syncResult = await enedisService.sync(false);
     expect(syncResult).to.deep.equal([
       {
-        syncFromDate: '2022-05-13',
-        lastDateSynced: '2022-05-20',
-        lastDateSync: '2022-08-11',
-        usagePointExternalId: 'enedis:16401220101758',
+        dailyConsumptionSync: null,
+        consumptionLoadCurveSync: null,
       },
     ]);
   });
-  it('should sync from start', async () => {
-    const dailyConsumptionStub = stub();
-    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+  it('should sync from one week ago', async () => {
+    const consumptionLoadCurveStub = stub();
+    consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -170,12 +131,12 @@ describe('enedis.sync', () => {
               {
                 external_id: 'enedis:16401220101758',
                 category: 'energy-sensor',
-                type: 'daily-consumption',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
               },
             ],
             params: [
               {
-                name: 'LAST_DATE_SYNCED',
+                name: 'LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE',
                 value: '2022-05-20',
               },
             ],
@@ -187,7 +148,56 @@ describe('enedis.sync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: dailyConsumptionStub,
+        enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    const syncResult = await enedisService.sync(false);
+    expect(syncResult).to.deep.equal([
+      {
+        consumptionLoadCurveSync: {
+          syncFromDate: '2022-05-13',
+          lastDateSynced: '2022-05-20',
+          lastDateSync: '2022-08-11',
+          usagePointExternalId: 'enedis:16401220101758',
+        },
+        dailyConsumptionSync: null,
+      },
+    ]);
+  });
+  it('should sync from start', async () => {
+    const consumptionLoadCurveStub = stub();
+    consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+              },
+            ],
+            params: [
+              {
+                name: 'LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE',
+                value: '2022-05-20',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+      gateway: {
+        enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
     };
     const enedisService = new Enedis(gladys);
@@ -195,17 +205,20 @@ describe('enedis.sync', () => {
     const syncResult = await enedisService.sync(true);
     expect(syncResult).to.deep.equal([
       {
-        syncFromDate: undefined,
-        lastDateSynced: '2022-05-20',
-        lastDateSync: '2022-08-11',
-        usagePointExternalId: 'enedis:16401220101758',
+        dailyConsumptionSync: null,
+        consumptionLoadCurveSync: {
+          syncFromDate: undefined,
+          lastDateSynced: '2022-05-20',
+          lastDateSync: '2022-08-11',
+          usagePointExternalId: 'enedis:16401220101758',
+        },
       },
     ]);
   });
   it('should sync with 1 page = 100', async () => {
-    const dailyConsumptionStub = stub();
-    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(0));
+    const consumptionLoadCurveStub = stub();
+    consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(0));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -216,7 +229,7 @@ describe('enedis.sync', () => {
               {
                 external_id: 'enedis:16401220101758',
                 category: 'energy-sensor',
-                type: 'daily-consumption',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
               },
             ],
           },
@@ -227,7 +240,7 @@ describe('enedis.sync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: dailyConsumptionStub,
+        enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
     };
     const enedisService = new Enedis(gladys);
