@@ -12,7 +12,7 @@ async function get(options = {}) {
   if (options.electric_meter_device_id) {
     where.electric_meter_device_id = options.electric_meter_device_id;
   }
-  const rows = await db.EnergyPrice.findAll({ where, order: [['start_date', 'ASC']] });
+  const rows = await db.EnergyPrice.findAll({ where, order: [['start_date', 'DESC']] });
   return rows.map((r) => r.get({ plain: true }));
 }
 
