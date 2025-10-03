@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 class ImportPricesPage extends Component {
   state = {
@@ -119,8 +119,6 @@ class ImportPricesPage extends Component {
           electric_meter_device_id: selectedDeviceId,
           subscribed_power: selectedPower
         };
-
-        console.log(pricePayload);
 
         await this.props.httpClient.post('/api/v1/energy_price', pricePayload);
       }

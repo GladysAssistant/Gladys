@@ -171,7 +171,6 @@ class EnergyMonitoringPage extends Component {
     if (p) {
       // Parse hour slots (supports legacy numeric formats and HH:MM)
       const slots = this.parseHourSlotsToSet(p.hour_slots || '');
-      console.log({ price: p });
       this.setState({
         wizardEditingId: p.id,
         wizardStep: 0,

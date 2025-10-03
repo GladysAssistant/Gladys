@@ -1,15 +1,11 @@
-import { Component, createRef } from 'preact';
+import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
-import get from 'get-value';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from '../chart/ApexChartComponent';
-import { getDeviceName } from '../../../utils/device';
 import { formatHttpError } from '../../../utils/formatErrors';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 import fr from 'date-fns/locale/fr';
 

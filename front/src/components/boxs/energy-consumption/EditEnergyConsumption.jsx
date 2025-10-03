@@ -1,14 +1,11 @@
 import { Component } from 'preact';
-import { Localizer, Text } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import update from 'immutability-helper';
-import get from 'get-value';
 
 import BaseEditBox from '../baseEditBox';
 import EnergyConsumption from './EnergyConsumption';
 import { getDeviceFeatureName } from '../../../utils/device';
-import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDragAndDrop';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
