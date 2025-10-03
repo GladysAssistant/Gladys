@@ -220,7 +220,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     await Promise.all(createPromises);
   };
   // Import all EDF Base prices from GitHub API and create one entry per period
-  const importAllBasePricesFromCsv = async (electricMeterDeviceId, energyPriceInstance, subscribedPower) => {
+  /* const importAllBasePricesFromCsv = async (electricMeterDeviceId, energyPriceInstance, subscribedPower) => {
     // Fetch latest release from GitHub API
     const releaseResponse = await fetch(
       'https://api.github.com/repos/GladysAssistant/energy-contracts/releases/latest',
@@ -273,7 +273,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       );
     }
     await Promise.all(createPromises);
-  };
+  }; */
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
     stateManager = new StateManager(event);

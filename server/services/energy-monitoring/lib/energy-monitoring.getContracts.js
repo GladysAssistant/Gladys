@@ -9,25 +9,27 @@ const logger = require('../../../utils/logger');
  */
 async function getContracts() {
   try {
-    logger.info('Fetching energy contracts from GitHub releases');
-    
+    logger.debug('Fetching energy contracts from GitHub releases');
+
     // Get the latest release from GitHub API
-    const releaseResponse = await axios.get('https://api.github.com/repos/GladysAssistant/energy-contracts/releases/latest');
+    const releaseResponse = await axios.get(
+      'https://api.github.com/repos/GladysAssistant/energy-contracts/releases/latest',
+    );
     const release = releaseResponse.data;
-    
+
     // Find the contracts.json asset
-    const contractsAsset = release.assets.find(asset => asset.name === 'contracts.json');
-    
+    const contractsAsset = release.assets.find((asset) => asset.name === 'contracts.json');
+
     if (!contractsAsset) {
       throw new Error('contracts.json not found in the latest release');
     }
-    
+
     // Download the contracts.json file
     const contractsResponse = await axios.get(contractsAsset.browser_download_url);
     const contracts = contractsResponse.data;
-    
-    logger.info(`Successfully fetched ${contracts.length} energy contracts`);
-    
+
+    logger.debug(`Successfully fetched ${contracts.length} energy contracts`);
+
     return contracts;
   } catch (error) {
     logger.error('Error fetching energy contracts:', error);
