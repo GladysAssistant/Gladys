@@ -26,7 +26,7 @@ const variable = {
   },
 };
 
-describe.only('EnergyMonitoring.init', () => {
+describe('EnergyMonitoring.init', () => {
   let stateManager;
   let serviceManager;
   let device;

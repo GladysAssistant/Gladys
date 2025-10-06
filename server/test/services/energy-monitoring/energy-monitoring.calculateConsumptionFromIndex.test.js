@@ -118,14 +118,37 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Verify consumption was calculated and saved (25 total: 5+7+6+7)
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
-      expect(saveCall.args[0]).to.equal('feature-consumption-1');
+      expect(saveCall.args[0]).to.deep.equal({
+        id: 'feature-consumption-1',
+        selector: 'test-device-consumption',
+        category: 'energy-sensor',
+        type: 'thirty-minutes-consumption',
+      });
       expect(saveCall.args[1]).to.equal(25); // Total consumption
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
 
       // Verify last processed timestamp was saved
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
-      expect(setParamCall.args[0]).to.equal('device-1');
+      expect(setParamCall.args[0]).to.deep.equal({
+        id: 'device-1',
+        name: 'Test Energy Device',
+        params: [],
+        features: [
+          {
+            id: 'feature-index-1',
+            selector: 'test-device-index',
+            category: 'energy-sensor',
+            type: 'index',
+          },
+          {
+            id: 'feature-consumption-1',
+            selector: 'test-device-consumption',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+          },
+        ],
+      });
       expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:50:00.000Z');
     });
@@ -228,14 +251,42 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Verify consumption of 0 was saved (single state, no calculation possible)
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
-      expect(saveCall.args[0]).to.equal('feature-consumption-1');
+      expect(saveCall.args[0]).to.deep.equal({
+        id: 'feature-consumption-1',
+        selector: 'test-device-consumption',
+        category: 'energy-sensor',
+        type: 'thirty-minutes-consumption',
+      });
       expect(saveCall.args[1]).to.equal(0); // No consumption calculated
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
 
       // Verify last processed timestamp was updated
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
-      expect(setParamCall.args[0]).to.equal('device-1');
+      expect(setParamCall.args[0]).to.deep.equal({
+        id: 'device-1',
+        name: 'Test Energy Device',
+        params: [
+          {
+            name: 'ENERGY_INDEX_LAST_PROCESSED',
+            value: lastProcessedTime,
+          },
+        ],
+        features: [
+          {
+            id: 'feature-index-1',
+            selector: 'test-device-index',
+            category: 'energy-sensor',
+            type: 'index',
+          },
+          {
+            id: 'feature-consumption-1',
+            selector: 'test-device-consumption',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+          },
+        ],
+      });
       expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
       expect(setParamCall.args[2]).to.equal(lastProcessedTime);
     });
@@ -262,13 +313,13 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
       await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
-      // Verify consumption calculation with counter reset handling (5 + 10 + 5 = 20)
+      // Verify consumption calculation with counter reset handling (5 + 5 = 10)
       // 5: normal consumption (1005 - 1000)
-      // 10: counter reset, treat current value (10) as consumption since reset
+      // 10: counter reset, don't count value
       // 5: normal consumption (15 - 10)
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
-      expect(saveCall.args[1]).to.equal(20); // Total consumption including reset handling
+      expect(saveCall.args[1]).to.equal(10); // Total consumption including reset handling
     });
 
     it('should handle counter reset to zero', async () => {
@@ -318,14 +369,37 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Verify consumption of 0 was saved (single state, no calculation possible)
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
-      expect(saveCall.args[0]).to.equal('feature-consumption-1');
+      expect(saveCall.args[0]).to.deep.equal({
+        id: 'feature-consumption-1',
+        selector: 'test-device-consumption',
+        category: 'energy-sensor',
+        type: 'thirty-minutes-consumption',
+      });
       expect(saveCall.args[1]).to.equal(0); // No consumption calculated
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
 
       // Verify last processed timestamp was updated
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
-      expect(setParamCall.args[0]).to.equal('device-1');
+      expect(setParamCall.args[0]).to.deep.equal({
+        id: 'device-1',
+        name: 'Test Energy Device',
+        params: [],
+        features: [
+          {
+            id: 'feature-index-1',
+            selector: 'test-device-index',
+            category: 'energy-sensor',
+            type: 'index',
+          },
+          {
+            id: 'feature-consumption-1',
+            selector: 'test-device-consumption',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+          },
+        ],
+      });
       expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:30:00.000Z');
     });

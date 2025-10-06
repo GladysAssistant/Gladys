@@ -119,10 +119,9 @@ async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
               `Device ${device.name}: +${consumption} (${currentIndex} - ${lastValidIndex}) at ${currentTimestamp}`,
             );
           } else {
-            // Counter reset detected: assume reset to 0, current value = consumption since reset
-            totalConsumption += currentIndex;
+            // Counter reset detected, do not count anything
             logger.warn(
-              `Device ${device.name}: counter reset detected at ${currentTimestamp}, treating ${currentIndex} as consumption since reset`,
+              `Device ${device.name}: counter reset detected at ${currentTimestamp}, not counting negative value`,
             );
           }
         }
@@ -132,17 +131,13 @@ async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
       }
 
       // Update the last processed timestamp in device parameters
-      await this.gladys.device.setParam(
-        device.id,
-        ENERGY_INDEX_LAST_PROCESSED,
-        newLastProcessedTimestamp.toISOString(),
-      );
+      await this.gladys.device.setParam(device, ENERGY_INDEX_LAST_PROCESSED, newLastProcessedTimestamp.toISOString());
 
       // Save the total consumption (always create historical state, even if 0)
       logger.debug(`Device ${device.name}: total consumption = ${totalConsumption}`);
 
       // Save the calculated consumption value
-      await this.gladys.device.saveHistoricalState(consumptionFeature.id, totalConsumption, thirtyMinutesWindowTime);
+      await this.gladys.device.saveHistoricalState(consumptionFeature, totalConsumption, thirtyMinutesWindowTime);
 
       logger.info(`Saved consumption ${totalConsumption} for device ${device.name} at ${thirtyMinutesWindowTime}`);
     } catch (error) {

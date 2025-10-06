@@ -2706,7 +2706,8 @@
       "service-matter-backup": "Matter backup",
       "energy-monitoring-cost-calculation-thirty-minutes": "Energy cost calculation (30 minutes)",
       "energy-monitoring-cost-calculation-beginning": "Energy cost calculation (from beginning)",
-      "energy-monitoring-consumption-from-index": "Energy consumption calculation from index"
+      "energy-monitoring-consumption-from-index": "Energy consumption calculation from index",
+      "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
