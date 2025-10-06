@@ -4,7 +4,9 @@ const { calculateCostFrom } = require('./energy-monitoring.calculateCostFrom');
 const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCostFromBeginning');
 const { getContracts } = require('./energy-monitoring.getContracts');
 const { calculateConsumptionFromIndex } = require('./energy-monitoring.calculateConsumptionFromIndex');
-const { calculateConsumptionFromIndexFromBeginning } = require('./energy-monitoring.calculateConsumptionFromIndexFromBeginning');
+const {
+  calculateConsumptionFromIndexFromBeginning: ccFromIndexFromBeginning,
+} = require('./energy-monitoring.calculateConsumptionFromIndexFromBeginning');
 
 const { JOB_TYPES } = require('../../../utils/constants');
 
@@ -35,7 +37,6 @@ EnergyMonitoringHandler.prototype.calculateCostFrom = calculateCostFrom;
 EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFromBeginning;
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
-EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning =
-  calculateConsumptionFromIndexFromBeginning;
+EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning = ccFromIndexFromBeginning;
 
 module.exports = EnergyMonitoringHandler;

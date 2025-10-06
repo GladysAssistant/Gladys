@@ -19,14 +19,14 @@ function init() {
       const now = new Date();
       const minutes = now.getMinutes();
       const thirtyMinuteWindow = new Date(now);
-      
+
       // Round to the nearest 30-minute mark (00:00 or 00:30)
       if (minutes < 30) {
         thirtyMinuteWindow.setMinutes(0, 0, 0);
       } else {
         thirtyMinuteWindow.setMinutes(30, 0, 0);
       }
-      
+
       this.calculateConsumptionFromIndex(null, thirtyMinuteWindow);
     });
   }
