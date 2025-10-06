@@ -3,6 +3,7 @@ const { calculateCostEveryThirtyMinutes } = require('./energy-monitoring.calcula
 const { calculateCostFrom } = require('./energy-monitoring.calculateCostFrom');
 const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCostFromBeginning');
 const { getContracts } = require('./energy-monitoring.getContracts');
+const { calculateConsumptionFromIndex } = require('./energy-monitoring.calculateConsumptionFromIndex');
 
 const { JOB_TYPES } = require('../../../utils/constants');
 
@@ -24,5 +25,6 @@ EnergyMonitoringHandler.prototype.calculateCostEveryThirtyMinutes = calculateCos
 EnergyMonitoringHandler.prototype.calculateCostFrom = calculateCostFrom;
 EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFromBeginning;
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
+EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
 
 module.exports = EnergyMonitoringHandler;
