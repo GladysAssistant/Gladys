@@ -241,6 +241,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,
     },
+    'get /api/v1/device_feature/:device_feature_selector/energy_consumption': {
+      authenticated: true,
+      controller: deviceController.getConsumptionByDates,
+    },
     // house
     'post /api/v1/house': {
       authenticated: true,

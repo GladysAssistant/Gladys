@@ -106,6 +106,19 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/:device_feature_selector/consumption getConsumptionByDates
+   * @apiName getConsumptionByDates
+   * @apiGroup Device
+   */
+  async function getConsumptionByDates(req, res) {
+    const states = await gladys.device.energySensorManager.getConsumptionByDates(
+      req.params.device_feature_selector,
+      req.query,
+    );
+    res.json(states);
+  }
+
+  /**
    * @api {post} /api/v1/device/purge_all_sqlite_state purgeAllSqliteStates
    * @apiName purgeAllSqliteStates
    * @apiGroup Device
@@ -155,6 +168,7 @@ module.exports = function DeviceController(gladys) {
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
+    getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
