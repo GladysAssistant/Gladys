@@ -106,13 +106,13 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/device_feature/:device_feature_selector/consumption getConsumptionByDates
+   * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
    * @apiName getConsumptionByDates
    * @apiGroup Device
    */
   async function getConsumptionByDates(req, res) {
     const states = await gladys.device.energySensorManager.getConsumptionByDates(
-      req.params.device_feature_selector,
+      req.query.device_features.split(','),
       req.query,
     );
     res.json(states);

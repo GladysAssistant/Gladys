@@ -1,4 +1,6 @@
+const Promise = require('bluebird');
 const db = require('../../../models');
+
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
 
 const GROUPED_QUERY_DATE_RANGE = `
@@ -23,12 +25,12 @@ const GROUPED_QUERY_DATE_RANGE = `
 
 /**
  * @description Get electricity consumption by date.
- * @param {string} selector - Device selector.
+ * @param {Array<string>} selectors - Device selector.
  * @param {object} options - Options object.
  * @param {Date} [options.from] - Start date for date range approach.
  * @param {Date} [options.to] - End date for date range approach.
  * @param {string} [options.group_by] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
- * @returns {Promise<object>} - Resolve with an array of data.
+ * @returns {Promise<array>} - Resolve with an array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-device', {
  *   from: new Date('2023-01-01'),
@@ -36,54 +38,66 @@ const GROUPED_QUERY_DATE_RANGE = `
  *   group_by: 'day'
  * });
  */
-async function getConsumptionByDates(selector, options = {}) {
-  const deviceFeature = this.stateManager.get('deviceFeature', selector);
-  if (deviceFeature === null) {
-    throw new NotFoundError('DeviceFeature not found');
-  }
-  const device = this.stateManager.get('deviceById', deviceFeature.device_id);
+async function getConsumptionByDates(selectors, options = {}) {
+  return Promise.map(
+    selectors,
+    async (selector) => {
+      const deviceFeature = this.stateManager.get('deviceFeature', selector);
+      if (deviceFeature === null) {
+        throw new NotFoundError('DeviceFeature not found');
+      }
+      const device = this.stateManager.get('deviceById', deviceFeature.device_id);
 
-  // Extract options with defaults
-  const { from, to, group_by: groupBy = null } = options;
+      // Extract options with defaults
+      const { from, to, group_by: groupBy = null } = options;
 
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
 
-  if (fromDate >= toDate) {
-    throw new BadParameters('"from" date must be before "to" date');
-  }
+      if (fromDate >= toDate) {
+        throw new BadParameters('"from" date must be before "to" date');
+      }
 
-  // Offset in UTC
-  fromDate.setMinutes(fromDate.getMinutes() - fromDate.getTimezoneOffset());
-  toDate.setMinutes(toDate.getMinutes() - toDate.getTimezoneOffset());
+      // Offset in UTC
+      fromDate.setMinutes(fromDate.getMinutes() - fromDate.getTimezoneOffset());
+      toDate.setMinutes(toDate.getMinutes() - toDate.getTimezoneOffset());
 
-  let values;
+      let values;
 
-  // Validate groupBy parameter if provided
-  const validGroupByOptions = ['hour', 'day', 'week', 'month', 'year'];
+      // Validate groupBy parameter if provided
+      const validGroupByOptions = ['hour', 'day', 'week', 'month', 'year'];
 
-  if (groupBy !== null && !validGroupByOptions.includes(groupBy)) {
-    throw new BadParameters(`Invalid groupBy parameter. Must be one of: ${validGroupByOptions.join(', ')}`);
-  }
+      if (groupBy !== null && !validGroupByOptions.includes(groupBy)) {
+        throw new BadParameters(`Invalid groupBy parameter. Must be one of: ${validGroupByOptions.join(', ')}`);
+      }
 
-  values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY_DATE_RANGE, groupBy, deviceFeature.id, fromDate, toDate);
+      values = await db.duckDbReadConnectionAllAsync(
+        GROUPED_QUERY_DATE_RANGE,
+        groupBy,
+        deviceFeature.id,
+        fromDate,
+        toDate,
+      );
 
-  // Rename grouped_date to created_at for consistency with the existing API
-  values = values.map((value) => ({
-    ...value,
-    created_at: value.grouped_date,
-    count_value: Number(value.count_value),
-  }));
+      // Rename grouped_date to created_at for consistency with the existing API
+      values = values.map((value) => ({
+        ...value,
+        created_at: value.grouped_date,
+        count_value: Number(value.count_value),
+      }));
 
-  return {
-    device: {
-      name: device.name,
+      return {
+        device: {
+          name: device.name,
+        },
+        deviceFeature: {
+          name: deviceFeature.name,
+        },
+        values,
+      };
     },
-    deviceFeature: {
-      name: deviceFeature.name,
-    },
-    values,
-  };
+    { concurrency: 4 },
+  );
 }
 
 module.exports = {

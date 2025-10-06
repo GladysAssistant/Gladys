@@ -67,7 +67,7 @@ class EnergyConsumption extends Component {
       const { startDate, endDate } = this.getDateRange();
       const deviceFeatures = this.props.box.device_features;
 
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
         device_features: deviceFeatures.join(','),
         from: startDate.toISOString(),
         to: endDate.toISOString(),
