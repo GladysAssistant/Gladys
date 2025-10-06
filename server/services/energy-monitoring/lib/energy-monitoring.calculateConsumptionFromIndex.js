@@ -15,13 +15,13 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 /**
  * @description Calculate thirty-minute consumption from index differences for devices that have both
  * INDEX and THIRTY_MINUTES_CONSUMPTION features.
- * @param {Date} thirtyMinutesWindowTime - The specific time for the thirty-minute window.
  * @param {string} jobId - The job id.
+ * @param {Date} thirtyMinutesWindowTime - The specific time for the thirty-minute window.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateConsumptionFromIndex(new Date(), '12345678-1234-1234-1234-1234567890ab');
+ * calculateConsumptionFromIndex('12345678-1234-1234-1234-1234567890ab', new Date());
  */
-async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
+async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime}`);
 

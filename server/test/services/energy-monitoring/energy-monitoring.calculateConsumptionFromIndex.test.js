@@ -32,7 +32,7 @@ const variable = {
   },
 };
 
-describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
+describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
   let stateManager;
   let serviceManager;
   let device;
@@ -106,7 +106,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify getDeviceFeatureStates was called with correct parameters
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -152,7 +152,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify getDeviceFeatureStates was called with last processed timestamp
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -187,7 +187,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Mock empty index states
       device.getDeviceFeatureStates = fake.returns([]);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify getDeviceFeatureStates was called
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -218,7 +218,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify getDeviceFeatureStates was called with last processed timestamp
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -260,7 +260,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify consumption calculation with counter reset handling (5 + 10 + 5 = 20)
       // 5: normal consumption (1005 - 1000)
@@ -289,7 +289,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify consumption calculation with counter reset to 0 (5 + 0 + 8 = 13)
       // 5: normal consumption (1005 - 1000)
@@ -313,7 +313,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       const mockIndexStates = [{ created_at: '2023-10-03T13:30:00.000Z', value: 1000 }];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify consumption of 0 was saved (single state, no calculation possible)
       assert.calledOnce(device.saveHistoricalState);
@@ -348,7 +348,7 @@ describe.only('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       };
       device.get = fake.returns([deviceWithMissingFeature]);
 
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
 
       // Verify no device feature states were queried (device filtered out)
       assert.notCalled(device.getDeviceFeatureStates);

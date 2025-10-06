@@ -18,6 +18,10 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING,
     this.calculateCostFromBeginning.bind(this),
   );
+  this.calculateConsumptionFromIndex = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX,
+    this.calculateConsumptionFromIndex.bind(this),
+  );
 };
 
 EnergyMonitoringHandler.prototype.init = init;
