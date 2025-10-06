@@ -3251,6 +3251,14 @@
           "high": "Hoch",
           "critical": "Netz kritisch"
         }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Niedrig",
+          "2": "Mittel",
+          "3": "Hoch",
+          "4": "Netz kritisch"
+        }
       }
     }
   },

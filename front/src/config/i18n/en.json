@@ -3251,6 +3251,14 @@
           "high": "High",
           "critical": "Critical"
         }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Low",
+          "2": "Medium",
+          "3": "High",
+          "4": "Critical"
+        }
       }
     }
   },

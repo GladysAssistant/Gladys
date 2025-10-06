@@ -3251,6 +3251,14 @@
           "high": "Élevé",
           "critical": "Critique"
         }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Faible",
+          "2": "Moyen",
+          "3": "Élevé",
+          "4": "Critique"
+        }
       }
     }
   },

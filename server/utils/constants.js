@@ -136,6 +136,13 @@ const LIQUID_STATE = {
   HIGH: 2,
 };
 
+const LEVEL_MATTER_STATE = {
+  LOW: 1,
+  MEDIUM: 2,
+  HIGH: 3,
+  CRITICAL: 4,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -793,9 +800,6 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
   },
   VOC_INDEX_SENSOR: {
-    INTEGER: 'integer',
-  },
-  VOC_MATTER_INDEX_SENSOR: {
     INTEGER: 'integer',
   },
   SHUTTER: {
@@ -1541,3 +1545,5 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
+
+module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;
