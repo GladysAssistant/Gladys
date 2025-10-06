@@ -3242,6 +3242,15 @@
           "0": "Déconnecté",
           "1": "Connecté"
         }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Inconnu",
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Élevé",
+          "critical": "Critique"
+        }
       }
     }
   },
@@ -3614,12 +3623,12 @@
       "decimal": "COV (Décimale)"
     },
     "voc-index-sensor": {
-      "shortCategoryName": "Indice COV",
-      "integer": "Indice COV (entier)"
+      "shortCategoryName": "Indice COV Sensirion",
+      "integer": "Indice COV Sensirion (entier)"
     },
     "voc-matter-index-sensor": {
-      "shortCategoryName": "Indice COV-Matter",
-      "integer": "Indice COV-Matter (entier)"
+      "shortCategoryName": "Indice COV",
+      "integer": "Indice COV (entier)"
     },
     "shutter": {
       "shortCategoryName": "Volet",
