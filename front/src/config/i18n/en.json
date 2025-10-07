@@ -3242,6 +3242,23 @@
           "0": "Unplugged",
           "1": "Plugged"
         }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unknown",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Low",
+          "2": "Medium",
+          "3": "High",
+          "4": "Critical"
+        }
       }
     }
   },
@@ -3614,6 +3631,10 @@
       "decimal": "VOC (decimal)"
     },
     "voc-index-sensor": {
+      "shortCategoryName": "Sensirion VOC Index",
+      "integer": "Sensirion VOC Index (integer)"
+    },
+    "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
       "integer": "VOC Index (integer)"
     },
