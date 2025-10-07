@@ -3242,6 +3242,23 @@
           "0": "Déconnecté",
           "1": "Connecté"
         }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Inconnu",
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Élevé",
+          "critical": "Critique"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Faible",
+          "2": "Moyen",
+          "3": "Élevé",
+          "4": "Critique"
+        }
       }
     }
   },
@@ -3614,6 +3631,10 @@
       "decimal": "COV (Décimale)"
     },
     "voc-index-sensor": {
+      "shortCategoryName": "Indice COV Sensirion",
+      "integer": "Indice COV Sensirion (entier)"
+    },
+    "voc-matter-index-sensor": {
       "shortCategoryName": "Indice COV",
       "integer": "Indice COV (entier)"
     },

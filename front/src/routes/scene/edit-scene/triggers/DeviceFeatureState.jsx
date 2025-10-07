@@ -12,6 +12,7 @@ import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
 import PilotWireModeDeviceState from './device-states/PilotWireModeDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
+import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
 
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
@@ -50,6 +51,7 @@ class TurnOnLight extends Component {
     let buttonClickDevice = false;
     let pilotWireModeDevice = false;
     let levelSensorDevice = false;
+    let levelMatterSensorDevice = false;
 
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
@@ -60,6 +62,7 @@ class TurnOnLight extends Component {
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
       levelSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;
+      levelMatterSensorDevice = category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR;
     }
 
     const defaultDevice =
@@ -68,10 +71,16 @@ class TurnOnLight extends Component {
       !presenceDevice &&
       !buttonClickDevice &&
       !pilotWireModeDevice &&
-      !levelSensorDevice;
+      !levelSensorDevice &&
+      !levelMatterSensorDevice;
 
     const thresholdDevice =
-      selectedDeviceFeature && !presenceDevice && !buttonClickDevice && !pilotWireModeDevice && !levelSensorDevice;
+      selectedDeviceFeature &&
+      !presenceDevice &&
+      !buttonClickDevice &&
+      !pilotWireModeDevice &&
+      !levelSensorDevice &&
+      !levelMatterSensorDevice;
 
     return (
       <div>
@@ -89,6 +98,7 @@ class TurnOnLight extends Component {
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
           {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
+          {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}

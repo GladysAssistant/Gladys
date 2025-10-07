@@ -11,6 +11,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -275,6 +276,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: minMeasuredValue,
           max: maxMeasuredValue,
+        });
+      } else if (clusterIndex === TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
         });
       } else if (clusterIndex === FormaldehydeConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
