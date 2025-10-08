@@ -11,6 +11,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -227,6 +228,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1070',
       state: 3,
+    });
+  });
+  it('should listen to state change (FormaldehydeConcentrationMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(FormaldehydeConcentrationMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(100);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1067',
+      state: 100,
     });
   });
   it('should listen to state change (Thermostat heating)', async () => {
