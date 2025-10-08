@@ -1,5 +1,5 @@
 const { createServer } = require('./createServer');
-const { getAllTools } = require('./getAllTools');
+const { getAllResources, getAllTools } = require('./getAllTools');
 const { formatValue } = require('./formatValue');
 
 /**
@@ -19,6 +19,7 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp) {
 };
 
 MCPHandler.prototype.createServer = createServer;
+MCPHandler.prototype.getAllResources = getAllResources;
 MCPHandler.prototype.getAllTools = getAllTools;
 MCPHandler.prototype.formatValue = formatValue;
 

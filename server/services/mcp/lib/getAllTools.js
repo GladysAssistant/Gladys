@@ -27,6 +27,93 @@ const switchableFeatureCategories = [
 ];
 
 /**
+ * @description Get all resources (room and devices) available for the MCP service.
+ * @returns {Promise<Array>} Array of resources with home schema configuration.
+ * @example
+ * getAllResources()
+ */
+async function getAllResources() {
+  const homeSchema = {};
+
+  const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
+  rooms.forEach((room) => {
+    homeSchema[room] = {
+      devices: {}
+    };
+  });
+
+  let sensorDevices = (await this.gladys.device.get()).filter(device => {
+    return device.features.some(feature => sensorFeatureCategories.includes(feature.category));
+  });
+  sensorDevices = sensorDevices.map(device => {
+    device.features = device.features.filter(feature => sensorFeatureCategories.includes(feature.category));
+    return device;
+  });
+
+  sensorDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: 'read',
+      })),
+    };
+
+    homeSchema[device.room.selector].devices[device.selector] = d;
+  });
+
+  let switchableDevices = (await this.gladys.device.get()).filter(device => {
+    return device.features.some(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+  });
+  switchableDevices = switchableDevices.map(device => {
+    device.features = device.features.filter(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+    return device;
+  });
+
+  switchableDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: 'write',
+      })),
+    };
+
+    if (homeSchema[device.room.selector].devices[device.selector]?.name) {
+      homeSchema[device.room.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
+
+    homeSchema[device.room.selector].devices[device.selector] = d;
+  });
+
+  return [{
+    name: 'home',
+    uri: 'schema://home',
+    config: {
+      title: 'Home devices and rooms structure',
+      description: 'Structure of home by room with all their devices and associated features.',
+      mimeType: 'application/json',
+    },
+    cb: async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        text: JSON.stringify(homeSchema)
+      }]
+    })
+  }];
+}
+
+/**
  * @description Get all tools available in the MCP service.
  * @returns {Promise<Array>} Array of tools with their intent and configuration.
  * @example
@@ -218,5 +305,6 @@ async function getAllTools() {
 }
 
 module.exports = {
+  getAllResources,
   getAllTools,
 };

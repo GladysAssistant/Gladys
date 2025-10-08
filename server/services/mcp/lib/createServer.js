@@ -21,6 +21,9 @@ async function createServer() {
     },
   );
 
+  (await this.getAllResources()).map(({name, uri, config, cb}) => {
+    return mcpServer.registerResource(name, uri, config, cb);
+  });
   (await this.getAllTools()).map(({ intent, config, cb }) => {
     return mcpServer.registerTool(intent.replace('.', '_'), config, cb);
   });
