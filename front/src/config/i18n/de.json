@@ -3244,6 +3244,23 @@
           "0": "Nicht geladen",
           "1": "Geladen"
         }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unbekannt",
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "critical": "Netz kritisch"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Niedrig",
+          "2": "Mittel",
+          "3": "Hoch",
+          "4": "Netz kritisch"
+        }
       }
     }
   },
@@ -3616,8 +3633,12 @@
       "decimal": "VOC (dezimal)"
     },
     "voc-index-sensor": {
-      "shortCategoryName": "VOC-Index",
-      "integer": "VOC-Index (ganze Zahl)"
+      "shortCategoryName": "Sensirion VOC-Index",
+      "integer": "Sensirion VOC-Index (ganze Zahl)"
+    },
+    "voc-matter-index-sensor": {
+      "shortCategoryName": "VOC Index",
+      "integer": "VOC Index (ganze Zahl)"
     },
     "shutter": {
       "shortCategoryName": "Jalousie",

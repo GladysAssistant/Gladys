@@ -59,10 +59,23 @@ const getRiskColor = value => {
   return RISK_COLORS[value];
 };
 
+const LEVEL_MATTER_INDEX_COLOR = {
+  unknown: 'secondary',
+  low: 'success',
+  medium: 'warning',
+  high: 'orange',
+  critical: 'danger'
+};
+
+const getLevelMatterIndexColor = value => {
+  return LEVEL_MATTER_INDEX_COLOR[value];
+};
+
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
   [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: value => getVocIndexColor(value),
+  [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: value => getLevelMatterIndexColor(value),
   [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: value => colorLowAsGreen(value, 30, 50),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 15, 25),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
@@ -76,6 +89,13 @@ const BADGE_VALUE_CONVERTERS = {
     1: 'low-risk',
     2: 'medium-risk',
     3: 'high-risk'
+  },
+  [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: {
+    0: 'unknown',
+    1: 'low',
+    2: 'medium',
+    3: 'high',
+    4: 'critical'
   }
 };
 

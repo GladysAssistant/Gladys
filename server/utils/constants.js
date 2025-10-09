@@ -136,6 +136,13 @@ const LIQUID_STATE = {
   HIGH: 2,
 };
 
+const LEVEL_MATTER_STATE = {
+  LOW: 1,
+  MEDIUM: 2,
+  HIGH: 3,
+  CRITICAL: 4,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -565,6 +572,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOC_INDEX_SENSOR: 'voc-index-sensor',
+  VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
   INPUT: 'input',
@@ -1583,3 +1591,5 @@ module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
 module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
 module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
 module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;
+
+module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;

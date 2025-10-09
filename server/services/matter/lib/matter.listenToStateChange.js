@@ -10,6 +10,8 @@ const {
   Thermostat,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -201,6 +203,45 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: Pm10ConcentrationMeasurement attribute changed to ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${Pm10ConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const totalVolatileOrganicCompoundsConcentrationMeasurement = device.clusterClients.get(
+    TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
+  );
+  if (
+    totalVolatileOrganicCompoundsConcentrationMeasurement &&
+    !this.stateChangeListeners.has(totalVolatileOrganicCompoundsConcentrationMeasurement)
+  ) {
+    logger.debug(
+      `Matter: Adding state change listener for totalVolatileOrganicCompoundsConcentrationMeasurement cluster ${totalVolatileOrganicCompoundsConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(totalVolatileOrganicCompoundsConcentrationMeasurement);
+    // Subscribe to TotalVolatileOrganicCompoundsConcentrationMeasurement attribute changes
+    totalVolatileOrganicCompoundsConcentrationMeasurement.addLevelValueAttributeListener((value) => {
+      logger.debug(`Matter: TotalVolatileOrganicCompoundsConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const formaldehydeConcentrationMeasurement = device.clusterClients.get(
+    FormaldehydeConcentrationMeasurement.Complete.id,
+  );
+  if (formaldehydeConcentrationMeasurement && !this.stateChangeListeners.has(formaldehydeConcentrationMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for FormaldehydeConcentrationMeasurement cluster ${formaldehydeConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(formaldehydeConcentrationMeasurement);
+    // Subscribe to FormaldehydeConcentrationMeasurement attribute changes
+    formaldehydeConcentrationMeasurement.addMeasuredValueAttributeListener((value) => {
+      logger.debug(`Matter: FormaldehydeConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${FormaldehydeConcentrationMeasurement.Complete.id}`,
         state: value,
       });
     });

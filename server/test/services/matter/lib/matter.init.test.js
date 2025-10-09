@@ -1,6 +1,8 @@
 const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -182,6 +184,33 @@ describe('Matter.init', () => {
     clusterClients.set(Pm10ConcentrationMeasurement.Complete.id, {
       id: Pm10ConcentrationMeasurement.Complete.id,
       name: 'Pm10ConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
+    });
+
+    // VOC concentration measurement
+    clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
+      id: TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
+      name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        levelValue: {},
+      },
+      commands: {},
+      addLevelValueAttributeListener: fake.returns(null),
+    });
+
+    // Formaldehyde concentration measurement
+    clusterClients.set(FormaldehydeConcentrationMeasurement.Complete.id, {
+      id: FormaldehydeConcentrationMeasurement.Complete.id,
+      name: 'FormaldehydeConcentrationMeasurement',
       endpointId: 1,
       attributes: {
         measuredValue: {},
@@ -439,6 +468,29 @@ describe('Matter.init', () => {
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
+          {
+            category: 'voc-matter-index-sensor',
+            external_id: 'matter:12345:1:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[13].selector,
+            type: 'integer',
+          },
+          {
+            category: 'formaldehyd-sensor',
+            external_id: 'matter:12345:1:1067',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'FormaldehydeConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[14].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
         ],
         params: [],
       },
@@ -598,6 +650,29 @@ describe('Matter.init', () => {
             name: 'Pm10ConcentrationMeasurement - 1',
             read_only: true,
             selector: matterHandler.devices[1].features[12].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'voc-matter-index-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[13].selector,
+            type: 'integer',
+          },
+          {
+            category: 'formaldehyd-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1067',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'FormaldehydeConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[14].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
