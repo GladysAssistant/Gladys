@@ -39,8 +39,7 @@ async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
     // Find all INDEX features in this device
     const indexFeatures = energyDevice.features.filter(
       (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR && f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
     );
 
     // For each INDEX feature, find the corresponding THIRTY_MINUTES_CONSUMPTION feature
