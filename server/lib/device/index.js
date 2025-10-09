@@ -40,6 +40,7 @@ const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
+const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -142,5 +143,6 @@ DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
+DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 
 module.exports = DeviceManager;

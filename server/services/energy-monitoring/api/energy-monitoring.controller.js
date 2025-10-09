@@ -14,6 +14,19 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
   }
 
   /**
+   * @api {post} /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning
+   * Calculate consumption from index from beginning
+   * @apiName calculateConsumptionFromIndexFromBeginning
+   * @apiGroup EnergyMonitoring
+   */
+  async function calculateConsumptionFromIndexFromBeginning(req, res) {
+    await energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {get} /api/v1/service/energy-monitoring/contracts Get energy contracts
    * @apiName getContracts
    * @apiGroup EnergyMonitoring
@@ -27,6 +40,10 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
     'post /api/v1/service/energy-monitoring/calculate-cost-from-beginning': {
       authenticated: true,
       controller: asyncMiddleware(calculateCostFromBeginning),
+    },
+    'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning': {
+      authenticated: true,
+      controller: asyncMiddleware(calculateConsumptionFromIndexFromBeginning),
     },
     'get /api/v1/service/energy-monitoring/contracts': {
       authenticated: true,

@@ -149,7 +149,9 @@ async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
     }
 
     // Update job progress
-    await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100));
+    if (jobId) {
+      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100));
+    }
   });
 
   logger.info(`Finished calculating consumption from index for ${devicesWithBothFeatures.length} devices`);

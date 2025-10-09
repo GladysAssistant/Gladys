@@ -18,8 +18,11 @@ class EnergyMonitoringPage extends Component {
     priceError: null,
     // Settings state
     calculatingFromBeginning: false,
+    calculatingConsumptionFromBeginning: false,
     settingsSuccess: null,
     settingsError: null,
+    consumptionSettingsSuccess: null,
+    consumptionSettingsError: null,
     // UI state for collapsible price items
     expandedPriceIds: new Set(),
     // Wizard state
@@ -100,6 +103,25 @@ class EnergyMonitoringPage extends Component {
       this.setState({ settingsError: e });
     } finally {
       this.setState({ calculatingFromBeginning: false });
+    }
+  };
+
+  calculateConsumptionFromIndexFromBeginning = async () => {
+    try {
+      this.setState({
+        calculatingConsumptionFromBeginning: true,
+        consumptionSettingsError: null,
+        consumptionSettingsSuccess: null
+      });
+      await this.props.httpClient.post(
+        '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
+        {}
+      );
+      this.setState({ consumptionSettingsSuccess: 'ok' });
+    } catch (e) {
+      this.setState({ consumptionSettingsError: e });
+    } finally {
+      this.setState({ calculatingConsumptionFromBeginning: false });
     }
   };
 
@@ -962,29 +984,72 @@ class EnergyMonitoringPage extends Component {
                 />
               </div>
             )}
-            <button
-              class="btn btn-primary"
-              disabled={state.calculatingFromBeginning}
-              onClick={this.calculateFromBeginning}
-            >
-              {state.calculatingFromBeginning ? (
-                <span>
-                  <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                  <Text
-                    id="integration.energyMonitoring.calculatingFromBeginning"
-                    defaultMessage="Starting calculation..."
-                  />
-                </span>
-              ) : (
-                <span>
-                  <i class="fe fe-play mr-2" />
-                  <Text
-                    id="integration.energyMonitoring.calculateCostFromBeginning"
-                    defaultMessage="Calculate cost from beginning"
-                  />
-                </span>
-              )}
-            </button>
+            {state.consumptionSettingsError && (
+              <div class="alert alert-danger" role="alert">
+                <Text
+                  id="integration.energyMonitoring.calculateConsumptionFromBeginningError"
+                  defaultMessage="An error occurred while starting the consumption calculation."
+                />
+              </div>
+            )}
+            {state.consumptionSettingsSuccess && (
+              <div class="alert alert-success" role="alert">
+                <Text
+                  id="integration.energyMonitoring.calculateConsumptionFromBeginningStarted"
+                  defaultMessage="Consumption calculation started. You can follow progress in Jobs."
+                />
+              </div>
+            )}
+            <p>
+              <button
+                class="btn btn-primary"
+                disabled={state.calculatingFromBeginning}
+                onClick={this.calculateFromBeginning}
+              >
+                {state.calculatingFromBeginning ? (
+                  <span>
+                    <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                    <Text
+                      id="integration.energyMonitoring.calculatingFromBeginning"
+                      defaultMessage="Starting calculation..."
+                    />
+                  </span>
+                ) : (
+                  <span>
+                    <i class="fe fe-play mr-2" />
+                    <Text
+                      id="integration.energyMonitoring.calculateCostFromBeginning"
+                      defaultMessage="Calculate cost from beginning"
+                    />
+                  </span>
+                )}
+              </button>
+            </p>
+            <p>
+              <button
+                class="btn btn-primary"
+                disabled={state.calculatingConsumptionFromBeginning}
+                onClick={this.calculateConsumptionFromIndexFromBeginning}
+              >
+                {state.calculatingConsumptionFromBeginning ? (
+                  <span>
+                    <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                    <Text
+                      id="integration.energyMonitoring.calculatingConsumptionFromBeginning"
+                      defaultMessage="Starting consumption calculation..."
+                    />
+                  </span>
+                ) : (
+                  <span>
+                    <i class="fe fe-play mr-2" />
+                    <Text
+                      id="integration.energyMonitoring.calculateConsumptionFromIndexFromBeginning"
+                      defaultMessage="Calculate consumption from index from beginning"
+                    />
+                  </span>
+                )}
+              </button>
+            </p>
           </div>
         </div>
       </div>

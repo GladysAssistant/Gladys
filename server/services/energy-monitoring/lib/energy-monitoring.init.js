@@ -27,7 +27,7 @@ function init() {
         thirtyMinuteWindow.setMinutes(30, 0, 0);
       }
 
-      this.calculateConsumptionFromIndex(null, thirtyMinuteWindow);
+      this.calculateConsumptionFromIndexWithJobWrapper(thirtyMinuteWindow);
     });
   }
 

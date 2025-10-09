@@ -12,6 +12,7 @@ describe('EnergyMonitoringController', () => {
     // Mock the energy monitoring handler
     energyMonitoringHandler = {
       calculateCostFromBeginning: fake.resolves(null),
+      calculateConsumptionFromIndexFromBeginning: fake.resolves(null),
       getContracts: fake.resolves({
         'edf-base': {
           '3': [
@@ -110,6 +111,43 @@ describe('EnergyMonitoringController', () => {
     });
   });
 
+  describe('POST /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning', () => {
+    it('should calculate consumption from index from beginning successfully', async () => {
+      await controller[
+        'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning'
+      ].controller(req, res);
+
+      assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning);
+      assert.calledOnceWithExactly(res.json, {
+        success: true,
+      });
+    });
+
+    it('should propagate handler errors', async () => {
+      const error = new Error('Calculation failed');
+      energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning = fake.rejects(error);
+
+      try {
+        await controller[
+          'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning'
+        ].controller(req, res);
+        expect.fail('Should have thrown an error');
+      } catch (thrownError) {
+        expect(thrownError).to.equal(error);
+        assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning);
+        assert.notCalled(res.json);
+      }
+    });
+
+    it('should have correct route configuration', () => {
+      const route =
+        controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning'];
+      expect(route).to.have.property('authenticated', true);
+      expect(route).to.have.property('controller');
+      expect(typeof route.controller).to.equal('function');
+    });
+  });
+
   describe('GET /api/v1/service/energy-monitoring/contracts', () => {
     it('should get contracts successfully', async () => {
       const expectedContracts = {
@@ -178,13 +216,19 @@ describe('EnergyMonitoringController', () => {
   describe('Controller structure', () => {
     it('should export all expected routes', () => {
       expect(controller).to.have.property('post /api/v1/service/energy-monitoring/calculate-cost-from-beginning');
+      expect(controller).to.have.property(
+        'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
+      );
       expect(controller).to.have.property('get /api/v1/service/energy-monitoring/contracts');
     });
 
     it('should have only the expected routes', () => {
       const routes = Object.keys(controller);
-      expect(routes).to.have.lengthOf(2);
+      expect(routes).to.have.lengthOf(3);
       expect(routes).to.include('post /api/v1/service/energy-monitoring/calculate-cost-from-beginning');
+      expect(routes).to.include(
+        'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
+      );
       expect(routes).to.include('get /api/v1/service/energy-monitoring/contracts');
     });
 

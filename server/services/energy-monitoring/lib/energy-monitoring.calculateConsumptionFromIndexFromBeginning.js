@@ -66,16 +66,7 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
   // Find the oldest device state across all index features using a direct SQL query
   const indexFeatureIds = devicesWithBothFeatures.map((deviceInfo) => deviceInfo.indexFeature.id);
 
-  // Build SQL query to find oldest state across all energy index features
-  // Use IN clause with placeholders instead of ANY(?)
-  const placeholders = indexFeatureIds.map(() => '?').join(',');
-  const query = `
-    SELECT MIN(created_at) as oldest_created_at
-    FROM t_device_feature_state 
-    WHERE device_feature_id IN (${placeholders})
-  `;
-
-  const result = await this.gladys.db.duckDbReadConnectionAllAsync(query, ...indexFeatureIds);
+  const result = await this.gladys.device.getOldestStateFromDeviceFeatures(indexFeatureIds);
 
   let oldestStateTime = null;
 
@@ -126,7 +117,7 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
   await Promise.each(windows, async (windowTime) => {
     try {
       // Call the existing calculateConsumptionFromIndex function for each window
-      await this.calculateConsumptionFromIndex(jobId, windowTime);
+      await this.calculateConsumptionFromIndex(null, windowTime);
       successfulWindows += 1;
 
       // Update job progress

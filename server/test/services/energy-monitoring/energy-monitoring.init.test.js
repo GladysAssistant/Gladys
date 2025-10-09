@@ -119,7 +119,7 @@ describe('EnergyMonitoring.init', () => {
       calculateConsumptionFromIndex = fake.returns(null);
 
       energyMonitoring.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
-      energyMonitoring.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndexWithJobWrapper = calculateConsumptionFromIndex;
     });
 
     it('should execute cost calculation when cost job runs', () => {
@@ -150,16 +150,15 @@ describe('EnergyMonitoring.init', () => {
       assert.notCalled(calculateCostEveryThirtyMinutes);
 
       const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-      expect(callArgs[0]).to.equal(null); // jobId
-      expect(callArgs[1]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
+      expect(callArgs[0]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
 
       // Verify timestamp has correct minutes (should be 0 or 30)
-      const minutes = callArgs[1].getMinutes();
+      const minutes = callArgs[0].getMinutes();
       expect([0, 30]).to.include(minutes);
 
       // Verify seconds and milliseconds are 0
-      expect(callArgs[1].getSeconds()).to.equal(0);
-      expect(callArgs[1].getMilliseconds()).to.equal(0);
+      expect(callArgs[0].getSeconds()).to.equal(0);
+      expect(callArgs[0].getMilliseconds()).to.equal(0);
     });
 
     it('should create timestamp with proper rounding logic', () => {
@@ -175,11 +174,10 @@ describe('EnergyMonitoring.init', () => {
       assert.calledOnce(calculateConsumptionFromIndex);
 
       const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-      expect(callArgs[0]).to.equal(null); // jobId
-      expect(callArgs[1]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
+      expect(callArgs[0]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
 
       // Verify the timestamp is properly rounded
-      const timestamp = callArgs[1];
+      const timestamp = callArgs[0];
       const minutes = timestamp.getMinutes();
       const seconds = timestamp.getSeconds();
       const milliseconds = timestamp.getMilliseconds();
@@ -208,7 +206,7 @@ describe('EnergyMonitoring.init', () => {
         assert.calledOnce(calculateConsumptionFromIndex);
 
         const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-        const timestamp = callArgs[1];
+        const timestamp = callArgs[0];
 
         // Should round to 00:00
         expect(timestamp.getMinutes()).to.equal(0);
@@ -236,7 +234,7 @@ describe('EnergyMonitoring.init', () => {
         assert.calledOnce(calculateConsumptionFromIndex);
 
         const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-        const timestamp = callArgs[1];
+        const timestamp = callArgs[0];
 
         // Should round to 00:30
         expect(timestamp.getMinutes()).to.equal(30);
