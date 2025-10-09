@@ -98,6 +98,10 @@ class EnedisWelcomePageComponent extends Component {
     }
   };
   createUsagePointDevice = async (usagePointId, serviceId) => {
+    const dailyConsumptionFeatureId = uuid.v4();
+    const thirtyMinutesConsumptionFeatureId = uuid.v4();
+    const thirtyMinutesConsumptionCostFeatureId = uuid.v4();
+
     const device = {
       name: 'Enedis',
       selector: `enedis-${usagePointId}`,
@@ -105,7 +109,7 @@ class EnedisWelcomePageComponent extends Component {
       service_id: serviceId,
       features: [
         {
-          id: uuid.v4(),
+          id: dailyConsumptionFeatureId,
           name: get(this.props.intl.dictionary, 'integration.enedis.welcome.dailyConsumptionFeatureName'),
           selector: `enedis-${usagePointId}-daily-consumption`,
           min: 0,
@@ -116,10 +120,11 @@ class EnedisWelcomePageComponent extends Component {
           unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
           read_only: true,
           has_feedback: false,
-          keep_history: true
+          keep_history: true,
+          energy_parent_id: null
         },
         {
-          id: uuid.v4(),
+          id: thirtyMinutesConsumptionFeatureId,
           name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveFeatureName'),
           selector: `enedis-${usagePointId}-consumption-load-curve`,
           min: 0,
@@ -130,10 +135,11 @@ class EnedisWelcomePageComponent extends Component {
           unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
           read_only: true,
           has_feedback: false,
-          keep_history: true
+          keep_history: true,
+          energy_parent_id: dailyConsumptionFeatureId
         },
         {
-          id: uuid.v4(),
+          id: thirtyMinutesConsumptionCostFeatureId,
           name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveCostFeatureName'),
           selector: `enedis-${usagePointId}-consumption-load-curve-cost`,
           min: 0,
@@ -144,7 +150,8 @@ class EnedisWelcomePageComponent extends Component {
           unit: DEVICE_FEATURE_UNITS.EURO,
           read_only: true,
           has_feedback: false,
-          keep_history: true
+          keep_history: true,
+          energy_parent_id: thirtyMinutesConsumptionFeatureId
         }
       ]
     };
