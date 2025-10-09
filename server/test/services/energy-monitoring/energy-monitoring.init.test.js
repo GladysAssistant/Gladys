@@ -1,4 +1,4 @@
-const { fake, assert } = require('sinon');
+const { fake, assert, useFakeTimers } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 
@@ -189,6 +189,62 @@ describe('EnergyMonitoring.init', () => {
       // Seconds and milliseconds should be 0 (exact time)
       expect(seconds).to.equal(0);
       expect(milliseconds).to.equal(0);
+    });
+
+    it('should round to 00:00 when current time is before 30 minutes', () => {
+      // Use sinon fake timers to mock a time with minutes < 30 (e.g., 10:15:45.123)
+      const clock = useFakeTimers(new Date('2023-10-15T10:15:45.123Z'));
+
+      try {
+        energyMonitoring.init();
+
+        // Get the consumption calculation job function
+        const consumptionJobFunction = mockScheduler.scheduleJob.getCall(1).args[1];
+
+        // Execute the job
+        consumptionJobFunction();
+
+        // Verify consumption calculation was called with rounded time
+        assert.calledOnce(calculateConsumptionFromIndex);
+
+        const callArgs = calculateConsumptionFromIndex.getCall(0).args;
+        const timestamp = callArgs[1];
+
+        // Should round to 00:00
+        expect(timestamp.getMinutes()).to.equal(0);
+        expect(timestamp.getSeconds()).to.equal(0);
+        expect(timestamp.getMilliseconds()).to.equal(0);
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('should round to 00:30 when current time is at or after 30 minutes', () => {
+      // Use sinon fake timers to mock a time with minutes >= 30 (e.g., 10:45:30.456)
+      const clock = useFakeTimers(new Date('2023-10-15T10:45:30.456Z'));
+
+      try {
+        energyMonitoring.init();
+
+        // Get the consumption calculation job function
+        const consumptionJobFunction = mockScheduler.scheduleJob.getCall(1).args[1];
+
+        // Execute the job
+        consumptionJobFunction();
+
+        // Verify consumption calculation was called with rounded time
+        assert.calledOnce(calculateConsumptionFromIndex);
+
+        const callArgs = calculateConsumptionFromIndex.getCall(0).args;
+        const timestamp = callArgs[1];
+
+        // Should round to 00:30
+        expect(timestamp.getMinutes()).to.equal(30);
+        expect(timestamp.getSeconds()).to.equal(0);
+        expect(timestamp.getMilliseconds()).to.equal(0);
+      } finally {
+        clock.restore();
+      }
     });
   });
 });

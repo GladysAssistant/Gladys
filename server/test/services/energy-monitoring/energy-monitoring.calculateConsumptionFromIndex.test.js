@@ -429,5 +429,25 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.notCalled(device.saveHistoricalState);
       assert.notCalled(device.setParam);
     });
+
+    it('should handle errors during device processing without throwing', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Mock device
+      device.get = fake.returns([mockDevice]);
+
+      // Make getDeviceFeatureStates throw an error
+      device.getDeviceFeatureStates = fake.throws(new Error('Database error'));
+
+      // Should not throw - error is caught and logged
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+
+      // Verify the function completed without throwing
+      // The error was caught in the try-catch block (lines 143-145)
+      assert.calledOnce(device.getDeviceFeatureStates);
+
+      // Verify saveHistoricalState was NOT called (because error occurred before that)
+      assert.notCalled(device.saveHistoricalState);
+    });
   });
 });

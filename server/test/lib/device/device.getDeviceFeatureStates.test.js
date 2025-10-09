@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -60,5 +60,23 @@ describe('Device.getDeviceFeatureStates', function Describe() {
       { created_at: new Date('2025-08-28T15:01:00.000Z'), value: 2 },
       { created_at: new Date('2025-08-28T15:03:00.000Z'), value: 3 },
     ]);
+  });
+
+  it('should throw NotFoundError when device feature does not exist', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns(null), // Return null to simulate device feature not found
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+
+    const promise = deviceInstance.getDeviceFeatureStates(
+      'non-existent-feature',
+      new Date('2025-08-28T15:01:00.000Z'),
+      new Date('2025-08-28T15:03:00.000Z'),
+    );
+
+    await assert.isRejected(promise, 'DeviceFeature not found');
   });
 });
