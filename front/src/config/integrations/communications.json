@@ -35,5 +35,9 @@
   {
     "key": "callmebot",
     "img": "/assets/integrations/cover/callmebot.jpg"
+  },
+  {
+    "key": "mcp",
+    "img": "/assets/integrations/cover/mcp.jpg"
   }
 ]
