@@ -108,7 +108,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify getDeviceFeatureStates was called with correct parameters
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -180,7 +180,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify getDeviceFeatureStates was called with last processed timestamp
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -215,7 +215,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Mock empty index states
       device.getDeviceFeatureStates = fake.returns([]);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify getDeviceFeatureStates was called
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -246,7 +246,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify getDeviceFeatureStates was called with last processed timestamp
       assert.calledOnce(device.getDeviceFeatureStates);
@@ -319,7 +319,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify consumption calculation with counter reset handling (5 + 5 = 10)
       // 5: normal consumption (1005 - 1000)
@@ -348,7 +348,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify consumption calculation with counter reset to 0 (5 + 0 + 8 = 13)
       // 5: normal consumption (1005 - 1000)
@@ -372,7 +372,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       const mockIndexStates = [{ created_at: '2023-10-03T13:30:00.000Z', value: 1000 }];
       device.getDeviceFeatureStates = fake.returns(mockIndexStates);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify consumption of 0 was saved (single state, no calculation possible)
       assert.calledOnce(device.saveHistoricalState);
@@ -434,7 +434,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       };
       device.get = fake.returns([deviceWithMissingFeature]);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify no device feature states were queried (device filtered out)
       assert.notCalled(device.getDeviceFeatureStates);
@@ -467,7 +467,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       };
       device.get = fake.returns([deviceWithoutParentRelationship]);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify no device feature states were queried (device filtered out due to missing relationship)
       assert.notCalled(device.getDeviceFeatureStates);
@@ -517,7 +517,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       device.get = fake.returns([deviceWithMultipleIndexes]);
       device.getDeviceFeatureStates = fake.returns([]);
 
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Should process both index/consumption pairs
       // getDeviceFeatureStates should be called twice (once for each index)
@@ -534,7 +534,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       device.getDeviceFeatureStates = fake.throws(new Error('Database error'));
 
       // Should not throw - error is caught and logged
-      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
 
       // Verify the function completed without throwing
       // The error was caught in the try-catch block (lines 143-145)

@@ -117,7 +117,7 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
   await Promise.each(windows, async (windowTime) => {
     try {
       // Call the existing calculateConsumptionFromIndex function for each window
-      await this.calculateConsumptionFromIndex(null, windowTime);
+      await this.calculateConsumptionFromIndex(windowTime);
       successfulWindows += 1;
 
       // Update job progress
