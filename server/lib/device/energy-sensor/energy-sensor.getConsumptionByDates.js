@@ -30,7 +30,7 @@ const GROUPED_QUERY_DATE_RANGE = `
  * @param {Date} [options.from] - Start date for date range approach.
  * @param {Date} [options.to] - End date for date range approach.
  * @param {string} [options.group_by] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
- * @returns {Promise<array>} - Resolve with an array of data.
+ * @returns {Promise<Array>} - Resolve with an array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-device', {
  *   from: new Date('2023-01-01'),
