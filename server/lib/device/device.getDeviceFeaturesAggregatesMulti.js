@@ -2,21 +2,18 @@ const Promise = require('bluebird');
 /**
  * @description Get all features states aggregates.
  * @param {Array} selectors - Array of device feature selectors.
- * @param {object} options - Options object.
- * @param {number} [options.intervalInMinutes] - Interval in minutes (legacy approach).
- * @param {Date} [options.from] - Start date for date range approach.
- * @param {Date} [options.to] - End date for date range approach.
- * @param {number} [options.maxStates=100] - Number of elements to return max.
- * @param {string} [options.groupBy] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
+ * @param {number} intervalInMinutes - Interval.
+ * @param {number} [maxStates] - Number of elements to return max.
+ * @param {string} [groupBy] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
  * @returns {Promise<Array>} - Resolve with an array of array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
-async function getDeviceFeaturesAggregatesMulti(selectors, options) {
+async function getDeviceFeaturesAggregatesMulti(selectors, intervalInMinutes, maxStates = 100, groupBy = null) {
   return Promise.map(
     selectors,
     async (selector) => {
-      return this.getDeviceFeaturesAggregates(selector, options);
+      return this.getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates, groupBy);
     },
     { concurrency: 4 },
   );
