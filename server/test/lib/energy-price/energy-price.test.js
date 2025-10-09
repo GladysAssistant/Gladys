@@ -48,9 +48,10 @@ describe('energy-price', () => {
     const all = await energyPrice.get();
     expect(all).to.be.instanceOf(Array);
     expect(all.length).to.be.greaterThan(0);
-    // ordered by start_date ASC
+
+    // ordered by start_date DESC
     for (let i = 1; i < all.length; i += 1) {
-      expect(all[i].start_date >= all[i - 1].start_date).to.equal(true);
+      expect(all[i].start_date <= all[i - 1].start_date).to.equal(true);
     }
 
     const filteredByElectricMeterDeviceId = await energyPrice.get({
