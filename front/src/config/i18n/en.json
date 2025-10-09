@@ -3644,7 +3644,18 @@
       "power": "Power",
       "energy": "Energy",
       "index": "Index",
-      "daily-consumption": "Daily Consumption"
+      "daily-consumption": "Daily Consumption",
+      "daily-consumption-cost": "Daily Cost",
+      "thirty-minutes-consumption": "30 Minutes Consumption",
+      "thirty-minutes-consumption-cost": "30 Minutes Cost"
+    },
+    "energy-production-sensor": {
+      "shortCategoryName": "Energy production sensor",
+      "index": "Index",
+      "daily-production": "Daily Production",
+      "daily-production-revenue": "Daily Revenue",
+      "thirty-minutes-production": "30 Minutes Production",
+      "thirty-minutes-production-revenue": "30 Minutes Revenue"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

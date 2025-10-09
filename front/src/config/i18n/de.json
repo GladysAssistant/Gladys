@@ -20,7 +20,20 @@
     "milesPerHour": "m/h",
     "selectPlaceholder": "Auswählen …",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "create": "Erstellen",
+    "cancel": "Abbrechen",
+    "selectDevice": "Gerät auswählen",
+    "noData": "Keine Daten",
+    "price": "Preis",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen",
+    "loading": "Lädt...",
+    "preview": "Vorschau"
   },
   "color": {
     "aqua": "Aqua",
@@ -271,7 +284,8 @@
       "clock": "Uhr",
       "scene": "Szene",
       "music": "Musik",
-      "gauge": "Messanzeige"
+      "gauge": "Messanzeige",
+      "energy-consumption": "Energieverbrauch"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -461,6 +475,18 @@
       },
       "music": {
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
+      },
+      "energyConsumption": {
+        "editTitle": "Widget-Titel (optional)",
+        "editTitlePlaceholder": "Name auf dem Dashboard angezeigt",
+        "editDeviceFeatures": "Energieverbrauchsgeräte auswählen",
+        "year": "Jahr",
+        "month": "Monat",
+        "day": "Tag",
+        "consumptionCost": "Verbrauchskosten",
+        "totalConsumption": "Gesamtverbrauchskosten",
+        "error": "Fehler beim Laden der Energieverbrauchsdaten",
+        "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar"
       }
     }
   },
@@ -591,6 +617,83 @@
       "rotation90": "90°",
       "rotation18O": "180°",
       "rotation27O": "270°"
+    },
+    "energyMonitoring": {
+      "title": "Energieüberwachung",
+      "description": "Verfolgen Sie Ihren Stromverbrauch in Gladys",
+      "myDevicesTab": "Meine Geräte",
+      "energyPriceTab": "Energietarife",
+      "documentation": "Dokumentation",
+      "hierarchicalListDescription": "Hier ist die hierarchische Liste der Energiesensoren. Sie können Eltern-/Kind-Beziehungen definieren, um den Verbrauch zu aggregieren.",
+      "rootNotParent": "Kein Elternteil (Wurzel)",
+      "level": "Ebene {{depth}}",
+      "wizard": {
+        "basics": "Informationen",
+        "periodScope": "Zeitraum & Umfang",
+        "priceAndSlots": "Preis & Zeitfenster"
+      },
+      "contract": "Vertrag",
+      "priceType": "Preistyp",
+      "currency": "Währung",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "dayType": "Tagestyp",
+      "dayTypeOptions": {
+        "any": "beliebig",
+        "red": "rot",
+        "white": "weiß",
+        "blue": "blau"
+      },
+      "electricMeter": "Stromzähler",
+      "leaveEndDateEmpty": "Lassen Sie das Enddatum leer für einen offenen Zeitraum.",
+      "priceAndTimeSlots": "Preis & Zeitfenster",
+      "price": "Preis",
+      "hourSlots": "Zeitfenster",
+      "selectHoursHelp": "Wählen Sie die Stunden aus, in denen dieser Preis gilt.",
+      "daytime820": "Tagsüber 8-20",
+      "clear": "Löschen",
+      "selected": "Ausgewählt:",
+      "none": "keine",
+      "subscribedPower": "Abonnierte Leistung",
+      "summary": "Zusammenfassung",
+      "type": "Typ",
+      "period": "Zeitraum",
+      "slots": "Zeitfenster",
+      "meter": "Zähler",
+      "contractTypes": {
+        "base": "Basis",
+        "peak_offpeak": "Haupt-/Nebenzeiten",
+        "edf_tempo": "EDF Tempo"
+      },
+      "priceTypes": {
+        "consumption": "Verbrauch",
+        "subscription": "Abonnement"
+      },
+      "currencies": {
+        "euro": "Euro",
+        "dollar": "Dollar"
+      },
+      "errorLoadingPrices": "Fehler beim Laden der Tarife.",
+      "errorLoadingDevices": "Fehler beim Laden der Geräte.",
+      "noDeviceFeaturesFound": "Keine Gerätefunktionen gefunden.",
+      "settings": "Einstellungen",
+      "calculateCostFromBeginning": "Kosten von Anfang an berechnen",
+      "calculatingFromBeginning": "Berechnung läuft...",
+      "calculateFromBeginningStarted": "Die Berechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen.",
+      "calculateFromBeginningError": "Beim Starten der Berechnung ist ein Fehler aufgetreten.",
+      "importPrices": "Importieren",
+      "importPricesTitle": "Energievertragstarife importieren",
+      "selectElectricMeter": "Stromzählergerät auswählen",
+      "selectContract": "Energievertrag auswählen",
+      "selectContractPlaceholder": "Vertrag auswählen",
+      "selectSubscribedPower": "Abonnierte Leistung auswählen",
+      "selectPowerPlaceholder": "Leistung auswählen",
+      "provider": "Anbieter",
+      "importPricesButton": "Tarife importieren",
+      "importSuccess": "Tarife erfolgreich importiert!",
+      "errorLoadingContracts": "Fehler beim Laden der Verträge",
+      "availablePowers": "Verfügbare Leistungen",
+      "contractId": "Vertrags-ID"
     },
     "netatmo": {
       "title": "Netatmo",
@@ -2600,7 +2703,11 @@
       "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte",
-      "service-matter-backup": "Matter backup"
+      "service-matter-backup": "Matter backup",
+      "energy-monitoring-cost-calculation-thirty-minutes": "Energiekostenberechnung (30 Minuten)",
+      "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
+      "energy-monitoring-consumption-from-index": "Energieverbrauchsberechnung aus Index",
+      "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
@@ -3537,7 +3644,18 @@
       "power": "Leistung",
       "energy": "Energie",
       "index": "Index",
-      "daily-consumption": "Tagesverbrauch"
+      "daily-consumption": "Tagesverbrauch",
+      "daily-consumption-cost": "Tageskosten",
+      "thirty-minutes-consumption": "Verbrauch 30 Minuten",
+      "thirty-minutes-consumption-cost": "Kosten 30 Minuten"
+    },
+    "energy-production-sensor": {
+      "shortCategoryName": "Energieproduktionssensor",
+      "index": "Index",
+      "daily-production": "Tagesproduktion",
+      "daily-production-revenue": "Tagesertrag",
+      "thirty-minutes-production": "Produktion 30 Minuten",
+      "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

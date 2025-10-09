@@ -3649,6 +3649,14 @@
       "thirty-minutes-consumption": "Consommation 30 minutes",
       "thirty-minutes-consumption-cost": "Coût 30 minutes"
     },
+    "energy-production-sensor": {
+      "shortCategoryName": "Capteur de production d'énergie",
+      "index": "Index",
+      "daily-production": "Production journalière",
+      "daily-production-revenue": "Revenu journalier",
+      "thirty-minutes-production": "Production 30 minutes",
+      "thirty-minutes-production-revenue": "Revenu 30 minutes"
+    },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
       "binary": "Relais",
