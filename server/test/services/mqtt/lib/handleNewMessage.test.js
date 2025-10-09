@@ -71,6 +71,24 @@ describe('Mqtt handle message', () => {
     });
   });
 
+  it('should update device historical state', () => {
+    const historicalData = {
+      state: 22.5,
+      created_at: '2023-10-15T10:30:00.000Z',
+    };
+
+    mqttHandler.handleNewMessage(
+      'gladys/master/device/my_device_external_id/feature/my_feature_external_id/historical',
+      JSON.stringify(historicalData),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'my_feature_external_id',
+      state: 22.5,
+      created_at: '2023-10-15T10:30:00.000Z',
+    });
+  });
+
   it('should fail to update device state, but not crash', () => {
     mqttHandler.handleNewMessage('gladys/master/device/my_device_external_id/', '19.8');
 

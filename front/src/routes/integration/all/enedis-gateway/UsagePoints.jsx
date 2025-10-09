@@ -12,24 +12,12 @@ dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
 import { getDeviceParam } from '../../../../utils/device';
-import { DEVICE_FEATURE_UNITS } from '../../../../../../server/utils/constants';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 
-const UsagePointDevice = ({
-  device,
-  language = 'fr',
-  deviceIndex,
-  updateDeviceParam,
-  saveDevice,
-  destroyDevice,
-  syncs = []
-}) => {
+const UsagePointDevice = ({ device, language = 'fr', deviceIndex, saveDevice, destroyDevice, syncs = [] }) => {
   const usagePointId = device.external_id.split(':')[1];
 
-  const contractType = getDeviceParam(device, DEVICE_PARAMS.CONTRACT_TYPE);
-  const pricePerKwh = getDeviceParam(device, DEVICE_PARAMS.PRICE_PER_KWH);
-  const priceCurrency = getDeviceParam(device, DEVICE_PARAMS.PRICE_CURRENCY);
   const lastRefresh = getDeviceParam(device, DEVICE_PARAMS.LAST_REFRESH);
   const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
   const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
@@ -48,15 +36,6 @@ const UsagePointDevice = ({
         .locale(language)
         .format('L LTS')
     : undefined;
-
-  const updateContractType = e => {
-    updateDeviceParam(deviceIndex, DEVICE_PARAMS.CONTRACT_TYPE, e.target.value);
-  };
-
-  const updatePricePerKwh = async e => {
-    await updateDeviceParam(deviceIndex, DEVICE_PARAMS.PRICE_PER_KWH, e.target.value);
-    await updateDeviceParam(deviceIndex, DEVICE_PARAMS.PRICE_CURRENCY, DEVICE_FEATURE_UNITS.EURO);
-  };
 
   const save = () => {
     saveDevice(deviceIndex);
@@ -81,36 +60,6 @@ const UsagePointDevice = ({
             </label>
             <input type="text" class="form-control" value={usagePointId} disabled />
           </div>
-          {false && (
-            <div class="form-group">
-              <label>
-                <Text id="integration.enedis.usagePoints.contractType" />
-              </label>
-              <select class="form-control" onChange={updateContractType} value={contractType}>
-                <option value="base">
-                  <Text id="integration.enedis.usagePoints.contracts.base" />
-                </option>
-                <option value="hc-hp">
-                  <Text id="integration.enedis.usagePoints.contracts.hc-hp" />
-                </option>
-              </select>
-            </div>
-          )}
-          {contractType === 'base' && (
-            <div class="form-group">
-              <label>
-                <Text id="integration.enedis.usagePoints.pricePerKwh" />
-              </label>
-              <div class="input-group">
-                <input type="text" class="form-control" value={pricePerKwh} onChange={updatePricePerKwh} />
-                <div class="input-group-append">
-                  <span class="input-group-text">
-                    <Text id={`deviceFeatureUnitShort.${priceCurrency}`} />
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
           {syncInProgress && (
             <div class="form-group">
               <label>

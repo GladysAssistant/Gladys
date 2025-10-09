@@ -9,6 +9,24 @@ module.exports = {
       include: [
         {
           model: db.DeviceFeature,
+          attributes: [
+            'id',
+            'device_id',
+            'name',
+            'selector',
+            'external_id',
+            'category',
+            'type',
+            'read_only',
+            'keep_history',
+            'has_feedback',
+            'unit',
+            'min',
+            'max',
+            'last_value',
+            'last_value_string',
+            'last_value_changed',
+          ],
           as: 'features',
           where: {
             category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
