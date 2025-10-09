@@ -66,11 +66,6 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
   // Find the oldest device state across all index features using a direct SQL query
   const indexFeatureIds = devicesWithBothFeatures.map((deviceInfo) => deviceInfo.indexFeature.id);
 
-  if (indexFeatureIds.length === 0) {
-    logger.info('No index feature IDs found');
-    return null;
-  }
-
   // Build SQL query to find oldest state across all energy index features
   // Use IN clause with placeholders instead of ANY(?)
   const placeholders = indexFeatureIds.map(() => '?').join(',');

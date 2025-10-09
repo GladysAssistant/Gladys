@@ -313,4 +313,45 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       ]);
     });
   });
+
+  it('should continue processing windows even when some fail', async () => {
+    // Insert test states
+    const baseTime = new Date('2023-10-03T10:00:00.000Z');
+    const states = [
+      { value: 1000, created_at: baseTime },
+      {
+        value: 1050,
+        created_at: new Date(baseTime.getTime() + 30 * 60 * 1000),
+      },
+    ];
+
+    await db.duckDbBatchInsertState(testIndexFeatureId, states);
+
+    // Mock current time to create multiple windows
+    clock = useFakeTimers(new Date('2023-10-03T11:30:00.000Z'));
+
+    // Stub calculateConsumptionFromIndex to throw error on second call
+    let callCount = 0;
+    const originalCalculateConsumptionFromIndex = energyMonitoring.calculateConsumptionFromIndex;
+    energyMonitoring.calculateConsumptionFromIndex = async (jobId, windowTime) => {
+      callCount += 1;
+      if (callCount === 2) {
+        throw new Error('Simulated error for testing');
+      }
+      return originalCalculateConsumptionFromIndex.call(energyMonitoring, jobId, windowTime);
+    };
+
+    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+
+    // Restore original function
+    energyMonitoring.calculateConsumptionFromIndex = originalCalculateConsumptionFromIndex;
+
+    expect(result).to.equal(null); // Function should complete successfully despite errors
+
+    // Verify that job progress was updated (should be called for each window)
+    expect(gladys.job.updateProgress.called).to.equal(true);
+
+    // Should have processed multiple windows (at least 3: 10:00, 10:30, 11:00, 11:30)
+    expect(callCount).to.be.at.least(3);
+  });
 });

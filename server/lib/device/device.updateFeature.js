@@ -53,8 +53,36 @@ async function updateFeature(selector, updates) {
   }
   const updated = await db.DeviceFeature.findOne({ where: { selector } });
   const plain = updated.get({ plain: true });
-  // update cache/state if used elsewhere
-  this.stateManager.setState('deviceFeature', selector, plain);
+
+  // Reload the full device from DB with all features (same pattern as device.init)
+  const fullDevice = await db.Device.findOne({
+    where: { id: plain.device_id },
+    include: [
+      {
+        model: db.DeviceFeature,
+        as: 'features',
+      },
+      {
+        model: db.DeviceParam,
+        as: 'params',
+      },
+      {
+        model: db.Room,
+        as: 'room',
+      },
+      {
+        model: db.Service,
+        as: 'service',
+      },
+    ],
+  });
+
+  if (fullDevice) {
+    const plainDevice = fullDevice.get({ plain: true });
+    // Use device.add to update all caches consistently
+    this.add(plainDevice);
+  }
+
   return plain;
 }
 

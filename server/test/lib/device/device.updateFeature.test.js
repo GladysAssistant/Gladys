@@ -13,12 +13,20 @@ describe('Device.updateFeature', () => {
   let device;
   let stateManager;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     stateManager = new StateManager(event);
-    // Spy on setState to ensure it is called after successful update
-    stateManager.setState = fake.bind(stateManager, stateManager.setState);
-    const service = { getLocalServiceByName: fake.resolves({ id: 'service-id' }) };
-    device = new Device(event, {}, stateManager, service, {}, {}, job);
+    const serviceManager = {
+      getLocalServiceByName: fake.resolves({ id: 'service-id' }),
+      getService: fake.returns(null), // Mock getService method used by device.add
+    };
+    const brain = {
+      addNamedEntity: fake.returns(null),
+      removeNamedEntity: fake.returns(null),
+    };
+    device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    // Initialize devices in state manager (loads all devices into cache)
+    await device.init(false); // false = don't start DuckDB migration
   });
 
   it('should return existing feature when nothing to update', async () => {
@@ -50,6 +58,26 @@ describe('Device.updateFeature', () => {
 
     const reloaded = await db.DeviceFeature.findOne({ where: { selector: childSelector } });
     expect(reloaded.energy_parent_id).to.equal(parent.id);
+
+    // Verify cache is updated in StateManager with all three keys
+    const cachedBySelector = stateManager.get('deviceFeature', childSelector);
+    expect(cachedBySelector).to.not.equal(null);
+    expect(cachedBySelector.energy_parent_id).to.equal(parent.id);
+
+    const cachedById = stateManager.get('deviceFeatureById', child.id);
+    expect(cachedById).to.not.equal(null);
+    expect(cachedById.energy_parent_id).to.equal(parent.id);
+
+    const cachedByExternalId = stateManager.get('deviceFeatureByExternalId', child.external_id);
+    expect(cachedByExternalId).to.not.equal(null);
+    expect(cachedByExternalId.energy_parent_id).to.equal(parent.id);
+
+    // Verify the device cache also has the updated feature in its features array
+    const cachedDevice = stateManager.get('deviceById', child.device_id);
+    expect(cachedDevice).to.not.equal(null);
+    const featureInDevice = cachedDevice.features.find((f) => f.id === child.id);
+    expect(featureInDevice).to.not.equal(undefined);
+    expect(featureInDevice.energy_parent_id).to.equal(parent.id);
   });
 
   it('should prevent circular energy_parent_id', async () => {
@@ -84,6 +112,26 @@ describe('Device.updateFeature', () => {
     expect(updated.energy_parent_id).to.equal(null);
     check = await db.DeviceFeature.findOne({ where: { id: child.id } });
     expect(check.energy_parent_id).to.equal(null);
+
+    // Verify cache is updated with null value in all three keys
+    const cachedBySelector = stateManager.get('deviceFeature', childSelector);
+    expect(cachedBySelector).to.not.equal(null);
+    expect(cachedBySelector.energy_parent_id).to.equal(null);
+
+    const cachedById = stateManager.get('deviceFeatureById', child.id);
+    expect(cachedById).to.not.equal(null);
+    expect(cachedById.energy_parent_id).to.equal(null);
+
+    const cachedByExternalId = stateManager.get('deviceFeatureByExternalId', child.external_id);
+    expect(cachedByExternalId).to.not.equal(null);
+    expect(cachedByExternalId.energy_parent_id).to.equal(null);
+
+    // Verify the device cache also has the updated feature with null parent
+    const cachedDevice = stateManager.get('deviceById', child.device_id);
+    expect(cachedDevice).to.not.equal(null);
+    const featureInDevice = cachedDevice.features.find((f) => f.id === child.id);
+    expect(featureInDevice).to.not.equal(undefined);
+    expect(featureInDevice.energy_parent_id).to.equal(null);
   });
 
   it('should throw NotFoundError when selector does not exist', async () => {
