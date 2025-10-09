@@ -40,21 +40,23 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
   let energyMonitoring;
 
   const mockDevice = {
-    id: 'device-1',
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     name: 'Test Energy Device',
     params: [],
     features: [
       {
-        id: 'feature-index-1',
+        id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
         selector: 'test-device-index',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        energy_parent_id: null,
       },
       {
-        id: 'feature-consumption-1',
+        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
         selector: 'test-device-consumption',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+        energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901', // Links to the index feature
       },
     ],
   };
@@ -119,10 +121,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
       expect(saveCall.args[0]).to.deep.equal({
-        id: 'feature-consumption-1',
+        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
         selector: 'test-device-consumption',
         category: 'energy-sensor',
         type: 'thirty-minutes-consumption',
+        energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
       });
       expect(saveCall.args[1]).to.equal(25); // Total consumption
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
@@ -131,21 +134,23 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
       expect(setParamCall.args[0]).to.deep.equal({
-        id: 'device-1',
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         name: 'Test Energy Device',
         params: [],
         features: [
           {
-            id: 'feature-index-1',
+            id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
             selector: 'test-device-index',
             category: 'energy-sensor',
             type: 'index',
+            energy_parent_id: null,
           },
           {
-            id: 'feature-consumption-1',
+            id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
             selector: 'test-device-consumption',
             category: 'energy-sensor',
             type: 'thirty-minutes-consumption',
+            energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           },
         ],
       });
@@ -252,10 +257,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
       expect(saveCall.args[0]).to.deep.equal({
-        id: 'feature-consumption-1',
+        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
         selector: 'test-device-consumption',
         category: 'energy-sensor',
         type: 'thirty-minutes-consumption',
+        energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
       });
       expect(saveCall.args[1]).to.equal(0); // No consumption calculated
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
@@ -264,7 +270,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
       expect(setParamCall.args[0]).to.deep.equal({
-        id: 'device-1',
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         name: 'Test Energy Device',
         params: [
           {
@@ -274,16 +280,18 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
         ],
         features: [
           {
-            id: 'feature-index-1',
+            id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
             selector: 'test-device-index',
             category: 'energy-sensor',
             type: 'index',
+            energy_parent_id: null,
           },
           {
-            id: 'feature-consumption-1',
+            id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
             selector: 'test-device-consumption',
             category: 'energy-sensor',
             type: 'thirty-minutes-consumption',
+            energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           },
         ],
       });
@@ -370,10 +378,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.saveHistoricalState);
       const saveCall = device.saveHistoricalState.getCall(0);
       expect(saveCall.args[0]).to.deep.equal({
-        id: 'feature-consumption-1',
+        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
         selector: 'test-device-consumption',
         category: 'energy-sensor',
         type: 'thirty-minutes-consumption',
+        energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
       });
       expect(saveCall.args[1]).to.equal(0); // No consumption calculated
       expect(saveCall.args[2].toISOString()).to.equal(testTime.toISOString());
@@ -382,21 +391,23 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
       expect(setParamCall.args[0]).to.deep.equal({
-        id: 'device-1',
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         name: 'Test Energy Device',
         params: [],
         features: [
           {
-            id: 'feature-index-1',
+            id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
             selector: 'test-device-index',
             category: 'energy-sensor',
             type: 'index',
+            energy_parent_id: null,
           },
           {
-            id: 'feature-consumption-1',
+            id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
             selector: 'test-device-consumption',
             category: 'energy-sensor',
             type: 'thirty-minutes-consumption',
+            energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           },
         ],
       });
@@ -412,10 +423,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
         ...mockDevice,
         features: [
           {
-            id: 'feature-index-1',
+            id: 'd4e5f6a7-b8c9-0123-def1-234567890123',
             selector: 'test-device-index',
             category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
             type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
           },
           // Missing THIRTY_MINUTES_CONSUMPTION feature
         ],
@@ -428,6 +440,88 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.notCalled(device.getDeviceFeatureStates);
       assert.notCalled(device.saveHistoricalState);
       assert.notCalled(device.setParam);
+    });
+
+    it('should handle devices with both features but no energy_parent_id relationship', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Mock device with both features but consumption doesn't link to index
+      const deviceWithoutParentRelationship = {
+        ...mockDevice,
+        features: [
+          {
+            id: 'e5f6a7b8-c9d0-1234-ef12-345678901234',
+            selector: 'test-device-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'f6a7b8c9-d0e1-2345-f123-456789012345',
+            selector: 'test-device-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: null, // Not linked to the index feature
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithoutParentRelationship]);
+
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+
+      // Verify no device feature states were queried (device filtered out due to missing relationship)
+      assert.notCalled(device.getDeviceFeatureStates);
+      assert.notCalled(device.saveHistoricalState);
+      assert.notCalled(device.setParam);
+    });
+
+    it('should handle devices with multiple index features', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Mock device with two index features, each with its own consumption feature
+      const deviceWithMultipleIndexes = {
+        id: 'a7b8c9d0-e1f2-3456-1234-567890123456',
+        name: 'Multi Index Device',
+        params: [],
+        features: [
+          {
+            id: 'b8c9d0e1-f2a3-4567-2345-678901234567',
+            selector: 'test-device-index-1',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'c9d0e1f2-a3b4-5678-3456-789012345678',
+            selector: 'test-device-consumption-1',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'b8c9d0e1-f2a3-4567-2345-678901234567',
+          },
+          {
+            id: 'd0e1f2a3-b4c5-6789-4567-890123456789',
+            selector: 'test-device-index-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'e1f2a3b4-c5d6-7890-5678-901234567890',
+            selector: 'test-device-consumption-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'd0e1f2a3-b4c5-6789-4567-890123456789',
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithMultipleIndexes]);
+      device.getDeviceFeatureStates = fake.returns([]);
+
+      await energyMonitoring.calculateConsumptionFromIndex('job-123', testTime);
+
+      // Should process both index/consumption pairs
+      // getDeviceFeatureStates should be called twice (once for each index)
+      expect(device.getDeviceFeatureStates.callCount).to.equal(2);
     });
 
     it('should handle errors during device processing without throwing', async () => {

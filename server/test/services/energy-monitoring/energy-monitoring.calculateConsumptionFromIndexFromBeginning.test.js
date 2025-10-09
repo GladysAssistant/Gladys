@@ -90,6 +90,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           min: 0,
           max: 999999,
           last_value: 0,
+          energy_parent_id: null,
         },
         {
           id: testConsumptionFeatureId,
@@ -103,6 +104,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           min: 0,
           max: 999999,
           last_value: 0,
+          energy_parent_id: testIndexFeatureId,
         },
       ],
     });
@@ -231,6 +233,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
             min: 0,
             max: 999999,
             last_value: 0,
+            energy_parent_id: null,
           },
           {
             id: testConsumptionFeature2Id,
@@ -244,6 +247,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
             min: 0,
             max: 999999,
             last_value: 0,
+            energy_parent_id: testIndexFeature2Id,
           },
         ],
       });

@@ -6,15 +6,14 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
 /**
- * @description Calculate thirty-minute consumption from index differences for devices that have both
- * INDEX and THIRTY_MINUTES_CONSUMPTION features.
+ * @description Calculate thirty-minute consumption from index differences for devices that have
+ * INDEX features with corresponding THIRTY_MINUTES_CONSUMPTION features (linked via energy_parent_id).
  * @param {string} jobId - The job id.
  * @param {Date} thirtyMinutesWindowTime - The specific time for the thirty-minute window.
  * @returns {Promise<null>} Return null when finished.
@@ -32,29 +31,35 @@ async function calculateConsumptionFromIndex(jobId, thirtyMinutesWindowTime) {
 
   logger.info(`Found ${energyDevices.length} energy devices`);
 
-  // Filter devices that have both INDEX and THIRTY_MINUTES_CONSUMPTION features
+  // Filter devices that have INDEX features with corresponding THIRTY_MINUTES_CONSUMPTION features
+  // The consumption feature should have energy_parent_id pointing to the index feature
   const devicesWithBothFeatures = [];
 
   energyDevices.forEach((energyDevice) => {
-    const indexFeature = getDeviceFeature(
-      energyDevice,
-      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+    // Find all INDEX features in this device
+    const indexFeatures = energyDevice.features.filter(
+      (f) =>
+        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
     );
 
-    const consumptionFeature = getDeviceFeature(
-      energyDevice,
-      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-    );
+    // For each INDEX feature, find the corresponding THIRTY_MINUTES_CONSUMPTION feature
+    indexFeatures.forEach((indexFeature) => {
+      const consumptionFeature = energyDevice.features.find(
+        (f) =>
+          f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
+          f.energy_parent_id === indexFeature.id,
+      );
 
-    if (indexFeature && consumptionFeature) {
-      devicesWithBothFeatures.push({
-        device: energyDevice,
-        indexFeature,
-        consumptionFeature,
-      });
-    }
+      if (consumptionFeature) {
+        devicesWithBothFeatures.push({
+          device: energyDevice,
+          indexFeature,
+          consumptionFeature,
+        });
+      }
+    });
   });
 
   logger.info(
