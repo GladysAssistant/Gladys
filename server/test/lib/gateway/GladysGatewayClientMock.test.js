@@ -97,6 +97,11 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
     }),
     getEcowattSignals: fake.resolves({ signals: [] }),
     getEdfTempo: fake.resolves({ today: 'blue', tomorrow: 'unknown' }),
+    getEdfTempoHistorical: fake.resolves([
+      { date: '2025-01-01', color: 'blue' },
+      { date: '2025-01-02', color: 'white' },
+      { date: '2025-01-03', color: 'red' },
+    ]),
     ttsGetToken: fake.resolves({ url: 'http://test.com' }),
     openAIAsk: fake.resolves({ answer: 'this is the answer' }),
   };
