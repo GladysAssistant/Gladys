@@ -119,7 +119,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
           max: 1000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+          energy_parent_id: '17488546-e1b8-4cb9-bd75-e20526a94a99', // Links to the consumption feature
         },
       ],
     });
@@ -355,7 +355,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
           max: 1000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
-          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+          energy_parent_id: '700ed79b-ebee-4501-8bbd-19e223f92fa5', // Links to the daily consumption feature
         },
       ],
     });

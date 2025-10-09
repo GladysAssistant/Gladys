@@ -6,7 +6,6 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -38,55 +37,64 @@ async function calculateCostFrom(startAt, jobId) {
     try {
       const energyConsumptionFeatures = [];
 
-      // Find energy consumption feature 30 minutes
-      const energyConsumptionfeature = getDeviceFeature(
-        energyDevice,
-        DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      // Find all THIRTY_MINUTES_CONSUMPTION features
+      const thirtyMinConsumptionFeatures = energyDevice.features.filter(
+        (f) =>
+          f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
       );
-      if (!energyConsumptionfeature) {
-        logger.debug(`Device ${energyDevice.name} has no thirty minutes consumption feature`);
-      } else {
-        const energyConsumptionCostFeature = getDeviceFeature(
-          energyDevice,
-          DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+
+      // For each consumption feature, find the corresponding cost feature (linked via energy_parent_id)
+      thirtyMinConsumptionFeatures.forEach((consumptionFeature) => {
+        const costFeature = energyDevice.features.find(
+          (f) =>
+            f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+            f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST &&
+            f.energy_parent_id === consumptionFeature.id,
         );
-        if (!energyConsumptionCostFeature) {
-          logger.debug(`Device ${energyDevice.name} has no thirty minutes consumption cost feature`);
-        } else {
+
+        if (costFeature) {
           energyConsumptionFeatures.push({
-            consumptionFeature: energyConsumptionfeature,
-            consumptionCostFeature: energyConsumptionCostFeature,
+            consumptionFeature,
+            consumptionCostFeature: costFeature,
           });
+        } else {
+          logger.debug(
+            `Device ${energyDevice.name}: consumption feature ${consumptionFeature.id} has no linked cost feature`,
+          );
         }
-      }
+      });
 
       // Find energy consumption feature daily, only if there are no thirty minutes consumption features
       // Otherwise, we'll calculate daily based on thirty minutes consumption features * 12
       if (energyConsumptionFeatures.length === 0) {
-        const energyConsumptionDailyfeature = getDeviceFeature(
-          energyDevice,
-          DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+        // Find all DAILY_CONSUMPTION features
+        const dailyConsumptionFeatures = energyDevice.features.filter(
+          (f) =>
+            f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+            f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
         );
-        if (!energyConsumptionDailyfeature) {
-          logger.debug(`Device ${energyDevice.name} has no daily consumption feature`);
-        } else {
-          const energyConsumptionDailyCostFeature = getDeviceFeature(
-            energyDevice,
-            DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+
+        // For each daily consumption feature, find the corresponding cost feature (linked via energy_parent_id)
+        dailyConsumptionFeatures.forEach((consumptionFeature) => {
+          const costFeature = energyDevice.features.find(
+            (f) =>
+              f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+              f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST &&
+              f.energy_parent_id === consumptionFeature.id,
           );
-          if (!energyConsumptionDailyCostFeature) {
-            logger.debug(`Device ${energyDevice.name} has no daily consumption cost feature`);
-          } else {
+
+          if (costFeature) {
             energyConsumptionFeatures.push({
-              consumptionFeature: energyConsumptionDailyfeature,
-              consumptionCostFeature: energyConsumptionDailyCostFeature,
+              consumptionFeature,
+              consumptionCostFeature: costFeature,
             });
+          } else {
+            logger.debug(
+              `Device ${energyDevice.name}: daily consumption feature ${consumptionFeature.id} has no linked cost feature`,
+            );
           }
-        }
+        });
       }
 
       // For each energy consumption feature

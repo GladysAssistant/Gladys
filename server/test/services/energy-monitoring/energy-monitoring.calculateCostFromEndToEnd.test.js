@@ -311,6 +311,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
           max: 1000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: null,
         },
         {
           id: '0f4133be-b86c-4a97-9cc8-585fadb74006',
@@ -323,6 +324,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
           max: 1000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: '17488546-e1b8-4cb9-bd75-e20526a94a99', // Links to the consumption feature
         },
       ],
     });
