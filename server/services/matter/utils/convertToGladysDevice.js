@@ -13,6 +13,8 @@ const {
   ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  ElectricalPowerMeasurement,
+  ElectricalEnergyMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -304,6 +306,76 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: minMeasuredValue,
           max: maxMeasuredValue,
         });
+      } else if (clusterIndex === ElectricalPowerMeasurement.Complete.id) {
+        // Add ActivePower feature
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Power)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-power`, true),
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.WATT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:power`,
+          min: -1000000,
+          max: 1000000,
+        });
+        // Add Voltage feature if available
+        try {
+          const voltage = await clusterClient.getVoltageAttribute();
+          if (voltage !== undefined) {
+            gladysDevice.features.push({
+              name: `${clusterClient.name} - ${clusterClient.endpointId} (Voltage)`,
+              selector: slugify(`matter-${device.name}-${clusterClient.name}-voltage`, true),
+              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
+              read_only: true,
+              has_feedback: true,
+              unit: DEVICE_FEATURE_UNITS.VOLT,
+              external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:voltage`,
+              min: 0,
+              max: 1000,
+            });
+          }
+        } catch (error) {
+          // Voltage attribute not available
+        }
+        // Add ActiveCurrent feature if available
+        try {
+          const activeCurrent = await clusterClient.getActiveCurrentAttribute();
+          if (activeCurrent !== undefined) {
+            gladysDevice.features.push({
+              name: `${clusterClient.name} - ${clusterClient.endpointId} (Current)`,
+              selector: slugify(`matter-${device.name}-${clusterClient.name}-current`, true),
+              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+              read_only: true,
+              has_feedback: true,
+              unit: DEVICE_FEATURE_UNITS.AMPERE,
+              external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:current`,
+              min: 0,
+              max: 1000,
+            });
+          }
+        } catch (error) {
+          // ActiveCurrent attribute not available
+        }
+      } else if (clusterIndex === ElectricalEnergyMeasurement.Complete.id) {
+        // Check if CumulativeEnergy feature is supported
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.cumulativeEnergy) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Energy)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-energy`, true),
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            read_only: true,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:energy`,
+            min: 0,
+            max: 1000000,
+          });
+        }
       }
     });
   }
