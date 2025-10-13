@@ -662,8 +662,8 @@
       "meter": "Zähler",
       "contractTypes": {
         "base": "Basis",
-        "peak_offpeak": "Haupt-/Nebenzeiten",
-        "edf_tempo": "EDF Tempo"
+        "peak-off-peak": "Haupt-/Nebenzeiten",
+        "edf-tempo": "EDF Tempo"
       },
       "priceTypes": {
         "consumption": "Verbrauch",

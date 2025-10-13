@@ -604,11 +604,11 @@ class EnergyMonitoringPage extends Component {
                         <option value="base">
                           <Text id="integration.energyMonitoring.contractTypes.base" />
                         </option>
-                        <option value="peak_offpeak">
-                          <Text id="integration.energyMonitoring.contractTypes.peak_offpeak" />
+                        <option value="peak-off-peak">
+                          <Text id="integration.energyMonitoring.contractTypes.peak-off-peak" />
                         </option>
-                        <option value="edf_tempo">
-                          <Text id="integration.energyMonitoring.contractTypes.edf_tempo" />
+                        <option value="edf-tempo">
+                          <Text id="integration.energyMonitoring.contractTypes.edf-tempo" />
                         </option>
                       </select>
                     </div>

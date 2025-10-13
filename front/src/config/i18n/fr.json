@@ -560,8 +560,8 @@
       "meter": "Compteur",
       "contractTypes": {
         "base": "base",
-        "peak_offpeak": "heures pleines/creuses",
-        "edf_tempo": "EDF Tempo"
+        "peak-off-peak": "heures pleines/creuses",
+        "edf-tempo": "EDF Tempo"
       },
       "priceTypes": {
         "consumption": "consommation",

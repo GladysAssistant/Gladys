@@ -41,6 +41,8 @@ const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
+const { destroyParam } = require('./device.destroyParam');
+const { destroyStatesFrom } = require('./device.destroyStatesFrom');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -144,5 +146,7 @@ DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
+DeviceManager.prototype.destroyParam = destroyParam;
+DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;
 
 module.exports = DeviceManager;

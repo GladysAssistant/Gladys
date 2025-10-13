@@ -99,6 +99,9 @@ async function calculateCostFrom(startAt, jobId) {
 
       // For each energy consumption feature
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
+        // First, clean the cost feature states
+        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
+        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the feature of the root electrical meter device
         const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
           ecf.consumptionFeature,

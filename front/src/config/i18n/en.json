@@ -1678,8 +1678,8 @@
       "meter": "Meter",
       "contractTypes": {
         "base": "base",
-        "peak_offpeak": "peak/off-peak hours",
-        "edf_tempo": "EDF Tempo"
+        "peak-off-peak": "peak/off-peak hours",
+        "edf-tempo": "EDF Tempo"
       },
       "priceTypes": {
         "consumption": "consumption",

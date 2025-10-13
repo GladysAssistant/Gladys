@@ -10,6 +10,8 @@ const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
+const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
+
 /**
  * @description Calculate consumption from index for all 30-minute windows from the beginning of the instance until now.
  * This function finds the oldest device state for energy index devices and processes all 30-minute windows.
@@ -52,6 +54,12 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
         consumptionFeature,
       });
     }
+  });
+
+  await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
+    // Reset the last processed timestamp
+    logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
+    await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
   });
 
   logger.info(

@@ -82,10 +82,11 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
       const lastProcessedParam = device.params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
       let lastProcessedTimestamp;
 
-      // If no last processed timestamp, start from 30 minutes ago
       if (!lastProcessedParam || !lastProcessedParam.value) {
+        logger.debug(`Device ${device.name}: no last processed timestamp, starting from ${windowStart}`);
         lastProcessedTimestamp = windowStart;
       } else {
+        logger.debug(`Device ${device.name}: last processed timestamp: ${lastProcessedParam.value}`);
         lastProcessedTimestamp = new Date(lastProcessedParam.value);
       }
 
