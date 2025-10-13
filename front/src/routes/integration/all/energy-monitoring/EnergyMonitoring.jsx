@@ -501,46 +501,36 @@ class EnergyMonitoringPage extends Component {
             </div>
             {expanded && (
               <div class="mt-3">
-                <div class="row">
-                  <div class="col-md-4">
-                    <strong>
-                      <Text id="global.price" defaultMessage="Price" />:
-                    </strong>{' '}
-                    {p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : '-'}
-                  </div>
-                  <div class="col-md-4">
-                    <strong>
-                      <Text id="integration.energyMonitoring.dayType" />:
-                    </strong>{' '}
-                    {p.day_type ? (
-                      <Text
-                        id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`}
-                        defaultMessage={p.day_type}
-                      />
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div class="col-md-4">
-                    <strong>
-                      <Text id="integration.energyMonitoring.subscribedPower" />:
-                    </strong>{' '}
-                    {p.subscribed_power || '-'}
-                  </div>
+                <div class="mb-2">
+                  <strong>
+                    <Text id="global.price" defaultMessage="Price" />:
+                  </strong>{' '}
+                  {p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : '-'}
                 </div>
-                <div class="row mt-2">
-                  <div class="col-md-6">
-                    <strong>
-                      <Text id="integration.energyMonitoring.hourSlots" />:
-                    </strong>{' '}
-                    {formatStoredSlots(p.hour_slots) || '-'}
-                  </div>
-                  <div class="col-md-6">
-                    <strong>
-                      <Text id="integration.energyMonitoring.meter" />:
-                    </strong>{' '}
-                    {p.electric_meter_device_id || '-'}
-                  </div>
+                <div class="mb-2">
+                  <strong>
+                    <Text id="integration.energyMonitoring.dayType" />:
+                  </strong>{' '}
+                  {p.day_type ? (
+                    <Text
+                      id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`}
+                      defaultMessage={p.day_type}
+                    />
+                  ) : (
+                    '-'
+                  )}
+                </div>
+                <div class="mb-2">
+                  <strong>
+                    <Text id="integration.energyMonitoring.subscribedPower" />:
+                  </strong>{' '}
+                  {p.subscribed_power || '-'}
+                </div>
+                <div class="mb-2">
+                  <strong>
+                    <Text id="integration.energyMonitoring.hourSlots" />:
+                  </strong>{' '}
+                  {formatStoredSlots(p.hour_slots) || '-'}
                 </div>
               </div>
             )}
