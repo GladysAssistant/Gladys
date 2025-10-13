@@ -291,7 +291,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     });
     // Subscribe to Voltage attribute changes if available
-    try {
+    if (electricalPowerMeasurement.supportedFeatures && electricalPowerMeasurement.supportedFeatures.voltage) {
       electricalPowerMeasurement.addVoltageAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement Voltage attribute changed to ${value}`);
         // Value is in millivolts, convert to volts
@@ -301,12 +301,9 @@ async function listenToStateChange(nodeId, devicePath, device) {
           state: voltageInVolts,
         });
       });
-    } catch (error) {
-      // Voltage attribute not available
-      logger.debug(`Matter: Voltage attribute not available for ElectricalPowerMeasurement cluster`);
     }
     // Subscribe to ActiveCurrent attribute changes if available
-    try {
+    if (electricalPowerMeasurement.supportedFeatures && electricalPowerMeasurement.supportedFeatures.current) {
       electricalPowerMeasurement.addActiveCurrentAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement ActiveCurrent attribute changed to ${value}`);
         // Value is in milliamps, convert to amps
@@ -316,9 +313,6 @@ async function listenToStateChange(nodeId, devicePath, device) {
           state: currentInAmps,
         });
       });
-    } catch (error) {
-      // ActiveCurrent attribute not available
-      logger.debug(`Matter: ActiveCurrent attribute not available for ElectricalPowerMeasurement cluster`);
     }
   }
 
@@ -332,27 +326,18 @@ async function listenToStateChange(nodeId, devicePath, device) {
     const hasCumulativeEnergy =
       electricalEnergyMeasurement.supportedFeatures && electricalEnergyMeasurement.supportedFeatures.cumulativeEnergy;
     if (hasCumulativeEnergy) {
-      try {
-        electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
-          logger.debug(
-            `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(
-              value,
-            )}`,
-          );
-          // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
-          const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
-          const externalId = `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`;
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: externalId,
-            state: energyInKwh,
-          });
-        });
-      } catch (error) {
-        // CumulativeEnergyImported attribute not available
+      electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
         logger.debug(
-          `Matter: CumulativeEnergyImported attribute not available for ElectricalEnergyMeasurement cluster`,
+          `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(value)}`,
         );
-      }
+        // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
+        const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
+        const externalId = `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: energyInKwh,
+        });
+      });
     }
   }
 }

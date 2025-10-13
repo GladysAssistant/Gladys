@@ -394,6 +394,9 @@ describe('Matter.listenToStateChange', () => {
   it('should listen to state change (ElectricalPowerMeasurement - Voltage)', async () => {
     const clusterClients = new Map();
     clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      supportedFeatures: {
+        voltage: true,
+      },
       addActivePowerAttributeListener: () => {},
       addVoltageAttributeListener: (callback) => {
         callback(230000); // 230000 mV = 230 V
@@ -413,6 +416,9 @@ describe('Matter.listenToStateChange', () => {
   it('should listen to state change (ElectricalPowerMeasurement - ActiveCurrent)', async () => {
     const clusterClients = new Map();
     clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      supportedFeatures: {
+        current: true,
+      },
       addActivePowerAttributeListener: () => {},
       addVoltageAttributeListener: () => {},
       addActiveCurrentAttributeListener: (callback) => {
