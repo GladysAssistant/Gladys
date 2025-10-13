@@ -335,7 +335,9 @@ async function listenToStateChange(nodeId, devicePath, device) {
       try {
         electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
           logger.debug(
-            `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(value)}`,
+            `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(
+              value,
+            )}`,
           );
           // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
           const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
