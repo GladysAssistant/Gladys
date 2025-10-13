@@ -133,7 +133,7 @@ class EnergyMonitoringPage extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     // Load prices when navigating to the prices tab
     const wasPricesRoute = this.isPricesRoute();
     if (wasPricesRoute && !this.wasPricesRouteLastUpdate) {
