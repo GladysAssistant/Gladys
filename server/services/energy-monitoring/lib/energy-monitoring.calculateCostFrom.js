@@ -10,6 +10,7 @@ const logger = require('../../../utils/logger');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
   ENERGY_PRICE_TYPES,
   ENERGY_CONTRACT_TYPES,
   SYSTEM_VARIABLE_NAMES,
@@ -154,11 +155,19 @@ async function calculateCostFrom(startAt, jobId) {
           // We take the contract from the first price.
           // It's not possible to have multiple contracts for the same electrical meter device.
           const { contract } = energyPricesForDate[0];
+
+          // Convert the value in the correct unit
+          let valueInKwh = deviceFeatureState.value;
+
+          if (ecf.consumptionFeature.unit === DEVICE_FEATURE_UNITS.WATT_HOUR) {
+            valueInKwh = deviceFeatureState.value / 1000;
+          }
+
           // Calculate the cost per contract
           const cost = await contracts[contract](
             energyPricesForDate,
             createdAtRemoved30Minutes,
-            deviceFeatureState.value,
+            valueInKwh,
             systemTimezone,
             { edfTempoHistoricalMap },
           );

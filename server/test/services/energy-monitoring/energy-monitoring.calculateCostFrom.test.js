@@ -14,6 +14,7 @@ const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
   ENERGY_CONTRACT_TYPES,
   ENERGY_PRICE_TYPES,
   ENERGY_PRICE_DAY_TYPES,
@@ -157,6 +158,76 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.18);
     // Price should be equal to 0.18€/kwh * 20kwh
     expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.18);
+  });
+  it('should calculate cost from a specific date with Watt-hour unit conversion', async () => {
+    // Create a device with consumption in Watt-hour (not kWh)
+    await device.create({
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Power plug with Wh',
+      external_id: 'power-plug-wh',
+      features: [
+        {
+          id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          selector: 'power-plug-consumption-wh',
+          external_id: 'power-plug-consumption-wh',
+          name: 'Power plug Consumption (Wh)',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
+          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+        },
+        {
+          id: 'c3d4e5f6-a789-0123-cdef-234567890abc',
+          selector: 'power-plug-consumption-cost-wh',
+          external_id: 'power-plug-consumption-cost-wh',
+          name: 'Power plug Consumption Cost (Wh)',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+        },
+      ],
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('b2c3d4e5-f6a7-8901-bcde-f12345678901', [
+      {
+        value: 5000, // 5000 Wh = 5 kWh
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 10000, // 10000 Wh = 10 kWh
+        created_at: new Date('2025-08-28T15:30:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-08-28T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost-wh',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(2);
+    // Price should be equal to 0.18€/kwh * 5kwh (5000 Wh / 1000)
+    expect(deviceFeatureState[0]).to.have.property('value', 5 * 0.18);
+    // Price should be equal to 0.18€/kwh * 10kwh (10000 Wh / 1000)
+    expect(deviceFeatureState[1]).to.have.property('value', 10 * 0.18);
   });
   it('should calculate cost from a specific date for a peak/off peak contract', async () => {
     await energyPrice.create({
