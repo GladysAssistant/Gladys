@@ -133,6 +133,15 @@ class EnergyMonitoringPage extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    // Load prices when navigating to the prices tab
+    const wasPricesRoute = this.isPricesRoute();
+    if (wasPricesRoute && !this.wasPricesRouteLastUpdate) {
+      this.loadPrices();
+    }
+    this.wasPricesRouteLastUpdate = wasPricesRoute;
+  }
+
   // ----- ROUTE HELPERS -----
   isPricesRoute() {
     const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
