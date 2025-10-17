@@ -291,7 +291,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     });
     // Subscribe to Voltage attribute changes if available
-    if (electricalPowerMeasurement.supportedFeatures && electricalPowerMeasurement.supportedFeatures.voltage) {
+    if (electricalPowerMeasurement.addVoltageAttributeListener) {
       electricalPowerMeasurement.addVoltageAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement Voltage attribute changed to ${value}`);
         // Value is in millivolts, convert to volts
@@ -303,7 +303,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     }
     // Subscribe to ActiveCurrent attribute changes if available
-    if (electricalPowerMeasurement.supportedFeatures && electricalPowerMeasurement.supportedFeatures.current) {
+    if (electricalPowerMeasurement.addActiveCurrentAttributeListener) {
       electricalPowerMeasurement.addActiveCurrentAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement ActiveCurrent attribute changed to ${value}`);
         // Value is in milliamps, convert to amps
@@ -323,9 +323,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     );
     this.stateChangeListeners.add(electricalEnergyMeasurement);
     // Subscribe to CumulativeEnergyImported attribute changes if CumulativeEnergy feature is supported
-    const hasCumulativeEnergy =
-      electricalEnergyMeasurement.supportedFeatures && electricalEnergyMeasurement.supportedFeatures.cumulativeEnergy;
-    if (hasCumulativeEnergy) {
+    if (electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener) {
       electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
         logger.debug(
           `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(value)}`,
