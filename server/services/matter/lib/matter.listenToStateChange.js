@@ -325,9 +325,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     // Subscribe to CumulativeEnergyImported attribute changes if CumulativeEnergy feature is supported
     if (electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener) {
       electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
-        logger.debug(
-          `Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to ${JSON.stringify(value)}`,
-        );
+        logger.debug(`Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to`, value);
         // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
         const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
         const externalId = `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`;
