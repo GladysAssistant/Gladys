@@ -5,7 +5,16 @@ import { route } from 'preact-router';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import ImportPricesPage from './ImportPrices';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+
+const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX
+];
 
 class EnergyMonitoringPage extends Component {
   state = {
@@ -293,7 +302,12 @@ class EnergyMonitoringPage extends Component {
     const { devices } = this.state;
     devices.forEach(device => {
       (device.features || [])
-        .filter(feature => feature && feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR)
+        .filter(
+          feature =>
+            feature &&
+            feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+            DEVICE_FEATURE_TYPES_TO_DISPLAY.includes(feature.type)
+        )
         .forEach(feature => {
           flat.push({ ...feature, __device: device });
         });
