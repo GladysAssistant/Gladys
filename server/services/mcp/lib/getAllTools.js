@@ -59,7 +59,7 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: 'read',
+        access: ['read'],
       })),
     };
 
@@ -83,7 +83,7 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: 'write',
+        access: ['write', 'read'],
       })),
     };
 
@@ -201,28 +201,28 @@ async function getAllTools() {
         description: 'Get last state of specific device type or in a specific room.',
         inputSchema: {
           room: z.enum(rooms).optional().describe('Room to get information from, leave empty to select multiple rooms.'),
-          sensor_type: z.enum(availableSensorFeatureCategories).optional().describe('Type of sensor to query, leave empty to retrieve all devices.'),
+          device_type: z.enum([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories]).optional().describe('Type of device to query, leave empty to retrieve all devices.'),
         },
       },
-      cb: async ({ room, sensor_type: sensorType }) => {
+      cb: async ({ room, device_type: deviceType }) => {
         const states = [];
 
-        let selectedDevices = sensorDevices;
+        let selectedDevices = [...sensorDevices, ...switchableDevices];
 
         if (room && room !== '') {
           selectedDevices = selectedDevices.filter(device => device.room.selector === room);
         }
 
-        if (sensorType && sensorType.length > 0) {
+        if (deviceType && deviceType.length > 0) {
           selectedDevices = selectedDevices.filter(device => {
-            return device.features.some(feature => sensorType.includes(feature.category));
+            return device.features.some(feature => deviceType.includes(feature.category));
           });
         }
 
         await Promise.all(selectedDevices.map(async (device) => {
           const deviceLastState = await this.gladys.device.getBySelector(device.selector);
           return device.features.map(feature => {
-            if (!sensorType || sensorType.length === 0 || sensorType.includes(feature.category)) {
+            if (!deviceType || deviceType.length === 0 || deviceType.includes(feature.category)) {
               const featureLastState = deviceLastState.features.find(feat => feat.id === feature.id);
 
               states.push({

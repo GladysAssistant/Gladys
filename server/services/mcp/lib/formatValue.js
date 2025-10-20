@@ -11,6 +11,12 @@ function formatValue(feature) {
       return {
         value: feature.last_value === 0 ? 'open' : 'closed',
       };
+    case 'light:binary':
+    case 'switch:binary':
+    case 'air-conditioning':
+      return {
+        value: feature.last_value === 0 ? 'off' : 'on',
+      };
     default:
       return {
         value: feature.last_value,
