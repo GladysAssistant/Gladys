@@ -35,15 +35,11 @@ describe('EnergyMonitoring Service', () => {
     await energyMonitoringService.start();
 
     // Verify scheduler was called to schedule jobs
-    assert.calledTwice(mockScheduler.scheduleJob);
+    assert.calledOnce(mockScheduler.scheduleJob);
 
-    // Verify cost calculation job (every 30 minutes)
+    // Verify that job is scheduled every 30 minutes
     const costJobCall = mockScheduler.scheduleJob.getCall(0);
-    expect(costJobCall.args[0]).to.equal('0 */30 * * * *');
-
-    // Verify consumption calculation job (at 00:00 and 00:30)
-    const consumptionJobCall = mockScheduler.scheduleJob.getCall(1);
-    expect(consumptionJobCall.args[0]).to.equal('0 0,30 * * * *');
+    expect(costJobCall.args[0]).to.equal('0 0,30 * * * *');
   });
 
   it('should not throw error when starting service', async () => {
