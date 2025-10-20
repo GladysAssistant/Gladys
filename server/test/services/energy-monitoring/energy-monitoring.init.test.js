@@ -103,14 +103,14 @@ describe('EnergyMonitoring.init', () => {
 
   describe('Scheduled job execution', () => {
     let calculateCostEveryThirtyMinutes;
-    let calculateConsumptionFromIndex;
+    let calculateConsumptionFromIndexThirtyMinutes;
 
     beforeEach(() => {
       calculateCostEveryThirtyMinutes = fake.returns(null);
-      calculateConsumptionFromIndex = fake.returns(null);
+      calculateConsumptionFromIndexThirtyMinutes = fake.returns(null);
 
       energyMonitoring.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
-      energyMonitoring.calculateConsumptionFromIndexWithJobWrapper = calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndexThirtyMinutes = calculateConsumptionFromIndexThirtyMinutes;
     });
 
     it('should execute both consumption and cost calculation when job runs', async () => {
@@ -123,11 +123,11 @@ describe('EnergyMonitoring.init', () => {
       await jobFunction();
 
       // Verify both calculations were called
-      assert.calledOnce(calculateConsumptionFromIndex);
+      assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
       assert.calledOnce(calculateCostEveryThirtyMinutes);
     });
 
-    it('should execute consumption calculation with correct timestamp when job runs', async () => {
+    it('should pass current time to both calculation functions', async () => {
       energyMonitoring.init();
 
       // Get the combined job function
@@ -137,50 +137,34 @@ describe('EnergyMonitoring.init', () => {
       await jobFunction();
 
       // Verify both calculations were called
-      assert.calledOnce(calculateConsumptionFromIndex);
+      assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
       assert.calledOnce(calculateCostEveryThirtyMinutes);
 
-      const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-      expect(callArgs[0]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
+      // Verify both functions receive the now timestamp
+      const consumptionCallArgs = calculateConsumptionFromIndexThirtyMinutes.getCall(0).args;
+      const costCallArgs = calculateCostEveryThirtyMinutes.getCall(0).args;
 
-      // Verify timestamp has correct minutes (should be 0 or 30)
-      const minutes = callArgs[0].getMinutes();
-      expect([0, 30]).to.include(minutes);
-
-      // Verify seconds and milliseconds are 0
-      expect(callArgs[0].getSeconds()).to.equal(0);
-      expect(callArgs[0].getMilliseconds()).to.equal(0);
+      expect(consumptionCallArgs[0]).to.be.instanceOf(Date);
+      expect(costCallArgs[0]).to.be.instanceOf(Date);
     });
 
-    it('should create timestamp with proper rounding logic', async () => {
+    it('should create current timestamp when job executes', async () => {
       energyMonitoring.init();
 
       // Get the combined job function
       const jobFunction = mockScheduler.scheduleJob.getCall(0).args[1];
 
-      // Execute the job to test rounding
+      // Execute the job
       await jobFunction();
 
       // Verify consumption calculation was called
-      assert.calledOnce(calculateConsumptionFromIndex);
+      assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
 
-      const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-      expect(callArgs[0]).to.be.instanceOf(Date); // thirtyMinutesWindowTime
-
-      // Verify the timestamp is properly rounded
-      const timestamp = callArgs[0];
-      const minutes = timestamp.getMinutes();
-      const seconds = timestamp.getSeconds();
-      const milliseconds = timestamp.getMilliseconds();
-
-      // Minutes should be 0 or 30
-      expect([0, 30]).to.include(minutes);
-      // Seconds and milliseconds should be 0 (exact time)
-      expect(seconds).to.equal(0);
-      expect(milliseconds).to.equal(0);
+      const callArgs = calculateConsumptionFromIndexThirtyMinutes.getCall(0).args;
+      expect(callArgs[0]).to.be.instanceOf(Date);
     });
 
-    it('should round to 00:00 when current time is before 30 minutes', async () => {
+    it('should pass mocked time when using fake timers (before 30 minutes)', async () => {
       // Use sinon fake timers to mock a time with minutes < 30 (e.g., 10:15:45.123)
       const clock = useFakeTimers(new Date('2023-10-15T10:15:45.123Z'));
 
@@ -193,22 +177,22 @@ describe('EnergyMonitoring.init', () => {
         // Execute the job
         await jobFunction();
 
-        // Verify consumption calculation was called with rounded time
-        assert.calledOnce(calculateConsumptionFromIndex);
+        // Verify consumption calculation was called
+        assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
 
-        const callArgs = calculateConsumptionFromIndex.getCall(0).args;
+        const callArgs = calculateConsumptionFromIndexThirtyMinutes.getCall(0).args;
         const timestamp = callArgs[0];
 
-        // Should round to 00:00
-        expect(timestamp.getMinutes()).to.equal(0);
-        expect(timestamp.getSeconds()).to.equal(0);
-        expect(timestamp.getMilliseconds()).to.equal(0);
+        // Should receive the mocked time
+        expect(timestamp.getMinutes()).to.equal(15);
+        expect(timestamp.getSeconds()).to.equal(45);
+        expect(timestamp.getMilliseconds()).to.equal(123);
       } finally {
         clock.restore();
       }
     });
 
-    it('should round to 00:30 when current time is at or after 30 minutes', async () => {
+    it('should pass mocked time when using fake timers (after 30 minutes)', async () => {
       // Use sinon fake timers to mock a time with minutes >= 30 (e.g., 10:45:30.456)
       const clock = useFakeTimers(new Date('2023-10-15T10:45:30.456Z'));
 
@@ -221,16 +205,16 @@ describe('EnergyMonitoring.init', () => {
         // Execute the job
         await jobFunction();
 
-        // Verify consumption calculation was called with rounded time
-        assert.calledOnce(calculateConsumptionFromIndex);
+        // Verify consumption calculation was called
+        assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
 
-        const callArgs = calculateConsumptionFromIndex.getCall(0).args;
+        const callArgs = calculateConsumptionFromIndexThirtyMinutes.getCall(0).args;
         const timestamp = callArgs[0];
 
-        // Should round to 00:30
-        expect(timestamp.getMinutes()).to.equal(30);
-        expect(timestamp.getSeconds()).to.equal(0);
-        expect(timestamp.getMilliseconds()).to.equal(0);
+        // Should receive the mocked time
+        expect(timestamp.getMinutes()).to.equal(45);
+        expect(timestamp.getSeconds()).to.equal(30);
+        expect(timestamp.getMilliseconds()).to.equal(456);
       } finally {
         clock.restore();
       }

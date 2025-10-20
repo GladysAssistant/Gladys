@@ -2710,7 +2710,7 @@
       "service-matter-backup": "Sauvegarde Matter",
       "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
-      "energy-monitoring-consumption-from-index": "Calcul de la consommation énergétique depuis l'index",
+      "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)"
     },
     "jobErrors": {

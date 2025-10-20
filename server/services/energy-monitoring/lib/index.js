@@ -1,3 +1,5 @@
+const queue = require('queue');
+
 const { init } = require('./energy-monitoring.init');
 const { calculateCostEveryThirtyMinutes } = require('./energy-monitoring.calculateCostEveryThirtyMinutes');
 const { calculateCostFrom } = require('./energy-monitoring.calculateCostFrom');
@@ -7,12 +9,20 @@ const { calculateConsumptionFromIndex } = require('./energy-monitoring.calculate
 const {
   calculateConsumptionFromIndexFromBeginning: ccFromIndexFromBeginning,
 } = require('./energy-monitoring.calculateConsumptionFromIndexFromBeginning');
+const {
+  calculateConsumptionFromIndexThirtyMinutes: ccConsumptionFromIndexThirtyMinutes,
+} = require('./energy-monitoring.calculateConsumptionFromIndexThirtyMinutes');
 
 const { JOB_TYPES } = require('../../../utils/constants');
 
 const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
+  // @ts-ignore
+  this.queue = queue({
+    autostart: true,
+    concurrency: 1,
+  });
   this.calculateCostEveryThirtyMinutes = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES,
     this.calculateCostEveryThirtyMinutes.bind(this),
@@ -21,9 +31,9 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING,
     this.calculateCostFromBeginning.bind(this),
   );
-  this.calculateConsumptionFromIndexWithJobWrapper = this.gladys.job.wrapper(
-    JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX,
-    this.calculateConsumptionFromIndex.bind(this),
+  this.calculateConsumptionFromIndexThirtyMinutes = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES,
+    this.calculateConsumptionFromIndexThirtyMinutes.bind(this),
   );
   this.calculateConsumptionFromIndexFromBeginning = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING,
@@ -38,5 +48,6 @@ EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFrom
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning = ccFromIndexFromBeginning;
+EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexThirtyMinutes = ccConsumptionFromIndexThirtyMinutes;
 
 module.exports = EnergyMonitoringHandler;
