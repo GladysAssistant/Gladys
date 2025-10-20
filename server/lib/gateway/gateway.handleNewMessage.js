@@ -89,6 +89,11 @@ async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-open-api' && data.action === 'alexa-request') {
     await this.handleAlexaMessage(data, rawMessage, cb);
   }
+
+  if (data.type === 'gladys-open-api' && data.action === 'mcp-webhook') {
+    console.log(data);
+    cb({ status: 200 });
+  }
 }
 
 module.exports = {

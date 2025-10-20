@@ -24,6 +24,9 @@ const stateSchema = Joi.object({
  * ]);
  */
 async function saveMultipleHistoricalStates(deviceFeatureId, states) {
+  if (!states || states.length === 0) {
+    return;
+  }
   logger.debug(
     `device.saveMultipleHistoricalStates: Inserting ${states.length} states for device feature ${deviceFeatureId}`,
   );

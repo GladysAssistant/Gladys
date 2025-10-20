@@ -53,6 +53,21 @@ describe('Device.saveMultipleHistoricalStates', () => {
     expect(savedStates[2].value).to.equal(30);
   });
 
+  it('should save 0 states', async () => {
+    const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+    const states = [];
+
+    await device.saveMultipleHistoricalStates(deviceFeatureId, states);
+
+    // Verify no states were inserted
+    const savedStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT value, created_at FROM t_device_feature_state WHERE device_feature_id = ? ORDER BY created_at',
+      deviceFeatureId,
+    );
+
+    expect(savedStates).to.have.lengthOf(0);
+  });
+
   it('should sort states by created_at before inserting', async () => {
     const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
     // States in wrong order
