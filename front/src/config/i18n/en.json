@@ -1898,6 +1898,23 @@
         "defaultDeletionError": "An error occurred while deleting the device",
         "getDevicesError": "An error occurred while getting the devices list"
       }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Connect your AI agent to Gladys.",
+      "documentation": "MCP Documentation",
+      "longDescription": "MCP is a protocol that allows adding real-world capabilities to your agent. This integration acts as an MCP server and allows your MCP-compatible AI agents to interact with your smart home. Your agent and your Gladys instance must be on the same network.",
+      "urlLabel": "MCP Server URL",
+      "urlInstruction": "Copy this URL into your agent's configuration.",
+      "apiKeyLabel": "MCP Server API Key",
+      "apiKeyInstruction": "Generate an API key to authenticate your MCP client. In your MCP client configuration, add an \"Authorization\" header with this key as the value.",
+      "warningKeyDisappear": "Warning: you will only see the key once. Copy/paste your key and save it somewhere.",
+      "keyName": "Details",
+      "revoke": "Revoke",
+      "namePlaceholder": "Client name",
+      "generateButton": "Generate",
+      "keyNameLabel": "Key:",
+      "registeredLabel": "Registered on:"
     }
   },
   "editScene": {

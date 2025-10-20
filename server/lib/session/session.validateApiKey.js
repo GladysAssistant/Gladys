@@ -25,7 +25,7 @@ async function validateApiKey(apiKey, scope) {
     throw new Error401(`Api key not found`);
   }
 
-  if (session.valid_until < new Date()) {
+  if (session.valid_until && session.valid_until < new Date()) {
     throw new Error401(`Api key has expired`);
   }
 

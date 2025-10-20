@@ -72,18 +72,15 @@ module.exports = function MCPController(mcpHandler) {
 
   return {
     'post /api/v1/service/mcp/proxy': {
-      // authenticated: true,
-      // admin: true,
+      authenticated: true,
       controller: asyncMiddleware(proxy),
     },
     'get /api/v1/service/mcp/proxy': {
-      // authenticated: true,
-      // admin: true,
+      authenticated: true,
       controller: asyncMiddleware(handleSessionRequest),
     },
     'delete /api/v1/service/mcp/proxy': {
-      // authenticated: true,
-      // admin: true,
+      authenticated: true,
       controller: asyncMiddleware(handleSessionRequest),
     },
   };

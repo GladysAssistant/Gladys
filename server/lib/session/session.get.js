@@ -38,6 +38,8 @@ async function get(userId, options) {
     where: {
       revoked: false,
       user_id: userId,
+      ...(options.token_type ? { token_type: options.token_type } : {}),
+      ...(options.scope ? { scope: options.scope } : {}),
     },
   });
 
