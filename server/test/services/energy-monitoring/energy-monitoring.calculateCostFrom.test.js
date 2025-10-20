@@ -236,6 +236,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
       currency: 'euro',
       start_date: '2025-01-01',
+      end_date: '',
       // 0,15€/kwh stored as integer with 4 decimals
       price: 1500,
       // Off peak time

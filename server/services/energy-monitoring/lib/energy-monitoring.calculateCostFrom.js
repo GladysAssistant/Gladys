@@ -18,6 +18,8 @@ const {
 const contracts = require('../contracts/contracts.calculateCost');
 const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDayMap');
 
+const isNullOrEmpty = (value) => value === null || value === undefined || value === '';
+
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
@@ -136,12 +138,13 @@ async function calculateCostFrom(startAt, jobId) {
             .toDate();
           // Get the prices for this date
           const energyPricesForDate = energyPrices.filter((price) => {
+            console.log({ priceEndDate: price.end_date });
             // We only keep consumption prices (no subscription)
             return (
               price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
               // We only keep prices that are valid for this date
               dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
-              (price.end_date === null ||
+              (isNullOrEmpty(price.end_date) ||
                 dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).toDate() >= createdAtRemoved30Minutes)
             );
           });

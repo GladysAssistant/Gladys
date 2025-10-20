@@ -260,6 +260,10 @@ class EnergyMonitoringPage extends Component {
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
         payload.hour_slots = this.formatSetToHourSlots(this.state.wizardHourSlots);
       }
+      // Convert empty end_date to null
+      if (payload.end_date === '' || payload.end_date === 'Invalid date') {
+        payload.end_date = null;
+      }
       // Scale price to integer with 4 decimals (x10000) before saving
       if (payload.price !== undefined && payload.price !== null && payload.price !== '') {
         const n = Number(payload.price);

@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       end_date: {
         allowNull: true,
         type: DataTypes.DATEONLY,
+        set(value) {
+          // Convert empty string to null
+          this.setDataValue('end_date', value === '' ? null : value);
+        },
       },
       contract: {
         allowNull: false,
