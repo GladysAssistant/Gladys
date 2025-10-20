@@ -7,9 +7,9 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const { queueWrapper } = require('../utils/queueWrapper');
-const { getDeviceFeature } = require('../../../utils/device');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
@@ -37,23 +37,20 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
     const devicesWithBothFeatures = [];
 
     energyDevices.forEach((energyDevice) => {
-      const indexFeature = getDeviceFeature(
-        energyDevice,
-        DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+      const indexFeatures = energyDevice.features.filter(
+        (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
       );
 
-      const consumptionFeature = getDeviceFeature(
-        energyDevice,
-        DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      const consumptionFeatures = energyDevice.features.filter(
+        (f) =>
+          f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
       );
 
-      if (indexFeature && consumptionFeature) {
+      if (indexFeatures.length > 0 && consumptionFeatures.length > 0) {
         devicesWithBothFeatures.push({
           device: energyDevice,
-          indexFeature,
-          consumptionFeature,
+          indexFeatures,
         });
       }
     });
@@ -74,7 +71,9 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
     }
 
     // Find the oldest device state across all index features using a direct SQL query
-    const indexFeatureIds = devicesWithBothFeatures.map((deviceInfo) => deviceInfo.indexFeature.id);
+    const indexFeatureIds = devicesWithBothFeatures
+      .map((deviceInfo) => deviceInfo.indexFeatures.map((f) => f.id))
+      .flat();
 
     const result = await this.gladys.device.getOldestStateFromDeviceFeatures(indexFeatureIds);
 

@@ -524,6 +524,66 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       expect(device.getDeviceFeatureStates.callCount).to.equal(2);
     });
 
+    it('should handle SWITCH.ENERGY type as index feature', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+      const windowStart = dayjs(testTime)
+        .subtract(30, 'minutes')
+        .toDate();
+
+      // Mock device with SWITCH.ENERGY as index feature
+      const deviceWithSwitchEnergy = {
+        id: 'f2a3b4c5-d6e7-8901-6789-012345678901',
+        name: 'Switch Energy Device',
+        params: [],
+        features: [
+          {
+            id: 'a3b4c5d6-e7f8-9012-7890-123456789012',
+            selector: 'test-switch-energy',
+            category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+            type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+            energy_parent_id: null,
+          },
+          {
+            id: 'b4c5d6e7-f8a9-0123-8901-234567890123',
+            selector: 'test-switch-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'a3b4c5d6-e7f8-9012-7890-123456789012', // Links to the SWITCH.ENERGY feature
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithSwitchEnergy]);
+
+      // Mock states for the SWITCH.ENERGY feature
+      device.getDeviceFeatureStates = fake.returns([
+        {
+          value: 1000,
+          created_at: dayjs(windowStart)
+            .add(5, 'minutes')
+            .toDate(),
+        },
+        {
+          value: 1200,
+          created_at: dayjs(windowStart)
+            .add(15, 'minutes')
+            .toDate(),
+        },
+      ]);
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+
+      // Verify the SWITCH.ENERGY feature was processed
+      assert.calledOnce(device.getDeviceFeatureStates);
+      const getStatesCall = device.getDeviceFeatureStates.getCall(0);
+      expect(getStatesCall.args[0]).to.equal('test-switch-energy'); // SWITCH.ENERGY feature selector
+
+      // Verify consumption was calculated and saved
+      assert.calledOnce(device.saveHistoricalState);
+
+      // Verify last processed timestamp was saved
+      assert.calledOnce(device.setParam);
+    });
+
     it('should handle errors during device processing without throwing', async () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
 

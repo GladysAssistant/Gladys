@@ -8,6 +8,7 @@ dayjs.extend(timezone);
 
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
@@ -38,8 +39,7 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
   energyDevices.forEach((energyDevice) => {
     // Find all INDEX features in this device
     const indexFeatures = energyDevice.features.filter(
-      (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR && f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+      (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
     );
 
     // For each INDEX feature, find the corresponding THIRTY_MINUTES_CONSUMPTION feature
