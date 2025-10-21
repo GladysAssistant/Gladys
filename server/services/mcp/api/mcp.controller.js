@@ -5,7 +5,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function MCPController(mcpHandler) {
   /**
-   * @api {post} /api/v1/service/mcp/proxy Start MCP bridge
+   * @api {post} /api/v1/service/mcp/proxy Connect to MCP bridge
    * @apiName proxy
    * @apiGroup MCP
    */

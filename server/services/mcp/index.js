@@ -34,5 +34,6 @@ module.exports = function MCPService(gladys, serviceId) {
     start,
     stop,
     controllers: MCPController(mcpHandler),
+    mcpHandler,
   });
 };
