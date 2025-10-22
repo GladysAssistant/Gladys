@@ -1,5 +1,5 @@
 import { SESSION_TOKEN_TYPES } from '../../../../../../server/utils/constants';
-import { RequestStatus } from '../../../../utils/consts'
+import { RequestStatus } from '../../../../utils/consts';
 import update from 'immutability-helper';
 
 function createActions(store) {
@@ -11,9 +11,8 @@ function createActions(store) {
       try {
         const mcpApiKeys = await state.httpClient.get('/api/v1/session', {
           scope: ['mcp'],
-          token_type: SESSION_TOKEN_TYPES.API_KEY,
+          token_type: SESSION_TOKEN_TYPES.API_KEY
         });
-        console.log(mcpApiKeys)
         store.setState({
           mcpApiKeys,
           sessionsGetStatus: RequestStatus.Success
@@ -35,7 +34,7 @@ function createActions(store) {
       try {
         const newApiKey = await state.httpClient.post('/api/v1/session/api_key', {
           scope: ['mcp'],
-          useragent: state.newMCPClient,
+          useragent: state.newMCPClient
         });
         const mcpApiKeys = update(state.mcpApiKeys, {
           $push: [{ ...newApiKey, useragent: state.newMCPClient }]
@@ -73,7 +72,7 @@ function createActions(store) {
       store.setState({
         newMCPClient: e.target.value
       });
-    },
+    }
   };
   return actions;
 }

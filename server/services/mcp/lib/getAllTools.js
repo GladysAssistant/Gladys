@@ -38,15 +38,15 @@ async function getAllResources() {
   const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
   rooms.forEach((room) => {
     homeSchema[room] = {
-      devices: {}
+      devices: {},
     };
   });
 
-  let sensorDevices = (await this.gladys.device.get()).filter(device => {
-    return device.features.some(feature => sensorFeatureCategories.includes(feature.category));
+  let sensorDevices = (await this.gladys.device.get()).filter((device) => {
+    return device.features.some((feature) => sensorFeatureCategories.includes(feature.category));
   });
-  sensorDevices = sensorDevices.map(device => {
-    device.features = device.features.filter(feature => sensorFeatureCategories.includes(feature.category));
+  sensorDevices = sensorDevices.map((device) => {
+    device.features = device.features.filter((feature) => sensorFeatureCategories.includes(feature.category));
     return device;
   });
 
@@ -66,11 +66,15 @@ async function getAllResources() {
     homeSchema[device.room.selector].devices[device.selector] = d;
   });
 
-  let switchableDevices = (await this.gladys.device.get()).filter(device => {
-    return device.features.some(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+  let switchableDevices = (await this.gladys.device.get()).filter((device) => {
+    return device.features.some(
+      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
+    );
   });
-  switchableDevices = switchableDevices.map(device => {
-    device.features = device.features.filter(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+  switchableDevices = switchableDevices.map((device) => {
+    device.features = device.features.filter(
+      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
+    );
     return device;
   });
 
@@ -96,21 +100,25 @@ async function getAllResources() {
     homeSchema[device.room.selector].devices[device.selector] = d;
   });
 
-  return [{
-    name: 'home',
-    uri: 'schema://home',
-    config: {
-      title: 'Home devices and rooms structure',
-      description: 'Structure of home by room with all their devices and associated features.',
-      mimeType: 'application/json',
+  return [
+    {
+      name: 'home',
+      uri: 'schema://home',
+      config: {
+        title: 'Home devices and rooms structure',
+        description: 'Structure of home by room with all their devices and associated features.',
+        mimeType: 'application/json',
+      },
+      cb: async (uri) => ({
+        contents: [
+          {
+            uri: uri.href,
+            text: JSON.stringify(homeSchema),
+          },
+        ],
+      }),
     },
-    cb: async (uri) => ({
-      contents: [{
-        uri: uri.href,
-        text: JSON.stringify(homeSchema)
-      }]
-    })
-  }];
+  ];
 }
 
 /**
@@ -122,27 +130,43 @@ async function getAllResources() {
 async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
   const scenes = (await this.gladys.scene.get()).map(({ selector }) => selector);
-  let sensorDevices = (await this.gladys.device.get()).filter(device => {
-    return device.features.some(feature => sensorFeatureCategories.includes(feature.category));
+  let sensorDevices = (await this.gladys.device.get()).filter((device) => {
+    return device.features.some((feature) => sensorFeatureCategories.includes(feature.category));
   });
-  sensorDevices = sensorDevices.map(device => {
-    device.features = device.features.filter(feature => sensorFeatureCategories.includes(feature.category));
+  sensorDevices = sensorDevices.map((device) => {
+    device.features = device.features.filter((feature) => sensorFeatureCategories.includes(feature.category));
     return device;
   });
-  const availableSensorFeatureCategories = [...new Set(sensorDevices.map(device => {
-    return device.features.map(feature => feature.category);
-  }).flat())];
+  const availableSensorFeatureCategories = [
+    ...new Set(
+      sensorDevices
+        .map((device) => {
+          return device.features.map((feature) => feature.category);
+        })
+        .flat(),
+    ),
+  ];
 
-  let switchableDevices = (await this.gladys.device.get()).filter(device => {
-    return device.features.some(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+  let switchableDevices = (await this.gladys.device.get()).filter((device) => {
+    return device.features.some(
+      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
+    );
   });
-  switchableDevices = switchableDevices.map(device => {
-    device.features = device.features.filter(feature => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary');
+  switchableDevices = switchableDevices.map((device) => {
+    device.features = device.features.filter(
+      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
+    );
     return device;
   });
-  const availableSwitchableFeatureCategories = [...new Set(switchableDevices.map(device => {
-    return device.features.map(feature => feature.category);
-  }).flat())];
+  const availableSwitchableFeatureCategories = [
+    ...new Set(
+      switchableDevices
+        .map((device) => {
+          return device.features.map((feature) => feature.category);
+        })
+        .flat(),
+    ),
+  ];
 
   return [
     {
@@ -200,8 +224,14 @@ async function getAllTools() {
         title: 'Get states from devices',
         description: 'Get last state of specific device type or in a specific room.',
         inputSchema: {
-          room: z.enum(rooms).optional().describe('Room to get information from, leave empty to select multiple rooms.'),
-          device_type: z.enum([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories]).optional().describe('Type of device to query, leave empty to retrieve all devices.'),
+          room: z
+            .enum(rooms)
+            .optional()
+            .describe('Room to get information from, leave empty to select multiple rooms.'),
+          device_type: z
+            .enum([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories])
+            .optional()
+            .describe('Type of device to query, leave empty to retrieve all devices.'),
         },
       },
       cb: async ({ room, device_type: deviceType }) => {
@@ -210,38 +240,40 @@ async function getAllTools() {
         let selectedDevices = [...sensorDevices, ...switchableDevices];
 
         if (room && room !== '') {
-          selectedDevices = selectedDevices.filter(device => device.room.selector === room);
+          selectedDevices = selectedDevices.filter((device) => device.room.selector === room);
         }
 
         if (deviceType && deviceType.length > 0) {
-          selectedDevices = selectedDevices.filter(device => {
-            return device.features.some(feature => deviceType.includes(feature.category));
+          selectedDevices = selectedDevices.filter((device) => {
+            return device.features.some((feature) => deviceType.includes(feature.category));
           });
         }
 
-        await Promise.all(selectedDevices.map(async (device) => {
-          const deviceLastState = await this.gladys.device.getBySelector(device.selector);
-          return device.features.map(feature => {
-            if (!deviceType || deviceType.length === 0 || deviceType.includes(feature.category)) {
-              const featureLastState = deviceLastState.features.find(feat => feat.id === feature.id);
+        await Promise.all(
+          selectedDevices.map(async (device) => {
+            const deviceLastState = await this.gladys.device.getBySelector(device.selector);
+            return device.features.map((feature) => {
+              if (!deviceType || deviceType.length === 0 || deviceType.includes(feature.category)) {
+                const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
 
-              states.push({
-                room: device.room.name,
-                device: device.name,
-                feature: featureLastState.name,
-                category: featureLastState.category,
-                ...this.formatValue(featureLastState),
-              });
+                states.push({
+                  room: device.room.name,
+                  device: device.name,
+                  feature: featureLastState.name,
+                  category: featureLastState.category,
+                  ...this.formatValue(featureLastState),
+                });
 
-              return true;
-            }
+                return true;
+              }
 
-            return false;
-          });
-        }));
+              return false;
+            });
+          }),
+        );
 
         return {
-          content: states.map(state => ({
+          content: states.map((state) => ({
             type: 'text',
             text: JSON.stringify(state),
           })),
@@ -252,21 +284,33 @@ async function getAllTools() {
       intent: 'device.turn-on-off',
       config: {
         title: 'Turn on/off devices',
-        description: 'Turn on/off specific device selected either by the name if we know it else by it room and it device type.',
+        description:
+          'Turn on/off specific device selected either by the name if we know it else by it room and it device type.',
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
-          device: z.enum(switchableDevices.map(d => d.selector)).describe('Device name to turn on/off.').optional(),
-          room: z.enum(rooms).describe("Device's room only if we don't know it name.").optional(),
-          device_category: z.enum(availableSwitchableFeatureCategories).describe("Type of device to turn on/off only if we don't know it name.").optional(),
-        }
+          device: z
+            .enum(switchableDevices.map((d) => d.selector))
+            .describe('Device name to turn on/off.')
+            .optional(),
+          room: z
+            .enum(rooms)
+            .describe("Device's room only if we don't know it name.")
+            .optional(),
+          device_category: z
+            .enum(availableSwitchableFeatureCategories)
+            .describe("Type of device to turn on/off only if we don't know it name.")
+            .optional(),
+        },
       },
       cb: async ({ action, device, room, device_category: deviceCategory }) => {
         if (device) {
-          const selectedDevice = switchableDevices.find(d => d.selector === device);
+          const selectedDevice = switchableDevices.find((d) => d.selector === device);
           if (selectedDevice) {
-            await Promise.all(selectedDevice.features.map(f => {
-              return this.gladys.device.setValue(selectedDevice, f, action === 'on' ? 1 : 0);
-            }));
+            await Promise.all(
+              selectedDevice.features.map((f) => {
+                return this.gladys.device.setValue(selectedDevice, f, action === 'on' ? 1 : 0);
+              }),
+            );
 
             return {
               content: [{ type: 'text', text: `device.turn-${action} command sent for ${device}` }],
@@ -275,23 +319,32 @@ async function getAllTools() {
         }
 
         if (room && deviceCategory) {
-          const selectedDevices = switchableDevices.filter(d =>
-            (d.room.selector === room && d.features.some(f => f.category === deviceCategory))
+          const selectedDevices = switchableDevices.filter(
+            (d) => d.room.selector === room && d.features.some((f) => f.category === deviceCategory),
           );
 
           if (selectedDevices.length > 0) {
-            await Promise.all(selectedDevices.map(d => {
-              return Promise.all(d.features.map(f => {
-                if (f.category === deviceCategory) {
-                  return this.gladys.device.setValue(d, f, action === 'on' ? 1 : 0);
-                }
+            await Promise.all(
+              selectedDevices.map((d) => {
+                return Promise.all(
+                  d.features.map((f) => {
+                    if (f.category === deviceCategory) {
+                      return this.gladys.device.setValue(d, f, action === 'on' ? 1 : 0);
+                    }
 
-                return null;
-              }));
-            }));
+                    return null;
+                  }),
+                );
+              }),
+            );
 
             return {
-              content: [{ type: 'text', text: `device.turn-${action} command sent for devices in room ${room} with category ${deviceCategory}` }],
+              content: [
+                {
+                  type: 'text',
+                  text: `device.turn-${action} command sent for devices in room ${room} with category ${deviceCategory}`,
+                },
+              ],
             };
           }
         }

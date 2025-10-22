@@ -52,7 +52,6 @@ class ServerResponseMock {
   flushHeaders() {
     // No-op for now
   }
-
 }
 
 module.exports = {

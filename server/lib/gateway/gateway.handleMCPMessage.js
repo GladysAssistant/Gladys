@@ -1,4 +1,4 @@
-const { ServerResponseMock } = require("../../services/mcp/lib/ServerResponseMock");
+const { ServerResponseMock } = require('../../services/mcp/lib/ServerResponseMock');
 
 /**
  * @description Handle a new MCP message from Gateway.
@@ -15,11 +15,14 @@ const { ServerResponseMock } = require("../../services/mcp/lib/ServerResponseMoc
 async function handleMCPMessage({ data }, cb) {
   const service = this.serviceManager.getService('mcp');
 
-  await service.mcpHandler.proxy({
-    method: data.mcp_method,
-    headers: data.mcp_headers,
-    body: data.mcp_data,
-  }, new ServerResponseMock(cb));
+  await service.mcpHandler.proxy(
+    {
+      method: data.mcp_method,
+      headers: data.mcp_headers,
+      body: data.mcp_data,
+    },
+    new ServerResponseMock(cb),
+  );
 }
 
 module.exports = {

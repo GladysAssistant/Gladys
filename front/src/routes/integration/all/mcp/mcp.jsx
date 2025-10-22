@@ -77,7 +77,12 @@ const MCPWelcomePage = ({ user, ...props }) => (
                       <tbody>
                         {props.mcpApiKeys &&
                           props.mcpApiKeys.map((apiKey, index) => (
-                            <MCPApiKey user={props.user} apiKey={apiKey} revokeMCPApiKey={props.revokeMCPApiKey} index={index} />
+                            <MCPApiKey
+                              user={props.user}
+                              apiKey={apiKey}
+                              revokeMCPApiKey={props.revokeMCPApiKey}
+                              index={index}
+                            />
                           ))}
 
                         <tr>

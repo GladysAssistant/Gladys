@@ -35,9 +35,9 @@ module.exports = function MCPController(mcpHandler) {
           jsonrpc: '2.0',
           error: {
             code: -32603,
-            message: 'Internal server error'
+            message: 'Internal server error',
           },
-          id: null
+          id: null,
         });
       }
     }
