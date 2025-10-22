@@ -1,6 +1,9 @@
+const { ServerResponseMock } = require("../../services/mcp/lib/ServerResponseMock");
+
 /**
  * @description Handle a new MCP message from Gateway.
  * @param {object} data - Gateway message.
+ * @param {object} data.data - Gateway message body.
  * @param {Function} cb - Callback.
  * @returns {Promise} Resolve when finished.
  * @example
@@ -9,10 +12,14 @@
  *  action: 'mcp-webhook',
  * });
  */
-async function handleMCPMessage(data, cb) {
+async function handleMCPMessage({ data }, cb) {
   const service = this.serviceManager.getService('mcp');
 
-  await service.mcpHandler.proxy(data, cb);
+  await service.mcpHandler.proxy({
+    method: data.mcp_method,
+    headers: data.mcp_headers,
+    body: data.mcp_data,
+  }, new ServerResponseMock(cb));
 }
 
 module.exports = {

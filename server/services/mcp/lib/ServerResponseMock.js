@@ -1,36 +1,52 @@
 class ServerResponseMock {
   constructor(cb) {
-    this.status = 200;
+    this.statusCode = 200;
     this.headers = {};
     this.body = null;
+    this.headersSent = false;
     this.cb = cb;
+    this.listeners = {};
   }
 
-  writeHead(status, headers) {
-    this.status = status;
+  status(statusCode) {
+    this.statusCode = statusCode;
+
+    return this;
+  }
+
+  writeHead(statusCode, headers) {
+    this.statusCode = statusCode;
     this.headers = headers;
 
     return this;
   }
 
-  end(body) {
-    this.body = body;
+  json(jsonBody) {
+    this.body = jsonBody;
 
-    if (this.status !== 200) {
-      console.log(this.status);
-      console.log(this.headers);
-      console.log(this.body);
+    this.sendResponse();
+  }
+
+  end(body) {
+    if (body) {
+      this.body = JSON.parse(body);
     }
 
+    this.sendResponse();
+  }
+
+  sendResponse() {
+    this.listeners.close?.();
+
     return this.cb({
-      status: this.status,
+      status: this.statusCode,
       headers: this.headers,
-      ...(this.body && { body: JSON.parse(this.body) })
+      body: this.body,
     });
   }
 
-  on() {
-    // No-op for now
+  on(event, cb) {
+    this.listeners[event] = cb;
   }
 
   flushHeaders() {
