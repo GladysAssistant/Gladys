@@ -3,7 +3,13 @@ const MCPHandler = require('./lib');
 const MCPController = require('./api/mcp.controller');
 
 module.exports = function MCPService(gladys, serviceId) {
-  const mcp = require('@modelcontextprotocol/sdk/server/mcp.js');
+  const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
+  const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
+
+  const mcp = {
+    McpServer,
+    StreamableHTTPServerTransport,
+  };
 
   const mcpHandler = new MCPHandler(gladys, serviceId, mcp);
 

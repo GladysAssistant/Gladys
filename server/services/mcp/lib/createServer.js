@@ -1,5 +1,3 @@
-const mcpLocal = require('@modelcontextprotocol/sdk/server/mcp.js');
-
 /**
  * @description Create MCP server.
  * @returns {Promise} MCP server to expose.
@@ -7,7 +5,7 @@ const mcpLocal = require('@modelcontextprotocol/sdk/server/mcp.js');
  * createServer()
  */
 async function createServer() {
-  const mcpServer = new mcpLocal.McpServer(
+  const mcpServer = new this.mcp.McpServer(
     {
       name: 'Gladys',
       title: 'Gladys',

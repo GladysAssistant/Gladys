@@ -1,4 +1,3 @@
-const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const logger = require('../../../utils/logger');
 
 /**
@@ -19,7 +18,7 @@ async function proxy(req, res) {
   }
 
   try {
-    const transport = new StreamableHTTPServerTransport({
+    const transport = new this.mcp.StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });

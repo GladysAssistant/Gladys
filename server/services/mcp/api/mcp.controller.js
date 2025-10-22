@@ -1,4 +1,3 @@
-const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 
@@ -18,7 +17,7 @@ module.exports = function MCPController(mcpHandler) {
     }
 
     try {
-      const transport = new StreamableHTTPServerTransport({
+      const transport = new mcpHandler.mcp.StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
 
