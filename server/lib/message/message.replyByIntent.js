@@ -12,10 +12,6 @@
  * message.replyByIntent('en','light.turn-on.success',{ deviceFeature: {name: 'test'} },'telegram', 'XXXX');
  */
 async function replyByIntent(originalMessage, intent, context, file) {
-  if (!originalMessage) {
-    return;
-  }
-
   const text = this.brain.getReply(originalMessage.language, intent, context);
   await this.reply(originalMessage, text, context, file);
 }
