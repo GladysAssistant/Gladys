@@ -4,12 +4,14 @@ const logger = require('../../../utils/logger');
  * @description Connect to MCP.
  * @param {object} req - Origin request.
  * @param {object} res - Server response.
+ * @param {object} handler - MCP Handler if necessary.
  * @returns {Promise} Resolve when finished.
  * @example
- * proxy(req, res);
+ * proxy(req, res, mcpHandler);
  */
-async function proxy(req, res) {
-  if (this.server === null) {
+async function proxy(req, res, handler) {
+  const mcpHandler = handler || this;
+  if (mcpHandler.server === null) {
     res.json({
       success: false,
       error: 'MCP server is not running',
@@ -18,16 +20,16 @@ async function proxy(req, res) {
   }
 
   try {
-    const transport = new this.mcp.StreamableHTTPServerTransport({
+    const transport = new mcpHandler.mcp.StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
-      enableJsonResponse: true,
+      ...(!handler && { enableJsonResponse: true }),
     });
 
     res.on('close', () => {
       transport.close();
     });
 
-    await this.server.connect(transport);
+    await mcpHandler.server.connect(transport);
     await transport.handleRequest(req, res, req.body);
   } catch (e) {
     logger.error('Error handling MCP request:', e);

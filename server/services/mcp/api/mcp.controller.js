@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const logger = require('../../../utils/logger');
+const { proxy: proxyFunction } = require('../lib/mcp.proxy');
 
 module.exports = function MCPController(mcpHandler) {
   /**
@@ -8,39 +8,7 @@ module.exports = function MCPController(mcpHandler) {
    * @apiGroup MCP
    */
   async function proxy(req, res) {
-    if (mcpHandler.server === null) {
-      res.json({
-        success: false,
-        error: 'MCP server is not running',
-      });
-      return;
-    }
-
-    try {
-      const transport = new mcpHandler.mcp.StreamableHTTPServerTransport({
-        sessionIdGenerator: undefined,
-      });
-
-      res.on('close', () => {
-        transport.close();
-      });
-
-      await mcpHandler.server.connect(transport);
-      await transport.handleRequest(req, res, req.body);
-    } catch (e) {
-      logger.error('Error handling MCP request:', e);
-
-      if (!res.headersSent) {
-        res.status(500).json({
-          jsonrpc: '2.0',
-          error: {
-            code: -32603,
-            message: 'Internal server error',
-          },
-          id: null,
-        });
-      }
-    }
+    return proxyFunction(req, res, mcpHandler);
   }
 
   return {
