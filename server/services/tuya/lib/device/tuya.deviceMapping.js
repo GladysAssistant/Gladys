@@ -31,8 +31,6 @@ const OPEN = 'open';
 const CLOSE = 'close';
 const STOP = 'stop';
 
-
-
 const BATTERY = 'battery_percentage';
 
 const TEMPERATURE_1 = 'va_temperature';
@@ -47,56 +45,55 @@ const SWITCH_WINDOW_CHECK = 'window_check';
 const SWITCH_CHILD_LOCK = 'child_lock';
 
 const mappings = {
-
-  [TEMPERATURE_1]:{
-    category:DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  [TEMPERATURE_1]: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
     unit: DEVICE_FEATURE_UNITS.CELSIUS,
     name: 'Temperature',
     read_only: true,
     has_feedback: false,
     min: -100,
-    max: 600,    
+    max: 600,
   },
-  [TEMPERATURE_2]:{
-    category:DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+  [TEMPERATURE_2]: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
     unit: DEVICE_FEATURE_UNITS.CELSIUS,
     name: 'Temperature',
     read_only: true,
     has_feedback: false,
     min: -200,
-    max: 500,    
-  },  
-  [TEMPERATURE_3]:{
-    category:DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    max: 500,
+  },
+  [TEMPERATURE_3]: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
     unit: DEVICE_FEATURE_UNITS.CELSIUS,
     name: 'Set Temperature',
     min: 50,
-    max: 300,    
-  },   
-  [TEMPERATURE_4]:{
-    category:DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    max: 300,
+  },
+  [TEMPERATURE_4]: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
     unit: DEVICE_FEATURE_UNITS.CELSIUS,
     name: 'Temperature Correction',
     min: 50,
-    max: 50,    
-  },  
+    max: 50,
+  },
 
-  [RELHUMIDITY]:{
-    category:DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+  [RELHUMIDITY]: {
+    category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
     unit: DEVICE_FEATURE_UNITS.PERCENT,
     name: 'Humidity',
     read_only: true,
     has_feedback: false,
     min: 0,
-    max: 100,        
+    max: 100,
   },
-  [BATTERY]:{
-    category:DEVICE_FEATURE_CATEGORIES.BATTERY,
+  [BATTERY]: {
+    category: DEVICE_FEATURE_CATEGORIES.BATTERY,
     type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
     unit: DEVICE_FEATURE_UNITS.PERCENT,
     name: 'Battery',
@@ -110,12 +107,11 @@ const mappings = {
   [SWITCH_WINDOW_CHECK]: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },  
+  },
   [SWITCH_CHILD_LOCK]: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },  
-
+  },
 
   [SWITCH_LED]: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,
@@ -207,10 +203,10 @@ const writeValues = {
   },
 
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromGladys) =>  {
-      return parseInt(valueFromGladys, 10) *10;
-    },    
-  },  
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromGladys) => {
+      return parseInt(valueFromGladys, 10) * 10;
+    },
+  },
 
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromGladys) => {
@@ -256,25 +252,23 @@ const readValues = {
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10) / 10;
-    },    
+    },
   },
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10) / 10;
-    },    
-  },  
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10);
-    },    
+    },
   },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10);
-    },    
-  },  
-
-
+    },
+  },
 
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {

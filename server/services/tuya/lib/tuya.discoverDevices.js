@@ -38,9 +38,9 @@ async function discoverDevices() {
     logger.error('Unable to load Tuya devices', e);
   }
 
-  this.discoveredDevices = await Promise.allSettled(
-    devices.map((device) => this.loadDeviceDetails(device)),
-  ).then((results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value));
+  this.discoveredDevices = await Promise.allSettled(devices.map((device) => this.loadDeviceDetails(device))).then(
+    (results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value),
+  );
 
   this.discoveredDevices = this.discoveredDevices
     .map((device) => ({
