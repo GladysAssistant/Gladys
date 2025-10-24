@@ -241,11 +241,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // PREPARE
     const config = {};
     const getContainersStub = stub();
-    getContainersStub
-      .onFirstCall()
-      .resolves([])
-      .onSecondCall()
-      .resolves([container]);
+    getContainersStub.onFirstCall().resolves([]).onSecondCall().resolves([container]);
     gladys.system.getContainers = getContainersStub;
     gladys.system.pull = fake.resolves(true);
 

@@ -257,12 +257,8 @@ describe('calendar.findCurrentlyRunningEvent', () => {
   const calendar = new Calendar();
   let clock;
   const now = new Date();
-  const startDate = dayjs(now)
-    .subtract(45, 'minute')
-    .toDate();
-  const endDate = dayjs(now)
-    .add(45, 'minute')
-    .toDate();
+  const startDate = dayjs(now).subtract(45, 'minute').toDate();
+  const endDate = dayjs(now).add(45, 'minute').toDate();
   beforeEach(async () => {
     clock = useFakeTimers(now);
   });
@@ -340,9 +336,7 @@ describe('calendar.findCurrentlyRunningEvent', () => {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
       start: startDate,
-      end: dayjs(now)
-        .subtract(10, 'minute')
-        .toDate(),
+      end: dayjs(now).subtract(10, 'minute').toDate(),
     });
     const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'contains', 'test');
     const eventsId = events.map((e) => e.id);

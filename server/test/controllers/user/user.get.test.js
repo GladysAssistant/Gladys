@@ -65,9 +65,6 @@ describe('GET /api/v1/user', () => {
       });
   });
   it('should return 401 unauthorized', async () => {
-    await request
-      .get('/api/v1/user')
-      .expect('Content-Type', /json/)
-      .expect(401);
+    await request.get('/api/v1/user').expect('Content-Type', /json/).expect(401);
   });
 });

@@ -18,52 +18,24 @@ const alarmModeToken = generateAccessToken(
 
 const authenticatedRequest = {
   // @ts-ignore
-  get: (url) =>
-    request(TEST_BACKEND_APP)
-      .get(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', header),
+  get: (url) => request(TEST_BACKEND_APP).get(url).set('Accept', 'application/json').set('Authorization', header),
   // @ts-ignore
-  post: (url) =>
-    request(TEST_BACKEND_APP)
-      .post(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', header),
+  post: (url) => request(TEST_BACKEND_APP).post(url).set('Accept', 'application/json').set('Authorization', header),
   // @ts-ignore
-  patch: (url) =>
-    request(TEST_BACKEND_APP)
-      .patch(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', header),
+  patch: (url) => request(TEST_BACKEND_APP).patch(url).set('Accept', 'application/json').set('Authorization', header),
   // @ts-ignore
-  delete: (url) =>
-    request(TEST_BACKEND_APP)
-      .delete(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', header),
+  delete: (url) => request(TEST_BACKEND_APP).delete(url).set('Accept', 'application/json').set('Authorization', header),
 };
 
 const unAuthenticatedRequest = {
   // @ts-ignore
-  get: (url) =>
-    request(TEST_BACKEND_APP)
-      .get(url)
-      .set('Accept', 'application/json'),
+  get: (url) => request(TEST_BACKEND_APP).get(url).set('Accept', 'application/json'),
   // @ts-ignore
-  post: (url) =>
-    request(TEST_BACKEND_APP)
-      .post(url)
-      .set('Accept', 'application/json'),
+  post: (url) => request(TEST_BACKEND_APP).post(url).set('Accept', 'application/json'),
   // @ts-ignore
-  patch: (url) =>
-    request(TEST_BACKEND_APP)
-      .patch(url)
-      .set('Accept', 'application/json'),
+  patch: (url) => request(TEST_BACKEND_APP).patch(url).set('Accept', 'application/json'),
   // @ts-ignore
-  delete: (url) =>
-    request(TEST_BACKEND_APP)
-      .delete(url)
-      .set('Accept', 'application/json'),
+  delete: (url) => request(TEST_BACKEND_APP).delete(url).set('Accept', 'application/json'),
 };
 
 module.exports = {

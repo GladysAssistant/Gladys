@@ -25,36 +25,16 @@ async function dailyUpdate() {
 
   houses.forEach((house) => {
     if (house.latitude !== null && house.longitude !== null) {
-      const todayAt12InMyTimeZone = dayjs()
-        .hour(12)
-        .minute(0)
-        .tz(this.timezone)
-        .toDate();
+      const todayAt12InMyTimeZone = dayjs().hour(12).minute(0).tz(this.timezone).toDate();
       const times = this.sunCalc.getTimes(todayAt12InMyTimeZone, house.latitude, house.longitude);
       // Sunrise time
-      const sunriseHour = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('hour');
-      const sunriseMinute = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('minute');
-      const sunriseTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunriseHour)
-        .minute(sunriseMinute)
-        .toDate();
+      const sunriseHour = dayjs(times.sunrise).tz(this.timezone).get('hour');
+      const sunriseMinute = dayjs(times.sunrise).tz(this.timezone).get('minute');
+      const sunriseTime = dayjs().tz(this.timezone).hour(sunriseHour).minute(sunriseMinute).toDate();
       // Sunset time
-      const sunsetHour = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('hour');
-      const sunsetMinute = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('minute');
-      const sunsetTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunsetHour)
-        .minute(sunsetMinute)
-        .toDate();
+      const sunsetHour = dayjs(times.sunset).tz(this.timezone).get('hour');
+      const sunsetMinute = dayjs(times.sunset).tz(this.timezone).get('minute');
+      const sunsetTime = dayjs().tz(this.timezone).hour(sunsetHour).minute(sunsetMinute).toDate();
       logger.info(`Sunrise today is at ${sunriseHour}:${sunriseMinute} today, in your timezone = ${this.timezone}`);
       logger.info(`Sunset today is at ${sunsetHour}:${sunsetMinute} today, in your timezone = ${this.timezone}`);
       const sunriseJob = this.scheduler.scheduleJob(sunriseTime, () =>

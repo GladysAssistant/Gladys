@@ -29,12 +29,8 @@ describe('scene.checkCalendarTriggers', () => {
   let clock;
   const brain = {};
   const now = new Date();
-  const startDate = dayjs(now)
-    .add(10, 'minute')
-    .toDate();
-  const endDate = dayjs(now)
-    .add(50, 'minute')
-    .toDate();
+  const startDate = dayjs(now).add(10, 'minute').toDate();
+  const endDate = dayjs(now).add(50, 'minute').toDate();
   beforeEach(async () => {
     clock = useFakeTimers(now);
     brain.addNamedEntity = fake.returns(null);
@@ -78,14 +74,8 @@ describe('scene.checkCalendarTriggers', () => {
           name: 'my test event',
           location: null,
           description: null,
-          start: dayjs(startDate)
-            .tz('Europe/Paris')
-            .locale('en')
-            .format('LLL'),
-          end: dayjs(endDate)
-            .tz('Europe/Paris')
-            .locale('en')
-            .format('LLL'),
+          start: dayjs(startDate).tz('Europe/Paris').locale('en').format('LLL'),
+          end: dayjs(endDate).tz('Europe/Paris').locale('en').format('LLL'),
         },
       },
     });

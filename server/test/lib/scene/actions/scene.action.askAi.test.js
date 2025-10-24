@@ -48,8 +48,7 @@ describe('scene.ask-ai', () => {
             type: ACTIONS.AI.ASK,
             user: 'pepper',
             camera: 'my-camera',
-            text:
-              'Can you check if the camera in the living room is fine ? Temperature is high ({{0.0.last_value}} °C).',
+            text: 'Can you check if the camera in the living room is fine ? Temperature is high ({{0.0.last_value}} °C).',
           },
         ],
       ],
@@ -70,8 +69,8 @@ describe('scene.ask-ai', () => {
       context: {},
     });
     expect(scope).to.deep.equal({
-      '0': [{ category: 'light', type: 'binary', last_value: 15 }],
-      '1': [{ answer: 'answer' }],
+      0: [{ category: 'light', type: 'binary', last_value: 15 }],
+      1: [{ answer: 'answer' }],
     });
   });
 });

@@ -9,9 +9,7 @@ const PhilipsHueService = proxyquire('../../../services/philips-hue/index', {
 describe('PhilipsHueService', () => {
   it('should have controllers', () => {
     const philipsHueService = PhilipsHueService();
-    expect(philipsHueService)
-      .to.have.property('controllers')
-      .and.be.instanceOf(Object);
+    expect(philipsHueService).to.have.property('controllers').and.be.instanceOf(Object);
   });
   it('should start service', async () => {
     const philipsHueService = PhilipsHueService();

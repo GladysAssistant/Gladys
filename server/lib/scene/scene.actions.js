@@ -479,14 +479,8 @@ const actionsFunc = {
         name: eventRaw.name,
         location: eventRaw.location,
         description: eventRaw.description,
-        start: dayjs(eventRaw.start)
-          .tz(self.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
-        end: dayjs(eventRaw.end)
-          .tz(self.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
+        start: dayjs(eventRaw.start).tz(self.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
+        end: dayjs(eventRaw.end).tz(self.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
       };
       set(
         scope,

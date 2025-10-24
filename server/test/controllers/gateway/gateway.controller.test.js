@@ -18,9 +18,7 @@ describe('GET /api/v1/gateway/backup', () => {
         is_deleted: false,
       },
     ];
-    nock(config.gladysGatewayServerUrl)
-      .get('/backups')
-      .reply(200, backups);
+    nock(config.gladysGatewayServerUrl).get('/backups').reply(200, backups);
     await authenticatedRequest
       .get('/api/v1/gateway/backup')
       .expect('Content-Type', /json/)
@@ -44,9 +42,7 @@ describe('GET /api/v1/gateway/key', () => {
         connected: false,
       },
     ];
-    nock(config.gladysGatewayServerUrl)
-      .get('/instances/users')
-      .reply(200, users);
+    nock(config.gladysGatewayServerUrl).get('/instances/users').reply(200, users);
     await authenticatedRequest
       .get('/api/v1/gateway/key')
       .expect('Content-Type', /json/)
@@ -75,10 +71,7 @@ describe('GET /api/v1/gateway/status', () => {
 
 describe('POST /api/v1/gateway/logout', () => {
   it('should disconnect gateway', async () => {
-    await authenticatedRequest
-      .post('/api/v1/gateway/logout')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/gateway/logout').expect('Content-Type', /json/).expect(200);
   });
 });
 
@@ -109,11 +102,9 @@ describe('GET /api/v1/gateway/backup/restore/status', () => {
 
 describe('POST /api/v1/gateway/openai/ask', () => {
   it('should return GPT-3 response', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/openai/ask')
-      .reply(200, {
-        answer: 'this is my answer',
-      });
+    nock(config.gladysGatewayServerUrl).post('/openai/ask').reply(200, {
+      answer: 'this is my answer',
+    });
     const response = await authenticatedRequest
       .post('/api/v1/gateway/openai/ask')
       .expect('Content-Type', /json/)

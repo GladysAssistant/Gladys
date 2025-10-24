@@ -14,10 +14,7 @@ const API_KEY_LENGTH = 32;
  * hashRefreshToken('xx');
  */
 function hashRefreshToken(refreshToken) {
-  const refreshTokenHash = crypto
-    .createHash('sha256')
-    .update(refreshToken)
-    .digest('hex');
+  const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
   return refreshTokenHash;
 }
 

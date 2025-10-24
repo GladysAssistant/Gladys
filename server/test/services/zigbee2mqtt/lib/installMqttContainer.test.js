@@ -192,11 +192,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     const config = {};
     this.timeout(11000);
     const getContainersStub = sinon.stub();
-    getContainersStub
-      .onFirstCall()
-      .resolves([])
-      .onSecondCall()
-      .resolves([container]);
+    getContainersStub.onFirstCall().resolves([]).onSecondCall().resolves([container]);
     gladys.system.getContainers = getContainersStub;
     gladys.system.pull = fake.resolves(true);
 
@@ -256,11 +252,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     this.timeout(11000);
     const config = {};
     const getContainersStub = sinon.stub();
-    getContainersStub
-      .onFirstCall()
-      .resolves([])
-      .onSecondCall()
-      .resolves([container]);
+    getContainersStub.onFirstCall().resolves([]).onSecondCall().resolves([container]);
     gladys.system.getContainers = getContainersStub;
     gladys.system.restartContainer = fake.throws(new Error('docker fail restart'));
 

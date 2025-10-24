@@ -197,9 +197,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(1, 'day')
-                .toDate(),
+              date: dayjs().add(1, 'day').toDate(),
             },
           },
         ],
@@ -230,9 +228,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(2, 'days')
-                .toDate(),
+              date: dayjs().add(2, 'days').toDate(),
             },
           },
         ],
@@ -265,9 +261,7 @@ describe('weather.command', () => {
             sourceText: 'sunday',
             resolution: {
               type: 'interval',
-              strFutureValue: dayjs()
-                .add(4, 'days')
-                .toDate(),
+              strFutureValue: dayjs().add(4, 'days').toDate(),
             },
           },
         ],
@@ -322,9 +316,7 @@ describe('weather.command', () => {
             sourceText: 'sunday',
             resolution: {
               type: 'interval',
-              strFutureValue: dayjs()
-                .add(30, 'days')
-                .toDate(),
+              strFutureValue: dayjs().add(30, 'days').toDate(),
             },
           },
         ],

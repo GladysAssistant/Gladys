@@ -9,29 +9,19 @@ const ExampleService = proxyquire('../../../services/example/index', {
 describe('ExampleService', () => {
   const exampleService = ExampleService();
   it('should have start function', () => {
-    expect(exampleService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
+    expect(exampleService).to.have.property('start').and.be.instanceOf(Function);
   });
   it('should have stop function', () => {
-    expect(exampleService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
+    expect(exampleService).to.have.property('stop').and.be.instanceOf(Function);
   });
   it('should have light object', () => {
-    expect(exampleService)
-      .to.have.property('light')
-      .and.be.instanceOf(Object);
+    expect(exampleService).to.have.property('light').and.be.instanceOf(Object);
   });
   it('exampleService.light should have turnOn function', () => {
-    expect(exampleService.light)
-      .to.have.property('turnOn')
-      .and.be.instanceOf(Function);
+    expect(exampleService.light).to.have.property('turnOn').and.be.instanceOf(Function);
   });
   it('exampleService.light should have turnOff function', () => {
-    expect(exampleService.light)
-      .to.have.property('turnOff')
-      .and.be.instanceOf(Function);
+    expect(exampleService.light).to.have.property('turnOff').and.be.instanceOf(Function);
   });
 });
 

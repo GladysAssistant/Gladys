@@ -93,8 +93,8 @@ describe('action.httpRequest', () => {
       scope,
     );
     expect(scope).to.deep.equal({
-      '0': [{ success: true }, { success: true }],
-      '1': [{ success: true }],
+      0: [{ success: true }, { success: true }],
+      1: [{ success: true }],
     });
   });
   it('should execute action http.request with empty body', async () => {

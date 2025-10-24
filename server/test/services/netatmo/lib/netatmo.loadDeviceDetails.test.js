@@ -77,9 +77,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natNAModule4Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
     natThermDevices.forEach((device) => {
-      expect(device)
-        .to.haveOwnProperty('apiNotConfigured')
-        .to.be.eq(true);
+      expect(device).to.haveOwnProperty('apiNotConfigured').to.be.eq(true);
       expect(device.room).to.be.an('object');
       expect(device.room).to.not.deep.equal({});
       expect(device.plug).to.be.an('object');
@@ -87,13 +85,9 @@ describe('Netatmo Load Device Details', () => {
       expect(device.categoryAPI).to.be.eq('Energy');
     });
     natWeatherStationDevices.forEach((device) => {
-      expect(device)
-        .to.haveOwnProperty('apiNotConfigured')
-        .to.be.eq(true);
+      expect(device).to.haveOwnProperty('apiNotConfigured').to.be.eq(true);
       expect(device.categoryAPI).to.be.eq('Weather');
-      expect(device)
-        .to.have.property('modules_bridged')
-        .that.is.an('array');
+      expect(device).to.have.property('modules_bridged').that.is.an('array');
     });
   });
 
@@ -116,14 +110,10 @@ describe('Netatmo Load Device Details', () => {
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
     natThermDevices.forEach((device) => {
-      expect(device)
-        .to.haveOwnProperty('apiNotConfigured')
-        .to.be.eq(false);
+      expect(device).to.haveOwnProperty('apiNotConfigured').to.be.eq(false);
     });
     natWeatherStationDevices.forEach((device) => {
-      expect(device)
-        .to.haveOwnProperty('apiNotConfigured')
-        .to.be.eq(false);
+      expect(device).to.haveOwnProperty('apiNotConfigured').to.be.eq(false);
     });
   });
 
@@ -236,19 +226,13 @@ describe('Netatmo Load Device Details', () => {
     expect(natWeatherStationDevices).to.have.lengthOf.at.least(1);
     expect(natNAModule1Devices).to.have.lengthOf.at.least(1);
     natWeatherStationDevices.forEach((device) => {
-      expect(device)
-        .to.have.property('room')
-        .that.is.an('object');
-      expect(device)
-        .to.have.property('modules_bridged')
-        .that.is.an('array');
+      expect(device).to.have.property('room').that.is.an('object');
+      expect(device).to.have.property('modules_bridged').that.is.an('array');
       expect(device).to.not.have.property('dashboard_data');
     });
     expect(natNAModule1Devices).to.have.lengthOf.at.least(1);
     natNAModule1Devices.forEach((device) => {
-      expect(device)
-        .to.have.property('plug')
-        .that.is.an('object');
+      expect(device).to.have.property('plug').that.is.an('object');
       expect(device.plug).to.not.have.property('dashboard_data');
     });
   });

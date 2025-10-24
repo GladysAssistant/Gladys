@@ -40,8 +40,9 @@ async function backup(jobId) {
     }
     const systemInfos = await this.system.getInfos();
     const now = new Date();
-    const date = `${now.getFullYear()}-${now.getMonth() +
-      1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+    const date = `${now.getFullYear()}-${
+      now.getMonth() + 1
+    }-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
     const sqliteBackupFileName = `${BACKUP_NAME_BASE}-${date}.db`;
     const sqliteBackupFilePath = path.join(this.config.backupsFolder, sqliteBackupFileName);
     const duckDbBackupFolder = `${BACKUP_NAME_BASE}_${date}_parquet_folder`;

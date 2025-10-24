@@ -106,10 +106,7 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
   });
   it('should test timezone behavior', async () => {
     // Create current date in Toronto timezone, 30 minutes ago
-    const torontoDate = dayjs()
-      .tz('America/Toronto')
-      .subtract(30, 'minute')
-      .toDate();
+    const torontoDate = dayjs().tz('America/Toronto').subtract(30, 'minute').toDate();
 
     await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1, torontoDate);
     const variable = {
@@ -172,9 +169,7 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
   GROUPS.forEach((group) => {
     it(`should group by ${group.period}`, async () => {
       await Promise.each([...Array(group.numberOfDaysToInsert).keys()], async (i) => {
-        const dateFromXDaysAgo = dayjs()
-          .subtract(i, 'day')
-          .toDate();
+        const dateFromXDaysAgo = dayjs().subtract(i, 'day').toDate();
         await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', i, dateFromXDaysAgo);
       });
       const variable = {

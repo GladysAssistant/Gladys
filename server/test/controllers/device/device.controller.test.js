@@ -173,9 +173,6 @@ describe('GET /api/v1/service/:service_name/device', () => {
       });
   });
   it('should return 404 not found', async () => {
-    await authenticatedRequest
-      .get('/api/v1/service/unknown-service/device')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.get('/api/v1/service/unknown-service/device').expect('Content-Type', /json/).expect(404);
   });
 });

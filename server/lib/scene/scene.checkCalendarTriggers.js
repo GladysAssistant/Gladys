@@ -112,14 +112,8 @@ async function checkCalendarTriggers() {
         name: eventRaw.name,
         location: eventRaw.location,
         description: eventRaw.description,
-        start: dayjs(eventRaw.start)
-          .tz(this.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
-        end: dayjs(eventRaw.end)
-          .tz(this.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
+        start: dayjs(eventRaw.start).tz(this.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
+        end: dayjs(eventRaw.end).tz(this.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
       };
 
       // we start the scene of this trigger

@@ -75,9 +75,7 @@ async function sync(fromStart = false) {
 
     // We take a 1 week margin in case some days were lost
     if (lastDateSynced && !fromStart) {
-      syncFromDate = dayjs(lastDateSynced, 'YYYY-MM-DD')
-        .subtract(7, 'days')
-        .format('YYYY-MM-DD');
+      syncFromDate = dayjs(lastDateSynced, 'YYYY-MM-DD').subtract(7, 'days').format('YYYY-MM-DD');
     } else {
       syncFromDate = undefined;
     }

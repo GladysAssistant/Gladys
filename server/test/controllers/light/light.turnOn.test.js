@@ -17,9 +17,6 @@ describe('POST /api/v1/light/:device_selector/on', () => {
       });
   });
   it('should return 401 unauthorized', async () => {
-    await request
-      .post('/api/v1/light/test-device/on')
-      .expect('Content-Type', /json/)
-      .expect(401);
+    await request.post('/api/v1/light/test-device/on').expect('Content-Type', /json/).expect(401);
   });
 });

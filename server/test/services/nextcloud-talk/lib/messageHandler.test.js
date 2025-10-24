@@ -33,15 +33,9 @@ describe('NextcloudTalk.message', () => {
         },
       },
     };
-    gladys.variable.getValue = stub()
-      .onCall(0)
-      .resolves(null);
+    gladys.variable.getValue = stub().onCall(0).resolves(null);
     gladys.variable.getValue.resolves('test-value');
-    axios.request = stub()
-      .onCall(0)
-      .resolves({ status: 404 })
-      .onCall(1)
-      .rejects();
+    axios.request = stub().onCall(0).resolves({ status: 404 }).onCall(1).rejects();
     axios.request.resolves({});
     await messageHandler.connect([
       { value: 'testTokenNoURL', user_id: 'ecae21a5-76c5-4820-8a1e-31f567ab517f' },

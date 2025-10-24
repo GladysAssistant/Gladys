@@ -50,17 +50,11 @@ describe('message.sendToUser', () => {
     const stateManager = new StateManager();
     const send = fake.resolves(true);
     const service = {
-      getService: stub()
-        .onFirstCall()
-        .returns(null)
-        .onSecondCall()
-        .returns(null)
-        .onThirdCall()
-        .returns({
-          message: {
-            send,
-          },
-        }),
+      getService: stub().onFirstCall().returns(null).onSecondCall().returns(null).onThirdCall().returns({
+        message: {
+          send,
+        },
+      }),
     };
     const variable = {};
     const messageHandler = new MessageHandler(event, {}, service, stateManager, variable);
@@ -77,15 +71,11 @@ describe('message.sendToUser', () => {
     const stateManager = new StateManager();
     const send = fake.resolves(true);
     const service = {
-      getService: stub()
-        .onFirstCall()
-        .returns(false)
-        .onSecondCall()
-        .returns({
-          message: {
-            send,
-          },
-        }),
+      getService: stub().onFirstCall().returns(false).onSecondCall().returns({
+        message: {
+          send,
+        },
+      }),
     };
     const variable = {
       getValue: fake.resolves('a1z2e3'),

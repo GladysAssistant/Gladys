@@ -7,9 +7,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { BadParameters } = require('../../utils/coreErrors');
 
 // Date should be a valid ISO 8601 date format.
-const dateSchema = Joi.date()
-  .iso()
-  .required();
+const dateSchema = Joi.date().iso().required();
 
 /**
  * @description Save historical device feature state in DB.

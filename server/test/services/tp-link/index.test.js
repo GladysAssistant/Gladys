@@ -6,9 +6,7 @@ const TpLinkService = proxyquire('../../../services/tp-link/index', {});
 describe('TpLinkService', () => {
   it('should have controllers', () => {
     const tpLinkService = TpLinkService();
-    expect(tpLinkService)
-      .to.have.property('controllers')
-      .and.be.instanceOf(Object);
+    expect(tpLinkService).to.have.property('controllers').and.be.instanceOf(Object);
   });
   it('should start service', async () => {
     const tpLinkService = TpLinkService();

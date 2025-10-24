@@ -14,10 +14,7 @@ describe('GET /api/v1/variable/:variable_name', () => {
       });
   });
   it('should return 404 not found', async () => {
-    await authenticatedRequest
-      .get('/api/v1/variable/NOT_FOUND')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.get('/api/v1/variable/NOT_FOUND').expect('Content-Type', /json/).expect(404);
   });
 });
 

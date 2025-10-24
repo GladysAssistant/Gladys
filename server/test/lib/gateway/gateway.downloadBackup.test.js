@@ -63,9 +63,7 @@ describe('gateway.downloadBackup', () => {
       await gateway.downloadBackup('this-path-does-not-exist');
       assert.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(NotFoundError)
-        .haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
+      expect(e).instanceOf(NotFoundError).haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
     }
 
     assert.notCalled(event.emit);

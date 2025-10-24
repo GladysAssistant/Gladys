@@ -96,9 +96,7 @@ describe('gateway.backup', async function describe() {
       await gateway.backup();
       assert.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(Error)
-        .haveOwnProperty('message', 'error');
+      expect(e).instanceOf(Error).haveOwnProperty('message', 'error');
     }
 
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
@@ -153,9 +151,7 @@ describe('gateway.backup', async function describe() {
       await gateway.backup();
       assert.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(NotFoundError)
-        .haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
+      expect(e).instanceOf(NotFoundError).haveOwnProperty('message', 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
     }
   });
 });

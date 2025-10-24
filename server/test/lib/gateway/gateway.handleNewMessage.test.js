@@ -267,44 +267,46 @@ describe('gateway.handleNewMessage', () => {
   });
 
   describe('testing GoogleHome', () => {
-    const googleHomeTest = ({ intent, expectedResult }) => async () => {
-      serviceManager.getService = fake.returns({
-        googleActionsHandler: {
-          onSync: fake.resolves({ status: 200, onSync: true }),
-          onQuery: fake.resolves({ status: 200, onQuery: true }),
-          onExecute: fake.resolves({ status: 200, onExecute: true }),
-        },
-      });
-
-      gateway.usersKeys = [
-        {
-          rsa_public_key: 'fingerprint',
-          ecdsa_public_key: 'fingerprint',
-          accepted: true,
-        },
-      ];
-
-      const callback = fake.returns(true);
-
-      await gateway.handleNewMessage(
-        {
-          type: 'gladys-open-api',
-          action: 'google-home-request',
-          data: {
-            inputs: [{ intent: `action.devices.${intent}` }],
+    const googleHomeTest =
+      ({ intent, expectedResult }) =>
+      async () => {
+        serviceManager.getService = fake.returns({
+          googleActionsHandler: {
+            onSync: fake.resolves({ status: 200, onSync: true }),
+            onQuery: fake.resolves({ status: 200, onQuery: true }),
+            onExecute: fake.resolves({ status: 200, onExecute: true }),
           },
-        },
-        {
-          rsaPublicKeyRaw: 'key',
-          ecdsaPublicKeyRaw: 'key',
-          local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-        },
-        callback,
-      );
+        });
 
-      assert.notCalled(event.emit);
-      assert.calledOnceWithExactly(callback, expectedResult);
-    };
+        gateway.usersKeys = [
+          {
+            rsa_public_key: 'fingerprint',
+            ecdsa_public_key: 'fingerprint',
+            accepted: true,
+          },
+        ];
+
+        const callback = fake.returns(true);
+
+        await gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: `action.devices.${intent}` }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          callback,
+        );
+
+        assert.notCalled(event.emit);
+        assert.calledOnceWithExactly(callback, expectedResult);
+      };
 
     // We do not loop on array with values, beaucoup "forEach" method doesn't support async callbacks
     it(
