@@ -1,6 +1,5 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import linkState from 'linkstate';
 import actions from './actions';
 import MCPPage from './mcp';
 import { RequestStatus } from '../../../../utils/consts';

@@ -1,5 +1,5 @@
 const { createServer } = require('./createServer');
-const { getAllResources, getAllTools } = require('./getAllTools');
+const { getAllResources, getAllTools } = require('./buildSchemas');
 const { formatValue } = require('./formatValue');
 const { proxy } = require('./mcp.proxy');
 

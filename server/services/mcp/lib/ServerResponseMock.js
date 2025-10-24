@@ -50,7 +50,7 @@ class ServerResponseMock {
   }
 
   flushHeaders() {
-    // No-op for now
+    return this.headers;
   }
 }
 
