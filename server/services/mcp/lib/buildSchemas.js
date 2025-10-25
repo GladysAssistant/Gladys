@@ -1,30 +1,4 @@
 const { z } = require('zod');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
-
-const sensorFeatureCategories = [
-  DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.VOC_SENSOR,
-];
-
-const switchableFeatureCategories = [
-  DEVICE_FEATURE_CATEGORIES.LIGHT,
-  DEVICE_FEATURE_CATEGORIES.SWITCH,
-  DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
-];
 
 /**
  * @description Get all resources (room and devices) available for the MCP service.
@@ -42,13 +16,14 @@ async function getAllResources() {
     };
   });
 
-  let sensorDevices = (await this.gladys.device.get()).filter((device) => {
-    return device.features.some((feature) => sensorFeatureCategories.includes(feature.category));
-  });
-  sensorDevices = sensorDevices.map((device) => {
-    device.features = device.features.filter((feature) => sensorFeatureCategories.includes(feature.category));
-    return device;
-  });
+  const sensorDevices = (await this.gladys.device.get())
+    .filter((device) => {
+      return device.features.some((feature) => this.isSensorFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isSensorFeature(feature)),
+    }));
 
   sensorDevices.forEach((device) => {
     const d = {
@@ -66,17 +41,14 @@ async function getAllResources() {
     homeSchema[device.room.selector].devices[device.selector] = d;
   });
 
-  let switchableDevices = (await this.gladys.device.get()).filter((device) => {
-    return device.features.some(
-      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
-    );
-  });
-  switchableDevices = switchableDevices.map((device) => {
-    device.features = device.features.filter(
-      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
-    );
-    return device;
-  });
+  const switchableDevices = (await this.gladys.device.get())
+    .filter((device) => {
+      return device.features.some((feature) => this.isSwitchableFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isSwitchableFeature(feature)),
+    }));
 
   switchableDevices.forEach((device) => {
     const d = {
@@ -130,13 +102,14 @@ async function getAllResources() {
 async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
   const scenes = (await this.gladys.scene.get()).map(({ selector }) => selector);
-  let sensorDevices = (await this.gladys.device.get()).filter((device) => {
-    return device.features.some((feature) => sensorFeatureCategories.includes(feature.category));
-  });
-  sensorDevices = sensorDevices.map((device) => {
-    device.features = device.features.filter((feature) => sensorFeatureCategories.includes(feature.category));
-    return device;
-  });
+  const sensorDevices = (await this.gladys.device.get())
+    .filter((device) => {
+      return device.features.some((feature) => this.isSensorFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isSensorFeature(feature)),
+    }));
   const availableSensorFeatureCategories = [
     ...new Set(
       sensorDevices
@@ -147,17 +120,14 @@ async function getAllTools() {
     ),
   ];
 
-  let switchableDevices = (await this.gladys.device.get()).filter((device) => {
-    return device.features.some(
-      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
-    );
-  });
-  switchableDevices = switchableDevices.map((device) => {
-    device.features = device.features.filter(
-      (feature) => switchableFeatureCategories.includes(feature.category) && feature.type === 'binary',
-    );
-    return device;
-  });
+  const switchableDevices = (await this.gladys.device.get())
+    .filter((device) => {
+      return device.features.some((feature) => this.isSwitchableFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isSwitchableFeature(feature)),
+    }));
   const availableSwitchableFeatureCategories = [
     ...new Set(
       switchableDevices

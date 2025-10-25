@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const { stub, fake } = require('sinon');
 const { getAllResources, getAllTools } = require('../../../../services/mcp/lib/buildSchemas');
+const { isSensorFeature, isSwitchableFeature } = require('../../../../services/mcp/lib/selectFeature');
 
 describe('build schemas', () => {
   it('should build home structure resources schema', async () => {
@@ -56,11 +57,34 @@ describe('build schemas', () => {
           },
         ],
       },
+      {
+        selector: 'device-combined-1',
+        name: 'Smart Plug',
+        room: { selector: 'chambre' },
+        features: [
+          {
+            id: 8,
+            selector: 'device-combined-1-energy',
+            name: 'Energy Consumption',
+            category: 'energy-sensor',
+            type: 'decimal',
+          },
+          {
+            id: 9,
+            selector: 'device-combined-1-power',
+            name: 'Power',
+            category: 'switch',
+            type: 'binary',
+          },
+        ],
+      },
     ];
 
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       getAllResources,
+      isSensorFeature,
+      isSwitchableFeature,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
@@ -115,6 +139,28 @@ describe('build schemas', () => {
           name: 'On/Off',
           selector: 'device-light-1-binary',
           category: 'light',
+          type: 'binary',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+
+    // Verify combined device (sensor + switchable) with merged features in chambre
+    expect(homeSchema.chambre.devices['device-combined-1']).to.deep.equal({
+      name: 'Smart Plug',
+      selector: 'device-combined-1',
+      features: [
+        {
+          name: 'Energy Consumption',
+          selector: 'device-combined-1-energy',
+          category: 'energy-sensor',
+          type: 'decimal',
+          access: ['read'],
+        },
+        {
+          name: 'Power',
+          selector: 'device-combined-1-power',
+          category: 'switch',
           type: 'binary',
           access: ['write', 'read'],
         },
@@ -183,6 +229,8 @@ describe('build schemas', () => {
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,

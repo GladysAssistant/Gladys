@@ -2,6 +2,7 @@ const { createServer } = require('./createServer');
 const { getAllResources, getAllTools } = require('./buildSchemas');
 const { formatValue } = require('./formatValue');
 const { proxy } = require('./mcp.proxy');
+const { isSensorFeature, isSwitchableFeature } = require('./selectFeature');
 
 /**
  * @description Add ability to connect to MCP.
@@ -22,6 +23,8 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp) {
 MCPHandler.prototype.createServer = createServer;
 MCPHandler.prototype.getAllResources = getAllResources;
 MCPHandler.prototype.getAllTools = getAllTools;
+MCPHandler.prototype.isSensorFeature = isSensorFeature;
+MCPHandler.prototype.isSwitchableFeature = isSwitchableFeature;
 MCPHandler.prototype.formatValue = formatValue;
 MCPHandler.prototype.proxy = proxy;
 
