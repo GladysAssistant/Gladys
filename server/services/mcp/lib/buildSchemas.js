@@ -259,22 +259,24 @@ async function getAllTools() {
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
           device: z
-            .enum(switchableDevices.map((d) => d.selector))
+            .enum(switchableDevices.map((d) => d.name))
             .describe('Device name to turn on/off.')
             .optional(),
           room: z
             .enum(rooms)
-            .describe("Device's room only if we don't know it name.")
+            .describe("Device's room if specified, required if device_category is specified.")
             .optional(),
           device_category: z
             .enum(availableSwitchableFeatureCategories)
-            .describe("Type of device to turn on/off only if we don't know it name.")
+            .describe('Type of device to turn on/off only if user has not specified device name.')
             .optional(),
         },
       },
       cb: async ({ action, device, room, device_category: deviceCategory }) => {
         if (device) {
-          const selectedDevice = switchableDevices.find((d) => d.selector === device);
+          const selectedDevice = switchableDevices.find(
+            (d) => d.name === device && (!room || d.room.selector === room),
+          );
           if (selectedDevice) {
             await Promise.all(
               selectedDevice.features.map((f) => {

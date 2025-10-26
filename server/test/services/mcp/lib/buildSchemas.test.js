@@ -317,10 +317,10 @@ describe('build schemas', () => {
     expect(tools[3].intent).to.eq('device.turn-on-off');
     expect(tools[3].config.title).to.eq('Turn on/off devices');
 
-    const turnOnResult = await tools[3].cb({ action: 'on', device: 'device-light-1' });
+    const turnOnResult = await tools[3].cb({ action: 'on', device: 'Living Room Light' });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(1);
-    expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for device-light-1');
+    expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Living Room Light');
 
     mcpHandler.gladys.device.setValue.resetHistory();
 
