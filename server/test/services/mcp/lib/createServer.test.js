@@ -77,9 +77,6 @@ describe('Create server', () => {
     const mcpServerInstance = {
       registerResource: fake(),
       registerTool: fake(),
-      server: {
-        close: fake(),
-      },
     };
 
     const resources = [
@@ -107,7 +104,9 @@ describe('Create server', () => {
       mcp: {
         McpServer: stub().returns(mcpServerInstance),
       },
-      server: null,
+      server: {
+        close: fake(),
+      },
     };
 
     await mcpHandler.createServer();
