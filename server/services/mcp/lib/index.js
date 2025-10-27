@@ -3,6 +3,8 @@ const { getAllResources, getAllTools } = require('./buildSchemas');
 const { formatValue } = require('./formatValue');
 const { proxy } = require('./mcp.proxy');
 const { isSensorFeature, isSwitchableFeature } = require('./selectFeature');
+const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
+const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Add ability to connect to MCP.
@@ -18,6 +20,8 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp) {
   this.mcp = mcp;
   this.server = null;
   this.transports = {};
+
+  this.gladys.event.on(EVENTS.DEVICE.CREATE, eventFunctionWrapper(this.createServer.bind(this)));
 };
 
 MCPHandler.prototype.createServer = createServer;

@@ -17,6 +17,9 @@ describe('MCPService', () => {
       device: {
         get: async () => [],
       },
+      event: {
+        on: () => {},
+      },
     };
     mcpService = MCPService(gladys);
   });

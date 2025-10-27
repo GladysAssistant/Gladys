@@ -5,7 +5,11 @@
  * createServer()
  */
 async function createServer() {
-  const mcpServer = new this.mcp.McpServer(
+  if (this.server) {
+    this.server.close();
+  }
+
+  this.server = new this.mcp.McpServer(
     {
       name: 'Gladys',
       title: 'Gladys',
@@ -20,13 +24,11 @@ async function createServer() {
   );
 
   (await this.getAllResources()).map(({ name, uri, config, cb }) => {
-    return mcpServer.registerResource(name, uri, config, cb);
+    return this.server.registerResource(name, uri, config, cb);
   });
   (await this.getAllTools()).map(({ intent, config, cb }) => {
-    return mcpServer.registerTool(intent.replace('.', '_'), config, cb);
+    return this.server.registerTool(intent.replace('.', '_'), config, cb);
   });
-
-  this.server = mcpServer;
 }
 
 module.exports = {
