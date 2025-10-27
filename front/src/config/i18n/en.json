@@ -456,8 +456,8 @@
         "noDeviceFeatureLastValue": "This feature has not received any value yet"
       },
       "energyConsumption": {
-        "editTitle": "Widget Title (optional)",
-        "editTitlePlaceholder": "Name displayed on the dashboard",
+        "editName": "Widget Name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard",
         "editDeviceFeatures": "Select energy consumption devices",
         "year": "Year",
         "month": "Month",

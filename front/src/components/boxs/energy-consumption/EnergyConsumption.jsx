@@ -248,6 +248,12 @@ class EnergyConsumption extends Component {
     const localeSet = this.props.user.language === 'fr' ? fr : 'en';
     return (
       <div class="card">
+        {/* Widget Title */}
+        {props.box.name && (
+          <div class="card-header">
+            <h5 class="card-title">{props.box.name}</h5>
+          </div>
+        )}
         <div class="card-body">
           {/* Period Selection Buttons */}
           <div class="row mb-3">

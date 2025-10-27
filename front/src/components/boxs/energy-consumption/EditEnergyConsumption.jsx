@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
@@ -38,9 +38,9 @@ class EditEnergyConsumption extends Component {
     }
   };
 
-  updateBoxTitle = e => {
+  updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      title: e.target.value
+      name: e.target.value
     });
   };
 
@@ -115,15 +115,17 @@ class EditEnergyConsumption extends Component {
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.energy-consumption">
         <div class="form-group">
           <label>
-            <Text id="dashboard.boxes.energyConsumption.editTitle" />
+            <Text id="dashboard.boxes.energyConsumption.editName" />
           </label>
-          <input
-            type="text"
-            value={props.box.title}
-            onInput={this.updateBoxTitle}
-            class="form-control"
-            placeholder={<Text id="dashboard.boxes.energyConsumption.editTitlePlaceholder" />}
-          />
+          <Localizer>
+            <input
+              type="text"
+              value={props.box.name}
+              onInput={this.updateBoxName}
+              class="form-control"
+              placeholder={<Text id="dashboard.boxes.energyConsumption.editNamePlaceholder" />}
+            />
+          </Localizer>
         </div>
         <div class="form-group">
           <label>

@@ -477,8 +477,8 @@
         "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
       },
       "energyConsumption": {
-        "editTitle": "Titre du widget (optionnel)",
-        "editTitlePlaceholder": "Nom affiché sur le tableau de bord",
+        "editName": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeatures": "Sélectionner les appareils de consommation énergétique",
         "year": "Année",
         "month": "Mois",

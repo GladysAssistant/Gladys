@@ -477,8 +477,8 @@
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
       },
       "energyConsumption": {
-        "editTitle": "Widget-Titel (optional)",
-        "editTitlePlaceholder": "Name auf dem Dashboard angezeigt",
+        "editName": "Widget-Name (optional)",
+        "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "editDeviceFeatures": "Energieverbrauchsgeräte auswählen",
         "year": "Jahr",
         "month": "Monat",
