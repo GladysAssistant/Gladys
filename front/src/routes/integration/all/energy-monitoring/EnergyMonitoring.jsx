@@ -7,13 +7,19 @@ import DeviceConfigurationLink from '../../../../components/documentation/Device
 import ImportPricesPage from './ImportPrices';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
+const DEVICE_FEATURE_CATEGORIES_TO_DISPLAY = [
+  DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.SWITCH
+];
+
 const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
-  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+  DEVICE_FEATURE_TYPES.SWITCH.ENERGY
 ];
 
 class EnergyMonitoringPage extends Component {
@@ -309,7 +315,7 @@ class EnergyMonitoringPage extends Component {
         .filter(
           feature =>
             feature &&
-            feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+            DEVICE_FEATURE_CATEGORIES_TO_DISPLAY.includes(feature.category) &&
             DEVICE_FEATURE_TYPES_TO_DISPLAY.includes(feature.type)
         )
         .forEach(feature => {
