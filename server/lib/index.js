@@ -72,7 +72,7 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const energyPrice = new EnergyPrice();
+  const energyPrice = new EnergyPrice(stateManager);
   const gateway = new Gateway(
     variable,
     event,
