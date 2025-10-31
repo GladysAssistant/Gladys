@@ -137,13 +137,13 @@ function hasDeviceChanged(newDevice, existingDevice = {}) {
  * @description Merge feature attributes from existing with the new one.
  * It keeps 'name' and 'keep_history' attribute from existing.
  * @param {object} newFeature - Newly created feature.
- * @param {object} existingFeature - Already existing feature.
- * @param {object} featureIdMap - Map of feature id to existing feature id.
+ * @param {object} [existingFeature] - Already existing feature.
+ * @param {object} [featureIdMap] - Map of feature id to existing feature id.
  * @returns {object} A new feature merged with existing one.
  * @example
  * mergeFeatures({ name: 'Default name' }, { name: 'Overriden name' })
  */
-function mergeFeatures(newFeature, existingFeature = {}, featureIdMap) {
+function mergeFeatures(newFeature, existingFeature = {}, featureIdMap = new Map()) {
   const featureToReturn = { ...newFeature };
 
   if (existingFeature && existingFeature.name) {
