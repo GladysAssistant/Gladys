@@ -397,7 +397,7 @@ class EnergyMonitoringPage extends Component {
     };
 
     const renderFeature = (feature, depth = 0) => {
-      const paddingLeft = 8 + depth * 16;
+      const paddingLeft = depth > 0 ? 8 + Math.min(depth, 2) * 12 : 0;
       const label = `${feature.__device ? feature.__device.name : ''} - ${feature.name ||
         feature.selector ||
         feature.id}`;
@@ -407,20 +407,23 @@ class EnergyMonitoringPage extends Component {
       return (
         <div class="mb-2" style={{ paddingLeft: `${paddingLeft}px` }}>
           <div class="card shadow-sm" style={{ borderLeft: `4px solid ${color}`, borderRadius: '6px' }}>
-            <div class="card-body py-2 px-3">
-              <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                  <div class="d-flex align-items-center">
-                    <span class="badge mr-2" style={{ background: color, color: '#fff' }}>
+            <div class="card-body py-2 px-2 px-md-3">
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+                <div class="flex-grow-1 w-100 w-md-auto mb-2 mb-md-0">
+                  <div class="d-flex align-items-center flex-wrap">
+                    <span class="badge mr-2 mb-1" style={{ background: color, color: '#fff' }}>
                       <Text id="integration.energyMonitoring.level" fields={{ depth }} />
                     </span>
-                    <strong>{label}</strong>
+                    <strong class="mb-1">{label}</strong>
                   </div>
-                  <div class="small text-muted mt-1">{feature.selector}</div>
+                  <div class="small text-muted mt-1" style={{ wordBreak: 'break-all' }}>
+                    {feature.selector}
+                  </div>
                 </div>
-                <div style={{ minWidth: '280px' }} class="ml-3">
+                <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
                   <select
-                    class="form-control form-control-sm"
+                    class="form-control form-control-sm w-100"
+                    style={{ minWidth: '200px' }}
                     value={feature.energy_parent_id || ''}
                     onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
                   >
