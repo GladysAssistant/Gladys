@@ -89,20 +89,6 @@ describe('EnergyMonitoringController', () => {
       });
     });
 
-    it('should propagate handler errors', async () => {
-      const error = new Error('Calculation failed');
-      energyMonitoringHandler.calculateCostFromBeginning = fake.rejects(error);
-
-      try {
-        await controller['post /api/v1/service/energy-monitoring/calculate-cost-from-beginning'].controller(req, res);
-        expect.fail('Should have thrown an error');
-      } catch (thrownError) {
-        expect(thrownError).to.equal(error);
-        assert.calledOnce(energyMonitoringHandler.calculateCostFromBeginning);
-        assert.notCalled(res.json);
-      }
-    });
-
     it('should have correct route configuration', () => {
       const route = controller['post /api/v1/service/energy-monitoring/calculate-cost-from-beginning'];
       expect(route).to.have.property('authenticated', true);
@@ -121,22 +107,6 @@ describe('EnergyMonitoringController', () => {
       assert.calledOnceWithExactly(res.json, {
         success: true,
       });
-    });
-
-    it('should propagate handler errors', async () => {
-      const error = new Error('Calculation failed');
-      energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning = fake.rejects(error);
-
-      try {
-        await controller[
-          'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning'
-        ].controller(req, res);
-        expect.fail('Should have thrown an error');
-      } catch (thrownError) {
-        expect(thrownError).to.equal(error);
-        assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning);
-        assert.notCalled(res.json);
-      }
     });
 
     it('should have correct route configuration', () => {

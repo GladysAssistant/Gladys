@@ -7,7 +7,7 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateCostFromBeginning(req, res) {
-    await energyMonitoringHandler.calculateCostFromBeginning();
+    energyMonitoringHandler.calculateCostFromBeginning();
     res.json({
       success: true,
     });
@@ -20,7 +20,7 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
-    await energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
+    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
     res.json({
       success: true,
     });
