@@ -45,9 +45,9 @@ class EditEnergyConsumption extends Component {
   };
 
   updateDeviceFeatures = selectedOptions => {
-    if (selectedOptions && selectedOptions.length > 0) {
+    if (selectedOptions) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        device_features: selectedOptions.map(selectedOption => selectedOption.value)
+        device_features: [selectedOptions.value]
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -134,9 +134,8 @@ class EditEnergyConsumption extends Component {
           <Select
             defaultValue={[]}
             value={selectedDeviceFeatures}
-            isMulti
             onChange={this.updateDeviceFeatures}
-            options={deviceFeatureOptions}
+            options={deviceFeatureOptions.length > 0 ? deviceFeatureOptions : null}
             maxMenuHeight={220}
           />
         </div>
