@@ -138,7 +138,6 @@ async function calculateCostFrom(startAt, jobId) {
             .toDate();
           // Get the prices for this date
           const energyPricesForDate = energyPrices.filter((price) => {
-            console.log({ priceEndDate: price.end_date });
             // We only keep consumption prices (no subscription)
             return (
               price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
