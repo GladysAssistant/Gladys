@@ -458,7 +458,7 @@
       "energyConsumption": {
         "editName": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editDeviceFeatures": "Select energy consumption devices",
+        "editDeviceFeatures": "Select an energy consumption device",
         "year": "Year",
         "month": "Month",
         "day": "Day",

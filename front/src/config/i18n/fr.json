@@ -479,7 +479,7 @@
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editDeviceFeatures": "Sélectionner les appareils de consommation énergétique",
+        "editDeviceFeatures": "Sélectionner un appareil de consommation énergétique",
         "year": "Année",
         "month": "Mois",
         "day": "Jour",
