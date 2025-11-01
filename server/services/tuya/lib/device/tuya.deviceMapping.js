@@ -23,6 +23,7 @@ const SWITCH_1 = 'switch_1';
 const SWITCH_2 = 'switch_2';
 const SWITCH_3 = 'switch_3';
 const SWITCH_4 = 'switch_4';
+const SWITCH_5 = 'switch';
 
 const CONTROL = 'control';
 const PERCENT_CONTROL = 'percent_control';
@@ -150,6 +151,10 @@ const mappings = {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
+  [SWITCH_5]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },  
   [CONTROL]: {
     category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
     type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
