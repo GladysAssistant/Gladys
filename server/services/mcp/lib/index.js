@@ -25,6 +25,7 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp, levenshtein) {
   this.transports = {};
 
   this.gladys.event.on(EVENTS.DEVICE.CREATE, eventFunctionWrapper(this.createServer.bind(this)));
+  this.gladys.event.on(EVENTS.DEVICE.UPDATE, eventFunctionWrapper(this.createServer.bind(this)));
 };
 
 MCPHandler.prototype.createServer = createServer;

@@ -1908,6 +1908,7 @@
       "urlInstruction": "Copy this URL into your agent's configuration.",
       "apiKeyLabel": "MCP Server API Key",
       "apiKeyInstruction": "Generate an API key to authenticate your MCP client. In your MCP client configuration, add an \"Authorization\" header with this key as the value.",
+      "apiKeyDifference": "These API keys are local and only work on your local network. If you want to access your MCP server from outside your network, use a Gladys Plus API key and Open API route.",
       "warningKeyDisappear": "Warning: you will only see the key once. Copy/paste your key and save it somewhere.",
       "keyName": "Details",
       "revoke": "Revoke",

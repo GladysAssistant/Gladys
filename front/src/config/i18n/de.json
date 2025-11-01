@@ -1908,6 +1908,7 @@
       "urlInstruction": "Kopiere diese URL in die Konfiguration deines Agenten.",
       "apiKeyLabel": "MCP-Server-API-Schlüssel",
       "apiKeyInstruction": "Generiere einen API-Schlüssel, um deinen MCP-Client zu authentifizieren. Füge in der Konfiguration deines MCP-Clients einen \"Authorization\"-Header mit diesem Schlüssel als Wert hinzu.",
+      "apiKeyDifference": "Diese API-Schlüssel sind lokal und funktionieren nur in deinem lokalen Netzwerk. Wenn du von außerhalb deines Netzwerks auf deinen MCP-Server zugreifen möchtest, verwende einen Gladys-Plus-API-Schlüssel und die über die Open API verfügbare Route.",
       "warningKeyDisappear": "Warnung: Du siehst den Schlüssel nur einmal. Kopiere deinen Schlüssel und speichere ihn an einem sicheren Ort.",
       "keyName": "Details",
       "revoke": "Widerrufen",

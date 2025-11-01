@@ -60,6 +60,9 @@ const MCPWelcomePage = ({ user, ...props }) => (
                       <Text id="integration.mcp.apiKeyLabel" />
                     </label>
                     <Text id="integration.mcp.apiKeyInstruction" />
+                    <div class="alert alert-info mt-2">
+                      <Text id="integration.mcp.apiKeyDifference" />
+                    </div>
                     <small class="form-text text-muted">
                       <Text id="integration.mcp.warningKeyDisappear" />
                     </small>
