@@ -2,10 +2,27 @@ const { expect } = require('chai');
 const { stub, fake } = require('sinon');
 const { getAllResources, getAllTools } = require('../../../../services/mcp/lib/buildSchemas');
 const { isSensorFeature, isSwitchableFeature } = require('../../../../services/mcp/lib/selectFeature');
+const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
 
 describe('build schemas', () => {
   it('should build home structure resources schema', async () => {
-    const rooms = [{ selector: 'salon' }, { selector: 'chambre' }, { selector: 'cuisine' }];
+    const rooms = [
+      {
+        id: 'room-1',
+        name: 'Salon',
+        selector: 'salon',
+      },
+      {
+        id: 'room-2',
+        name: 'Chambre',
+        selector: 'chambre',
+      },
+      {
+        id: 'room-3',
+        name: 'Cuisine',
+        selector: 'cuisine',
+      },
+    ];
 
     const devices = [
       {
@@ -174,8 +191,30 @@ describe('build schemas', () => {
   });
 
   it('should return schema with all available tools', async () => {
-    const rooms = [{ selector: 'salon' }, { selector: 'chambre' }];
-    const scenes = [{ selector: 'scene-morning' }, { selector: 'scene-night' }];
+    const rooms = [
+      {
+        id: 'room-1',
+        name: 'Salon',
+        selector: 'salon',
+      },
+      {
+        id: 'room-2',
+        name: 'Chambre',
+        selector: 'chambre',
+      },
+    ];
+    const scenes = [
+      {
+        id: 'scene-1',
+        name: 'Scene morning',
+        selector: 'scene-morning',
+      },
+      {
+        id: 'scene-2',
+        name: 'Scene night',
+        selector: 'scene-night',
+      },
+    ];
 
     const devices = [
       {
@@ -235,19 +274,13 @@ describe('build schemas', () => {
         value: feature.last_value,
         unit: feature.unit,
       })),
+      findBySimilarity,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
-          getBySelector: stub().callsFake((selector) => {
-            const room = rooms.find((r) => r.selector === selector);
-            return Promise.resolve({ ...room, id: selector === 'salon' ? 1 : 2 });
-          }),
         },
         scene: {
           get: stub().resolves(scenes),
-          brain: {
-            getEntityIdByName: stub().returns('scene-id-123'),
-          },
         },
         device: {
           get: stub().resolves(devices),
@@ -263,6 +296,9 @@ describe('build schemas', () => {
           emit: fake(),
         },
       },
+      levenshtein: {
+        distance: stub().returns(4),
+      },
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -273,8 +309,7 @@ describe('build schemas', () => {
     expect(tools[0].config.description).to.eq('Get image from camera in specific room.');
 
     const cameraResult = await tools[0].cb({ room: 'salon' });
-    expect(mcpHandler.gladys.room.getBySelector.calledWith('salon')).to.eq(true);
-    expect(mcpHandler.gladys.device.camera.getImagesInRoom.calledWith(1)).to.eq(true);
+    expect(mcpHandler.gladys.device.camera.getImagesInRoom.calledWith('room-1')).to.eq(true);
     expect(cameraResult.content).to.be.an('array');
     expect(cameraResult.content.length).to.eq(2);
     expect(cameraResult.content[0]).to.deep.equal({
@@ -294,7 +329,6 @@ describe('build schemas', () => {
     expect(tools[1].config.description).to.eq('Start a home automation scene.');
 
     const sceneResult = await tools[1].cb({ scene: 'scene-morning' });
-    expect(mcpHandler.gladys.scene.brain.getEntityIdByName.calledWith('scene', 'scene-morning')).to.eq(true);
     expect(mcpHandler.gladys.event.emit.callCount).to.eq(1);
     expect(mcpHandler.gladys.event.emit.firstCall.args[0]).to.eq('intent.scene.start');
     expect(sceneResult.content).to.deep.equal([{ type: 'text', text: 'scene.start command sent' }]);

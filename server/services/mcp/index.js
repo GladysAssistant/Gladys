@@ -7,13 +7,14 @@ module.exports = function MCPService(gladys, serviceId) {
   const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
   // eslint-disable-next-line import/no-unresolved, import/extensions
   const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
+  const levenshtein = require('fastest-levenshtein');
 
   const mcp = {
     McpServer,
     StreamableHTTPServerTransport,
   };
 
-  const mcpHandler = new MCPHandler(gladys, serviceId, mcp);
+  const mcpHandler = new MCPHandler(gladys, serviceId, mcp, levenshtein);
 
   /**
    * @public
