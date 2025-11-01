@@ -146,6 +146,9 @@ class SetupTab extends Component {
                     <option value="india">
                       <Text id="integration.tuya.setup.endpoints.india" />
                     </option>
+                    <option value="local">
+                      <Text id="integration.tuya.setup.endpoints.local" />
+                    </option>                    
                   </select>
                 </div>
 

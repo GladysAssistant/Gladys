@@ -1059,7 +1059,8 @@
           "easternAmerica": "Eastern America",
           "centralEurope": "Central Europe",
           "westernEurope": "Western Europe",
-          "india": "India"
+          "india": "India",
+          "local": "Lokal"          
         },
         "endpoint": "Endpoint",
         "accessKey": "Access Key",
