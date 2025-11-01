@@ -36,7 +36,7 @@ function convertDevice(tuyaDevice) {
     model,
     service_id: this.serviceId,
     // Nachtwind: Quick and dirty fix for api flood issue. Should be improved with a proper queue system later.
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES * 60,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_60MINUTES,
     should_poll: true,
   };
   return device;
