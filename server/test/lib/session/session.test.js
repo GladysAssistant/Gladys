@@ -129,22 +129,22 @@ describe('session.validateAccessToken', () => {
 describe('session.validateApiKey', () => {
   it('should validate an api key', async () => {
     const session = new Session('secret');
-    const userId = await session.validateApiKey('api-key-test', ['dashboard:write']);
+    const userId = await session.validateApiKey('api-key-test', 'dashboard:write');
     expect(userId).to.equal('0cd30aef-9c4e-4a23-88e3-3547971296e5');
   });
   it('should return error, api key has expired', async () => {
     const session = new Session('secret');
-    const promise = session.validateApiKey('api-key-test-expired', ['dashboard:write']);
+    const promise = session.validateApiKey('api-key-test-expired', 'dashboard:write');
     return assert.isRejected(promise, 'Api key has expired');
   });
   it('should return error, api key was revoked', async () => {
     const session = new Session('secret');
-    const promise = session.validateApiKey('api-key-test-revoked', ['dashboard:write']);
+    const promise = session.validateApiKey('api-key-test-revoked', 'dashboard:write');
     return assert.isRejected(promise, 'Api key was revoked');
   });
   it('should return error, api key not found', async () => {
     const session = new Session('secret');
-    const promise = session.validateApiKey('api-key-not-found', ['dashboard:write']);
+    const promise = session.validateApiKey('api-key-not-found', 'dashboard:write');
     return assert.isRejected(promise, 'Api key not found');
   });
 });

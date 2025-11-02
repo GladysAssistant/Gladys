@@ -14,6 +14,7 @@ module.exports = function MCPController(mcpHandler) {
   return {
     'post /api/v1/service/mcp/proxy': {
       authenticated: true,
+      scope: 'mcp',
       controller: asyncMiddleware(proxy),
     },
   };

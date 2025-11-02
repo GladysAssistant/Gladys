@@ -73,7 +73,7 @@ class MCPIntegration extends Component {
     }
   };
 
-  updateNewMCPClient = (e) => {
+  updateNewMCPClient = e => {
     this.setState({
       newMCPClient: e.target.value
     });
