@@ -33,7 +33,7 @@ async function validateApiKey(apiKey, scope) {
     throw new Error401(`Api key was revoked`);
   }
 
-  if (session.scope !== scope) {
+  if (session.scope?.split(',').includes(scope) === false) {
     throw new Error401(`Api key does not have the required scope`);
   }
 
