@@ -147,6 +147,11 @@ describe('session.validateApiKey', () => {
     const promise = session.validateApiKey('api-key-not-found', 'dashboard:write');
     return assert.isRejected(promise, 'Api key not found');
   });
+  it('should return error, api key does not have the required scope', async () => {
+    const session = new Session('secret');
+    const promise = session.validateApiKey('api-key-test', 'mcp');
+    return assert.isRejected(promise, 'Api key does not have the required scope');
+  });
 });
 
 describe('session.setTabletModeLocked', () => {

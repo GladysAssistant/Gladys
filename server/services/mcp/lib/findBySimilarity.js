@@ -16,7 +16,7 @@ function findBySimilarity(list, name) {
 
   const similars = [];
   list.forEach((elem) => {
-    const similarNumber = this.levenshtein.distance(elem.name.toLowerCase(), nameLower, true);
+    const similarNumber = this.levenshtein.distance(elem.name.toLowerCase(), nameLower);
     if (similarNumber <= 3) {
       similars.push({ elem, similarNumber });
     }

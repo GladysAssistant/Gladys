@@ -294,7 +294,7 @@ async function getAllTools() {
             );
 
             return {
-              content: [{ type: 'text', text: `device.turn-${actionValue} command sent for ${device}` }],
+              content: [{ type: 'text', text: `device.turn-${actionValue} command sent for ${selectedDevice.name}` }],
             };
           }
         }

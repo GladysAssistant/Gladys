@@ -358,7 +358,17 @@ describe('build schemas', () => {
 
     mcpHandler.gladys.device.setValue.resetHistory();
 
+    // Tool: device.turn-on-off by device with similarity
+    mcpHandler.levenshtein.distance.returns(2);
+    const turnOnResultSimilar = await tools[3].cb({ action: 'on', device: 'A Living Room Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(1);
+    expect(turnOnResultSimilar.content[0].text).to.eq('device.turn-on command sent for Living Room Light');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
     // Test device.turn-on-off by room and category
+    mcpHandler.levenshtein.distance.returns(4);
     const turnOffResult = await tools[3].cb({
       action: 'off',
       room: 'chambre',
@@ -370,7 +380,6 @@ describe('build schemas', () => {
       'device.turn-off command sent for devices in room chambre with category switch',
     );
 
-    // Reset stub
     mcpHandler.gladys.device.setValue.resetHistory();
 
     const noDeviceResult = await tools[3].cb({
