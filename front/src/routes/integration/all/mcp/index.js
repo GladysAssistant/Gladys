@@ -84,7 +84,7 @@ class MCPIntegration extends Component {
   }
 
   render(props, state) {
-    const loading = props.sessionsGetStatus === RequestStatus.Getting;
+    const loading = state.sessionsGetStatus === RequestStatus.Getting;
     return (
       <MCPPage
         {...props}
@@ -98,6 +98,4 @@ class MCPIntegration extends Component {
   }
 }
 
-export default connect(
-  'user,sessionsGetStatus,sessionsCreateStatus,sessionsRevokeStatus,mcpApiKeys,newMCPClient,missingNewMCPClient,httpClient'
-)(MCPIntegration);
+export default connect('user,httpClient')(MCPIntegration);
