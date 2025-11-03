@@ -12,6 +12,8 @@ const {
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  ElectricalPowerMeasurement,
+  ElectricalEnergyMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -267,6 +269,69 @@ async function listenToStateChange(nodeId, devicePath, device) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`,
           state: value / 100,
+        });
+      });
+    }
+  }
+
+  const electricalPowerMeasurement = device.clusterClients.get(ElectricalPowerMeasurement.Complete.id);
+  if (electricalPowerMeasurement && !this.stateChangeListeners.has(electricalPowerMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for ElectricalPowerMeasurement cluster ${electricalPowerMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(electricalPowerMeasurement);
+    // Subscribe to ActivePower attribute changes
+    electricalPowerMeasurement.addActivePowerAttributeListener((value) => {
+      logger.debug(`Matter: ElectricalPowerMeasurement ActivePower attribute changed to ${value}`);
+      // Value is in milliwatts, convert to watts
+      const powerInWatts = value !== null ? value / 1000 : null;
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,
+        state: powerInWatts,
+      });
+    });
+    // Subscribe to Voltage attribute changes if available
+    if (electricalPowerMeasurement.addVoltageAttributeListener) {
+      electricalPowerMeasurement.addVoltageAttributeListener((value) => {
+        logger.debug(`Matter: ElectricalPowerMeasurement Voltage attribute changed to ${value}`);
+        // Value is in millivolts, convert to volts
+        const voltageInVolts = value !== null ? value / 1000 : null;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:voltage`,
+          state: voltageInVolts,
+        });
+      });
+    }
+    // Subscribe to ActiveCurrent attribute changes if available
+    if (electricalPowerMeasurement.addActiveCurrentAttributeListener) {
+      electricalPowerMeasurement.addActiveCurrentAttributeListener((value) => {
+        logger.debug(`Matter: ElectricalPowerMeasurement ActiveCurrent attribute changed to ${value}`);
+        // Value is in milliamps, convert to amps
+        const currentInAmps = value !== null ? value / 1000 : null;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:current`,
+          state: currentInAmps,
+        });
+      });
+    }
+  }
+
+  const electricalEnergyMeasurement = device.clusterClients.get(ElectricalEnergyMeasurement.Complete.id);
+  if (electricalEnergyMeasurement && !this.stateChangeListeners.has(electricalEnergyMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for ElectricalEnergyMeasurement cluster ${electricalEnergyMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(electricalEnergyMeasurement);
+    // Subscribe to CumulativeEnergyImported attribute changes if CumulativeEnergy feature is supported
+    if (electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener) {
+      electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
+        logger.debug(`Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to`, value);
+        // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
+        const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
+        const externalId = `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: energyInKwh,
         });
       });
     }
