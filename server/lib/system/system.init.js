@@ -1,8 +1,6 @@
 const fse = require('fs-extra');
 const path = require('path');
 const logger = require('../../utils/logger');
-const db = require('../../models');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Init the system, connect to docker if in docker.
