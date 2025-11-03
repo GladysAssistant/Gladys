@@ -27,7 +27,7 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
 
   // Get all energy sensor devices
   const energyDevices = await this.gladys.device.get({
-    device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    device_feature_categories: [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR, DEVICE_FEATURE_CATEGORIES.SWITCH],
   });
 
   logger.info(`Found ${energyDevices.length} energy devices`);

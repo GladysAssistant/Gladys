@@ -584,6 +584,108 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       assert.calledOnce(device.setParam);
     });
 
+    it('should retrieve and process switch devices with SWITCH.ENERGY features', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Mock energy sensor device
+      const energySensorDevice = {
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        name: 'Energy Sensor Device',
+        params: [],
+        features: [
+          {
+            id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+            selector: 'energy-sensor-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+            selector: 'energy-sensor-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          },
+        ],
+      };
+
+      // Mock switch device with SWITCH.ENERGY
+      const switchDevice = {
+        id: 'f2a3b4c5-d6e7-8901-6789-012345678901',
+        name: 'Smart Switch Device',
+        params: [],
+        features: [
+          {
+            id: 'a3b4c5d6-e7f8-9012-7890-123456789012',
+            selector: 'smart-switch-energy',
+            category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+            type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+            energy_parent_id: null,
+          },
+          {
+            id: 'b4c5d6e7-f8a9-0123-8901-234567890123',
+            selector: 'smart-switch-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'a3b4c5d6-e7f8-9012-7890-123456789012',
+          },
+        ],
+      };
+
+      // Mock device.get to return different devices based on category
+      device.get = fake((params) => {
+        return [energySensorDevice, switchDevice];
+      });
+
+      // Mock states for both devices
+      device.getDeviceFeatureStates = fake((selector) => {
+        if (selector === 'energy-sensor-index') {
+          return [
+            { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+            { created_at: '2023-10-03T13:45:00.000Z', value: 1015 },
+          ];
+        }
+        if (selector === 'smart-switch-energy') {
+          return [
+            { created_at: '2023-10-03T13:30:00.000Z', value: 500 },
+            { created_at: '2023-10-03T13:40:00.000Z', value: 525 },
+            { created_at: '2023-10-03T13:50:00.000Z', value: 560 },
+          ];
+        }
+        return [];
+      });
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+
+      // Verify device.get was called once
+      expect(device.get.callCount).to.equal(1);
+      expect(device.get.getCall(0).args[0]).to.deep.equal({
+        device_feature_categories: [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR, DEVICE_FEATURE_CATEGORIES.SWITCH],
+      });
+
+      // Verify both devices were processed (getDeviceFeatureStates called twice)
+      expect(device.getDeviceFeatureStates.callCount).to.equal(2);
+      expect(device.getDeviceFeatureStates.getCall(0).args[0]).to.equal('energy-sensor-index');
+      expect(device.getDeviceFeatureStates.getCall(1).args[0]).to.equal('smart-switch-energy');
+
+      // Verify consumption was saved for both devices
+      expect(device.saveHistoricalState.callCount).to.equal(2);
+
+      // Verify energy sensor consumption (15 Wh)
+      const energySensorSaveCall = device.saveHistoricalState.getCall(0);
+      expect(energySensorSaveCall.args[0].selector).to.equal('energy-sensor-consumption');
+      expect(energySensorSaveCall.args[1]).to.equal(15);
+
+      // Verify switch consumption (60 Wh: 25 + 35)
+      const switchSaveCall = device.saveHistoricalState.getCall(1);
+      expect(switchSaveCall.args[0].selector).to.equal('smart-switch-consumption');
+      expect(switchSaveCall.args[1]).to.equal(60);
+
+      // Verify last processed timestamp was saved for both devices
+      expect(device.setParam.callCount).to.equal(2);
+    });
+
     it('should handle errors during device processing without throwing', async () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
 
