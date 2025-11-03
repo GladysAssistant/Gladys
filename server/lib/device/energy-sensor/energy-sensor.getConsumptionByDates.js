@@ -79,8 +79,6 @@ async function getConsumptionByDates(selectors, options = {}) {
         toDate,
       );
 
-      console.log(values);
-
       // Rename grouped_date to created_at for consistency with the existing API
       values = values.map((value) => {
         const newValue = {
