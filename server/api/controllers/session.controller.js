@@ -43,7 +43,7 @@ module.exports = function SessionController(gladys) {
    */
   async function createApiKey(req, res) {
     const scope = req.body.scope || ['dashboard:write', 'dashboard:read'];
-    const session = await gladys.session.createApiKey(req.user.id, scope);
+    const session = await gladys.session.createApiKey(req.user.id, scope, req.body.useragent);
     res.status(201).json(session);
   }
 

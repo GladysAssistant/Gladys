@@ -1,0 +1,20 @@
+{
+  "name": "gladys-mcp",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "fastest-levenshtein": "^1.0.16",
+    "zod": "^3.25.76"
+  }
+}
