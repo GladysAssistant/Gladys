@@ -379,4 +379,40 @@ describe('gateway.handleNewMessage', () => {
     assert.notCalled(event.emit);
     assert.calledOnceWithExactly(callback, { onDiscovery: true });
   });
+
+  it('should handle a new gateway open api message: mcp-webhook', async () => {
+    serviceManager.getService = fake.returns({
+      mcpHandler: {
+        proxy: fake.returns({ mcp: true }),
+      },
+    });
+
+    gateway.usersKeys = [
+      {
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        accepted: true,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-open-api',
+        action: 'mcp-webhook',
+        data: {
+          mcp_method: 'POST',
+          mcp_headers: { 'Content-Type': 'application/json' },
+          mcp_data: { jsonrpc: '2.0', method: 'post', params: {} },
+        },
+      },
+      {
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+  });
 });

@@ -2007,6 +2007,24 @@
         "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten",
         "getDevicesError": "Beim Abrufen der Geräteliste ist ein Fehler aufgetreten"
       }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Verbinde deinen KI-Agenten mit Gladys.",
+      "documentation": "MCP-Dokumentation",
+      "longDescription": "MCP ist ein Protokoll, das es ermöglicht, reale Funktionen zu deinem Agenten hinzuzufügen. Diese Integration fungiert als MCP-Server und ermöglicht es deinen MCP-kompatiblen KI-Agenten, mit deinem Smart Home zu interagieren. Dein Agent und deine Gladys-Instanz müssen sich im selben Netzwerk befinden.",
+      "urlLabel": "MCP-Server-URL",
+      "urlInstruction": "Kopiere diese URL in die Konfiguration deines Agenten.",
+      "apiKeyLabel": "MCP-Server-API-Schlüssel",
+      "apiKeyInstruction": "Generiere einen API-Schlüssel, um deinen MCP-Client zu authentifizieren. Füge in der Konfiguration deines MCP-Clients einen \"Authorization\"-Header mit diesem Schlüssel als Wert hinzu.",
+      "apiKeyDifference": "Diese API-Schlüssel sind lokal und funktionieren nur in deinem lokalen Netzwerk. Wenn du von außerhalb deines Netzwerks auf deinen MCP-Server zugreifen möchtest, verwende einen Gladys-Plus-API-Schlüssel und die über die Open API verfügbare Route.",
+      "warningKeyDisappear": "Warnung: Du siehst den Schlüssel nur einmal. Kopiere deinen Schlüssel und speichere ihn an einem sicheren Ort.",
+      "keyName": "Details",
+      "revoke": "Widerrufen",
+      "namePlaceholder": "Client-Name",
+      "generateButton": "Generieren",
+      "keyNameLabel": "Schlüssel:",
+      "registeredLabel": "Registriert am:"
     }
   },
   "editScene": {

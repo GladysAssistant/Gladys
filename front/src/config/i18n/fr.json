@@ -2007,6 +2007,24 @@
         "disableButton": "Désactiver Matter",
         "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
       }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Connectez votre agent IA à Gladys.",
+      "documentation": "Documentation MCP",
+      "longDescription": "MCP est un protocol permettant d'ajouter des fonctionnalités du monde réel à votre agent. Cette intégration fait office de serveur MCP et permet à vos agents IA compatible MCP d'intéragire avec votre maison connectée. Votre agent et votre instance Gladys doivent être sur le même réseau.",
+      "urlLabel": "URL du serveur MCP",
+      "urlInstruction": "Copiez cette URL dans la configuration de votre agent.",
+      "apiKeyLabel": "Clé API du serveur MCP",
+      "apiKeyInstruction": "Générez une clé API pour authentifier votre client MCP. Dans la configuration de votre client MCP, ajoutez un header \"Authorization\" avec pour valeur cette clé.",
+      "apiKeyDifference": "Ces clés API sont locales et fonctionnent uniquement sur votre réseau local. Si vous souhaitez accéder à votre serveur MCP depuis l'extérieur de votre réseau, utilisez une clé API Gladys Plus et la route disponible via l'Open API.",
+      "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
+      "keyName": "Détails",
+      "revoke": "Révoquer",
+      "namePlaceholder": "Nom du client",
+      "generateButton": "Générer",
+      "keyNameLabel": "Clé :",
+      "registeredLabel": "Enregistré le :"
     }
   },
   "editScene": {

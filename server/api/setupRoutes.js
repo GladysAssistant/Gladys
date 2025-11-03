@@ -38,9 +38,13 @@ function setupRoutes(gladys) {
     const method = splitted[0];
     const path = splitted[1];
     const routerParams = [];
-    // if the route is marked as authenticated
-    if (routes[routeKey].authenticated) {
+    // if the route is marked as authenticated but no scope defined
+    if (routes[routeKey].authenticated && !routes[routeKey].scope) {
       routerParams.push(authMiddleware);
+    }
+    // if the route is marked as authenticated with a scope
+    if (routes[routeKey].authenticated && routes[routeKey].scope) {
+      routerParams.push(AuthMiddleware(routes[routeKey].scope, gladys));
     }
     // if the route is marked as admin
     if (routes[routeKey].admin) {
