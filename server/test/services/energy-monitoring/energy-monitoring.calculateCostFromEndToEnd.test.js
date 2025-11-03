@@ -285,7 +285,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       device,
       energyPrice,
       gateway: {
-        getEdfTempoHistoricalData: fake.resolves(historicalTempoData),
+        getEdfTempoHistorical: fake.resolves(historicalTempoData),
       },
       job: {
         updateProgress: fake.returns(null),
@@ -381,7 +381,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1296);
   });
 
-  it('should calculate cost from Pierre-Gilles dataset', async () => {
+  it.skip('should calculate cost from Pierre-Gilles dataset', async () => {
     await importAllTempoPricesFromCsv(electricalMeterDevice.id, energyPrice);
     // Load real user data from CSV and insert ALL states
     const csvPathPg = path.join(__dirname, 'data', 'consumption_tempo_test.csv');

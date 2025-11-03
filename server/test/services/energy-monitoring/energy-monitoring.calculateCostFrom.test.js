@@ -60,7 +60,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       device,
       energyPrice,
       gateway: {
-        getEdfTempoHistoricalData: fake.resolves(historicalTempoData),
+        getEdfTempoHistorical: fake.resolves(historicalTempoData),
       },
       job: {
         updateProgress: fake.returns(null),

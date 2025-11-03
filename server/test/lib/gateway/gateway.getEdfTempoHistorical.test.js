@@ -34,12 +34,12 @@ describe('gateway.getEdfTempoHistorical', () => {
 
     expect(data).to.be.an('array');
     expect(data).to.have.lengthOf(3);
-    expect(data[0]).to.have.property('date', '2025-01-01');
-    expect(data[0]).to.have.property('color', 'blue');
-    expect(data[1]).to.have.property('date', '2025-01-02');
-    expect(data[1]).to.have.property('color', 'white');
-    expect(data[2]).to.have.property('date', '2025-01-03');
-    expect(data[2]).to.have.property('color', 'red');
+    expect(data[0]).to.have.property('created_at', '2025-01-01');
+    expect(data[0]).to.have.property('day_type', 'blue');
+    expect(data[1]).to.have.property('created_at', '2025-01-02');
+    expect(data[1]).to.have.property('day_type', 'white');
+    expect(data[2]).to.have.property('created_at', '2025-01-03');
+    expect(data[2]).to.have.property('day_type', 'red');
   });
 
   it('should call system.getInfos to get Gladys version', async () => {
