@@ -190,6 +190,88 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.get.callCount).to.eq(2);
   });
 
+  it('should handle devices without room assignment in getAllResources', async () => {
+    const rooms = [
+      {
+        id: 'room-1',
+        name: 'Salon',
+        selector: 'salon',
+      },
+    ];
+
+    const devices = [
+      {
+        selector: 'device-sensor-1',
+        name: 'Temperature Sensor',
+        room: { selector: 'salon' },
+        features: [
+          {
+            id: 1,
+            selector: 'device-sensor-1-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+          },
+        ],
+      },
+      {
+        selector: 'device-no-room',
+        name: 'Device Without Room',
+        room: null, // Device without room assignment
+        features: [
+          {
+            id: 2,
+            selector: 'device-no-room-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+          },
+        ],
+      },
+      {
+        selector: 'device-light-no-room',
+        name: 'Light Without Room',
+        room: null, // Device without room assignment
+        features: [
+          {
+            id: 3,
+            selector: 'device-light-no-room-binary',
+            name: 'On/Off',
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllResources,
+      isSensorFeature,
+      isSwitchableFeature,
+      gladys: {
+        room: {
+          getAll: stub().resolves(rooms),
+        },
+        device: {
+          get: stub().resolves(devices),
+        },
+      },
+    };
+
+    // Should not throw error
+    const resources = await mcpHandler.getAllResources();
+
+    expect(resources[0].name).to.eq('home');
+    const result = await resources[0].cb({ href: 'schema://home' });
+    const homeSchema = JSON.parse(result.contents[0].text);
+
+    // Verify only devices with rooms are included
+    expect(homeSchema.salon.devices).to.have.property('device-sensor-1');
+    expect(homeSchema.salon.devices).to.not.have.property('device-no-room');
+    expect(homeSchema.salon.devices).to.not.have.property('device-light-no-room');
+  });
+
   it('should return schema with all available tools', async () => {
     const rooms = [
       {
@@ -392,5 +474,124 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.get.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.get.callCount).to.eq(2);
+  });
+
+  it('should handle devices without room assignment in getAllTools', async () => {
+    const rooms = [
+      {
+        id: 'room-1',
+        name: 'Salon',
+        selector: 'salon',
+      },
+    ];
+    const scenes = [
+      {
+        id: 'scene-1',
+        name: 'Scene morning',
+        selector: 'scene-morning',
+      },
+    ];
+
+    const devices = [
+      {
+        selector: 'device-temp-1',
+        name: 'Temperature Sensor',
+        room: { selector: 'salon', name: 'Living Room' },
+        features: [
+          {
+            id: 1,
+            selector: 'device-temp-1-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            last_value: 22.5,
+            unit: '°C',
+          },
+        ],
+      },
+      {
+        selector: 'device-no-room',
+        name: 'Sensor Without Room',
+        room: null, // Device without room assignment
+        features: [
+          {
+            id: 2,
+            selector: 'device-no-room-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            last_value: 20.0,
+            unit: '°C',
+          },
+        ],
+      },
+      {
+        selector: 'device-light-no-room',
+        name: 'Light Without Room',
+        room: null, // Device without room assignment
+        features: [
+          {
+            id: 3,
+            selector: 'device-light-no-room-binary',
+            name: 'On/Off',
+            category: 'light',
+            type: 'binary',
+            last_value: 1,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: {
+          getAll: stub().resolves(rooms),
+        },
+        scene: {
+          get: stub().resolves(scenes),
+        },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().callsFake((selector) => {
+            return Promise.resolve(devices.find((d) => d.selector === selector));
+          }),
+          setValue: stub().resolves(),
+          camera: {
+            getImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ']),
+          },
+        },
+        event: {
+          emit: fake(),
+        },
+      },
+      levenshtein: {
+        distance: stub().returns(4),
+      },
+    };
+
+    // Should not throw error
+    const tools = await mcpHandler.getAllTools();
+
+    // Verify tools are created successfully
+    expect(tools).to.be.an('array');
+    expect(tools.length).to.eq(4);
+
+    // Test device.get-state - should only return device with room
+    const stateResult = await tools[2].cb({ room: undefined, device_type: undefined });
+    expect(stateResult.content.length).to.eq(1); // Only device-temp-1 should be included
+
+    // Test device.turn-on-off - devices without rooms should be filtered out
+    const turnOnResult = await tools[3].cb({ action: 'on', device: 'Light Without Room' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0); // Should not find device
+    expect(turnOnResult.content[0].text).to.eq('device.turn-on command not sent, no device found.');
   });
 });
