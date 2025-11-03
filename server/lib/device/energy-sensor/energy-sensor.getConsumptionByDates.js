@@ -16,7 +16,7 @@ const GROUPED_QUERY_DATE_RANGE = `
   WHERE
     device_feature_id = ?
     AND created_at >= ?
-    AND created_at <= ?
+    AND created_at < ?
   GROUP BY
     grouped_date
   ORDER BY
@@ -78,6 +78,8 @@ async function getConsumptionByDates(selectors, options = {}) {
         fromDate,
         toDate,
       );
+
+      console.log(values);
 
       // Rename grouped_date to created_at for consistency with the existing API
       values = values.map((value) => {
