@@ -139,6 +139,10 @@ const duckDbShowVersion = async () => {
   logger.info(`DuckDB version = ${result[0].version}`);
 };
 
+const duckDbSetTimezone = async (timezone) => {
+  await duckDbWriteConnectionAllAsync('set timezone=?;', timezone);
+};
+
 const db = {
   ...models,
   sequelize,
@@ -152,6 +156,7 @@ const db = {
   duckDbInsertState,
   duckDbBatchInsertState,
   duckDbShowVersion,
+  duckDbSetTimezone,
 };
 
 module.exports = db;
