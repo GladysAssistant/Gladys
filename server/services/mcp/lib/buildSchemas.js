@@ -18,7 +18,7 @@ async function getAllResources() {
 
   const sensorDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.features.some((feature) => this.isSensorFeature(feature));
+      return device.room && device.features.some((feature) => this.isSensorFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -43,7 +43,7 @@ async function getAllResources() {
 
   const switchableDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.features.some((feature) => this.isSwitchableFeature(feature));
+      return device.room && device.features.some((feature) => this.isSwitchableFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -104,7 +104,7 @@ async function getAllTools() {
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const sensorDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.features.some((feature) => this.isSensorFeature(feature));
+      return device.room && device.features.some((feature) => this.isSensorFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -123,7 +123,7 @@ async function getAllTools() {
 
   const switchableDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.features.some((feature) => this.isSwitchableFeature(feature));
+      return device.room && device.features.some((feature) => this.isSwitchableFeature(feature));
     })
     .map((device) => ({
       ...device,
