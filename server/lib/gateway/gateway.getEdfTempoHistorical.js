@@ -8,7 +8,7 @@
  */
 async function getEdfTempoHistorical(start, take) {
   const systemInfos = await this.system.getInfos();
-  return this.gladysGatewayClient.getEdfTempoHistorical(systemInfos.gladys_version, start, take);
+  return this.gladysGatewayClient.getEdfTempoHistoricalData(systemInfos.gladys_version, start, take);
 }
 
 module.exports = {
