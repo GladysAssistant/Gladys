@@ -6,7 +6,6 @@ const { getDeviceFeature, getDeviceParam } = require('../../../utils/device');
 const { getUsagePointIdFromExternalId } = require('../utils/parser');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../utils/constants');
 
-const ENEDIS_SYNC_BATCH_SIZE = 100;
 const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
 const LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE = 'LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE';
 
@@ -21,24 +20,38 @@ const BATCH_TYPES = {
  * @param {string} batchType - Batch type ConsumptionLoadCurve or DailyConsumption or DailyConsumptionMaxPower.
  * @param {string} externalId - Enedis usage point external id.
  * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
+ * @param {number} enedisSyncBatchSize - Number of items to get in one call.
  * @param {string} after - Get data after this date.
  * @returns {Promise<object>} - Resolve with last date.
  * @example await recursiveBatchCall('usage-point');
  */
-async function recursiveBatchCall(gladys, batchType, externalId, syncDelayBetweenCallsInMs, after = '2000-01-01') {
+async function recursiveBatchCall(
+  gladys,
+  batchType,
+  externalId,
+  syncDelayBetweenCallsInMs,
+  enedisSyncBatchSize,
+  after = '2000-01-01',
+) {
   const usagePointId = getUsagePointIdFromExternalId(externalId);
   logger.info(`Enedis: Syncing ${usagePointId} after ${after}`);
   const data = await gladys.gateway[`enedisGet${batchType}`]({
     usage_point_id: usagePointId,
     after,
-    take: ENEDIS_SYNC_BATCH_SIZE,
+    take: enedisSyncBatchSize,
   });
 
   // Foreach value returned in the interval, we save it slowly in DB
   await Promise.each(data, async (value) => {
+    let valueToInsert = value.value;
+    if (batchType === BATCH_TYPES.CONSUMPTION_LOAD_CURVE) {
+      // Values are average power in W over a 30-minute interval.
+      // Convert to energy in kWh: kWh = (W / 1000) * 0.5
+      valueToInsert = (value.value / 1000) * 0.5;
+    }
     gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: externalId,
-      state: value.value,
+      state: valueToInsert,
       created_at: new Date(value.created_at),
     });
     await Promise.delay(syncDelayBetweenCallsInMs / 10);
@@ -46,9 +59,16 @@ async function recursiveBatchCall(gladys, batchType, externalId, syncDelayBetwee
   await Promise.delay(syncDelayBetweenCallsInMs);
 
   // If there was still some data to get
-  if (data.length === ENEDIS_SYNC_BATCH_SIZE) {
+  if (data.length === enedisSyncBatchSize) {
     const lastEntry = data[data.length - 1];
-    return recursiveBatchCall(gladys, batchType, externalId, syncDelayBetweenCallsInMs, lastEntry.created_at);
+    return recursiveBatchCall(
+      gladys,
+      batchType,
+      externalId,
+      syncDelayBetweenCallsInMs,
+      enedisSyncBatchSize,
+      lastEntry.created_at,
+    );
   }
   if (data.length === 0) {
     return after;
@@ -104,6 +124,7 @@ async function sync(fromStart = false) {
         BATCH_TYPES.DAILY_CONSUMPTION,
         usagePointFeatureDailyConsumption.external_id,
         this.syncDelayBetweenCallsInMs,
+        this.enedisSyncBatchSize,
         syncFromDate,
       );
 
@@ -150,6 +171,7 @@ async function sync(fromStart = false) {
         BATCH_TYPES.CONSUMPTION_LOAD_CURVE,
         usagePointFeatureConsumptionLoadCurve.external_id,
         this.syncDelayBetweenCallsInMs,
+        this.enedisSyncBatchSize,
         syncFromDate,
       );
 

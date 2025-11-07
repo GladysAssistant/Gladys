@@ -46,6 +46,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
     assert.callCount(gladys.event.emit, 4);
     assert.calledOnce(gladys.device.setParam);
@@ -80,6 +81,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
     assert.callCount(gladys.event.emit, 110);
     assert.calledOnce(gladys.device.setParam);
@@ -109,6 +111,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     const syncResult = await enedisService.sync(false);
     expect(syncResult).to.deep.equal([
       {
@@ -153,6 +156,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     const syncResult = await enedisService.sync(false);
     expect(syncResult).to.deep.equal([
       {
@@ -202,6 +206,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     const syncResult = await enedisService.sync(true);
     expect(syncResult).to.deep.equal([
       {
@@ -245,6 +250,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
     assert.callCount(gladys.event.emit, 100);
     assert.calledOnce(gladys.device.setParam);
