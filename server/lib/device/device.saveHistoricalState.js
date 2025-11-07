@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const { Op } = require('sequelize');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { formatDateInUTC } = require('../../utils/date');
