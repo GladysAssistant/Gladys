@@ -1084,7 +1084,8 @@
         "refreshLocal": "Mit Gladys Plus synchronisieren",
         "explanation": "Die Synchronisierung zwischen Gladys Plus und Enedis erfolgt automatisch täglich zwischen 8:30 Uhr und 11:30 Uhr. Es ist möglich, dass an einigen Tagen die Daten erst spät verfügbar sind. Auf der Gladys-Seite synchronisiert sich Gladys jede Stunde automatisch mit Gladys Plus.",
         "saveButton": "Sichern",
-        "deleteButton": "Löschen"
+        "deleteButton": "Löschen",
+        "recreateButton": "Aktualisieren"
       }
     },
     "homekit": {

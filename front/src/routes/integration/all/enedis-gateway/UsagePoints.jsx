@@ -1,12 +1,21 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
+import uuid from 'uuid';
+import get from 'get-value';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import update from 'immutability-helper';
+
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../server/utils/constants';
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -15,12 +24,21 @@ import { getDeviceParam } from '../../../../utils/device';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 
-const UsagePointDevice = ({ device, language = 'fr', deviceIndex, saveDevice, destroyDevice, syncs = [] }) => {
+const UsagePointDevice = ({
+  device,
+  language = 'fr',
+  deviceIndex,
+  saveDevice,
+  destroyDevice,
+  reCreateUsagePointDevice,
+  syncs = []
+}) => {
   const usagePointId = device.external_id.split(':')[1];
 
   const lastRefresh = getDeviceParam(device, DEVICE_PARAMS.LAST_REFRESH);
   const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
   const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
+  const deviceShouldBeUpdated = device.features.length < 3;
 
   let syncInProgress;
   if (mySyncs.length > 0) {
@@ -43,6 +61,10 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, saveDevice, de
 
   const destroy = () => {
     destroyDevice(deviceIndex);
+  };
+
+  const reCreate = () => {
+    reCreateUsagePointDevice(usagePointId, deviceIndex);
   };
 
   return (
@@ -122,6 +144,11 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, saveDevice, de
           <button class="btn btn-danger ml-2" onClick={destroy}>
             <Text id="integration.enedis.usagePoints.deleteButton" />
           </button>
+          {deviceShouldBeUpdated && (
+            <button class="btn btn-primary ml-2" onClick={reCreate}>
+              <Text id="integration.enedis.usagePoints.recreateButton" />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -135,6 +162,7 @@ const EnedisUsagePoints = ({
   updateDeviceParam,
   saveDevice,
   destroyDevice,
+  reCreateUsagePointDevice,
   syncs,
   sync
 }) => (
@@ -189,6 +217,7 @@ const EnedisUsagePoints = ({
                   updateDeviceParam={updateDeviceParam}
                   saveDevice={saveDevice}
                   destroyDevice={destroyDevice}
+                  reCreateUsagePointDevice={reCreateUsagePointDevice}
                   syncs={syncs}
                 />
               ))}
@@ -279,6 +308,69 @@ class EnedisWelcomePageComponent extends Component {
     }
     await this.setState({ loading: false });
   };
+  reCreateUsagePointDevice = async (usagePointId, deviceIndex) => {
+    // Get the old device
+    const oldDevice = this.state.usagePointsDevices[deviceIndex];
+    // Get the enedis integration
+    const enedisIntegration = await this.props.httpClient.get(`/api/v1/service/enedis`, {
+      pod_id: null
+    });
+    const serviceId = enedisIntegration.id;
+
+    const oldDailyConsumptionFeature = oldDevice.features.find(
+      feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION
+    );
+    const oldConsumptionLoadCurveFeature = oldDevice.features.find(
+      feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION
+    );
+    const oldConsumptionLoadCurveCostFeature = oldDevice.features.find(
+      feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
+    );
+
+    const newDailyConsumptionFeature = oldDailyConsumptionFeature;
+
+    const newConsumptionLoadCurveFeature = {
+      id: get(oldConsumptionLoadCurveFeature, 'id') || uuid.v4(),
+      name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveFeatureName'),
+      selector: `enedis-${usagePointId}-consumption-load-curve`,
+      min: 0,
+      max: 1000000,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      external_id: `enedis:${usagePointId}:consumption-load-curve`,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      energy_parent_id: newDailyConsumptionFeature.id
+    };
+
+    const newConsumptionLoadCurveCostFeature = {
+      id: get(oldConsumptionLoadCurveCostFeature, 'id') || uuid.v4(),
+      name: get(this.props.intl.dictionary, 'integration.enedis.welcome.consumptionLoadCurveCostFeatureName'),
+      selector: `enedis-${usagePointId}-consumption-load-curve-cost`,
+      min: 0,
+      max: 1000000,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      external_id: `enedis:${usagePointId}:consumption-load-curve-cost`,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      unit: DEVICE_FEATURE_UNITS.EURO,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      energy_parent_id: newConsumptionLoadCurveFeature.id
+    };
+
+    const device = {
+      name: 'Enedis',
+      selector: `enedis-${usagePointId}`,
+      external_id: `enedis:${usagePointId}`,
+      service_id: serviceId,
+      features: [newDailyConsumptionFeature, newConsumptionLoadCurveFeature, newConsumptionLoadCurveCostFeature]
+    };
+
+    await this.props.httpClient.post('/api/v1/device', device);
+  };
   init = async () => {
     await this.setState({ loading: true });
     await this.getCurrentEnedisUsagePoints();
@@ -305,10 +397,11 @@ class EnedisWelcomePageComponent extends Component {
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
           destroyDevice={this.destroyDevice}
+          reCreateUsagePointDevice={this.reCreateUsagePointDevice}
         />
       </EnedisPage>
     );
   }
 }
 
-export default connect('user,session,httpClient', {})(EnedisWelcomePageComponent);
+export default connect('user,session,httpClient', {})(withIntlAsProp(EnedisWelcomePageComponent));

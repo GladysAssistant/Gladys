@@ -1003,7 +1003,8 @@
         "refreshLocal": "Synchronise with Gladys Plus",
         "explanation": "The synchronization with Enedis is done automatically between Gladys Plus and Enedis every day between 8:30 and 11:30. It is possible that on some days the data may be available late. On the Gladys side, Gladys automatically synchronizes with Gladys Plus every hour.",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "recreateButton": "Update"
       }
     },
     "homekit": {
