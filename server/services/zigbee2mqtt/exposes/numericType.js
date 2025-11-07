@@ -636,7 +636,7 @@ module.exports = {
     },
     NTARF: {
       feature: {
-        name: 'Numéro de l\'index tarifaire en cours',
+        name: "Numéro de l'index tarifaire en cours",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.NTARF,
       },
@@ -801,7 +801,7 @@ module.exports = {
     },
     ADIR1: {
       feature: {
-        name: 'Avertissement de dépassement d\'intensité Phase 1',
+        name: "Avertissement de dépassement d'intensité Phase 1",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR1,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -809,7 +809,7 @@ module.exports = {
     },
     ADIR2: {
       feature: {
-        name: 'Avertissement de dépassement d\'intensité Phase 2',
+        name: "Avertissement de dépassement d'intensité Phase 2",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR2,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -817,7 +817,7 @@ module.exports = {
     },
     ADIR3: {
       feature: {
-        name: 'Avertissement de dépassement d\'intensité Phase 3',
+        name: "Avertissement de dépassement d'intensité Phase 3",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR3,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
