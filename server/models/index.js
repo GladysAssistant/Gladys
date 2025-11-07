@@ -115,6 +115,16 @@ const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
+  const createdAtInString = formatDateInUTC(createdAt);
+  await duckDbWriteConnectionAllAsync(
+    'UPDATE t_device_feature_state SET value = ? WHERE device_feature_id = ? AND created_at = ?',
+    value,
+    deviceFeatureId,
+    createdAtInString,
+  );
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
@@ -154,6 +164,7 @@ const db = {
   duckDbReadConnectionAllAsync,
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
+  duckDbUpdateState,
   duckDbBatchInsertState,
   duckDbShowVersion,
   duckDbSetTimezone,
