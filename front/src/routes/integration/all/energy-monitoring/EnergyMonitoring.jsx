@@ -114,6 +114,8 @@ class EnergyMonitoringPage extends Component {
       this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
       await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {});
       this.setState({ settingsSuccess: 'ok' });
+      // Redirect to jobs page
+      route('/dashboard/settings/jobs');
     } catch (e) {
       this.setState({ settingsError: e });
     } finally {
@@ -133,6 +135,8 @@ class EnergyMonitoringPage extends Component {
         {}
       );
       this.setState({ consumptionSettingsSuccess: 'ok' });
+      // Redirect to jobs page
+      route('/dashboard/settings/jobs');
     } catch (e) {
       this.setState({ consumptionSettingsError: e });
     } finally {
@@ -1026,56 +1030,72 @@ class EnergyMonitoringPage extends Component {
                 />
               </div>
             )}
-            <p>
-              <button
-                class="btn btn-primary"
-                disabled={state.calculatingFromBeginning}
-                onClick={this.calculateFromBeginning}
-              >
-                {state.calculatingFromBeginning ? (
-                  <span>
-                    <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                    <Text
-                      id="integration.energyMonitoring.calculatingFromBeginning"
-                      defaultMessage="Starting calculation..."
-                    />
-                  </span>
-                ) : (
-                  <span>
-                    <i class="fe fe-play mr-2" />
-                    <Text
-                      id="integration.energyMonitoring.calculateCostFromBeginning"
-                      defaultMessage="Calculate cost from beginning"
-                    />
-                  </span>
-                )}
-              </button>
-            </p>
-            <p>
-              <button
-                class="btn btn-primary"
-                disabled={state.calculatingConsumptionFromBeginning}
-                onClick={this.calculateConsumptionFromIndexFromBeginning}
-              >
-                {state.calculatingConsumptionFromBeginning ? (
-                  <span>
-                    <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                    <Text
-                      id="integration.energyMonitoring.calculatingConsumptionFromBeginning"
-                      defaultMessage="Starting consumption calculation..."
-                    />
-                  </span>
-                ) : (
-                  <span>
-                    <i class="fe fe-play mr-2" />
-                    <Text
-                      id="integration.energyMonitoring.calculateConsumptionFromIndexFromBeginning"
-                      defaultMessage="Calculate consumption from index from beginning"
-                    />
-                  </span>
-                )}
-              </button>
-            </p>
+            <div class="mb-4">
+              <p class="text-muted">
+                <Text
+                  id="integration.energyMonitoring.calculateConsumptionFromIndexDescription"
+                  defaultMessage="This will calculate the energy consumption (in kWh) from your energy meter index readings. Use this if you have index data and want to compute the actual consumption between readings."
+                />
+              </p>
+              <p>
+                <button
+                  class="btn btn-primary"
+                  disabled={state.calculatingConsumptionFromBeginning}
+                  onClick={this.calculateConsumptionFromIndexFromBeginning}
+                >
+                  {state.calculatingConsumptionFromBeginning ? (
+                    <span>
+                      <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                      <Text
+                        id="integration.energyMonitoring.calculatingConsumptionFromBeginning"
+                        defaultMessage="Starting consumption calculation..."
+                      />
+                    </span>
+                  ) : (
+                    <span>
+                      <i class="fe fe-play mr-2" />
+                      <Text
+                        id="integration.energyMonitoring.calculateConsumptionFromIndexFromBeginning"
+                        defaultMessage="Calculate consumption from index from beginning"
+                      />
+                    </span>
+                  )}
+                </button>
+              </p>
+            </div>
+            <div class="mb-4">
+              <p class="text-muted">
+                <Text
+                  id="integration.energyMonitoring.calculateCostFromBeginningDescription"
+                  defaultMessage="This will calculate the cost of your energy consumption based on your consumption data and electricity prices. Use this after you have consumption data and configured your electricity prices."
+                />
+              </p>
+              <p>
+                <button
+                  class="btn btn-primary"
+                  disabled={state.calculatingFromBeginning}
+                  onClick={this.calculateFromBeginning}
+                >
+                  {state.calculatingFromBeginning ? (
+                    <span>
+                      <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                      <Text
+                        id="integration.energyMonitoring.calculatingFromBeginning"
+                        defaultMessage="Starting calculation..."
+                      />
+                    </span>
+                  ) : (
+                    <span>
+                      <i class="fe fe-play mr-2" />
+                      <Text
+                        id="integration.energyMonitoring.calculateCostFromBeginning"
+                        defaultMessage="Calculate cost from beginning"
+                      />
+                    </span>
+                  )}
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </div>
