@@ -92,7 +92,7 @@ class EnergyConsumption extends Component {
 
       // Process data for stacked bar chart
       // Each device feature becomes a separate series with aligned timestamps
-      data.forEach((deviceData, index) => {
+      data.forEach(deviceData => {
         const deviceFeatureName = deviceData.deviceFeature.name
           ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
           : deviceData.device.name;
@@ -243,14 +243,14 @@ class EnergyConsumption extends Component {
     if (value === 0) {
       return '0€';
     }
-    return value.toFixed(2) + '€';
+    return `${value.toFixed(2)}€`;
   };
 
   tooltipYFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
-    return value.toFixed(2) + '€';
+    return `${value.toFixed(2)}€`;
   };
 
   tooltipXFormatter = value => {
@@ -414,7 +414,7 @@ class EnergyConsumption extends Component {
                     series={series}
                     chart_type="bar"
                     height={300}
-                    colors={DEFAULT_COLORS}
+                    colors={props.box.colors || DEFAULT_COLORS}
                     size="big"
                     display_axes={true}
                     hide_legend={true}

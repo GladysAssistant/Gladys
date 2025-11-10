@@ -7,8 +7,7 @@ const getApexChartBarOptions = ({
   colors,
   locales,
   defaultLocale,
-  yAxisFormatter: customYAxisFormatter,
-  yAxisUnit
+  yAxisFormatter: customYAxisFormatter
 }) => {
   const options = {
     chart: {

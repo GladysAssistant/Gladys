@@ -246,6 +246,7 @@ class ApexChartComponent extends Component {
     const additionalHeightDifferent = nextProps.additionalHeight !== this.props.additionalHeight;
     const yAxisFormatterDifferent = nextProps.y_axis_formatter !== this.props.y_axis_formatter;
     const yAxisUnitDifferent = nextProps.y_axis_unit !== this.props.y_axis_unit;
+    const colorsDifferent = nextProps.colors !== this.props.colors;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
@@ -255,7 +256,8 @@ class ApexChartComponent extends Component {
       sizeDifferent ||
       additionalHeightDifferent ||
       yAxisFormatterDifferent ||
-      yAxisUnitDifferent
+      yAxisUnitDifferent ||
+      colorsDifferent
     ) {
       this.displayChart();
     }
