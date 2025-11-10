@@ -46,7 +46,15 @@ class ApexChartComponent extends Component {
           .format('LL');
       };
     }
+    // Configure tooltip with fixed position and date formatter
     options.tooltip = {
+      followCursor: false,
+      fixed: {
+        enabled: true,
+        position: 'topLeft',
+        offsetX: 0,
+        offsetY: -30
+      },
       x: {
         formatter
       }
