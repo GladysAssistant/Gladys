@@ -1,6 +1,15 @@
 import { yAxisFormatter } from './yAxisFormatter';
 
-const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultLocale }) => {
+const getApexChartBarOptions = ({
+  displayAxes,
+  hideLegend,
+  series,
+  colors,
+  locales,
+  defaultLocale,
+  yAxisFormatter: customYAxisFormatter,
+  yAxisUnit
+}) => {
   const options = {
     chart: {
       locales,
@@ -22,7 +31,7 @@ const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultL
     },
     plotOptions: {
       bar: {
-        columnWidth: '100%'
+        columnWidth: '90%'
       }
     },
     dataLabels: {
@@ -62,12 +71,12 @@ const getApexChartBarOptions = ({ displayAxes, series, colors, locales, defaultL
     yaxis: {
       labels: {
         padding: 4,
-        formatter: yAxisFormatter
+        formatter: customYAxisFormatter || yAxisFormatter
       }
     },
     colors,
     legend: {
-      show: displayAxes,
+      show: hideLegend ? false : displayAxes,
       position: 'bottom'
     }
   };

@@ -45,9 +45,9 @@ class EditEnergyConsumption extends Component {
   };
 
   updateDeviceFeatures = selectedOptions => {
-    if (selectedOptions) {
+    if (selectedOptions && selectedOptions.length > 0) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        device_features: [selectedOptions.value]
+        device_features: selectedOptions.map(option => option.value)
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -137,6 +137,7 @@ class EditEnergyConsumption extends Component {
             onChange={this.updateDeviceFeatures}
             options={deviceFeatureOptions.length > 0 ? deviceFeatureOptions : null}
             maxMenuHeight={220}
+            isMulti
           />
         </div>
         <div class="form-group">

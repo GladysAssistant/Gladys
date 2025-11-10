@@ -105,12 +105,27 @@ class ApexChartComponent extends Component {
   getBarChartOptions = () => {
     const options = getApexChartBarOptions({
       displayAxes: this.props.display_axes,
+      hideLegend: this.props.hide_legend,
       series: this.props.series,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language
+      defaultLocale: this.props.user.language,
+      yAxisFormatter: this.props.y_axis_formatter,
+      yAxisUnit: this.props.y_axis_unit
     });
     this.addDateFormatter(options);
+    // Apply custom tooltip formatters if provided
+    if (this.props.tooltip_x_formatter || this.props.tooltip_y_formatter) {
+      if (!options.tooltip) {
+        options.tooltip = {};
+      }
+      if (this.props.tooltip_x_formatter) {
+        options.tooltip.x = { formatter: this.props.tooltip_x_formatter };
+      }
+      if (this.props.tooltip_y_formatter) {
+        options.tooltip.y = { formatter: this.props.tooltip_y_formatter };
+      }
+    }
     return options;
   };
   getAreaChartOptions = () => {
@@ -225,16 +240,22 @@ class ApexChartComponent extends Component {
     const seriesDifferent = nextProps.series !== this.props.series;
     const chartTypeDifferent = nextProps.chart_type !== this.props.chart_type;
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
+    const hideLegendDifferent = nextProps.hide_legend !== this.props.hide_legend;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
     const additionalHeightDifferent = nextProps.additionalHeight !== this.props.additionalHeight;
+    const yAxisFormatterDifferent = nextProps.y_axis_formatter !== this.props.y_axis_formatter;
+    const yAxisUnitDifferent = nextProps.y_axis_unit !== this.props.y_axis_unit;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
       displayAxesDifferent ||
+      hideLegendDifferent ||
       intervalDifferent ||
       sizeDifferent ||
-      additionalHeightDifferent
+      additionalHeightDifferent ||
+      yAxisFormatterDifferent ||
+      yAxisUnitDifferent
     ) {
       this.displayChart();
     }
