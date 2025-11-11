@@ -689,6 +689,12 @@ class EnergyMonitoringPage extends Component {
                 <h5 class="mb-3">
                   <Text id="integration.energyMonitoring.wizard.periodScope" />
                 </h5>
+                <p class="text-muted mb-3">
+                  <Text
+                    id="integration.energyMonitoring.selectElectricMeterDescription"
+                    defaultMessage="You can either use an existing electric meter from another integration (e.g., Enedis), or automatically create a new electric meter here."
+                  />
+                </p>
                 <div class="row">
                   <div class="col-md-3">
                     <div class="form-group">
