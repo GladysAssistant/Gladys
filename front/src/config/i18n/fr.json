@@ -587,6 +587,7 @@
       "calculateFromBeginningError": "Une erreur est survenue lors du lancement du calcul.",
       "importPrices": "Importer",
       "importPricesTitle": "Importer les tarifs de contrat d'énergie",
+      "selectElectricMeterDescription": "Vous pouvez soit utiliser un compteur électrique existant d'une autre intégration (ex : Enedis), soit créer automatiquement un nouveau compteur électrique ici.",
       "selectElectricMeter": "Sélectionner le compteur électrique",
       "selectContract": "Sélectionner le contrat d'énergie",
       "selectContractPlaceholder": "Sélectionner un contrat",

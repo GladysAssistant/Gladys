@@ -689,6 +689,7 @@
       "calculateFromBeginningError": "Beim Starten der Berechnung ist ein Fehler aufgetreten.",
       "importPrices": "Importieren",
       "importPricesTitle": "Energievertragstarife importieren",
+      "selectElectricMeterDescription": "Sie können entweder einen vorhandenen Stromzähler aus einer anderen Integration verwenden (z. B. Enedis) oder hier automatisch einen neuen Stromzähler erstellen.",
       "selectElectricMeter": "Stromzählergerät auswählen",
       "selectContract": "Energievertrag auswählen",
       "selectContractPlaceholder": "Vertrag auswählen",

@@ -1706,6 +1706,7 @@
       "calculateFromBeginningError": "An error occurred while starting the calculation.",
       "importPrices": "Import",
       "importPricesTitle": "Import Energy Contract Prices",
+      "selectElectricMeterDescription": "You can either use an existing electric meter from another integration (e.g., Enedis), or automatically create a new electric meter here.",
       "selectElectricMeter": "Select Electric Meter Device",
       "selectContract": "Select Energy Contract",
       "selectContractPlaceholder": "Select a contract",

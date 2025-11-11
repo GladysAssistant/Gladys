@@ -172,6 +172,12 @@ class ImportPricesPage extends Component {
           {importError && <div class="alert alert-danger">{importError}</div>}
 
           <div class="mb-3">
+            <p class="text-muted">
+              <Text
+                id="integration.energyMonitoring.selectElectricMeterDescription"
+                defaultMessage="You can either use an existing electric meter from another integration (e.g., Enedis), or automatically create a new electric meter here."
+              />
+            </p>
             <label class="form-label required">
               <Text
                 id="integration.energyMonitoring.selectElectricMeter"
