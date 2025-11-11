@@ -26,10 +26,6 @@ describe('Contracts.buildEdfTempoDayMap', () => {
     };
   });
 
-  afterEach(() => {
-    sinon.restore();
-  });
-
   it('should build map with multiple EDF tempo historical days', async () => {
     const startDate = '2023-01-01';
     const mockHistoricalData = [
