@@ -5,7 +5,12 @@ import { route } from 'preact-router';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import ImportPricesPage from './ImportPrices';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../server/utils/constants';
 
 const DEVICE_FEATURE_CATEGORIES_TO_DISPLAY = [
   DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -310,6 +315,70 @@ class EnergyMonitoringPage extends Component {
       this.setState({ loadingDevices: false });
     }
   }
+
+  createElectricMeter = async () => {
+    try {
+      this.setState({ loadingDevices: true, error: null });
+
+      // Get the MQTT service ID
+      const mqttService = await this.props.httpClient.get('/api/v1/service/mqtt');
+      const serviceId = mqttService.id;
+
+      // Generate a unique external_id like MQTT does
+      const timestamp = Date.now();
+      const newDevice = {
+        name: this.props.intl.dictionary.integration.energyMonitoring.electricMeterDeviceName || 'Electric Meter',
+        external_id: `mqtt:electric-meter-${timestamp}`,
+        selector: `mqtt:electric-meter-${timestamp}`,
+        service_id: serviceId,
+        should_poll: false,
+        features: [
+          {
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            name:
+              this.props.intl.dictionary.integration.energyMonitoring.electricMeterFeatureName ||
+              'Electric Meter Index',
+            external_id: `mqtt:electric-meter-${timestamp}-index`,
+            selector: `mqtt:electric-meter-${timestamp}-index`,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 10000000000
+          }
+        ],
+        params: []
+      };
+
+      const createdDevice = await this.props.httpClient.post('/api/v1/device', newDevice);
+
+      // Reload devices to include the new one
+      await this.loadDevices();
+
+      // Update the wizard form with the newly created device
+      this.setState(({ newPrice }) => ({
+        newPrice: { ...newPrice, electric_meter_device_id: createdDevice.id }
+      }));
+    } catch (error) {
+      console.error(error);
+      this.setState({ error });
+    } finally {
+      this.setState({ loadingDevices: false });
+    }
+  };
+
+  handleElectricMeterChange = async e => {
+    const value = e.target.value;
+
+    if (value === 'CREATE_NEW') {
+      await this.createElectricMeter();
+    } else {
+      this.setState(({ newPrice }) => ({
+        newPrice: { ...newPrice, electric_meter_device_id: value }
+      }));
+    }
+  };
 
   getAllFeatures() {
     const flat = [];
@@ -755,9 +824,15 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.electric_meter_device_id || ''}
-                        onChange={e => updateNewPrice({ electric_meter_device_id: e.target.value })}
+                        onChange={this.handleElectricMeterChange}
                       >
                         <option value="">—</option>
+                        <option value="CREATE_NEW">
+                          <Text
+                            id="integration.energyMonitoring.createElectricMeter"
+                            defaultMessage="+ Create Electric Meter"
+                          />
+                        </option>
                         {state.devices
                           .filter(
                             d => Array.isArray(d.features) && d.features.some(f => f && f.category === 'energy-sensor')
@@ -1248,4 +1323,4 @@ class EnergyMonitoringPage extends Component {
   }
 }
 
-export default EnergyMonitoringPage;
+export default withIntlAsProp(EnergyMonitoringPage);

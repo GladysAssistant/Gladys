@@ -2,7 +2,12 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../server/utils/constants';
 
 class ImportPricesPage extends Component {
   state = {
@@ -79,8 +84,65 @@ class ImportPricesPage extends Component {
     }
   };
 
-  handleDeviceChange = e => {
-    this.setState({ selectedDeviceId: e.target.value });
+  handleDeviceChange = async e => {
+    const value = e.target.value;
+
+    if (value === 'CREATE_NEW') {
+      await this.createElectricMeter();
+    } else {
+      this.setState({ selectedDeviceId: value });
+    }
+  };
+
+  createElectricMeter = async () => {
+    try {
+      this.setState({ loadingDevices: true, devicesError: null });
+
+      // Get the MQTT service ID
+      const mqttService = await this.props.httpClient.get('/api/v1/service/mqtt');
+      const serviceId = mqttService.id;
+
+      // Generate a unique external_id like MQTT does
+      const timestamp = Date.now();
+
+      const newDevice = {
+        name: this.props.intl.dictionary.integration.energyMonitoring.electricMeterDeviceName || 'Electric Meter',
+        external_id: `mqtt:electric-meter-${timestamp}`,
+        selector: `mqtt:electric-meter-${timestamp}`,
+        service_id: serviceId,
+        should_poll: false,
+        features: [
+          {
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            name:
+              this.props.intl.dictionary.integration.energyMonitoring.electricMeterFeatureName ||
+              'Electric Meter Index',
+            external_id: `mqtt:electric-meter-${timestamp}-index`,
+            selector: `mqtt:electric-meter-${timestamp}-index`,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 10000000000
+          }
+        ],
+        params: []
+      };
+
+      const createdDevice = await this.props.httpClient.post('/api/v1/device', newDevice);
+
+      // Reload devices to include the new one
+      await this.loadDevices();
+
+      // Select the newly created device
+      this.setState({ selectedDeviceId: createdDevice.id });
+    } catch (error) {
+      console.error(error);
+      this.setState({ devicesError: error });
+    } finally {
+      this.setState({ loadingDevices: false });
+    }
   };
 
   handleContractChange = e => {
@@ -193,6 +255,9 @@ class ImportPricesPage extends Component {
               <option value="">
                 <Text id="global.selectDevice" defaultMessage="Select a device" />
               </option>
+              <option value="CREATE_NEW">
+                <Text id="integration.energyMonitoring.createElectricMeter" defaultMessage="+ Create Electric Meter" />
+              </option>
               {devices.map(device => (
                 <option key={device.id} value={device.id}>
                   {device.name}
@@ -296,4 +361,4 @@ class ImportPricesPage extends Component {
   }
 }
 
-export default ImportPricesPage;
+export default withIntlAsProp(ImportPricesPage);
