@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import get from 'get-value';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import {
   DEVICE_FEATURE_CATEGORIES,
@@ -57,11 +58,34 @@ class ImportPricesPage extends Component {
   };
 
   formatContractName = contractId => {
-    // Transform contract ID to a readable name
-    return contractId
+    // Contract ID format: "provider-contract-type" (e.g., "edf-base", "edf-peak-off-peak")
+    const parts = contractId.split('-');
+
+    if (parts.length < 2) {
+      // Fallback if format is unexpected
+      return contractId;
+    }
+
+    // First part is the provider (capitalize first letter)
+    const provider = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+
+    // Rest is the contract type (rejoin with dashes)
+    const contractType = parts.slice(1).join('-');
+
+    // Try to get translation for contract type
+    const translation = get(this.props.intl.dictionary, `integration.energyMonitoring.contractTypes.${contractType}`);
+
+    if (translation) {
+      return `${provider} ${translation}`;
+    }
+
+    // Fallback: capitalize each word of contract type
+    const formattedContractType = contractType
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+
+    return `${provider} ${formattedContractType}`;
   };
 
   loadDevices = async () => {
