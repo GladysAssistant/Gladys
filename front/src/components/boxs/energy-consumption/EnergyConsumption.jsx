@@ -422,6 +422,7 @@ class EnergyConsumption extends Component {
                     tooltip_y_formatter={this.tooltipYFormatter}
                     tooltip_x_formatter={this.tooltipXFormatter}
                     dictionary={props.intl.dictionary}
+                    disable_zoom={true}
                   />
                 </>
               )}

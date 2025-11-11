@@ -7,7 +7,8 @@ const getApexChartBarOptions = ({
   colors,
   locales,
   defaultLocale,
-  yAxisFormatter: customYAxisFormatter
+  yAxisFormatter: customYAxisFormatter,
+  disableZoom
 }) => {
   const options = {
     chart: {
@@ -26,7 +27,10 @@ const getApexChartBarOptions = ({
       animations: {
         enabled: false
       },
-      stacked: true
+      stacked: true,
+      zoom: {
+        enabled: !disableZoom
+      }
     },
     plotOptions: {
       bar: {

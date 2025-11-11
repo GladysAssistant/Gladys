@@ -119,7 +119,8 @@ class ApexChartComponent extends Component {
       locales: [fr, en, de],
       defaultLocale: this.props.user.language,
       yAxisFormatter: this.props.y_axis_formatter,
-      yAxisUnit: this.props.y_axis_unit
+      yAxisUnit: this.props.y_axis_unit,
+      disableZoom: this.props.disable_zoom
     });
     this.addDateFormatter(options);
     // Apply custom tooltip formatters if provided
