@@ -118,7 +118,11 @@ async function calculateCostFrom(startAt, jobId) {
           logger.info(
             `Device ${electricMeterFeature.device_id} has tempo prices and Map is empty, getting EDF tempo historical`,
           );
-          const startDateAsDayString = dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD');
+          // Subtract 1 day to ensure we have tempo data for hours before 6AM that use previous day's color
+          const startDateAsDayString = dayjs
+            .tz(startAt, systemTimezone)
+            .subtract(1, 'day')
+            .format('YYYY-MM-DD');
           edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
         }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);

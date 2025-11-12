@@ -65,12 +65,12 @@ module.exports = {
     const consumptionDateHour = dayjs(consumptionDate)
       .tz(systemTimezone)
       .hour();
-    const dateForColor = consumptionDate;
+    let dateForColor = dayjs(consumptionDate).tz(systemTimezone);
     // For hours before 6AM strictly, we use the previous day to get the color
     if (consumptionDateHour < 6) {
-      dateForColor.setDate(dateForColor.getDate() - 1);
+      dateForColor = dateForColor.subtract(1, 'day');
     }
-    const consumptionDateDay = dateForColor.toISOString().split('T')[0];
+    const consumptionDateDay = dateForColor.format('YYYY-MM-DD');
     const consumptionDateYear = consumptionDateDay.split('-')[0];
 
     logger.debug(`Getting tempo data for date ${consumptionDateDay} at year ${consumptionDateYear}`);
