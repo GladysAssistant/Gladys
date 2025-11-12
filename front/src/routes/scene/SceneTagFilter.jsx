@@ -65,7 +65,10 @@ class SceneTagFilter extends Component {
         })}
       >
         <button className="btn btn-secondary btn-sm dropdown-toggle" onClick={this.toggleTagFilterDropdown}>
-          <Text id="scene.filterTagsName" />
+          <i class="fe fe-tag" />
+          <span class="d-none d-lg-inline-block ml-2">
+            <Text id="scene.filterTagsName" />
+          </span>
         </button>
         <div
           class={cx('dropdown-menu', {

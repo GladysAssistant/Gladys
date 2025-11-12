@@ -10,6 +10,10 @@ const {
   Thermostat,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
+  ElectricalPowerMeasurement,
+  ElectricalEnergyMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -211,6 +215,40 @@ describe('Matter.listenToStateChange', () => {
       state: 100,
     });
   });
+  it('should listen to state change (TotalVolatileOrganicCompoundsConcentrationMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
+      addLevelValueAttributeListener: (callback) => {
+        callback(3);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1070',
+      state: 3,
+    });
+  });
+  it('should listen to state change (FormaldehydeConcentrationMeasurement)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(FormaldehydeConcentrationMeasurement.Complete.id, {
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(100);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1067',
+      state: 100,
+    });
+  });
   it('should listen to state change (Thermostat heating)', async () => {
     const clusterClients = new Map();
     clusterClients.set(Thermostat.Complete.id, {
@@ -332,6 +370,89 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:768:color',
       state: 14090213,
+    });
+  });
+  it('should listen to state change (ElectricalPowerMeasurement - ActivePower)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      addActivePowerAttributeListener: (callback) => {
+        callback(1500000); // 1500000 mW = 1500 W
+      },
+      addVoltageAttributeListener: () => {},
+      addActiveCurrentAttributeListener: () => {},
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:power',
+      state: 1500,
+    });
+  });
+  it('should listen to state change (ElectricalPowerMeasurement - Voltage)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      supportedFeatures: {
+        voltage: true,
+      },
+      addActivePowerAttributeListener: () => {},
+      addVoltageAttributeListener: (callback) => {
+        callback(230000); // 230000 mV = 230 V
+      },
+      addActiveCurrentAttributeListener: () => {},
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:voltage',
+      state: 230,
+    });
+  });
+  it('should listen to state change (ElectricalPowerMeasurement - ActiveCurrent)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      supportedFeatures: {
+        current: true,
+      },
+      addActivePowerAttributeListener: () => {},
+      addVoltageAttributeListener: () => {},
+      addActiveCurrentAttributeListener: (callback) => {
+        callback(6500); // 6500 mA = 6.5 A
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:current',
+      state: 6.5,
+    });
+  });
+  it('should listen to state change (ElectricalEnergyMeasurement - CumulativeEnergy)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(ElectricalEnergyMeasurement.Complete.id, {
+      supportedFeatures: {
+        cumulativeEnergy: true,
+      },
+      addCumulativeEnergyImportedAttributeListener: (callback) => {
+        callback({ energy: 1500000000 }); // 1500000000 mWh = 1500 kWh
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:145:energy',
+      state: 1500,
     });
   });
 });

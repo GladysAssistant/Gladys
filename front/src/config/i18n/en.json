@@ -1971,6 +1971,24 @@
         "defaultDeletionError": "An error occurred while deleting the device",
         "getDevicesError": "An error occurred while getting the devices list"
       }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Connect your AI agent to Gladys.",
+      "documentation": "MCP Documentation",
+      "longDescription": "MCP is a protocol that allows adding real-world capabilities to your agent. This integration acts as an MCP server and allows your MCP-compatible AI agents to interact with your smart home. Your agent and your Gladys instance must be on the same network.",
+      "urlLabel": "MCP Server URL",
+      "urlInstruction": "Copy this URL into your agent's configuration.",
+      "apiKeyLabel": "MCP Server API Key",
+      "apiKeyInstruction": "Generate an API key to authenticate your MCP client. In your MCP client configuration, add an \"Authorization\" header with this key as the value.",
+      "apiKeyDifference": "These API keys are local and only work on your local network. If you want to access your MCP server from outside your network, use a Gladys Plus API key and Open API route.",
+      "warningKeyDisappear": "Warning: you will only see the key once. Copy/paste your key and save it somewhere.",
+      "keyName": "Details",
+      "revoke": "Revoke",
+      "namePlaceholder": "Client name",
+      "generateButton": "Generate",
+      "keyNameLabel": "Key:",
+      "registeredLabel": "Registered on:"
     }
   },
   "editScene": {
@@ -2883,6 +2901,7 @@
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
+    "ppt": "Parts per trillion (ppt)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "watt-hour": "Watt hour (Wh)",
@@ -2953,7 +2972,11 @@
     "megabytes-per-second": "Megabytes per second (MB/s)",
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
     "aqi": "Air Quality Index",
+    "milligram-per-cubic-meter": "Milligram per cubic meter (mg/m³)",
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
+    "nanogram-per-cubic-meter": "Nanogram per cubic meter (ng/m³)",
+    "particles-per-cubic-meter": "Particles per cubic meter (p/m³)",
+    "becquerel-per-cubic-meter": "Becquerel per cubic meter (Bq/m³)",
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
     "square-kilometer": "Square kilometer (km²)",
@@ -2973,6 +2996,7 @@
     "lux": "lx",
     "ppm": "ppm",
     "ppb": "ppb",
+    "ppt": "ppt",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -3043,7 +3067,11 @@
     "megabytes-per-second": "MB/s",
     "gigabytes-per-second": "GB/s",
     "aqi": "AQI",
+    "milligram-per-cubic-meter": "mg/m³",
     "microgram-per-cubic-meter": "µg/m³",
+    "nanogram-per-cubic-meter": "ng/m³",
+    "particles-per-cubic-meter": "p/m³",
+    "becquerel-per-cubic-meter": "Bq/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
@@ -3316,6 +3344,23 @@
         "plugged": {
           "0": "Unplugged",
           "1": "Plugged"
+        }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unknown",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Low",
+          "2": "Medium",
+          "3": "High",
+          "4": "Critical"
         }
       }
     }
@@ -3689,6 +3734,10 @@
       "decimal": "VOC (decimal)"
     },
     "voc-index-sensor": {
+      "shortCategoryName": "Sensirion VOC Index",
+      "integer": "Sensirion VOC Index (integer)"
+    },
+    "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
       "integer": "VOC Index (integer)"
     },
