@@ -82,23 +82,22 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
-            {props.allowModifyFeatures && (
-              <div class="form-group">
-                <label class="form-label" for={`externalid_${featureIndex}`}>
-                  <Text id="editDeviceForm.externalIdLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    id={`externalid_${featureIndex}`}
-                    type="text"
-                    value={feature.external_id}
-                    onInput={this.updateExternalId}
-                    class="form-control"
-                    placeholder={<Text id="editDeviceForm.externalIdPlaceholder" />}
-                  />
-                </Localizer>
-              </div>
-            )}
+            <div class="form-group">
+              <label class="form-label" for={`externalid_${featureIndex}`}>
+                <Text id="editDeviceForm.externalIdLabel" />
+              </label>
+              <Localizer>
+                <input
+                  id={`externalid_${featureIndex}`}
+                  type="text"
+                  value={feature.external_id}
+                  onInput={this.updateExternalId}
+                  class="form-control"
+                  disabled={!props.allowModifyFeatures}
+                  placeholder={<Text id="editDeviceForm.externalIdPlaceholder" />}
+                />
+              </Localizer>
+            </div>
             {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${featureIndex}`}>

@@ -36,6 +36,7 @@ const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyPriceModel = require('./energy_price');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -61,6 +62,7 @@ const models = {
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),
@@ -113,6 +115,16 @@ const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
+  const createdAtInString = formatDateInUTC(createdAt);
+  await duckDbWriteConnectionAllAsync(
+    'UPDATE t_device_feature_state SET value = ? WHERE device_feature_id = ? AND created_at = ?',
+    value,
+    deviceFeatureId,
+    createdAtInString,
+  );
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
@@ -137,6 +149,10 @@ const duckDbShowVersion = async () => {
   logger.info(`DuckDB version = ${result[0].version}`);
 };
 
+const duckDbSetTimezone = async (timezone) => {
+  await duckDbWriteConnectionAllAsync('set timezone=?;', timezone);
+};
+
 const db = {
   ...models,
   sequelize,
@@ -148,8 +164,10 @@ const db = {
   duckDbReadConnectionAllAsync,
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
+  duckDbUpdateState,
   duckDbBatchInsertState,
   duckDbShowVersion,
+  duckDbSetTimezone,
 };
 
 module.exports = db;
