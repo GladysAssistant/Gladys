@@ -268,8 +268,8 @@ describe('build schemas', () => {
 
     // Verify only devices with rooms are included
     expect(homeSchema.salon.devices).to.have.property('device-sensor-1');
-    expect(homeSchema.salon.devices).to.not.have.property('device-no-room');
-    expect(homeSchema.salon.devices).to.not.have.property('device-light-no-room');
+    expect(homeSchema['no-room'].devices).to.have.property('device-no-room');
+    expect(homeSchema['no-room'].devices).to.have.property('device-light-no-room');
   });
 
   it('should return schema with all available tools', async () => {
@@ -469,7 +469,7 @@ describe('build schemas', () => {
       device: 'non-existent-device',
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
-    expect(noDeviceResult.content[0].text).to.eq('device.turn-on command not sent, no device found.');
+    expect(noDeviceResult.content[0].text).to.eq('device.turn-on command not sent, no device found');
 
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.get.callCount).to.eq(1);
@@ -585,13 +585,13 @@ describe('build schemas', () => {
     expect(tools).to.be.an('array');
     expect(tools.length).to.eq(4);
 
-    // Test device.get-state - should only return device with room
+    // Test device.get-state - should return all devices with and without room
     const stateResult = await tools[2].cb({ room: undefined, device_type: undefined });
-    expect(stateResult.content.length).to.eq(1); // Only device-temp-1 should be included
+    expect(stateResult.content.length).to.eq(3);
 
-    // Test device.turn-on-off - devices without rooms should be filtered out
+    // Test device.turn-on-off - for device without room
     const turnOnResult = await tools[3].cb({ action: 'on', device: 'Light Without Room' });
-    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0); // Should not find device
-    expect(turnOnResult.content[0].text).to.eq('device.turn-on command not sent, no device found.');
+    expect(mcpHandler.gladys.device.setValue.args[0][0].room).to.eq(null);
+    expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Light Without Room');
   });
 });
