@@ -48,7 +48,7 @@ class Header extends Component {
     // Adapt forum URL to user language
     const userLanguage = get(props, 'user.language');
     const forumUrl =
-      userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://en-community.gladysassistant.com/';
+      userLanguage === 'fr' ? 'https://community.gladysassistant.com/' : 'https://community.gladysassistant.com/';
 
     if (props.fullScreen) {
       return null;
