@@ -3762,6 +3762,7 @@
     "description": "Stelle sicher, dass dieser Benutzer lokal in deiner Gladys-Instanz akzeptiert ist (\"Einstellungen\" -> \"Gladys Plus\" -> \"Benutzer\"), bevor du ihn hier auswählst.",
     "noInstanceFound": "Deine Gladys-Instanz ist nicht mit dem Gladys Gateway verbunden. Hast du dich in deiner Gladys-Installation mit deinem Gladys-Plus-Account verbunden?",
     "error": "Ein Fehler ist aufgetreten. Ist dein Benutzer lokal in deiner Gladys-Instanz akzeptiert?",
+    "errorNotAcceptedLocally": "Der Benutzer wurde lokal in der Gladys-Instanz nicht akzeptiert. Bitte akzeptiere ihn in den Einstellungen deiner Instanz.",
     "saveButton": "Speichern",
     "manageBilling": "Um deine Abrechnung zu verwalten, klicke ",
     "here": "hier"

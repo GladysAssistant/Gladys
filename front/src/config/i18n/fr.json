@@ -3762,6 +3762,7 @@
     "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
+    "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
     "saveButton": "Sauvegarder",
     "manageBilling": "Pour gérer votre facturation, cliquez ",
     "here": "ici"
