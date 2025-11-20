@@ -10,6 +10,8 @@ import {
   DEVICE_FEATURE_UNITS
 } from '../../../../../../server/utils/constants';
 
+const KNOWN_CONTRACT_TYPES = ['peak-off-peak', 'tempo', 'base'];
+
 class ImportPricesPage extends Component {
   state = {
     // Loading states
@@ -66,11 +68,21 @@ class ImportPricesPage extends Component {
       return contractId;
     }
 
-    // First part is the provider (capitalize first letter)
-    const provider = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+    // Determine contract type by checking known suffixes (longest first)
+    let contractType = parts[parts.length - 1];
+    let providerParts = parts.slice(0, parts.length - 1);
 
-    // Rest is the contract type (rejoin with dashes)
-    const contractType = parts.slice(1).join('-');
+    for (const type of KNOWN_CONTRACT_TYPES) {
+      const typeParts = type.split('-');
+      const matches = parts.slice(-typeParts.length).join('-') === type;
+      if (matches) {
+        contractType = type;
+        providerParts = parts.slice(0, parts.length - typeParts.length);
+        break;
+      }
+    }
+
+    const provider = providerParts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
 
     // Try to get translation for contract type
     const translation = get(this.props.intl.dictionary, `integration.energyMonitoring.contractTypes.${contractType}`);
