@@ -37,8 +37,7 @@ Ready to contribute code? Start by setting up your local dev environment:
 
 We recommend starting with a quick discussion on the Gladys forum to make sure your idea aligns with ongoing development:
 
-- [Forum (English)](https://en-community.gladysassistant.com/)
-- [Forum (Français)](https://community.gladysassistant.com/)
+🌐 [Forum](https://community.gladysassistant.com/)
 
 Then, follow our guide:
 

@@ -1,5 +1,11 @@
 const { z } = require('zod');
 
+const noRoom = {
+  id: null,
+  name: 'No room',
+  selector: 'no-room',
+};
+
 /**
  * @description Get all resources (room and devices) available for the MCP service.
  * @returns {Promise<Array>} Array of resources with home schema configuration.
@@ -10,6 +16,7 @@ async function getAllResources() {
   const homeSchema = {};
 
   const rooms = (await this.gladys.room.getAll()).map(({ selector }) => selector);
+  rooms.push(noRoom.selector);
   rooms.forEach((room) => {
     homeSchema[room] = {
       devices: {},
@@ -18,7 +25,7 @@ async function getAllResources() {
 
   const sensorDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.room && device.features.some((feature) => this.isSensorFeature(feature));
+      return device.features.some((feature) => this.isSensorFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -38,12 +45,12 @@ async function getAllResources() {
       })),
     };
 
-    homeSchema[device.room.selector].devices[device.selector] = d;
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
   const switchableDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.room && device.features.some((feature) => this.isSwitchableFeature(feature));
+      return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -63,13 +70,13 @@ async function getAllResources() {
       })),
     };
 
-    if (homeSchema[device.room.selector].devices[device.selector]?.name) {
-      homeSchema[device.room.selector].devices[device.selector].features.push(...d.features);
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
 
       return;
     }
 
-    homeSchema[device.room.selector].devices[device.selector] = d;
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
   return [
@@ -101,10 +108,11 @@ async function getAllResources() {
  */
 async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
+  rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const sensorDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.room && device.features.some((feature) => this.isSensorFeature(feature));
+      return device.features.some((feature) => this.isSensorFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -123,7 +131,7 @@ async function getAllTools() {
 
   const switchableDevices = (await this.gladys.device.get())
     .filter((device) => {
-      return device.room && device.features.some((feature) => this.isSwitchableFeature(feature));
+      return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
     .map((device) => ({
       ...device,
@@ -201,7 +209,7 @@ async function getAllTools() {
             .optional()
             .describe('Room to get information from, leave empty to select multiple rooms.'),
           device_type: z
-            .enum([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories])
+            .enum([...new Set([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories])])
             .optional()
             .describe('Type of device to query, leave empty to retrieve all devices.'),
         },
@@ -213,7 +221,7 @@ async function getAllTools() {
 
         if (room && room !== '') {
           const { selector } = this.findBySimilarity(rooms, room);
-          selectedDevices = selectedDevices.filter((device) => device.room.selector === selector);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
         }
 
         if (deviceType && deviceType.length > 0) {
@@ -230,7 +238,7 @@ async function getAllTools() {
                 const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
 
                 states.push({
-                  room: device.room.name,
+                  room: device.room?.name || noRoom.name,
                   device: device.name,
                   feature: featureLastState.name,
                   category: featureLastState.category,
@@ -262,7 +270,7 @@ async function getAllTools() {
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
           device: z
-            .enum(switchableDevices.map(({ name }) => name))
+            .enum([...new Set(switchableDevices.map(({ name }) => name))])
             .describe('Device name to turn on/off.')
             .optional(),
           room: z
@@ -281,7 +289,7 @@ async function getAllTools() {
 
         if (room && room !== '') {
           const { selector } = this.findBySimilarity(rooms, room);
-          selectedDevices = selectedDevices.filter((d) => d.room.selector === selector);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
         }
 
         if (device) {
@@ -329,7 +337,7 @@ async function getAllTools() {
         }
 
         return {
-          content: [{ type: 'text', text: `device.turn-${actionValue} command not sent, no device found.` }],
+          content: [{ type: 'text', text: `device.turn-${actionValue} command not sent, no device found` }],
         };
       },
     },
