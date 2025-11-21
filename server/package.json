@@ -100,6 +100,7 @@
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.intersection": "^4.4.0",
+    "lru-cache": "^11.2.2",
     "mathjs": "^11.8.0",
     "node-nlp": "^4.26.1",
     "node-schedule": "^2.1.0",
