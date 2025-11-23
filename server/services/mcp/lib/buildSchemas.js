@@ -292,10 +292,12 @@ async function getAllTools() {
         );
 
         return {
-          content: states.map((state) => ({
-            type: 'text',
-            text: JSON.stringify(state),
-          })),
+          content: [
+            {
+              type: 'text',
+              text: encode(states),
+            },
+          ],
         };
       },
     },
@@ -413,8 +415,8 @@ async function getAllTools() {
 
         if (feature && feature !== '') {
           const [featureCategory, featureType] = feature.split(':');
-          selectedDevices = selectedDevices.filter((device) => {
-            return device.features.some(
+          selectedDevices = selectedDevices.filter((d) => {
+            return d.features.some(
               (f) => f.category === featureCategory && (featureType ? f.type === featureType : true),
             );
           });
