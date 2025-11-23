@@ -1,5 +1,4 @@
 const { z } = require('zod');
-const { encode } = require('@toon-format/toon');
 
 const noRoom = {
   id: null,
@@ -295,7 +294,7 @@ async function getAllTools() {
           content: [
             {
               type: 'text',
-              text: encode(states),
+              text: this.toon(states),
             },
           ],
         };
@@ -451,7 +450,7 @@ async function getAllTools() {
             content: [
               {
                 type: 'text',
-                text: encode({
+                text: this.toon({
                   room: selectedDevices[0].room?.name || noRoom.name,
                   device: selectedDevices[0].name,
                   feature: selectedFeature.name,
