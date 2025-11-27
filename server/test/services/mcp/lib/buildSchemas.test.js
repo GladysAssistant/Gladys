@@ -1,7 +1,11 @@
 const { expect } = require('chai');
 const { stub, fake } = require('sinon');
 const { getAllResources, getAllTools } = require('../../../../services/mcp/lib/buildSchemas');
-const { isSensorFeature, isSwitchableFeature } = require('../../../../services/mcp/lib/selectFeature');
+const {
+  isSensorFeature,
+  isSwitchableFeature,
+  isHistoryFeature,
+} = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
 
 describe('build schemas', () => {
@@ -102,6 +106,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isHistoryFeature,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
@@ -249,6 +254,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isHistoryFeature,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
@@ -352,6 +358,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isHistoryFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -381,6 +388,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
+      toon: stub().returns(),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -421,10 +429,10 @@ describe('build schemas', () => {
     expect(tools[2].config.description).to.eq('Get last state of specific device type or in a specific room.');
 
     const stateResultAll = await tools[2].cb({ room: undefined, device_type: undefined });
-    expect(stateResultAll.content.length).to.eq(3);
+    expect(stateResultAll.content.length).to.eq(1);
 
     const stateResultRoom = await tools[2].cb({ room: 'salon', device_type: undefined });
-    expect(stateResultRoom.content.length).to.eq(2);
+    expect(stateResultRoom.content.length).to.eq(1);
 
     const stateResultType = await tools[2].cb({ room: undefined, device_type: 'light' });
     expect(stateResultType.content.length).to.eq(1);
@@ -473,7 +481,7 @@ describe('build schemas', () => {
 
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.get.callCount).to.eq(1);
-    expect(mcpHandler.gladys.device.get.callCount).to.eq(2);
+    expect(mcpHandler.gladys.device.get.callCount).to.eq(3);
   });
 
   it('should handle devices without room assignment in getAllTools', async () => {
@@ -547,6 +555,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isHistoryFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -576,6 +585,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
+      toon: stub().returns(),
     };
 
     // Should not throw error
@@ -583,11 +593,11 @@ describe('build schemas', () => {
 
     // Verify tools are created successfully
     expect(tools).to.be.an('array');
-    expect(tools.length).to.eq(4);
+    expect(tools.length).to.eq(5);
 
     // Test device.get-state - should return all devices with and without room
     const stateResult = await tools[2].cb({ room: undefined, device_type: undefined });
-    expect(stateResult.content.length).to.eq(3);
+    expect(stateResult.content.length).to.eq(1);
 
     // Test device.turn-on-off - for device without room
     const turnOnResult = await tools[3].cb({ action: 'on', device: 'Light Without Room' });

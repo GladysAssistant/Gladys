@@ -430,7 +430,7 @@ async function getAllTools() {
 
         if (selectedDevices.length > 0) {
           const selectedFeature =
-            selectedDevices[0].features.find(async (f) => {
+            selectedDevices[0].features.find((f) => {
               if (feature && feature !== '') {
                 const [featureCategory, featureType] = feature.split(':');
 
@@ -443,7 +443,7 @@ async function getAllTools() {
           const aggStates = await this.gladys.device.getDeviceFeaturesAggregates(
             selectedFeature.selector,
             interval ? intervalByName[interval] : THIRTY_DAYS_IN_MINUTES,
-            300,
+            500,
           );
 
           return {
