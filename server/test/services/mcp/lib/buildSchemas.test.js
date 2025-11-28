@@ -318,6 +318,7 @@ describe('build schemas', () => {
             type: 'decimal',
             last_value: 22.5,
             unit: '°C',
+            keep_history: true,
           },
         ],
       },
@@ -377,6 +378,36 @@ describe('build schemas', () => {
             return Promise.resolve(devices.find((d) => d.selector === selector));
           }),
           setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({
+            device: { name: 'Capteur température' },
+            deviceFeature: { name: 'Température' },
+            values: [
+              {
+                created_at: '2025-10-30T19:52:46.361Z',
+                value: 18.58,
+                max_value: 18.58,
+                min_value: 18.58,
+                sum_value: 18.58,
+                count_value: 1,
+              },
+              {
+                created_at: '2025-10-30T20:02:39.008Z',
+                value: 18.63,
+                max_value: 18.63,
+                min_value: 18.63,
+                sum_value: 18.63,
+                count_value: 1,
+              },
+              {
+                created_at: '2025-10-30T20:02:39.013Z',
+                value: 18.65,
+                max_value: 18.65,
+                min_value: 18.65,
+                sum_value: 18.65,
+                count_value: 1,
+              },
+            ],
+          }),
           camera: {
             getImagesInRoom: stub().resolves(['data:image/jpeg;base64,/9j/4AAQ', 'data:image/jpeg;base64,ABCD']),
           },
@@ -388,7 +419,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
-      toon: stub().returns(),
+      toon: stub().returns('toonmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -478,6 +509,29 @@ describe('build schemas', () => {
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
     expect(noDeviceResult.content[0].text).to.eq('device.turn-on command not sent, no device found');
+
+    // Test device.get-history
+    const getHistoryResult = await tools[4].cb({
+      room: 'salon',
+      device: 'temperature',
+      feature: 'temperature-sensor:decimal',
+      period: 'last-month',
+    });
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq('device-temp-1-temp');
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[1]).to.eq(43200);
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[2]).to.eq(500);
+    expect(getHistoryResult.content[0].text).to.eq('toonmockdata');
+
+    mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
+
+    const historyDisabledResult = await tools[4].cb({
+      room: 'salon',
+      feature: 'humidity-sensor:decimal',
+      period: 'last-month',
+    });
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.callCount).to.eq(0);
+    expect(historyDisabledResult.content[0].text).to.eq('device.get-history, no device or feature found');
 
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.get.callCount).to.eq(1);
