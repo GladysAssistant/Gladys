@@ -13,6 +13,7 @@ describe('formatValue', () => {
 
     expect(result).to.deep.equal({
       value: 'open',
+      unit: null,
     });
   });
 
@@ -27,6 +28,7 @@ describe('formatValue', () => {
 
     expect(result).to.deep.equal({
       value: 'off',
+      unit: null,
     });
   });
 
