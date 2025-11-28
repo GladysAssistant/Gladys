@@ -513,7 +513,7 @@ describe('build schemas', () => {
     // Test device.get-history
     const getHistoryResult = await tools[4].cb({
       room: 'salon',
-      device: 'temperature',
+      device: 'temperature sensor',
       feature: 'temperature-sensor:decimal',
       period: 'last-month',
     });
@@ -522,6 +522,19 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[1]).to.eq(43200);
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[2]).to.eq(500);
     expect(getHistoryResult.content[0].text).to.eq('toonmockdata');
+
+    mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
+
+    const getHistoryDefaultFeatureResult = await tools[4].cb({
+      room: 'salon',
+      device: 'temperature sensor',
+      period: 'last-month',
+    });
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq('device-temp-1-temp');
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[1]).to.eq(43200);
+    expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[2]).to.eq(500);
+    expect(getHistoryDefaultFeatureResult.content[0].text).to.eq('toonmockdata');
 
     mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
 
