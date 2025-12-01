@@ -277,4 +277,45 @@ describe('enedis.sync.dailySync', () => {
     assert.callCount(gladys.event.emit, 100);
     assert.calledOnce(gladys.device.setParam);
   });
+  it('should sync with jobId and update progress', async () => {
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(4)),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+    const jobId = 'test-job-id';
+    await enedisService.sync(false, jobId);
+    assert.callCount(gladys.event.emit, 4);
+    assert.calledOnce(gladys.device.setParam);
+    // With 1 usage point: after daily sync = 50%, after load curve = 100%
+    assert.calledTwice(gladys.job.updateProgress);
+    assert.calledWith(gladys.job.updateProgress, jobId, 50);
+    assert.calledWith(gladys.job.updateProgress, jobId, 100);
+  });
 });
