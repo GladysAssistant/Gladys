@@ -43,6 +43,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       gateway: {
         enedisGetConsumptionLoadCurve: fake.resolves(getConsumptionLoadCurveArray(4)),
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -78,6 +82,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -107,6 +115,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);
@@ -152,6 +164,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);
@@ -203,6 +219,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -246,6 +266,10 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);

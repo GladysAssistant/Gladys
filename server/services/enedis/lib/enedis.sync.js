@@ -79,22 +79,32 @@ async function recursiveBatchCall(
 /**
  * @description Sync Enedis account.
  * @param {boolean} fromStart - Sync from start.
+ * @param {string} jobId - Job ID for progress tracking.
  * @returns {Promise} Resolving when finished.
  * @example
  * sync();
  */
-async function sync(fromStart = false) {
+async function sync(fromStart = false, jobId = null) {
   logger.debug('Enedis: Syncing account');
   const usagePoints = await this.gladys.device.get({
     service: 'enedis',
   });
   logger.debug(`Enedis: Found ${usagePoints.length} usage points to sync`);
+
+  const totalUsagePoints = usagePoints.length;
+
   // Foreach usage point
-  return Promise.mapSeries(usagePoints, async (usagePoint) => {
+  return Promise.mapSeries(usagePoints, async (usagePoint, index) => {
     const response = {
       dailyConsumptionSync: null,
       consumptionLoadCurveSync: null,
     };
+
+    // Calculate base progress for this usage point
+    // Each usage point represents (100 / totalUsagePoints)% of progress
+    // Within each usage point: daily consumption = 50%, load curve = 50%
+    const usagePointBaseProgress = (index / totalUsagePoints) * 100;
+    const usagePointProgressShare = 100 / totalUsagePoints;
 
     // First, sync daily consumption
     const usagePointFeatureDailyConsumption = getDeviceFeature(
@@ -139,6 +149,12 @@ async function sync(fromStart = false) {
         lastDateSync,
         usagePointExternalId: usagePointFeatureDailyConsumption.external_id,
       };
+    }
+
+    // Update progress after daily consumption sync (50% of this usage point)
+    if (jobId) {
+      const progress = Math.round(usagePointBaseProgress + usagePointProgressShare * 0.5);
+      await this.gladys.job.updateProgress(jobId, progress);
     }
 
     // Then, sync 30 minutes consumption
@@ -186,6 +202,12 @@ async function sync(fromStart = false) {
         lastDateSync,
         usagePointExternalId: usagePointFeatureConsumptionLoadCurve.external_id,
       };
+    }
+
+    // Update progress after load curve sync (100% of this usage point)
+    if (jobId) {
+      const progress = Math.round(usagePointBaseProgress + usagePointProgressShare);
+      await this.gladys.job.updateProgress(jobId, progress);
     }
 
     return response;

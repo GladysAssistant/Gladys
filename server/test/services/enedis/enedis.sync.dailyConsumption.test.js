@@ -41,6 +41,10 @@ describe('enedis.sync.dailySync', () => {
       gateway: {
         enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(4)),
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -76,6 +80,10 @@ describe('enedis.sync.dailySync', () => {
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -105,6 +113,10 @@ describe('enedis.sync.dailySync', () => {
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);
@@ -150,6 +162,10 @@ describe('enedis.sync.dailySync', () => {
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);
@@ -201,6 +217,10 @@ describe('enedis.sync.dailySync', () => {
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
       },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
     };
     const enedisService = new Enedis(gladys);
     enedisService.syncDelayBetweenCallsInMs = 0;
@@ -244,6 +264,10 @@ describe('enedis.sync.dailySync', () => {
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
       },
     };
     const enedisService = new Enedis(gladys);
