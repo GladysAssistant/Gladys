@@ -15,7 +15,7 @@ function init() {
   if (!this.syncEnedisJob) {
     const rSecond = randomIntFromInterval(0, 60);
     const rMinute = randomIntFromInterval(30, 50);
-    this.syncEnedisJob = this.gladys.scheduler.scheduleJob(`${rSecond} ${rMinute} * * * *`, () => this.sync());
+    this.syncEnedisJob = this.gladys.scheduler.scheduleJob(`${rSecond} ${rMinute} * * * *`, () => this.sync(false));
   }
 
   return null;
