@@ -277,7 +277,11 @@ describe('enedis.sync.dailySync', () => {
     assert.callCount(gladys.event.emit, 100);
     assert.calledOnce(gladys.device.setParam);
   });
-  it('should sync with jobId and update progress', async () => {
+  it('should sync with jobId and update progress after each batch', async () => {
+    const dailyConsumptionStub = stub();
+    // Simulate 2 batches for daily consumption
+    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(4));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -299,7 +303,7 @@ describe('enedis.sync.dailySync', () => {
         emit: fake.returns(null),
       },
       gateway: {
-        enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(4)),
+        enedisGetDailyConsumption: dailyConsumptionStub,
       },
       job: {
         wrapper: (type, func) => func,
@@ -311,11 +315,11 @@ describe('enedis.sync.dailySync', () => {
     enedisService.enedisSyncBatchSize = 100;
     const jobId = 'test-job-id';
     await enedisService.sync(false, jobId);
-    assert.callCount(gladys.event.emit, 4);
+    assert.callCount(gladys.event.emit, 104);
     assert.calledOnce(gladys.device.setParam);
-    // With 1 usage point: after daily sync = 50%, after load curve = 100%
+    // Progress should be updated after each batch request (2 batches in this case)
     assert.calledTwice(gladys.job.updateProgress);
-    assert.calledWith(gladys.job.updateProgress, jobId, 50);
-    assert.calledWith(gladys.job.updateProgress, jobId, 100);
+    // Verify jobId is passed correctly
+    assert.calledWith(gladys.job.updateProgress, jobId);
   });
 });

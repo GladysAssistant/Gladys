@@ -22,6 +22,7 @@ const BATCH_TYPES = {
  * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
  * @param {number} enedisSyncBatchSize - Number of items to get in one call.
  * @param {string} after - Get data after this date.
+ * @param {Function} onProgress - Callback function to report progress.
  * @returns {Promise<object>} - Resolve with last date.
  * @example await recursiveBatchCall('usage-point');
  */
@@ -32,6 +33,7 @@ async function recursiveBatchCall(
   syncDelayBetweenCallsInMs,
   enedisSyncBatchSize,
   after = '2000-01-01',
+  onProgress = null,
 ) {
   const usagePointId = getUsagePointIdFromExternalId(externalId);
   logger.info(`Enedis: Syncing ${usagePointId} after ${after}`);
@@ -58,6 +60,11 @@ async function recursiveBatchCall(
   });
   await Promise.delay(syncDelayBetweenCallsInMs);
 
+  // Report progress after each batch
+  if (onProgress) {
+    await onProgress();
+  }
+
   // If there was still some data to get
   if (data.length === enedisSyncBatchSize) {
     const lastEntry = data[data.length - 1];
@@ -68,6 +75,7 @@ async function recursiveBatchCall(
       syncDelayBetweenCallsInMs,
       enedisSyncBatchSize,
       lastEntry.created_at,
+      onProgress,
     );
   }
   if (data.length === 0) {
@@ -91,20 +99,87 @@ async function sync(fromStart = false, jobId = null) {
   });
   logger.debug(`Enedis: Found ${usagePoints.length} usage points to sync`);
 
-  const totalUsagePoints = usagePoints.length;
+  // Constants for batch calculation
+  // - DailyConsumption: 1 point per day, batch size = 1000 => ~1000 days per batch
+  // - ConsumptionLoadCurve: 48 points per day, batch size = 1000 => ~21 days per batch
+  const DAILY_POINTS_PER_DAY = 1;
+  const LOAD_CURVE_POINTS_PER_DAY = 48;
+  const MAX_HISTORY_DAYS = 1095; // ~3 years max from Enedis
+
+  // Helper to calculate days to sync from a date
+  const getDaysToSync = (syncFromDate) => {
+    if (!syncFromDate) {
+      return MAX_HISTORY_DAYS;
+    }
+    const daysFromDate = dayjs().diff(dayjs(syncFromDate, 'YYYY-MM-DD'), 'day');
+    return Math.min(daysFromDate, MAX_HISTORY_DAYS);
+  };
+
+  // Helper to get syncFromDate for a usage point and param
+  const getSyncFromDate = (usagePoint, paramName) => {
+    const lastDateSynced = getDeviceParam(usagePoint, paramName);
+    if (lastDateSynced && !fromStart) {
+      return dayjs(lastDateSynced, 'YYYY-MM-DD')
+        .subtract(7, 'days')
+        .format('YYYY-MM-DD');
+    }
+    return undefined;
+  };
+
+  // First pass: calculate total estimated batches based on actual sync dates
+  let totalEstimatedBatches = 0;
+
+  usagePoints.forEach((usagePoint) => {
+    // Check daily consumption feature
+    const dailyFeature = getDeviceFeature(
+      usagePoint,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+    );
+    if (dailyFeature) {
+      const syncFromDate = getSyncFromDate(usagePoint, LAST_DATE_SYNCED);
+      const daysToSync = getDaysToSync(syncFromDate);
+      const batches = Math.max(1, Math.ceil((daysToSync * DAILY_POINTS_PER_DAY) / this.enedisSyncBatchSize));
+      totalEstimatedBatches += batches;
+    }
+
+    // Check load curve feature
+    const loadCurveFeature = getDeviceFeature(
+      usagePoint,
+      DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    );
+    if (loadCurveFeature) {
+      const syncFromDate = getSyncFromDate(usagePoint, LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE);
+      const daysToSync = getDaysToSync(syncFromDate);
+      const batches = Math.max(1, Math.ceil((daysToSync * LOAD_CURVE_POINTS_PER_DAY) / this.enedisSyncBatchSize));
+      totalEstimatedBatches += batches;
+    }
+  });
+
+  // Ensure we have at least 1 batch to avoid division by zero
+  totalEstimatedBatches = Math.max(1, totalEstimatedBatches);
+
+  // Progress increment per batch
+  const progressPerBatch = 100 / totalEstimatedBatches;
+
+  // Track overall progress across all batch calls
+  let currentProgress = 0;
+
+  // Helper to update progress
+  const updateProgress = async (increment) => {
+    if (jobId) {
+      currentProgress = Math.min(100, currentProgress + increment);
+      await this.gladys.job.updateProgress(jobId, Math.round(currentProgress));
+    }
+  };
 
   // Foreach usage point
-  return Promise.mapSeries(usagePoints, async (usagePoint, index) => {
+  return Promise.mapSeries(usagePoints, async (usagePoint) => {
     const response = {
       dailyConsumptionSync: null,
       consumptionLoadCurveSync: null,
     };
-
-    // Calculate base progress for this usage point
-    // Each usage point represents (100 / totalUsagePoints)% of progress
-    // Within each usage point: daily consumption = 50%, load curve = 50%
-    const usagePointBaseProgress = (index / totalUsagePoints) * 100;
-    const usagePointProgressShare = 100 / totalUsagePoints;
 
     // First, sync daily consumption
     const usagePointFeatureDailyConsumption = getDeviceFeature(
@@ -115,16 +190,7 @@ async function sync(fromStart = false, jobId = null) {
 
     if (usagePointFeatureDailyConsumption) {
       const lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
-      let syncFromDate = lastDateSynced;
-
-      // We take a 1 week margin in case some days were lost
-      if (lastDateSynced && !fromStart) {
-        syncFromDate = dayjs(lastDateSynced, 'YYYY-MM-DD')
-          .subtract(7, 'days')
-          .format('YYYY-MM-DD');
-      } else {
-        syncFromDate = undefined;
-      }
+      const syncFromDate = getSyncFromDate(usagePoint, LAST_DATE_SYNCED);
 
       logger.debug(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
 
@@ -136,6 +202,7 @@ async function sync(fromStart = false, jobId = null) {
         this.syncDelayBetweenCallsInMs,
         this.enedisSyncBatchSize,
         syncFromDate,
+        () => updateProgress(progressPerBatch),
       );
 
       logger.debug(`Enedis: Saving new last data sync = ${lastDateSync}`);
@@ -151,12 +218,6 @@ async function sync(fromStart = false, jobId = null) {
       };
     }
 
-    // Update progress after daily consumption sync (50% of this usage point)
-    if (jobId) {
-      const progress = Math.round(usagePointBaseProgress + usagePointProgressShare * 0.5);
-      await this.gladys.job.updateProgress(jobId, progress);
-    }
-
     // Then, sync 30 minutes consumption
     const usagePointFeatureConsumptionLoadCurve = getDeviceFeature(
       usagePoint,
@@ -166,16 +227,7 @@ async function sync(fromStart = false, jobId = null) {
 
     if (usagePointFeatureConsumptionLoadCurve) {
       const lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE);
-      let syncFromDate = lastDateSynced;
-
-      // We take a 1 week margin in case some days were lost
-      if (lastDateSynced && !fromStart) {
-        syncFromDate = dayjs(lastDateSynced, 'YYYY-MM-DD')
-          .subtract(7, 'days')
-          .format('YYYY-MM-DD');
-      } else {
-        syncFromDate = undefined;
-      }
+      const syncFromDate = getSyncFromDate(usagePoint, LAST_DATE_SYNCED_CONSUMPTION_LOAD_CURVE);
 
       logger.debug(
         `Enedis: Usage point last consumption load curve sync was ${lastDateSynced}, syncing from ${syncFromDate}`,
@@ -189,6 +241,7 @@ async function sync(fromStart = false, jobId = null) {
         this.syncDelayBetweenCallsInMs,
         this.enedisSyncBatchSize,
         syncFromDate,
+        () => updateProgress(progressPerBatch),
       );
 
       logger.debug(`Enedis: Saving new last data sync = ${lastDateSync}`);
@@ -202,12 +255,6 @@ async function sync(fromStart = false, jobId = null) {
         lastDateSync,
         usagePointExternalId: usagePointFeatureConsumptionLoadCurve.external_id,
       };
-    }
-
-    // Update progress after load curve sync (100% of this usage point)
-    if (jobId) {
-      const progress = Math.round(usagePointBaseProgress + usagePointProgressShare);
-      await this.gladys.job.updateProgress(jobId, progress);
     }
 
     return response;
