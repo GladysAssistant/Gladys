@@ -14,6 +14,7 @@ const TUYA_ENDPOINTS = {
   centralEurope: 'https://openapi.tuyaeu.com',
   westernEurope: 'https://openapi-weaz.tuyaeu.com',
   india: 'https://openapi.tuyain.com',
+  local: 'http://localhost:5000',
 };
 
 const STATUS = {
