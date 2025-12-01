@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { route } from 'preact-router';
+
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { Text } from 'preact-i18n';
@@ -274,6 +276,7 @@ class EnedisWelcomePageComponent extends Component {
     await this.setState({ loading: true });
     try {
       await this.props.httpClient.post('/api/v1/service/enedis/sync');
+      route('/dashboard/settings/jobs');
     } catch (e) {
       console.error(e);
     }
