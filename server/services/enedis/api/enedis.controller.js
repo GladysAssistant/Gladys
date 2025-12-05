@@ -7,7 +7,7 @@ module.exports = function EnedisController(enedisHandler) {
    * @apiGroup Enedis
    */
   async function sync(req, res) {
-    await enedisHandler.sync(true);
+    enedisHandler.sync(true);
     res.json({
       success: true,
     });

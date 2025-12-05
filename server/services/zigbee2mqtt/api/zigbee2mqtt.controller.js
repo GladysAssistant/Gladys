@@ -10,7 +10,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   async function getDiscoveredDevices(req, res) {
     logger.debug('Get discovered devices');
     const { query = {} } = req;
-    const devices = zigbee2mqttManager.getDiscoveredDevices(query);
+    const defaultElectricMeterDeviceFeatureId = await gladys.energyPrice.getDefaultElectricMeterFeatureId();
+    const devices = zigbee2mqttManager.getDiscoveredDevices(query, defaultElectricMeterDeviceFeatureId);
     res.json(devices);
   }
 

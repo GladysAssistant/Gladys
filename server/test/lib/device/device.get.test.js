@@ -76,6 +76,18 @@ describe('Device.get', () => {
       .to.be.instanceOf(Array)
       .and.have.lengthOf(0);
   });
+  it('should get devices filtered by device_feature_categories', async () => {
+    const devices = await device.get({
+      device_feature_categories: ['temperature-sensor', 'humidity-sensor'],
+    });
+    expect(devices).to.be.instanceOf(Array);
+    // Verify that features are filtered
+    devices.forEach((oneDevice) => {
+      oneDevice.features.forEach((feature) => {
+        expect(feature.category).to.be.oneOf(['temperature-sensor', 'humidity-sensor']);
+      });
+    });
+  });
   it('should get devices filtered by device_feature_type', async () => {
     const devices = await device.get({
       device_feature_type: 'my-unknown-type',

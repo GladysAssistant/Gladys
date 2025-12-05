@@ -10,12 +10,12 @@ const randomIntFromInterval = (min, max) => {
  * init();
  */
 function init() {
-  // We sync every hour at HH:50
-  // We do it at 50 because at 00 the aggregation is running, so data will be ready for hourly aggregate
-  // We take a random seconds to avoid overloading the API if all clients calls at the same seconds
+  // We sync every hour at HH:30-50
+  // We take a random minutes/seconds to avoid overloading the API if all clients calls at the same time
   if (!this.syncEnedisJob) {
-    const randomSeconds = randomIntFromInterval(0, 59);
-    this.syncEnedisJob = this.gladys.scheduler.scheduleJob(`${randomSeconds} 50 * * * *`, () => this.sync());
+    const rSecond = randomIntFromInterval(0, 60);
+    const rMinute = randomIntFromInterval(30, 50);
+    this.syncEnedisJob = this.gladys.scheduler.scheduleJob(`${rSecond} ${rMinute} * * * *`, () => this.sync(false));
   }
 
   return null;
