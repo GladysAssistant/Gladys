@@ -48,11 +48,11 @@ describe('Broadlink edit device', () => {
     cy.contains('.card-header', 'SP2 device').should('exist');
     cy.get('.card-body').within(() => {
       // Check device name
-      cy.get('input')
+      cy.get('input#deviceName')
         .should('have.value', 'SP2 device')
         .should('not.be.disabled');
       // Check device room
-      cy.get('select')
+      cy.get('select#room')
         .should('have.value', '')
         .should('not.be.disabled');
       // Check device features

@@ -91,6 +91,98 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/energy_consumption', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await insertStates(7 * 24 * 60); // Insert 7 days of data
+  });
+
+  it('should get energy consumption by dates', async () => {
+    const now = new Date();
+    const from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
+    const to = new Date();
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature/energy_consumption')
+      .query({
+        device_features: 'test-device-feature',
+        from: from.toISOString(),
+        to: to.toISOString(),
+        group_by: 'day',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0]).to.have.property('device');
+        expect(res.body[0]).to.have.property('deviceFeature');
+        expect(res.body[0]).to.have.property('values');
+        expect(res.body[0].values).to.be.instanceOf(Array);
+      });
+  });
+
+  it('should get energy consumption for multiple device features', async () => {
+    const now = new Date();
+    const from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const to = new Date();
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature/energy_consumption')
+      .query({
+        device_features: 'test-device-feature,test-device-feature-2',
+        from: from.toISOString(),
+        to: to.toISOString(),
+        group_by: 'hour',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        // Should return results for each device feature
+        res.body.forEach((result) => {
+          expect(result).to.have.property('device');
+          expect(result).to.have.property('deviceFeature');
+          expect(result).to.have.property('values');
+          expect(result.device).to.have.property('name');
+          expect(result.deviceFeature).to.have.property('name');
+        });
+      });
+  });
+
+  it('should get energy consumption with different group_by options', async () => {
+    const now = new Date();
+    const from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
+    const to = new Date();
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature/energy_consumption')
+      .query({
+        device_features: 'test-device-feature',
+        from: from.toISOString(),
+        to: to.toISOString(),
+        group_by: 'week',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        expect(res.body[0].values).to.be.instanceOf(Array);
+        // Verify aggregated data structure
+        if (res.body[0].values.length > 0) {
+          res.body[0].values.forEach((value) => {
+            expect(value).to.have.property('created_at');
+            expect(value).to.have.property('value');
+            expect(value).to.have.property('max_value');
+            expect(value).to.have.property('min_value');
+            expect(value).to.have.property('sum_value');
+            expect(value).to.have.property('count_value');
+          });
+        }
+      });
+  });
+});
+
 describe('DELETE /api/v1/device/:device_selector', () => {
   it('should delete device', async () => {
     await authenticatedRequest
@@ -177,5 +269,82 @@ describe('GET /api/v1/service/:service_name/device', () => {
       .get('/api/v1/service/unknown-service/device')
       .expect('Content-Type', /json/)
       .expect(404);
+  });
+});
+
+describe('PATCH /api/v1/device_feature/:device_feature_selector', () => {
+  it('should update device feature energy_parent_id', async () => {
+    const childSelector = 'test-device-feature';
+    const parentSelector = 'test-device-feature-2';
+
+    // Get the actual parent ID from the database
+    const parent = await db.DeviceFeature.findOne({ where: { selector: parentSelector } });
+
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${childSelector}`)
+      .send({ energy_parent_id: parent.id })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('selector', childSelector);
+        expect(res.body).to.have.property('energy_parent_id', parent.id);
+      });
+  });
+
+  it('should clear device feature energy_parent_id when set to null', async () => {
+    const childSelector = 'test-device-feature';
+
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${childSelector}`)
+      .send({ energy_parent_id: null })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('selector', childSelector);
+        expect(res.body).to.have.property('energy_parent_id', null);
+      });
+  });
+
+  it('should return 404 when device feature does not exist', async () => {
+    await authenticatedRequest
+      .patch('/api/v1/device_feature/non-existent-feature')
+      .send({ energy_parent_id: null })
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+
+  it('should return 400 when trying to create circular dependency', async () => {
+    const aSelector = 'test-device-feature';
+    const bSelector = 'test-device-feature-2';
+
+    // Get the actual IDs from the database
+    const a = await db.DeviceFeature.findOne({ where: { selector: aSelector } });
+    const b = await db.DeviceFeature.findOne({ where: { selector: bSelector } });
+
+    // First set B's parent to A
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${bSelector}`)
+      .send({ energy_parent_id: a.id })
+      .expect(200);
+
+    // Now try to set A's parent to B (should fail with circular dependency)
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${aSelector}`)
+      .send({ energy_parent_id: b.id })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+
+  it('should return unchanged feature when no updates provided', async () => {
+    const selector = 'test-device-feature';
+
+    await authenticatedRequest
+      .patch(`/api/v1/device_feature/${selector}`)
+      .send({})
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('selector', selector);
+      });
   });
 });

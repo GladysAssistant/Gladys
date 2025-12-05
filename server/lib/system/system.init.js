@@ -31,6 +31,8 @@ async function init() {
       logger.info(`System.init: This system doesn't have a docker dameon available.`);
     }
   }
+  // Set DuckDB timezone
+  this.setDuckDbTimezone();
 }
 
 module.exports = {

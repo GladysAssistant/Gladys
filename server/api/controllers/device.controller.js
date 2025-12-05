@@ -108,6 +108,19 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
+   * @apiName getConsumptionByDates
+   * @apiGroup Device
+   */
+  async function getConsumptionByDates(req, res) {
+    const states = await gladys.device.energySensorManager.getConsumptionByDates(
+      req.query.device_features.split(','),
+      req.query,
+    );
+    res.json(states);
+  }
+
+  /**
    * @api {post} /api/v1/device/purge_all_sqlite_state purgeAllSqliteStates
    * @apiName purgeAllSqliteStates
    * @apiGroup Device
@@ -129,6 +142,16 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {patch} /api/v1/device_feature/:device_feature_selector updateDeviceFeature
+   * @apiName updateDeviceFeature
+   * @apiGroup Device
+   */
+  async function updateDeviceFeature(req, res) {
+    const feature = await gladys.device.updateFeature(req.params.device_feature_selector, req.body);
+    res.json(feature);
+  }
+
+  /**
    * @api {get} /api/v1/device/duckdb_migration_state getDuckDbMigrationState
    * @apiName getDuckDbMigrationState
    * @apiGroup Device
@@ -147,8 +170,10 @@ module.exports = function DeviceController(gladys) {
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
+    getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
+    updateDeviceFeature: asyncMiddleware(updateDeviceFeature),
   });
 };

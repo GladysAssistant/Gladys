@@ -31,7 +31,11 @@ describe('system.init', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config, job);
+    // To test system.setDuckDbTimezone, we need to mock variable.getValue
+    const variable = {
+      getValue: fake.resolves('Europe/Paris'),
+    };
+    system = new System(sequelize, event, config, job, variable);
   });
 
   afterEach(() => {
