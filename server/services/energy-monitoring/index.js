@@ -13,7 +13,7 @@ module.exports = function EnergyMonitoringService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting energy monitoring service');
-    energyMonitoringHandler.init();
+    await energyMonitoringHandler.init();
   }
 
   /**

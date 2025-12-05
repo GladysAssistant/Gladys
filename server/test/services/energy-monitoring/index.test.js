@@ -34,12 +34,19 @@ describe('EnergyMonitoring Service', () => {
   it('should start the energy monitoring service and initialize handler', async () => {
     await energyMonitoringService.start();
 
-    // Verify scheduler was called to schedule jobs
-    assert.calledOnce(mockScheduler.scheduleJob);
+    // Verify scheduler was called to schedule both jobs (30 min + 24h)
+    assert.calledTwice(mockScheduler.scheduleJob);
 
-    // Verify that job is scheduled every 30 minutes
-    const costJobCall = mockScheduler.scheduleJob.getCall(0);
-    expect(costJobCall.args[0]).to.equal('0 0,30 * * * *');
+    // Verify that 30-minute job is scheduled
+    const thirtyMinJobCall = mockScheduler.scheduleJob.getCall(0);
+    expect(thirtyMinJobCall.args[0]).to.equal('0 0,30 * * * *');
+
+    // Verify that 24h job is scheduled with RecurrenceRule
+    const dailyJobCall = mockScheduler.scheduleJob.getCall(1);
+    const rule = dailyJobCall.args[0];
+    expect(rule).to.have.property('hour', 9);
+    expect(rule).to.have.property('minute', 0);
+    expect(rule).to.have.property('tz', 'Europe/Paris');
   });
 
   it('should not throw error when starting service', async () => {
