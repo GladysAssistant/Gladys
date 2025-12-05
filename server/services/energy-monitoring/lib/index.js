@@ -3,6 +3,7 @@ const queue = require('queue');
 const { init } = require('./energy-monitoring.init');
 const { calculateCostEveryThirtyMinutes } = require('./energy-monitoring.calculateCostEveryThirtyMinutes');
 const { calculateCostFrom } = require('./energy-monitoring.calculateCostFrom');
+const { calculateCostFromYesterday } = require('./energy-monitoring.calculateCostFromYesterday');
 const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCostFromBeginning');
 const { getContracts } = require('./energy-monitoring.getContracts');
 const { calculateConsumptionFromIndex } = require('./energy-monitoring.calculateConsumptionFromIndex');
@@ -27,6 +28,10 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES,
     this.calculateCostEveryThirtyMinutes.bind(this),
   );
+  this.calculateCostFromYesterday = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_YESTERDAY,
+    this.calculateCostFromYesterday.bind(this),
+  );
   this.calculateCostFromBeginning = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING,
     this.calculateCostFromBeginning.bind(this),
@@ -44,6 +49,7 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
 EnergyMonitoringHandler.prototype.init = init;
 EnergyMonitoringHandler.prototype.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
 EnergyMonitoringHandler.prototype.calculateCostFrom = calculateCostFrom;
+EnergyMonitoringHandler.prototype.calculateCostFromYesterday = calculateCostFromYesterday;
 EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFromBeginning;
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;

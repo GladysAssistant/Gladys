@@ -2734,6 +2734,7 @@
       "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte",
       "service-matter-backup": "Matter backup",
       "energy-monitoring-cost-calculation-thirty-minutes": "Energiekostenberechnung (30 Minuten)",
+      "energy-monitoring-cost-calculation-yesterday": "Energiekostenberechnung (von gestern)",
       "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energieverbrauchsberechnung aus Index (30 Minuten)",
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",

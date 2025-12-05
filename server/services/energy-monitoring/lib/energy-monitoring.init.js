@@ -45,7 +45,7 @@ async function init() {
         .toDate();
 
       // Add to queue
-      await this.calculateCostFrom(yesterdayDate);
+      await this.calculateCostFromYesterday(yesterdayDate);
     });
   }
 

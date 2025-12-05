@@ -118,16 +118,16 @@ describe('EnergyMonitoring.init', () => {
   describe('Scheduled job execution', () => {
     let calculateCostEveryThirtyMinutes;
     let calculateConsumptionFromIndexThirtyMinutes;
-    let calculateCostFrom;
+    let calculateCostFromYesterday;
 
     beforeEach(() => {
       calculateCostEveryThirtyMinutes = fake.returns(null);
       calculateConsumptionFromIndexThirtyMinutes = fake.returns(null);
-      calculateCostFrom = fake.returns(null);
+      calculateCostFromYesterday = fake.returns(null);
 
       energyMonitoring.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
       energyMonitoring.calculateConsumptionFromIndexThirtyMinutes = calculateConsumptionFromIndexThirtyMinutes;
-      energyMonitoring.calculateCostFrom = calculateCostFrom;
+      energyMonitoring.calculateCostFromYesterday = calculateCostFromYesterday;
     });
 
     it('should execute both consumption and cost calculation when job runs', async () => {
@@ -237,7 +237,7 @@ describe('EnergyMonitoring.init', () => {
       }
     });
 
-    it('should execute calculateCostFrom with yesterday at midnight when daily job runs', async () => {
+    it('should execute calculateCostFromYesterday with yesterday at midnight when daily job runs', async () => {
       // Use sinon fake timers to mock a specific time
       const clock = useFakeTimers(new Date('2023-10-15T09:00:00.000Z'));
 
@@ -250,10 +250,10 @@ describe('EnergyMonitoring.init', () => {
         // Execute the daily job
         await dailyJobFunction();
 
-        // Verify calculateCostFrom was called
-        assert.calledOnce(calculateCostFrom);
+        // Verify calculateCostFromYesterday was called
+        assert.calledOnce(calculateCostFromYesterday);
 
-        const callArgs = calculateCostFrom.getCall(0).args;
+        const callArgs = calculateCostFromYesterday.getCall(0).args;
         const yesterdayDate = callArgs[0];
 
         // Should be yesterday at midnight in Europe/Paris timezone
