@@ -25,6 +25,8 @@ class ImportPricesPage extends Component {
     selectedDeviceId: '',
     selectedContractId: '',
     selectedPower: '',
+    // Hour slot selector for TO_REPLACE cases (selected = peak, unselected = off-peak)
+    peakHourSlots: new Set(),
     // Errors
     contractsError: null,
     devicesError: null,
@@ -186,7 +188,67 @@ class ImportPricesPage extends Component {
   };
 
   handlePowerChange = e => {
-    this.setState({ selectedPower: e.target.value });
+    // Reset hour slots when power changes
+    this.setState({
+      selectedPower: e.target.value,
+      peakHourSlots: new Set()
+    });
+  };
+
+  // ----- TIME SLOT HELPERS -----
+  slotIndexToLabel = slot => {
+    if (!Number.isInteger(slot) || slot < 0 || slot > 47) return '';
+    const hour = Math.floor(slot / 2);
+    const minutes = slot % 2 === 1 ? '30' : '00';
+    const hh = hour < 10 ? `0${hour}` : `${hour}`;
+    return `${hh}:${minutes}`;
+  };
+
+  formatSetToHourSlots = set => {
+    const arr = Array.from(set || []).filter(n => Number.isInteger(n));
+    arr.sort((a, b) => a - b);
+    return arr.map(this.slotIndexToLabel).join(',');
+  };
+
+  togglePeakSlot = slot => {
+    this.setState(({ peakHourSlots }) => {
+      const next = new Set(peakHourSlots);
+      if (next.has(slot)) next.delete(slot);
+      else next.add(slot);
+      return { peakHourSlots: next };
+    });
+  };
+
+  // Check if the selected contract/power has TO_REPLACE hour slots
+  hasToReplaceHourSlots = () => {
+    const { selectedContractId, selectedPower, contracts } = this.state;
+    if (!selectedContractId || !selectedPower) return false;
+
+    const selectedContract = contracts.find(c => c.id === selectedContractId);
+    if (!selectedContract) return false;
+
+    const powerData = selectedContract.data[selectedPower];
+    if (!powerData || !Array.isArray(powerData)) return false;
+
+    for (const priceData of powerData) {
+      if (priceData.hour_slots && typeof priceData.hour_slots === 'string') {
+        if (priceData.hour_slots.includes('TO_REPLACE')) return true;
+      }
+    }
+
+    return false;
+  };
+
+  // Generate off-peak slots (all slots not in peak)
+  getOffPeakSlots = () => {
+    const { peakHourSlots } = this.state;
+    const offPeakSlots = new Set();
+    for (let i = 0; i < 48; i++) {
+      if (!peakHourSlots.has(i)) {
+        offPeakSlots.add(i);
+      }
+    }
+    return offPeakSlots;
   };
 
   handleImport = async () => {
@@ -210,6 +272,9 @@ class ImportPricesPage extends Component {
         throw new Error('No price data found for selected power');
       }
 
+      const { peakHourSlots } = this.state;
+      const offPeakHourSlots = this.getOffPeakSlots();
+
       // Import each price period from the contract
       for (const priceData of powerData) {
         const pricePayload = {
@@ -217,6 +282,15 @@ class ImportPricesPage extends Component {
           electric_meter_device_id: selectedDeviceId,
           subscribed_power: selectedPower
         };
+
+        // Replace TO_REPLACE_OFF_PEAK and TO_REPLACE_PEAK with actual hour slots
+        if (pricePayload.hour_slots && typeof pricePayload.hour_slots === 'string') {
+          if (pricePayload.hour_slots.includes('TO_REPLACE_OFF_PEAK')) {
+            pricePayload.hour_slots = this.formatSetToHourSlots(offPeakHourSlots);
+          } else if (pricePayload.hour_slots.includes('TO_REPLACE_PEAK')) {
+            pricePayload.hour_slots = this.formatSetToHourSlots(peakHourSlots);
+          }
+        }
 
         await this.props.httpClient.post('/api/v1/energy_price', pricePayload);
       }
@@ -244,6 +318,7 @@ class ImportPricesPage extends Component {
       selectedDeviceId,
       selectedContractId,
       selectedPower,
+      peakHourSlots,
       contractsError,
       devicesError,
       importError,
@@ -252,6 +327,74 @@ class ImportPricesPage extends Component {
 
     const selectedContract = contracts.find(c => c.id === selectedContractId);
     const availablePowers = selectedContract ? selectedContract.powers || [] : [];
+    const needsHourSlots = this.hasToReplaceHourSlots();
+
+    // Helper to render hour slot selector grid (selected = peak, unselected = off-peak)
+    const renderHourSlotSelector = () => (
+      <div class="mb-3">
+        <label class="form-label required">
+          <Text id="integration.energyMonitoring.selectPeakHours" />
+        </label>
+        <div class="mb-2 d-flex justify-content-between align-items-center">
+          <div class="small text-muted">
+            <Text id="integration.energyMonitoring.selectPeakHoursHelp" />
+          </div>
+          <div>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary mr-2"
+              onClick={() => this.setState({ peakHourSlots: new Set() })}
+            >
+              <Text id="integration.energyMonitoring.clear" />
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          {Array.from({ length: 48 }, (_, slot) => (
+            <div class="col-3 col-sm-2 mb-2" key={slot}>
+              <button
+                type="button"
+                class={cx(
+                  'btn btn-sm btn-block text-center py-2 text-nowrap',
+                  peakHourSlots.has(slot) ? 'btn-warning' : 'btn-outline-primary'
+                )}
+                onClick={() => this.togglePeakSlot(slot)}
+              >
+                {(() => {
+                  const hour = Math.floor(slot / 2);
+                  const m = slot % 2 === 1 ? '30' : '00';
+                  const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                  return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
+                })()}
+              </button>
+            </div>
+          ))}
+        </div>
+        <div class="small text-muted mt-2">
+          <strong>
+            <Text id="integration.energyMonitoring.peakHours" />:
+          </strong>{' '}
+          {(() => {
+            const arr = Array.from(peakHourSlots).sort((a, b) => a - b);
+            if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
+            return arr.map(this.slotIndexToLabel).join(', ');
+          })()}
+        </div>
+        <div class="small text-muted mt-1">
+          <strong>
+            <Text id="integration.energyMonitoring.offPeakHours" />:
+          </strong>{' '}
+          {(() => {
+            const offPeakArr = [];
+            for (let i = 0; i < 48; i++) {
+              if (!peakHourSlots.has(i)) offPeakArr.push(i);
+            }
+            if (!offPeakArr.length) return <Text id="integration.energyMonitoring.none" />;
+            return offPeakArr.map(this.slotIndexToLabel).join(', ');
+          })()}
+        </div>
+      </div>
+    );
 
     return (
       <div class="card">
@@ -379,6 +522,18 @@ class ImportPricesPage extends Component {
             </div>
           )}
 
+          {needsHourSlots && selectedPower && (
+            <div class="mb-3">
+              <div class="alert alert-info">
+                <Text
+                  id="integration.energyMonitoring.hourSlotsRequiredInfo"
+                  defaultMessage="This contract requires you to specify the peak hours for your location. The remaining hours will be considered off-peak."
+                />
+              </div>
+              {renderHourSlotSelector()}
+            </div>
+          )}
+
           <div class="d-flex justify-content-between">
             <Link href="/dashboard/integration/device/energy-monitoring" class="btn btn-secondary">
               <Text id="global.cancel" defaultMessage="Cancel" />
@@ -386,7 +541,13 @@ class ImportPricesPage extends Component {
             <button
               class={cx('btn btn-primary', { 'btn-loading': importing })}
               onClick={this.handleImport}
-              disabled={!selectedDeviceId || !selectedContractId || !selectedPower || importing}
+              disabled={
+                !selectedDeviceId ||
+                !selectedContractId ||
+                !selectedPower ||
+                importing ||
+                (needsHourSlots && peakHourSlots.size === 0)
+              }
             >
               <Text id="integration.energyMonitoring.importPricesButton" defaultMessage="Import Prices" />
             </button>

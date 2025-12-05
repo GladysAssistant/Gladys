@@ -1720,7 +1720,12 @@
       "importSuccess": "Prices imported successfully!",
       "errorLoadingContracts": "Error loading contracts",
       "availablePowers": "Available Powers",
-      "contractId": "Contract ID"
+      "contractId": "Contract ID",
+      "hourSlotsRequiredInfo": "This contract requires you to specify the peak hours for your location. The remaining hours will be considered off-peak.",
+      "selectPeakHours": "Select Peak Hours",
+      "selectPeakHoursHelp": "Click on the time slots when peak pricing applies. Unselected slots will be off-peak.",
+      "peakHours": "Peak hours",
+      "offPeakHours": "Off-peak hours"
     },
     "caldav": {
       "title": "CalDAV",

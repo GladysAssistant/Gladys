@@ -703,7 +703,12 @@
       "importSuccess": "Tarife erfolgreich importiert!",
       "errorLoadingContracts": "Fehler beim Laden der Verträge",
       "availablePowers": "Verfügbare Leistungen",
-      "contractId": "Vertrags-ID"
+      "contractId": "Vertrags-ID",
+      "hourSlotsRequiredInfo": "Dieser Vertrag erfordert die Angabe der Hauptzeiten für Ihren Standort. Die verbleibenden Stunden werden als Nebenzeiten betrachtet.",
+      "selectPeakHours": "Hauptzeiten auswählen",
+      "selectPeakHoursHelp": "Klicken Sie auf die Zeitfenster, in denen der Haupttarif gilt. Nicht ausgewählte Zeitfenster sind Nebenzeiten.",
+      "peakHours": "Hauptzeiten",
+      "offPeakHours": "Nebenzeiten"
     },
     "netatmo": {
       "title": "Netatmo",

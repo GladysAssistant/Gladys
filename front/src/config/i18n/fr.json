@@ -601,7 +601,12 @@
       "importSuccess": "Tarifs importés avec succès !",
       "errorLoadingContracts": "Erreur lors du chargement des contrats",
       "availablePowers": "Puissances disponibles",
-      "contractId": "ID du contrat"
+      "contractId": "ID du contrat",
+      "hourSlotsRequiredInfo": "Ce contrat nécessite de spécifier les heures pleines pour votre localisation. Les heures restantes seront considérées comme heures creuses.",
+      "selectPeakHours": "Sélectionner les heures pleines",
+      "selectPeakHoursHelp": "Cliquez sur les créneaux horaires où le tarif heures pleines s'applique. Les créneaux non sélectionnés seront en heures creuses.",
+      "peakHours": "Heures pleines",
+      "offPeakHours": "Heures creuses"
     },
     "caldav": {
       "title": "CalDAV",
