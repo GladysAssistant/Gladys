@@ -34,7 +34,7 @@ async function init() {
   if (!this.calculateConsumptionAndCostEvery24HoursJob) {
     const rule = new schedule.RecurrenceRule();
     rule.hour = 11;
-    rule.minute = 0;
+    rule.minute = 10;
     rule.tz = systemTimezone;
     // Scheduling consumption and cost calculation every day at 9AM
     this.calculateConsumptionAndCostEvery24HoursJob = this.gladys.scheduler.scheduleJob(rule, async () => {
