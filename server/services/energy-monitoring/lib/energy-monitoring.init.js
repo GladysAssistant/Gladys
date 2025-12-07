@@ -30,10 +30,10 @@ async function init() {
       },
     );
   }
-  // Re-calculate yesterday at 9AM (useful for enedis)
+  // Re-calculate yesterday at 11 AM (useful for enedis)
   if (!this.calculateConsumptionAndCostEvery24HoursJob) {
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 9;
+    rule.hour = 11;
     rule.minute = 0;
     rule.tz = systemTimezone;
     // Scheduling consumption and cost calculation every day at 9AM
