@@ -72,7 +72,7 @@ describe('EnergyMonitoring.init', () => {
     const dailyJobCall = mockScheduler.scheduleJob.getCall(1);
     const rule = dailyJobCall.args[0];
     expect(rule).to.have.property('recurs', true);
-    expect(rule).to.have.property('hour', 9);
+    expect(rule).to.have.property('hour', 11);
     expect(rule).to.have.property('minute', 0);
     expect(rule).to.have.property('tz', 'Europe/Paris');
     expect(typeof dailyJobCall.args[1]).to.equal('function');
