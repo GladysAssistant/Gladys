@@ -1,3 +1,29 @@
+.sceneContainer {
+  width: 100%;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .sceneContainer {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .sceneContainer {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .sceneContainer {
+    max-width: 90%;
+  }
+}
+
 .arrowDown {
   font-size: 35px;
 }
@@ -32,13 +58,12 @@
   }
 }
 
-
 .settings {
   opacity: 0;
   max-height: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, max-height 0.3s ease;
-  padding: 0rem
+  padding: 0rem;
 }
 
 .settingsOpen {
