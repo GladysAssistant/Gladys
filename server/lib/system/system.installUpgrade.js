@@ -58,7 +58,7 @@ async function installUpgrade() {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  const watchtowerImage = 'containrrr/watchtower:latest';
+  const watchtowerImage = 'nickfedor/watchtower:latest';
 
   logger.info(`Pulling ${watchtowerImage} image...`);
   await this.pull(watchtowerImage);
