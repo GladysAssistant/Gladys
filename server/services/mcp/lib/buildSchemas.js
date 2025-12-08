@@ -6,6 +6,24 @@ const noRoom = {
   selector: 'no-room',
 };
 
+const ONE_HOUR_IN_MINUTES = 60;
+const TWELVE_HOURS_IN_MINUTES = 12 * 60;
+const ONE_DAY_IN_MINUTES = 24 * 60;
+const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
+const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
+const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
+const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
+
+const intervalByName = {
+  'last-hour': ONE_HOUR_IN_MINUTES,
+  'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
+  'last-day': ONE_DAY_IN_MINUTES,
+  'last-week': SEVEN_DAYS_IN_MINUTES,
+  'last-month': THIRTY_DAYS_IN_MINUTES,
+  'last-three-months': THREE_MONTHS_IN_MINUTES,
+  'last-year': ONE_YEAR_IN_MINUTES,
+};
+
 /**
  * @description Get all resources (room and devices) available for the MCP service.
  * @returns {Promise<Array>} Array of resources with home schema configuration.
@@ -148,6 +166,25 @@ async function getAllTools() {
     ),
   ];
 
+  const historyDevices = (await this.gladys.device.get())
+    .filter((device) => {
+      return device.features.some((feature) => this.isHistoryFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter((feature) => this.isHistoryFeature(feature)),
+    }));
+  const availableHistoryFeature = [
+    ...new Set(
+      historyDevices
+        .map((device) => {
+          return device.features.map((feature) => `${feature.category}:${feature.type}`);
+        })
+        .flat(),
+    ),
+  ];
+
   return [
     {
       intent: 'camera.get-image',
@@ -254,10 +291,12 @@ async function getAllTools() {
         );
 
         return {
-          content: states.map((state) => ({
-            type: 'text',
-            text: JSON.stringify(state),
-          })),
+          content: [
+            {
+              type: 'text',
+              text: this.toon(states),
+            },
+          ],
         };
       },
     },
@@ -338,6 +377,95 @@ async function getAllTools() {
 
         return {
           content: [{ type: 'text', text: `device.turn-${actionValue} command not sent, no device found` }],
+        };
+      },
+    },
+    {
+      intent: 'device.get-history',
+      config: {
+        title: 'Get device history',
+        description: 'Get history states of specific device.',
+        inputSchema: {
+          room: z
+            .enum(rooms.map(({ name }) => name))
+            .describe('Room to get information from.')
+            .optional(),
+          device: z
+            .enum([...new Set(historyDevices.map(({ name }) => name))])
+            .describe('Device name to get history.')
+            .optional(),
+          feature: z
+            .enum(availableHistoryFeature)
+            .describe('Type of device to query.')
+            .optional(),
+          interval: z
+            .enum(Object.keys(intervalByName))
+            .describe('Time interval to get history from.')
+            .optional(),
+        },
+      },
+      cb: async ({ room, device, feature, interval }) => {
+        let selectedDevices = historyDevices;
+
+        if (room && room !== '') {
+          const { selector } = this.findBySimilarity(rooms, room);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        }
+
+        if (feature && feature !== '') {
+          const [featureCategory, featureType] = feature.split(':');
+          selectedDevices = selectedDevices.filter((d) => {
+            return d.features.some(
+              (f) => f.category === featureCategory && (featureType ? f.type === featureType : true),
+            );
+          });
+        }
+
+        if (device && device !== '') {
+          const deviceFound = this.findBySimilarity(selectedDevices, device);
+          if (deviceFound?.name) {
+            selectedDevices = [deviceFound];
+          }
+        }
+
+        if (selectedDevices.length > 0) {
+          const selectedFeature =
+            selectedDevices[0].features.find((f) => {
+              if (feature && feature !== '') {
+                const [featureCategory, featureType] = feature.split(':');
+
+                return f.category === featureCategory && (featureType ? f.type === featureType : true);
+              }
+
+              return false;
+            }) || selectedDevices[0].features[0];
+
+          const aggStates = await this.gladys.device.getDeviceFeaturesAggregates(
+            selectedFeature.selector,
+            interval ? intervalByName[interval] : THIRTY_DAYS_IN_MINUTES,
+            500,
+          );
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: this.toon({
+                  room: selectedDevices[0].room?.name || noRoom.name,
+                  device: selectedDevices[0].name,
+                  feature: selectedFeature.name,
+                  category: selectedFeature.category,
+                  type: selectedFeature.type,
+                  unit: this.formatValue(selectedFeature).unit,
+                  values: aggStates.values,
+                }),
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [{ type: 'text', text: `device.get-history, no device or feature found` }],
         };
       },
     },

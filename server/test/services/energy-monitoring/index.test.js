@@ -44,8 +44,8 @@ describe('EnergyMonitoring Service', () => {
     // Verify that 24h job is scheduled with RecurrenceRule
     const dailyJobCall = mockScheduler.scheduleJob.getCall(1);
     const rule = dailyJobCall.args[0];
-    expect(rule).to.have.property('hour', 9);
-    expect(rule).to.have.property('minute', 0);
+    expect(rule).to.have.property('hour', 11);
+    expect(rule).to.have.property('minute', 10);
     expect(rule).to.have.property('tz', 'Europe/Paris');
   });
 
