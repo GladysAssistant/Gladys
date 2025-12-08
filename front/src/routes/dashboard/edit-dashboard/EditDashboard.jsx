@@ -15,7 +15,7 @@ const EditDashboard = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <div class="my-3 my-md-5">
-            <div class={cx('container', style.largeContainer)}>
+            <div class={cx(style.dashboardContainer)}>
               <div class="row">
                 <div class="col-lg-3">
                   <div class="card">
