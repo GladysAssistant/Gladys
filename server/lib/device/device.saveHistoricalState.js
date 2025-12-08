@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const { Op } = require('sequelize');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { formatDateInUTC } = require('../../utils/date');
@@ -82,79 +81,23 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
         SELECT * 
         FROM t_device_feature_state
         WHERE device_feature_id = ?
-        AND value = ?
         AND created_at = ?
       `,
       deviceFeature.id,
-      newValue,
       formatDateInUTC(newValueCreatedAtDate),
     );
     // if the value already exist in the DB, don't re-create it
-    if (valueAlreadyExistInDb.length > 0) {
+    if (valueAlreadyExistInDb.length > 0 && valueAlreadyExistInDb[0].value === newValue) {
       logger.debug('device.saveHistoricalState: Not saving value in history, value already exists');
       return;
     }
-    await db.duckDbInsertState(deviceFeature.id, newValue, newValueCreatedAtDate);
-    // We need to update last aggregate value
-    // So that aggregate is calculated again
-    const lastDayOfPreviousMonth = new Date(
-      newValueCreatedAtDate.getFullYear(),
-      newValueCreatedAtDate.getMonth() - 1,
-      0,
-    );
-    const dayBeforeJustBeforeMidnight = new Date(
-      newValueCreatedAtDate.getFullYear(),
-      newValueCreatedAtDate.getMonth(),
-      newValueCreatedAtDate.getDate() - 1,
-      23,
-      59,
-      59,
-    );
-
-    // We update last monthly aggregate only if current last monthly aggregate is more recent
-    await db.DeviceFeature.update(
-      {
-        last_monthly_aggregate: lastDayOfPreviousMonth,
-      },
-      {
-        where: {
-          id: deviceFeature.id,
-          last_monthly_aggregate: {
-            [Op.gt]: lastDayOfPreviousMonth,
-          },
-        },
-      },
-    );
-
-    // We update last daily aggregate only if current last daily aggregate is more recent
-    await db.DeviceFeature.update(
-      {
-        last_daily_aggregate: dayBeforeJustBeforeMidnight,
-      },
-      {
-        where: {
-          id: deviceFeature.id,
-          last_daily_aggregate: {
-            [Op.gt]: dayBeforeJustBeforeMidnight,
-          },
-        },
-      },
-    );
-
-    // We update last hourly aggregate only if current last hourly aggregate is more recent
-    await db.DeviceFeature.update(
-      {
-        last_hourly_aggregate: dayBeforeJustBeforeMidnight,
-      },
-      {
-        where: {
-          id: deviceFeature.id,
-          last_hourly_aggregate: {
-            [Op.gt]: dayBeforeJustBeforeMidnight,
-          },
-        },
-      },
-    );
+    if (valueAlreadyExistInDb.length > 0 && valueAlreadyExistInDb[0].value !== newValue) {
+      logger.debug('device.saveHistoricalState: Updating value in history');
+      await db.duckDbUpdateState(deviceFeature.id, newValue, newValueCreatedAtDate);
+    } else {
+      logger.debug('device.saveHistoricalState: Inserting value in history');
+      await db.duckDbInsertState(deviceFeature.id, newValue, newValueCreatedAtDate);
+    }
 
     const newDeviceInDb = await db.DeviceFeature.findOne({
       where: {

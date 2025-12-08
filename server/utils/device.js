@@ -137,12 +137,13 @@ function hasDeviceChanged(newDevice, existingDevice = {}) {
  * @description Merge feature attributes from existing with the new one.
  * It keeps 'name' and 'keep_history' attribute from existing.
  * @param {object} newFeature - Newly created feature.
- * @param {object} existingFeature - Already existing feature.
+ * @param {object} [existingFeature] - Already existing feature.
+ * @param {object} [featureIdMap] - Map of feature id to existing feature id.
  * @returns {object} A new feature merged with existing one.
  * @example
  * mergeFeatures({ name: 'Default name' }, { name: 'Overriden name' })
  */
-function mergeFeatures(newFeature, existingFeature = {}) {
+function mergeFeatures(newFeature, existingFeature = {}, featureIdMap = new Map()) {
   const featureToReturn = { ...newFeature };
 
   if (existingFeature && existingFeature.name) {
@@ -151,6 +152,17 @@ function mergeFeatures(newFeature, existingFeature = {}) {
 
   if (existingFeature && existingFeature.keep_history !== undefined) {
     featureToReturn.keep_history = existingFeature.keep_history;
+  }
+
+  if (existingFeature && existingFeature.id) {
+    featureToReturn.id = existingFeature.id;
+    if (newFeature.id) {
+      featureIdMap.set(newFeature.id, existingFeature.id);
+    }
+  }
+
+  if (existingFeature && existingFeature.energy_parent_id) {
+    featureToReturn.energy_parent_id = existingFeature.energy_parent_id;
   }
 
   return featureToReturn;
@@ -183,16 +195,22 @@ function mergeDevices(newDevice, existingDevice, updateAttribute = 'updatable') 
     oldFeatureByExternalId[oldFeature.external_id] = oldFeature;
   });
 
+  const featureIdMap = new Map();
+
   // Merge matching features
   const features = newFeatures.map((newFeature) => {
     const oldFeature = oldFeatureByExternalId[newFeature.external_id];
 
     if (!oldFeature) {
       deviceChanged = true;
+      // If there is a new energy parent id, we need to get the correct id if the feature already existed
+      if (newFeature.energy_parent_id && featureIdMap.get(newFeature.energy_parent_id)) {
+        newFeature.energy_parent_id = featureIdMap.get(newFeature.energy_parent_id);
+      }
       return newFeature;
     }
 
-    return mergeFeatures(newFeature, oldFeature);
+    return mergeFeatures(newFeature, oldFeature, featureIdMap);
   });
 
   let i = 0;

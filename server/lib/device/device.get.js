@@ -56,6 +56,15 @@ async function get(options) {
     };
   }
 
+  // search by device feature categories
+  if (optionsWithDefault.device_feature_categories) {
+    queryParams.include[0].where = {
+      category: {
+        [Op.in]: optionsWithDefault.device_feature_categories,
+      },
+    };
+  }
+
   // search by device feature selectors
   if (optionsWithDefault.device_feature_selectors) {
     queryParams.include[0].where = {

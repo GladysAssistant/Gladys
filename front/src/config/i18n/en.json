@@ -20,7 +20,20 @@
     "milesPerHour": "m/h",
     "selectPlaceholder": "Select...",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "edit": "Edit",
+    "delete": "Delete",
+    "next": "Next",
+    "back": "Back",
+    "create": "Create",
+    "cancel": "Cancel",
+    "selectDevice": "Select a device",
+    "noData": "No data",
+    "price": "Price",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "loading": "Loading...",
+    "preview": "Preview"
   },
   "color": {
     "aqua": "Aqua",
@@ -271,7 +284,8 @@
       "clock": "Clock",
       "scene": "Scene",
       "music": "Music",
-      "gauge": "Gauge"
+      "gauge": "Gauge",
+      "energy-consumption": "Energy Consumption"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -440,6 +454,18 @@
         "noDeviceFeatureSelector": "No feature selected",
         "errorLoadingDevice": "An error occured while loading the device",
         "noDeviceFeatureLastValue": "This feature has not received any value yet"
+      },
+      "energyConsumption": {
+        "editName": "Widget Name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard",
+        "editDeviceFeatures": "Select an energy consumption device",
+        "year": "Year",
+        "month": "Month",
+        "day": "Day",
+        "consumptionCost": "Consumption Cost",
+        "totalConsumption": "Total Consumption Cost",
+        "error": "Error loading energy consumption data",
+        "noData": "No energy consumption data available for this period"
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
@@ -951,7 +977,9 @@
         "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface, available here:",
         "connectedToUsagePointds": "Successfully connected to Enedis! The first sync will take from 2 to 3 hours depending on the volume of request on Enedis API. No need to keep this tab open during this time.",
         "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years.",
-        "dailyConsumptionFeatureName": "Daily consumption"
+        "dailyConsumptionFeatureName": "Daily consumption",
+        "consumptionLoadCurveFeatureName": "Consumption 30 minutes",
+        "consumptionLoadCurveCostFeatureName": "Consumption 30 minutes cost"
       },
       "usagePoints": {
         "title": "My meters",
@@ -975,7 +1003,8 @@
         "refreshLocal": "Synchronise with Gladys Plus",
         "explanation": "The synchronization with Enedis is done automatically between Gladys Plus and Enedis every day between 8:30 and 11:30. It is possible that on some days the data may be available late. On the Gladys side, Gladys automatically synchronizes with Gladys Plus every hour.",
         "saveButton": "Save",
-        "deleteButton": "Delete"
+        "deleteButton": "Delete",
+        "recreateButton": "Update"
       }
     },
     "homekit": {
@@ -1605,6 +1634,98 @@
         "leak": "Leak Sensor",
         "magnet": "Magnet Sensor"
       }
+    },
+    "energyMonitoring": {
+      "title": "Energy Monitoring",
+      "description": "Track your electricity consumption in Gladys",
+      "myDevicesTab": "My Devices",
+      "energyPriceTab": "Energy Rates",
+      "documentation": "Documentation",
+      "hierarchicalListDescription": "Here is the hierarchical list of energy sensors. You can define parent/child relationships to aggregate consumption.",
+      "rootNotParent": "No parent (root)",
+      "level": "Level {{depth}}",
+      "wizard": {
+        "basics": "Information",
+        "periodScope": "Period & Scope",
+        "priceAndSlots": "Price & Time Slots"
+      },
+      "contract": "Contract",
+      "priceType": "Price Type",
+      "currency": "Currency",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "dayType": "Day Type",
+      "dayTypeOptions": {
+        "any": "any",
+        "red": "red",
+        "white": "white",
+        "blue": "blue"
+      },
+      "electricMeter": "Electric Meter",
+      "leaveEndDateEmpty": "Leave the end date empty for an open period.",
+      "priceAndTimeSlots": "Price & Time Slots",
+      "price": "Price",
+      "hourSlots": "Time Slots",
+      "selectHoursHelp": "Select the hours when this price applies.",
+      "daytime820": "Daytime 8-20",
+      "clear": "Clear",
+      "selected": "Selected:",
+      "none": "none",
+      "subscribedPower": "Subscribed Power",
+      "summary": "Summary",
+      "type": "Type",
+      "period": "Period",
+      "slots": "Slots",
+      "meter": "Meter",
+      "contractTypes": {
+        "base": "base",
+        "peak-off-peak": "peak/off-peak hours",
+        "edf-tempo": "EDF Tempo"
+      },
+      "priceTypes": {
+        "consumption": "consumption",
+        "subscription": "subscription"
+      },
+      "currencies": {
+        "euro": "euro",
+        "dollar": "dollar"
+      },
+      "errorLoadingPrices": "Error loading rates.",
+      "errorLoadingDevices": "Error loading devices.",
+      "noDeviceFeaturesFound": "No device features found.",
+      "settings": "Settings",
+      "calculateConsumptionFromIndexDescription": "This will recalculate the energy consumption (in kWh) in 30-minute intervals from the \"index\" features, since the beginning of your Gladys installation.",
+      "calculateConsumptionFromIndexFromBeginning": "Calculate consumption from index from the beginning",
+      "calculatingConsumptionFromBeginning": "Calculating consumption...",
+      "calculateConsumptionFromBeginningStarted": "The consumption calculation has been started. You can follow the progress in background tasks.",
+      "calculateConsumptionFromBeginningError": "An error occurred while starting the consumption calculation.",
+      "calculateCostFromBeginningDescription": "This will calculate the cost of your energy consumption based on your consumption data and electricity prices. Use this after you have consumption data and configured your electricity prices.",
+      "calculateCostFromBeginning": "Calculate cost from the beginning",
+      "calculatingFromBeginning": "Calculating...",
+      "calculateFromBeginningStarted": "The calculation has been started. You can follow the progress in background tasks.",
+      "calculateFromBeginningError": "An error occurred while starting the calculation.",
+      "importPrices": "Import",
+      "importPricesTitle": "Import Energy Contract Prices",
+      "selectElectricMeterDescription": "You can either use an existing electric meter from another integration (e.g., Enedis), or automatically create a new electric meter here. If you create the meter automatically here, it will be created in the MQTT integration.",
+      "selectElectricMeter": "Select Electric Meter Device",
+      "createElectricMeter": "+ Create Electric Meter",
+      "electricMeterDeviceName": "Electric Meter (MQTT)",
+      "electricMeterFeatureName": "Electric Meter Index (MQTT)",
+      "selectContract": "Select Energy Contract",
+      "selectContractPlaceholder": "Select a contract",
+      "selectSubscribedPower": "Select Subscribed Power",
+      "selectPowerPlaceholder": "Select power",
+      "provider": "Provider",
+      "importPricesButton": "Import Prices",
+      "importSuccess": "Prices imported successfully!",
+      "errorLoadingContracts": "Error loading contracts",
+      "availablePowers": "Available Powers",
+      "contractId": "Contract ID",
+      "hourSlotsRequiredInfo": "This contract requires you to specify the peak hours for your location. The remaining hours will be considered off-peak.",
+      "selectPeakHours": "Select Peak Hours",
+      "selectPeakHoursHelp": "Click on the time slots when peak pricing applies. Unselected slots will be off-peak.",
+      "peakHours": "Peak hours",
+      "offPeakHours": "Off-peak hours"
     },
     "caldav": {
       "title": "CalDAV",
@@ -2616,7 +2737,13 @@
       "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Purge all SQLite states",
-      "service-matter-backup": "Matter backup"
+      "service-matter-backup": "Matter backup",
+      "energy-monitoring-cost-calculation-thirty-minutes": "Energy cost calculation (30 minutes)",
+      "energy-monitoring-cost-calculation-yesterday": "Energy cost calculation (from yesterday)",
+      "energy-monitoring-cost-calculation-beginning": "Energy cost calculation (from beginning)",
+      "energy-monitoring-consumption-from-index-thirty-minutes": "Energy consumption calculation from index (30 minutes)",
+      "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)",
+      "service-enedis-sync": "Enedis data synchronization"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -3553,7 +3680,18 @@
       "power": "Power",
       "energy": "Energy",
       "index": "Index",
-      "daily-consumption": "Daily Consumption"
+      "daily-consumption": "Daily Consumption",
+      "daily-consumption-cost": "Daily Cost",
+      "thirty-minutes-consumption": "30 Minutes Consumption",
+      "thirty-minutes-consumption-cost": "30 Minutes Cost"
+    },
+    "energy-production-sensor": {
+      "shortCategoryName": "Energy production sensor",
+      "index": "Index",
+      "daily-production": "Daily Production",
+      "daily-production-revenue": "Daily Revenue",
+      "thirty-minutes-production": "30 Minutes Production",
+      "thirty-minutes-production-revenue": "30 Minutes Revenue"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
