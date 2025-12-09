@@ -1,9 +1,10 @@
 const logger = require('../../../../utils/logger');
-const { LOCK, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const {
   MAPPING_STATES_NUKI_TO_GLADYS,
+  MAPPING_SWITCH_NUKI_TO_GLADYS,
+  MAPPING_ACTIONS_NUKI_TO_GLADYS,
   NUKI_LOCK_STATES,
-  NUKI_LOCK_ACTIONS,
   TRIGGER,
 } = require('../utils/nuki.constants');
 
@@ -40,11 +41,11 @@ function handleMessage(topic, message) {
         // 3.3 Lock States
         const state = Math.round(message);
         logger.info(`Lock state has changed : ${NUKI_LOCK_STATES[state]}`);
-        externalId = `${main}:${deviceType}:button`;
-        const binaryValue = NUKI_LOCK_STATES[state] === 'locked' ? LOCK.STATE.LOCKED : LOCK.STATE.UNLOCKED;
+        externalId = `${main}:${deviceType}:button`;      
+        // update button state based on lock state
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
-          state: binaryValue,
+          state: MAPPING_SWITCH_NUKI_TO_GLADYS[state],
         });
         externalId = `${main}:${deviceType}:state`;
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -56,8 +57,9 @@ function handleMessage(topic, message) {
       case 'commandResponse': {
         // 0 = Success
         // 1-255 = Error code as described in the BLE API.
-        if (message !== 0) {
-          logger.error(`Error command response : ${message}`);
+        const code = parseInt(message, 10);
+        if (code !== 0) {
+          logger.error(`Error command response : ${code}`);
         }
         break;
       }
@@ -78,10 +80,9 @@ function handleMessage(topic, message) {
         logger.debug(
           `Lock action (${lockAction} via ${TRIGGER[trigger]}) with Auth-ID  ${authId} from Code-ID ${codeId} (if keypad) (Auto-unlock or number of button presses ${autoLock})`,
         );
-        const binaryValue = lockAction === NUKI_LOCK_ACTIONS.LOCK ? LOCK.STATE.LOCKED : LOCK.STATE.UNLOCKED;
         const newState = {
           device_feature_external_id: `${main}:${deviceType}:button`,
-          state: binaryValue,
+          state: MAPPING_ACTIONS_NUKI_TO_GLADYS[lockAction],
         };
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
         break;

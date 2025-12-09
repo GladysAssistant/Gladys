@@ -47,8 +47,8 @@ const NUKI_LOCK_STATES = {
   255: 'undefined',
 };
 
-// mapping between Nuki states (labels) and Gladys
-const NUKI_TO_GLADYS_MAP = {
+// mapping between Nuki states (labels) and Gladys (integer) lock states
+const NUKI_TO_GLADYS_STATE = {
   uncalibrated: LOCK.STATE.ERROR,
   locked: LOCK.STATE.LOCKED,
   unlocking: LOCK.STATE.ACTIVITY,
@@ -62,9 +62,30 @@ const NUKI_TO_GLADYS_MAP = {
   undefined: LOCK.STATE.ERROR,
 };
 
-// helper that generate the final mapping final based on int codes
+// helper that generate the final mapping based on Nuki state
 const MAPPING_STATES_NUKI_TO_GLADYS = Object.entries(NUKI_LOCK_STATES).reduce((acc, [code, label]) => {
-  acc[code] = NUKI_TO_GLADYS_MAP[label];
+  acc[code] = NUKI_TO_GLADYS_STATE[label];
+  return acc;
+}, {});
+
+// mapping between Nuki states (labels) and Gladys (integer) lock states for switch feature
+const NUKI_TO_GLADYS_SWITCH = {
+  locked: LOCK.STATE.LOCKED,
+  locking: LOCK.STATE.LOCKED,
+  unlocked: LOCK.STATE.UNLOCKED,
+  unlocking: LOCK.STATE.UNLOCKED,
+  'unlatching opening': LOCK.STATE.UNLOCKED,
+  uncalibrated: LOCK.STATE.ERROR,
+  'boot run': LOCK.STATE.ERROR,
+  'motor blocked': LOCK.STATE.ERROR,
+  undefined: LOCK.STATE.ERROR,
+  unlatched: LOCK.STATE.UNLOCKED,
+  'unlocked (lock ‘n’ go)': LOCK.STATE.UNLOCKED,
+};
+
+// helper that generate the final mapping based on Nuki state labels for switch feature
+const MAPPING_SWITCH_NUKI_TO_GLADYS = Object.entries(NUKI_LOCK_STATES).reduce((acc, [code, label]) => {
+  acc[code] = NUKI_TO_GLADYS_SWITCH[label] ?? LOCK.STATE.ERROR;
   return acc;
 }, {});
 
@@ -77,6 +98,21 @@ const NUKI_LOCK_ACTIONS = {
   LOCKNGO_WITH_UNLATCH: 5,
   FULL_LOCK: 6,
 };
+
+const NUKI_TO_GLADYS_ACTIONS = {
+  1: LOCK.STATE.UNLOCKED,
+  2: LOCK.STATE.LOCKED,
+  3: LOCK.STATE.UNLOCKED,
+  4: LOCK.STATE.LOCKED,
+  5: LOCK.STATE.LOCKED,
+  6: LOCK.STATE.LOCKED,
+};
+
+// helper that generate the final mapping based on Nuki action codes
+const MAPPING_ACTIONS_NUKI_TO_GLADYS = Object.entries(NUKI_LOCK_ACTIONS).reduce((acc, [label, code]) => {
+  acc[code] = NUKI_TO_GLADYS_ACTIONS[code];
+  return acc;
+}, {});
 
 // 3.7 Trigger (see  MQTT API 1.5.pdf https://developer.nuki.io/uploads/short-url/ysgxlVRSHb9qAFIDQP6eeXr78QF.pdf)
 const TRIGGER = {
@@ -104,4 +140,6 @@ module.exports = {
   TOPICS,
   NUKI_LOCK_STATES,
   MAPPING_STATES_NUKI_TO_GLADYS,
+  MAPPING_SWITCH_NUKI_TO_GLADYS,
+  MAPPING_ACTIONS_NUKI_TO_GLADYS,
 };
