@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
-const { NUKI_LOCK_STATES, MAPPING_STATES_NUKI_TO_GLADYS } = require('../utils/nuki.constants');
+const { MAPPING_STATES_NUKI_TO_GLADYS, MAPPING_SWITCH_NUKI_TO_GLADYS } = require('../utils/nuki.constants');
 
 /**
  * @description Get device values through HTTP.
@@ -30,10 +30,12 @@ async function getValue(device) {
   });
 
   // Update button state
-  const binaryValue = NUKI_LOCK_STATES[state] === 'locked' ? 0 : 1;
+  logger.debug(
+    `Lock ${device.external_id} is in ${state} state and button will be in ${MAPPING_SWITCH_NUKI_TO_GLADYS[state]} state`,
+  );
   gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: `${device.external_id}:button`,
-    state: binaryValue,
+    state: MAPPING_SWITCH_NUKI_TO_GLADYS[state],
   });
 }
 
