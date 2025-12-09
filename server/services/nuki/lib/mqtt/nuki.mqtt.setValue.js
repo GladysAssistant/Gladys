@@ -9,11 +9,11 @@ const { getTopicFromExternalId } = require('../utils/nuki.externalId');
  * @example
  * nukiMQTTHandler.setValue(device, command, value);
  */
-async function setValue(device, command, value) {
+function setValue(device, command, value) {
   logger.debug(`set value for ${device.external_id}`);
   // Send message to Nuki topics
   const topic = getTopicFromExternalId(device);
-  await this.mqttService.device.publish(`${topic}${command}`, `true`);
+  this.mqttService.device.publish(`${topic}${command}`, `true`);
 }
 
 module.exports = {
