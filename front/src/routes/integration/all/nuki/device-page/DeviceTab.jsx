@@ -113,6 +113,7 @@ class DeviceTab extends Component {
   }
 
   render({}, { orderDir, search, nukiGetStatus, nukiDevices, housesWithRooms, nukiEnabled }) {
+    const displayWarning = !nukiEnabled || (nukiDevices && nukiDevices.length === 0);
     return (
       <div class="card">
         <div class="card-header">
@@ -139,7 +140,7 @@ class DeviceTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.nukiListBody)}>
-              {!nukiEnabled && (
+              {displayWarning && (
                 <div class="alert alert-warning">
                   <MarkupText id="integration.nuki.setup.disabledWarning" />
                 </div>
