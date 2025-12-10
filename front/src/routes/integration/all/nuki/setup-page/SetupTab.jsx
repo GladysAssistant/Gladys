@@ -103,7 +103,7 @@ class SetupTab extends Component {
   };
 
   render() {
-    const { nukiConnectionStatus, nukiConnectionError, nukiConnected, nukiApiKey } = this.state;
+    const { nukiConnectionStatus, nukiConnectionError, nukiConnected, nukiApiKey, apiKeyChanges } = this.state;
     return (
       <div class="card">
         <div class="card-header">
@@ -162,7 +162,12 @@ class SetupTab extends Component {
 
                 <div class="row mt-5">
                   <div class="col">
-                    <button type="submit" class="btn btn-success" onClick={this.saveConfiguration}>
+                    <button
+                      type="submit"
+                      disabled={!apiKeyChanges}
+                      class="btn btn-success"
+                      onClick={this.saveConfiguration}
+                    >
                       <Text id="integration.nuki.setup.saveLabel" />
                     </button>
                   </div>
