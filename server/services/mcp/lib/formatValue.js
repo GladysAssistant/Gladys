@@ -10,12 +10,14 @@ function formatValue(feature) {
     case 'opening-sensor:binary':
       return {
         value: feature.last_value === 0 ? 'open' : 'closed',
+        unit: null,
       };
     case 'light:binary':
     case 'switch:binary':
     case 'air-conditioning':
       return {
         value: feature.last_value === 0 ? 'off' : 'on',
+        unit: null,
       };
     default:
       return {

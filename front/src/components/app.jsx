@@ -185,6 +185,9 @@ import FreeMobilePage from '../routes/integration/all/free-mobile';
 // CallMeBot integration
 import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 
+// Energy Monitoring integration
+import EnergyMonitoringIntegration from '../routes/integration/all/energy-monitoring/index';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -290,6 +293,12 @@ const AppRouter = connect(
 
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/import" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />

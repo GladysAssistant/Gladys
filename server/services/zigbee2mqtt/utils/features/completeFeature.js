@@ -15,10 +15,19 @@ function completeFeature(deviceName, feature, property, suffixIndex = 0) {
   const externalIdSuffix = suffixIndex > 0 ? `:${suffixIndex}` : '';
   const externalId = `zigbee2mqtt:${deviceName}:${category}:${type}:${property}${externalIdSuffix}`;
 
-  const nameSuffix = suffixIndex > 0 ? ` ${suffixIndex}` : '';
-  const name = `${property.charAt(0).toUpperCase() + property.slice(1).replace(/_/g, ' ')}${nameSuffix}`;
+  // Use custom name if specified, otherwise generate from property
+  let name;
+  if (feature.name) {
+    // Custom name is specified in the feature definition
+    const nameSuffix = suffixIndex > 0 ? ` ${suffixIndex}` : '';
+    name = `${feature.name}${nameSuffix}`;
+  } else {
+    // Generate name from property
+    const nameSuffix = suffixIndex > 0 ? ` ${suffixIndex}` : '';
+    name = `${property.charAt(0).toUpperCase() + property.slice(1).replace(/_/g, ' ')}${nameSuffix}`;
+  }
 
-  const completedFeature = { name, ...feature, external_id: externalId, selector: externalId };
+  const completedFeature = { ...feature, name, external_id: externalId, selector: externalId };
   addSelector(completedFeature);
   return completedFeature;
 }

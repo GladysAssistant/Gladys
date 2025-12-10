@@ -547,6 +547,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ELECTRICAL_VEHICLE_CLIMATE: 'electrical-vehicle-climate',
   ELECTRICAL_VEHICLE_COMMAND: 'electrical-vehicle-command',
   ENERGY_SENSOR: 'energy-sensor',
+  ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   HEATER: 'heater',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
@@ -732,6 +733,16 @@ const DEVICE_FEATURE_TYPES = {
     CURRENT: 'current',
     INDEX: 'index',
     DAILY_CONSUMPTION: 'daily-consumption',
+    DAILY_CONSUMPTION_COST: 'daily-consumption-cost',
+    THIRTY_MINUTES_CONSUMPTION: 'thirty-minutes-consumption',
+    THIRTY_MINUTES_CONSUMPTION_COST: 'thirty-minutes-consumption-cost',
+  },
+  ENERGY_PRODUCTION_SENSOR: {
+    INDEX: 'index',
+    DAILY_PRODUCTION: 'daily-production',
+    DAILY_PRODUCTION_REVENUE: 'daily-production-revenue',
+    THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
+    THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1097,6 +1108,8 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
+    DEVICE_FEATURE_UNITS.EURO,
+    DEVICE_FEATURE_UNITS.DOLLAR,
   ],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
@@ -1392,6 +1405,7 @@ const DASHBOARD_BOX_TYPE = {
   SCENE: 'scene',
   MUSIC: 'music',
   GAUGE: 'gauge',
+  ENERGY_CONSUMPTION: 'energy-consumption',
 };
 
 const ERROR_MESSAGES = {
@@ -1427,6 +1441,12 @@ const JOB_TYPES = {
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
+  ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES: 'energy-monitoring-cost-calculation-thirty-minutes',
+  ENERGY_MONITORING_COST_CALCULATION_YESTERDAY: 'energy-monitoring-cost-calculation-yesterday',
+  ENERGY_MONITORING_COST_CALCULATION_BEGINNING: 'energy-monitoring-cost-calculation-beginning',
+  ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-consumption-from-index-thirty-minutes',
+  ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
+  SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
 };
 
 const JOB_STATUS = {
@@ -1455,6 +1475,26 @@ const ALARM_MODES = {
   ARMED: 'armed',
   PARTIALLY_ARMED: 'partially-armed',
   PANIC: 'panic',
+};
+
+const ENERGY_CONTRACT_TYPES = {
+  // Generic base contract
+  BASE: 'base',
+  // Generic peak off peak contract
+  PEAK_OFF_PEAK: 'peak-off-peak',
+  // EDF Tempo
+  EDF_TEMPO: 'edf-tempo',
+};
+
+const ENERGY_PRICE_TYPES = {
+  CONSUMPTION: 'consumption',
+  SUBSCRIPTION: 'subscription',
+};
+
+const ENERGY_PRICE_DAY_TYPES = {
+  RED: 'red',
+  BLUE: 'blue',
+  WHITE: 'white',
 };
 
 const createList = (obj) => {
@@ -1490,6 +1530,9 @@ const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
+const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
+const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
+const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -1571,5 +1614,12 @@ module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
+
+module.exports.ENERGY_CONTRACT_TYPES = ENERGY_CONTRACT_TYPES;
+module.exports.ENERGY_CONTRACT_TYPES_LIST = ENERGY_CONTRACT_TYPES_LIST;
+module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
+module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
+module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
+module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;
 
 module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;
