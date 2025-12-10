@@ -1798,7 +1798,7 @@
       "description": "Control your Nuki devices.",
       "deviceTab": "Devices",
       "discoverTab": "Nuki Discovery",
-      "setupTab": "Setup",
+      "setupTab": "Web setup",
       "documentation": "Nuki documentation ",
       "discoverDeviceDescr": "Automatically scan for Nuki devices",
       "nameLabel": "Device Name",
@@ -1844,21 +1844,21 @@
         },
         "http": {
           "title": "Discover Nuki Devices on the NukiWeb cloud",
-          "description": "Configured Nuki devices are automatically discovered from your NukiWeb account.",
+          "description": "Start a scan to discover the devices from your NukiWeb account.",
           "scan": "Search"
         }
       },
       "setup": {
         "title": "Nuki Setup",
-        "nukiDescription": "To control your devices via NukiWeb, Gladys must be connected to the internet and you need to obtain an API key. Follow these steps:<br><br>1. Go to the <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb site</a><br>2. Go to the API menu, then click on “Generate API token” to get your API key<br>3. Enter your API key below<br><br>⚠️ Note: This configuration is <u>optional</u> if your setup is configured with MQTT.",
-        "apiKeyLabel": "API Key",
-        "apiKeyPlaceholder": "Enter your Nuki Web API key",
+        "nukiDescription": "To control your devices via NukiWeb, Gladys must be connected to the internet and you need to obtain an API token. Follow these steps:<br><br>1. If you don’t have a Nuki Web account yet, create one by following <a href=\"https://help.nuki.io/hc/en-us/articles/360016485718-Activer-et-désactiver-un-compte-Nuki-Web\" target=\"_blank\" rel=\"noopener noreferrer\">these instructions</a> and then go to the <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb website</a><br>2. Go to the <a href=\"https://web.nuki.io/#/pages/web-api\" target=\"_blank\" rel=\"noopener noreferrer\">API menu</a>, then click on “Generate API token” to get your API token<br>3. Enter your API token below (Note: this is not the OAuth2 key, but the API token created earlier)<br>4. Perform a search in <a href=\"/dashboard/integration/device/nuki/http\">Web Discovery</a> to add your devices<br><br>⚠️ Note: This configuration is <u>optional</u> if your setup is configured with MQTT.",
+        "apiKeyLabel": "API token",
+        "apiKeyPlaceholder": "Enter your Nuki Web API token",
         "saveLabel": "Save Configuration",
         "error": "An error occurred while saving the configuration.",
         "connecting": "Configuration saved. Connecting to your Nuki cloud account...",
         "connected": "Successfully connected to the Nuki cloud account!",
         "connectionError": "Connection error, please check your configuration.",
-        "disabledWarning": "The service is not yet activated. To start using the service, you can: <ul><li>either <a href=\"/dashboard/integration/device/mqtt/setup\">connect Gladys to an MQTT broker</a></li><li>or enter an API key in the <a href=\"/dashboard/integration/device/nuki/setup\">Configuration</a> tab</li></ul>"
+        "disabledWarning": "The service is not yet activated. To start using the service, you can: <ul><li>either <a href=\"/dashboard/integration/device/mqtt/setup\">connect Gladys to an MQTT broker</a></li><li>or enter an API token in the <a href=\"/dashboard/integration/device/nuki/setup\">Configuration</a> tab</li></ul>"
       },
       "error": {
         "defaultError": "An error occurred while saving the device.",

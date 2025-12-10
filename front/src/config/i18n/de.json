@@ -1798,7 +1798,7 @@
       "description": "Steuern Sie Ihre Nuki-Geräte.",
       "deviceTab": "Geräte",
       "discoverTab": "Nuki-Erkennung",
-      "setupTab": "Einrichtung",
+      "setupTab": "Web einrichtung",
       "documentation": "Nuki-Documentation ",
       "discoverDeviceDescr": "Nuki-Geräte automatisch scannen",
       "nameLabel": "Gerätename",
@@ -1844,21 +1844,21 @@
         },
         "http": {
           "title": "Erkennung von Nuki-Geräten über NukiWeb",
-          "description": "Konfigurierte Nuki-Geräte werden automatisch über Ihr NukiWeb-Konto erkannt.",
+          "description": "Starten Sie eine Suche, um die Geräte über Ihr NukiWeb-Konto zu entdecken.",
           "scan": "Suchen"
         }
       },
       "setup": {
         "title": "Nuki-Einrichtung",
-        "nukiDescription": "Um Ihre Geräte über NukiWeb zu steuern, muss Gladys mit dem Internet verbunden sein und Sie benötigen einen API-Schlüssel. Befolgen Sie diese Schritte:<br><br>1. Gehen Sie auf die <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb-Website</a><br>2. Öffnen Sie das API-Menü und klicken Sie auf „API-Token generieren“, um Ihren API-Schlüssel zu erhalten<br>3. Geben Sie Ihren API-Schlüssel unten ein<br><br>⚠️ Hinweis: Diese Konfiguration ist <u>optional</u>, wenn Ihre Installation mit MQTT eingerichtet ist.",
-        "apiKeyLabel": "API-Schlüssel",
-        "apiKeyPlaceholder": "Geben Sie den Nuki-Web-API-Schlüssel ein",
+        "nukiDescription": "Um Ihre Geräte über NukiWeb zu steuern, muss Gladys mit dem Internet verbunden sein und Sie benötigen einen API-Token. Befolgen Sie diese Schritte:<br><br>1. Falls Sie noch kein Nuki-Web-Konto haben, erstellen Sie eines, indem Sie <a href=\"https://help.nuki.io/hc/de/articles/360016485718-Activer-et-désactiver-un-compte-Nuki-Web\" target=\"_blank\" rel=\"noopener noreferrer\">diesen Anweisungen</a> folgen, und gehen Sie anschließend auf die <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb-Website</a><br>2. Öffnen Sie das <a href=\"https://web.nuki.io/#/pages/web-api\" target=\"_blank\" rel=\"noopener noreferrer\">API-Menü</a> und klicken Sie auf „API-Token generieren“, um Ihren API-Token zu erhalten<br>3. Geben Sie unten Ihren API-Token ein (Achtung: Dies ist nicht der OAuth2-Schlüssel, sondern das zuvor erstellte API-Token)<br>4. Führen Sie eine Suche in <a href=\"/dashboard/integration/device/nuki/http\">Web-Erkennung</a> durch, um Ihre Geräte hinzuzufügen<br><br>⚠️ Hinweis: Diese Konfiguration ist <u>optional</u>, wenn Ihre Installation mit MQTT eingerichtet ist.",
+        "apiKeyLabel": "API-Token",
+        "apiKeyPlaceholder": "Geben Sie den Nuki-Web-API-Token ein",
         "saveLabel": "Konfiguration speichern",
         "error": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "connecting": "Konfiguration gespeichert. Verbindung zu Ihrem Nuki-Cloud-Konto wird hergestellt...",
         "connected": "Erfolgreich mit dem Nuki-Cloud-Konto verbunden!",
         "connectionError": "Verbindungsfehler. Bitte überprüfen Sie Ihre Konfiguration.",
-        "disabledWarning": "Der Dienst ist noch nicht aktiviert. Um den Dienst zu nutzen, können Sie: <ul><li>entweder <a href=\"/dashboard/integration/device/mqtt/setup\">Gladys mit einem MQTT-Broker verbinden</a></li><li>oder einen API-Schlüssel im Tab <a href=\"/dashboard/integration/device/nuki/setup\">Konfiguration</a> eingeben</li></ul>"
+        "disabledWarning": "Der Dienst ist noch nicht aktiviert. Um den Dienst zu nutzen, können Sie: <ul><li>entweder <a href=\"/dashboard/integration/device/mqtt/setup\">Gladys mit einem MQTT-Broker verbinden</a></li><li>oder einen API-Token im Tab <a href=\"/dashboard/integration/device/nuki/setup\">Konfiguration</a> eingeben</li></ul>"
       },
       "error": {
         "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten.",
