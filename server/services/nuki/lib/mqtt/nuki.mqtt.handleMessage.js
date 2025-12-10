@@ -41,7 +41,7 @@ function handleMessage(topic, message) {
         // 3.3 Lock States
         const state = Math.round(message);
         logger.info(`Lock state has changed : ${NUKI_LOCK_STATES[state]}`);
-        externalId = `${main}:${deviceType}:button`;      
+        externalId = `${main}:${deviceType}:button`;
         // update button state based on lock state
         gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
