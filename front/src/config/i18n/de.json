@@ -632,6 +632,11 @@
         "periodScope": "Zeitraum & Umfang",
         "priceAndSlots": "Preis & Zeitfenster"
       },
+      "contractName": "Vertragsname",
+      "contractNamePlaceholder": "z.B. EDF Haupt-/Nebenzeiten 2024",
+      "contractNameHelp": "Ein benutzerdefinierter Name zur Identifizierung Ihres Energievertrags (z.B. Anbietername und Vertragstyp)",
+      "deleteContract": "Vertrag löschen",
+      "confirmDeleteContract": "Sind Sie sicher, dass Sie diesen Vertrag und alle seine Preise löschen möchten?",
       "contract": "Vertrag",
       "priceType": "Preistyp",
       "currency": "Währung",

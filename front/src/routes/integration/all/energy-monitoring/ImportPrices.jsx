@@ -25,6 +25,7 @@ class ImportPricesPage extends Component {
     selectedDeviceId: '',
     selectedContractId: '',
     selectedPower: '',
+    contractName: '',
     // Hour slot selector for TO_REPLACE cases (selected = peak, unselected = off-peak)
     peakHourSlots: new Set(),
     // Errors
@@ -184,7 +185,15 @@ class ImportPricesPage extends Component {
   };
 
   handleContractChange = e => {
-    this.setState({ selectedContractId: e.target.value });
+    const selectedContractId = e.target.value;
+    const selectedContract = this.state.contracts.find(c => c.id === selectedContractId);
+    // Set default name to contract name
+    const contractName = selectedContract ? selectedContract.name : '';
+    this.setState({ selectedContractId, contractName });
+  };
+
+  handleNameChange = e => {
+    this.setState({ contractName: e.target.value });
   };
 
   handlePowerChange = e => {
@@ -272,13 +281,14 @@ class ImportPricesPage extends Component {
         throw new Error('No price data found for selected power');
       }
 
-      const { peakHourSlots } = this.state;
+      const { peakHourSlots, contractName } = this.state;
       const offPeakHourSlots = this.getOffPeakSlots();
 
       // Import each price period from the contract
       for (const priceData of powerData) {
         const pricePayload = {
           ...priceData,
+          contract_name: contractName,
           electric_meter_device_id: selectedDeviceId,
           subscribed_power: selectedPower
         };
@@ -318,6 +328,7 @@ class ImportPricesPage extends Component {
       selectedDeviceId,
       selectedContractId,
       selectedPower,
+      contractName,
       peakHourSlots,
       contractsError,
       devicesError,
@@ -478,6 +489,27 @@ class ImportPricesPage extends Component {
               </div>
             )}
           </div>
+
+          {selectedContract && (
+            <div class="mb-3">
+              <label class="form-label">
+                <Text id="integration.energyMonitoring.contractName" defaultMessage="Contract Name" />
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                value={contractName}
+                onChange={this.handleNameChange}
+                placeholder={props.intl.dictionary.integration.energyMonitoring.contractNamePlaceholder}
+              />
+              <small class="text-muted">
+                <Text
+                  id="integration.energyMonitoring.contractNameHelp"
+                  defaultMessage="A custom name to identify your energy contract"
+                />
+              </small>
+            </div>
+          )}
 
           {selectedContract && (
             <div class="mb-3">
