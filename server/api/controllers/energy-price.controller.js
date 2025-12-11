@@ -50,10 +50,22 @@ module.exports = function EnergyPriceController(gladys) {
     res.json({ success: true });
   }
 
+  /**
+   * @description Get default electric meter feature ID.
+   * @param {object} req - Express request.
+   * @param {object} res - Express response.
+   * @returns {Promise<void>} Nothing.
+   */
+  async function getDefaultElectricMeterFeatureId(req, res) {
+    const featureId = await gladys.energyPrice.getDefaultElectricMeterFeatureId();
+    res.json({ feature_id: featureId });
+  }
+
   return Object.freeze({
     get: asyncMiddleware(get),
     create: asyncMiddleware(create),
     update: asyncMiddleware(update),
     destroy: asyncMiddleware(destroy),
+    getDefaultElectricMeterFeatureId: asyncMiddleware(getDefaultElectricMeterFeatureId),
   });
 };

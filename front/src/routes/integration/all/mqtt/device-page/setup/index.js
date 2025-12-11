@@ -102,7 +102,7 @@ class MqttDeviceSetupPage extends Component {
     });
   }
 
-  createEnergyConsumptionFeatures(featureIndex) {
+  async createEnergyConsumptionFeatures(featureIndex) {
     const parentFeature = this.state.device.features[featureIndex];
     const consumptionFeatureId = uuid.v4();
     const costFeatureId = uuid.v4();
@@ -116,6 +116,15 @@ class MqttDeviceSetupPage extends Component {
       this.props.intl.dictionary,
       `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST}`
     );
+
+    // Get default electric meter feature ID to set as energy_parent_id on the INDEX feature
+    let defaultElectricMeterFeatureId = null;
+    try {
+      const response = await this.props.httpClient.get('/api/v1/energy_price/default_electric_meter_feature_id');
+      defaultElectricMeterFeatureId = response.feature_id;
+    } catch (e) {
+      console.error('Failed to get default electric meter feature ID', e);
+    }
 
     // Create THIRTY_MINUTES_CONSUMPTION feature with parent as energy_parent_id
     const consumptionFeature = {
@@ -149,14 +158,27 @@ class MqttDeviceSetupPage extends Component {
       energy_parent_id: consumptionFeatureId
     };
 
-    const device = update(this.state.device, {
-      features: {
-        $push: [consumptionFeature, costFeature]
-      }
-    });
+    // Update parent feature with default electric meter feature ID if available
+    let deviceUpdate;
+    if (defaultElectricMeterFeatureId && !parentFeature.energy_parent_id) {
+      deviceUpdate = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            energy_parent_id: { $set: defaultElectricMeterFeatureId }
+          },
+          $push: [consumptionFeature, costFeature]
+        }
+      });
+    } else {
+      deviceUpdate = update(this.state.device, {
+        features: {
+          $push: [consumptionFeature, costFeature]
+        }
+      });
+    }
 
     this.setState({
-      device
+      device: deviceUpdate
     });
   }
 

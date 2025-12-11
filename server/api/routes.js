@@ -605,6 +605,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: energyPriceController.destroy,
     },
+    'get /api/v1/energy_price/default_electric_meter_feature_id': {
+      authenticated: true,
+      controller: energyPriceController.getDefaultElectricMeterFeatureId,
+    },
   };
 
   Object.assign(routes, coreRoutes);
