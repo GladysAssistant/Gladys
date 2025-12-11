@@ -483,41 +483,56 @@ class EnergyMonitoringPage extends Component {
       const levelColors = ['#5c7cfa', '#40c057', '#fab005', '#fa5252', '#12b886', '#7950f2'];
       const color = levelColors[depth % levelColors.length];
       const descendantIds = getDescendantIds(feature.id);
+      const isChildFeature =
+        feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION ||
+        feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST;
       return (
-        <div class="mb-2" style={{ paddingLeft: `${paddingLeft}px` }}>
-          <div class="card shadow-sm" style={{ borderLeft: `4px solid ${color}`, borderRadius: '6px' }}>
-            <div class="card-body py-2 px-2 px-md-3">
+        <div class={isChildFeature ? 'mb-1' : 'mb-2'} style={{ paddingLeft: `${paddingLeft}px` }}>
+          <div
+            class="card shadow-sm"
+            style={{ borderLeft: `${isChildFeature ? '3px' : '4px'} solid ${color}`, borderRadius: '6px' }}
+          >
+            <div class={isChildFeature ? 'card-body py-1 px-2' : 'card-body py-2 px-2 px-md-3'}>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
                 <div class="flex-grow-1 w-100 w-md-auto mb-2 mb-md-0">
                   <div class="d-flex align-items-center flex-wrap">
-                    <span class="badge mr-2 mb-1" style={{ background: color, color: '#fff' }}>
+                    <span
+                      class={isChildFeature ? 'badge mr-2' : 'badge mr-2 mb-1'}
+                      style={{ background: color, color: '#fff', fontSize: isChildFeature ? '0.7em' : undefined }}
+                    >
                       <Text id="integration.energyMonitoring.level" fields={{ depth }} />
                     </span>
-                    <strong class="mb-1">{label}</strong>
+                    <span class={isChildFeature ? 'small' : 'mb-1'}>
+                      <strong>{label}</strong>
+                    </span>
                   </div>
-                  <div class="small text-muted mt-1" style={{ wordBreak: 'break-all' }}>
-                    {feature.selector}
+                  {!isChildFeature && (
+                    <div class="small text-muted mt-1" style={{ wordBreak: 'break-all' }}>
+                      {feature.selector}
+                    </div>
+                  )}
+                </div>
+                {!isChildFeature && (
+                  <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
+                    <select
+                      class="form-control form-control-sm w-100"
+                      style={{ minWidth: '200px' }}
+                      value={feature.energy_parent_id || ''}
+                      onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
+                    >
+                      <option value="">
+                        <Text id="integration.energyMonitoring.rootNotParent" />
+                      </option>
+                      {allFeatures
+                        .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
+                        .map(f => (
+                          <option key={f.id} value={f.id}>
+                            {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
+                          </option>
+                        ))}
+                    </select>
                   </div>
-                </div>
-                <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
-                  <select
-                    class="form-control form-control-sm w-100"
-                    style={{ minWidth: '200px' }}
-                    value={feature.energy_parent_id || ''}
-                    onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
-                  >
-                    <option value="">
-                      <Text id="integration.energyMonitoring.rootNotParent" />
-                    </option>
-                    {allFeatures
-                      .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
-                      .map(f => (
-                        <option key={f.id} value={f.id}>
-                          {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                )}
               </div>
             </div>
           </div>
