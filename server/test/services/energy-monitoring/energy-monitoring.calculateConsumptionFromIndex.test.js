@@ -661,7 +661,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Verify device.get was called once
       expect(device.get.callCount).to.equal(1);
       expect(device.get.getCall(0).args[0]).to.deep.equal({
-        device_feature_categories: [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR, DEVICE_FEATURE_CATEGORIES.SWITCH],
+        device_feature_categories: [
+          DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          DEVICE_FEATURE_CATEGORIES.SWITCH,
+          DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+        ],
       });
 
       // Verify both devices were processed (getDeviceFeatureStates called twice)
