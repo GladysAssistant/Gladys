@@ -115,7 +115,7 @@ function convertToDevice(message) {
     model: '',
     service_id: this.nukiHandler.serviceId,
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTE,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     params: [
       {
         name: DEVICE_PARAM_NAME.PROTOCOL,

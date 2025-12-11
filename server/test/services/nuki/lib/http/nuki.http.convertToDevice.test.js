@@ -144,7 +144,7 @@ describe('nuki.http.convertToDevice', () => {
       model: '',
       service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bc',
       should_poll: true,
-      poll_frequency: 1000,
+      poll_frequency: 60000,
       params: [{ name: 'protocol', value: 'http' }],
     };
     const result = nukiHttpHandler.convertToDevice(message);
