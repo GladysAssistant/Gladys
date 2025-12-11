@@ -103,6 +103,44 @@ describe('addEnergyFeatures', () => {
     expect(costFeature).to.not.equal(undefined);
   });
 
+  it('should add consumption and cost features for a teleinformation EAST feature', () => {
+    const device = {
+      features: [
+        {
+          id: 'teleinformation-east-id',
+          category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+          type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EAST,
+          external_id: 'teleinformation:east',
+          name: 'Teleinformation EAST',
+          selector: 'teleinformation-east',
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+      ],
+    };
+
+    const result = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
+
+    // Should have 3 features: original teleinformation + consumption + cost
+    expect(result.features).to.have.lengthOf(3);
+
+    // Check original feature has energy_parent_id set
+    expect(result.features[0].energy_parent_id).to.equal(defaultElectricMeterDeviceFeatureId);
+
+    // Check consumption and cost features exist
+    const consumptionFeature = result.features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    );
+    const costFeature = result.features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+    );
+    expect(consumptionFeature).to.not.equal(undefined);
+    expect(costFeature).to.not.equal(undefined);
+
+    // Check consumption feature links to the teleinformation feature
+    expect(consumptionFeature.energy_parent_id).to.equal('teleinformation-east-id');
+    expect(costFeature.energy_parent_id).to.equal(consumptionFeature.id);
+  });
+
   it('should not add consumption feature if it already exists', () => {
     const device = {
       features: [
