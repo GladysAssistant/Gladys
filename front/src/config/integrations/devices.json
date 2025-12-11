@@ -56,7 +56,8 @@
   {
     "key": "nuki",
     "link": "nuki",
-    "img": "/assets/integrations/cover/nuki.png"
+    "img": "/assets/integrations/cover/nuki.jpg",
+    "whiteBackground": true
   },
   {
     "key": "enedis",
