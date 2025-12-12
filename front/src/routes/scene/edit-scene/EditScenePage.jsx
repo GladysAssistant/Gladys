@@ -98,6 +98,11 @@ const EditScenePage = ({ children, ...props }) => (
             {props.error && (
               <div class="alert alert-danger">
                 <Text id="editScene.saveSceneError" />
+                {props.errorMessage && (
+                  <div class="mt-2">
+                    <small>{props.errorMessage}</small>
+                  </div>
+                )}
               </div>
             )}
             <div class="row">
