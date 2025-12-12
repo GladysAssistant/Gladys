@@ -6,7 +6,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * @description Save new device feature string state in DB.
  * @param {object} device - A Device object.
  * @param {object} deviceFeature - A DeviceFeature object.
- * @param {number} newValue - The new value of the deviceFeature to save.
+ * @param {string} newValue - The new string value of the deviceFeature to save.
  * @example
  * saveState({
  *   id: 'fc235c88-b10d-4706-8b59-fef92a7119b2',
@@ -17,6 +17,8 @@ async function saveStringState(device, deviceFeature, newValue) {
   logger.debug(`device.saveStringState of deviceFeature ${deviceFeature.selector}`);
 
   const now = new Date();
+  const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
+  const previousDeviceFeatureValue = previousDeviceFeature ? previousDeviceFeature.last_value_string : null;
 
   deviceFeature.last_value_string = newValue;
   deviceFeature.last_value_changed = now;
@@ -45,6 +47,15 @@ async function saveStringState(device, deviceFeature, newValue) {
       last_value_string: newValue,
       last_value_changed: now,
     },
+  });
+
+  // check if there is a trigger matching
+  this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+    type: EVENTS.DEVICE.NEW_STATE,
+    device_feature: deviceFeature.selector,
+    previous_value: previousDeviceFeatureValue,
+    last_value: newValue,
+    last_value_changed: now,
   });
 }
 
