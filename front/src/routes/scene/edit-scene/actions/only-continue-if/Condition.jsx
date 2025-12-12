@@ -27,7 +27,6 @@ class Condition extends Component {
   };
 
   handleValueChange = value => {
-    this.setState({ valueErrored: false });
     let newValue;
     let evalValue;
     // We handle the case where it's a variable
@@ -37,16 +36,28 @@ class Condition extends Component {
     } else if (value === '') {
       newValue = undefined;
       evalValue = undefined;
-    } else if (value.endsWith('.')) {
+    } else if (value.endsWith('.') || value.endsWith(',')) {
+      // Preserve trailing decimal separator (. or , for French locale)
       newValue = value;
       evalValue = undefined;
+    } else if (value.includes(',')) {
+      // Handle French decimal separator: convert comma to dot for parsing
+      const valueWithDot = value.replace(',', '.');
+      if (!Number.isNaN(Number.parseFloat(valueWithDot))) {
+        newValue = Number.parseFloat(valueWithDot);
+        evalValue = undefined;
+      } else {
+        // Allow text values for string comparison (= and != operators)
+        newValue = value;
+        evalValue = undefined;
+      }
     } else if (!Number.isNaN(Number.parseFloat(value))) {
       newValue = Number.parseFloat(value);
       evalValue = undefined;
     } else {
+      // Allow text values for string comparison (= and != operators)
       newValue = value;
       evalValue = undefined;
-      this.setState({ valueErrored: true });
     }
     const newCondition = update(this.props.condition, {
       value: {
@@ -76,7 +87,7 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  render(props, { valueErrored }) {
+  render(props, {}) {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
@@ -156,12 +167,9 @@ class Condition extends Component {
                   path={props.path}
                   updateText={this.handleValueChange}
                   singleLineInput
-                  class={`${valueErrored ? 'is-invalid' : ''} ${style.conditionTagify}`}
+                  class={`${style.conditionTagify}`}
                 />
               </Localizer>
-              <div class="invalid-feedback">
-                <Text id="editScene.actionsCard.onlyContinueIf.valueError" />
-              </div>
             </div>
           </div>
           <div class="col-md-2">
