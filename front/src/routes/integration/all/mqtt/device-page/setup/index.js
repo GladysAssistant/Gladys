@@ -10,7 +10,11 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
   selectFeature(selectedFeatureOption) {
@@ -95,6 +99,86 @@ class MqttDeviceSetupPage extends Component {
 
     this.setState({
       device
+    });
+  }
+
+  async createEnergyConsumptionFeatures(featureIndex) {
+    const parentFeature = this.state.device.features[featureIndex];
+    const consumptionFeatureId = uuid.v4();
+    const costFeatureId = uuid.v4();
+
+    // Get translated names from dictionary
+    const consumptionName = get(
+      this.props.intl.dictionary,
+      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION}`
+    );
+    const costName = get(
+      this.props.intl.dictionary,
+      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST}`
+    );
+
+    // Get default electric meter feature ID to set as energy_parent_id on the INDEX feature
+    let defaultElectricMeterFeatureId = null;
+    try {
+      const response = await this.props.httpClient.get('/api/v1/energy_price/default_electric_meter_feature_id');
+      defaultElectricMeterFeatureId = response.feature_id;
+    } catch (e) {
+      console.error('Failed to get default electric meter feature ID', e);
+    }
+
+    // Create THIRTY_MINUTES_CONSUMPTION feature with parent as energy_parent_id
+    const consumptionFeature = {
+      id: consumptionFeatureId,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      external_id: `mqtt:${parentFeature.external_id.replace('mqtt:', '')}_consumption`,
+      name: `${parentFeature.name} - ${consumptionName}`,
+      unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      min: 0,
+      max: 1000000000,
+      energy_parent_id: parentFeature.id
+    };
+
+    // Create THIRTY_MINUTES_CONSUMPTION_COST feature with consumption as energy_parent_id
+    const costFeature = {
+      id: costFeatureId,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      external_id: `mqtt:${parentFeature.external_id.replace('mqtt:', '')}_cost`,
+      name: `${parentFeature.name} - ${costName}`,
+      unit: DEVICE_FEATURE_UNITS.EURO,
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      min: 0,
+      max: 1000000000,
+      energy_parent_id: consumptionFeatureId
+    };
+
+    // Update parent feature with default electric meter feature ID if available
+    let deviceUpdate;
+    if (defaultElectricMeterFeatureId && !parentFeature.energy_parent_id) {
+      deviceUpdate = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            energy_parent_id: { $set: defaultElectricMeterFeatureId }
+          },
+          $push: [consumptionFeature, costFeature]
+        }
+      });
+    } else {
+      deviceUpdate = update(this.state.device, {
+        features: {
+          $push: [consumptionFeature, costFeature]
+        }
+      });
+    }
+
+    this.setState({
+      device: deviceUpdate
     });
   }
 
@@ -314,6 +398,7 @@ class MqttDeviceSetupPage extends Component {
     this.updateDeviceProperty = this.updateDeviceProperty.bind(this);
     this.updateFeatureProperty = this.updateFeatureProperty.bind(this);
     this.saveDevice = this.saveDevice.bind(this);
+    this.createEnergyConsumptionFeatures = this.createEnergyConsumptionFeatures.bind(this);
   }
 
   async componentWillMount() {
@@ -364,6 +449,7 @@ class MqttDeviceSetupPage extends Component {
           updateFeatureProperty={this.updateFeatureProperty}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
+          createEnergyConsumptionFeatures={this.createEnergyConsumptionFeatures}
         />
       </MqttPage>
     );

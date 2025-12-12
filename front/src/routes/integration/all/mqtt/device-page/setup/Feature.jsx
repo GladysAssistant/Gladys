@@ -2,8 +2,10 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  DEVICE_FEATURE_CATEGORIES
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
 } from '../../../../../../../../server/utils/constants';
+import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
 import get from 'get-value';
@@ -156,72 +158,86 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
           </div>
 
           <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.mqtt.feature.mqttTopicToPublishExampleLabel" />
-            </label>
-            <p>
-              <small>
-                <MarkupText id="integration.mqtt.feature.mqttTopicToPublishExampleDescription" />
-              </small>
-            </p>
-            <pre>
-              <code>{props.publishMqttTopic}</code>
-            </pre>
+            <button type="button" onClick={props.toggleAdvancedSettings} class="btn btn-outline-secondary btn-sm">
+              {props.showAdvancedSettings ? (
+                <Text id="integration.mqtt.feature.hideAdvancedSettings" />
+              ) : (
+                <Text id="integration.mqtt.feature.showAdvancedSettings" />
+              )}
+            </button>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.mqtt.feature.mqttCustomTopic" />
-            </label>
-            <p>
-              <small>
-                <MarkupText id="integration.mqtt.feature.mqttCustomTopicDescription" />
-              </small>
-            </p>
-            <Localizer>
-              <input
-                type="text"
-                value={props.mqttCustomTopic}
-                onInput={props.updateMqttCustomTopic}
-                class="form-control"
-                placeholder={<Text id="integration.mqtt.feature.mqttCustomTopicPlaceholder" />}
-              />
-            </Localizer>
-          </div>
+          {props.showAdvancedSettings && (
+            <div>
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.mqtt.feature.mqttTopicToPublishExampleLabel" />
+                </label>
+                <p>
+                  <small>
+                    <MarkupText id="integration.mqtt.feature.mqttTopicToPublishExampleDescription" />
+                  </small>
+                </p>
+                <pre>
+                  <code>{props.publishMqttTopic}</code>
+                </pre>
+              </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <Text id="integration.mqtt.feature.mqttCustomObjectPath" />
-            </label>
-            <p>
-              <small>
-                <MarkupText id="integration.mqtt.feature.mqttCustomObjectPathDescription" />
-              </small>
-            </p>
-            <Localizer>
-              <input
-                type="text"
-                value={props.mqttCustomObjectPath}
-                onInput={props.updateMqttCustomObjectPath}
-                class="form-control"
-                placeholder={<Text id="integration.mqtt.feature.mqttCustomObjectPathPlaceholder" />}
-              />
-            </Localizer>
-          </div>
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.mqtt.feature.mqttCustomTopic" />
+                </label>
+                <p>
+                  <small>
+                    <MarkupText id="integration.mqtt.feature.mqttCustomTopicDescription" />
+                  </small>
+                </p>
+                <Localizer>
+                  <input
+                    type="text"
+                    value={props.mqttCustomTopic}
+                    onInput={props.updateMqttCustomTopic}
+                    class="form-control"
+                    placeholder={<Text id="integration.mqtt.feature.mqttCustomTopicPlaceholder" />}
+                  />
+                </Localizer>
+              </div>
 
-          {feature.read_only === false && (
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="integration.mqtt.feature.mqttTopicToListenExampleLabel" />
-              </label>
-              <p>
-                <small>
-                  <MarkupText id="integration.mqtt.feature.mqttTopicToListenExampleDescription" />
-                </small>
-              </p>
-              <pre>
-                <code>{props.listenMqttTopic}</code>
-              </pre>
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.mqtt.feature.mqttCustomObjectPath" />
+                </label>
+                <p>
+                  <small>
+                    <MarkupText id="integration.mqtt.feature.mqttCustomObjectPathDescription" />
+                  </small>
+                </p>
+                <Localizer>
+                  <input
+                    type="text"
+                    value={props.mqttCustomObjectPath}
+                    onInput={props.updateMqttCustomObjectPath}
+                    class="form-control"
+                    placeholder={<Text id="integration.mqtt.feature.mqttCustomObjectPathPlaceholder" />}
+                  />
+                </Localizer>
+              </div>
+
+              {feature.read_only === false && (
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.mqtt.feature.mqttTopicToListenExampleLabel" />
+                  </label>
+                  <p>
+                    <small>
+                      <MarkupText id="integration.mqtt.feature.mqttTopicToListenExampleDescription" />
+                    </small>
+                  </p>
+                  <pre>
+                    <code>{props.listenMqttTopic}</code>
+                  </pre>
+                </div>
+              )}
             </div>
           )}
 
@@ -230,6 +246,22 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               <Text id="integration.mqtt.feature.deleteLabel" />
             </button>
           </div>
+
+          {props.showCreateEnergyFeaturesButton && (
+            <div class="form-group">
+              <div class="alert alert-info">
+                <h4>
+                  <Text id="integration.mqtt.feature.energyMonitoring.title" />
+                </h4>
+                <p>
+                  <Text id="integration.mqtt.feature.energyMonitoring.description" />
+                </p>
+                <button onClick={props.createEnergyConsumptionFeatures} class="btn btn-primary">
+                  <Text id="integration.mqtt.feature.energyMonitoring.createButton" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -313,14 +345,41 @@ class MqttFeatureBoxComponent extends Component {
       this.setState({ clipboardCopiedStatus: RequestStatus.Error });
     }
   };
+  isEnergyIndexFeature = () => {
+    const { feature } = this.props;
+    const categoryTypes = ENERGY_INDEX_FEATURE_TYPES[feature.category];
+    return categoryTypes && categoryTypes.includes(feature.type);
+  };
+  hasEnergyConsumptionFeatures = () => {
+    const { device, feature } = this.props;
+    if (!device || !device.features) return false;
+
+    // Check if THIRTY_MINUTES_CONSUMPTION feature exists with this feature as parent
+    const hasConsumption = device.features.some(
+      f => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id
+    );
+
+    return hasConsumption;
+  };
+  createEnergyConsumptionFeatures = () => {
+    this.props.createEnergyConsumptionFeatures(this.props.featureIndex);
+  };
+  toggleAdvancedSettings = () => {
+    this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings });
+  };
   render() {
     const { publishMqttTopic, listenMqttTopic } = this.getMqttTopic();
     const mqttCustomTopic = this.getCustomMqttTopicValue();
     const mqttCustomObjectPath = this.getCustomMqttObjectPathValue();
+    const isEnergyIndex = this.isEnergyIndexFeature();
+    const hasConsumptionFeatures = this.hasEnergyConsumptionFeatures();
+    const showCreateEnergyFeaturesButton = isEnergyIndex && !hasConsumptionFeatures;
     return (
       <MqttFeatureBox
         {...this.props}
         clipboardCopiedStatus={this.state.clipboardCopiedStatus}
+        showAdvancedSettings={this.state.showAdvancedSettings}
+        toggleAdvancedSettings={this.toggleAdvancedSettings}
         updateName={this.updateName}
         updateExternalId={this.updateExternalId}
         updateMin={this.updateMin}
@@ -336,6 +395,8 @@ class MqttFeatureBoxComponent extends Component {
         mqttCustomObjectPath={mqttCustomObjectPath}
         updateMqttCustomTopic={this.updateMqttCustomTopic}
         updateMqttCustomObjectPath={this.updateMqttCustomObjectPath}
+        showCreateEnergyFeaturesButton={showCreateEnergyFeaturesButton}
+        createEnergyConsumptionFeatures={this.createEnergyConsumptionFeatures}
       />
     );
   }

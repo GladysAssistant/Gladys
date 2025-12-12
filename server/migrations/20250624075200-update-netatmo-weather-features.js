@@ -30,6 +30,24 @@ module.exports = {
     await Promise.each(netatmoDevices, async (netatmoDevice) => {
       // Load impacted features
       const features = await db.DeviceFeature.findAll({
+        attributes: [
+          'id',
+          'device_id',
+          'name',
+          'selector',
+          'external_id',
+          'category',
+          'type',
+          'read_only',
+          'keep_history',
+          'has_feedback',
+          'unit',
+          'min',
+          'max',
+          'last_value',
+          'last_value_string',
+          'last_value_changed',
+        ],
         where: {
           device_id: netatmoDevice.id,
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,

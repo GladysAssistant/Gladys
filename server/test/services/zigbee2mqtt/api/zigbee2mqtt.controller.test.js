@@ -9,6 +9,9 @@ const event = {
 
 const gladys = {
   event,
+  energyPrice: {
+    getDefaultElectricMeterFeatureId: fake.resolves('default-meter-feature-id'),
+  },
 };
 const zigbee2mqttManager = {
   getDiscoveredDevices: fake.returns(['device']),
@@ -41,6 +44,7 @@ describe('zigbee2mqtt API', () => {
     await controller['get /api/v1/service/zigbee2mqtt/discovered'].controller(req, res);
 
     assert.calledOnce(zigbee2mqttManager.getDiscoveredDevices);
+    assert.calledOnce(gladys.energyPrice.getDefaultElectricMeterFeatureId);
     assert.calledWith(res.json, ['device']);
   });
 
