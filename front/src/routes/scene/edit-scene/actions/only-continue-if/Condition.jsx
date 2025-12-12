@@ -27,7 +27,6 @@ class Condition extends Component {
   };
 
   handleValueChange = value => {
-    this.setState({ valueErrored: false });
     let newValue;
     let evalValue;
     // We handle the case where it's a variable
@@ -88,7 +87,7 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  render(props, { valueErrored }) {
+  render(props, {}) {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
@@ -168,12 +167,9 @@ class Condition extends Component {
                   path={props.path}
                   updateText={this.handleValueChange}
                   singleLineInput
-                  class={`${valueErrored ? 'is-invalid' : ''} ${style.conditionTagify}`}
+                  class={`${style.conditionTagify}`}
                 />
               </Localizer>
-              <div class="invalid-feedback">
-                <Text id="editScene.actionsCard.onlyContinueIf.valueError" />
-              </div>
             </div>
           </div>
           <div class="col-md-2">
