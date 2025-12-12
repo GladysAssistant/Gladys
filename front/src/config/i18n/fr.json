@@ -530,6 +530,11 @@
         "periodScope": "Période & périmètre",
         "priceAndSlots": "Prix & créneaux"
       },
+      "contractName": "Nom du contrat",
+      "contractNamePlaceholder": "ex. EDF Heures Pleines/Creuses 2024",
+      "contractNameHelp": "Un nom personnalisé pour identifier votre contrat d'énergie (ex. nom du fournisseur et type de contrat)",
+      "deleteContract": "Supprimer le contrat",
+      "confirmDeleteContract": "Êtes-vous sûr de vouloir supprimer ce contrat et tous ses tarifs ?",
       "contract": "Contrat",
       "priceType": "Type de prix",
       "currency": "Devise",

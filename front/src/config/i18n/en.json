@@ -1656,6 +1656,11 @@
         "periodScope": "Period & Scope",
         "priceAndSlots": "Price & Time Slots"
       },
+      "contractName": "Contract Name",
+      "contractNamePlaceholder": "e.g. EDF Peak/Off-Peak 2024",
+      "contractNameHelp": "A custom name to identify your energy contract (e.g. your provider name and contract type)",
+      "deleteContract": "Delete contract",
+      "confirmDeleteContract": "Are you sure you want to delete this contract and all its prices?",
       "contract": "Contract",
       "priceType": "Price Type",
       "currency": "Currency",
