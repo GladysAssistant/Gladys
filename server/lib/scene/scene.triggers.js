@@ -101,7 +101,7 @@ const triggersFunc = {
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
-    event.topic === trigger.topic && (trigger.message === '' || trigger.message === event.message),
+    event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
 };
 
 module.exports = {
