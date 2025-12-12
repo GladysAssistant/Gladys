@@ -132,7 +132,39 @@ describe('Mqtt handle message', () => {
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'device_feature_external_id',
-      state: '12',
+      state: 12,
+    });
+  });
+  it('handle device with custom topic and numeric string value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', '19.8');
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 19.8,
+    });
+  });
+  it('handle device with custom topic and non-numeric string value', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: null,
+      },
+    ];
+    mqttHandler.handleNewMessage('custom_mqtt_topic/test/test', 'hello-world');
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 'hello-world',
     });
   });
   it('handle device with custom topic and custom object path', () => {
@@ -156,6 +188,52 @@ describe('Mqtt handle message', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'device_feature_external_id',
       state: 18,
+    });
+  });
+  it('handle device with custom topic and custom object path with string number', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.temperature',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          temperature: '22.5',
+        },
+      }),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 22.5,
+    });
+  });
+  it('handle device with custom topic and custom object path with non-numeric string', () => {
+    mqttHandler.deviceFeatureCustomMqttTopics = [
+      {
+        device_feature_id: 'b42d3688-4403-479a-9376-9f5227ab543a',
+        regex_key: 'custom_mqtt_topic/test/test',
+        topic: 'custom_mqtt_topic/test/test',
+        object_path: 'test.status',
+      },
+    ];
+    mqttHandler.handleNewMessage(
+      'custom_mqtt_topic/test/test',
+      JSON.stringify({
+        test: {
+          status: 'online',
+        },
+      }),
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'device_feature_external_id',
+      state: 'online',
     });
   });
 
