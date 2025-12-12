@@ -56,7 +56,7 @@ const actionSchema = Joi.object()
       operator: Joi.string()
         .valid('=', '!=', '>', '>=', '<', '<=')
         .required(),
-      value: Joi.number(),
+      value: Joi.alternatives().try(Joi.number(), Joi.string()),
       evaluate_value: Joi.string(),
     }),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
