@@ -42,7 +42,8 @@ class EnergyConsumption extends Component {
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
       selectedDate: now,
-      displayMode: DISPLAY_MODES.CURRENCY
+      displayMode: DISPLAY_MODES.CURRENCY,
+      currencyUnit: null
     };
   }
 
@@ -97,6 +98,14 @@ class EnergyConsumption extends Component {
       // Sort timestamps
       const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
+      // Get the currency unit from the first device feature that has one
+      let currencyUnit = null;
+      data.forEach(deviceData => {
+        if (deviceData.deviceFeature.currency_unit && !currencyUnit) {
+          currencyUnit = deviceData.deviceFeature.currency_unit;
+        }
+      });
+
       // Process data for stacked bar chart
       // Each device feature becomes a separate series with aligned timestamps
       data.forEach(deviceData => {
@@ -129,7 +138,8 @@ class EnergyConsumption extends Component {
         series,
         loading: false,
         emptySeries,
-        totalConsumption
+        totalConsumption,
+        currencyUnit
       });
     } catch (e) {
       console.error('Error fetching energy consumption data:', e);
@@ -247,12 +257,20 @@ class EnergyConsumption extends Component {
     this.setState({ displayMode: mode }, this.refreshData);
   };
 
+  getCurrencySymbol = () => {
+    const { currencyUnit } = this.state;
+    if (currencyUnit === 'dollar') {
+      return '$';
+    }
+    return '€';
+  };
+
   yAxisFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
     const { displayMode } = this.state;
-    const unit = displayMode === DISPLAY_MODES.CURRENCY ? '€' : ' kWh';
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
     if (value === 0) {
       return `0${unit}`;
     }
@@ -264,7 +282,7 @@ class EnergyConsumption extends Component {
       return value;
     }
     const { displayMode } = this.state;
-    const unit = displayMode === DISPLAY_MODES.CURRENCY ? '€' : ' kWh';
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
     return `${value.toFixed(2)}${unit}`;
   };
 
@@ -450,7 +468,8 @@ class EnergyConsumption extends Component {
                                 />
                               </h5>
                               <h3 class="mb-0 text-primary font-weight-bold">
-                                {totalConsumption.toFixed(2)} {displayMode === DISPLAY_MODES.CURRENCY ? '€' : 'kWh'}
+                                {totalConsumption.toFixed(2)}{' '}
+                                {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
                               </h3>
                             </div>
                           </div>

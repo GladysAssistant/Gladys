@@ -584,6 +584,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
               category: 'energy-sensor',
               type: 'thirty-minutes-consumption-cost',
               energy_parent_id: consumptionFeatureId,
+              unit: 'euro',
             };
           }
           if (type === 'deviceFeatureById' && selector === consumptionFeatureId) {
@@ -620,6 +621,8 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results).to.have.lengthOf(1);
       // Should use consumption feature name, not cost feature name
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
+      // Should return the currency unit from the original cost feature
+      expect(results[0].deviceFeature.currency_unit).to.equal('euro');
       expect(results[0].values).to.be.an('array');
       expect(results[0].values.length).to.be.at.least(1);
     });
@@ -643,6 +646,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
               category: 'energy-sensor',
               type: 'thirty-minutes-consumption-cost',
               energy_parent_id: 'some-consumption-feature-id',
+              unit: 'dollar',
             };
           }
           if (type === 'deviceById') {
@@ -670,6 +674,8 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results).to.have.lengthOf(1);
       // Should use cost feature name
       expect(results[0].deviceFeature.name).to.equal('Energy Cost');
+      // Should return the currency unit from the cost feature
+      expect(results[0].deviceFeature.currency_unit).to.equal('dollar');
       expect(results[0].values).to.be.an('array');
     });
 
@@ -716,6 +722,8 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(results).to.have.lengthOf(1);
       // Should still use the consumption feature
       expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
+      // Should return null for currency_unit since this is not a cost feature
+      expect(results[0].deviceFeature.currency_unit).to.equal(null);
     });
 
     it('should convert Wh to kWh when display_mode is kwh and unit is watt-hour', async () => {

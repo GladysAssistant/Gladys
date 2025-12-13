@@ -51,6 +51,14 @@ async function getConsumptionByDates(selectors, options = {}) {
         throw new NotFoundError('DeviceFeature not found');
       }
 
+      // Store the original cost feature's currency unit before potentially swapping
+      const originalCostFeature = deviceFeature;
+      const currencyUnit =
+        originalCostFeature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+        originalCostFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
+          ? originalCostFeature.unit
+          : null;
+
       // If display_mode is 'kwh' and this is a cost feature, hot-replace with the consumption feature
       // The cost feature has energy_parent_id pointing to the consumption feature
       if (
@@ -124,6 +132,7 @@ async function getConsumptionByDates(selectors, options = {}) {
         },
         deviceFeature: {
           name: deviceFeature.name,
+          currency_unit: currencyUnit,
         },
         values,
       };
