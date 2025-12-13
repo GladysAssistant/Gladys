@@ -427,73 +427,68 @@ class EnergyConsumption extends Component {
           {/* Chart */}
           <div class="row">
             <div class="col-12">
-              {loading && (
-                <div class="text-center">
-                  <div class="spinner-border" role="status">
-                    <span class="sr-only">
-                      <Text id="global.loading" />
-                    </span>
-                  </div>
-                </div>
-              )}
+              <div class={loading ? 'dimmer active' : 'dimmer'}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  {error && (
+                    <div class="alert alert-danger" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.error" />
+                      {errorDetail && <div class="mt-2">{errorDetail}</div>}
+                    </div>
+                  )}
 
-              {error && (
-                <div class="alert alert-danger" role="alert">
-                  <Text id="dashboard.boxes.energyConsumption.error" />
-                  {errorDetail && <div class="mt-2">{errorDetail}</div>}
-                </div>
-              )}
+                  {!error && emptySeries && (
+                    <div class="alert alert-info" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.noData" />
+                    </div>
+                  )}
 
-              {!loading && !error && emptySeries && (
-                <div class="alert alert-info" role="alert">
-                  <Text id="dashboard.boxes.energyConsumption.noData" />
-                </div>
-              )}
-
-              {!loading && !error && !emptySeries && (
-                <>
-                  <div class="row mb-2">
-                    <div class="col-12">
-                      <div class="card border-0 mb-0">
-                        <div class="card-body text-center py-3">
-                          <div class="d-flex align-items-center justify-content-center">
-                            <div>
-                              <h5 class="mb-1 text-muted small">
-                                <Text
-                                  id={
-                                    displayMode === DISPLAY_MODES.CURRENCY
-                                      ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
-                                      : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
-                                  }
-                                />
-                              </h5>
-                              <h3 class="mb-0 text-primary font-weight-bold">
-                                {totalConsumption.toFixed(2)}{' '}
-                                {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
-                              </h3>
+                  {!error && !emptySeries && (
+                    <>
+                      <div class="row mb-2">
+                        <div class="col-12">
+                          <div class="card border-0 mb-0">
+                            <div class="card-body text-center py-3">
+                              <div class="d-flex align-items-center justify-content-center">
+                                <div>
+                                  <h5 class="mb-1 text-muted small">
+                                    <Text
+                                      id={
+                                        displayMode === DISPLAY_MODES.CURRENCY
+                                          ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                          : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                                      }
+                                    />
+                                  </h5>
+                                  <h3 class="mb-0 text-primary font-weight-bold">
+                                    {totalConsumption.toFixed(2)}{' '}
+                                    {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
+                                  </h3>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <ApexChartComponent
-                    user={this.props.user}
-                    series={series}
-                    chart_type="bar"
-                    height={300}
-                    colors={props.box.colors || DEFAULT_COLORS}
-                    size="big"
-                    display_axes={true}
-                    hide_legend={true}
-                    y_axis_formatter={this.yAxisFormatter}
-                    tooltip_y_formatter={this.tooltipYFormatter}
-                    tooltip_x_formatter={this.tooltipXFormatter}
-                    dictionary={props.intl.dictionary}
-                    disable_zoom={true}
-                  />
-                </>
-              )}
+                      <ApexChartComponent
+                        user={this.props.user}
+                        series={series}
+                        chart_type="bar"
+                        height={300}
+                        colors={props.box.colors || DEFAULT_COLORS}
+                        size="big"
+                        display_axes={true}
+                        hide_legend={true}
+                        y_axis_formatter={this.yAxisFormatter}
+                        tooltip_y_formatter={this.tooltipYFormatter}
+                        tooltip_x_formatter={this.tooltipXFormatter}
+                        dictionary={props.intl.dictionary}
+                        disable_zoom={true}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
