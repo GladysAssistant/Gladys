@@ -462,8 +462,11 @@
         "year": "Year",
         "month": "Month",
         "day": "Day",
+        "currency": "Cost (€)",
+        "kwh": "Consumption (kWh)",
         "consumptionCost": "Consumption Cost",
-        "totalConsumption": "Total Consumption Cost",
+        "totalConsumptionCost": "Total Consumption Cost",
+        "totalConsumptionKwh": "Total Consumption",
         "error": "Error loading energy consumption data",
         "noData": "No energy consumption data available for this period"
       },
