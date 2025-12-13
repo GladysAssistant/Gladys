@@ -562,4 +562,262 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       });
     });
   });
+
+  describe('Display mode', () => {
+    it('should hot-replace cost feature with consumption feature when display_mode is kwh', async () => {
+      const costFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const consumptionFeatureId = 'ba91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5';
+
+      // Insert states for consumption feature
+      await db.duckDbBatchInsertState(consumptionFeatureId, [
+        { value: 1.5, created_at: new Date('2023-10-10T01:00:00.000Z') },
+        { value: 2.0, created_at: new Date('2023-10-10T02:00:00.000Z') },
+      ]);
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature' && selector === 'cost-feature-selector') {
+            return {
+              id: costFeatureId,
+              name: 'Energy Cost',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              energy_parent_id: consumptionFeatureId,
+            };
+          }
+          if (type === 'deviceFeatureById' && selector === consumptionFeatureId) {
+            return {
+              id: consumptionFeatureId,
+              name: 'Energy Consumption',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption',
+            };
+          }
+          if (type === 'deviceById') {
+            return {
+              name: 'Smart Meter',
+            };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-11T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['cost-feature-selector'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'kwh',
+      });
+
+      expect(results).to.be.an('array');
+      expect(results).to.have.lengthOf(1);
+      // Should use consumption feature name, not cost feature name
+      expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
+      expect(results[0].values).to.be.an('array');
+      expect(results[0].values.length).to.be.at.least(1);
+    });
+
+    it('should use cost feature when display_mode is currency (default)', async () => {
+      const costFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+      // Insert states for cost feature
+      await db.duckDbBatchInsertState(costFeatureId, [
+        { value: 0.15, created_at: new Date('2023-10-10T01:00:00.000Z') },
+        { value: 0.2, created_at: new Date('2023-10-10T02:00:00.000Z') },
+      ]);
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: costFeatureId,
+              name: 'Energy Cost',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              energy_parent_id: 'some-consumption-feature-id',
+            };
+          }
+          if (type === 'deviceById') {
+            return {
+              name: 'Smart Meter',
+            };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-11T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['cost-feature-selector'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'currency',
+      });
+
+      expect(results).to.be.an('array');
+      expect(results).to.have.lengthOf(1);
+      // Should use cost feature name
+      expect(results[0].deviceFeature.name).to.equal('Energy Cost');
+      expect(results[0].values).to.be.an('array');
+    });
+
+    it('should not replace feature when display_mode is kwh but feature is not a cost feature', async () => {
+      const consumptionFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+      await db.duckDbBatchInsertState(consumptionFeatureId, [
+        { value: 1.5, created_at: new Date('2023-10-10T01:00:00.000Z') },
+      ]);
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: consumptionFeatureId,
+              name: 'Energy Consumption',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption',
+            };
+          }
+          if (type === 'deviceById') {
+            return {
+              name: 'Smart Meter',
+            };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-11T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['consumption-feature-selector'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'kwh',
+      });
+
+      expect(results).to.be.an('array');
+      expect(results).to.have.lengthOf(1);
+      // Should still use the consumption feature
+      expect(results[0].deviceFeature.name).to.equal('Energy Consumption');
+    });
+
+    it('should convert Wh to kWh when display_mode is kwh and unit is watt-hour', async () => {
+      const consumptionFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+      // Insert states with values in Wh (1500 Wh = 1.5 kWh)
+      await db.duckDbBatchInsertState(consumptionFeatureId, [
+        { value: 1500, created_at: new Date('2023-10-10T01:00:00.000Z') },
+        { value: 2000, created_at: new Date('2023-10-10T02:00:00.000Z') },
+      ]);
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: consumptionFeatureId,
+              name: 'Energy Consumption',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption',
+              unit: 'watt-hour',
+            };
+          }
+          if (type === 'deviceById') {
+            return {
+              name: 'Smart Meter',
+            };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-11T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['consumption-feature-selector'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'kwh',
+      });
+
+      expect(results).to.be.an('array');
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].values).to.be.an('array');
+      expect(results[0].values.length).to.equal(2);
+      // Values should be converted from Wh to kWh (divided by 1000)
+      expect(results[0].values[0].sum_value).to.equal(1.5);
+      expect(results[0].values[1].sum_value).to.equal(2);
+    });
+
+    it('should not convert when display_mode is kwh but unit is already kilowatt-hour', async () => {
+      const consumptionFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+      // Insert states with values already in kWh
+      await db.duckDbBatchInsertState(consumptionFeatureId, [
+        { value: 1.5, created_at: new Date('2023-10-10T01:00:00.000Z') },
+        { value: 2.0, created_at: new Date('2023-10-10T02:00:00.000Z') },
+      ]);
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: consumptionFeatureId,
+              name: 'Energy Consumption',
+              device_id: 'device-1',
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption',
+              unit: 'kilowatt-hour',
+            };
+          }
+          if (type === 'deviceById') {
+            return {
+              name: 'Smart Meter',
+            };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-11T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['consumption-feature-selector'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'kwh',
+      });
+
+      expect(results).to.be.an('array');
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].values).to.be.an('array');
+      expect(results[0].values.length).to.equal(2);
+      // Values should NOT be converted (already in kWh)
+      expect(results[0].values[0].sum_value).to.equal(1.5);
+      expect(results[0].values[1].sum_value).to.equal(2);
+    });
+  });
 });

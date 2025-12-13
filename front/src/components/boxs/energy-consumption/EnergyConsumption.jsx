@@ -18,6 +18,11 @@ const PERIODS = {
   DAY: 'day'
 };
 
+const DISPLAY_MODES = {
+  CURRENCY: 'currency',
+  KWH: 'kwh'
+};
+
 const PERIOD_LABELS = {
   [PERIODS.YEAR]: 'dashboard.boxes.energyConsumption.year',
   [PERIODS.MONTH]: 'dashboard.boxes.energyConsumption.month',
@@ -36,7 +41,8 @@ class EnergyConsumption extends Component {
       series: [],
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
-      selectedDate: now
+      selectedDate: now,
+      displayMode: DISPLAY_MODES.CURRENCY
     };
   }
 
@@ -72,7 +78,8 @@ class EnergyConsumption extends Component {
         device_features: deviceFeatures.join(','),
         from: startDate.toISOString(),
         to: endDate.toISOString(),
-        group_by: this.getGroupBy()
+        group_by: this.getGroupBy(),
+        display_mode: this.state.displayMode
       });
 
       let emptySeries = true;
@@ -236,21 +243,29 @@ class EnergyConsumption extends Component {
     this.setState({ selectedDate: date }, this.refreshData);
   };
 
+  changeDisplayMode = mode => {
+    this.setState({ displayMode: mode }, this.refreshData);
+  };
+
   yAxisFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? '€' : ' kWh';
     if (value === 0) {
-      return '0€';
+      return `0${unit}`;
     }
-    return `${value.toFixed(2)}€`;
+    return `${value.toFixed(2)}${unit}`;
   };
 
   tooltipYFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
-    return `${value.toFixed(2)}€`;
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? '€' : ' kWh';
+    return `${value.toFixed(2)}${unit}`;
   };
 
   tooltipXFormatter = value => {
@@ -305,7 +320,7 @@ class EnergyConsumption extends Component {
   };
 
   render(props, state) {
-    const { loading, error, errorDetail, series, emptySeries, selectedPeriod, totalConsumption } = state;
+    const { loading, error, errorDetail, series, emptySeries, selectedPeriod, totalConsumption, displayMode } = state;
     const localeSet = this.props.user.language === 'fr' ? fr : 'en';
     return (
       <div class="card">
@@ -338,7 +353,7 @@ class EnergyConsumption extends Component {
           </div>
 
           {/* Navigation Controls */}
-          <div class="row mb-3">
+          <div class="row mb-2">
             <div class="col-12">
               <div class="d-flex align-items-center">
                 <button type="button" class="btn btn-outline-secondary" onClick={this.navigatePrevious}>
@@ -362,6 +377,32 @@ class EnergyConsumption extends Component {
                   <i class="fe fe-chevron-right" />
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Display Mode Toggle */}
+          <div class="row mb-3">
+            <div class="col-12 text-center">
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-secondary': displayMode === DISPLAY_MODES.CURRENCY,
+                  'btn-outline-secondary': displayMode !== DISPLAY_MODES.CURRENCY
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.currency" />
+              </button>
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-secondary': displayMode === DISPLAY_MODES.KWH,
+                  'btn-outline-secondary': displayMode !== DISPLAY_MODES.KWH
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.kwh" />
+              </button>
             </div>
           </div>
 
@@ -400,9 +441,17 @@ class EnergyConsumption extends Component {
                           <div class="d-flex align-items-center justify-content-center">
                             <div>
                               <h5 class="mb-1 text-muted small">
-                                <Text id="dashboard.boxes.energyConsumption.totalConsumption" />
+                                <Text
+                                  id={
+                                    displayMode === DISPLAY_MODES.CURRENCY
+                                      ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                      : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                                  }
+                                />
                               </h5>
-                              <h3 class="mb-0 text-primary font-weight-bold">{totalConsumption.toFixed(2)} €</h3>
+                              <h3 class="mb-0 text-primary font-weight-bold">
+                                {totalConsumption.toFixed(2)} {displayMode === DISPLAY_MODES.CURRENCY ? '€' : 'kWh'}
+                              </h3>
                             </div>
                           </div>
                         </div>
