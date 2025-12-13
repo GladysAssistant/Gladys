@@ -1,8 +1,14 @@
 const Promise = require('bluebird');
+const dayjs = require('dayjs');
 const db = require('../../../models');
 
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  ENERGY_PRICE_TYPES,
+} = require('../../../utils/constants');
 
 const GROUPED_QUERY_DATE_RANGE = `
   SELECT
@@ -25,6 +31,112 @@ const GROUPED_QUERY_DATE_RANGE = `
 `;
 
 /**
+ * @description Calculate subscription prices for each time period.
+ * @param {Array} subscriptionPrices - Array of subscription price entries from DB.
+ * @param {Date} fromDate - Start date of the range.
+ * @param {Date} toDate - End date of the range.
+ * @param {string} groupBy - Grouping period ('hour', 'day', 'month', 'year').
+ * @returns {Array} Array of subscription values per period.
+ * @example
+ * calculateSubscriptionPrices(prices, new Date('2023-01-01'), new Date('2023-01-31'), 'day');
+ */
+function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, groupBy) {
+  if (!subscriptionPrices || subscriptionPrices.length === 0) {
+    return [];
+  }
+
+  const subscriptionValues = [];
+  let currentDate = dayjs(fromDate);
+  const endDate = dayjs(toDate);
+
+  while (currentDate.isBefore(endDate)) {
+    let nextDate;
+    let periodLabel;
+
+    switch (groupBy) {
+      case 'hour':
+        nextDate = currentDate.add(1, 'hour');
+        periodLabel = currentDate.toISOString();
+        break;
+      case 'day':
+        nextDate = currentDate.add(1, 'day');
+        periodLabel = currentDate.toISOString();
+        break;
+      case 'week':
+        nextDate = currentDate.add(1, 'week');
+        periodLabel = currentDate.toISOString();
+        break;
+      case 'month':
+        nextDate = currentDate.add(1, 'month');
+        periodLabel = currentDate.toISOString();
+        break;
+      case 'year':
+        nextDate = currentDate.add(1, 'year');
+        periodLabel = currentDate.toISOString();
+        break;
+      default:
+        nextDate = currentDate.add(1, 'day');
+        periodLabel = currentDate.toISOString();
+    }
+
+    // Find the subscription price valid for this period
+    const currentDateStr = currentDate.format('YYYY-MM-DD');
+    const validPrice = subscriptionPrices.find((price) => {
+      const startDate = price.start_date;
+      const endDatePrice = price.end_date;
+      return startDate <= currentDateStr && (endDatePrice === null || endDatePrice >= currentDateStr);
+    });
+
+    if (validPrice) {
+      // Price is stored as integer, divide by 10000 to get float
+      // The price is monthly, so we need to calculate the price for the period
+      const monthlyPrice = validPrice.price / 10000;
+
+      let periodPrice;
+      switch (groupBy) {
+        case 'hour': {
+          // Divide monthly price by days in month, then by 24 hours
+          const daysInMonth = currentDate.daysInMonth();
+          periodPrice = monthlyPrice / daysInMonth / 24;
+          break;
+        }
+        case 'day': {
+          // Divide monthly price by days in month
+          const daysInMonth = currentDate.daysInMonth();
+          periodPrice = monthlyPrice / daysInMonth;
+          break;
+        }
+        case 'week': {
+          // Approximate: divide monthly price by ~4.33 weeks per month
+          const daysInMonth = currentDate.daysInMonth();
+          periodPrice = (monthlyPrice / daysInMonth) * 7;
+          break;
+        }
+        case 'month':
+          periodPrice = monthlyPrice;
+          break;
+        case 'year':
+          periodPrice = monthlyPrice * 12;
+          break;
+        default:
+          periodPrice = monthlyPrice / currentDate.daysInMonth();
+      }
+
+      subscriptionValues.push({
+        created_at: periodLabel,
+        sum_value: periodPrice,
+      });
+    }
+
+    currentDate = nextDate;
+  }
+
+  console.log('Subscription prices:', subscriptionValues);
+
+  return subscriptionValues;
+}
+
+/**
  * @description Get electricity consumption by date.
  * @param {Array<string>} selectors - Device selector.
  * @param {object} options - Options object.
@@ -32,9 +144,9 @@ const GROUPED_QUERY_DATE_RANGE = `
  * @param {Date} [options.to] - End date for date range approach.
  * @param {string} [options.group_by] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
  * @param {string} [options.display_mode] - Display mode: 'currency' (default) or 'kwh'.
- * @returns {Promise<Array>} - Resolve with an array of data.
+ * @returns {Promise<object>} - Resolve with an object containing consumption and subscription data.
  * @example
- * device.getDeviceFeaturesAggregates('test-device', {
+ * device.getConsumptionByDates(['test-device'], {
  *   from: new Date('2023-01-01'),
  *   to: new Date('2023-01-31'),
  *   group_by: 'day'
@@ -43,7 +155,39 @@ const GROUPED_QUERY_DATE_RANGE = `
 async function getConsumptionByDates(selectors, options = {}) {
   const { display_mode: displayMode = 'currency' } = options;
 
-  return Promise.map(
+  // Get the first feature to determine the electric meter device for subscription prices
+  let subscriptionValues = [];
+
+  if (selectors.length > 0 && displayMode === 'currency') {
+    const firstSelector = selectors[0];
+    const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
+
+    if (firstFeature) {
+      // Get the root electric meter device
+      const rootFeature = this.getRootElectricMeterDevice(firstFeature);
+      const electricMeterDeviceId = rootFeature ? rootFeature.device_id : firstFeature.device_id;
+
+      // Fetch subscription prices for this electric meter device
+      const allPrices = await db.EnergyPrice.findAll({
+        where: {
+          electric_meter_device_id: electricMeterDeviceId,
+          price_type: ENERGY_PRICE_TYPES.SUBSCRIPTION,
+        },
+        order: [['start_date', 'ASC']],
+      });
+
+      const subscriptionPrices = allPrices.map((r) => r.get({ plain: true }));
+
+      if (subscriptionPrices.length > 0) {
+        const { from, to, group_by: groupBy = 'day' } = options;
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+        subscriptionValues = calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, groupBy);
+      }
+    }
+  }
+
+  const consumptionResults = await Promise.map(
     selectors,
     async (selector) => {
       let deviceFeature = this.stateManager.get('deviceFeature', selector);
@@ -139,6 +283,27 @@ async function getConsumptionByDates(selectors, options = {}) {
     },
     { concurrency: 4 },
   );
+
+  // Add subscription as a new item in the results array if there are subscription values
+  if (subscriptionValues.length > 0 && selectors.length > 0) {
+    const firstSelector = selectors[0];
+    const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
+    const device = this.stateManager.get('deviceById', firstFeature.device_id);
+
+    consumptionResults.push({
+      device: {
+        name: device.name,
+      },
+      deviceFeature: {
+        name: firstFeature.name,
+        currency_unit: firstFeature.unit,
+        is_subscription: true,
+      },
+      values: subscriptionValues,
+    });
+  }
+
+  return consumptionResults;
 }
 
 module.exports = {
