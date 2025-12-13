@@ -386,8 +386,8 @@ class EnergyConsumption extends Component {
               <button
                 type="button"
                 class={cx('btn btn-sm mx-1', {
-                  'btn-secondary': displayMode === DISPLAY_MODES.CURRENCY,
-                  'btn-outline-secondary': displayMode !== DISPLAY_MODES.CURRENCY
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
                 })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
               >
@@ -396,8 +396,8 @@ class EnergyConsumption extends Component {
               <button
                 type="button"
                 class={cx('btn btn-sm mx-1', {
-                  'btn-secondary': displayMode === DISPLAY_MODES.KWH,
-                  'btn-outline-secondary': displayMode !== DISPLAY_MODES.KWH
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
                 })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
               >
