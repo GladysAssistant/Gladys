@@ -8,8 +8,9 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
  */
 async function getDuckDbMigrationState() {
   const isDuckDbMigrated = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.DUCKDB_MIGRATED);
-  const [{ count: duckDbDeviceStateCount }] = await db.duckDbReadConnectionAllAsync(`
-    SELECT COUNT(value) as count FROM t_device_feature_state;  
+  // Use estimated_size from DuckDB metadata for fast approximate count
+  const [{ estimated_size: duckDbDeviceStateCount }] = await db.duckDbReadConnectionAllAsync(`
+    SELECT estimated_size FROM duckdb_tables() WHERE table_name = 't_device_feature_state';
   `);
   const sqliteDeviceStateCount = await db.DeviceFeatureState.count();
 
