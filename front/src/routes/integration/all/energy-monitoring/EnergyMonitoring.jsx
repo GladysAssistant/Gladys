@@ -628,6 +628,7 @@ class EnergyMonitoringPage extends Component {
       const isChildFeature =
         feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION ||
         feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST;
+      const canModifyParent = true; // Temporary fix, should be !isChildFeature || !hasParentId;
       return (
         <div class={isChildFeature ? 'mb-1' : 'mb-2'} style={{ paddingLeft: `${paddingLeft}px` }}>
           <div
@@ -654,7 +655,7 @@ class EnergyMonitoringPage extends Component {
                     </div>
                   )}
                 </div>
-                {(!isChildFeature || !hasParentId) && (
+                {canModifyParent && (
                   <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
                     <select
                       class="form-control form-control-sm w-100"
