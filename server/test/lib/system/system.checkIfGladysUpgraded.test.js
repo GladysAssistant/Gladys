@@ -207,4 +207,58 @@ describe('system.checkIfGladysUpgraded', () => {
     assert.notCalled(brainGetReplyStub);
     assert.notCalled(messageSendToUserStub);
   });
+
+  it('should continue processing when sendToUser fails for upgrade message', async () => {
+    // Setup stubs
+    variableGetValueStub.resolves(previousVersion);
+    userGetByRoleStub.resolves([frenchAdmin, englishAdmin]);
+    brainGetReplyStub.returns('Upgrade message');
+    system.gladysVersion = currentVersion;
+
+    // First call to sendToUser fails, subsequent calls succeed
+    messageSendToUserStub.onFirstCall().rejects(new Error('Message service unavailable'));
+    messageSendToUserStub.resolves(null);
+
+    const gateway = {
+      getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
+    };
+
+    // Execute function - should not throw
+    await system.checkIfGladysUpgraded(gateway, 0);
+
+    // Verify that processing continued despite the error
+    // Should have attempted to send messages to both admins
+    assert.calledWith(messageSendToUserStub, frenchAdmin.selector);
+    assert.calledWith(messageSendToUserStub, englishAdmin.selector);
+
+    // Verify version was still saved
+    assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
+  });
+
+  it('should continue processing when sendToUser fails for release note message', async () => {
+    // Setup stubs
+    variableGetValueStub.resolves(previousVersion);
+    userGetByRoleStub.resolves([frenchAdmin]);
+    brainGetReplyStub.returns('Upgrade message');
+    system.gladysVersion = currentVersion;
+
+    // First call succeeds (upgrade message), second call fails (release note)
+    messageSendToUserStub.onFirstCall().resolves(null);
+    messageSendToUserStub.onSecondCall().rejects(new Error('Message service unavailable'));
+
+    const gateway = {
+      getLatestGladysVersion: gatewayGetLatestGladysVersionStub,
+    };
+
+    // Execute function - should not throw
+    await system.checkIfGladysUpgraded(gateway, 0);
+
+    // Verify that both messages were attempted
+    assert.calledTwice(messageSendToUserStub);
+    assert.calledWith(messageSendToUserStub.firstCall, frenchAdmin.selector, 'Upgrade message');
+    assert.calledWith(messageSendToUserStub.secondCall, frenchAdmin.selector, releaseNotes.fr_release_note_link);
+
+    // Verify version was still saved despite the error
+    assert.calledOnceWithExactly(variableSetValueStub, SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
+  });
 });
