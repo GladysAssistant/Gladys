@@ -591,4 +591,79 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
     }
   });
+  it('should skip consumption feature when getRootElectricMeterDevice returns null (broken hierarchy)', async () => {
+    // Create a device with a consumption feature that has a valid energy_parent_id in DB
+    // but we'll mock getRootElectricMeterDevice to return null to simulate a broken hierarchy
+    await device.create({
+      id: 'a1b2c3d4-e5f6-7890-abcd-000000000001',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Device with Broken Hierarchy',
+      external_id: 'broken-hierarchy-device',
+      features: [
+        {
+          id: 'a1b2c3d4-e5f6-7890-abcd-000000000002',
+          selector: 'broken-consumption-feature',
+          external_id: 'broken-consumption-feature',
+          name: 'Broken Consumption Feature',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          // Points to the electrical meter feature which exists in DB
+          energy_parent_id: '101d2306-b15e-4859-b403-a076167eadd9',
+        },
+        {
+          id: 'a1b2c3d4-e5f6-7890-abcd-000000000003',
+          selector: 'broken-cost-feature',
+          external_id: 'broken-cost-feature',
+          name: 'Broken Cost Feature',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 1000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: 'a1b2c3d4-e5f6-7890-abcd-000000000002',
+        },
+      ],
+    });
+
+    // Insert consumption data that would normally be processed
+    await db.duckDbBatchInsertState('a1b2c3d4-e5f6-7890-abcd-000000000002', [
+      {
+        value: 50,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+    ]);
+
+    // Mock getRootElectricMeterDevice to return null for this specific feature
+    const original = gladys.device.energySensorManager.getRootElectricMeterDevice;
+    gladys.device.energySensorManager.getRootElectricMeterDevice = (feature) => {
+      if (feature && feature.id === 'a1b2c3d4-e5f6-7890-abcd-000000000002') {
+        return null; // Simulate broken hierarchy
+      }
+      return original.call(gladys.device.energySensorManager, feature);
+    };
+
+    try {
+      const energyMonitoring = new EnergyMonitoring(gladys, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
+      const date = new Date('2025-08-28T00:00:00.000Z');
+
+      // This should not throw - it should skip the broken feature and log a warning
+      await energyMonitoring.calculateCostFrom(date, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
+
+      // Verify that no cost states were created for the broken feature
+      const costStates = await device.getDeviceFeatureStates(
+        'broken-cost-feature',
+        new Date('2025-01-01T00:00:00.000Z'),
+        new Date('2025-12-01T00:00:00.000Z'),
+      );
+      expect(costStates).to.have.lengthOf(0);
+    } finally {
+      // Restore original function
+      gladys.device.energySensorManager.getRootElectricMeterDevice = original;
+    }
+  });
 });

@@ -614,7 +614,14 @@
       "selectPeakHours": "Sélectionner les heures pleines",
       "selectPeakHoursHelp": "Cliquez sur les créneaux horaires où le tarif heures pleines s'applique. Les créneaux non sélectionnés seront en heures creuses.",
       "peakHours": "Heures pleines",
-      "offPeakHours": "Heures creuses"
+      "offPeakHours": "Heures creuses",
+      "circularDependencyDetected": "Dépendances circulaires ou cassées détectées",
+      "circularDependencyDescription": "Les fonctionnalités suivantes ont des références parent invalides qui peuvent causer des problèmes de performance. Cliquez sur le bouton pour les corriger automatiquement.",
+      "brokenReference": "référence cassée",
+      "circularReference": "référence circulaire",
+      "selfReference": "auto-référence",
+      "fixAutomatically": "Corriger",
+      "fixing": "Correction en cours..."
     },
     "caldav": {
       "title": "CalDAV",

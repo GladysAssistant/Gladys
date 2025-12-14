@@ -1740,7 +1740,14 @@
       "selectPeakHours": "Select Peak Hours",
       "selectPeakHoursHelp": "Click on the time slots when peak pricing applies. Unselected slots will be off-peak.",
       "peakHours": "Peak hours",
-      "offPeakHours": "Off-peak hours"
+      "offPeakHours": "Off-peak hours",
+      "circularDependencyDetected": "Circular or broken dependencies detected",
+      "circularDependencyDescription": "The following device features have invalid parent references that could cause performance issues. Click the button to fix them automatically.",
+      "brokenReference": "broken reference",
+      "circularReference": "circular reference",
+      "selfReference": "self reference",
+      "fixAutomatically": "Fix",
+      "fixing": "Fixing..."
     },
     "caldav": {
       "title": "CalDAV",
