@@ -624,10 +624,11 @@ class EnergyMonitoringPage extends Component {
       const levelColors = ['#5c7cfa', '#40c057', '#fab005', '#fa5252', '#12b886', '#7950f2'];
       const color = levelColors[depth % levelColors.length];
       const descendantIds = getDescendantIds(feature.id);
-      const hasParentId = feature.energy_parent_id !== null && feature.energy_parent_id !== undefined;
+
       const isChildFeature =
         feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION ||
         feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST;
+      // const hasParentId = feature.energy_parent_id !== null && feature.energy_parent_id !== undefined;
       const canModifyParent = true; // Temporary fix, should be !isChildFeature || !hasParentId;
       return (
         <div class={isChildFeature ? 'mb-1' : 'mb-2'} style={{ paddingLeft: `${paddingLeft}px` }}>
