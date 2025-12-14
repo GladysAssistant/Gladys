@@ -16,7 +16,7 @@ const DashboardPage = ({ children, ...props }) => (
         <div class="loader" />
         <div class="dimmer-content">
           <div class="my-3 my-md-5 dashboard">
-            <div class={cx('container')}>
+            <div class={cx(style.dashboardContainer)}>
               <div class="page-header">
                 <div>
                   {!props.dashboardListEmpty && (
