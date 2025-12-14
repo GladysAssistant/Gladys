@@ -716,7 +716,14 @@
       "selectPeakHours": "Hauptzeiten auswählen",
       "selectPeakHoursHelp": "Klicken Sie auf die Zeitfenster, in denen der Haupttarif gilt. Nicht ausgewählte Zeitfenster sind Nebenzeiten.",
       "peakHours": "Hauptzeiten",
-      "offPeakHours": "Nebenzeiten"
+      "offPeakHours": "Nebenzeiten",
+      "circularDependencyDetected": "Zirkuläre oder fehlerhafte Abhängigkeiten erkannt",
+      "circularDependencyDescription": "Die folgenden Gerätefunktionen haben ungültige Elternreferenzen, die Leistungsprobleme verursachen können. Klicken Sie auf die Schaltfläche, um sie automatisch zu beheben.",
+      "brokenReference": "fehlerhafte Referenz",
+      "circularReference": "zirkuläre Referenz",
+      "selfReference": "Selbstreferenz",
+      "fixAutomatically": "beheben",
+      "fixing": "Behebung läuft..."
     },
     "netatmo": {
       "title": "Netatmo",

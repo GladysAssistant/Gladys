@@ -127,4 +127,155 @@ describe('Device.getRootElectricMeterDevice', () => {
     // Should return null when parent doesn't exist
     expect(result).to.equal(null);
   });
+
+  it('should return null when deviceFeature is null', () => {
+    const result = energySensorManager.getRootElectricMeterDevice(null);
+    expect(result).to.equal(null);
+  });
+
+  it('should return null when deviceFeature is undefined', () => {
+    const result = energySensorManager.getRootElectricMeterDevice(undefined);
+    expect(result).to.equal(null);
+  });
+
+  it('should detect and handle circular reference (self-referencing)', () => {
+    const selfReferencingFeature = {
+      id: 'circular-0001-0001-0001-000000000001',
+      name: 'Self Referencing Meter',
+      energy_parent_id: 'circular-0001-0001-0001-000000000001',
+    };
+
+    // Set up state manager with self-referencing feature
+    stateManager.setState('deviceFeatureById', 'circular-0001-0001-0001-000000000001', selfReferencingFeature);
+
+    const result = energySensorManager.getRootElectricMeterDevice(selfReferencingFeature);
+
+    // Should return null due to circular reference
+    expect(result).to.equal(null);
+  });
+
+  it('should detect and handle circular reference (two features referencing each other)', () => {
+    const featureA = {
+      id: 'circular-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      name: 'Feature A',
+      energy_parent_id: 'circular-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    };
+
+    const featureB = {
+      id: 'circular-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+      name: 'Feature B',
+      energy_parent_id: 'circular-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    };
+
+    // Set up state manager with circular references
+    stateManager.setState('deviceFeatureById', 'circular-aaaa-aaaa-aaaa-aaaaaaaaaaaa', featureA);
+    stateManager.setState('deviceFeatureById', 'circular-bbbb-bbbb-bbbb-bbbbbbbbbbbb', featureB);
+
+    const result = energySensorManager.getRootElectricMeterDevice(featureA);
+
+    // Should return null due to circular reference
+    expect(result).to.equal(null);
+  });
+
+  it('should detect and handle circular reference in longer chain', () => {
+    // Setup: A -> B -> C -> A (circular)
+    const featureA = {
+      id: 'chain-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      name: 'Feature A',
+      energy_parent_id: 'chain-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    };
+
+    const featureB = {
+      id: 'chain-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+      name: 'Feature B',
+      energy_parent_id: 'chain-cccc-cccc-cccc-cccccccccccc',
+    };
+
+    const featureC = {
+      id: 'chain-cccc-cccc-cccc-cccccccccccc',
+      name: 'Feature C',
+      energy_parent_id: 'chain-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    };
+
+    // Set up state manager
+    stateManager.setState('deviceFeatureById', 'chain-aaaa-aaaa-aaaa-aaaaaaaaaaaa', featureA);
+    stateManager.setState('deviceFeatureById', 'chain-bbbb-bbbb-bbbb-bbbbbbbbbbbb', featureB);
+    stateManager.setState('deviceFeatureById', 'chain-cccc-cccc-cccc-cccccccccccc', featureC);
+
+    const result = energySensorManager.getRootElectricMeterDevice(featureA);
+
+    // Should return null due to circular reference
+    expect(result).to.equal(null);
+  });
+
+  it('should return null when intermediate parent does not exist in state manager', () => {
+    // Setup: root <- missing_parent <- child
+    const rootFeature = {
+      id: 'root-1111-1111-1111-111111111111',
+      name: 'Root Meter',
+      energy_parent_id: null,
+    };
+
+    const childFeature = {
+      id: 'child-3333-3333-3333-333333333333',
+      name: 'Child Meter',
+      energy_parent_id: 'missing-2222-2222-2222-222222222222',
+    };
+
+    // Only set up root, not the intermediate parent
+    stateManager.setState('deviceFeatureById', 'root-1111-1111-1111-111111111111', rootFeature);
+
+    const result = energySensorManager.getRootElectricMeterDevice(childFeature);
+
+    // Should return null because intermediate parent is missing
+    expect(result).to.equal(null);
+  });
+
+  it('should return null when parent in chain does not exist', () => {
+    // Setup: root <- parent <- child, but parent points to non-existent grandparent
+    const parentFeature = {
+      id: 'parent-2222-2222-2222-222222222222',
+      name: 'Parent Meter',
+      energy_parent_id: 'nonexistent-0000-0000-0000-000000000000',
+    };
+
+    const childFeature = {
+      id: 'child-3333-3333-3333-333333333333',
+      name: 'Child Meter',
+      energy_parent_id: 'parent-2222-2222-2222-222222222222',
+    };
+
+    // Set up state manager with parent but not grandparent
+    stateManager.setState('deviceFeatureById', 'parent-2222-2222-2222-222222222222', parentFeature);
+
+    const result = energySensorManager.getRootElectricMeterDevice(childFeature);
+
+    // Should return null because grandparent doesn't exist
+    expect(result).to.equal(null);
+  });
+
+  it('should return null when hierarchy depth exceeds maximum limit', () => {
+    // Create a chain of 102 features (exceeds MAX_HIERARCHY_DEPTH of 100)
+    const features = [];
+    for (let i = 0; i <= 101; i += 1) {
+      const parentId = i === 0 ? null : `depth-test-${String(i - 1).padStart(4, '0')}-0000-0000-000000000000`;
+      features.push({
+        id: `depth-test-${String(i).padStart(4, '0')}-0000-0000-000000000000`,
+        name: `Feature Level ${i}`,
+        energy_parent_id: parentId,
+      });
+    }
+
+    // Set up all features in state manager
+    features.forEach((feature) => {
+      stateManager.setState('deviceFeatureById', feature.id, feature);
+    });
+
+    // Start from the deepest feature (index 101)
+    const deepestFeature = features[101];
+    const result = energySensorManager.getRootElectricMeterDevice(deepestFeature);
+
+    // Should return null because depth exceeds MAX_HIERARCHY_DEPTH (100)
+    expect(result).to.equal(null);
+  });
 });
