@@ -119,6 +119,12 @@ class EnergyConsumption extends Component {
 
       data.forEach(deviceData => {
         const isSubscription = deviceData.deviceFeature.is_subscription === true;
+
+        // Skip subscription data if show_subscription_prices is not enabled
+        if (isSubscription && !this.props.box.show_subscription_prices) {
+          return;
+        }
+
         const deviceFeatureName = deviceData.deviceFeature.name
           ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
           : deviceData.device.name;

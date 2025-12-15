@@ -489,7 +489,9 @@
         "totalConsumptionCost": "Coût total sur la période",
         "totalConsumptionKwh": "Consommation totale sur la période",
         "error": "Erreur lors du chargement des données de consommation énergétique",
-        "noData": "Aucune donnée de consommation énergétique disponible pour cette période"
+        "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
+        "showSubscriptionPrices": "Afficher les prix d'abonnement",
+        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
       }
     }
   },
