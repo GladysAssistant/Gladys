@@ -41,10 +41,6 @@ const GROUPED_QUERY_DATE_RANGE = `
  * calculateSubscriptionPrices(prices, new Date('2023-01-01'), new Date('2023-01-31'), 'day');
  */
 function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, groupBy) {
-  if (!subscriptionPrices || subscriptionPrices.length === 0) {
-    return [];
-  }
-
   const subscriptionValues = [];
   let currentDate = dayjs(fromDate);
   const endDate = dayjs(toDate);

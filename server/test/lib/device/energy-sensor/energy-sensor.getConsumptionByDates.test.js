@@ -1065,6 +1065,513 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(subscriptionResult).to.equal(undefined);
     });
 
+    it('should calculate subscription prices grouped by hour', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+      await insertConsumptionStates(deviceFeatureId, 2);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Hour',
+        selector: 'test-smart-meter-hour',
+        external_id: 'test-smart-meter-hour',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-hour',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000, // 15€/month
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'Hourly Contract',
+        selector: 'test-subscription-price-hour',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-10-10T00:00:00.000Z');
+      const to = new Date('2023-10-10T06:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'hour',
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(6); // 6 hours
+
+      // Price is 15€/month, October has 31 days, so hourly price = 15 / 31 / 24
+      const expectedHourlyPrice = 15 / 31 / 24;
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(expectedHourlyPrice, 0.001);
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-hour' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should calculate subscription prices grouped by week', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e5';
+
+      await insertConsumptionStates(deviceFeatureId, 21);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Week',
+        selector: 'test-smart-meter-week',
+        external_id: 'test-smart-meter-week',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-week',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000, // 15€/month
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'Weekly Contract',
+        selector: 'test-subscription-price-week',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-10-01T00:00:00.000Z');
+      const to = new Date('2023-10-22T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'week',
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(3); // 3 weeks
+
+      // Price is 15€/month, October has 31 days, weekly price = (15 / 31) * 7
+      const expectedWeeklyPrice = (15 / 31) * 7;
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(expectedWeeklyPrice, 0.01);
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-week' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should calculate subscription prices grouped by month', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e6';
+
+      await insertConsumptionStates(deviceFeatureId, 60);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Month',
+        selector: 'test-smart-meter-month',
+        external_id: 'test-smart-meter-month',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-month',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000, // 15€/month
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'Monthly Contract',
+        selector: 'test-subscription-price-month',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-09-01T00:00:00.000Z');
+      const to = new Date('2023-11-01T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'month',
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(2); // 2 months
+
+      // Price is 15€/month
+      const expectedMonthlyPrice = 15;
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(expectedMonthlyPrice, 0.01);
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-month' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should calculate subscription prices grouped by year', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e7';
+
+      await insertConsumptionStates(deviceFeatureId, 365);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Year',
+        selector: 'test-smart-meter-year',
+        external_id: 'test-smart-meter-year',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-year',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000, // 15€/month
+        currency: 'EUR',
+        start_date: '2022-01-01',
+        end_date: null,
+        contract_name: 'Yearly Contract',
+        selector: 'test-subscription-price-year',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2022-01-01T00:00:00.000Z');
+      const to = new Date('2024-01-01T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'year',
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(2); // 2 years
+
+      // Price is 15€/month * 12 = 180€/year
+      const expectedYearlyPrice = 15 * 12;
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(expectedYearlyPrice, 0.01);
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-year' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should use default grouping when group_by is not specified for subscription', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e8';
+
+      await insertConsumptionStates(deviceFeatureId, 7);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Default',
+        selector: 'test-smart-meter-default',
+        external_id: 'test-smart-meter-default',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-default',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000, // 15€/month
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'Default Contract',
+        selector: 'test-subscription-price-default',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-10-08T00:00:00.000Z');
+      const to = new Date('2023-10-15T00:00:00.000Z');
+
+      // Note: not passing group_by, should use default 'day'
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(7); // 7 days (default grouping)
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-default' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should fallback to feature name when contract_name is not set', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e9';
+
+      await insertConsumptionStates(deviceFeatureId, 7);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter No Contract Name',
+        selector: 'test-smart-meter-no-contract',
+        external_id: 'test-smart-meter-no-contract',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      // Create subscription price WITHOUT contract_name
+      await db.EnergyPrice.create({
+        id: 'price-sub-no-name',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000,
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        // contract_name is not set
+        selector: 'test-subscription-price-no-name',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'My Energy Cost Feature',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-10-08T00:00:00.000Z');
+      const to = new Date('2023-10-15T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'day',
+        display_mode: 'currency',
+      });
+
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      // Should fallback to feature name when contract_name is not set
+      expect(subscriptionResult.deviceFeature.name).to.equal('My Energy Cost Feature');
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-no-name' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should use firstFeature.device_id when getRootElectricMeterDevice returns null', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5ea';
+
+      await insertConsumptionStates(deviceFeatureId, 7);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter No Root',
+        selector: 'test-smart-meter-no-root',
+        external_id: 'test-smart-meter-no-root',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-no-root',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000,
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'No Root Contract',
+        selector: 'test-subscription-price-no-root',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      // getRootElectricMeterDevice returns null - should fallback to firstFeature.device_id
+      energySensorManager.getRootElectricMeterDevice = () => null;
+
+      const from = new Date('2023-10-08T00:00:00.000Z');
+      const to = new Date('2023-10-15T00:00:00.000Z');
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'day',
+        display_mode: 'currency',
+      });
+
+      // Should still find subscription prices using firstFeature.device_id
+      const subscriptionResult = results.find((r) => r.deviceFeature.is_subscription === true);
+      expect(subscriptionResult).to.not.equal(undefined);
+      expect(subscriptionResult.values.length).to.equal(7);
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-no-root' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
     it('should not fetch subscription prices when display_mode is kwh', async () => {
       const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
       const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5e3';
@@ -1136,6 +1643,76 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
 
       // Cleanup
       await db.EnergyPrice.destroy({ where: { id: 'price-sub-kwh' } });
+      await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should handle invalid group_by with default behavior for subscription calculation', async () => {
+      const deviceFeatureId = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+      const deviceId = 'da91dfdf-55b2-4cf8-a58b-99c0fbf6f5eb';
+
+      await insertConsumptionStates(deviceFeatureId, 7);
+
+      await db.Device.create({
+        id: deviceId,
+        name: 'Test Smart Meter Invalid GroupBy',
+        selector: 'test-smart-meter-invalid',
+        external_id: 'test-smart-meter-invalid',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      });
+
+      await db.EnergyPrice.create({
+        id: 'price-sub-invalid',
+        electric_meter_device_id: deviceId,
+        contract: 'base',
+        price_type: 'subscription',
+        price: 150000,
+        currency: 'EUR',
+        start_date: '2023-01-01',
+        end_date: null,
+        contract_name: 'Invalid GroupBy Contract',
+        selector: 'test-subscription-price-invalid',
+      });
+
+      const stateManager = {
+        get: fake((type, selector) => {
+          if (type === 'deviceFeature') {
+            return {
+              id: deviceFeatureId,
+              name: 'Energy Cost',
+              device_id: deviceId,
+              category: 'energy-sensor',
+              type: 'thirty-minutes-consumption-cost',
+              unit: 'euro',
+            };
+          }
+          if (type === 'deviceById') {
+            return { id: deviceId, name: 'Smart Meter' };
+          }
+          return null;
+        }),
+      };
+
+      const energySensorManager = new EnergySensorManager(stateManager);
+      energySensorManager.getRootElectricMeterDevice = () => ({
+        id: deviceFeatureId,
+        device_id: deviceId,
+      });
+
+      const from = new Date('2023-10-08T00:00:00.000Z');
+      const to = new Date('2023-10-15T00:00:00.000Z');
+
+      // Pass an invalid group_by - this will hit the default cases in calculateSubscriptionPrices
+      // but then throw an error in the main function validation
+      const promise = energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from,
+        to,
+        group_by: 'invalid_value',
+        display_mode: 'currency',
+      });
+
+      await assert.isRejected(promise, 'Invalid groupBy parameter');
+
+      await db.EnergyPrice.destroy({ where: { id: 'price-sub-invalid' } });
       await db.Device.destroy({ where: { id: deviceId } });
     });
   });
