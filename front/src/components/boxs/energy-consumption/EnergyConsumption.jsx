@@ -111,9 +111,11 @@ class EnergyConsumption extends Component {
 
       // Process data for stacked bar chart
       // Each device feature becomes a separate series with aligned timestamps
-      // Track colors for each series (gray for subscription, default colors for others)
+      // Track colors for each series (gray for subscription, widget colors for consumption)
       const seriesColors = [];
       let colorIndex = 0;
+      // Use widget configured colors if available, otherwise fall back to default colors
+      const widgetColors = this.props.box.colors || DEFAULT_COLORS;
 
       data.forEach(deviceData => {
         const isSubscription = deviceData.deviceFeature.is_subscription === true;
@@ -141,11 +143,11 @@ class EnergyConsumption extends Component {
           data: seriesData
         });
 
-        // Assign gray color for subscription, otherwise use default colors
+        // Assign gray color for subscription, otherwise use widget configured colors
         if (isSubscription) {
           seriesColors.push(SUBSCRIPTION_COLOR);
         } else {
-          seriesColors.push(DEFAULT_COLORS[colorIndex % DEFAULT_COLORS.length]);
+          seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
           colorIndex++;
         }
       });
