@@ -151,38 +151,6 @@ function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, group
 async function getConsumptionByDates(selectors, options = {}) {
   const { display_mode: displayMode = 'currency' } = options;
 
-  // Get the first feature to determine the electric meter device for subscription prices
-  let subscriptionValues = [];
-
-  if (selectors.length > 0 && displayMode === 'currency') {
-    const firstSelector = selectors[0];
-    const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
-
-    if (firstFeature) {
-      // Get the root electric meter device
-      const rootFeature = this.getRootElectricMeterDevice(firstFeature);
-      const electricMeterDeviceId = rootFeature ? rootFeature.device_id : firstFeature.device_id;
-
-      // Fetch subscription prices for this electric meter device
-      const allPrices = await db.EnergyPrice.findAll({
-        where: {
-          electric_meter_device_id: electricMeterDeviceId,
-          price_type: ENERGY_PRICE_TYPES.SUBSCRIPTION,
-        },
-        order: [['start_date', 'ASC']],
-      });
-
-      const subscriptionPrices = allPrices.map((r) => r.get({ plain: true }));
-
-      if (subscriptionPrices.length > 0) {
-        const { from, to, group_by: groupBy = 'day' } = options;
-        const fromDate = new Date(from);
-        const toDate = new Date(to);
-        subscriptionValues = calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, groupBy);
-      }
-    }
-  }
-
   const consumptionResults = await Promise.map(
     selectors,
     async (selector) => {
@@ -280,26 +248,69 @@ async function getConsumptionByDates(selectors, options = {}) {
     { concurrency: 4 },
   );
 
-  // Add subscription as a new item in the results array if there are subscription values
-  if (subscriptionValues.length > 0 && selectors.length > 0) {
+  // Add subscription prices if in currency mode
+  if (selectors.length > 0 && displayMode === 'currency') {
     const firstSelector = selectors[0];
     const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
-    const device = this.stateManager.get('deviceById', firstFeature.device_id);
 
-    // Get the contract name from the first subscription value
-    const contractName = subscriptionValues[0].contract_name || firstFeature.name;
+    if (firstFeature) {
+      // Get the root electric meter device
+      const rootFeature = this.getRootElectricMeterDevice(firstFeature);
+      const electricMeterDeviceId = rootFeature ? rootFeature.device_id : firstFeature.device_id;
 
-    consumptionResults.unshift({
-      device: {
-        name: device.name,
-      },
-      deviceFeature: {
-        name: contractName,
-        currency_unit: firstFeature.unit,
-        is_subscription: true,
-      },
-      values: subscriptionValues,
-    });
+      // Fetch subscription prices for this electric meter device
+      const allPrices = await db.EnergyPrice.findAll({
+        where: {
+          electric_meter_device_id: electricMeterDeviceId,
+          price_type: ENERGY_PRICE_TYPES.SUBSCRIPTION,
+        },
+        order: [['start_date', 'ASC']],
+      });
+
+      const subscriptionPrices = allPrices.map((r) => r.get({ plain: true }));
+
+      if (subscriptionPrices.length > 0) {
+        const { from, to, group_by: groupBy = 'day' } = options;
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+        let subscriptionValues = calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, groupBy);
+
+        // Filter subscription values to only include dates within the range of actual consumption data
+        // This prevents showing subscription prices for future dates or dates without data
+        if (consumptionResults.length > 0 && consumptionResults[0].values.length > 0) {
+          const consumptionValues = consumptionResults[0].values;
+          const firstConsumptionDate = new Date(consumptionValues[0].created_at);
+          const lastConsumptionDate = new Date(consumptionValues[consumptionValues.length - 1].created_at);
+
+          subscriptionValues = subscriptionValues.filter((sv) => {
+            const subscriptionDate = new Date(sv.created_at);
+            return subscriptionDate >= firstConsumptionDate && subscriptionDate <= lastConsumptionDate;
+          });
+        } else {
+          // No consumption data - don't show any subscription prices
+          subscriptionValues = [];
+        }
+
+        if (subscriptionValues.length > 0) {
+          const device = this.stateManager.get('deviceById', firstFeature.device_id);
+
+          // Get the contract name from the first subscription value
+          const contractName = subscriptionValues[0].contract_name || firstFeature.name;
+
+          consumptionResults.unshift({
+            device: {
+              name: device.name,
+            },
+            deviceFeature: {
+              name: contractName,
+              currency_unit: firstFeature.unit,
+              is_subscription: true,
+            },
+            values: subscriptionValues,
+          });
+        }
+      }
+    }
   }
 
   return consumptionResults;
