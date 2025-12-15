@@ -71,6 +71,7 @@ function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, group
         periodLabel = currentDate.toISOString();
         break;
       default:
+        // Default to day grouping
         nextDate = currentDate.add(1, 'day');
         periodLabel = currentDate.toISOString();
     }
@@ -115,6 +116,7 @@ function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, group
           periodPrice = monthlyPrice * 12;
           break;
         default:
+          // Default to day pricing
           periodPrice = monthlyPrice / currentDate.daysInMonth();
       }
 
@@ -318,4 +320,5 @@ async function getConsumptionByDates(selectors, options = {}) {
 
 module.exports = {
   getConsumptionByDates,
+  calculateSubscriptionPrices,
 };

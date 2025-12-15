@@ -8,6 +8,9 @@ const Promise = require('bluebird');
 
 const db = require('../../../../models');
 const EnergySensorManager = require('../../../../lib/device/energy-sensor');
+const {
+  calculateSubscriptionPrices,
+} = require('../../../../lib/device/energy-sensor/energy-sensor.getConsumptionByDates');
 
 // Extend Day.js with plugins
 dayjs.extend(utc);
@@ -1803,6 +1806,32 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       // Cleanup
       await db.EnergyPrice.destroy({ where: { id: 'price-sub-no-data' } });
       await db.Device.destroy({ where: { id: deviceId } });
+    });
+
+    it('should use default day grouping when invalid groupBy is passed to calculateSubscriptionPrices', () => {
+      const subscriptionPrices = [
+        {
+          price: 150000, // 15€/month
+          start_date: '2023-01-01',
+          end_date: null,
+          contract_name: 'Test Contract',
+        },
+      ];
+
+      const fromDate = new Date('2023-10-01T00:00:00.000Z');
+      const toDate = new Date('2023-10-03T00:00:00.000Z');
+
+      // Pass an invalid groupBy - should use default (day) behavior
+      const result = calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, 'invalid_groupby');
+
+      // Should return 2 days worth of subscription values (Oct 1 and Oct 2)
+      expect(result).to.be.an('array');
+      expect(result.length).to.equal(2);
+
+      // Price should be calculated as daily (15 / 31 days in October)
+      const expectedDailyPrice = 15 / 31;
+      expect(result[0].sum_value).to.be.closeTo(expectedDailyPrice, 0.001);
+      expect(result[0].contract_name).to.equal('Test Contract');
     });
   });
 });
