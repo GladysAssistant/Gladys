@@ -23,17 +23,26 @@ async function checkIfGladysUpgraded(gateway, waitTimeBetweenMessages = 300) {
           previousGladysVersion,
           gladysVersion: this.gladysVersion,
         });
-        await this.message.sendToUser(admin.selector, message);
+        try {
+          await this.message.sendToUser(admin.selector, message);
+        } catch (e) {
+          logger.error(e);
+        }
         await Promise.delay(waitTimeBetweenMessages);
         const gladysVersionInfos = await gateway.getLatestGladysVersion();
         if (gladysVersionInfos.name === this.gladysVersion) {
-          // If the user is french && there is a french release note link
-          if (admin.language === 'fr' && gladysVersionInfos.fr_release_note_link) {
-            // Send the release note to the user
-            await this.message.sendToUser(admin.selector, gladysVersionInfos.fr_release_note_link);
-          } else if (gladysVersionInfos.default_release_note_link) {
-            // If there is no release note in french / or the user is not french, send the default one (english)
-            await this.message.sendToUser(admin.selector, gladysVersionInfos.default_release_note_link);
+          try {
+            // If the user is french && there is a french release note link
+            if (admin.language === 'fr' && gladysVersionInfos.fr_release_note_link) {
+              // Send the release note to the user
+              await this.message.sendToUser(admin.selector, gladysVersionInfos.fr_release_note_link);
+            } else if (gladysVersionInfos.default_release_note_link) {
+              // If there is no release note in french / or the user is not french, send the default one (english)
+
+              await this.message.sendToUser(admin.selector, gladysVersionInfos.default_release_note_link);
+            }
+          } catch (e) {
+            logger.error(e);
           }
         }
       });
