@@ -677,6 +677,7 @@
         "consumption": "Verbrauch",
         "subscription": "Abonnement"
       },
+      "perMonth": "/Monat",
       "currencies": {
         "euro": "Euro",
         "dollar": "Dollar"
