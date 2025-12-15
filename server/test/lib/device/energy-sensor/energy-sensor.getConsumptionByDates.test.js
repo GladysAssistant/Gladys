@@ -851,7 +851,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
         electric_meter_device_id: deviceId,
         contract: 'base',
         price_type: 'subscription',
-        price: 15000, // 15€/month (stored as integer, divide by 1000)
+        price: 150000, // 15€/month (stored as integer, divide by 10000)
         currency: 'EUR',
         start_date: '2023-01-01',
         end_date: null,
@@ -906,13 +906,12 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       expect(subscriptionResult.deviceFeature.is_subscription).to.equal(true);
       expect(subscriptionResult.values).to.be.an('array');
       expect(subscriptionResult.values.length).to.equal(7); // 7 days
-      expect(subscriptionResult.values[0]).to.have.property('value');
-      expect(subscriptionResult.values[0]).to.have.property('currency', 'EUR');
+      expect(subscriptionResult.values[0]).to.have.property('sum_value');
       expect(subscriptionResult.values[0]).to.have.property('created_at');
 
       // Price is 15€/month, October has 31 days, so daily price = 15/31 ≈ 0.484
       const expectedDailyPrice = 15 / 31;
-      expect(subscriptionResult.values[0].value).to.be.closeTo(expectedDailyPrice, 0.01);
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(expectedDailyPrice, 0.01);
 
       // Cleanup
       await db.EnergyPrice.destroy({ where: { id: 'price-sub-1' } });
@@ -940,7 +939,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
         electric_meter_device_id: deviceId,
         contract: 'base',
         price_type: 'subscription',
-        price: 12000, // 12€/month
+        price: 120000, // 12€/month
         currency: 'EUR',
         start_date: '2023-01-01',
         end_date: '2023-10-12',
@@ -953,7 +952,7 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
         electric_meter_device_id: deviceId,
         contract: 'base',
         price_type: 'subscription',
-        price: 18000, // 18€/month
+        price: 180000, // 18€/month
         currency: 'EUR',
         start_date: '2023-10-13',
         end_date: null,
@@ -1009,15 +1008,15 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
 
       // First 3 days (Oct 10-12) should use old contract (12€/month)
       const oldContractDailyPrice = 12 / 31;
-      expect(subscriptionResult.values[0].value).to.be.closeTo(oldContractDailyPrice, 0.01);
-      expect(subscriptionResult.values[1].value).to.be.closeTo(oldContractDailyPrice, 0.01);
-      expect(subscriptionResult.values[2].value).to.be.closeTo(oldContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[0].sum_value).to.be.closeTo(oldContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[1].sum_value).to.be.closeTo(oldContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[2].sum_value).to.be.closeTo(oldContractDailyPrice, 0.01);
 
       // Last 3 days (Oct 13-15) should use new contract (18€/month)
       const newContractDailyPrice = 18 / 31;
-      expect(subscriptionResult.values[3].value).to.be.closeTo(newContractDailyPrice, 0.01);
-      expect(subscriptionResult.values[4].value).to.be.closeTo(newContractDailyPrice, 0.01);
-      expect(subscriptionResult.values[5].value).to.be.closeTo(newContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[3].sum_value).to.be.closeTo(newContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[4].sum_value).to.be.closeTo(newContractDailyPrice, 0.01);
+      expect(subscriptionResult.values[5].sum_value).to.be.closeTo(newContractDailyPrice, 0.01);
 
       // Cleanup
       await db.EnergyPrice.destroy({ where: { id: ['price-sub-2a', 'price-sub-2b'] } });

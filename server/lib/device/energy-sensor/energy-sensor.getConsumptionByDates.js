@@ -124,14 +124,14 @@ function calculateSubscriptionPrices(subscriptionPrices, fromDate, toDate, group
 
       subscriptionValues.push({
         created_at: periodLabel,
+        value: periodPrice,
         sum_value: periodPrice,
+        contract_name: validPrice.contract_name,
       });
     }
 
     currentDate = nextDate;
   }
-
-  console.log('Subscription prices:', subscriptionValues);
 
   return subscriptionValues;
 }
@@ -290,12 +290,15 @@ async function getConsumptionByDates(selectors, options = {}) {
     const firstFeature = this.stateManager.get('deviceFeature', firstSelector);
     const device = this.stateManager.get('deviceById', firstFeature.device_id);
 
-    consumptionResults.push({
+    // Get the contract name from the first subscription value
+    const contractName = subscriptionValues[0].contract_name || firstFeature.name;
+
+    consumptionResults.unshift({
       device: {
         name: device.name,
       },
       deviceFeature: {
-        name: firstFeature.name,
+        name: contractName,
         currency_unit: firstFeature.unit,
         is_subscription: true,
       },
