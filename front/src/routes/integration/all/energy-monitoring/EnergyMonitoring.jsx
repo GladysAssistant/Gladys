@@ -851,7 +851,11 @@ class EnergyMonitoringPage extends Component {
                   <strong class="mr-3" style={{ fontSize: '1.1em' }}>
                     {priceDisplay}{' '}
                     <Text id={`integration.energyMonitoring.currencies.${p.currency}`} defaultMessage={p.currency} />
-                    /kWh
+                    {p.price_type === 'subscription' ? (
+                      <Text id="integration.energyMonitoring.perMonth" defaultMessage="/month" />
+                    ) : (
+                      '/kWh'
+                    )}
                   </strong>
                 )}
                 {/* Period info */}

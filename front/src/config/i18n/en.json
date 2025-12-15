@@ -1701,6 +1701,7 @@
         "consumption": "consumption",
         "subscription": "subscription"
       },
+      "perMonth": "/month",
       "currencies": {
         "euro": "euro",
         "dollar": "dollar"

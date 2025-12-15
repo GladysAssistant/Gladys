@@ -29,6 +29,8 @@ const PERIOD_LABELS = {
   [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day'
 };
 
+const SUBSCRIPTION_COLOR = '#b8c2cc';
+
 class EnergyConsumption extends Component {
   constructor(props) {
     super(props);
@@ -39,6 +41,7 @@ class EnergyConsumption extends Component {
       error: null,
       errorDetail: null,
       series: [],
+      seriesColors: [],
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
       selectedDate: now,
@@ -108,7 +111,14 @@ class EnergyConsumption extends Component {
 
       // Process data for stacked bar chart
       // Each device feature becomes a separate series with aligned timestamps
+      // Track colors for each series (gray for subscription, widget colors for consumption)
+      const seriesColors = [];
+      let colorIndex = 0;
+      // Use widget configured colors if available, otherwise fall back to default colors
+      const widgetColors = this.props.box.colors || DEFAULT_COLORS;
+
       data.forEach(deviceData => {
+        const isSubscription = deviceData.deviceFeature.is_subscription === true;
         const deviceFeatureName = deviceData.deviceFeature.name
           ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
           : deviceData.device.name;
@@ -132,10 +142,19 @@ class EnergyConsumption extends Component {
           name: deviceFeatureName,
           data: seriesData
         });
+
+        // Assign gray color for subscription, otherwise use widget configured colors
+        if (isSubscription) {
+          seriesColors.push(SUBSCRIPTION_COLOR);
+        } else {
+          seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
+          colorIndex++;
+        }
       });
 
       await this.setState({
         series,
+        seriesColors,
         loading: false,
         emptySeries,
         totalConsumption,
@@ -338,7 +357,17 @@ class EnergyConsumption extends Component {
   };
 
   render(props, state) {
-    const { loading, error, errorDetail, series, emptySeries, selectedPeriod, totalConsumption, displayMode } = state;
+    const {
+      loading,
+      error,
+      errorDetail,
+      series,
+      seriesColors,
+      emptySeries,
+      selectedPeriod,
+      totalConsumption,
+      displayMode
+    } = state;
     const localeSet = this.props.user.language === 'fr' ? fr : 'en';
     return (
       <div class="card">
@@ -475,7 +504,7 @@ class EnergyConsumption extends Component {
                         series={series}
                         chart_type="bar"
                         height={300}
-                        colors={props.box.colors || DEFAULT_COLORS}
+                        colors={seriesColors.length > 0 ? seriesColors : DEFAULT_COLORS}
                         size="big"
                         display_axes={true}
                         hide_legend={true}
