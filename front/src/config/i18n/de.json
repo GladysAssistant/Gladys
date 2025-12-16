@@ -489,7 +489,9 @@
         "totalConsumptionCost": "Gesamtverbrauchskosten",
         "totalConsumptionKwh": "Gesamtverbrauch",
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
-        "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar"
+        "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
+        "showSubscriptionPrices": "Abonnementpreise anzeigen",
+        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
       }
     }
   },
@@ -677,6 +679,7 @@
         "consumption": "Verbrauch",
         "subscription": "Abonnement"
       },
+      "perMonth": "/Monat",
       "currencies": {
         "euro": "Euro",
         "dollar": "Dollar"
