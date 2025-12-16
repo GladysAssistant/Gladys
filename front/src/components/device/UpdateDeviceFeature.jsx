@@ -5,6 +5,7 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS_BY_CATEGORY
 } from '../../../../server/utils/constants';
+import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
@@ -29,10 +30,33 @@ class UpdateDeviceFeature extends Component {
     this.props.updateFeatureProperty(this.props.featureIndex, 'keep_history', e.target.value);
   };
   deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
+  isEnergyIndexFeature = () => {
+    const { feature } = this.props;
+    const categoryTypes = ENERGY_INDEX_FEATURE_TYPES[feature.category];
+    return categoryTypes && categoryTypes.includes(feature.type);
+  };
+  hasEnergyConsumptionFeatures = () => {
+    const { device, feature } = this.props;
+    if (!device || !device.features) return false;
 
+    // Check if THIRTY_MINUTES_CONSUMPTION feature exists with this feature as parent
+    const hasConsumption = device.features.some(
+      f => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id
+    );
+
+    return hasConsumption;
+  };
+  createEnergyConsumptionFeatures = () => {
+    this.props.createEnergyConsumptionFeatures(this.props.featureIndex);
+  };
+
+  // render({ feature, featureIndex, canEditCategory, device, energyHelperBuilder, ...props }) {
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
     const allowModifyCategory =
       canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
+    const isEnergyIndex = this.isEnergyIndexFeature();
+    const hasConsumptionFeatures = this.hasEnergyConsumptionFeatures();
+    const showCreateEnergyFeaturesButton = isEnergyIndex && !hasConsumptionFeatures;
 
     return (
       <div class="col-md-4">
@@ -187,6 +211,21 @@ class UpdateDeviceFeature extends Component {
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">
                   <Text id="editDeviceForm.deleteLabel" />
                 </button>
+              </div>
+            )}
+            {showCreateEnergyFeaturesButton && (
+              <div class="form-group">
+                <div class="alert alert-info">
+                  <h4>
+                    <Text id="integration.mqtt.feature.energyMonitoring.title" />
+                  </h4>
+                  <p>
+                    <Text id="integration.mqtt.feature.energyMonitoring.description" />
+                  </p>
+                  <button onClick={this.createEnergyConsumptionFeatures} class="btn btn-primary">
+                    <Text id="integration.mqtt.feature.energyMonitoring.createButton" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
