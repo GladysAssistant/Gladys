@@ -64,6 +64,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       job: {
         updateProgress: stub().returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
 
@@ -123,14 +124,14 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         where: { id: testConsumptionFeatureId },
       });
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
       expect(result).to.equal(null);
     });
 
     it('should return null when no device states found in database', async () => {
       // No device states inserted, so database should be empty
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
       expect(result).to.equal(null);
     });
@@ -159,7 +160,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be just after the last state
       clock = useFakeTimers(new Date(baseTime.getTime() + 5 * 60 * 1000)); // 5 minutes after
 
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
       // Verify that consumption states were created
       const consumptionStates = await db.duckDbReadConnectionAllAsync(
@@ -187,7 +188,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be 1 hour after the newest state
       clock = useFakeTimers(new Date('2023-10-03T12:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -279,7 +280,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time
       clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -318,6 +319,193 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     });
   });
 
+  describe('Date range handling', () => {
+    const systemTimezone = 'Europe/Paris';
+    const roundWindowStart = (date) => {
+      const startTime = dayjs(date).tz(systemTimezone);
+      return startTime
+        .minute(startTime.minute() < 30 ? 0 : 30)
+        .second(0)
+        .millisecond(0);
+    };
+    const roundWindowEnd = (date) => {
+      const endTime = dayjs(date).tz(systemTimezone);
+      return endTime
+        .minute(endTime.minute() < 30 ? 30 : 60)
+        .second(0)
+        .millisecond(0);
+    };
+
+    it('should respect start date only and selector', async () => {
+      const oldestTime = new Date('2023-10-02T20:00:00.000Z');
+      await db.duckDbBatchInsertState(testIndexFeatureId, [{ value: 1000, created_at: oldestTime }]);
+
+      clock = useFakeTimers(new Date('2023-10-03T01:10:00.000Z'));
+
+      const calls = [];
+      const original = energyMonitoring.calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndex = async (windowTime, selectors) => {
+        calls.push({ windowTime, selectors });
+      };
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
+        '2023-10-03',
+        ['test-energy-device-consumption'],
+        null,
+        'job-123',
+      );
+
+      energyMonitoring.calculateConsumptionFromIndex = original;
+
+      expect(calls.length).to.be.greaterThan(0);
+      const expectedStart = roundWindowStart(dayjs.tz('2023-10-03 00:00:00', systemTimezone).toDate()).toDate();
+      const expectedEnd = roundWindowEnd(new Date('2023-10-03T01:10:00.000Z')).toDate();
+
+      calls.forEach((call) => {
+        expect(call.windowTime.getTime()).to.be.at.least(expectedStart.getTime());
+        expect(call.windowTime.getTime()).to.be.below(expectedEnd.getTime());
+        expect(call.selectors).to.deep.equal(['test-energy-device-consumption']);
+      });
+    });
+
+    it('should respect end date only', async () => {
+      const oldestTime = new Date('2023-10-03T20:00:00.000Z');
+      await db.duckDbBatchInsertState(testIndexFeatureId, [{ value: 1000, created_at: oldestTime }]);
+
+      clock = useFakeTimers(new Date('2023-10-05T00:00:00.000Z'));
+
+      const calls = [];
+      const original = energyMonitoring.calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndex = async (windowTime) => {
+        calls.push(windowTime);
+      };
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
+        null,
+        ['test-energy-device-consumption'],
+        '2023-10-03',
+        'job-123',
+      );
+
+      energyMonitoring.calculateConsumptionFromIndex = original;
+
+      expect(calls.length).to.be.greaterThan(0);
+      const expectedStart = roundWindowStart(oldestTime).toDate();
+      const expectedEnd = roundWindowEnd(dayjs.tz('2023-10-03 23:59:59', systemTimezone).toDate()).toDate();
+
+      calls.forEach((windowTime) => {
+        expect(windowTime.getTime()).to.be.at.least(expectedStart.getTime());
+        expect(windowTime.getTime()).to.be.below(expectedEnd.getTime());
+      });
+    });
+
+    it('should respect start/end dates with two selectors', async () => {
+      const testDevice2Id = 'd4e5f6a7-b8c9-0123-def4-567890123456';
+      const testIndexFeature2Id = 'e5f6a7b8-c9d0-1234-ef56-78901234567a';
+      const testConsumptionFeature2Id = 'f6a7b8c9-d0e1-2345-f678-901234567890';
+
+      await gladys.device.create({
+        id: testDevice2Id,
+        name: 'Test Energy Device 2',
+        selector: 'test-energy-device-2',
+        external_id: 'test-energy-device-2-external',
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+        features: [
+          {
+            id: testIndexFeature2Id,
+            name: 'Energy Index 2',
+            selector: 'test-energy-device-2-index',
+            external_id: 'test-energy-index-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 999999,
+            last_value: 0,
+            energy_parent_id: null,
+          },
+          {
+            id: testConsumptionFeature2Id,
+            name: 'Energy Consumption 30min 2',
+            selector: 'test-energy-device-2-consumption',
+            external_id: 'test-energy-consumption-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            read_only: true,
+            has_feedback: false,
+            min: 0,
+            max: 999999,
+            last_value: 0,
+            energy_parent_id: testIndexFeature2Id,
+          },
+        ],
+      });
+
+      await db.duckDbBatchInsertState(testIndexFeatureId, [
+        { value: 1000, created_at: new Date('2023-10-02T20:00:00.000Z') },
+      ]);
+      await db.duckDbBatchInsertState(testIndexFeature2Id, [
+        { value: 2000, created_at: new Date('2023-10-02T21:00:00.000Z') },
+      ]);
+
+      clock = useFakeTimers(new Date('2023-10-05T00:00:00.000Z'));
+
+      const calls = [];
+      const original = energyMonitoring.calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndex = async (windowTime, selectors) => {
+        calls.push({ windowTime, selectors });
+      };
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
+        '2023-10-03',
+        ['test-energy-device-consumption', 'test-energy-device-2-consumption'],
+        '2023-10-03',
+        'job-123',
+      );
+
+      energyMonitoring.calculateConsumptionFromIndex = original;
+
+      expect(calls.length).to.be.greaterThan(0);
+      const expectedStart = roundWindowStart(dayjs.tz('2023-10-03 00:00:00', systemTimezone).toDate()).toDate();
+      const expectedEnd = roundWindowEnd(dayjs.tz('2023-10-03 23:59:59', systemTimezone).toDate()).toDate();
+
+      calls.forEach((call) => {
+        const sortedSelectors = [...call.selectors].sort();
+        expect(sortedSelectors).to.deep.equal(['test-energy-device-2-consumption', 'test-energy-device-consumption']);
+        expect(call.windowTime.getTime()).to.be.at.least(expectedStart.getTime());
+        expect(call.windowTime.getTime()).to.be.below(expectedEnd.getTime());
+      });
+    });
+
+    it('should return early when start date is after end date', async () => {
+      await db.duckDbBatchInsertState(testIndexFeatureId, [
+        { value: 1000, created_at: new Date('2023-10-02T20:00:00.000Z') },
+      ]);
+
+      clock = useFakeTimers(new Date('2023-10-06T00:00:00.000Z'));
+
+      let callCount = 0;
+      const original = energyMonitoring.calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndex = async () => {
+        callCount += 1;
+      };
+
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
+        '2023-10-05',
+        ['test-energy-device-consumption'],
+        '2023-10-03',
+        'job-123',
+      );
+
+      energyMonitoring.calculateConsumptionFromIndex = original;
+
+      expect(result).to.equal(null);
+      expect(callCount).to.equal(0);
+    });
+  });
+
   it('should continue processing windows even when some fail', async () => {
     // Insert test states
     const baseTime = new Date('2023-10-03T10:00:00.000Z');
@@ -345,7 +533,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       return originalCalculateConsumptionFromIndex.call(energyMonitoring, jobId, windowTime);
     };
 
-    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-123');
 
     // Restore original function
     energyMonitoring.calculateConsumptionFromIndex = originalCalculateConsumptionFromIndex;

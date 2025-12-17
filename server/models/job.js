@@ -9,9 +9,16 @@ const dataSchema = Joi.object({
   devices: Joi.array().items(
     Joi.object({
       device: Joi.string().required(),
-      features: Joi.array().items(Joi.string()).min(1).required(),
+      features: Joi.array()
+        .items(Joi.string())
+        .min(1)
+        .required(),
     }),
   ),
+  period: Joi.object({
+    start_date: Joi.string().allow(null, ''),
+    end_date: Joi.string().allow(null, ''),
+  }),
 }).unknown(false);
 
 module.exports = (sequelize, DataTypes) => {

@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const logger = require('../../../utils/logger');
 
 module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
   /**
@@ -8,16 +7,13 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateCostFromBeginning(req, res) {
-    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors)
-      ? req.body.feature_selectors
-      : [];
-    logger.info(
-      `[energy-monitoring] API calculate-cost-from-beginning selectors=${featureSelectors.length}`,
-      featureSelectors,
-    );
-    energyMonitoringHandler.calculateCostFromBeginning(featureSelectors);
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
+    const startDate = req.body && req.body.start_date;
+    const endDate = req.body && req.body.end_date;
+    const job = await energyMonitoringHandler.calculateCostFromBeginning(startDate, featureSelectors, endDate);
     res.json({
       success: true,
+      job_id: job && job.id,
     });
   }
 
@@ -28,16 +24,17 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
-    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors)
-      ? req.body.feature_selectors
-      : [];
-    logger.info(
-      `[energy-monitoring] API calculate-consumption-from-index-from-beginning selectors=${featureSelectors.length}`,
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
+    const startDate = req.body && req.body.start_date;
+    const endDate = req.body && req.body.end_date;
+    const job = await energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(
+      startDate,
       featureSelectors,
+      endDate,
     );
-    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(featureSelectors);
     res.json({
       success: true,
+      job_id: job && job.id,
     });
   }
 

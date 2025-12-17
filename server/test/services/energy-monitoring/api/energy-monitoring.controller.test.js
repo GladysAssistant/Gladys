@@ -7,12 +7,13 @@ describe('EnergyMonitoringController', () => {
   let controller;
   let req;
   let res;
+  let next;
 
   beforeEach(() => {
     // Mock the energy monitoring handler
     energyMonitoringHandler = {
-      calculateCostFromBeginning: fake.resolves(null),
-      calculateConsumptionFromIndexFromBeginning: fake.resolves(null),
+      calculateCostFromBeginning: fake.resolves({ id: 'job-id' }),
+      calculateConsumptionFromIndexFromBeginning: fake.resolves({ id: 'job-id' }),
       getContracts: fake.resolves({
         'edf-base': {
           '3': [
@@ -77,6 +78,7 @@ describe('EnergyMonitoringController', () => {
     res = {
       json: fake.returns(null),
     };
+    next = fake.returns(null);
   });
 
   describe('POST /api/v1/service/energy-monitoring/calculate-cost-from-beginning', () => {
@@ -86,7 +88,29 @@ describe('EnergyMonitoringController', () => {
       assert.calledOnce(energyMonitoringHandler.calculateCostFromBeginning);
       assert.calledOnceWithExactly(res.json, {
         success: true,
+        job_id: 'job-id',
       });
+    });
+
+    it('should forward selectors and dates when provided', async () => {
+      req.body = {
+        feature_selectors: ['feature-1'],
+        start_date: '2025-01-01',
+        end_date: '2025-01-31',
+      };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-from-beginning'].controller(
+        req,
+        res,
+        next,
+      );
+
+      assert.calledWithExactly(
+        energyMonitoringHandler.calculateCostFromBeginning,
+        '2025-01-01',
+        ['feature-1'],
+        '2025-01-31',
+      );
     });
 
     it('should have correct route configuration', () => {
@@ -106,7 +130,27 @@ describe('EnergyMonitoringController', () => {
       assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning);
       assert.calledOnceWithExactly(res.json, {
         success: true,
+        job_id: 'job-id',
       });
+    });
+
+    it('should forward selectors and dates when provided', async () => {
+      req.body = {
+        feature_selectors: ['feature-2'],
+        start_date: '2025-02-01',
+        end_date: '2025-02-15',
+      };
+
+      await controller[
+        'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning'
+      ].controller(req, res, next);
+
+      assert.calledWithExactly(
+        energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning,
+        '2025-02-01',
+        ['feature-2'],
+        '2025-02-15',
+      );
     });
 
     it('should have correct route configuration', () => {
@@ -139,7 +183,7 @@ describe('EnergyMonitoringController', () => {
 
       energyMonitoringHandler.getContracts = fake.resolves(expectedContracts);
 
-      await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res);
+      await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res, next);
 
       assert.calledOnce(energyMonitoringHandler.getContracts);
       assert.calledOnceWithExactly(res.json, expectedContracts);
@@ -149,14 +193,11 @@ describe('EnergyMonitoringController', () => {
       const error = new Error('Failed to fetch contracts');
       energyMonitoringHandler.getContracts = fake.rejects(error);
 
-      try {
-        await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res);
-        expect.fail('Should have thrown an error');
-      } catch (thrownError) {
-        expect(thrownError).to.equal(error);
-        assert.calledOnce(energyMonitoringHandler.getContracts);
-        assert.notCalled(res.json);
-      }
+      await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res, next);
+
+      assert.calledOnce(energyMonitoringHandler.getContracts);
+      assert.notCalled(res.json);
+      assert.calledWith(next, error);
     });
 
     it('should handle network timeout errors', async () => {
@@ -164,15 +205,11 @@ describe('EnergyMonitoringController', () => {
       timeoutError.code = 'ECONNABORTED';
       energyMonitoringHandler.getContracts = fake.rejects(timeoutError);
 
-      try {
-        await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res);
-        expect.fail('Should have thrown an error');
-      } catch (thrownError) {
-        expect(thrownError).to.equal(timeoutError);
-        expect(thrownError.code).to.equal('ECONNABORTED');
-        assert.calledOnce(energyMonitoringHandler.getContracts);
-        assert.notCalled(res.json);
-      }
+      await controller['get /api/v1/service/energy-monitoring/contracts'].controller(req, res, next);
+
+      assert.calledOnce(energyMonitoringHandler.getContracts);
+      assert.notCalled(res.json);
+      assert.calledWith(next, timeoutError);
     });
 
     it('should have correct route configuration', () => {

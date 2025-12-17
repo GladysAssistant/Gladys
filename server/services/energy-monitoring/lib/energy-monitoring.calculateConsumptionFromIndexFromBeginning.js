@@ -14,33 +14,40 @@ const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
 /**
- * @description Calculate consumption from index for all 30-minute windows from the beginning of the instance until now.
+ * @description Calculate consumption from index for all 30-minute windows from the beginning or a date range.
  * This function finds the oldest device state for energy index devices and processes all 30-minute windows.
- * @param {Array} featureSelectors - Optional whitelist of consumption feature selectors to process.
+ * @param {Date|string|null} startAt - Optional start date (YYYY-MM-DD or Date).
+ * @param {Array<string>} featureSelectors - Optional whitelist of consumption feature selectors.
+ * @param {Date|string|null} endAt - Optional end date (YYYY-MM-DD or Date).
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
- * @example
- * calculateConsumptionFromIndexFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
+ * @example <caption>Recalculate full history</caption>
+ * calculateConsumptionFromIndexFromBeginning(null, [], null, '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndexFromBeginning(featureSelectors = [], jobId) {
-  // Backward compatibility: wrapper injects jobId as last arg; scheduled calls may omit selectors
-  if (jobId === undefined && typeof featureSelectors === 'string') {
-    jobId = featureSelectors;
-    featureSelectors = [];
-  }
-  const selectorSet = new Set(
-    Array.isArray(featureSelectors)
-      ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
-      : [],
-  );
-    logger.info(
-      `[energy-monitoring] calculateConsumptionFromIndexFromBeginning scope=${
-        selectorSet.size === 0 ? 'all' : 'selection'
-      } selectors=${selectorSet.size}`,
-    );
+async function calculateConsumptionFromIndexFromBeginning(startAt, featureSelectors, endAt, jobId) {
+  const selectors = Array.isArray(featureSelectors)
+    ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+    : [];
+  const selectorSet = new Set(selectors);
   return queueWrapper(this.queue, async () => {
     const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
     logger.info(`Calculating consumption from index from beginning in timezone ${systemTimezone}`);
+    const parseDateWithBoundary = (value, boundary) => {
+      if (value instanceof Date) {
+        return value;
+      }
+      if (typeof value !== 'string') {
+        return null;
+      }
+      const suffix = boundary === 'end' ? '23:59:59' : '00:00:00';
+      const parsed = dayjs.tz(`${value} ${suffix}`, systemTimezone);
+      return parsed.isValid() ? parsed.toDate() : null;
+    };
+    const parsedStartAt = parseDateWithBoundary(startAt, 'start');
+    const parsedEndAt = parseDateWithBoundary(endAt, 'end');
+    const now = dayjs().tz(systemTimezone);
+    const nowDate = now.toDate();
+    const effectiveEndAt = parsedEndAt && parsedEndAt < nowDate ? parsedEndAt : nowDate;
 
     // Get all energy sensor devices
     const energyDevices = await this.gladys.device.get({
@@ -65,36 +72,49 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors = [],
         if (!isConsumption) {
           return false;
         }
-        if (selectorSet.size === 0) return true;
+        if (selectorSet.size === 0) {
+          return true;
+        }
         const featureSelector = f.selector || f.external_id || f.id;
         return selectorSet.has(featureSelector);
       });
 
-      const matchedIndexFeatures = consumptionFeatures
-        .map((cf) => indexById.get(cf.energy_parent_id))
-        .filter((f) => !!f);
+      const matchedPairs = consumptionFeatures
+        .map((consumptionFeature) => ({
+          consumptionFeature,
+          indexFeature: indexById.get(consumptionFeature.energy_parent_id),
+        }))
+        .filter((pair) => !!pair.indexFeature);
 
-      if (matchedIndexFeatures.length > 0) {
+      if (matchedPairs.length > 0) {
+        const uniqueIndexFeatures = new Map();
+        const uniqueConsumptionFeatures = new Map();
+        matchedPairs.forEach((pair) => {
+          uniqueIndexFeatures.set(pair.indexFeature.id, pair.indexFeature);
+          uniqueConsumptionFeatures.set(pair.consumptionFeature.id, pair.consumptionFeature);
+        });
         devicesWithBothFeatures.push({
           device: energyDevice,
-          indexFeatures: matchedIndexFeatures,
+          indexFeatures: Array.from(uniqueIndexFeatures.values()),
+          consumptionFeatures: Array.from(uniqueConsumptionFeatures.values()),
         });
       }
     });
 
-    await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
-      // Reset the last processed timestamp
-      logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
-      await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
-    });
+    const shouldRestoreLastProcessed = Boolean(parsedEndAt && parsedEndAt < nowDate);
+    const originalLastProcessedByDeviceId = new Map();
+    if (shouldRestoreLastProcessed) {
+      devicesWithBothFeatures.forEach(({ device }) => {
+        const lastProcessedParam = device.params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
+        if (lastProcessedParam && lastProcessedParam.value) {
+          originalLastProcessedByDeviceId.set(device.id, lastProcessedParam.value);
+        }
+      });
+    }
 
     logger.info(
       `Found ${devicesWithBothFeatures.length} devices with both INDEX and THIRTY_MINUTES_CONSUMPTION features`,
     );
-    if (selectorSet.size > 0 && devicesWithBothFeatures.length > 0) {
-      const names = devicesWithBothFeatures.map((d) => d.device.name || d.device.id).join(', ');
-      logger.info(`[energy-monitoring] selection devices: ${names}`);
-    }
 
     if (devicesWithBothFeatures.length === 0) {
       logger.info('No devices found with both features, nothing to process');
@@ -121,17 +141,32 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors = [],
 
     logger.info(`Oldest device state found at: ${oldestStateTime}`);
 
-    // Round the oldest time down to the nearest 30-minute mark
-    const startTime = dayjs(oldestStateTime).tz(systemTimezone);
+    let effectiveStartAt = parsedStartAt || oldestStateTime;
+    if (effectiveStartAt && parsedStartAt && oldestStateTime && parsedStartAt < oldestStateTime) {
+      effectiveStartAt = oldestStateTime;
+    }
+
+    if (!effectiveStartAt) {
+      logger.info('No valid start date found, nothing to process');
+      return null;
+    }
+
+    if (effectiveStartAt > effectiveEndAt) {
+      logger.info('Start date is after end date, nothing to process');
+      return null;
+    }
+
+    // Round the start time down to the nearest 30-minute mark
+    const startTime = dayjs(effectiveStartAt).tz(systemTimezone);
     const roundedStartTime = startTime
       .minute(startTime.minute() < 30 ? 0 : 30)
       .second(0)
       .millisecond(0);
 
-    // Get current time and round up to the next 30-minute mark
-    const now = dayjs().tz(systemTimezone);
-    const currentMinute = now.minute();
-    const roundedEndTime = now
+    // Round end time up to the next 30-minute mark
+    const endTime = dayjs(effectiveEndAt).tz(systemTimezone);
+    const currentMinute = endTime.minute();
+    const roundedEndTime = endTime
       .minute(currentMinute < 30 ? 30 : 60)
       .second(0)
       .millisecond(0);
@@ -153,33 +188,77 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors = [],
       `Generated ${windows.length} thirty-minute windows to process for ${devicesWithBothFeatures.length} devices`,
     );
 
+    const deletionStartTime = roundedStartTime.toDate();
+    const deletionEndTime = roundedEndTime.toDate();
+    const consumptionFeaturesToReset = new Map();
+    devicesWithBothFeatures.forEach((deviceWithBothFeatures) => {
+      (deviceWithBothFeatures.consumptionFeatures || []).forEach((feature) => {
+        if (!feature.selector) {
+          return;
+        }
+        consumptionFeaturesToReset.set(feature.selector, feature);
+      });
+    });
+
+    await Promise.each(Array.from(consumptionFeaturesToReset.values()), async (feature) => {
+      const { selector } = feature;
+      if (parsedEndAt) {
+        await this.gladys.device.destroyStatesBetween(selector, deletionStartTime, deletionEndTime);
+      } else {
+        await this.gladys.device.destroyStatesFrom(selector, deletionStartTime);
+      }
+    });
+
+    // Reset the last processed timestamp
+    await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
+      logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
+      await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
+    });
+
     // Process each window sequentially
     let processedWindows = 0;
     let successfulWindows = 0;
     let failedWindows = 0;
 
-    await Promise.each(windows, async (windowTime) => {
-      try {
-        // Call the existing calculateConsumptionFromIndex function for each window
-        await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet));
-        successfulWindows += 1;
+    try {
+      await Promise.each(windows, async (windowTime) => {
+        try {
+          // Call the existing calculateConsumptionFromIndex function for each window
+          await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet), jobId);
+          successfulWindows += 1;
 
-        // Update job progress
-        processedWindows += 1;
-        const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
+          // Update job progress
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
 
-        logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
-      } catch (error) {
-        failedWindows += 1;
-        logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
+          logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
+        } catch (error) {
+          failedWindows += 1;
+          logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
 
-        // Continue processing other windows even if one fails
-        processedWindows += 1;
-        const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
+          // Continue processing other windows even if one fails
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
+        }
+      });
+    } finally {
+      if (shouldRestoreLastProcessed) {
+        await Promise.each(devicesWithBothFeatures, async ({ device }) => {
+          const originalValue = originalLastProcessedByDeviceId.get(device.id);
+          if (originalValue) {
+            await this.gladys.device.setParam(device, ENERGY_INDEX_LAST_PROCESSED, originalValue);
+          } else {
+            await this.gladys.device.destroyParam(device, ENERGY_INDEX_LAST_PROCESSED);
+          }
+        });
       }
-    });
+    }
 
     logger.info(
       `Finished processing all windows. Successful: ${successfulWindows}, Failed: ${failedWindows}, Total: ${windows.length}`,

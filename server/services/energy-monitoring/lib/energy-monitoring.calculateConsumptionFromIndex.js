@@ -22,23 +22,12 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
  * @example
  * calculateConsumptionFromIndex(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSelectors = [], jobId) {
-  // Backward compatibility: wrapper injects jobId as last arg; scheduled jobs may call (time, jobId)
-  if (jobId === undefined && typeof featureSelectors === 'string') {
-    jobId = featureSelectors;
-    featureSelectors = [];
-  }
-  const selectorSet = new Set(
-    Array.isArray(featureSelectors)
-      ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
-      : [],
-  );
+async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSelectors, jobId) {
+  const isSelectorsArray = Array.isArray(featureSelectors);
+  const selectors = isSelectorsArray ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0) : [];
+  const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-  logger.info(
-    `Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime} (scope=${
-      selectorSet.size === 0 ? 'all' : 'selection'
-    }, selectors=${selectorSet.size})`,
-  );
+  logger.info(`Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime}`);
 
   // Get all energy sensor devices
   const energyDevices = await this.gladys.device.get({
@@ -69,7 +58,8 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSel
       if (consumptionFeature) {
         // If a whitelist is provided, only keep matches
         if (selectorSet.size > 0) {
-          const consumptionSelector = consumptionFeature.selector || consumptionFeature.external_id || consumptionFeature.id;
+          const consumptionSelector =
+            consumptionFeature.selector || consumptionFeature.external_id || consumptionFeature.id;
           if (!selectorSet.has(consumptionSelector)) {
             return;
           }

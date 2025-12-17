@@ -40,23 +40,51 @@ const JobList = ({ children, ...props }) => (
                       <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
-                  {job.data && job.data.scope === 'selection' && Array.isArray(job.data.devices) && job.data.devices.length > 0 && (
-                    <div class="mt-1 text-muted">
-                      <div>
-                        <Text id="jobsSettings.selectionTitle" />:
-                      </div>
-                      {job.data.devices.map(device => (
-                        <div class="small" key={`${device.device}-${(device.features || []).join('|')}`}>
-                          <strong>{device.device}</strong>
-                          {device.features && device.features.length > 0 && (
-                            <div>
-                              <Text id="jobsSettings.selectionFeatures" />: {device.features.join(', ')}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                  {job.data && job.data.period && (
+                    <div class="mt-1 text-muted small">
+                      {job.data.period.start_date && job.data.period.end_date && (
+                        <Text
+                          id="jobsSettings.periodFromTo"
+                          defaultMessage="Period: from {{startDate}} to {{endDate}}."
+                          fields={{ startDate: job.data.period.start_date, endDate: job.data.period.end_date }}
+                        />
+                      )}
+                      {job.data.period.start_date && !job.data.period.end_date && (
+                        <Text
+                          id="jobsSettings.periodFrom"
+                          defaultMessage="Period: from {{startDate}}."
+                          fields={{ startDate: job.data.period.start_date }}
+                        />
+                      )}
+                      {!job.data.period.start_date && job.data.period.end_date && (
+                        <Text
+                          id="jobsSettings.periodUntil"
+                          defaultMessage="Period: until {{endDate}}."
+                          fields={{ endDate: job.data.period.end_date }}
+                        />
+                      )}
                     </div>
                   )}
+                  {job.data &&
+                    job.data.scope === 'selection' &&
+                    Array.isArray(job.data.devices) &&
+                    job.data.devices.length > 0 && (
+                      <div class="mt-1 text-muted">
+                        <div>
+                          <Text id="jobsSettings.selectionTitle" />:
+                        </div>
+                        {job.data.devices.map(device => (
+                          <div class="small" key={`${device.device}-${(device.features || []).join('|')}`}>
+                            <strong>{device.device}</strong>
+                            {device.features && device.features.length > 0 && (
+                              <div>
+                                <Text id="jobsSettings.selectionFeatures" />: {device.features.join(', ')}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>
