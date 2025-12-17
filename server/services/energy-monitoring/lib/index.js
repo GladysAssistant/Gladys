@@ -13,6 +13,7 @@ const {
 const {
   calculateConsumptionFromIndexThirtyMinutes: ccConsumptionFromIndexThirtyMinutes,
 } = require('./energy-monitoring.calculateConsumptionFromIndexThirtyMinutes');
+const { buildJobDataForConsumption, buildJobDataForCost } = require('./energy-monitoring.jobData');
 
 const { JOB_TYPES } = require('../../../utils/constants');
 
@@ -35,6 +36,7 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
   this.calculateCostFromBeginning = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_BEGINNING,
     this.calculateCostFromBeginning.bind(this),
+    { buildJobData: this.buildJobDataForCost.bind(this) },
   );
   this.calculateConsumptionFromIndexThirtyMinutes = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES,
@@ -43,6 +45,7 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
   this.calculateConsumptionFromIndexFromBeginning = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING,
     this.calculateConsumptionFromIndexFromBeginning.bind(this),
+    { buildJobData: this.buildJobDataForConsumption.bind(this) },
   );
 };
 
@@ -55,5 +58,7 @@ EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning = ccFromIndexFromBeginning;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexThirtyMinutes = ccConsumptionFromIndexThirtyMinutes;
+EnergyMonitoringHandler.prototype.buildJobDataForConsumption = buildJobDataForConsumption;
+EnergyMonitoringHandler.prototype.buildJobDataForCost = buildJobDataForCost;
 
 module.exports = EnergyMonitoringHandler;

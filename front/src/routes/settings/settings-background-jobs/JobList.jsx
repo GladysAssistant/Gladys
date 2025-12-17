@@ -40,6 +40,23 @@ const JobList = ({ children, ...props }) => (
                       <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
+                  {job.data && job.data.scope === 'selection' && Array.isArray(job.data.devices) && job.data.devices.length > 0 && (
+                    <div class="mt-1 text-muted">
+                      <div>
+                        <Text id="jobsSettings.selectionTitle" />:
+                      </div>
+                      {job.data.devices.map(device => (
+                        <div class="small" key={`${device.device}-${(device.features || []).join('|')}`}>
+                          <strong>{device.device}</strong>
+                          {device.features && device.features.length > 0 && (
+                            <div>
+                              <Text id="jobsSettings.selectionFeatures" />: {device.features.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>

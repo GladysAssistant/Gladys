@@ -16,12 +16,28 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 /**
  * @description Calculate consumption from index for all 30-minute windows from the beginning of the instance until now.
  * This function finds the oldest device state for energy index devices and processes all 30-minute windows.
+ * @param {Array} featureSelectors - Optional whitelist of consumption feature selectors to process.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateConsumptionFromIndexFromBeginning('12345678-1234-1234-1234-1234567890ab');
+ * calculateConsumptionFromIndexFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndexFromBeginning(jobId) {
+async function calculateConsumptionFromIndexFromBeginning(featureSelectors = [], jobId) {
+  // Backward compatibility: wrapper injects jobId as last arg; scheduled calls may omit selectors
+  if (jobId === undefined && typeof featureSelectors === 'string') {
+    jobId = featureSelectors;
+    featureSelectors = [];
+  }
+  const selectorSet = new Set(
+    Array.isArray(featureSelectors)
+      ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+      : [],
+  );
+    logger.info(
+      `[energy-monitoring] calculateConsumptionFromIndexFromBeginning scope=${
+        selectorSet.size === 0 ? 'all' : 'selection'
+      } selectors=${selectorSet.size}`,
+    );
   return queueWrapper(this.queue, async () => {
     const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
     logger.info(`Calculating consumption from index from beginning in timezone ${systemTimezone}`);
@@ -40,17 +56,28 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
       const indexFeatures = energyDevice.features.filter(
         (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
       );
+      const indexById = new Map(indexFeatures.map((f) => [f.id, f]));
 
-      const consumptionFeatures = energyDevice.features.filter(
-        (f) =>
+      const consumptionFeatures = energyDevice.features.filter((f) => {
+        const isConsumption =
           f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-      );
+          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION;
+        if (!isConsumption) {
+          return false;
+        }
+        if (selectorSet.size === 0) return true;
+        const featureSelector = f.selector || f.external_id || f.id;
+        return selectorSet.has(featureSelector);
+      });
 
-      if (indexFeatures.length > 0 && consumptionFeatures.length > 0) {
+      const matchedIndexFeatures = consumptionFeatures
+        .map((cf) => indexById.get(cf.energy_parent_id))
+        .filter((f) => !!f);
+
+      if (matchedIndexFeatures.length > 0) {
         devicesWithBothFeatures.push({
           device: energyDevice,
-          indexFeatures,
+          indexFeatures: matchedIndexFeatures,
         });
       }
     });
@@ -64,6 +91,10 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
     logger.info(
       `Found ${devicesWithBothFeatures.length} devices with both INDEX and THIRTY_MINUTES_CONSUMPTION features`,
     );
+    if (selectorSet.size > 0 && devicesWithBothFeatures.length > 0) {
+      const names = devicesWithBothFeatures.map((d) => d.device.name || d.device.id).join(', ');
+      logger.info(`[energy-monitoring] selection devices: ${names}`);
+    }
 
     if (devicesWithBothFeatures.length === 0) {
       logger.info('No devices found with both features, nothing to process');
@@ -118,7 +149,9 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
       currentWindow = currentWindow.add(30, 'minute');
     }
 
-    logger.info(`Generated ${windows.length} thirty-minute windows to process`);
+    logger.info(
+      `Generated ${windows.length} thirty-minute windows to process for ${devicesWithBothFeatures.length} devices`,
+    );
 
     // Process each window sequentially
     let processedWindows = 0;
@@ -128,7 +161,7 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
     await Promise.each(windows, async (windowTime) => {
       try {
         // Call the existing calculateConsumptionFromIndex function for each window
-        await this.calculateConsumptionFromIndex(windowTime);
+        await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet));
         successfulWindows += 1;
 
         // Update job progress

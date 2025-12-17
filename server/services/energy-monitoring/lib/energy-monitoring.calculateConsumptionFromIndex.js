@@ -16,14 +16,29 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
  * @description Calculate thirty-minute consumption from index differences for devices that have
  * INDEX features with corresponding THIRTY_MINUTES_CONSUMPTION features (linked via energy_parent_id).
  * @param {Date} thirtyMinutesWindowTime - The specific time for the thirty-minute window.
+ * @param {Array} featureSelectors - Optional whitelist of consumption feature selectors to process.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateConsumptionFromIndex(new Date(), '12345678-1234-1234-1234-1234567890ab');
+ * calculateConsumptionFromIndex(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
+async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSelectors = [], jobId) {
+  // Backward compatibility: wrapper injects jobId as last arg; scheduled jobs may call (time, jobId)
+  if (jobId === undefined && typeof featureSelectors === 'string') {
+    jobId = featureSelectors;
+    featureSelectors = [];
+  }
+  const selectorSet = new Set(
+    Array.isArray(featureSelectors)
+      ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+      : [],
+  );
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-  logger.info(`Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime}`);
+  logger.info(
+    `Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime} (scope=${
+      selectorSet.size === 0 ? 'all' : 'selection'
+    }, selectors=${selectorSet.size})`,
+  );
 
   // Get all energy sensor devices
   const energyDevices = await this.gladys.device.get({
@@ -52,6 +67,13 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
       );
 
       if (consumptionFeature) {
+        // If a whitelist is provided, only keep matches
+        if (selectorSet.size > 0) {
+          const consumptionSelector = consumptionFeature.selector || consumptionFeature.external_id || consumptionFeature.id;
+          if (!selectorSet.has(consumptionSelector)) {
+            return;
+          }
+        }
         devicesWithBothFeatures.push({
           device: energyDevice,
           indexFeature,

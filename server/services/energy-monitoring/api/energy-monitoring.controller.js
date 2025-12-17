@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const logger = require('../../../utils/logger');
 
 module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
   /**
@@ -7,7 +8,14 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateCostFromBeginning(req, res) {
-    energyMonitoringHandler.calculateCostFromBeginning();
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors)
+      ? req.body.feature_selectors
+      : [];
+    logger.info(
+      `[energy-monitoring] API calculate-cost-from-beginning selectors=${featureSelectors.length}`,
+      featureSelectors,
+    );
+    energyMonitoringHandler.calculateCostFromBeginning(featureSelectors);
     res.json({
       success: true,
     });
@@ -20,7 +28,14 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
-    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors)
+      ? req.body.feature_selectors
+      : [];
+    logger.info(
+      `[energy-monitoring] API calculate-consumption-from-index-from-beginning selectors=${featureSelectors.length}`,
+      featureSelectors,
+    );
+    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(featureSelectors);
     res.json({
       success: true,
     });

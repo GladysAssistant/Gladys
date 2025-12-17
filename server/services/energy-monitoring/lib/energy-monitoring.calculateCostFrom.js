@@ -23,14 +23,29 @@ const isNullOrEmpty = (value) => value === null || value === undefined || value 
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
+ * @param {Array} featureSelectors - Optional whitelist of cost feature selectors to process.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateCostFrom(new Date(), '12345678-1234-1234-1234-1234567890ab');
+ * calculateCostFrom(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateCostFrom(startAt, jobId) {
+async function calculateCostFrom(startAt, featureSelectors = [], jobId) {
+  // Backward compatibility: wrapper injects jobId as last arg; existing calls may pass (startAt, jobId)
+  if (jobId === undefined && typeof featureSelectors === 'string') {
+    jobId = featureSelectors;
+    featureSelectors = [];
+  }
+  const selectorSet = new Set(
+    Array.isArray(featureSelectors)
+      ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+      : [],
+  );
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-  logger.info(`Calculating cost in timezone ${systemTimezone}`);
+  logger.info(
+    `Calculating cost in timezone ${systemTimezone} (scope=${selectorSet.size === 0 ? 'all' : 'selection'}, selectors=${
+      selectorSet.size
+    })`,
+  );
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
@@ -101,7 +116,15 @@ async function calculateCostFrom(startAt, jobId) {
       }
 
       // For each energy consumption feature
+      let processed = 0;
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
+        if (selectorSet.size > 0) {
+          const costSelector = ecf.consumptionCostFeature.selector || ecf.consumptionCostFeature.external_id || ecf.consumptionCostFeature.id;
+          if (!selectorSet.has(costSelector)) {
+            return;
+          }
+        }
+        processed += 1;
         // Get the feature of the root electrical meter device
         const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
           ecf.consumptionFeature,
@@ -196,6 +219,11 @@ async function calculateCostFrom(startAt, jobId) {
           deviceFeatureCostStatesToInsert,
         );
       });
+      if (selectorSet.size > 0) {
+        logger.info(
+          `Device ${energyDevice.name}: processed ${processed} cost feature(s) out of ${energyConsumptionFeatures.length}`,
+        );
+      }
     } catch (e) {
       logger.error(e);
     }
