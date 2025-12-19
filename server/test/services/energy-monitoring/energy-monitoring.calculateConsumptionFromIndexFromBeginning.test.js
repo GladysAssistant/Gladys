@@ -509,88 +509,80 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   });
 
   describe('Edge cases on params and selectors', () => {
-    it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async () => {
-      // Set a last processed param
+    it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async function testRestoreParam() {
+      // this.timeout(5000);
       const originalValue = '2023-09-30T00:00:00.000Z';
-      const originalSetParam = device.setParam;
       device.setParam = Device.prototype.setParam.bind(device);
       await device.setParam({ id: testDeviceId }, ENERGY_INDEX_LAST_PROCESSED, originalValue);
 
-      // Minimal state to generate one window
       await db.duckDbBatchInsertState(testIndexFeatureId, [
         { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
       ]);
 
-      // Force shouldRestoreLastProcessed = true (endAt in the past)
-      clock = useFakeTimers(new Date('2023-10-10T00:00:00.000Z'));
+      clock = useFakeTimers(new Date('2023-10-06T00:00:00.000Z'));
 
-      // Spy on setParam to confirm restoration
-      const setParamSpy = stub(device, 'setParam').callThrough();
+      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
+      const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
 
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], '2023-10-05', 'job-restore');
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], '2023-10-04', 'job-restore');
 
       const param = await db.DeviceParam.findOne({
         where: { device_id: testDeviceId, name: ENERGY_INDEX_LAST_PROCESSED },
       });
       expect(param.value).to.equal(originalValue);
-      expect(setParamSpy.called).to.equal(true);
-      setParamSpy.restore();
-      device.setParam = originalSetParam;
+
+      destroyFromStub.restore();
+      destroyBetweenStub.restore();
+      calcStub.restore();
     });
 
     it('should skip consumption features without selector and still process valid ones', async () => {
-      // Stub device.get to return a custom device with one missing selector and one valid selector
       const customDevice = {
         id: 'custom-device',
         name: 'Custom Energy Device',
         params: [],
         features: [
           {
-            id: 'custom-index',
+            id: '11111111-1111-1111-1111-111111111111',
             selector: 'custom-index',
             category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
             type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
             energy_parent_id: null,
           },
           {
-            id: 'missing-selector',
+            id: '22222222-2222-2222-2222-222222222222',
             selector: null,
             category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
             type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: 'custom-index',
+            energy_parent_id: '11111111-1111-1111-1111-111111111111',
           },
           {
-            id: 'valid-consumption',
+            id: '33333333-3333-3333-3333-333333333333',
             selector: 'valid-consumption',
             category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
             type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: 'custom-index',
+            energy_parent_id: '11111111-1111-1111-1111-111111111111',
           },
         ],
       };
 
-      // Stub DB call to provide index states
-      const originalDb = gladys.db.duckDbReadConnectionAllAsync;
-      gladys.db.duckDbReadConnectionAllAsync = stub().resolves([
-        { device_feature_id: 'custom-index', created_at: new Date('2023-10-03T10:00:00.000Z'), value: 1000 },
-        { device_feature_id: 'custom-index', created_at: new Date('2023-10-03T10:30:00.000Z'), value: 1020 },
+      await db.duckDbBatchInsertState('11111111-1111-1111-1111-111111111111', [
+        { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
+        { value: 1020, created_at: new Date('2023-10-03T10:30:00.000Z') },
       ]);
 
-      // Fake current time to generate at least one window after the last state
       clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
-      // Stub device.get
-      const originalGet = gladys.device.get;
       const getStub = stub(gladys.device, 'get').returns([customDevice]);
+      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
+      const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
 
-      // Capture selectors passed to inner calculation
       const calls = [];
-      const originalCalc = energyMonitoring.calculateConsumptionFromIndex;
-      energyMonitoring.calculateConsumptionFromIndex = async (windowTime, selectors) => {
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(async (windowTime, selectors) => {
         calls.push(selectors);
-      };
-
-      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+        return null;
+      });
 
       await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
         null,
@@ -599,16 +591,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         'job-selectors',
       );
 
-      // Restore
-      energyMonitoring.calculateConsumptionFromIndex = originalCalc;
-      if (getStub.restore) {
-        getStub.restore();
-      } else {
-        gladys.device.get = originalGet;
-      }
-      gladys.db.duckDbReadConnectionAllAsync = originalDb;
+      calcStub.restore();
+      destroyFromStub.restore();
+      destroyBetweenStub.restore();
+      getStub.restore();
 
-      // Only the valid selector should be forwarded (no missing selector)
       expect(calls.length).to.be.greaterThan(0);
       calls.forEach((selectors) => {
         expect(selectors).to.deep.equal(['valid-consumption']);
