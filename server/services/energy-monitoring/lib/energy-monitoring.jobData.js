@@ -13,12 +13,8 @@ const buildPeriod = (startDate, endDate) => {
   };
 };
 
-const extractSelectorsFromObject = (value) => {
-  if (value && typeof value === 'object') {
-    return asArrayOfStrings(value.featureSelectors || value.feature_selectors || []);
-  }
-  return [];
-};
+const extractSelectorsFromObject = (value = {}) =>
+  asArrayOfStrings(value.featureSelectors || value.feature_selectors || []);
 
 const normalizeJobArgs = (startAt, featureSelectors, endAt) => {
   if (Array.isArray(startAt)) {

@@ -796,5 +796,20 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
       expect(device.saveHistoricalState.called).to.equal(false);
     });
+
+    it('should update job progress when jobId is provided', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+      device.get = fake.returns([mockDevice]);
+      device.getDeviceFeatureStates = fake.returns([
+        { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+        { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },
+      ]);
+      gladys.job.updateProgress.resetHistory();
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, undefined, 'job-progress');
+      expect(gladys.job.updateProgress.calledOnce).to.equal(true);
+      const { args } = gladys.job.updateProgress.getCall(0);
+      expect(args[0]).to.equal('job-progress');
+      expect(args[1]).to.equal(100);
+    });
   });
 });

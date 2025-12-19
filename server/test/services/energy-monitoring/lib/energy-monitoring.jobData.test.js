@@ -1,9 +1,9 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const {
-  buildJobDataForConsumption,
-  buildJobDataForCost,
-} = require('../../../../services/energy-monitoring/lib/energy-monitoring.jobData');
+const jobData = require('../../../../services/energy-monitoring/lib/energy-monitoring.jobData');
+const logger = require('../../../../utils/logger');
+
+const { buildJobDataForConsumption, buildJobDataForCost } = jobData;
 
 describe('energy-monitoring.jobData', () => {
   const baseTimezone = 'Europe/Paris';
@@ -38,6 +38,10 @@ describe('energy-monitoring.jobData', () => {
     id: 'device-id',
     name: 'My Energy Device',
   };
+
+  afterEach(() => {
+    sinon.restore();
+  });
 
   beforeEach(() => {
     fakeStateManager.get.resetHistory();
@@ -82,15 +86,19 @@ describe('energy-monitoring.jobData', () => {
   });
 
   it('should return empty object when buildJobData fails (consumption)', async () => {
-    const ctx = {}; // missing gladys will make buildJobData throw
-    const res = await buildJobDataForConsumption.call(ctx, null, null, null);
-    expect(res).to.deep.equal({ scope: 'all' });
+    const ctx = { gladys: { stateManager: { get: sinon.stub().throws(new Error('boom')) } } };
+    const warnStub = sinon.stub(logger, 'warn');
+    const res = await buildJobDataForConsumption.call(ctx, null, ['unknown'], null);
+    expect(res).to.deep.equal({});
+    expect(warnStub.called).to.equal(true);
   });
 
   it('should return empty object when buildJobData fails (cost)', async () => {
-    const ctx = {}; // missing gladys will make buildJobData throw
-    const res = await buildJobDataForCost.call(ctx, null, null, null);
-    expect(res).to.deep.equal({ scope: 'all' });
+    const ctx = { gladys: { stateManager: { get: sinon.stub().throws(new Error('boom')) } } };
+    const warnStub = sinon.stub(logger, 'warn');
+    const res = await buildJobDataForCost.call(ctx, null, ['unknown'], null);
+    expect(res).to.deep.equal({});
+    expect(warnStub.called).to.equal(true);
   });
 
   it('should normalize args when startAt is an object with selectors and period', async () => {
@@ -133,5 +141,13 @@ describe('energy-monitoring.jobData', () => {
     };
     const res = await buildJobDataForConsumption.call(ctx, { start_date: '2025-04-01' }, [], null);
     expect(res).to.deep.equal({ scope: 'all', period: { start_date: '2025-04-01', end_date: null } });
+  });
+
+  it('should normalize when startAt provided without feature selectors', async () => {
+    const ctx = {
+      gladys: { stateManager: fakeStateManager, variable: { getValue: sinon.stub().resolves(baseTimezone) } },
+    };
+    const res = await buildJobDataForConsumption.call(ctx, { start_date: '2025-05-01' }, [], null);
+    expect(res).to.deep.equal({ scope: 'all', period: { start_date: '2025-05-01', end_date: null } });
   });
 });
