@@ -134,12 +134,11 @@ async function calculateConsumptionFromIndexFromBeginning(startAt, featureSelect
       oldestStateTime = new Date(result[0].oldest_created_at);
     }
 
-    if (!oldestStateTime) {
+    if (oldestStateTime) {
+      logger.info(`Oldest device state found at: ${oldestStateTime}`);
+    } else {
       logger.info('No device states found, nothing to process');
-      return null;
     }
-
-    logger.info(`Oldest device state found at: ${oldestStateTime}`);
 
     let effectiveStartAt = parsedStartAt || oldestStateTime;
     if (effectiveStartAt && parsedStartAt && oldestStateTime && parsedStartAt < oldestStateTime) {
