@@ -724,6 +724,9 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const statesStub = sinon
       .stub(gladys.device, 'getDeviceFeatureStates')
       .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z') }]);
+    const rootStub = sinon
+      .stub(gladys.device.energySensorManager, 'getRootElectricMeterDevice')
+      .returns({ id: 'meter-feature', device_id: 'meter-device' });
     const res = await energyMonitoring.calculateCostFrom(
       new Date('2025-10-01T00:00:00.000Z'),
       undefined,
@@ -737,6 +740,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     destroyBetweenStub.restore();
     priceStub.restore();
     statesStub.restore();
+    rootStub.restore();
   });
 
   it('should return null when start date is invalid type', async () => {
