@@ -67,7 +67,7 @@ describe('energy-monitoring.jobData', () => {
     expect(result)
       .to.have.nested.property('period.end_date')
       .that.is.a('string');
-    expect(result.devices).to.deep.equal([{ device: 'My Energy Device', features: ['Energy root', 'Consumption'] }]);
+    expect(result.devices).to.deep.equal([{ device: 'My Energy Device', features: ['Consumption', 'Energy root'] }]);
     expect(result).to.have.property('kind', 'consumption');
   });
 

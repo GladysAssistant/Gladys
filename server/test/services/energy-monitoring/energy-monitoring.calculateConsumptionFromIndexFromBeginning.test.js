@@ -589,7 +589,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
       clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-selectors');
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
+        null,
+        ['valid-consumption'],
+        null,
+        'job-selectors',
+      );
 
       // Restore
       energyMonitoring.calculateConsumptionFromIndex = originalCalc;
