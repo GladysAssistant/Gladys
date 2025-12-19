@@ -358,10 +358,13 @@ class EnergyMonitoringPage extends Component {
         selectionCostSettingsError: null,
         selectionCostSettingsSuccess: null
       });
-      const costResponse = await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {
-        feature_selectors: costSelectors,
-        ...this.getRecalculateDatePayload()
-      });
+      const costResponse = await this.props.httpClient.post(
+        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
+        {
+          feature_selectors: costSelectors,
+          ...this.getRecalculateDatePayload()
+        }
+      );
       if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
         throw new Error('job_not_created');
       }
@@ -411,10 +414,13 @@ class EnergyMonitoringPage extends Component {
       if (!consumptionResponse || consumptionResponse.success !== true || !consumptionResponse.job_id) {
         throw new Error('job_not_created');
       }
-      const costResponse = await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {
-        feature_selectors: costSelectors,
-        ...this.getRecalculateDatePayload()
-      });
+      const costResponse = await this.props.httpClient.post(
+        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
+        {
+          feature_selectors: costSelectors,
+          ...this.getRecalculateDatePayload()
+        }
+      );
       if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
         throw new Error('job_not_created');
       }
