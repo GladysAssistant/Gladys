@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -811,5 +813,9 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       expect(args[0]).to.equal('job-progress');
       expect(args[1]).to.equal(100);
     });
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 });
