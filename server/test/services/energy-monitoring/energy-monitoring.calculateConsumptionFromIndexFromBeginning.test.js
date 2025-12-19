@@ -691,14 +691,14 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     // Device with missing selector on consumption feature
     await db.DeviceFeature.destroy({ where: {} });
     await gladys.device.create({
-      id: 'sel-missing-device',
+      id: '00000000-0000-0000-0000-0000000000aa',
       name: 'Missing Selector Device',
       selector: 'missing-selector-device',
       external_id: 'missing-selector-device',
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       features: [
         {
-          id: 'sel-missing-index',
+          id: '00000000-0000-0000-0000-0000000000ab',
           name: 'Index',
           selector: 'sel-missing-index',
           external_id: 'sel-missing-index',
@@ -711,7 +711,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           energy_parent_id: null,
         },
         {
-          id: 'sel-missing-consumption',
+          id: '00000000-0000-0000-0000-0000000000ac',
           name: 'Consumption',
           selector: null,
           external_id: 'sel-missing-consumption',
@@ -721,11 +721,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           max: 999999,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'sel-missing-index',
+          energy_parent_id: '00000000-0000-0000-0000-0000000000ab',
         },
       ],
     });
-    await db.duckDbBatchInsertState('sel-missing-index', [
+    await db.duckDbBatchInsertState('00000000-0000-0000-0000-0000000000ab', [
       { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
     ]);
     clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));

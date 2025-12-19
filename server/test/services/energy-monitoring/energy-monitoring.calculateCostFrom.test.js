@@ -699,7 +699,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     try {
       const res = await energyMonitoring.calculateCostFrom(
         new Date('2025-10-01T00:00:00.000Z'),
-        ['cost-selector'],
+        ['plug-without-price-consumption-cost'],
         '2025-10-02',
       );
       expect(res).to.equal(null);
