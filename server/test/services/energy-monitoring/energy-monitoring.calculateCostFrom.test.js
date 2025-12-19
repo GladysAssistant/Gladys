@@ -697,9 +697,13 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]);
     const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
     try {
-      const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), [], '2025-10-02');
+      const res = await energyMonitoring.calculateCostFrom(
+        new Date('2025-10-01T00:00:00.000Z'),
+        ['cost-selector'],
+        '2025-10-02',
+      );
       expect(res).to.equal(null);
-      expect(destroyBetweenStub.called).to.equal(true);
+      expect(destroyBetweenStub.calledOnce).to.equal(true);
     } finally {
       priceStub.restore();
       destroyBetweenStub.restore();

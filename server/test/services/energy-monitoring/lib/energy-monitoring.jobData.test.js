@@ -84,13 +84,13 @@ describe('energy-monitoring.jobData', () => {
   it('should return empty object when buildJobData fails (consumption)', async () => {
     const ctx = {}; // missing gladys will make buildJobData throw
     const res = await buildJobDataForConsumption.call(ctx, null, null, null);
-    expect(res).to.deep.equal({});
+    expect(res).to.deep.equal({ scope: 'all' });
   });
 
   it('should return empty object when buildJobData fails (cost)', async () => {
     const ctx = {}; // missing gladys will make buildJobData throw
     const res = await buildJobDataForCost.call(ctx, null, null, null);
-    expect(res).to.deep.equal({});
+    expect(res).to.deep.equal({ scope: 'all' });
   });
 
   it('should normalize args when startAt is an object with selectors and period', async () => {
