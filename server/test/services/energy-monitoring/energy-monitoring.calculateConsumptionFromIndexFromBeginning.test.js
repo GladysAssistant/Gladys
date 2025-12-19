@@ -509,7 +509,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   });
 
   describe('Edge cases on params and selectors', () => {
-    it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async function testRestoreParam() {
+    it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async () => {
       // this.timeout(5000);
       const originalValue = '2023-09-30T00:00:00.000Z';
       device.setParam = Device.prototype.setParam.bind(device);
@@ -579,10 +579,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
 
       const calls = [];
-      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(async (windowTime, selectors) => {
-        calls.push(selectors);
-        return null;
-      });
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(
+        async (windowTime, selectors) => {
+          calls.push(selectors);
+          return null;
+        },
+      );
 
       await energyMonitoring.calculateConsumptionFromIndexFromBeginning(
         null,
