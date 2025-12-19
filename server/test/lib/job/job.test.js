@@ -214,5 +214,16 @@ describe('Job', () => {
       const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
       expect(finishedJob.status).to.equal(JOB_STATUS.SUCCESS);
     });
+
+    it('should log finish error when job.finish fails in wrapperDetached', async () => {
+      const finishStub = sinon.stub(job, 'finish').rejects(new Error('finish-fail'));
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
+        throw new Error('boom');
+      });
+      const startedJob = await wrapped();
+      // Even if finish fails, we should still get a job object back
+      expect(startedJob).to.have.property('id');
+      finishStub.restore();
+    });
   });
 });

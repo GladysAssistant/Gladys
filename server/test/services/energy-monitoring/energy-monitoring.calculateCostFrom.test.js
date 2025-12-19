@@ -1,4 +1,4 @@
-const { fake } = require('sinon');
+const sinon = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -30,8 +30,8 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 const brain = {
-  addNamedEntity: fake.returns(null),
-  removeNamedEntity: fake.returns(null),
+  addNamedEntity: sinon.fake.returns(null),
+  removeNamedEntity: sinon.fake.returns(null),
 };
 const variable = {
   getValue: (name) => {
@@ -60,10 +60,10 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       device,
       energyPrice,
       gateway: {
-        getEdfTempoHistorical: fake.resolves(historicalTempoData),
+        getEdfTempoHistorical: sinon.fake.resolves(historicalTempoData),
       },
       job: {
-        updateProgress: fake.returns(null),
+        updateProgress: sinon.fake.returns(null),
         wrapper: (name, func) => func,
         wrapperDetached: (name, func) => func,
       },
@@ -683,5 +683,23 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     const res = await energyMonitoring.calculateCostFrom(12345, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     expect(res).to.equal(null);
+  });
+
+  it('should skip cost feature not present in selector whitelist', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    // selector list does not include the cost feature of this device
+    const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), ['other-selector']);
+    expect(res).to.equal(null);
+  });
+
+  it('should return when no energy price found for date', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]);
+    try {
+      const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'));
+      expect(res).to.equal(null);
+    } finally {
+      priceStub.restore();
+    }
   });
 });

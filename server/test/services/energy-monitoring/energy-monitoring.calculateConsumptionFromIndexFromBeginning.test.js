@@ -655,4 +655,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(12345);
     expect(res).to.equal(null);
   });
+
+  it('should accept Date objects for startAt/endAt', async () => {
+    const start = new Date('2023-10-02T00:00:00.000Z');
+    const end = new Date('2023-10-02T01:00:00.000Z');
+    clock = useFakeTimers(new Date('2023-10-03T00:00:00.000Z'));
+    const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(start, [], end, 'job-date');
+    expect(res).to.equal(null);
+  });
 });

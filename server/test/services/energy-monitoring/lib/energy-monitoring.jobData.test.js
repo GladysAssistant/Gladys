@@ -100,4 +100,38 @@ describe('energy-monitoring.jobData', () => {
     const res = await buildJobDataForCost.call(ctx, null, null, null);
     expect(res).to.deep.equal({ scope: 'all' });
   });
+
+  it('should normalize args when startAt is an object with selectors and period', async () => {
+    const ctx = {
+      gladys: { stateManager: fakeStateManager, variable: { getValue: sinon.stub().resolves(baseTimezone) } },
+    };
+    const startAt = {
+      start_date: '2025-03-01',
+      end_date: '2025-03-15',
+      featureSelectors: ['consumption-selector'],
+    };
+    const res = await buildJobDataForConsumption.call(ctx, startAt, ['ignored-selector'], null);
+    expect(res.scope).to.equal('selection');
+    expect(res.kind).to.equal('consumption');
+    expect(res.period).to.deep.equal({ start_date: '2025-03-01', end_date: '2025-03-15' });
+    expect(res.devices[0].features).to.deep.equal(['Consumption']);
+  });
+
+  it('should handle array startAt legacy with mixed selectors', async () => {
+    const ctx = {
+      gladys: { stateManager: fakeStateManager, variable: { getValue: sinon.stub().resolves(baseTimezone) } },
+    };
+    const res = await buildJobDataForConsumption.call(ctx, ['consumption-selector'], ['energy-selector'], null);
+    expect(res.scope).to.equal('selection');
+    expect(res.period || null).to.equal(null);
+    expect(res.devices[0].features).to.include('Consumption');
+  });
+
+  it('should return scope all when selectors cannot be resolved', async () => {
+    const ctx = {
+      gladys: { stateManager: fakeStateManager, variable: { getValue: sinon.stub().resolves(baseTimezone) } },
+    };
+    const res = await buildJobDataForCost.call(ctx, {}, ['unknown-selector'], {});
+    expect(res).to.deep.equal({ scope: 'all' });
+  });
 });
