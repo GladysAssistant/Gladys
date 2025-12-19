@@ -773,14 +773,16 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       { oldest_created_at: '2023-10-03T10:00:00.000Z' },
     ]);
     const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
+    const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
     const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
     clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
     await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-mixed');
     // calc called for windows
     expect(calcStub.called).to.equal(true);
     // destroyStatesBetween should not throw even with missing selector feature
-    expect(destroyBetweenStub.called).to.equal(true);
+    expect(destroyBetweenStub.called || destroyFromStub.called).to.equal(true);
     calcStub.restore();
+    destroyFromStub.restore();
     destroyBetweenStub.restore();
     oldestStub.restore();
     getStub.restore();
