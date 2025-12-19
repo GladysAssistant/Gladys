@@ -624,7 +624,15 @@
       "circularReference": "référence circulaire",
       "selfReference": "auto-référence",
       "fixAutomatically": "Corriger",
-      "fixing": "Correction en cours..."
+      "fixing": "Correction en cours...",
+      "featureHint": {
+        "title": "Suivi énergétique",
+        "description": "Cette fonctionnalité peut être utilisée pour le suivi énergétique. Cliquez sur le bouton ci-dessous pour créer automatiquement les fonctionnalités de suivi de consommation et de coût.",
+        "createButton": "Créer les fonctionnalités",
+        "hierarchy": "Pour les coûts, placez cette fonctionnalité dans la hiérarchie de l'intégration « Suivi de l'énergie » (onglet Mes appareils).",
+        "recalc": "Une fois la hiérarchie définie, lancez un recalcul de consommation et/ou de coût depuis l'onglet Paramètres de cette intégration.",
+        "goToIntegration": "Ouvrir le Suivi de l'énergie"
+      }
     },
     "caldav": {
       "title": "CalDAV",

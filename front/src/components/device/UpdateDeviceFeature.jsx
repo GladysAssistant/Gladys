@@ -217,14 +217,32 @@ class UpdateDeviceFeature extends Component {
               <div class="form-group">
                 <div class="alert alert-info">
                   <h4>
-                    <Text id="integration.mqtt.feature.energyMonitoring.title" />
+                    <Text id="integration.energyMonitoring.featureHint.title" />
                   </h4>
                   <p>
-                    <Text id="integration.mqtt.feature.energyMonitoring.description" />
+                    <Text id="integration.energyMonitoring.featureHint.description" />
                   </p>
                   <button onClick={this.createEnergyConsumptionFeatures} class="btn btn-primary">
-                    <Text id="integration.mqtt.feature.energyMonitoring.createButton" />
+                    <Text id="integration.energyMonitoring.featureHint.createButton" />
                   </button>
+                </div>
+              </div>
+            )}
+            {hasConsumptionFeatures && (
+              <div class="form-group">
+                <div class="alert alert-warning">
+                  <h5 class="mb-2">
+                    <Text id="integration.energyMonitoring.featureHint.title" />
+                  </h5>
+                  <p class="mb-2">
+                    <Text id="integration.energyMonitoring.featureHint.hierarchy" />
+                  </p>
+                  <p class="mb-3">
+                    <Text id="integration.energyMonitoring.featureHint.recalc" />
+                  </p>
+                  <a class="btn btn-outline-primary" href="/dashboard/integration/device/energy-monitoring">
+                    <Text id="integration.energyMonitoring.featureHint.goToIntegration" />
+                  </a>
                 </div>
               </div>
             )}

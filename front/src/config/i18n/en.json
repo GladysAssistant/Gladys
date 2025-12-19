@@ -1750,7 +1750,15 @@
       "circularReference": "circular reference",
       "selfReference": "self reference",
       "fixAutomatically": "Fix",
-      "fixing": "Fixing..."
+      "fixing": "Fixing...",
+      "featureHint": {
+        "title": "Energy monitoring",
+        "description": "This feature can be used for energy monitoring. Click the button below to automatically create the consumption and cost tracking features.",
+        "createButton": "Create energy monitoring features",
+        "hierarchy": "For cost calculations, place this feature in the hierarchy of the “Energy monitoring” integration (My devices tab).",
+        "recalc": "After setting the hierarchy, run a consumption and/or cost recalculation from the Parameters tab of that integration.",
+        "goToIntegration": "Open Energy monitoring"
+      }
     },
     "caldav": {
       "title": "CalDAV",
