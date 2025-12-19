@@ -43,6 +43,10 @@ describe('energy-monitoring.jobData', () => {
     sinon.restore();
   });
 
+  afterEach(() => {
+    sinon.restore();
+  });
+
   beforeEach(() => {
     fakeStateManager.get.resetHistory();
     fakeStateManager.get.withArgs('deviceFeature', 'energy-selector').returns(energyFeature);
