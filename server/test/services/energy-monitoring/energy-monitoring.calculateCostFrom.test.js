@@ -695,11 +695,14 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
   it('should return when no energy price found for date', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]);
+    const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
     try {
-      const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'));
+      const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), [], '2025-10-02');
       expect(res).to.equal(null);
+      expect(destroyBetweenStub.called).to.equal(true);
     } finally {
       priceStub.restore();
+      destroyBetweenStub.restore();
     }
   });
 });

@@ -663,4 +663,65 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(start, [], end, 'job-date');
     expect(res).to.equal(null);
   });
+
+  it('should clamp start date to oldest state when startAt is earlier', async () => {
+    await db.duckDbBatchInsertState(testIndexFeatureId, [
+      { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
+      { value: 1010, created_at: new Date('2023-10-03T10:30:00.000Z') },
+    ]);
+    clock = useFakeTimers(new Date('2023-10-03T12:00:00.000Z'));
+    const calls = [];
+    const original = energyMonitoring.calculateConsumptionFromIndex;
+    energyMonitoring.calculateConsumptionFromIndex = async (windowTime) => {
+      calls.push(windowTime);
+    };
+    await energyMonitoring.calculateConsumptionFromIndexFromBeginning('2023-10-01', [], null, 'job-clamp');
+    energyMonitoring.calculateConsumptionFromIndex = original;
+    expect(calls.length).to.be.greaterThan(0);
+    // First window should start at 10:00 rounded
+    expect(calls[0].toISOString()).to.equal(new Date('2023-10-03T10:00:00.000Z').toISOString());
+  });
+
+  it('should return null when no valid start date can be determined', async () => {
+    const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(true, [], null, 'job-nostart');
+    expect(res).to.equal(null);
+  });
+
+  it('should skip consumption features without selector', async () => {
+    // Device with missing selector on consumption feature
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature');
+    await gladys.device.create({
+      id: 'sel-missing-device',
+      name: 'Missing Selector Device',
+      selector: 'missing-selector-device',
+      external_id: 'missing-selector-device',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      features: [
+        {
+          id: 'sel-missing-index',
+          name: 'Index',
+          selector: 'sel-missing-index',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+          energy_parent_id: null,
+        },
+        {
+          id: 'sel-missing-consumption',
+          name: 'Consumption',
+          selector: null,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: 'sel-missing-index',
+        },
+      ],
+    });
+    await db.duckDbBatchInsertState('sel-missing-index', [
+      { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
+    ]);
+    clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+    const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
+    await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-noselector');
+    expect(calcStub.called).to.equal(false);
+    calcStub.restore();
+  });
 });

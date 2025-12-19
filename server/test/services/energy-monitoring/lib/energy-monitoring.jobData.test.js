@@ -88,7 +88,7 @@ describe('energy-monitoring.jobData', () => {
       },
     };
     const res = await buildJobDataForConsumption.call(ctx, null, null, null);
-    expect(res).to.deep.equal({ scope: 'all' });
+    expect(res).to.deep.equal({});
   });
 
   it('should return empty object when buildJobData fails (cost)', async () => {
@@ -98,7 +98,7 @@ describe('energy-monitoring.jobData', () => {
       },
     };
     const res = await buildJobDataForCost.call(ctx, null, null, null);
-    expect(res).to.deep.equal({ scope: 'all' });
+    expect(res).to.deep.equal({});
   });
 
   it('should normalize args when startAt is an object with selectors and period', async () => {
@@ -133,5 +133,13 @@ describe('energy-monitoring.jobData', () => {
     };
     const res = await buildJobDataForCost.call(ctx, {}, ['unknown-selector'], {});
     expect(res).to.deep.equal({ scope: 'all' });
+  });
+
+  it('should return scope all when startAt object has no selectors', async () => {
+    const ctx = {
+      gladys: { stateManager: fakeStateManager, variable: { getValue: sinon.stub().resolves(baseTimezone) } },
+    };
+    const res = await buildJobDataForConsumption.call(ctx, { start_date: '2025-04-01' }, [], null);
+    expect(res).to.deep.equal({ scope: 'all', period: { start_date: '2025-04-01', end_date: null } });
   });
 });
