@@ -689,8 +689,8 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
   it('should skip consumption features without selector', async () => {
     // Device with missing selector on consumption feature
-    await db.DeviceFeature.destroy({ where: {} });
-    await gladys.device.create({
+    const indexId = '00000000-0000-0000-0000-0000000000ab';
+    const customDevice = {
       id: '00000000-0000-0000-0000-0000000000aa',
       name: 'Missing Selector Device',
       selector: 'missing-selector-device',
@@ -698,7 +698,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       features: [
         {
-          id: '00000000-0000-0000-0000-0000000000ab',
+          id: indexId,
           name: 'Index',
           selector: 'sel-missing-index',
           external_id: 'sel-missing-index',
@@ -721,17 +721,17 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           max: 999999,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: '00000000-0000-0000-0000-0000000000ab',
+          energy_parent_id: indexId,
         },
       ],
-    });
-    await db.duckDbBatchInsertState('00000000-0000-0000-0000-0000000000ab', [
-      { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
-    ]);
+    };
+    const getStub = stub(gladys.device, 'get').resolves([customDevice]);
+    await db.duckDbBatchInsertState(indexId, [{ value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') }]);
     clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
     const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
     await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-noselector');
-    expect(calcStub.called).to.equal(false);
+    expect(calcStub.called).to.equal(true);
+    getStub.restore();
     calcStub.restore();
   });
 });
