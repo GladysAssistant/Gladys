@@ -16,6 +16,8 @@ const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
 
+const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
+
 describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let gladys;
   let energyMonitoring;
@@ -506,6 +508,101 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     });
   });
 
+  describe('Edge cases on params and selectors', () => {
+    it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async () => {
+      // Set a last processed param
+      const originalValue = '2023-09-30T00:00:00.000Z';
+      await device.setParam({ selector: 'test-energy-device' }, ENERGY_INDEX_LAST_PROCESSED, originalValue);
+
+      // Minimal state to generate one window
+      await db.duckDbBatchInsertState(testIndexFeatureId, [
+        { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
+      ]);
+
+      // Force shouldRestoreLastProcessed = true (endAt in the past)
+      clock = useFakeTimers(new Date('2023-10-10T00:00:00.000Z'));
+
+      // Spy on setParam to confirm restoration
+      const setParamSpy = stub(device, 'setParam').callThrough();
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], '2023-10-05', 'job-restore');
+
+      const param = await db.DeviceParam.findOne({
+        where: { device_id: testDeviceId, name: ENERGY_INDEX_LAST_PROCESSED },
+      });
+      expect(param.value).to.equal(originalValue);
+      expect(setParamSpy.called).to.equal(true);
+      setParamSpy.restore();
+    });
+
+    it('should skip consumption features without selector and still process valid ones', async () => {
+      // Stub device.get to return a custom device with one missing selector and one valid selector
+      const customDevice = {
+        id: 'custom-device',
+        name: 'Custom Energy Device',
+        params: [],
+        features: [
+          {
+            id: 'custom-index',
+            selector: 'custom-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'missing-selector',
+            selector: null,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'custom-index',
+          },
+          {
+            id: 'valid-consumption',
+            selector: 'valid-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'custom-index',
+          },
+        ],
+      };
+
+      // Stub DB call to provide index states
+      const originalDb = gladys.db.duckDbReadConnectionAllAsync;
+      gladys.db.duckDbReadConnectionAllAsync = stub().resolves([
+        { device_feature_id: 'custom-index', created_at: new Date('2023-10-03T10:00:00.000Z'), value: 1000 },
+        { device_feature_id: 'custom-index', created_at: new Date('2023-10-03T10:30:00.000Z'), value: 1020 },
+      ]);
+
+      // Stub device.get
+      const originalGet = gladys.device.get;
+      const getStub = stub(gladys.device, 'get').returns([customDevice]);
+
+      // Capture selectors passed to inner calculation
+      const calls = [];
+      const originalCalc = energyMonitoring.calculateConsumptionFromIndex;
+      energyMonitoring.calculateConsumptionFromIndex = async (windowTime, selectors) => {
+        calls.push(selectors);
+      };
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-selectors');
+
+      // Restore
+      energyMonitoring.calculateConsumptionFromIndex = originalCalc;
+      if (getStub.restore) {
+        getStub.restore();
+      } else {
+        gladys.device.get = originalGet;
+      }
+      gladys.db.duckDbReadConnectionAllAsync = originalDb;
+
+      // Only the valid selector should be forwarded
+      expect(calls.length).to.be.greaterThan(0);
+      calls.forEach((selectors) => {
+        expect(selectors).to.deep.equal(['valid-consumption']);
+      });
+    });
+  });
+
   it('should continue processing windows even when some fail', async () => {
     // Insert test states
     const baseTime = new Date('2023-10-03T10:00:00.000Z');
@@ -545,5 +642,15 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
     // Should have processed multiple windows (at least 3: 10:00, 10:30, 11:00, 11:30)
     expect(callCount).to.be.at.least(3);
+  });
+
+  it('should return null when start date is after end date', async () => {
+    const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('2025-12-31', null, '2025-01-01');
+    expect(res).to.equal(null);
+  });
+
+  it('should return null when start date is invalid type', async () => {
+    const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(12345);
+    expect(res).to.equal(null);
   });
 });

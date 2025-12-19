@@ -667,4 +667,21 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
     }
   });
+
+  it('should return null when start date is after end date', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    const res = await energyMonitoring.calculateCostFrom(
+      '2025-12-31',
+      'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22',
+      null,
+      '2025-01-01',
+    );
+    expect(res).to.equal(null);
+  });
+
+  it('should return null when start date is invalid type', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    const res = await energyMonitoring.calculateCostFrom(12345, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    expect(res).to.equal(null);
+  });
 });

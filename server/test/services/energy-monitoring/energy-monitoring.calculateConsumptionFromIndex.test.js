@@ -1,4 +1,4 @@
-const { fake, assert } = require('sinon');
+const { fake, assert, spy } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -772,6 +772,30 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
       // Verify last processed timestamp was saved
       assert.calledOnce(device.setParam);
+    });
+
+    it('should skip consumption features not in whitelist selectors', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Only provide energy sensor device
+      device.get = fake.returns([mockDevice]);
+
+      device.getDeviceFeatureStates = fake((selector) => {
+        if (selector === 'test-energy-device-index') {
+          return [
+            { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+            { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },
+          ];
+        }
+        return [];
+      });
+
+      const saveSpy = spy(gladys.device, 'saveHistoricalState');
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, ['non-matching-selector']);
+
+      expect(saveSpy.called).to.equal(false);
+      saveSpy.restore();
     });
   });
 });

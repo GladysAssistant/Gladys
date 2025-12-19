@@ -131,6 +131,28 @@ describe('Job', () => {
   });
   describe('job.wrapper', () => {
     const job = new Job(event);
+    it('should inject buildJobData result into job data', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async (...args) => ({ scope: 'all', args: args.length }),
+      });
+      await wrapped('a', 'b');
+      const jobs = await job.get();
+      const lastJob = jobs[0];
+      expect(lastJob.data).to.deep.include({ scope: 'all', args: 2 });
+    });
+
+    it('should continue when buildJobData throws', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async () => {
+          throw new Error('fail-data');
+        },
+      });
+      await wrapped();
+      const jobs = await job.get();
+      const lastJob = jobs[0];
+      expect(lastJob).to.have.property('status', JOB_STATUS.SUCCESS);
+    });
+
     it('should test wrapper', async () => {
       const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {});
       await wrapped();
@@ -193,6 +215,26 @@ describe('Job', () => {
       const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.FAILED);
       expect(finishedJob).to.have.property('status', JOB_STATUS.FAILED);
       expect(finishedJob.data.error).to.include('failed');
+    });
+
+    it('should run wrapperDetached with custom buildJobData', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async () => ({ scope: 'custom' }),
+      });
+      const startedJob = await wrapped();
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob.data).to.deep.include({ scope: 'custom' });
+    });
+
+    it('should ignore buildJobData error in wrapperDetached', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async () => {
+          throw new Error('bd-fail');
+        },
+      });
+      const startedJob = await wrapped();
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob.status).to.equal(JOB_STATUS.SUCCESS);
     });
   });
 });
