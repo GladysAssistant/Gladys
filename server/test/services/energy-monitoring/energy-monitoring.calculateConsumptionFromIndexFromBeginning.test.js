@@ -740,7 +740,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       name: 'Mixed Consumption Device',
       features: [
         {
-          id: 'mix-index',
+          id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
           selector: 'mix-index',
           external_id: 'mix-index',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -753,7 +753,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           external_id: 'mix-consumption-valid',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'mix-index',
+          energy_parent_id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
         },
         {
           id: 'mix-consumption-missing',
@@ -761,11 +761,13 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
           external_id: 'mix-consumption-missing',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'mix-index',
+          energy_parent_id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
         },
       ],
     };
-    await db.duckDbBatchInsertState('mix-index', [{ value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') }]);
+    await db.duckDbBatchInsertState('aaaabbbb-cccc-dddd-eeee-ffffffffffff', [
+      { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
+    ]);
     const getStub = stub(gladys.device, 'get').resolves([mixedDevice]);
     const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
       { oldest_created_at: '2023-10-03T10:00:00.000Z' },
