@@ -82,21 +82,13 @@ describe('energy-monitoring.jobData', () => {
   });
 
   it('should return empty object when buildJobData fails (consumption)', async () => {
-    const ctx = {
-      buildJobData() {
-        throw new Error('boom');
-      },
-    };
+    const ctx = {}; // missing gladys will make buildJobData throw
     const res = await buildJobDataForConsumption.call(ctx, null, null, null);
     expect(res).to.deep.equal({});
   });
 
   it('should return empty object when buildJobData fails (cost)', async () => {
-    const ctx = {
-      buildJobData() {
-        throw new Error('boom');
-      },
-    };
+    const ctx = {}; // missing gladys will make buildJobData throw
     const res = await buildJobDataForCost.call(ctx, null, null, null);
     expect(res).to.deep.equal({});
   });

@@ -689,7 +689,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
   it('should skip consumption features without selector', async () => {
     // Device with missing selector on consumption feature
-    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature');
+    await db.DeviceFeature.destroy({ where: {} });
     await gladys.device.create({
       id: 'sel-missing-device',
       name: 'Missing Selector Device',
