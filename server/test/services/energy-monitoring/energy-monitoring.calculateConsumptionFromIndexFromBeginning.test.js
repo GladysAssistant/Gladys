@@ -18,7 +18,7 @@ const db = require('../../../models');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
-describe.only('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
+describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let gladys;
   let energyMonitoring;
   let clock;
