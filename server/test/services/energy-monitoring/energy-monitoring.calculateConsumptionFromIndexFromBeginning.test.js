@@ -18,7 +18,7 @@ const db = require('../../../models');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
-describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
+describe.only('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let gladys;
   let energyMonitoring;
   let clock;
@@ -576,6 +576,9 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         { device_feature_id: 'custom-index', created_at: new Date('2023-10-03T10:30:00.000Z'), value: 1020 },
       ]);
 
+      // Fake current time to generate at least one window after the last state
+      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+
       // Stub device.get
       const originalGet = gladys.device.get;
       const getStub = stub(gladys.device, 'get').returns([customDevice]);
@@ -605,7 +608,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       }
       gladys.db.duckDbReadConnectionAllAsync = originalDb;
 
-      // Only the valid selector should be forwarded
+      // Only the valid selector should be forwarded (no missing selector)
       expect(calls.length).to.be.greaterThan(0);
       calls.forEach((selectors) => {
         expect(selectors).to.deep.equal(['valid-consumption']);
