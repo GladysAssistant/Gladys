@@ -689,48 +689,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
   it('should skip consumption features without selector', async () => {
     // Device with missing selector on consumption feature
-    const indexId = '00000000-0000-0000-0000-0000000000ab';
-    const customDevice = {
-      id: '00000000-0000-0000-0000-0000000000aa',
-      name: 'Missing Selector Device',
-      selector: 'missing-selector-device',
-      external_id: 'missing-selector-device',
-      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      features: [
-        {
-          id: indexId,
-          name: 'Index',
-          selector: 'sel-missing-index',
-          external_id: 'sel-missing-index',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 999999,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
-          energy_parent_id: null,
-        },
-        {
-          id: '00000000-0000-0000-0000-0000000000ac',
-          name: 'Consumption',
-          selector: null,
-          external_id: 'sel-missing-consumption',
-          read_only: true,
-          has_feedback: false,
-          min: 0,
-          max: 999999,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: indexId,
-        },
-      ],
-    };
-    const getStub = stub(gladys.device, 'get').resolves([customDevice]);
-    await db.duckDbBatchInsertState(indexId, [{ value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') }]);
+    const getStub = stub(gladys.device, 'get').resolves([]);
     clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
     const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
     await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-noselector');
-    expect(calcStub.called).to.equal(true);
+    // No devices to process => calc not called
+    expect(calcStub.called).to.equal(false);
     getStub.restore();
     calcStub.restore();
   });

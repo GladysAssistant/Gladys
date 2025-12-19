@@ -679,6 +679,66 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(res).to.equal(null);
   });
 
+  it('should return null when no price matches a state (energyPricesForDate empty)', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    // Force a valid hierarchy with one consumption/cost pair
+    const getStub = sinon.stub(gladys.device, 'get').resolves([
+      {
+        id: 'meter-device',
+        name: 'Meter',
+        features: [
+          {
+            id: 'meter-feature',
+            selector: 'meter-feature',
+            external_id: 'meter-feature',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          },
+        ],
+      },
+      {
+        id: 'plug-device',
+        name: 'Plug',
+        features: [
+          {
+            id: 'plug-consumption',
+            selector: 'plug-consumption',
+            external_id: 'plug-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'meter-feature',
+          },
+          {
+            id: 'plug-cost',
+            selector: 'plug-cost',
+            external_id: 'plug-cost',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+            energy_parent_id: 'plug-consumption',
+          },
+        ],
+      },
+    ]);
+    const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
+    const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]); // no prices
+    const statesStub = sinon
+      .stub(gladys.device, 'getDeviceFeatureStates')
+      .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z') }]);
+    const res = await energyMonitoring.calculateCostFrom(
+      new Date('2025-10-01T00:00:00.000Z'),
+      undefined,
+      null,
+      '2025-10-02',
+    );
+    expect(res).to.equal(null);
+    expect(destroyBetweenStub.calledOnce).to.equal(true);
+    expect(statesStub.calledOnce).to.equal(true);
+    getStub.restore();
+    destroyBetweenStub.restore();
+    priceStub.restore();
+    statesStub.restore();
+  });
+
   it('should return null when start date is invalid type', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     const res = await energyMonitoring.calculateCostFrom(12345, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
