@@ -17,7 +17,8 @@ async function calculateCostFromBeginning(startAt, featureSelectors, endAt, jobI
 
   return queueWrapper(this.queue, async () => {
     const finalStartAt = startAt || new Date(0);
-    await this.calculateCostFrom(finalStartAt, selectors, jobId, endAt);
+    // Outer job controls progress; inner call runs without jobId to prevent double updates.
+    await this.calculateCostFrom(finalStartAt, selectors, null, endAt);
   });
 }
 

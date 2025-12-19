@@ -224,7 +224,8 @@ async function calculateConsumptionFromIndexFromBeginning(startAt, featureSelect
       await Promise.each(windows, async (windowTime) => {
         try {
           // Call the existing calculateConsumptionFromIndex function for each window
-          await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet), jobId);
+          // Avoid double progress updates: outer job manages progress, so inner call runs without jobId
+          await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet), null);
           successfulWindows += 1;
 
           // Update job progress
