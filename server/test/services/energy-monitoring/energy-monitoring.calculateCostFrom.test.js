@@ -700,6 +700,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       const res = await energyMonitoring.calculateCostFrom(
         new Date('2025-10-01T00:00:00.000Z'),
         undefined,
+        null,
         '2025-10-02',
       );
       expect(res).to.equal(null);
