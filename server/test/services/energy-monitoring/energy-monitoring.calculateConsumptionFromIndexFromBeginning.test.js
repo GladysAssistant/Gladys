@@ -512,7 +512,9 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     it('should restore ENERGY_INDEX_LAST_PROCESSED param when end date provided', async () => {
       // Set a last processed param
       const originalValue = '2023-09-30T00:00:00.000Z';
-      await device.setParam({ selector: 'test-energy-device' }, ENERGY_INDEX_LAST_PROCESSED, originalValue);
+      const originalSetParam = device.setParam;
+      device.setParam = Device.prototype.setParam.bind(device);
+      await device.setParam({ id: testDeviceId }, ENERGY_INDEX_LAST_PROCESSED, originalValue);
 
       // Minimal state to generate one window
       await db.duckDbBatchInsertState(testIndexFeatureId, [
@@ -533,6 +535,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       expect(param.value).to.equal(originalValue);
       expect(setParamSpy.called).to.equal(true);
       setParamSpy.restore();
+      device.setParam = originalSetParam;
     });
 
     it('should skip consumption features without selector and still process valid ones', async () => {
@@ -583,6 +586,8 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       energyMonitoring.calculateConsumptionFromIndex = async (windowTime, selectors) => {
         calls.push(selectors);
       };
+
+      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
       await energyMonitoring.calculateConsumptionFromIndexFromBeginning(null, [], null, 'job-selectors');
 

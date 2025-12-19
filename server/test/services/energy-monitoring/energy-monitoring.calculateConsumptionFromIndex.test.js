@@ -1,4 +1,4 @@
-const { fake, assert, spy } = require('sinon');
+const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -790,12 +790,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
         return [];
       });
 
-      const saveSpy = spy(gladys.device, 'saveHistoricalState');
+      device.saveHistoricalState.resetHistory();
 
       await energyMonitoring.calculateConsumptionFromIndex(testTime, ['non-matching-selector']);
 
-      expect(saveSpy.called).to.equal(false);
-      saveSpy.restore();
+      expect(device.saveHistoricalState.called).to.equal(false);
     });
   });
 });
