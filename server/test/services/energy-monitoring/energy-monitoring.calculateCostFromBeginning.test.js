@@ -57,39 +57,27 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
     await energyMonitoring.calculateCostFromBeginning(null, [], null, '12345678-1234-1234-1234-1234567890ab');
-    assert.calledWith(
-      energyMonitoring.calculateCostFrom,
-      new Date(0),
-      [],
-      '12345678-1234-1234-1234-1234567890ab',
-      null,
-    );
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), [], null, null);
   });
 
   it('should pass provided dates to calculateCostFrom', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
     await energyMonitoring.calculateCostFromBeginning('2025-01-01', ['feature-1'], '2025-01-31', 'job-123');
-    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-01-01', ['feature-1'], 'job-123', '2025-01-31');
+    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-01-01', ['feature-1'], null, '2025-01-31');
   });
 
   it('should pass start date only to calculateCostFrom', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
     await energyMonitoring.calculateCostFromBeginning('2025-02-01', ['feature-1', 'feature-2'], null, 'job-456');
-    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-02-01', ['feature-1', 'feature-2'], 'job-456', null);
+    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-02-01', ['feature-1', 'feature-2'], null, null);
   });
 
   it('should pass end date only to calculateCostFrom', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
     await energyMonitoring.calculateCostFromBeginning(null, ['feature-1', 'feature-2'], '2025-02-28', 'job-789');
-    assert.calledWith(
-      energyMonitoring.calculateCostFrom,
-      new Date(0),
-      ['feature-1', 'feature-2'],
-      'job-789',
-      '2025-02-28',
-    );
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), ['feature-1', 'feature-2'], null, '2025-02-28');
   });
 });
