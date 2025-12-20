@@ -216,13 +216,13 @@ class UpdateDeviceFeature extends Component {
             {showCreateEnergyFeaturesButton && (
               <div class="form-group">
                 <div class="alert alert-info">
-                  <h4>
+                  <h5>
                     <Text id="integration.energyMonitoring.featureHint.title" />
-                  </h4>
+                  </h5>
                   <p>
                     <Text id="integration.energyMonitoring.featureHint.description" />
                   </p>
-                  <button onClick={this.createEnergyConsumptionFeatures} class="btn btn-primary">
+                  <button onClick={this.createEnergyConsumptionFeatures} class="btn btn-primary btn-sm d-block w-100 text-center">
                     <Text id="integration.energyMonitoring.featureHint.createButton" />
                   </button>
                 </div>
@@ -240,7 +240,10 @@ class UpdateDeviceFeature extends Component {
                   <p class="mb-3">
                     <Text id="integration.energyMonitoring.featureHint.recalc" />
                   </p>
-                  <a class="btn btn-outline-primary" href="/dashboard/integration/device/energy-monitoring">
+                  <a
+                    class="btn btn-outline-primary btn-sm d-block w-100 text-center"
+                    href="/dashboard/integration/device/energy-monitoring"
+                  >
                     <Text id="integration.energyMonitoring.featureHint.goToIntegration" />
                   </a>
                 </div>

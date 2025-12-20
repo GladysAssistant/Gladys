@@ -669,8 +669,8 @@
         "title": "Suivi énergétique",
         "description": "Cette fonctionnalité peut être utilisée pour le suivi énergétique. Cliquez sur le bouton ci-dessous pour créer automatiquement les fonctionnalités de suivi de consommation et de coût.",
         "createButton": "Créer les fonctionnalités",
-        "hierarchy": "Pour les coûts, placez cette fonctionnalité dans la hiérarchie de l'intégration « Suivi de l'énergie » (onglet Mes appareils).",
-        "recalc": "Une fois la hiérarchie définie, lancez un recalcul de consommation et/ou de coût depuis l'onglet Paramètres de cette intégration.",
+        "hierarchy": "Placez-la dans la hiérarchie « Suivi de l'énergie » (onglet Mes appareils) pour lier les coûts.",
+        "recalc": "Ensuite, relancez le calcul conso/coût depuis l'onglet Paramètres.",
         "goToIntegration": "Ouvrir le Suivi de l'énergie"
       }
     },

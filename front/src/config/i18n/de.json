@@ -771,8 +771,8 @@
         "title": "Energieüberwachung",
         "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
         "createButton": "Energieüberwachungsfunktionen erstellen",
-        "hierarchy": "Für die Kostenermittlung ordne diese Funktion in der Hierarchie der Integration „Energieüberwachung“ zu (Tab „Meine Geräte“).",
-        "recalc": "Nach der Hierarchie starte eine Neu­berechnung von Verbrauch und/oder Kosten über den Tab „Einstellungen“ dieser Integration.",
+        "hierarchy": "Ordne sie der Hierarchie „Energieüberwachung“ zu (Tab „Meine Geräte“), um Kosten zu verknüpfen.",
+        "recalc": "Dann Verbrauch/Kosten im Tab „Einstellungen“ neu berechnen.",
         "goToIntegration": "Energieüberwachung öffnen"
       }
     },
