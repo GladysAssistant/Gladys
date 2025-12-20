@@ -222,7 +222,10 @@ class UpdateDeviceFeature extends Component {
                   <p>
                     <Text id="integration.energyMonitoring.featureHint.description" />
                   </p>
-                  <button onClick={this.createEnergyConsumptionFeatures} class="btn btn-primary btn-sm d-block w-100 text-center">
+                  <button
+                    onClick={this.createEnergyConsumptionFeatures}
+                    class="btn btn-primary btn-sm d-block w-100 text-center"
+                  >
                     <Text id="integration.energyMonitoring.featureHint.createButton" />
                   </button>
                 </div>
