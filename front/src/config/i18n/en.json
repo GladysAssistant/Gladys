@@ -1432,12 +1432,7 @@
         "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature",
         "showAdvancedSettings": "Show advanced settings",
-        "hideAdvancedSettings": "Hide advanced settings",
-        "energyMonitoring": {
-          "title": "Energy Monitoring",
-          "description": "This feature can be used for energy monitoring. Click the button below to automatically create the consumption and cost tracking features.",
-          "createButton": "Create energy monitoring features"
-        }
+        "hideAdvancedSettings": "Hide advanced settings"
       },
       "setup": {
         "title": "MQTT configuration",
