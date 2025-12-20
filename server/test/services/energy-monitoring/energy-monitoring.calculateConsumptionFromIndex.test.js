@@ -814,8 +814,4 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       expect(args[1]).to.equal(100);
     });
   });
-
-  afterEach(() => {
-    sinon.restore();
-  });
 });

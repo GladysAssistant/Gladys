@@ -839,8 +839,4 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     getStub.restore();
     errorStub.restore();
   });
-
-  afterEach(() => {
-    sinon.restore();
-  });
 });

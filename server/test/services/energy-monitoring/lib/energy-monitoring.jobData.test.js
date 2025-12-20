@@ -39,14 +39,6 @@ describe('energy-monitoring.jobData', () => {
     name: 'My Energy Device',
   };
 
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  afterEach(() => {
-    sinon.restore();
-  });
-
   beforeEach(() => {
     fakeStateManager.get.resetHistory();
     fakeStateManager.get.withArgs('deviceFeature', 'energy-selector').returns(energyFeature);
@@ -95,6 +87,7 @@ describe('energy-monitoring.jobData', () => {
     const res = await buildJobDataForConsumption.call(ctx, null, ['unknown'], null);
     expect(res).to.deep.equal({});
     expect(warnStub.called).to.equal(true);
+    warnStub.restore();
   });
 
   it('should return empty object when buildJobData fails (cost)', async () => {
@@ -103,6 +96,7 @@ describe('energy-monitoring.jobData', () => {
     const res = await buildJobDataForCost.call(ctx, null, ['unknown'], null);
     expect(res).to.deep.equal({});
     expect(warnStub.called).to.equal(true);
+    warnStub.restore();
   });
 
   it('should normalize args when startAt is an object with selectors and period', async () => {
