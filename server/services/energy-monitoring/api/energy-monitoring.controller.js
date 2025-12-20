@@ -7,9 +7,13 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateCostFromBeginning(req, res) {
-    energyMonitoringHandler.calculateCostFromBeginning();
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
+    const startDate = req.body && req.body.start_date;
+    const endDate = req.body && req.body.end_date;
+    const job = await energyMonitoringHandler.calculateCostFromBeginning(startDate, featureSelectors, endDate);
     res.json({
       success: true,
+      job_id: job && job.id,
     });
   }
 
@@ -20,9 +24,17 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
-    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
+    const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
+    const startDate = req.body && req.body.start_date;
+    const endDate = req.body && req.body.end_date;
+    const job = await energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(
+      startDate,
+      featureSelectors,
+      endDate,
+    );
     res.json({
       success: true,
+      job_id: job && job.id,
     });
   }
 

@@ -155,4 +155,75 @@ describe('Job', () => {
       expect(lastJob).to.have.property('status', JOB_STATUS.FAILED);
     });
   });
+  describe('job.wrapperDetached', () => {
+    const job = new Job(event);
+    const sleep = (ms) =>
+      new Promise((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    const waitForStatus = async (jobId, status, attempts = 0) => {
+      const jobs = await job.get();
+      const current = jobs.find((oneJob) => oneJob.id === jobId);
+      if (current && current.status === status) {
+        return current;
+      }
+      if (attempts >= 40) {
+        throw new Error(`Timeout waiting for job ${jobId} to reach status ${status}`);
+      }
+      await sleep(10);
+      return waitForStatus(jobId, status, attempts + 1);
+    };
+
+    it('should run wrapperDetached', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {});
+      const startedJob = await wrapped();
+      expect(startedJob).to.have.property('id');
+
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob).to.have.property('status', JOB_STATUS.SUCCESS);
+    });
+
+    it('should run wrapperDetached with failed job', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
+        throw new Error('failed');
+      });
+      const startedJob = await wrapped();
+      expect(startedJob).to.have.property('id');
+
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.FAILED);
+      expect(finishedJob).to.have.property('status', JOB_STATUS.FAILED);
+      expect(finishedJob.data.error).to.include('failed');
+    });
+
+    it('should run wrapperDetached with custom buildJobData', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async () => ({ scope: 'custom' }),
+      });
+      const startedJob = await wrapped();
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob.data).to.deep.include({ scope: 'custom' });
+    });
+
+    it('should ignore buildJobData error in wrapperDetached', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, {
+        buildJobData: async () => {
+          throw new Error('bd-fail');
+        },
+      });
+      const startedJob = await wrapped();
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob.status).to.equal(JOB_STATUS.SUCCESS);
+    });
+
+    it('should log finish error when job.finish fails in wrapperDetached', async () => {
+      const finishStub = sinon.stub(job, 'finish').rejects(new Error('finish-fail'));
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
+        throw new Error('boom');
+      });
+      const startedJob = await wrapped();
+      // Even if finish fails, we should still get a job object back
+      expect(startedJob).to.have.property('id');
+      finishStub.restore();
+    });
+  });
 });
