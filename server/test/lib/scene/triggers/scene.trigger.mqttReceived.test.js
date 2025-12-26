@@ -90,6 +90,43 @@ describe('Scene.triggers.mqttReceived', () => {
     });
   });
 
+  it('should execute scene with message received trigger with undefined message (match any)', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.MQTT.RECEIVED,
+          topic: 'my/topic',
+          // message is undefined - should match any message
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'my/topic',
+      message: '{"event":"S","event_cnt":47}',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
   it('should execute scene with message received trigger whit message', async () => {
     sceneManager.addScene({
       selector: 'my-scene',

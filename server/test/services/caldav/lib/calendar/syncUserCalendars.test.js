@@ -254,7 +254,7 @@ describe('CalDAV sync', () => {
 
     await sync.syncUserCalendars(userId);
 
-    expect(sync.gladys.variable.getValue.callCount).to.equal(4);
+    expect(sync.gladys.variable.getValue.callCount).to.equal(5);
 
     expect(sync.requestCalendars.callCount).to.equal(1);
     expect(sync.requestChanges.callCount).to.equal(2);

@@ -1,3 +1,13 @@
+const {
+  Pm25ConcentrationMeasurement,
+  Pm10ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
+  ElectricalPowerMeasurement,
+  ElectricalEnergyMeasurement,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
+
 const sinon = require('sinon');
 const { expect } = require('chai');
 
@@ -7,6 +17,9 @@ const config = require('../../../../config/config');
 
 const MatterHandler = require('../../../../services/matter/lib');
 const { VARIABLES } = require('../../../../services/matter/utils/constants');
+const {
+  convertMeasurementUnitToDeviceFeatureUnits,
+} = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.init', () => {
   let matterHandler;
@@ -152,6 +165,96 @@ describe('Matter.init', () => {
       commands: {},
       addOccupiedHeatingSetpointAttributeListener: fake.returns(null),
       addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
+    });
+
+    // PM2.5 concentration measurement
+    clusterClients.set(Pm25ConcentrationMeasurement.Complete.id, {
+      id: Pm25ConcentrationMeasurement.Complete.id,
+      name: 'Pm25ConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
+    });
+
+    // PM10 concentration measurement
+    clusterClients.set(Pm10ConcentrationMeasurement.Complete.id, {
+      id: Pm10ConcentrationMeasurement.Complete.id,
+      name: 'Pm10ConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
+    });
+
+    // VOC concentration measurement
+    clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
+      id: TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
+      name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        levelValue: {},
+      },
+      commands: {},
+      addLevelValueAttributeListener: fake.returns(null),
+    });
+
+    // Formaldehyde concentration measurement
+    clusterClients.set(FormaldehydeConcentrationMeasurement.Complete.id, {
+      id: FormaldehydeConcentrationMeasurement.Complete.id,
+      name: 'FormaldehydeConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        measuredValue: {},
+      },
+      commands: {},
+      addMeasuredValueAttributeListener: fake.returns(null),
+      getMeasurementUnitAttribute: fake.returns(4),
+      getMinMeasuredValueAttribute: fake.returns(0),
+      getMaxMeasuredValueAttribute: fake.returns(999),
+    });
+
+    // Electrical Power Measurement
+    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+      id: ElectricalPowerMeasurement.Complete.id,
+      name: 'ElectricalPowerMeasurement',
+      endpointId: 1,
+      attributes: {
+        activePower: {},
+        voltage: {},
+        activeCurrent: {},
+      },
+      commands: {},
+      addActivePowerAttributeListener: fake.returns(null),
+      addVoltageAttributeListener: fake.returns(null),
+      addActiveCurrentAttributeListener: fake.returns(null),
+      getVoltageAttribute: fake.resolves(230000),
+      getActiveCurrentAttribute: fake.resolves(6500),
+    });
+
+    // Electrical Energy Measurement
+    clusterClients.set(ElectricalEnergyMeasurement.Complete.id, {
+      id: ElectricalEnergyMeasurement.Complete.id,
+      name: 'ElectricalEnergyMeasurement',
+      endpointId: 1,
+      attributes: {
+        cumulativeEnergyImported: {},
+      },
+      commands: {},
+      supportedFeatures: {
+        cumulativeEnergy: true,
+      },
+      addCumulativeEnergyImportedAttributeListener: fake.returns(null),
     });
 
     // Mock commissioning controller
@@ -376,6 +479,101 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:1066',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'pm10-sensor',
+            external_id: 'matter:12345:1:1069',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'Pm10ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[12].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'voc-matter-index-sensor',
+            external_id: 'matter:12345:1:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[13].selector,
+            type: 'integer',
+          },
+          {
+            category: 'formaldehyd-sensor',
+            external_id: 'matter:12345:1:1067',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'FormaldehydeConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[14].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:144:power',
+            has_feedback: true,
+            max: 1000000,
+            min: -1000000,
+            name: 'ElectricalPowerMeasurement - 1 (Power)',
+            read_only: true,
+            selector: matterHandler.devices[0].features[15].selector,
+            type: 'power',
+            unit: 'watt',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:144:voltage',
+            has_feedback: true,
+            max: 1000,
+            min: 0,
+            name: 'ElectricalPowerMeasurement - 1 (Voltage)',
+            read_only: true,
+            selector: matterHandler.devices[0].features[16].selector,
+            type: 'voltage',
+            unit: 'volt',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:144:current',
+            has_feedback: true,
+            max: 1000,
+            min: 0,
+            name: 'ElectricalPowerMeasurement - 1 (Current)',
+            read_only: true,
+            selector: matterHandler.devices[0].features[17].selector,
+            type: 'current',
+            unit: 'ampere',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:145:energy',
+            has_feedback: true,
+            max: 1000000,
+            min: 0,
+            name: 'ElectricalEnergyMeasurement - 1 (Energy)',
+            read_only: true,
+            selector: matterHandler.devices[0].features[18].selector,
+            type: 'index',
+            unit: 'kilowatt-hour',
+          },
         ],
         params: [],
       },
@@ -514,6 +712,101 @@ describe('Matter.init', () => {
             min: -100,
             max: 200,
           },
+          {
+            category: 'pm25-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1066',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'Pm25ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[11].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'pm10-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1069',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'Pm10ConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[12].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'voc-matter-index-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1070',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[13].selector,
+            type: 'integer',
+          },
+          {
+            category: 'formaldehyd-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1067',
+            has_feedback: true,
+            max: 999,
+            min: 0,
+            name: 'FormaldehydeConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[14].selector,
+            type: 'decimal',
+            unit: 'microgram-per-cubic-meter',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:144:power',
+            has_feedback: true,
+            max: 1000000,
+            min: -1000000,
+            name: 'ElectricalPowerMeasurement - 1 (Power)',
+            read_only: true,
+            selector: matterHandler.devices[1].features[15].selector,
+            type: 'power',
+            unit: 'watt',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:144:voltage',
+            has_feedback: true,
+            max: 1000,
+            min: 0,
+            name: 'ElectricalPowerMeasurement - 1 (Voltage)',
+            read_only: true,
+            selector: matterHandler.devices[1].features[16].selector,
+            type: 'voltage',
+            unit: 'volt',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:144:current',
+            has_feedback: true,
+            max: 1000,
+            min: 0,
+            name: 'ElectricalPowerMeasurement - 1 (Current)',
+            read_only: true,
+            selector: matterHandler.devices[1].features[17].selector,
+            type: 'current',
+            unit: 'ampere',
+          },
+          {
+            category: 'energy-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:145:energy',
+            has_feedback: true,
+            max: 1000000,
+            min: 0,
+            name: 'ElectricalEnergyMeasurement - 1 (Energy)',
+            read_only: true,
+            selector: matterHandler.devices[1].features[18].selector,
+            type: 'index',
+            unit: 'kilowatt-hour',
+          },
         ],
         params: [],
       },
@@ -560,5 +853,39 @@ describe('Matter.init', () => {
     assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+
+  it('should return PPM for 0', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(0)).to.equal('ppm');
+  });
+  it('should return PPB for 1', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(1)).to.equal('ppb');
+  });
+  it('should return PPT for 2', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(2)).to.equal('ppt');
+  });
+  it('should return MILLIGRAM_PER_CUBIC_METER for 3', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(3)).to.equal('milligram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for 4', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(4)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return NANOGRAM_PER_CUBIC_METER for 5', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(5)).to.equal('nanogram-per-cubic-meter');
+  });
+  it('should return PARTICLES_PER_CUBIC_METER for 6', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(6)).to.equal('particles-per-cubic-meter');
+  });
+  it('should return BECQUEREL_PER_CUBIC_METER for 7', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(7)).to.equal('becquerel-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for unknown value', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(42)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for undefined', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(undefined)).to.equal('microgram-per-cubic-meter');
+  });
+  it('should return MICROGRAM_PER_CUBIC_METER for null', () => {
+    expect(convertMeasurementUnitToDeviceFeatureUnits(null)).to.equal('microgram-per-cubic-meter');
   });
 });

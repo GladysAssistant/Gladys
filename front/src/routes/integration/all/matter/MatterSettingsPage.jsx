@@ -129,6 +129,7 @@ class MatterSettingsPage extends Component {
     super(props);
     this.state = {
       matterEnabled: null,
+      loading: true,
       saving: false,
       error: null,
       nodes: [],
@@ -144,10 +145,12 @@ class MatterSettingsPage extends Component {
   }
 
   init = async () => {
+    await this.setState({ loading: true });
     await this.loadConfiguration();
     if (this.state.matterEnabled) {
       await this.loadNodes();
     }
+    await this.setState({ loading: false });
   };
 
   loadConfiguration = async () => {
@@ -322,6 +325,7 @@ class MatterSettingsPage extends Component {
       saving,
       error,
       nodes,
+      loading,
       loadingNodes,
       decommissioningNodes,
       collapsedDevices,
@@ -337,125 +341,132 @@ class MatterSettingsPage extends Component {
               <Text id="integration.matter.settings.title" />
             </h3>
           </div>
-          <div class="card-body">
-            {hasIpv6 === false && (
-              <div class="alert alert-danger">
-                <Text id="integration.matter.settings.ipv6NotEnabled" />
-              </div>
-            )}
-
-            {hasIpv6 === true && (
-              <div class="alert alert-success">
-                <Text id="integration.matter.settings.ipv6Enabled" />
-              </div>
-            )}
-
-            {!matterEnabled && (
-              <>
-                <div class="alert alert-warning">
-                  <Text id="integration.matter.settings.disabledWarningSettings" />
+          <div
+            class={cx('card-body dimmer', {
+              active: loading
+            })}
+          >
+            <div class="loader" />
+            <div class="dimmer-content">
+              {hasIpv6 === false && (
+                <div class="alert alert-danger">
+                  <Text id="integration.matter.settings.ipv6NotEnabled" />
                 </div>
-                <div class="form-group">
-                  <button onClick={this.enableMatter} class="btn btn-success" disabled={saving}>
-                    <Text id="integration.matter.settings.enableButton" />
-                  </button>
-                </div>
-              </>
-            )}
+              )}
 
-            {matterEnabled && (
-              <>
-                <div class="alert alert-info">
-                  <Text id="integration.matter.settings.description" />
+              {hasIpv6 === true && (
+                <div class="alert alert-success">
+                  <Text id="integration.matter.settings.ipv6Enabled" />
                 </div>
+              )}
 
-                {error === RequestStatus.Error && (
-                  <div class="alert alert-danger">
-                    <Text id="integration.matter.settings.error" />
+              {!matterEnabled && (
+                <>
+                  <div class="alert alert-warning">
+                    <Text id="integration.matter.settings.disabledWarningSettings" />
                   </div>
-                )}
+                  <div class="form-group">
+                    <button onClick={this.enableMatter} class="btn btn-success" disabled={saving}>
+                      <Text id="integration.matter.settings.enableButton" />
+                    </button>
+                  </div>
+                </>
+              )}
 
-                <div class="mt-5">
-                  <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">
-                      <Text id="integration.matter.settings.nodesTitle" />
-                    </h4>
-                    {nodes && nodes.length > 0 && (
-                      <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
-                        <i class="fe fe-download me-2" /> <Text id="integration.matter.settings.downloadNodesJson" />
-                      </button>
-                    )}
+              {matterEnabled && (
+                <>
+                  <div class="alert alert-info">
+                    <Text id="integration.matter.settings.description" />
                   </div>
 
-                  <div
-                    class={cx('dimmer', {
-                      active: loadingNodes
-                    })}
-                  >
-                    <div class="loader" />
-                    <div class="dimmer-content">
-                      {nodes && nodes.length > 0 ? (
-                        <div class="table-responsive">
-                          {nodes.map(node => (
-                            <div class={cx('card mb-4', { 'dimmer active': decommissioningNodes[node.node_id] })}>
-                              {decommissioningNodes[node.node_id] && <div class="loader" />}
-                              <div class="dimmer-content">
-                                <div class="card-header">
-                                  <div class="d-flex justify-content-between align-items-center w-100">
-                                    <div>
-                                      <h5 class="mb-0">
-                                        {node.node_information.vendor_name} - {node.node_information.product_name}
-                                      </h5>
-                                      <small class="text-muted">
-                                        Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} | Product
-                                        ID: {node.node_information.product_id}
-                                      </small>
-                                    </div>
-                                    <div class="ms-auto">
-                                      <button
-                                        onClick={() => this.decommissionNode(node.node_id)}
-                                        class={cx('btn btn-danger btn-sm', {
-                                          loading: decommissioningNodes[node.node_id]
-                                        })}
-                                        disabled={decommissioningNodes[node.node_id]}
-                                      >
-                                        <Text id="integration.matter.settings.decommissionButton" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="card-body">
-                                  {node.devices.map(device => (
-                                    <DeviceDisplay
-                                      device={device}
-                                      nodeId={node.node_id}
-                                      collapsedDevices={collapsedDevices}
-                                      visibleKeys={visibleKeys}
-                                      toggleDevice={this.toggleDevice}
-                                      toggleKeys={this.toggleKeys}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div class="alert alert-secondary">
-                          <Text id="integration.matter.settings.noNodesFound" />
-                        </div>
+                  {error === RequestStatus.Error && (
+                    <div class="alert alert-danger">
+                      <Text id="integration.matter.settings.error" />
+                    </div>
+                  )}
+
+                  <div class="mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <h4 class="mb-0">
+                        <Text id="integration.matter.settings.nodesTitle" />
+                      </h4>
+                      {nodes && nodes.length > 0 && (
+                        <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
+                          <i class="fe fe-download me-2" /> <Text id="integration.matter.settings.downloadNodesJson" />
+                        </button>
                       )}
                     </div>
-                  </div>
-                </div>
 
-                <div class="form-group">
-                  <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
-                    <Text id="integration.matter.settings.disableButton" />
-                  </button>
-                </div>
-              </>
-            )}
+                    <div
+                      class={cx('dimmer', {
+                        active: loadingNodes
+                      })}
+                    >
+                      <div class="loader" />
+                      <div class="dimmer-content">
+                        {nodes && nodes.length > 0 ? (
+                          <div class="table-responsive">
+                            {nodes.map(node => (
+                              <div class={cx('card mb-4', { 'dimmer active': decommissioningNodes[node.node_id] })}>
+                                {decommissioningNodes[node.node_id] && <div class="loader" />}
+                                <div class="dimmer-content">
+                                  <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                      <div>
+                                        <h5 class="mb-0">
+                                          {node.node_information.vendor_name} - {node.node_information.product_name}
+                                        </h5>
+                                        <small class="text-muted">
+                                          Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} |
+                                          Product ID: {node.node_information.product_id}
+                                        </small>
+                                      </div>
+                                      <div class="ms-auto">
+                                        <button
+                                          onClick={() => this.decommissionNode(node.node_id)}
+                                          class={cx('btn btn-danger btn-sm', {
+                                            loading: decommissioningNodes[node.node_id]
+                                          })}
+                                          disabled={decommissioningNodes[node.node_id]}
+                                        >
+                                          <Text id="integration.matter.settings.decommissionButton" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="card-body">
+                                    {node.devices.map(device => (
+                                      <DeviceDisplay
+                                        device={device}
+                                        nodeId={node.node_id}
+                                        collapsedDevices={collapsedDevices}
+                                        visibleKeys={visibleKeys}
+                                        toggleDevice={this.toggleDevice}
+                                        toggleKeys={this.toggleKeys}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div class="alert alert-secondary">
+                            <Text id="integration.matter.settings.noNodesFound" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
+                      <Text id="integration.matter.settings.disableButton" />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </MatterPage>

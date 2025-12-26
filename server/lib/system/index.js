@@ -23,6 +23,7 @@ const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
 const { vacuum } = require('./system.vacuum');
 const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
+const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 
 const { shutdown } = require('./system.shutdown');
 
@@ -43,6 +44,8 @@ const System = function System(sequelize, event, config, job, variable, user, me
   this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
   this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
   this.event.on(EVENTS.SYSTEM.UPGRADE_CONTAINERS, eventFunctionWrapper(this.installUpgrade.bind(this)));
+  // on timezone change, reset DuckDB timezone
+  this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.setDuckDbTimezone.bind(this)));
   this.networkMode = null;
 };
 
@@ -67,7 +70,7 @@ System.prototype.removeContainer = removeContainer;
 System.prototype.stopContainer = stopContainer;
 System.prototype.getNetworkMode = getNetworkMode;
 System.prototype.vacuum = vacuum;
-
+System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;
 
 module.exports = System;

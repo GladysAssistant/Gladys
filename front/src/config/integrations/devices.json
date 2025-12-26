@@ -10,11 +10,13 @@
   },
   {
     "key": "mqtt",
-    "img": "/assets/integrations/cover/mqtt.jpg"
+    "img": "/assets/integrations/cover/mqtt.jpg",
+    "whiteBackground": true
   },
   {
     "key": "zigbee2mqtt",
-    "img": "/assets/integrations/cover/zigbee2mqtt.jpg"
+    "img": "/assets/integrations/cover/zigbee2mqtt.jpg",
+    "whiteBackground": true
   },
   {
     "key": "philipsHue",
@@ -28,47 +30,57 @@
   {
     "key": "tpLink",
     "link": "tp-link",
-    "img": "/assets/integrations/cover/tp-link.jpg"
+    "img": "/assets/integrations/cover/tp-link.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "bluetooth",
-    "img": "/assets/integrations/cover/bluetooth.jpg"
+    "img": "/assets/integrations/cover/bluetooth.jpg",
+    "whiteBackground": true
   },
   {
     "key": "eWeLink",
-    "img": "/assets/integrations/cover/ewelink.jpg"
+    "img": "/assets/integrations/cover/ewelink.jpg",
+    "whiteBackground": true
   },
   {
     "key": "owntracks",
-    "img": "/assets/integrations/cover/owntracks.jpg"
+    "img": "/assets/integrations/cover/owntracks.jpg",
+    "whiteBackground": true
   },
   {
     "key": "broadlink",
-    "img": "/assets/integrations/cover/broadlink.jpg"
+    "img": "/assets/integrations/cover/broadlink.jpg",
+    "whiteBackground": true
   },
   {
     "key": "enedis",
-    "img": "/assets/integrations/cover/enedis.jpg"
+    "img": "/assets/integrations/cover/enedis.jpg",
+    "whiteBackground": true
   },
   {
     "key": "lanManager",
     "link": "lan-manager",
-    "img": "/assets/integrations/cover/lan-manager.jpg"
+    "img": "/assets/integrations/cover/lan-manager.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "tuya",
     "link": "tuya",
-    "img": "/assets/integrations/cover/tuya.jpg"
+    "img": "/assets/integrations/cover/tuya.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "melcloud",
     "link": "melcloud",
-    "img": "/assets/integrations/cover/melcloud.jpg"
+    "img": "/assets/integrations/cover/melcloud.jpg",
+    "whiteBackground": true
   },
   {
     "key": "nodeRed",
     "link": "node-red",
-    "img": "/assets/integrations/cover/node-red.jpg"
+    "img": "/assets/integrations/cover/node-red.jpg",
+    "whiteBackground": true
   },
   {
     "key": "netatmo",
@@ -78,12 +90,14 @@
   {
     "key": "sonos",
     "link": "sonos",
-    "img": "/assets/integrations/cover/sonos.jpg"
+    "img": "/assets/integrations/cover/sonos.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "zwavejs-ui",
     "link": "zwavejs-ui",
-    "img": "/assets/integrations/cover/zwave-js-ui.jpg"
+    "img": "/assets/integrations/cover/zwave-js-ui.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "google-cast",
@@ -93,11 +107,19 @@
   {
     "key": "airplay",
     "link": "airplay",
-    "img": "/assets/integrations/cover/airplay.jpg"
+    "img": "/assets/integrations/cover/airplay.jpg",
+    "invertInDarkMode": true
   },
   {
     "key": "matter",
     "link": "matter",
-    "img": "/assets/integrations/cover/matter.jpg"
+    "img": "/assets/integrations/cover/matter.jpg",
+    "invertInDarkMode": true
+  },
+  {
+    "key": "energyMonitoring",
+    "link": "energy-monitoring",
+    "img": "/assets/integrations/cover/energy-monitoring.jpg",
+    "invertInDarkMode": true
   }
 ]

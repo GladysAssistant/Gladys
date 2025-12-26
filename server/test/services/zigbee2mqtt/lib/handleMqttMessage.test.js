@@ -100,15 +100,32 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
-  it('should get permit join from response/permit_join', async () => {
+  it('should get permit join from response/permit_join with time 254', async () => {
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/permit_join', `{"data": {"value": true}}`);
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"time":254},"status":"ok"}`,
+    );
     // ASSERT
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
     expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
+  });
+
+  it('should get permit join from response/permit_join with time 0', async () => {
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/bridge/response/permit_join',
+      `{"data":{"time":0},"status":"ok"}`,
+    );
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
+    });
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(false);
   });
 
   it('it should get permit join from config/permit_join', async () => {

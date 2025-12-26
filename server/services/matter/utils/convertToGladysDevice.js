@@ -8,11 +8,50 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  Pm25ConcentrationMeasurement,
+  Pm10ConcentrationMeasurement,
+  ConcentrationMeasurement,
+  TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  FormaldehydeConcentrationMeasurement,
+  ElectricalPowerMeasurement,
+  ElectricalEnergyMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
+
+/**
+ * @description Convert the Matter measurement unit attribute to Gladys attribute.
+ * @param {any} measurementUnit - Attribute sent by Matter.
+ * @example const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+ * @returns {string} The device feature unit.
+ */
+function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
+  if (measurementUnit !== undefined && measurementUnit !== null) {
+    switch (measurementUnit) {
+      case ConcentrationMeasurement.MeasurementUnit.Ppm:
+        return DEVICE_FEATURE_UNITS.PPM;
+      case ConcentrationMeasurement.MeasurementUnit.Ppb:
+        return DEVICE_FEATURE_UNITS.PPB;
+      case ConcentrationMeasurement.MeasurementUnit.Ppt:
+        return DEVICE_FEATURE_UNITS.PPT;
+      case ConcentrationMeasurement.MeasurementUnit.Mgm3:
+        return DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Ugm3:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Ngm3:
+        return DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Pm3:
+        return DEVICE_FEATURE_UNITS.PARTICLES_PER_CUBIC_METER;
+      case ConcentrationMeasurement.MeasurementUnit.Bqm3:
+        return DEVICE_FEATURE_UNITS.BECQUEREL_PER_CUBIC_METER;
+      default:
+        return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+    }
+  }
+  return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+}
 
 /**
  * @description Convert a Matter device to a Gladys device.
@@ -208,6 +247,135 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 200,
           });
         }
+      } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: deviceFeatureUnit,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
+        });
+      } else if (clusterIndex === Pm10ConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: deviceFeatureUnit,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
+        });
+      } else if (clusterIndex === TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
+      } else if (clusterIndex === FormaldehydeConcentrationMeasurement.Complete.id) {
+        const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
+        const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 999;
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: deviceFeatureUnit,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
+        });
+      } else if (clusterIndex === ElectricalPowerMeasurement.Complete.id) {
+        // Add ActivePower feature
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Power)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-power`, true),
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.WATT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:power`,
+          min: -1000000,
+          max: 1000000,
+        });
+        // Add Voltage feature if available
+        try {
+          const voltage = await clusterClient.getVoltageAttribute();
+          if (voltage !== undefined) {
+            gladysDevice.features.push({
+              name: `${clusterClient.name} - ${clusterClient.endpointId} (Voltage)`,
+              selector: slugify(`matter-${device.name}-${clusterClient.name}-voltage`, true),
+              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
+              read_only: true,
+              has_feedback: true,
+              unit: DEVICE_FEATURE_UNITS.VOLT,
+              external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:voltage`,
+              min: 0,
+              max: 1000,
+            });
+          }
+        } catch (error) {
+          // Voltage attribute not available
+        }
+        // Add ActiveCurrent feature if available
+        try {
+          const activeCurrent = await clusterClient.getActiveCurrentAttribute();
+          if (activeCurrent !== undefined) {
+            gladysDevice.features.push({
+              name: `${clusterClient.name} - ${clusterClient.endpointId} (Current)`,
+              selector: slugify(`matter-${device.name}-${clusterClient.name}-current`, true),
+              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+              read_only: true,
+              has_feedback: true,
+              unit: DEVICE_FEATURE_UNITS.AMPERE,
+              external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:current`,
+              min: 0,
+              max: 1000,
+            });
+          }
+        } catch (error) {
+          // ActiveCurrent attribute not available
+        }
+      } else if (clusterIndex === ElectricalEnergyMeasurement.Complete.id) {
+        // Check if CumulativeEnergy feature is supported
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.cumulativeEnergy) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Energy)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-energy`, true),
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            read_only: true,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:energy`,
+            min: 0,
+            max: 1000000,
+          });
+        }
       }
     });
   }
@@ -216,4 +384,5 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
 module.exports = {
   convertToGladysDevice,
+  convertMeasurementUnitToDeviceFeatureUnits,
 };

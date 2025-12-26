@@ -9,9 +9,9 @@
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
     "build": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider preact build --template src/template.html --no-prerender --no-inline-css",
-    "postbuild": "cp ./old-sw.js ./build/sw.js",
+    "postbuild": "cp ./old-sw.js ./build/sw.js && node ./cli/inject-index-tail.js",
     "build-with-stats": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider preact build --template src/template.html --no-prerender --json --no-inline-css",
-    "postbuild-with-stats": "cp ./old-sw.js ./build/sw.js",
+    "postbuild-with-stats": "cp ./old-sw.js ./build/sw.js && node ./cli/inject-index-tail.js",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider preact watch -p 1444 --template src/template.html",
     "start-gateway": "cross-env GATEWAY_MODE=true NODE_OPTIONS=--openssl-legacy-provider preact watch -p 1445 --template src/template.html",
@@ -25,7 +25,7 @@
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
   },
   "overrides": {
-    "esm": "npm:esm-wallaby"
+    "esm": "npm:esm-wallaby@3.2.35"
   },
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",
@@ -46,7 +46,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "4.17.0",
+    "@gladysassistant/gladys-gateway-js": "^4.19.1",
     "@gladysassistant/theme-optimized": "^1.0.4",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",
@@ -71,7 +71,7 @@
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
-    "react-big-calendar": "^1.6.9",
+    "react-big-calendar": "^1.19.4",
     "react-clock": "^4.5.0",
     "react-datepicker": "^3.8.0",
     "react-dnd": "^16.0.1",

@@ -1,14 +1,16 @@
 const { mergeDevices } = require('../../../utils/device');
 const { convertDevice } = require('../utils/convertDevice');
+const { addEnergyFeatures } = require('../../energy-monitoring/utils/addEnergyFeatures');
 
 /**
  * @description Get discovered devices.
  * @param {object} filters - Filters to apply.
+ * @param {string} defaultElectricMeterDeviceFeatureId - Default electric meter device feature ID.
  * @returns {Array} Array of discovered devices.
  * @example
  * getDiscoveredDevices();
  */
-function getDiscoveredDevices(filters = {}) {
+function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId) {
   let devices = Object.values(this.discoveredDevices)
     // Filter unknown models
     .filter((d) => d.definition !== null)
@@ -25,6 +27,10 @@ function getDiscoveredDevices(filters = {}) {
         }
         return acc;
       }, []);
+
+      // Add energy features
+      addEnergyFeatures(d, defaultElectricMeterDeviceFeatureId);
+
       return d;
     })
     .map((d) => {

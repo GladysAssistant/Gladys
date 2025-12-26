@@ -34,6 +34,22 @@ const AccountTab = ({ children, ...props }) => (
                 </option>
               ))}
             </select>
+            {props.caldavHost && props.dictionary.services[props.caldavHost].verifySSL && (
+              <div className={`form-group ${style.sslSwitch}`}>
+                <label class="custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-switch-input"
+                    checked={props.caldavCheckSSL}
+                    onClick={props.updateCaldavCheckSSL}
+                  />
+                  <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id={`integration.caldav.services.${props.caldavHost}.verifySSL`} />
+                  </span>
+                </label>
+              </div>
+            )}
           </div>
           <div class="form-group">
             <div class="form-label">

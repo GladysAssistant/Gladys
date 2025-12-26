@@ -311,7 +311,9 @@ const actionsFunc = {
         value = evaluate(Handlebars.compile(condition.evaluate_value)(scope).replace(/\s/g, ''));
       }
 
-      if (Number.isNaN(Number(value))) {
+      // For numeric comparison operators (>, >=, <, <=), value must be a number
+      const numericOperators = ['>', '>=', '<', '<='];
+      if (numericOperators.includes(condition.operator) && Number.isNaN(Number(value))) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 

@@ -333,6 +333,7 @@ module.exports = {
     // Lixee TIC Device
     EAST: {
       feature: {
+        name: 'Energie active soutirée totale',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EAST,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -342,6 +343,7 @@ module.exports = {
     },
     EAIT: {
       feature: {
+        name: 'Energie active injectée totale',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EAIT,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -351,6 +353,7 @@ module.exports = {
     },
     EASF01: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 01',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF01,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -360,6 +363,7 @@ module.exports = {
     },
     EASF02: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 02',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF02,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -369,6 +373,7 @@ module.exports = {
     },
     EASF03: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 03',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF03,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -378,6 +383,7 @@ module.exports = {
     },
     EASF04: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 04',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF04,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -387,6 +393,7 @@ module.exports = {
     },
     EASF05: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 05',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF05,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -396,6 +403,7 @@ module.exports = {
     },
     EASF06: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 06',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF06,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -405,6 +413,7 @@ module.exports = {
     },
     EASF07: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 07',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF07,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -414,6 +423,7 @@ module.exports = {
     },
     EASF08: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 08',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF08,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -423,6 +433,7 @@ module.exports = {
     },
     EASF09: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 09',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF09,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -432,6 +443,7 @@ module.exports = {
     },
     EASF10: {
       feature: {
+        name: 'Energie active soutirée Fournisseur Index 10',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -441,6 +453,7 @@ module.exports = {
     },
     PREF: {
       feature: {
+        name: 'Puissance apparente de référence',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.PREF,
         unit: DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
@@ -448,6 +461,7 @@ module.exports = {
     },
     PCOUP: {
       feature: {
+        name: 'Puissance apparente de coupure',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.PCOUP,
         unit: DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
@@ -455,12 +469,14 @@ module.exports = {
     },
     VTIC: {
       feature: {
+        name: 'Version de la TIC',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.VTIC,
       },
     },
     CCASN: {
       feature: {
+        name: 'Point n de la courbe de charge active soutirée',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.CCASN,
         unit: DEVICE_FEATURE_UNITS.WATT,
@@ -468,6 +484,7 @@ module.exports = {
     },
     'CCASN-1': {
       feature: {
+        name: 'Point n-1 de la courbe de charge active soutirée',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.CCASN_1,
         unit: DEVICE_FEATURE_UNITS.WATT,
@@ -475,6 +492,7 @@ module.exports = {
     },
     UMOY1: {
       feature: {
+        name: 'Tension moyenne Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY1,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -482,6 +500,7 @@ module.exports = {
     },
     UMOY2: {
       feature: {
+        name: 'Tension moyenne Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY2,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -489,6 +508,7 @@ module.exports = {
     },
     UMOY3: {
       feature: {
+        name: 'Tension moyenne Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY2,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -496,6 +516,7 @@ module.exports = {
     },
     ERQ1: {
       feature: {
+        name: 'Energie réactive Q1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ1,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
@@ -503,6 +524,7 @@ module.exports = {
     },
     ERQ2: {
       feature: {
+        name: 'Energie réactive Q2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ2,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
@@ -510,6 +532,7 @@ module.exports = {
     },
     ERQ3: {
       feature: {
+        name: 'Energie réactive Q3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ3,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
@@ -517,6 +540,7 @@ module.exports = {
     },
     ERQ4: {
       feature: {
+        name: 'Energie réactive Q4',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ4,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
@@ -524,6 +548,7 @@ module.exports = {
     },
     IRMS1: {
       feature: {
+        name: 'Courant efficace Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS1,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -531,6 +556,7 @@ module.exports = {
     },
     IRMS2: {
       feature: {
+        name: 'Courant efficace Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS2,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -538,6 +564,7 @@ module.exports = {
     },
     IRMS3: {
       feature: {
+        name: 'Courant efficace Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS3,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -545,6 +572,7 @@ module.exports = {
     },
     URMS1: {
       feature: {
+        name: 'Tension efficace Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS1,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -552,6 +580,7 @@ module.exports = {
     },
     URMS2: {
       feature: {
+        name: 'Tension efficace Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS2,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -559,6 +588,7 @@ module.exports = {
     },
     URMS3: {
       feature: {
+        name: 'Tension efficace Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS3,
         unit: DEVICE_FEATURE_UNITS.VOLT,
@@ -566,6 +596,7 @@ module.exports = {
     },
     EASD01: {
       feature: {
+        name: 'Energie active soutirée Distributeur Index 01',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASD01,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -575,6 +606,7 @@ module.exports = {
     },
     EASD02: {
       feature: {
+        name: 'Energie active soutirée Distributeur Index 02',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASD02,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -584,6 +616,7 @@ module.exports = {
     },
     EASD03: {
       feature: {
+        name: 'Energie active soutirée Distributeur Index 03',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASD03,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -593,6 +626,7 @@ module.exports = {
     },
     EASD04: {
       feature: {
+        name: 'Energie active soutirée Distributeur Index 04',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EASD04,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -602,12 +636,14 @@ module.exports = {
     },
     NTARF: {
       feature: {
+        name: "Numéro de l'index tarifaire en cours",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.NTARF,
       },
     },
     CCAIN: {
       feature: {
+        name: 'Point n de la courbe de charge active injectée',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.CCAIN,
         unit: DEVICE_FEATURE_UNITS.WATT,
@@ -615,6 +651,7 @@ module.exports = {
     },
     'CCAIN-1': {
       feature: {
+        name: 'Point n-1 de la courbe de charge active injectée',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.CCAIN_1,
         unit: DEVICE_FEATURE_UNITS.WATT,
@@ -622,6 +659,7 @@ module.exports = {
     },
     SINSTI: {
       feature: {
+        name: 'Puissance apparente instantanée injectée',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTI,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -629,6 +667,7 @@ module.exports = {
     },
     SMAXIN: {
       feature: {
+        name: 'Puissance apparente maximale injectée n',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -636,6 +675,7 @@ module.exports = {
     },
     'SMAXIN-1': {
       feature: {
+        name: 'Puissance apparente maximale injectée n-1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXIN_1,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -643,12 +683,14 @@ module.exports = {
     },
     RELAIS: {
       feature: {
+        name: 'Relais',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY,
       },
     },
     SMAXN: {
       feature: {
+        name: 'Puissance apparente maximale soutirée n Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -656,6 +698,7 @@ module.exports = {
     },
     SMAXN2: {
       feature: {
+        name: 'Puissance apparente maximale soutirée n Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -663,6 +706,7 @@ module.exports = {
     },
     SMAXN3: {
       feature: {
+        name: 'Puissance apparente maximale soutirée n Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -670,6 +714,7 @@ module.exports = {
     },
     SINSTS: {
       feature: {
+        name: 'Puissance apparente instantanée soutirée Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -677,6 +722,7 @@ module.exports = {
     },
     SINSTS2: {
       feature: {
+        name: 'Puissance apparente instantanée soutirée Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -684,6 +730,7 @@ module.exports = {
     },
     SINSTS3: {
       feature: {
+        name: 'Puissance apparente instantanée soutirée Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -691,6 +738,7 @@ module.exports = {
     },
     'SMAXN-1': {
       feature: {
+        name: 'Puissance apparente maximale soutirée n-1 Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN_1,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -698,6 +746,7 @@ module.exports = {
     },
     'SMAXN2-1': {
       feature: {
+        name: 'Puissance apparente maximale soutirée n-1 Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN2_1,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -705,6 +754,7 @@ module.exports = {
     },
     'SMAXN3-1': {
       feature: {
+        name: 'Puissance apparente maximale soutirée n-1 Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -712,12 +762,14 @@ module.exports = {
     },
     HHPHC: {
       feature: {
+        name: 'Horaire Heures Pleines Heures Creuses',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.HHPHC,
       },
     },
     IMAX: {
       feature: {
+        name: 'Intensité maximale Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -725,6 +777,7 @@ module.exports = {
     },
     IMAX2: {
       feature: {
+        name: 'Intensité maximale Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -732,6 +785,7 @@ module.exports = {
     },
     IMAX3: {
       feature: {
+        name: 'Intensité maximale Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -739,6 +793,7 @@ module.exports = {
     },
     ADPS: {
       feature: {
+        name: 'Avertissement de dépassement de puissance souscrite',
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADPS,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -746,6 +801,7 @@ module.exports = {
     },
     ADIR1: {
       feature: {
+        name: "Avertissement de dépassement d'intensité Phase 1",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR1,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -753,6 +809,7 @@ module.exports = {
     },
     ADIR2: {
       feature: {
+        name: "Avertissement de dépassement d'intensité Phase 2",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR2,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -760,6 +817,7 @@ module.exports = {
     },
     ADIR3: {
       feature: {
+        name: "Avertissement de dépassement d'intensité Phase 3",
         category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
         type: DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR3,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -767,6 +825,7 @@ module.exports = {
     },
     BASE: {
       feature: {
+        name: 'Index',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -776,6 +835,7 @@ module.exports = {
     },
     ISOUSC: {
       feature: {
+        name: 'Intensité souscrite',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -785,6 +845,7 @@ module.exports = {
     },
     HCHC: {
       feature: {
+        name: 'Heures Creuses',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -794,6 +855,27 @@ module.exports = {
     },
     HCHP: {
       feature: {
+        name: 'Heures Pleines',
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
+      },
+    },
+    BBRHCJB: {
+      feature: {
+        name: 'Heures Creuses Jours Bleus',
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
+      },
+    },
+    BBRHPJB: {
+      feature: {
+        name: 'Heures Pleines Jours Bleus',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -803,6 +885,7 @@ module.exports = {
     },
     BBRHCJW: {
       feature: {
+        name: 'Heures Creuses Jours Blancs',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -812,6 +895,7 @@ module.exports = {
     },
     BBRHPJW: {
       feature: {
+        name: 'Heures Pleines Jours Blancs',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -821,6 +905,7 @@ module.exports = {
     },
     BBRHCJR: {
       feature: {
+        name: 'Heures Creuses Jours Rouges',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -830,6 +915,7 @@ module.exports = {
     },
     BBRHPJR: {
       feature: {
+        name: 'Heures Pleines Jours Rouges',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -839,6 +925,7 @@ module.exports = {
     },
     IINST: {
       feature: {
+        name: 'Intensité instantanée Phase 1',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -846,6 +933,7 @@ module.exports = {
     },
     IINST2: {
       feature: {
+        name: 'Intensité instantanée Phase 2',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -853,6 +941,7 @@ module.exports = {
     },
     IINST3: {
       feature: {
+        name: 'Intensité instantanée Phase 3',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
@@ -860,6 +949,7 @@ module.exports = {
     },
     PMAX: {
       feature: {
+        name: 'Puissance maximale triphasée atteinte',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
         unit: DEVICE_FEATURE_UNITS.WATT,
@@ -867,6 +957,7 @@ module.exports = {
     },
     PAPP: {
       feature: {
+        name: 'Puissance apparente',
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
@@ -902,6 +993,15 @@ module.exports = {
     pm25: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+        min: 0,
+        max: 999,
+      },
+    },
+    pm10: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
         min: 0,

@@ -86,6 +86,7 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
+import MCPPage from '../routes/integration/all/mcp';
 
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
@@ -177,6 +178,9 @@ import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 import FreeMobilePage from '../routes/integration/all/free-mobile';
 // CallMeBot integration
 import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
+
+// Energy Monitoring integration
+import EnergyMonitoringIntegration from '../routes/integration/all/energy-monitoring/index';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -283,6 +287,12 @@ const AppRouter = connect(
 
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/create" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/import" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/prices/edit/:id" />
+        <EnergyMonitoringIntegration path="/dashboard/integration/device/energy-monitoring/settings" />
 
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
@@ -296,6 +306,7 @@ const AppRouter = connect(
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
+        <MCPPage path="/dashboard/integration/communication/mcp" />
 
         <TuyaPage path="/dashboard/integration/device/tuya" />
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
@@ -382,6 +393,22 @@ class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
   }
+
+  componentDidMount() {
+    // Listen for system preference change
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+    prefersDarkMode.addEventListener('change', this.handleSystemPreferenceChange);
+  }
+
+  componentWillUnmount() {
+    // Remove event listener to prevent memory leaks
+    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
+  }
+
+  handleSystemPreferenceChange = () => {
+    // Use the global action to update dark mode state based on system preference
+    this.props.updateDarkModeFromSystem();
+  };
 
   render({ user }, {}) {
     const translationDefinition = get(translations, user.language, { default: translations.en });
