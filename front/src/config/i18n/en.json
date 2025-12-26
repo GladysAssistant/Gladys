@@ -144,8 +144,8 @@
       "passwordRepeatError": "Passwords do not match.",
       "birthdateError": "Birthdate is required.",
       "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
-      "emailAlreadyExistError": "A user with this email already exist.",
-      "selectorAlreadyExistError": "A user with this first name already exist.",
+      "emailAlreadyExistError": "A user with this email already exists.",
+      "selectorAlreadyExistError": "A user with this first name already exists.",
       "createAccountButton": "Create Account"
     },
     "restoreBackupSetBackupKey": {
@@ -193,7 +193,7 @@
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Enter your house name",
       "houseNameError": "House name is required",
-      "houseLocationLabel": "Click where you house is located",
+      "houseLocationLabel": "Click where your house is located",
       "roomsLabel": "Add all rooms in your house",
       "roomNamePlaceHolder": "Type a new room to add",
       "addRoomButton": "Add",
@@ -201,8 +201,8 @@
       "deleteHouse": "Delete house",
       "confirmDeleteHouse": "Confirm house deletion",
       "cancelDeleteHouse": "Cancel",
-      "conflictError": "A house with the same name already exist.",
-      "roomConflictError": "A room with the same name already exist.",
+      "conflictError": "A house with the same name already exists.",
+      "roomConflictError": "A room with the same name already exists.",
       "validationError": "House name should be between 1 and 40 characters",
       "validationErrorRoom": "Room name should be between 1 and 40 characters",
       "alarmTitle": "Alarm",
@@ -224,7 +224,7 @@
       "title": "Thank you!",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a>, and I started working on Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys. I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSoftware": "I rely on contributions to make this project sustainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to the Dashboard"
     }
   },
@@ -2608,8 +2608,8 @@
     "passwordRepeatError": "Passwords do not match.",
     "birthdateError": "Birthdate is required.",
     "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
-    "emailAlreadyExistError": "A user with this email already exist.",
-    "selectorAlreadyExistError": "A user with this first name already exist.",
+    "emailAlreadyExistError": "A user with this email already exists.",
+    "selectorAlreadyExistError": "A user with this first name already exists.",
     "instanceAlreadyConfiguredError": "This instance is already configured. You cannot create another account.",
     "unknownError": "An unknown error occured. Please try again or contact Gladys community."
   },
@@ -2864,7 +2864,7 @@
     "createSceneButton": "Create scene",
     "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
-    "sceneAlreadyExist": "A scene with that name already exist."
+    "sceneAlreadyExist": "A scene with that name already exists."
   },
   "duplicateScene": {
     "cardTitle": "Duplicate scene \"{{name}}\"",
@@ -2874,7 +2874,7 @@
     "duplicateSceneButton": "Duplicate",
     "invalidName": "Name is required",
     "invalidIcon": "Icon is required",
-    "sceneAlreadyExist": "A scene with that name already exist.",
+    "sceneAlreadyExist": "A scene with that name already exists.",
     "nameAfterCopy": "Copy of {{name}}"
   },
   "scene": {
