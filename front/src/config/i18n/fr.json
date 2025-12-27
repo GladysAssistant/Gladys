@@ -3970,7 +3970,7 @@
     "supportText": "Support à hello@gladysassistant.com",
     "createAccount": "Créez votre compte Gladys Plus",
     "emailAlreadyExistError": "Un compte avec cet e-mail existe déjà",
-    "browserNotCompatibleError": " Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto.",
+    "browserNotCompatibleError": "Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto.",
     "tokenError": "Vous devez d'abord vous abonner au pack Gladys Community sur le site Web de Gladys !",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer plus tard ou me contacter à hello@gladysassistant.com pour comprendre ce qui s'est passé.",
     "invalidInvitationError": "Nous ne pouvons pas récupérer votre invitation. Peut-être qu'il était déjà utilisé ou a expiré ! Veuillez nous contacter à hello@gladysassistant.com."
