@@ -2030,7 +2030,7 @@
       "roomLabel": "Room",
       "featuresLabel": "Features",
       "noFeaturesHandled": "No features are handled by this device",
-      "displayDeviceInfo": "Display device informations",
+      "displayDeviceInfo": "Display device information",
       "matterParamsNames": {
         "SERIAL_NUMBER": "Serial Number",
         "UNIQUE_ID": "Unique ID"
