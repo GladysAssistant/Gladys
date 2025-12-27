@@ -1757,7 +1757,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronisierung",
       "shareTab": "Freigabe",
-      "documentation": "CalDav-Dokumentation",
+      "documentation": "CalDAV Dokumentation",
       "description": "Synchronisiere deine CalDAV-Kalender und verwende sie in Szenen.",
       "accountIntroduction": "Um den Gladys-Kalender über CalDAV zu synchronisieren, benötigst du zunächst einen externen kompatiblen Kalender. Gib dann im Folgenden die Konfiguration ein.",
       "syncIntroduction": "Wähle aus, welche Kalender du synchronisieren möchtest.",
