@@ -49,7 +49,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unkown', JSON.stringify({}));
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unknown', JSON.stringify({}));
     // ASSERT
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,

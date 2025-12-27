@@ -119,7 +119,7 @@ function onExecute(body) {
       controlPower(deviceFeature.category, 1);
       break;
     default:
-      throw new BadParameters(`Unkown directive ${directiveNamespace}`);
+      throw new BadParameters(`Unknown directive ${directiveNamespace}`);
   }
 
   const action = {

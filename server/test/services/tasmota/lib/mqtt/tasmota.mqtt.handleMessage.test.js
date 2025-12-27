@@ -46,8 +46,8 @@ describe('Tasmota - MQTT - Handle message', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should do nothing on unkown TASMOTA topic', () => {
-    tasmotaHandler.handleMessage('stat/my_device/UNKOWN', '{ "POWER": "ON"}');
+  it('should do nothing on unknown TASMOTA topic', () => {
+    tasmotaHandler.handleMessage('stat/my_device/UNKNOWN', '{ "POWER": "ON"}');
 
     assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);

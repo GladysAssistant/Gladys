@@ -146,7 +146,7 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.throws('An error occured'),
+        find: fake.throws('An error occurred'),
       },
     };
 
@@ -289,7 +289,7 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.throws('An error occured'),
+        find: fake.throws('An error occurred'),
       },
     };
 

@@ -19,7 +19,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 module.exports = function DashboardController(gladys) {
   /**
    * @api {post} /api/v1/dashboard create
-   * @apiName createDashoard
+   * @apiName createDashboard
    * @apiGroup Dashboard
    * @apiUse DashboardParam
    * @apiUse DashboardSuccess

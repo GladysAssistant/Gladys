@@ -258,7 +258,7 @@ describe('Broadlink edit remote', () => {
     // cy.sendWebSocket({ type: 'broadlink.learn', payload: { action: 'success', code: 'payload' } });
   });
 
-  it('Enable capture mode and recieve code', () => {
+  it('Enable capture mode and receive code', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {

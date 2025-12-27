@@ -219,11 +219,11 @@ describe('scene.blink-lights', () => {
   it('should throw error when blinking light', async () => {
     const stateManager = new StateManager(event);
     const device = {
-      setValue: fake.throws('An error occured'),
+      setValue: fake.throws('An error occurred'),
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.throws('An error occured'),
+        find: fake.throws('An error occurred'),
       },
     };
 

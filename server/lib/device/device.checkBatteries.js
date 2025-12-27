@@ -47,11 +47,11 @@ async function checkBatteries() {
       });
   });
 
-  const deviceswithBatteryLowFeatures = await this.get({
+  const devicesWithBatteryLowFeatures = await this.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
   });
 
-  deviceswithBatteryLowFeatures.forEach((device) => {
+  devicesWithBatteryLowFeatures.forEach((device) => {
     device.features
       .filter((feature) => {
         // We only take devices with battery low === true

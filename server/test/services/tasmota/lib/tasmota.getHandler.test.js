@@ -35,11 +35,11 @@ describe('Tasmota - getHandler', () => {
 
   it('invalid protocol', () => {
     try {
-      tasmotaHandler.getHandler('unkown');
+      tasmotaHandler.getHandler('unknown');
       assert.fail('Should fail if no protocol requested');
     } catch (e) {
       expect(e).to.be.instanceOf(NotFoundError);
-      expect(e.message).to.eq('Tasmota: "unkown" protocol is not managed');
+      expect(e.message).to.eq('Tasmota: "unknown" protocol is not managed');
     }
   });
 

@@ -43,7 +43,7 @@ describe('EweLinkHandler discover', () => {
     sinon.reset();
   });
 
-  it('should found 5 devices, 5 of wich are new unknown devices', async () => {
+  it('should found 5 devices, 5 of which are new unknown devices', async () => {
     const eweLinkService = EwelinkService(gladysWith0Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
     expect(newDevices.length).to.equal(5);
@@ -55,13 +55,13 @@ describe('EweLinkHandler discover', () => {
       GladysPowDevice,
     ]);
   });
-  it('should found 5 devices, 2 of wich are already in Gladys and 3 are a new unknown device', async () => {
+  it('should found 5 devices, 2 of which are already in Gladys and 3 are a new unknown device', async () => {
     const eweLinkService = EwelinkService(gladysWith2Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
     expect(newDevices.length).to.equal(3);
     expect(newDevices).to.have.deep.members([GladysOfflineDevice, GladysThDevice, GladysUnhandledDevice]);
   });
-  it('should found 0 devices', async () => {
+  it('should found 0 device', async () => {
     const eweLinkService = EwelinkServiceEmpty(gladysWith0Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
     expect(newDevices).to.have.deep.members([]);

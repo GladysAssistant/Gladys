@@ -126,7 +126,7 @@ function createActions(store) {
     },
     removeRoom(state, houseIndex, roomIndex) {
       let action;
-      // if the room already exist in DB, we set the flag to "to_delete" true.
+      // if the room already exists in DB, we set the flag to "to_delete" true.
       if (state.houses[houseIndex].rooms[roomIndex].id) {
         action = {
           [roomIndex]: {

@@ -47,7 +47,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     });
   }
 
-  // Diff between start date & first occurence to handle Timezone issue in rrule lib
+  // Diff between start date & first occurrence to handle Timezone issue in rrule lib
   const startDiff = event.rrule.after(startDate.toDate(), true) - startDate.toDate();
   // Initial local offset to handle daylight saving time (DST)
   const initLocalOffset = startDate.utcOffset();
