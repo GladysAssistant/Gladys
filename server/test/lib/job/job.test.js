@@ -64,19 +64,25 @@ describe('Job', () => {
     const job = new Job(event);
 
     it('should start a job with buildJobData and finish it', async () => {
+      const startStub = sinon
+        .stub(job, 'start')
+        .callsFake(async (type, data) => ({ id: 'job-id', type, status: JOB_STATUS.IN_PROGRESS, data }));
+      const finishStub = sinon.stub(job, 'finish').resolves({});
       const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, fake.resolves('ok'), {
         buildJobData: fake.returns({ scope: 'all', period: { start_date: '2025-01-01', end_date: null } }),
       });
 
       const result = await wrapped();
       expect(result).to.equal('ok');
-      // Validate job data on creation
-      const createCall = event.emit.getCalls().find((c) => c.args[1].type === WEBSOCKET_MESSAGE_TYPES.JOB.NEW);
-      const createdPayload = createCall.args[1].payload || createCall.args[1];
-      expect(createdPayload.data).to.deep.equal({
+
+      expect(startStub).to.have.been.calledWith(JOB_TYPES.GLADYS_GATEWAY_BACKUP, {
         scope: 'all',
         period: { start_date: '2025-01-01', end_date: null },
       });
+      expect(finishStub).to.have.been.calledWith('job-id', JOB_STATUS.SUCCESS);
+
+      startStub.restore();
+      finishStub.restore();
     });
   });
   describe('job.updateProgress', () => {

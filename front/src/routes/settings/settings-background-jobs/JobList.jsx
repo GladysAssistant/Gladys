@@ -63,8 +63,8 @@ const JobList = ({ children, ...props }) => (
                           id="jobsSettings.periodFromTo"
                           defaultMessage="Period: from {{startDate}} to {{endDate}}."
                           fields={{
-                            startDate: formatPeriodDate(job.data.period.start_date, props.user.language, job.type),
-                            endDate: formatPeriodDate(job.data.period.end_date, props.user.language, job.type)
+                            startDate: formatPeriodDate(job.data.period.start_date, props.user.language),
+                            endDate: formatPeriodDate(job.data.period.end_date, props.user.language)
                           }}
                         />
                       )}
@@ -72,18 +72,14 @@ const JobList = ({ children, ...props }) => (
                         <Text
                           id="jobsSettings.periodFrom"
                           defaultMessage="Period: from {{startDate}}."
-                          fields={{
-                            startDate: formatPeriodDate(job.data.period.start_date, props.user.language, job.type)
-                          }}
+                          fields={{ startDate: formatPeriodDate(job.data.period.start_date, props.user.language) }}
                         />
                       )}
                       {!job.data.period.start_date && job.data.period.end_date && (
                         <Text
                           id="jobsSettings.periodUntil"
                           defaultMessage="Period: until {{endDate}}."
-                          fields={{
-                            endDate: formatPeriodDate(job.data.period.end_date, props.user.language, job.type)
-                          }}
+                          fields={{ endDate: formatPeriodDate(job.data.period.end_date, props.user.language) }}
                         />
                       )}
                     </div>

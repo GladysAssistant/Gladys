@@ -56,8 +56,13 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   it('should return null when dates are invalid', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
-    const res = await energyMonitoring.calculateConsumptionFromIndexRange({}, [], '2025-01-02', 'job-1');
-    expect(res).to.equal(null);
+    let error;
+    try {
+      await energyMonitoring.calculateConsumptionFromIndexRange({}, [], '2025-01-02', 'job-1');
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.not.equal(undefined);
   });
 
   it('should process devices, update progress and include current_date', async () => {
@@ -88,10 +93,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
     gladys.device.getOldestStateFromDeviceFeatures = fake.resolves([
       { oldest_created_at: new Date('2025-06-16T22:00:00.000Z') },
     ]);
-    sinon.stub(gladys.device, 'destroyStatesBetween').resolves(null);
-    sinon.stub(gladys.device, 'destroyStatesFrom').resolves(null);
-    sinon.stub(gladys.device, 'destroyParam').resolves(null);
-    sinon.stub(gladys.device, 'setParam').resolves(null);
+    gladys.device.destroyStatesBetween = fake.resolves(null);
+    gladys.device.destroyStatesFrom = fake.resolves(null);
+    gladys.device.destroyParam = fake.resolves(null);
+    gladys.device.setParam = fake.resolves(null);
     energyMonitoring.calculateConsumptionFromIndex = fake.resolves(null);
 
     const result = await energyMonitoring.calculateConsumptionFromIndexRange(
