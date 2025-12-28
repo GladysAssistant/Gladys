@@ -13,6 +13,9 @@ const Device = require('../../../lib/device');
 const Variable = require('../../../lib/variable');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
+const {
+  buildCostYesterdayJobData,
+} = require('../../../services/energy-monitoring/lib/energy-monitoring.calculateCostFromYesterday');
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 
@@ -67,7 +70,7 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
 
   it('should build job data for yesterday cost job', () => {
     const yesterday = new Date('2025-01-02T00:00:00.000Z');
-    const data = energyMonitoring.buildCostYesterdayJobData(yesterday);
+    const data = buildCostYesterdayJobData(yesterday);
     expect(data).to.deep.equal({
       scope: 'all',
       period: {
