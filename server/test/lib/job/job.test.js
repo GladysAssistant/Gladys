@@ -60,6 +60,25 @@ describe('Job', () => {
       expect(updatedJob.data.current_date).to.equal(undefined);
     });
   });
+  describe('job.wrapper', () => {
+    const job = new Job(event);
+
+    it('should start a job with buildJobData and finish it', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, fake.resolves('ok'), {
+        buildJobData: fake.returns({ scope: 'all', period: { start_date: '2025-01-01', end_date: null } }),
+      });
+
+      const result = await wrapped();
+      expect(result).to.equal('ok');
+      const startCall = event.emit.getCall(0);
+      expect(startCall.args[0]).to.equal(EVENTS.WEBSOCKET.SEND_ALL);
+      const startedPayload = startCall.args[1].payload || startCall.args[1];
+      expect(startedPayload.data).to.deep.equal({
+        scope: 'all',
+        period: { start_date: '2025-01-01', end_date: null },
+      });
+    });
+  });
   describe('job.updateProgress', () => {
     const job = new Job(event);
     it('should update the progress a job', async () => {
@@ -86,6 +105,10 @@ describe('Job', () => {
       expect(withDate.data.current_date).to.equal('2025-01-01');
       const cleared = await job.updateProgress(newJob.id, 20, { current_date: null });
       expect(cleared.data.current_date).to.equal(undefined);
+    });
+    it('should throw when job not found', async () => {
+      const promise = job.updateProgress('00000000-0000-0000-0000-000000000000', 5);
+      await chaiAssert.isRejected(promise, 'Job not found');
     });
   });
   describe('job.get', () => {
