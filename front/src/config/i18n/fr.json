@@ -2039,7 +2039,7 @@
         "decommissionButton": "Décommissionner",
         "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
         "disabledWarning": "Matter n'est pas activé, veuillez l'activer dans <a href=\"/dashboard/integration/device/matter/settings\">Paramètres</a> pour commencer à utiliser l'intégration.",
-        "disabledWarningSettings": "Matter n'est activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
+        "disabledWarningSettings": "Matter n'est pas activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
         "enableButton": "Activer Matter",
         "disableButton": "Désactiver Matter",
         "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
