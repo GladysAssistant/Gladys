@@ -1,5 +1,6 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon');
+const { fake } = sinon;
 const EventEmitter = require('events');
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const StateManager = require('../../../lib/state');
@@ -54,7 +55,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   it('should return null when dates are invalid', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
-    const res = await energyMonitoring.calculateConsumptionFromIndexRange('invalid-date', [], '2025-01-02', 'job-1');
+    const res = await energyMonitoring.calculateConsumptionFromIndexRange({}, [], '2025-01-02', 'job-1');
     expect(res).to.equal(null);
   });
 
@@ -86,9 +87,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
     gladys.device.getOldestStateFromDeviceFeatures = fake.resolves([
       { oldest_created_at: new Date('2025-06-16T22:00:00.000Z') },
     ]);
-    gladys.device.destroyStatesFrom = fake.resolves(null);
-    gladys.device.destroyParam = fake.resolves(null);
-    gladys.device.setParam = fake.resolves(null);
+    sinon.stub(gladys.device, 'destroyStatesBetween').resolves(null);
+    sinon.stub(gladys.device, 'destroyStatesFrom').resolves(null);
+    sinon.stub(gladys.device, 'destroyParam').resolves(null);
+    sinon.stub(gladys.device, 'setParam').resolves(null);
     energyMonitoring.calculateConsumptionFromIndex = fake.resolves(null);
 
     const result = await energyMonitoring.calculateConsumptionFromIndexRange(

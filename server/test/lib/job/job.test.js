@@ -70,10 +70,12 @@ describe('Job', () => {
 
       const result = await wrapped();
       expect(result).to.equal('ok');
-      const startCall = event.emit.getCall(0);
-      expect(startCall.args[0]).to.equal(EVENTS.WEBSOCKET.SEND_ALL);
-      const startedPayload = startCall.args[1].payload || startCall.args[1];
-      expect(startedPayload.data).to.deep.equal({
+      // The first emit is the creation, the second emit is the finished job with merged data.
+      const finishCall = event.emit
+        .getCalls()
+        .find((c) => c.args[1].type === WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED);
+      const finishedPayload = finishCall.args[1].payload || finishCall.args[1];
+      expect(finishedPayload.data).to.deep.equal({
         scope: 'all',
         period: { start_date: '2025-01-01', end_date: null },
       });

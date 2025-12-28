@@ -223,8 +223,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     expect(data.scope).to.equal('all');
     expect(data.period.start_date).to.be.a('string');
     expect(data.period.end_date).to.be.a('string');
-    expect(new Date(data.period.end_date).getTime()).to.equal(now.getTime());
+    // end date is the rounded window end (00 or 30).
+    const end = new Date(data.period.end_date);
     const start = new Date(data.period.start_date);
-    expect(now.getTime() - start.getTime()).to.equal(30 * 60 * 1000);
+    expect(end.getTime() - start.getTime()).to.equal(30 * 60 * 1000);
+    expect(end.getUTCMinutes() === 0 || end.getUTCMinutes() === 30).to.equal(true);
   });
 });

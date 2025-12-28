@@ -24,6 +24,7 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
 
   beforeEach(() => {
     const event = new Event();
+    job = new Job(event);
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager(event, stateManager, {}, {});
     const device = new Device(
@@ -36,8 +37,6 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
       job,
       {},
     );
-
-    job = new Job(event);
 
     gladys = {
       device,
