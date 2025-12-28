@@ -2813,10 +2813,13 @@
       "energy-monitoring-cost-calculation-thirty-minutes": "Energiekostenberechnung (30 Minuten)",
       "energy-monitoring-cost-calculation-yesterday": "Energiekostenberechnung (von gestern)",
       "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
+      "energy-monitoring-cost-calculation-range": "Energiekostenberechnung (Zeitraum)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energieverbrauchsberechnung aus Index (30 Minuten)",
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-consumption-from-index-range": "Energieverbrauchsberechnung aus Index (Zeitraum)",
       "service-enedis-sync": "Enedis-Datensynchronisation"
     },
+    "currentDate": "Fortschritt: Datum {{date}}.",
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
     },

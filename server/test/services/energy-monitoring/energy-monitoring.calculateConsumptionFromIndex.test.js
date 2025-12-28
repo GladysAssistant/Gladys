@@ -808,10 +808,15 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       ]);
       gladys.job.updateProgress.resetHistory();
       await energyMonitoring.calculateConsumptionFromIndex(testTime, undefined, 'job-progress');
-      expect(gladys.job.updateProgress.calledOnce).to.equal(true);
-      const { args } = gladys.job.updateProgress.getCall(0);
-      expect(args[0]).to.equal('job-progress');
-      expect(args[1]).to.equal(100);
+      // Two calls: one during processing, one final at 100%
+      expect(gladys.job.updateProgress.callCount).to.equal(2);
+      const firstCall = gladys.job.updateProgress.getCall(0).args;
+      expect(firstCall[0]).to.equal('job-progress');
+      expect(firstCall[2]).to.deep.equal({ current_date: '2023-10-03' });
+      const finalCall = gladys.job.updateProgress.getCall(1).args;
+      expect(finalCall[0]).to.equal('job-progress');
+      expect(finalCall[1]).to.equal(100);
+      expect(finalCall[2]).to.deep.equal({ current_date: null });
     });
   });
 });

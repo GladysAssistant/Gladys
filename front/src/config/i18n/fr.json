@@ -2813,10 +2813,13 @@
       "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
       "energy-monitoring-cost-calculation-yesterday": "Calcul du coût énergétique (depuis hier)",
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
+      "energy-monitoring-cost-calculation-range": "Calcul du coût énergétique (période)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
+      "energy-monitoring-consumption-from-index-range": "Calcul de la consommation énergétique depuis l'index (période)",
       "service-enedis-sync": "Synchronisation des données Enedis"
     },
+    "currentDate": "Progression : date {{date}}.",
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
     },

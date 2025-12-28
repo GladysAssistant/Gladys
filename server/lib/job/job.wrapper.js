@@ -21,6 +21,7 @@ function wrapper(type, func) {
     } catch (error) {
       if (job) {
         const data = {
+          ...(job.data || {}),
           error_type: JOB_ERROR_TYPES.UNKNOWN_ERROR,
         };
         if (error && error.toString) {
@@ -65,6 +66,7 @@ function wrapperDetached(type, func, options = {}) {
         await this.finish(job.id, JOB_STATUS.SUCCESS);
       } catch (error) {
         const data = {
+          ...(job.data || {}),
           error_type: JOB_ERROR_TYPES.UNKNOWN_ERROR,
         };
         if (error && error.toString) {

@@ -5,7 +5,7 @@ const db = require('../../../models');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS } = require('../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS, JOB_ERROR_TYPES } = require('../../../utils/constants');
 
 const Job = require('../../../lib/job');
 
@@ -49,6 +49,16 @@ describe('Job', () => {
       const promise = job.finish('JOB_DOESNT_EXIST', JOB_STATUS.SUCCESS, {});
       return chaiAssert.isRejected(promise, 'Job not found');
     });
+    it('should merge data when finishing a job', async () => {
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP, { scope: 'all' });
+      const updatedJob = await job.finish(newJob.id, JOB_STATUS.FAILED, {
+        error_type: JOB_ERROR_TYPES.UNKNOWN_ERROR,
+        current_date: null,
+      });
+      expect(updatedJob.data.scope).to.equal('all');
+      expect(updatedJob.data.error_type).to.equal(JOB_ERROR_TYPES.UNKNOWN_ERROR);
+      expect(updatedJob.data.current_date).to.equal(undefined);
+    });
   });
   describe('job.updateProgress', () => {
     const job = new Job(event);
@@ -69,6 +79,13 @@ describe('Job', () => {
       const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const promise = job.updateProgress(newJob.id, -1);
       return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
+    });
+    it('should update progress and merge data patch', async () => {
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP, { scope: 'all' });
+      const withDate = await job.updateProgress(newJob.id, 10, { current_date: '2025-01-01' });
+      expect(withDate.data.current_date).to.equal('2025-01-01');
+      const cleared = await job.updateProgress(newJob.id, 20, { current_date: null });
+      expect(cleared.data.current_date).to.equal(undefined);
     });
   });
   describe('job.get', () => {

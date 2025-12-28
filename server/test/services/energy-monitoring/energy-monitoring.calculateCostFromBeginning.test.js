@@ -1,12 +1,5 @@
 const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
@@ -53,31 +46,17 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
       },
     };
   });
-  it('should calculate cost from beginning', async () => {
+  it('should calculate cost from beginning with empty selectors', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
-    await energyMonitoring.calculateCostFromBeginning(null, [], null, '12345678-1234-1234-1234-1234567890ab');
-    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), [], null, null);
+    await energyMonitoring.calculateCostFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), [], '12345678-1234-1234-1234-1234567890ab');
   });
 
-  it('should pass provided dates to calculateCostFrom', async () => {
+  it('should forward selectors and job id', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.resolves(null);
-    await energyMonitoring.calculateCostFromBeginning('2025-01-01', ['feature-1'], '2025-01-31', 'job-123');
-    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-01-01', ['feature-1'], null, '2025-01-31');
-  });
-
-  it('should pass start date only to calculateCostFrom', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    energyMonitoring.calculateCostFrom = fake.resolves(null);
-    await energyMonitoring.calculateCostFromBeginning('2025-02-01', ['feature-1', 'feature-2'], null, 'job-456');
-    assert.calledWith(energyMonitoring.calculateCostFrom, '2025-02-01', ['feature-1', 'feature-2'], null, null);
-  });
-
-  it('should pass end date only to calculateCostFrom', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    energyMonitoring.calculateCostFrom = fake.resolves(null);
-    await energyMonitoring.calculateCostFromBeginning(null, ['feature-1', 'feature-2'], '2025-02-28', 'job-789');
-    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), ['feature-1', 'feature-2'], null, '2025-02-28');
+    await energyMonitoring.calculateCostFromBeginning(['feature-1', 'feature-2'], 'job-456');
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), ['feature-1', 'feature-2'], 'job-456');
   });
 });

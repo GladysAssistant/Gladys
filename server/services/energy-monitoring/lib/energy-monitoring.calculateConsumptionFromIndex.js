@@ -163,11 +163,19 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSel
 
     // Update job progress
     if (jobId) {
-      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100));
+      const currentDate = dayjs(thirtyMinutesWindowTime)
+        .tz(systemTimezone)
+        .format('YYYY-MM-DD');
+      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100), {
+        current_date: currentDate,
+      });
     }
   });
 
   logger.info(`Finished calculating consumption from index for ${devicesWithBothFeatures.length} devices`);
+  if (jobId) {
+    await this.gladys.job.updateProgress(jobId, 100, { current_date: null });
+  }
   return null;
 }
 

@@ -85,6 +85,15 @@ const JobList = ({ children, ...props }) => (
                         ))}
                       </div>
                     )}
+                  {job.data && job.data.current_date && job.status !== JOB_STATUS.SUCCESS && (
+                    <div class="mt-1 small">
+                      <Text
+                        id="jobsSettings.currentDate"
+                        defaultMessage="Progress date: {{date}}."
+                        fields={{ date: job.data.current_date }}
+                      />
+                    </div>
+                  )}
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>

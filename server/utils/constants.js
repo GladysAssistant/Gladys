@@ -1419,8 +1419,10 @@ const JOB_TYPES = {
   ENERGY_MONITORING_COST_CALCULATION_THIRTY_MINUTES: 'energy-monitoring-cost-calculation-thirty-minutes',
   ENERGY_MONITORING_COST_CALCULATION_YESTERDAY: 'energy-monitoring-cost-calculation-yesterday',
   ENERGY_MONITORING_COST_CALCULATION_BEGINNING: 'energy-monitoring-cost-calculation-beginning',
+  ENERGY_MONITORING_COST_CALCULATION_RANGE: 'energy-monitoring-cost-calculation-range',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-consumption-from-index-thirty-minutes',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
+  ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_RANGE: 'energy-monitoring-consumption-from-index-range',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
 };
 

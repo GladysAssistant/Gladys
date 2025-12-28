@@ -6,6 +6,7 @@ const dataSchema = Joi.object({
   error_type: Joi.string().valid(...JOB_ERROR_TYPES_LIST),
   scope: Joi.string(),
   kind: Joi.string(),
+  current_date: Joi.string().allow(null, ''),
   devices: Joi.array().items(
     Joi.object({
       device: Joi.string().required(),

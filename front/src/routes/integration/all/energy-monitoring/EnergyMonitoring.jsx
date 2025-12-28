@@ -346,6 +346,10 @@ class EnergyMonitoringPage extends Component {
 
   runCostCalculations = async ({ costSelectors = [], fromSelection = false } = {}) => {
     try {
+      const hasPeriod = this.hasRecalculatePeriod();
+      const url = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-cost-range'
+        : '/api/v1/service/energy-monitoring/calculate-cost-from-beginning';
       this.setState({
         calculatingCostFromBeginning: !fromSelection,
         calculatingSelectedCostFromBeginning: fromSelection,
@@ -358,13 +362,10 @@ class EnergyMonitoringPage extends Component {
         selectionCostSettingsError: null,
         selectionCostSettingsSuccess: null
       });
-      const costResponse = await this.props.httpClient.post(
-        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
-        {
-          feature_selectors: costSelectors,
-          ...this.getRecalculateDatePayload()
-        }
-      );
+      const costResponse = await this.props.httpClient.post(url, {
+        feature_selectors: costSelectors,
+        ...this.getRecalculateDatePayload()
+      });
       if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
         throw new Error('job_not_created');
       }
@@ -395,6 +396,13 @@ class EnergyMonitoringPage extends Component {
     fromSelection = false
   } = {}) => {
     try {
+      const hasPeriod = this.hasRecalculatePeriod();
+      const consumptionUrl = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-consumption-from-index-range'
+        : '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning';
+      const costUrl = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-cost-range'
+        : '/api/v1/service/energy-monitoring/calculate-cost-from-beginning';
       this.setState({
         calculatingFromBeginning: !fromSelection,
         calculatingSelectedFromBeginning: fromSelection,
@@ -407,20 +415,17 @@ class EnergyMonitoringPage extends Component {
         selectionCostSettingsError: null,
         selectionCostSettingsSuccess: null
       });
-      const consumptionResponse = await this.props.httpClient.post(
-        '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
-        { feature_selectors: consumptionSelectors, ...this.getRecalculateDatePayload() }
-      );
+      const consumptionResponse = await this.props.httpClient.post(consumptionUrl, {
+        feature_selectors: consumptionSelectors,
+        ...this.getRecalculateDatePayload()
+      });
       if (!consumptionResponse || consumptionResponse.success !== true || !consumptionResponse.job_id) {
         throw new Error('job_not_created');
       }
-      const costResponse = await this.props.httpClient.post(
-        '/api/v1/service/energy-monitoring/calculate-cost-from-beginning',
-        {
-          feature_selectors: costSelectors,
-          ...this.getRecalculateDatePayload()
-        }
-      );
+      const costResponse = await this.props.httpClient.post(costUrl, {
+        feature_selectors: costSelectors,
+        ...this.getRecalculateDatePayload()
+      });
       if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
         throw new Error('job_not_created');
       }
@@ -770,22 +775,28 @@ class EnergyMonitoringPage extends Component {
   }
 
   getRecalculationOptions(features = this.getRecalculationCandidates()) {
-    return features.map(entry => {
-      const root = entry.root;
-      const consumption = entry.consumption;
-      const cost = entry.cost;
-      const value = root.selector || root.external_id || String(root.id);
-      const deviceName = (root.__device && root.__device.name) || '';
-      const featureName = root.name || root.type || value;
-      const label = deviceName ? `${deviceName} - ${featureName}` : featureName;
-      return {
-        value,
-        label,
-        rootSelector: root.selector || root.external_id || String(root.id),
-        consumptionSelector: consumption.selector || consumption.external_id || String(consumption.id),
-        costSelector: cost.selector || cost.external_id || String(cost.id)
-      };
-    });
+    const selected = new Set((this.state.selectedFeaturesForRecalc || []).map(opt => opt && opt.value).filter(Boolean));
+    return features
+      .filter(entry => {
+        const value = (entry.root && (entry.root.selector || entry.root.external_id || String(entry.root.id))) || '';
+        return value && !selected.has(value);
+      })
+      .map(entry => {
+        const root = entry.root;
+        const consumption = entry.consumption;
+        const cost = entry.cost;
+        const value = root.selector || root.external_id || String(root.id);
+        const deviceName = (root.__device && root.__device.name) || '';
+        const featureName = root.name || root.type || value;
+        const label = deviceName ? `${deviceName} - ${featureName}` : featureName;
+        return {
+          value,
+          label,
+          rootSelector: root.selector || root.external_id || String(root.id),
+          consumptionSelector: consumption.selector || consumption.external_id || String(consumption.id),
+          costSelector: cost.selector || cost.external_id || String(cost.id)
+        };
+      });
   }
 
   detectCircularDependencies() {
