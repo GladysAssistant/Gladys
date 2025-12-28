@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+
 const { fake } = sinon;
 const EventEmitter = require('events');
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');

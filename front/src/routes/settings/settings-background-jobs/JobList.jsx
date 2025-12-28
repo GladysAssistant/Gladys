@@ -4,6 +4,22 @@ import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constan
 import RelativeTime from '../../../components/device/RelativeTime';
 import style from './style.css';
 
+const formatPeriodDate = (value, language) => {
+  if (!value) {
+    return value;
+  }
+  const date = new Date(value);
+  const hasTime =
+    date.getUTCHours() !== 0 ||
+    date.getUTCMinutes() !== 0 ||
+    date.getUTCSeconds() !== 0 ||
+    date.getUTCMilliseconds() !== 0;
+  if (hasTime) {
+    return date.toLocaleString(language || undefined);
+  }
+  return date.toLocaleDateString(language || undefined);
+};
+
 const JobList = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
@@ -46,21 +62,28 @@ const JobList = ({ children, ...props }) => (
                         <Text
                           id="jobsSettings.periodFromTo"
                           defaultMessage="Period: from {{startDate}} to {{endDate}}."
-                          fields={{ startDate: job.data.period.start_date, endDate: job.data.period.end_date }}
+                          fields={{
+                            startDate: formatPeriodDate(job.data.period.start_date, props.user.language, job.type),
+                            endDate: formatPeriodDate(job.data.period.end_date, props.user.language, job.type)
+                          }}
                         />
                       )}
                       {job.data.period.start_date && !job.data.period.end_date && (
                         <Text
                           id="jobsSettings.periodFrom"
                           defaultMessage="Period: from {{startDate}}."
-                          fields={{ startDate: job.data.period.start_date }}
+                          fields={{
+                            startDate: formatPeriodDate(job.data.period.start_date, props.user.language, job.type)
+                          }}
                         />
                       )}
                       {!job.data.period.start_date && job.data.period.end_date && (
                         <Text
                           id="jobsSettings.periodUntil"
                           defaultMessage="Period: until {{endDate}}."
-                          fields={{ endDate: job.data.period.end_date }}
+                          fields={{
+                            endDate: formatPeriodDate(job.data.period.end_date, props.user.language, job.type)
+                          }}
                         />
                       )}
                     </div>

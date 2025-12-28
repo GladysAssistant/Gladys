@@ -71,9 +71,7 @@ describe('Job', () => {
       const result = await wrapped();
       expect(result).to.equal('ok');
       // The first emit is the creation, the second emit is the finished job with merged data.
-      const finishCall = event.emit
-        .getCalls()
-        .find((c) => c.args[1].type === WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED);
+      const finishCall = event.emit.getCalls().find((c) => c.args[1].type === WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED);
       const finishedPayload = finishCall.args[1].payload || finishCall.args[1];
       expect(finishedPayload.data).to.deep.equal({
         scope: 'all',
