@@ -11,6 +11,7 @@ const Job = require('../../../lib/job');
 
 describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   let gladys;
+  let clock;
 
   beforeEach(() => {
     const event = new EventEmitter();
@@ -197,7 +198,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   });
 
   it('should destroy states from when no end date provided', async () => {
-    const clock = sinon.useFakeTimers(new Date('2025-06-17T01:00:00Z').getTime());
+    clock = sinon.useFakeTimers(new Date('2025-06-17T01:00:00Z').getTime());
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
     const indexId = 'idx1';
@@ -231,7 +232,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
 
     expect(destroyStatesFromStub.calledOnce).to.equal(true);
     expect(gladys.device.destroyStatesBetween.called).to.equal(false);
-    clock.restore();
   });
 
   it('should continue processing on window error and update progress in catch', async () => {
@@ -341,6 +341,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   });
 
   afterEach(() => {
+    if (clock) {
+      clock.restore();
+      clock = null;
+    }
     sinon.restore();
   });
 });

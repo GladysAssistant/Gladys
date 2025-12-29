@@ -16,6 +16,10 @@ const event = {
 };
 
 describe('Job', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('job.create', () => {
     const job = new Job(event);
     it('should create a job', async () => {
