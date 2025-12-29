@@ -18,9 +18,8 @@ const event = {
 describe('Job', () => {
   let sandbox;
 
-
   beforeEach(() => {
-        sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
