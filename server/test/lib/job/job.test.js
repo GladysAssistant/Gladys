@@ -18,12 +18,14 @@ const event = {
 describe('Job', () => {
   let sandbox;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
+    await db.Job.destroy({ where: {}, truncate: true, cascade: true });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     sandbox.restore();
+    await db.Job.destroy({ where: {}, truncate: true, cascade: true });
   });
 
   describe('job.create', () => {

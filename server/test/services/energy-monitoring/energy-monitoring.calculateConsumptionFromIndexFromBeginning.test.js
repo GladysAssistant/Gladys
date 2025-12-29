@@ -1,5 +1,7 @@
+const sinon = require('sinon');
 const { expect } = require('chai');
-const { useFakeTimers, stub } = require('sinon');
+
+const { useFakeTimers, stub } = sinon;
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -24,6 +26,27 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let serviceManager;
   let device;
   let job;
+  const clearDuckDb = async () => {
+    const tables = [
+      't_device_feature_state',
+      't_device_feature_state_aggregate',
+      't_energy_price',
+      't_device_feature',
+      't_device_param',
+      't_device',
+    ];
+    // Delete children first to avoid FK issues.
+    // eslint-disable-next-line no-restricted-syntax
+    for (const table of tables) {
+      // Ignore errors to avoid breaking tests if a table is absent in a given schema.
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await db.duckDbWriteConnectionAllAsync(`DELETE FROM ${table}`);
+      } catch (e) {
+        // ignore
+      }
+    }
+  };
 
   // Test device IDs (using proper UUID format)
   const testDeviceId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
@@ -31,6 +54,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   const testConsumptionFeatureId = 'c3d4e5f6-a7b8-9012-cdef-123456789012';
 
   beforeEach(async () => {
+    await clearDuckDb();
     // Create event emitter and components
     const event = new EventEmitter();
     job = new Job(event);
@@ -114,7 +138,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   afterEach(async () => {
     if (clock) {
       clock.restore();
+      clock = null;
     }
+    sinon.restore();
+    await clearDuckDb();
   });
 
   describe('Basic functionality', () => {
