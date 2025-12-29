@@ -16,8 +16,15 @@ const event = {
 };
 
 describe('Job', () => {
+  let sandbox;
+
+
+  beforeEach(() => {
+        sandbox = sinon.createSandbox();
+  });
+
   afterEach(() => {
-    sinon.restore();
+    sandbox.restore();
   });
 
   describe('job.create', () => {
@@ -69,11 +76,11 @@ describe('Job', () => {
     const job = new Job(event);
 
     it('should log warning if buildJobData throws', async () => {
-      const warnStub = sinon.stub(logger, 'warn');
-      const startStub = sinon
+      const warnStub = sandbox.stub(logger, 'warn');
+      const startStub = sandbox
         .stub(job, 'start')
         .resolves({ id: 'job-id', status: JOB_STATUS.IN_PROGRESS, type: JOB_TYPES.GLADYS_GATEWAY_BACKUP });
-      const finishStub = sinon.stub(job, 'finish').resolves({});
+      const finishStub = sandbox.stub(job, 'finish').resolves({});
 
       const failingBuild = sinon.stub().throws(new Error('boom'));
       const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, fake.resolves('ok'), {
@@ -81,18 +88,16 @@ describe('Job', () => {
       });
 
       await wrapped();
-
       expect(warnStub.calledOnce).to.equal(true);
       startStub.restore();
       finishStub.restore();
-      warnStub.restore();
     });
 
     it('should start a job with buildJobData and finish it', async () => {
-      const startStub = sinon
+      const startStub = sandbox
         .stub(job, 'start')
         .callsFake(async (type, data) => ({ id: 'job-id', type, status: JOB_STATUS.IN_PROGRESS, data }));
-      const finishStub = sinon.stub(job, 'finish').resolves({});
+      const finishStub = sandbox.stub(job, 'finish').resolves({});
       const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, fake.resolves('ok'), {
         buildJobData: fake.returns({ scope: 'all', period: { start_date: '2025-01-01', end_date: null } }),
       });
@@ -105,9 +110,6 @@ describe('Job', () => {
         period: { start_date: '2025-01-01', end_date: null },
       });
       sinon.assert.calledWith(finishStub, 'job-id', JOB_STATUS.SUCCESS);
-
-      startStub.restore();
-      finishStub.restore();
     });
   });
   describe('job.updateProgress', () => {
@@ -287,7 +289,7 @@ describe('Job', () => {
     });
 
     it('should log finish error when job.finish fails in wrapperDetached', async () => {
-      const finishStub = sinon.stub(job, 'finish').rejects(new Error('finish-fail'));
+      const finishStub = sandbox.stub(job, 'finish').rejects(new Error('finish-fail'));
       const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
         throw new Error('boom');
       });
