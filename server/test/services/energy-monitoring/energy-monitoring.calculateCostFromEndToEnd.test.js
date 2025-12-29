@@ -353,7 +353,6 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     });
   });
   afterEach(async () => {
-    sinon.restore();
     await clearDuckDb();
   });
   it('should calculate cost from a specific date for a edf-tempo contract', async () => {

@@ -72,7 +72,6 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
   let gladys;
 
   afterEach(async () => {
-    sinon.restore();
     await clearDuckDb();
   });
   beforeEach(async () => {
