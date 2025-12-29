@@ -9,7 +9,12 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
-const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const {
+  SYSTEM_VARIABLE_NAMES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../utils/constants');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
@@ -156,6 +161,40 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       });
       expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:50:00.000Z');
+    });
+  });
+
+  describe('Unit conversion between index and consumption', () => {
+    it('should convert index deltas to the consumption unit', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      const deviceWithUnits = {
+        ...mockDevice,
+        params: [],
+        features: [
+          {
+            ...mockDevice.features[0],
+            unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
+          },
+          {
+            ...mockDevice.features[1],
+            unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithUnits]);
+
+      const mockIndexStates = [
+        { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+        { created_at: '2023-10-03T13:45:00.000Z', value: 2500 }, // +1500 Wh => 1.5 kWh
+      ];
+      device.getDeviceFeatureStates = fake.returns(mockIndexStates);
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+
+      assert.calledOnce(device.saveHistoricalState);
+      const saveCall = device.saveHistoricalState.getCall(0);
+      expect(saveCall.args[1]).to.equal(1.5);
     });
   });
 
