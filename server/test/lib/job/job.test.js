@@ -63,6 +63,27 @@ describe('Job', () => {
   describe('job.wrapper', () => {
     const job = new Job(event);
 
+    it('should log warning if buildJobData throws', async () => {
+      const logger = require('../../../utils/logger'); // eslint-disable-line global-require
+      const warnStub = sinon.stub(logger, 'warn');
+      const startStub = sinon
+        .stub(job, 'start')
+        .resolves({ id: 'job-id', status: JOB_STATUS.IN_PROGRESS, type: JOB_TYPES.GLADYS_GATEWAY_BACKUP });
+      const finishStub = sinon.stub(job, 'finish').resolves({});
+
+      const failingBuild = sinon.stub().throws(new Error('boom'));
+      const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, fake.resolves('ok'), {
+        buildJobData: failingBuild,
+      });
+
+      await wrapped();
+
+      expect(warnStub.calledOnce).to.equal(true);
+      startStub.restore();
+      finishStub.restore();
+      warnStub.restore();
+    });
+
     it('should start a job with buildJobData and finish it', async () => {
       const startStub = sinon
         .stub(job, 'start')
