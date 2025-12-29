@@ -39,8 +39,10 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   });
 
   afterEach(() => {
-    clock.restore();
-    clock = null;
+    if (clock) {
+      clock.restore();
+      clock = null;
+    }
     sinon.restore();
   });
 
