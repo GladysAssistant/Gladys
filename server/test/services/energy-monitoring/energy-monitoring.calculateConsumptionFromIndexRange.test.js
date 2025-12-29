@@ -38,6 +38,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
     };
   });
 
+  afterEach(() => {
+    clock.restore();
+    clock = null;
+    sinon.restore();
+  });
+
   it('should return null when no devices to process', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
@@ -338,12 +344,5 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
     await energyMonitoring.calculateConsumptionFromIndexRange('2025-06-17', ['cons'], '2025-06-20', 'job-restore');
 
     expect(destroyParamStub.called).to.equal(true);
-  });
-
-  afterEach(() => {
-    if (clock) {
-      clock.restore();
-    }
-    sinon.restore();
   });
 });

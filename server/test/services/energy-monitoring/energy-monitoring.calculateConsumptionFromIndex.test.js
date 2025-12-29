@@ -40,14 +40,9 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
   let device;
   let gladys;
   let energyMonitoring;
-  let clock;
 
   afterEach(() => {
     sinon.restore();
-    if (clock) {
-      clock.restore();
-      clock = null;
-    }
   });
 
   const mockDevice = {

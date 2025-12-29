@@ -92,6 +92,7 @@ describe('Job', () => {
       expect(warnStub.calledOnce).to.equal(true);
       startStub.restore();
       finishStub.restore();
+      warnStub.restore();
     });
 
     it('should start a job with buildJobData and finish it', async () => {

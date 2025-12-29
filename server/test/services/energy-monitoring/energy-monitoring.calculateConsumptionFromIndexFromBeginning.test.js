@@ -136,10 +136,8 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   });
 
   afterEach(async () => {
-    if (clock) {
-      clock.restore();
-      clock = null;
-    }
+    clock.restore();
+    clock = null;
     await clearDuckDb();
   });
 
