@@ -50,6 +50,10 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
   let energyPrice;
   let electricalMeterDevice;
   let gladys;
+
+  afterEach(() => {
+    sinon.restore();
+  });
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
     stateManager = new StateManager(event);

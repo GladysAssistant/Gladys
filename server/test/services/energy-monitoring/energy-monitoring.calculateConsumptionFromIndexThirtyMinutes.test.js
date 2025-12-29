@@ -38,13 +38,8 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
   let gladys;
   let energyMonitoring;
   let calculateConsumptionFromIndex;
-  let clock;
 
   afterEach(() => {
-    if (clock) {
-      clock.restore();
-      clock = null;
-    }
     if (calculateConsumptionFromIndex && calculateConsumptionFromIndex.restore) {
       calculateConsumptionFromIndex.restore();
     }

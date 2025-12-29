@@ -343,7 +343,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   afterEach(() => {
     if (clock) {
       clock.restore();
-      clock = null;
     }
     sinon.restore();
   });

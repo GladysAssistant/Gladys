@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -41,6 +43,10 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
   let device;
   let energyPrice;
   let gladys;
+
+  afterEach(() => {
+    sinon.restore();
+  });
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);

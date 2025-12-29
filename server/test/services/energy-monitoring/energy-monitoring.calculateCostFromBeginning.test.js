@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
@@ -30,6 +32,10 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
   let device;
   let energyPrice;
   let gladys;
+
+  afterEach(() => {
+    sinon.restore();
+  });
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
