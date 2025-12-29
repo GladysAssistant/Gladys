@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const chaiAssert = require('chai').assert;
 const sinon = require('sinon');
 const db = require('../../../models');
+const logger = require('../../../utils/logger');
 
 const { fake, assert } = sinon;
 
@@ -64,7 +65,6 @@ describe('Job', () => {
     const job = new Job(event);
 
     it('should log warning if buildJobData throws', async () => {
-      const logger = require('../../../utils/logger'); // eslint-disable-line global-require
       const warnStub = sinon.stub(logger, 'warn');
       const startStub = sinon
         .stub(job, 'start')
