@@ -56,13 +56,9 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
   it('should return null when dates are invalid', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
-    let error;
-    try {
-      await energyMonitoring.calculateConsumptionFromIndexRange({}, [], '2025-01-02', 'job-1');
-    } catch (e) {
-      error = e;
-    }
-    expect(error).to.not.equal(undefined);
+    const res = await energyMonitoring.calculateConsumptionFromIndexRange({}, [], '2025-01-02', 'job-1');
+    expect(res).to.equal(null);
+    expect(gladys.job.updateProgress.called).to.equal(false);
   });
 
   it('should process devices, update progress and include current_date', async () => {

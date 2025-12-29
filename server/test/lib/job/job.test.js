@@ -75,11 +75,11 @@ describe('Job', () => {
       const result = await wrapped();
       expect(result).to.equal('ok');
 
-      expect(startStub).to.have.been.calledWith(JOB_TYPES.GLADYS_GATEWAY_BACKUP, {
+      sinon.assert.calledWith(startStub, JOB_TYPES.GLADYS_GATEWAY_BACKUP, {
         scope: 'all',
         period: { start_date: '2025-01-01', end_date: null },
       });
-      expect(finishStub).to.have.been.calledWith('job-id', JOB_STATUS.SUCCESS);
+      sinon.assert.calledWith(finishStub, 'job-id', JOB_STATUS.SUCCESS);
 
       startStub.restore();
       finishStub.restore();
