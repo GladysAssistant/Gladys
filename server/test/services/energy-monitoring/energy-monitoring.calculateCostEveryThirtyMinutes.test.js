@@ -44,9 +44,6 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
   let energyPrice;
   let gladys;
 
-  afterEach(() => {
-    sinon.restore();
-  });
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);

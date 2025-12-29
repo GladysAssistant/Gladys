@@ -25,10 +25,6 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
   let gladys;
   let job;
 
-  afterEach(() => {
-    sinon.restore();
-  });
-
   beforeEach(() => {
     const event = new Event();
     job = new Job(event);

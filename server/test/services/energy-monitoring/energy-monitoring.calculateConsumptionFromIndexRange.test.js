@@ -43,7 +43,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
       clock.restore();
       clock = null;
     }
-    sinon.restore();
   });
 
   it('should return null when no devices to process', async () => {

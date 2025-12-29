@@ -39,13 +39,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
   let energyMonitoring;
   let calculateConsumptionFromIndex;
 
-  afterEach(() => {
-    if (calculateConsumptionFromIndex && calculateConsumptionFromIndex.restore) {
-      calculateConsumptionFromIndex.restore();
-    }
-    sinon.restore();
-  });
-
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
