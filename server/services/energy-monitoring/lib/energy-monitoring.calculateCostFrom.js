@@ -15,6 +15,7 @@ const {
   ENERGY_CONTRACT_TYPES,
   SYSTEM_VARIABLE_NAMES,
 } = require('../../../utils/constants');
+const { convertEnergyUnit } = require('../../../utils/units');
 const contracts = require('../contracts/contracts.calculateCost');
 const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDayMap');
 
@@ -218,11 +219,11 @@ async function calculateCostFrom(startAt, featureSelectors, jobId, endAt) {
             const { contract } = energyPricesForDate[0];
 
             // Convert the value in the correct unit
-            let valueInKwh = deviceFeatureState.value;
-
-            if (ecf.consumptionFeature.unit === DEVICE_FEATURE_UNITS.WATT_HOUR) {
-              valueInKwh = deviceFeatureState.value / 1000;
-            }
+            const valueInKwh = convertEnergyUnit(
+              deviceFeatureState.value,
+              ecf.consumptionFeature.unit,
+              DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            );
 
             // Calculate the cost per contract
             const cost = await contracts[contract](
