@@ -92,6 +92,12 @@ class EditEnergyConsumption extends Component {
     }
   };
 
+  updateShowSubscriptionPrices = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      show_subscription_prices: e.target.checked
+    });
+  };
+
   updateChartColor = (i, value) => {
     const colors = this.props.box.colors || [];
     if (value) {
@@ -226,6 +232,23 @@ class EditEnergyConsumption extends Component {
               />
             </div>
           ))}
+        <div class="form-group">
+          <label class="custom-switch">
+            <input
+              type="checkbox"
+              class="custom-switch-input"
+              checked={props.box.show_subscription_prices}
+              onChange={this.updateShowSubscriptionPrices}
+            />
+            <span class="custom-switch-indicator" />
+            <span class="custom-switch-description">
+              <Text id="dashboard.boxes.energyConsumption.showSubscriptionPrices" />
+            </span>
+          </label>
+          <small class="form-text text-muted">
+            <Text id="dashboard.boxes.energyConsumption.showSubscriptionPricesDescription" />
+          </small>
+        </div>
         <div class="form-group">
           <label>
             <Text id="global.preview" />

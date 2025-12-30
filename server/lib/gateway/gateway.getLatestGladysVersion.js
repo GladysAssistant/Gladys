@@ -1,4 +1,5 @@
 const db = require('../../models');
+const logger = require('../../utils/logger');
 
 /**
  * @description Return latest version of Gladys.
@@ -7,11 +8,15 @@ const db = require('../../models');
  * getLatestGladysVersion();
  */
 async function getLatestGladysVersion() {
+  logger.info('Gladys : getLatestGladysVersion');
   const systemInfos = await this.system.getInfos();
   const clientId = await this.variable.getValue('GLADYS_INSTANCE_CLIENT_ID');
-  const [{ count: deviceStateCount }] = await db.duckDbReadConnectionAllAsync(`
-    SELECT COUNT(value) as count FROM t_device_feature_state;  
+  // Use estimated_size from DuckDB metadata for fast approximate count
+  // This avoids a full table scan which can be very slow with millions of rows
+  const [{ estimated_size: deviceStateCount }] = await db.duckDbReadConnectionAllAsync(`
+    SELECT estimated_size FROM duckdb_tables() WHERE table_name = 't_device_feature_state';
   `);
+  logger.info(`Device state count in DuckDB: ${deviceStateCount}`);
   const serviceUsage = await this.serviceManager.getUsage();
   const params = {
     system: systemInfos.platform,

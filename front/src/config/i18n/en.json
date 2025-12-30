@@ -468,7 +468,9 @@
         "totalConsumptionCost": "Total Consumption Cost",
         "totalConsumptionKwh": "Total Consumption",
         "error": "Error loading energy consumption data",
-        "noData": "No energy consumption data available for this period"
+        "noData": "No energy consumption data available for this period",
+        "showSubscriptionPrices": "Show subscription prices",
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart."
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
@@ -1701,6 +1703,7 @@
         "consumption": "consumption",
         "subscription": "subscription"
       },
+      "perMonth": "/month",
       "currencies": {
         "euro": "euro",
         "dollar": "dollar"
