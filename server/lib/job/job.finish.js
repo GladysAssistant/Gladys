@@ -25,7 +25,16 @@ async function finish(id, status, data) {
     status,
   };
   if (data) {
-    toUpdate.data = data;
+    const mergedData = {
+      ...(job.data || {}),
+      ...data,
+    };
+    Object.keys(mergedData).forEach((key) => {
+      if (mergedData[key] === null) {
+        delete mergedData[key];
+      }
+    });
+    toUpdate.data = mergedData;
   }
   await job.update(toUpdate);
   const jobUpdated = job.get({ plain: true });

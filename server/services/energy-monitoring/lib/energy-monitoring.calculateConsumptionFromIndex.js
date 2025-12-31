@@ -16,12 +16,16 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
  * @description Calculate thirty-minute consumption from index differences for devices that have
  * INDEX features with corresponding THIRTY_MINUTES_CONSUMPTION features (linked via energy_parent_id).
  * @param {Date} thirtyMinutesWindowTime - The specific time for the thirty-minute window.
+ * @param {Array} featureSelectors - Optional whitelist of consumption feature selectors to process.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateConsumptionFromIndex(new Date(), '12345678-1234-1234-1234-1234567890ab');
+ * calculateConsumptionFromIndex(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
+async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSelectors, jobId) {
+  const isSelectorsArray = Array.isArray(featureSelectors);
+  const selectors = isSelectorsArray ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0) : [];
+  const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating consumption from index in timezone ${systemTimezone} for window ${thirtyMinutesWindowTime}`);
 
@@ -52,6 +56,14 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
       );
 
       if (consumptionFeature) {
+        // If a whitelist is provided, only keep matches
+        if (selectorSet.size > 0) {
+          const consumptionSelector =
+            consumptionFeature.selector || consumptionFeature.external_id || consumptionFeature.id;
+          if (!selectorSet.has(consumptionSelector)) {
+            return;
+          }
+        }
         devicesWithBothFeatures.push({
           device: energyDevice,
           indexFeature,
@@ -151,11 +163,19 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
 
     // Update job progress
     if (jobId) {
-      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100));
+      const currentDate = dayjs(thirtyMinutesWindowTime)
+        .tz(systemTimezone)
+        .format('YYYY-MM-DD');
+      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / devicesWithBothFeatures.length) * 100), {
+        current_date: currentDate,
+      });
     }
   });
 
   logger.info(`Finished calculating consumption from index for ${devicesWithBothFeatures.length} devices`);
+  if (jobId) {
+    await this.gladys.job.updateProgress(jobId, 100, { current_date: null });
+  }
   return null;
 }
 

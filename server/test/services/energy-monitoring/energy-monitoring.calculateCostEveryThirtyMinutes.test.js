@@ -1,4 +1,7 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
+const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -14,6 +17,9 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const EnergyPrice = require('../../../lib/energy-price');
+const {
+  buildCostThirtyMinutesJobData,
+} = require('../../../services/energy-monitoring/lib/energy-monitoring.calculateCostEveryThirtyMinutes');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -37,6 +43,7 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
   let device;
   let energyPrice;
   let gladys;
+
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
@@ -49,6 +56,7 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
   });
@@ -57,5 +65,18 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
     energyMonitoring.calculateCostFrom = fake.returns(null);
     await energyMonitoring.calculateCostEveryThirtyMinutes('12345678-1234-1234-1234-1234567890ab');
     assert.calledOnce(energyMonitoring.calculateCostFrom);
+  });
+
+  it('should build job data for thirty-minute cost window', () => {
+    const now = new Date('2025-03-10T12:18:00.000Z');
+    const data = buildCostThirtyMinutesJobData(now);
+    expect(data).to.deep.equal({
+      scope: 'all',
+      period: {
+        start_date: new Date(now.getTime() - 30 * 60 * 1000).toISOString(),
+        end_date: now.toISOString(),
+      },
+      kind: 'cost',
+    });
   });
 });

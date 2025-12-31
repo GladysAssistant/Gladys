@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -78,6 +80,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
 
@@ -771,6 +774,49 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
       // Verify last processed timestamp was saved
       assert.calledOnce(device.setParam);
+    });
+
+    it('should skip consumption features not in whitelist selectors', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Only provide energy sensor device
+      device.get = fake.returns([mockDevice]);
+
+      device.getDeviceFeatureStates = fake((selector) => {
+        if (selector === 'test-energy-device-index') {
+          return [
+            { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+            { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },
+          ];
+        }
+        return [];
+      });
+
+      device.saveHistoricalState.resetHistory();
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, ['non-matching-selector']);
+
+      expect(device.saveHistoricalState.called).to.equal(false);
+    });
+
+    it('should update job progress when jobId is provided', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+      device.get = fake.returns([mockDevice]);
+      device.getDeviceFeatureStates = fake.returns([
+        { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
+        { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },
+      ]);
+      gladys.job.updateProgress.resetHistory();
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, undefined, 'job-progress');
+      // Two calls: one during processing, one final at 100%
+      expect(gladys.job.updateProgress.callCount).to.equal(2);
+      const firstCall = gladys.job.updateProgress.getCall(0).args;
+      expect(firstCall[0]).to.equal('job-progress');
+      expect(firstCall[2]).to.deep.equal({ current_date: '2023-10-03' });
+      const finalCall = gladys.job.updateProgress.getCall(1).args;
+      expect(finalCall[0]).to.equal('job-progress');
+      expect(finalCall[1]).to.equal(100);
+      expect(finalCall[2]).to.deep.equal({ current_date: null });
     });
   });
 });
