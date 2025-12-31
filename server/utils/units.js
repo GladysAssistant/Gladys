@@ -1,4 +1,4 @@
-const { ENERGY_UNIT_FACTORS_IN_WH, UNIT_CONVERSIONS } = require('./unit-conversions');
+const { UNIT_CONVERSIONS } = require('./unit-conversions');
 
 /**
  * @description Convert celsius to fahrenheit.
@@ -125,35 +125,10 @@ function checkAndConvertUnit(value, fromUnit, userPreference) {
   return { value, unit: unitConversionParams.unit };
 }
 
-/**
- * @description Convert energy units between Wh, kWh, MWh.
- * @param {number} value - Value to convert.
- * @param {string} fromUnit - Original unit.
- * @param {string} toUnit - Target unit.
- * @returns {number} Converted value.
- * @example
- * convertEnergyUnit(1500, DEVICE_FEATURE_UNITS.WATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR); // 1.5
- */
-function convertEnergyUnit(value, fromUnit, toUnit) {
-  if (value === null || value === undefined) {
-    return value;
-  }
-  if (!fromUnit || !toUnit || fromUnit === toUnit) {
-    return value;
-  }
-  const fromFactor = ENERGY_UNIT_FACTORS_IN_WH[fromUnit];
-  const toFactor = ENERGY_UNIT_FACTORS_IN_WH[toUnit];
-  if (!fromFactor || !toFactor) {
-    return value;
-  }
-  return (value * fromFactor) / toFactor;
-}
-
 module.exports = {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   hslToRgb,
   checkAndConvertUnit,
-  convertEnergyUnit,
   smartRound,
 };

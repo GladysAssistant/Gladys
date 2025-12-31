@@ -8,7 +8,6 @@ dayjs.extend(timezone);
 
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
-const { convertEnergyUnit } = require('../../../utils/units');
 const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
@@ -132,10 +131,9 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSel
 
           // Handle consumption calculation and counter resets
           if (consumption >= 0) {
-            const convertedConsumption = convertEnergyUnit(consumption, indexFeature.unit, consumptionFeature.unit);
-            totalConsumption += convertedConsumption;
+            totalConsumption += consumption;
             logger.debug(
-              `Device ${device.name}: +${convertedConsumption} (${currentIndex} - ${lastValidIndex}) at ${currentTimestamp}`,
+              `Device ${device.name}: +${consumption} (${currentIndex} - ${lastValidIndex}) at ${currentTimestamp}`,
             );
           } else {
             // Counter reset detected, do not count anything
