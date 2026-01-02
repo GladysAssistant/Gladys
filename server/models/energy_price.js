@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
       },
+      contract_name: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
       start_date: {
         allowNull: false,
         type: DataTypes.DATEONLY,

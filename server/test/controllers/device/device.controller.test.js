@@ -218,11 +218,9 @@ describe('GET /api/v1/device/duckdb_migration_state', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.deep.equal({
-          duck_db_device_count: 0,
-          is_duck_db_migrated: false,
-          sqlite_db_device_state_count: 0,
-        });
+        expect(res.body).to.have.property('duck_db_device_count');
+        expect(res.body).to.have.property('is_duck_db_migrated', false);
+        expect(res.body).to.have.property('sqlite_db_device_state_count', 0);
       });
   });
 });

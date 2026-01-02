@@ -102,13 +102,20 @@ async function calculateCostFrom(startAt, jobId) {
 
       // For each energy consumption feature
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
-        // First, clean the cost feature states
-        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
-        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the feature of the root electrical meter device
         const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
           ecf.consumptionFeature,
         );
+        // Skip if no valid root electric meter feature found (broken hierarchy)
+        if (!electricMeterFeature) {
+          logger.warn(
+            `Device ${energyDevice.name}: skipping consumption feature ${ecf.consumptionFeature.id} - no valid root electric meter found (broken hierarchy)`,
+          );
+          return;
+        }
+        // First, clean the cost feature states
+        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
+        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
         // Get the energy prices from this electrical meter device
         const energyPrices = await this.gladys.energyPrice.get({
           electric_meter_device_id: electricMeterFeature.device_id,

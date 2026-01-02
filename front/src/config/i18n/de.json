@@ -483,10 +483,15 @@
         "year": "Jahr",
         "month": "Monat",
         "day": "Tag",
+        "currency": "Kosten (€)",
+        "kwh": "Verbrauch (kWh)",
         "consumptionCost": "Verbrauchskosten",
-        "totalConsumption": "Gesamtverbrauchskosten",
+        "totalConsumptionCost": "Gesamtverbrauchskosten",
+        "totalConsumptionKwh": "Gesamtverbrauch",
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
-        "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar"
+        "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
+        "showSubscriptionPrices": "Abonnementpreise anzeigen",
+        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
       }
     }
   },
@@ -632,6 +637,11 @@
         "periodScope": "Zeitraum & Umfang",
         "priceAndSlots": "Preis & Zeitfenster"
       },
+      "contractName": "Vertragsname",
+      "contractNamePlaceholder": "z.B. EDF Haupt-/Nebenzeiten 2024",
+      "contractNameHelp": "Ein benutzerdefinierter Name zur Identifizierung Ihres Energievertrags (z.B. Anbietername und Vertragstyp)",
+      "deleteContract": "Vertrag löschen",
+      "confirmDeleteContract": "Sind Sie sicher, dass Sie diesen Vertrag und alle seine Preise löschen möchten?",
       "contract": "Vertrag",
       "priceType": "Preistyp",
       "currency": "Währung",
@@ -669,6 +679,7 @@
         "consumption": "Verbrauch",
         "subscription": "Abonnement"
       },
+      "perMonth": "/Monat",
       "currencies": {
         "euro": "Euro",
         "dollar": "Dollar"
@@ -708,7 +719,14 @@
       "selectPeakHours": "Hauptzeiten auswählen",
       "selectPeakHoursHelp": "Klicken Sie auf die Zeitfenster, in denen der Haupttarif gilt. Nicht ausgewählte Zeitfenster sind Nebenzeiten.",
       "peakHours": "Hauptzeiten",
-      "offPeakHours": "Nebenzeiten"
+      "offPeakHours": "Nebenzeiten",
+      "circularDependencyDetected": "Zirkuläre oder fehlerhafte Abhängigkeiten erkannt",
+      "circularDependencyDescription": "Die folgenden Gerätefunktionen haben ungültige Elternreferenzen, die Leistungsprobleme verursachen können. Klicken Sie auf die Schaltfläche, um sie automatisch zu beheben.",
+      "brokenReference": "fehlerhafte Referenz",
+      "circularReference": "zirkuläre Referenz",
+      "selfReference": "Selbstreferenz",
+      "fixAutomatically": "beheben",
+      "fixing": "Behebung läuft..."
     },
     "netatmo": {
       "title": "Netatmo",
@@ -1484,7 +1502,14 @@
         "mqttCustomObjectPathPlaceholder": "Pfad im JSON folgen",
         "copied": "Kopiert!",
         "copyFailed": "Kopieren fehlgeschlagen",
-        "deleteLabel": "Funktion löschen"
+        "deleteLabel": "Funktion löschen",
+        "showAdvancedSettings": "Erweiterte Einstellungen anzeigen",
+        "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden",
+        "energyMonitoring": {
+          "title": "Energieüberwachung",
+          "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
+          "createButton": "Energieüberwachungsfunktionen erstellen"
+        }
       },
       "setup": {
         "title": "MQTT-Konfiguration",
@@ -2237,8 +2262,7 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
-        "valueError": "Der Wert muss eine Zahl sein"
+        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",

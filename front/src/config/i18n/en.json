@@ -462,10 +462,15 @@
         "year": "Year",
         "month": "Month",
         "day": "Day",
+        "currency": "Cost (€)",
+        "kwh": "Consumption (kWh)",
         "consumptionCost": "Consumption Cost",
-        "totalConsumption": "Total Consumption Cost",
+        "totalConsumptionCost": "Total Consumption Cost",
+        "totalConsumptionKwh": "Total Consumption",
         "error": "Error loading energy consumption data",
-        "noData": "No energy consumption data available for this period"
+        "noData": "No energy consumption data available for this period",
+        "showSubscriptionPrices": "Show subscription prices",
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart."
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",
@@ -1392,7 +1397,14 @@
         "mqttCustomObjectPathPlaceholder": "Path to follow in the JSON",
         "copied": "Copied!",
         "copyFailed": "Fail to copy",
-        "deleteLabel": "Delete feature"
+        "deleteLabel": "Delete feature",
+        "showAdvancedSettings": "Show advanced settings",
+        "hideAdvancedSettings": "Hide advanced settings",
+        "energyMonitoring": {
+          "title": "Energy Monitoring",
+          "description": "This feature can be used for energy monitoring. Click the button below to automatically create the consumption and cost tracking features.",
+          "createButton": "Create energy monitoring features"
+        }
       },
       "setup": {
         "title": "MQTT configuration",
@@ -1649,6 +1661,11 @@
         "periodScope": "Period & Scope",
         "priceAndSlots": "Price & Time Slots"
       },
+      "contractName": "Contract Name",
+      "contractNamePlaceholder": "e.g. EDF Peak/Off-Peak 2024",
+      "contractNameHelp": "A custom name to identify your energy contract (e.g. your provider name and contract type)",
+      "deleteContract": "Delete contract",
+      "confirmDeleteContract": "Are you sure you want to delete this contract and all its prices?",
       "contract": "Contract",
       "priceType": "Price Type",
       "currency": "Currency",
@@ -1686,6 +1703,7 @@
         "consumption": "consumption",
         "subscription": "subscription"
       },
+      "perMonth": "/month",
       "currencies": {
         "euro": "euro",
         "dollar": "dollar"
@@ -1725,7 +1743,14 @@
       "selectPeakHours": "Select Peak Hours",
       "selectPeakHoursHelp": "Click on the time slots when peak pricing applies. Unselected slots will be off-peak.",
       "peakHours": "Peak hours",
-      "offPeakHours": "Off-peak hours"
+      "offPeakHours": "Off-peak hours",
+      "circularDependencyDetected": "Circular or broken dependencies detected",
+      "circularDependencyDescription": "The following device features have invalid parent references that could cause performance issues. Click the button to fix them automatically.",
+      "brokenReference": "broken reference",
+      "circularReference": "circular reference",
+      "selfReference": "self reference",
+      "fixAutomatically": "Fix",
+      "fixing": "Fixing..."
     },
     "caldav": {
       "title": "CalDAV",
@@ -2237,8 +2262,7 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
-        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
-        "valueError": "Value must be a number"
+        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",

@@ -1,6 +1,8 @@
 import { Component, Fragment } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+
 class DefaultDeviceState extends Component {
   handleOperatorChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'operator', e.target.value);
@@ -8,18 +10,27 @@ class DefaultDeviceState extends Component {
 
   handleValueChange = e => {
     let value = e.target.value;
-    if (value.includes(',')) {
-      value = value.replaceAll(',', '.');
-    }
-    const lastCharacter = value.length > 0 ? value[value.length - 1] : '';
-    if (!isNaN(parseFloat(e.target.value)) && lastCharacter !== '.') {
-      this.props.updateTriggerProperty(this.props.index, 'value', parseFloat(value));
-    } else {
+    const { selectedDeviceFeature } = this.props;
+    const isTextFeature = selectedDeviceFeature && selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+
+    if (isTextFeature) {
       this.props.updateTriggerProperty(this.props.index, 'value', value);
+    } else {
+      if (value.includes(',')) {
+        value = value.replaceAll(',', '.');
+      }
+      const lastCharacter = value.length > 0 ? value[value.length - 1] : '';
+      if (!isNaN(parseFloat(e.target.value)) && lastCharacter !== '.') {
+        this.props.updateTriggerProperty(this.props.index, 'value', parseFloat(value));
+      } else {
+        this.props.updateTriggerProperty(this.props.index, 'value', value);
+      }
     }
   };
 
   render({ selectedDeviceFeature, trigger }) {
+    const isTextFeature = selectedDeviceFeature && selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+
     return (
       <Fragment>
         <div class="col-md-3">
@@ -31,21 +42,29 @@ class DefaultDeviceState extends Component {
               <option value="=">
                 <Text id="editScene.triggersCard.newState.equal" />
               </option>
-              <option value=">=">
-                <Text id="editScene.triggersCard.newState.superiorOrEqual" />
-              </option>
-              <option value=">">
-                <Text id="editScene.triggersCard.newState.superior" />
-              </option>
+              {!isTextFeature && (
+                <option value=">=">
+                  <Text id="editScene.triggersCard.newState.superiorOrEqual" />
+                </option>
+              )}
+              {!isTextFeature && (
+                <option value=">">
+                  <Text id="editScene.triggersCard.newState.superior" />
+                </option>
+              )}
               <option value="!=">
                 <Text id="editScene.triggersCard.newState.different" />
               </option>
-              <option value="<=">
-                <Text id="editScene.triggersCard.newState.lessOrEqual" />
-              </option>
-              <option value="<">
-                <Text id="editScene.triggersCard.newState.less" />
-              </option>
+              {!isTextFeature && (
+                <option value="<=">
+                  <Text id="editScene.triggersCard.newState.lessOrEqual" />
+                </option>
+              )}
+              {!isTextFeature && (
+                <option value="<">
+                  <Text id="editScene.triggersCard.newState.less" />
+                </option>
+              )}
             </select>
           </div>
         </div>

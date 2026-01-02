@@ -661,7 +661,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Verify device.get was called once
       expect(device.get.callCount).to.equal(1);
       expect(device.get.getCall(0).args[0]).to.deep.equal({
-        device_feature_categories: [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR, DEVICE_FEATURE_CATEGORIES.SWITCH],
+        device_feature_categories: [
+          DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          DEVICE_FEATURE_CATEGORIES.SWITCH,
+          DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+        ],
       });
 
       // Verify both devices were processed (getDeviceFeatureStates called twice)
@@ -704,6 +708,69 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
       // Verify saveHistoricalState was NOT called (because error occurred before that)
       assert.notCalled(device.saveHistoricalState);
+    });
+
+    it('should handle TELEINFORMATION.EAST type as index feature', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+      const windowStart = dayjs(testTime)
+        .subtract(30, 'minutes')
+        .toDate();
+
+      // Mock device with TELEINFORMATION.EAST as index feature
+      const deviceWithTeleinformation = {
+        id: 'g3h4i5j6-k7l8-9012-mnop-qrstuvwxyz01',
+        name: 'Teleinformation Device',
+        params: [],
+        features: [
+          {
+            id: 'h4i5j6k7-l8m9-0123-nopq-rstuvwxyz012',
+            selector: 'test-teleinformation-east',
+            category: DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
+            type: DEVICE_FEATURE_TYPES.TELEINFORMATION.EAST,
+            energy_parent_id: null,
+          },
+          {
+            id: 'i5j6k7l8-m9n0-1234-opqr-stuvwxyz0123',
+            selector: 'test-teleinformation-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'h4i5j6k7-l8m9-0123-nopq-rstuvwxyz012', // Links to the TELEINFORMATION.EAST feature
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithTeleinformation]);
+
+      // Mock states for the TELEINFORMATION.EAST feature
+      device.getDeviceFeatureStates = fake.returns([
+        {
+          value: 5000,
+          created_at: dayjs(windowStart)
+            .add(5, 'minutes')
+            .toDate(),
+        },
+        {
+          value: 5250,
+          created_at: dayjs(windowStart)
+            .add(15, 'minutes')
+            .toDate(),
+        },
+      ]);
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+
+      // Verify the TELEINFORMATION.EAST feature was processed
+      assert.calledOnce(device.getDeviceFeatureStates);
+      const getStatesCall = device.getDeviceFeatureStates.getCall(0);
+      expect(getStatesCall.args[0]).to.equal('test-teleinformation-east'); // TELEINFORMATION.EAST feature selector
+
+      // Verify consumption was calculated and saved (250 Wh: 5250 - 5000)
+      assert.calledOnce(device.saveHistoricalState);
+      const saveCall = device.saveHistoricalState.getCall(0);
+      expect(saveCall.args[0].selector).to.equal('test-teleinformation-consumption');
+      expect(saveCall.args[1]).to.equal(250);
+
+      // Verify last processed timestamp was saved
+      assert.calledOnce(device.setParam);
     });
   });
 });

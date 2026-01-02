@@ -3,6 +3,17 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 
 /**
+ * @description Convert a value to a Number if it's a valid number, otherwise return it as-is.
+ * @param {any} value - The value to convert.
+ * @returns {number|any} The converted number or the original value.
+ * @example parseNumber('42') // returns 42
+ */
+function parseNumber(value) {
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? value : parsed;
+}
+
+/**
  * @description When a new MQTT message is received on a custom topic.
  * @param {string} topic - The topic where the message was published.
  * @param {string} message - The content of the message.
@@ -24,13 +35,13 @@ function handleDeviceCustomTopicMessage(topic, message, deviceFeatureId, objectP
       const state = get(JSON.parse(message), objectPath);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeature.external_id,
-        state,
+        state: parseNumber(state),
       });
     } else {
       // else, it's supposed to be a normal string, send it raw
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeature.external_id,
-        state: message,
+        state: parseNumber(message),
       });
     }
   } catch (e) {

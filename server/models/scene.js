@@ -56,7 +56,7 @@ const actionSchema = Joi.object()
       operator: Joi.string()
         .valid('=', '!=', '>', '>=', '<', '<=')
         .required(),
-      value: Joi.number(),
+      value: Joi.alternatives().try(Joi.number(), Joi.string()),
       evaluate_value: Joi.string(),
     }),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
@@ -85,7 +85,7 @@ const triggersSchema = Joi.array().items(
     device: Joi.string(),
     device_feature: Joi.string(),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
-    value: Joi.number(),
+    value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
     area: Joi.string(),
     scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),

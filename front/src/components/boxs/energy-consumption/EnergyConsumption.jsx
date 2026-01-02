@@ -18,11 +18,18 @@ const PERIODS = {
   DAY: 'day'
 };
 
+const DISPLAY_MODES = {
+  CURRENCY: 'currency',
+  KWH: 'kwh'
+};
+
 const PERIOD_LABELS = {
   [PERIODS.YEAR]: 'dashboard.boxes.energyConsumption.year',
   [PERIODS.MONTH]: 'dashboard.boxes.energyConsumption.month',
   [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day'
 };
+
+const SUBSCRIPTION_COLOR = '#b8c2cc';
 
 class EnergyConsumption extends Component {
   constructor(props) {
@@ -34,9 +41,12 @@ class EnergyConsumption extends Component {
       error: null,
       errorDetail: null,
       series: [],
+      seriesColors: [],
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
-      selectedDate: now
+      selectedDate: now,
+      displayMode: DISPLAY_MODES.CURRENCY,
+      currencyUnit: null
     };
   }
 
@@ -72,7 +82,8 @@ class EnergyConsumption extends Component {
         device_features: deviceFeatures.join(','),
         from: startDate.toISOString(),
         to: endDate.toISOString(),
-        group_by: this.getGroupBy()
+        group_by: this.getGroupBy(),
+        display_mode: this.state.displayMode
       });
 
       let emptySeries = true;
@@ -90,9 +101,30 @@ class EnergyConsumption extends Component {
       // Sort timestamps
       const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
+      // Get the currency unit from the first device feature that has one
+      let currencyUnit = null;
+      data.forEach(deviceData => {
+        if (deviceData.deviceFeature.currency_unit && !currencyUnit) {
+          currencyUnit = deviceData.deviceFeature.currency_unit;
+        }
+      });
+
       // Process data for stacked bar chart
       // Each device feature becomes a separate series with aligned timestamps
+      // Track colors for each series (gray for subscription, widget colors for consumption)
+      const seriesColors = [];
+      let colorIndex = 0;
+      // Use widget configured colors if available, otherwise fall back to default colors
+      const widgetColors = this.props.box.colors || DEFAULT_COLORS;
+
       data.forEach(deviceData => {
+        const isSubscription = deviceData.deviceFeature.is_subscription === true;
+
+        // Skip subscription data if show_subscription_prices is not enabled
+        if (isSubscription && !this.props.box.show_subscription_prices) {
+          return;
+        }
+
         const deviceFeatureName = deviceData.deviceFeature.name
           ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
           : deviceData.device.name;
@@ -116,13 +148,23 @@ class EnergyConsumption extends Component {
           name: deviceFeatureName,
           data: seriesData
         });
+
+        // Assign gray color for subscription, otherwise use widget configured colors
+        if (isSubscription) {
+          seriesColors.push(SUBSCRIPTION_COLOR);
+        } else {
+          seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
+          colorIndex++;
+        }
       });
 
       await this.setState({
         series,
+        seriesColors,
         loading: false,
         emptySeries,
-        totalConsumption
+        totalConsumption,
+        currencyUnit
       });
     } catch (e) {
       console.error('Error fetching energy consumption data:', e);
@@ -236,21 +278,37 @@ class EnergyConsumption extends Component {
     this.setState({ selectedDate: date }, this.refreshData);
   };
 
+  changeDisplayMode = mode => {
+    this.setState({ displayMode: mode }, this.refreshData);
+  };
+
+  getCurrencySymbol = () => {
+    const { currencyUnit } = this.state;
+    if (currencyUnit === 'dollar') {
+      return '$';
+    }
+    return '€';
+  };
+
   yAxisFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
     if (value === 0) {
-      return '0€';
+      return `0${unit}`;
     }
-    return `${value.toFixed(2)}€`;
+    return `${value.toFixed(2)}${unit}`;
   };
 
   tooltipYFormatter = value => {
     if (Number.isNaN(value)) {
       return value;
     }
-    return `${value.toFixed(2)}€`;
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
+    return `${value.toFixed(2)}${unit}`;
   };
 
   tooltipXFormatter = value => {
@@ -305,7 +363,17 @@ class EnergyConsumption extends Component {
   };
 
   render(props, state) {
-    const { loading, error, errorDetail, series, emptySeries, selectedPeriod, totalConsumption } = state;
+    const {
+      loading,
+      error,
+      errorDetail,
+      series,
+      seriesColors,
+      emptySeries,
+      selectedPeriod,
+      totalConsumption,
+      displayMode
+    } = state;
     const localeSet = this.props.user.language === 'fr' ? fr : 'en';
     return (
       <div class="card">
@@ -338,7 +406,7 @@ class EnergyConsumption extends Component {
           </div>
 
           {/* Navigation Controls */}
-          <div class="row mb-3">
+          <div class="row mb-2">
             <div class="col-12">
               <div class="d-flex align-items-center">
                 <button type="button" class="btn btn-outline-secondary" onClick={this.navigatePrevious}>
@@ -365,67 +433,97 @@ class EnergyConsumption extends Component {
             </div>
           </div>
 
+          {/* Display Mode Toggle */}
+          <div class="row mb-3">
+            <div class="col-12 text-center">
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.currency" />
+              </button>
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.kwh" />
+              </button>
+            </div>
+          </div>
+
           {/* Chart */}
           <div class="row">
             <div class="col-12">
-              {loading && (
-                <div class="text-center">
-                  <div class="spinner-border" role="status">
-                    <span class="sr-only">
-                      <Text id="global.loading" />
-                    </span>
-                  </div>
-                </div>
-              )}
+              <div class={loading ? 'dimmer active' : 'dimmer'}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  {error && (
+                    <div class="alert alert-danger" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.error" />
+                      {errorDetail && <div class="mt-2">{errorDetail}</div>}
+                    </div>
+                  )}
 
-              {error && (
-                <div class="alert alert-danger" role="alert">
-                  <Text id="dashboard.boxes.energyConsumption.error" />
-                  {errorDetail && <div class="mt-2">{errorDetail}</div>}
-                </div>
-              )}
+                  {!error && emptySeries && (
+                    <div class="alert alert-info" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.noData" />
+                    </div>
+                  )}
 
-              {!loading && !error && emptySeries && (
-                <div class="alert alert-info" role="alert">
-                  <Text id="dashboard.boxes.energyConsumption.noData" />
-                </div>
-              )}
-
-              {!loading && !error && !emptySeries && (
-                <>
-                  <div class="row mb-2">
-                    <div class="col-12">
-                      <div class="card border-0 mb-0">
-                        <div class="card-body text-center py-3">
-                          <div class="d-flex align-items-center justify-content-center">
-                            <div>
-                              <h5 class="mb-1 text-muted small">
-                                <Text id="dashboard.boxes.energyConsumption.totalConsumption" />
-                              </h5>
-                              <h3 class="mb-0 text-primary font-weight-bold">{totalConsumption.toFixed(2)} €</h3>
+                  {!error && !emptySeries && (
+                    <>
+                      <div class="row mb-2">
+                        <div class="col-12">
+                          <div class="card border-0 mb-0">
+                            <div class="card-body text-center py-3">
+                              <div class="d-flex align-items-center justify-content-center">
+                                <div>
+                                  <h5 class="mb-1 text-muted small">
+                                    <Text
+                                      id={
+                                        displayMode === DISPLAY_MODES.CURRENCY
+                                          ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                          : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                                      }
+                                    />
+                                  </h5>
+                                  <h3 class="mb-0 text-primary font-weight-bold">
+                                    {totalConsumption.toFixed(2)}{' '}
+                                    {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
+                                  </h3>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <ApexChartComponent
-                    user={this.props.user}
-                    series={series}
-                    chart_type="bar"
-                    height={300}
-                    colors={props.box.colors || DEFAULT_COLORS}
-                    size="big"
-                    display_axes={true}
-                    hide_legend={true}
-                    y_axis_formatter={this.yAxisFormatter}
-                    tooltip_y_formatter={this.tooltipYFormatter}
-                    tooltip_x_formatter={this.tooltipXFormatter}
-                    dictionary={props.intl.dictionary}
-                    disable_zoom={true}
-                  />
-                </>
-              )}
+                      <ApexChartComponent
+                        user={this.props.user}
+                        series={series}
+                        chart_type="bar"
+                        height={300}
+                        colors={seriesColors.length > 0 ? seriesColors : DEFAULT_COLORS}
+                        size="big"
+                        display_axes={true}
+                        hide_legend={true}
+                        y_axis_formatter={this.yAxisFormatter}
+                        tooltip_y_formatter={this.tooltipYFormatter}
+                        tooltip_x_formatter={this.tooltipXFormatter}
+                        dictionary={props.intl.dictionary}
+                        disable_zoom={true}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

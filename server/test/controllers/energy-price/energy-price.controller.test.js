@@ -89,3 +89,16 @@ describe('DELETE /api/v1/energy_price/:selector', () => {
       });
   });
 });
+
+describe('GET /api/v1/energy_price/default_electric_meter_feature_id', () => {
+  it('should return null when no energy price exists', async () => {
+    await authenticatedRequest
+      .get('/api/v1/energy_price/default_electric_meter_feature_id')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('feature_id');
+        expect(res.body.feature_id).to.equal(null);
+      });
+  });
+});

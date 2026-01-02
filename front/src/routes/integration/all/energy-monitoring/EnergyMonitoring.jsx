@@ -14,7 +14,8 @@ import {
 
 const DEVICE_FEATURE_CATEGORIES_TO_DISPLAY = [
   DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.SWITCH
+  DEVICE_FEATURE_CATEGORIES.SWITCH,
+  DEVICE_FEATURE_CATEGORIES.TELEINFORMATION
 ];
 
 const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
@@ -24,7 +25,18 @@ const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
-  DEVICE_FEATURE_TYPES.SWITCH.ENERGY
+  DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EAST,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF01,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF02,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF03,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF04,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF05,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF06,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF07,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF08,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF09,
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
 ];
 
 class EnergyMonitoringPage extends Component {
@@ -45,11 +57,17 @@ class EnergyMonitoringPage extends Component {
     consumptionSettingsError: null,
     // UI state for collapsible price items
     expandedPriceIds: new Set(),
+    // UI state for collapsible contract groups (collapsed by default)
+    expandedContractGroups: new Set(),
+    // Circular dependency detection
+    circularDependencies: [],
+    fixingCircularDependencies: false,
     // Wizard state
     wizardEditingId: null,
     wizardStep: 0,
     wizardHourSlots: new Set(),
     newPrice: {
+      contract_name: '',
       contract: 'base',
       price_type: 'consumption',
       currency: 'euro',
@@ -231,6 +249,7 @@ class EnergyMonitoringPage extends Component {
         wizardStep: 0,
         wizardHourSlots: slots,
         newPrice: {
+          contract_name: p.contract_name || '',
           contract: p.contract || 'base',
           price_type: p.price_type || 'consumption',
           currency: p.currency || 'euro',
@@ -256,12 +275,37 @@ class EnergyMonitoringPage extends Component {
     });
   };
 
+  toggleContractGroupExpanded = groupName => {
+    this.setState(({ expandedContractGroups }) => {
+      const next = new Set(expandedContractGroups);
+      if (next.has(groupName)) next.delete(groupName);
+      else next.add(groupName);
+      return { expandedContractGroups: next };
+    });
+  };
+
   deletePrice = async id => {
     try {
       const item = (this.state.prices || []).find(p => p.id === id);
       const selector = item && item.selector;
       if (!selector) throw new Error('Missing selector for price.');
       await this.props.httpClient.delete(`/api/v1/energy_price/${selector}`);
+      await this.loadPrices();
+    } catch (e) {
+      this.setState({ priceError: e });
+    }
+  };
+
+  deleteContractGroup = async contractName => {
+    try {
+      const pricesToDelete = (this.state.prices || []).filter(
+        p => (p.contract_name || p.contract || 'base') === contractName
+      );
+      for (const item of pricesToDelete) {
+        if (item.selector) {
+          await this.props.httpClient.delete(`/api/v1/energy_price/${item.selector}`);
+        }
+      }
       await this.loadPrices();
     } catch (e) {
       this.setState({ priceError: e });
@@ -398,6 +442,103 @@ class EnergyMonitoringPage extends Component {
     return flat;
   }
 
+  detectCircularDependencies() {
+    const allFeatures = this.getAllFeatures();
+    const featureMap = new Map();
+    allFeatures.forEach(f => featureMap.set(f.id, f));
+
+    const circularDependencies = [];
+
+    allFeatures.forEach(feature => {
+      if (!feature.energy_parent_id) return;
+
+      const visited = new Set();
+      let current = feature;
+      const chain = [feature];
+
+      while (current && current.energy_parent_id) {
+        if (visited.has(current.id)) {
+          // Found a circular dependency
+          circularDependencies.push({
+            feature,
+            chain: [...chain],
+            type: current.id === feature.id ? 'self' : 'cycle'
+          });
+          break;
+        }
+        visited.add(current.id);
+        const parent = featureMap.get(current.energy_parent_id);
+        if (!parent) {
+          // Parent doesn't exist - broken reference
+          circularDependencies.push({
+            feature,
+            chain: [...chain],
+            type: 'broken',
+            missingParentId: current.energy_parent_id
+          });
+          break;
+        }
+        current = parent;
+        chain.push(current);
+      }
+    });
+
+    return circularDependencies;
+  }
+
+  fixCircularDependencies = async () => {
+    const circularDeps = this.detectCircularDependencies();
+    if (circularDeps.length === 0) return;
+
+    this.setState({ fixingCircularDependencies: true });
+
+    try {
+      // Find the highest point in each broken chain to fix
+      // We only want to fix the root cause, not the children (like 30min cost/consumption)
+      const featuresToFix = new Set();
+
+      for (const dep of circularDeps) {
+        if (dep.type === 'broken') {
+          // For broken references, find the feature that points to the missing parent
+          // This is the last feature in the chain that has a valid parent reference to a missing ID
+          const chainWithBrokenRef = dep.chain;
+          for (let i = 0; i < chainWithBrokenRef.length; i += 1) {
+            const f = chainWithBrokenRef[i];
+            if (f.energy_parent_id === dep.missingParentId) {
+              featuresToFix.add(f.id);
+              break;
+            }
+          }
+        } else if (dep.type === 'self' || dep.type === 'cycle') {
+          // For circular references, fix the first feature in the chain (highest in hierarchy)
+          // that is part of the cycle
+          featuresToFix.add(dep.feature.id);
+        }
+      }
+
+      // Get all features to access by ID
+      const allFeatures = this.getAllFeatures();
+      const featureMap = new Map();
+      allFeatures.forEach(f => featureMap.set(f.id, f));
+
+      // Fix only the identified features
+      for (const featureId of featuresToFix) {
+        const feature = featureMap.get(featureId);
+        if (feature && feature.selector) {
+          await this.props.httpClient.patch(`/api/v1/device_feature/${feature.selector}`, {
+            energy_parent_id: null
+          });
+        }
+      }
+      // Reload devices to get updated state
+      await this.loadDevices();
+    } catch (e) {
+      this.setState({ error: e });
+    } finally {
+      this.setState({ fixingCircularDependencies: false });
+    }
+  };
+
   getTree() {
     const allFeatures = this.getAllFeatures();
     const children = new Map();
@@ -483,41 +624,59 @@ class EnergyMonitoringPage extends Component {
       const levelColors = ['#5c7cfa', '#40c057', '#fab005', '#fa5252', '#12b886', '#7950f2'];
       const color = levelColors[depth % levelColors.length];
       const descendantIds = getDescendantIds(feature.id);
+
+      const isChildFeature =
+        feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION ||
+        feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST;
+      // const hasParentId = feature.energy_parent_id !== null && feature.energy_parent_id !== undefined;
+      const canModifyParent = true; // Temporary fix, should be !isChildFeature || !hasParentId;
       return (
-        <div class="mb-2" style={{ paddingLeft: `${paddingLeft}px` }}>
-          <div class="card shadow-sm" style={{ borderLeft: `4px solid ${color}`, borderRadius: '6px' }}>
-            <div class="card-body py-2 px-2 px-md-3">
+        <div class={isChildFeature ? 'mb-1' : 'mb-2'} style={{ paddingLeft: `${paddingLeft}px` }}>
+          <div
+            class="card shadow-sm"
+            style={{ borderLeft: `${isChildFeature ? '3px' : '4px'} solid ${color}`, borderRadius: '6px' }}
+          >
+            <div class={isChildFeature ? 'card-body py-1 px-2' : 'card-body py-2 px-2 px-md-3'}>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
                 <div class="flex-grow-1 w-100 w-md-auto mb-2 mb-md-0">
                   <div class="d-flex align-items-center flex-wrap">
-                    <span class="badge mr-2 mb-1" style={{ background: color, color: '#fff' }}>
+                    <span
+                      class={isChildFeature ? 'badge mr-2' : 'badge mr-2 mb-1'}
+                      style={{ background: color, color: '#fff', fontSize: isChildFeature ? '0.7em' : undefined }}
+                    >
                       <Text id="integration.energyMonitoring.level" fields={{ depth }} />
                     </span>
-                    <strong class="mb-1">{label}</strong>
+                    <span class={isChildFeature ? 'small' : 'mb-1'}>
+                      <strong>{label}</strong>
+                    </span>
                   </div>
-                  <div class="small text-muted mt-1" style={{ wordBreak: 'break-all' }}>
-                    {feature.selector}
+                  {!isChildFeature && (
+                    <div class="small text-muted mt-1" style={{ wordBreak: 'break-all' }}>
+                      {feature.selector}
+                    </div>
+                  )}
+                </div>
+                {canModifyParent && (
+                  <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
+                    <select
+                      class="form-control form-control-sm w-100"
+                      style={{ minWidth: '200px' }}
+                      value={feature.energy_parent_id || ''}
+                      onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
+                    >
+                      <option value="">
+                        <Text id="integration.energyMonitoring.rootNotParent" />
+                      </option>
+                      {allFeatures
+                        .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
+                        .map(f => (
+                          <option key={f.id} value={f.id}>
+                            {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
+                          </option>
+                        ))}
+                    </select>
                   </div>
-                </div>
-                <div class="w-100 w-md-auto mt-2 mt-md-0 ml-md-3" style={{ minWidth: '0', maxWidth: '100%' }}>
-                  <select
-                    class="form-control form-control-sm w-100"
-                    style={{ minWidth: '200px' }}
-                    value={feature.energy_parent_id || ''}
-                    onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
-                  >
-                    <option value="">
-                      <Text id="integration.energyMonitoring.rootNotParent" />
-                    </option>
-                    {allFeatures
-                      .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
-                      .map(f => (
-                        <option key={f.id} value={f.id}>
-                          {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -547,43 +706,162 @@ class EnergyMonitoringPage extends Component {
       </>
     );
 
+    // Helper to format stored hour slots
+    const formatStoredSlots = value => {
+      if (!value) return '';
+      const s = String(value);
+      if (s.includes(':')) return s; // already HH:MM list
+      // Legacy numeric list
+      const set = this.parseHourSlotsToSet(s);
+      return this.formatSetToHourSlots(set);
+    };
+
+    // Determine if price is for peak hours based on hour_slots content
+    // Peak hours are typically during the day (e.g., 08:00-12:00, 18:00-22:00)
+    // Off-peak hours typically include night hours (00:00-06:00)
+    const isPeakPrice = p => {
+      if (!p.hour_slots || String(p.hour_slots).trim().length === 0) {
+        // No hour slots = base contract, not peak/off-peak
+        return null;
+      }
+      const slots = String(p.hour_slots)
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+      if (slots.length === 0) return null;
+
+      // Count how many slots are in typical off-peak night hours (00:00-06:00)
+      // These are slots 0-11 (00:00, 00:30, 01:00, ..., 05:30)
+      let nightSlotCount = 0;
+      slots.forEach(slot => {
+        const match = slot.match(/^(\d{1,2}):(\d{2})$/);
+        if (match) {
+          const hour = parseInt(match[1], 10);
+          if (hour >= 0 && hour < 6) {
+            nightSlotCount++;
+          }
+        }
+      });
+
+      // If more than half of the 00:00-06:00 slots are included (6 hours = 12 half-hour slots),
+      // this is likely an off-peak price
+      // Off-peak typically has many night hours, peak typically has few or none
+      return nightSlotCount < 6; // If less than 6 night slots, it's peak
+    };
+
+    // Get border color based on day_type (for Tempo contracts)
+    const getDayTypeBorderColor = dayType => {
+      switch (dayType) {
+        case 'blue':
+          return '#4dabf7'; // blue
+        case 'white':
+          return '#868e96'; // gray
+        case 'red':
+          return '#fa5252'; // red
+        default:
+          return null;
+      }
+    };
+
+    // Get badge style for peak/off-peak
+    const getPeakBadgeStyle = isPeak => {
+      if (isPeak === true) {
+        return { background: '#fd7e14', color: '#fff' }; // orange for peak
+      }
+      if (isPeak === false) {
+        return { background: '#40c057', color: '#fff' }; // green for off-peak
+      }
+      return null; // no badge for base contracts
+    };
+
+    // Group prices by name
+    const groupPricesByName = prices => {
+      const groups = {};
+      prices.forEach(p => {
+        const name = p.contract_name || p.contract || 'base';
+        if (!groups[name]) {
+          groups[name] = [];
+        }
+        groups[name].push(p);
+      });
+      return groups;
+    };
+
+    // Sort prices within a group: by day_type, then by peak/off-peak
+    const sortPricesInGroup = prices => {
+      const dayTypeOrder = { blue: 0, white: 1, red: 2, any: 3 };
+      return [...prices].sort((a, b) => {
+        // First sort by day_type
+        const dayA = dayTypeOrder[a.day_type] !== undefined ? dayTypeOrder[a.day_type] : 99;
+        const dayB = dayTypeOrder[b.day_type] !== undefined ? dayTypeOrder[b.day_type] : 99;
+        if (dayA !== dayB) return dayA - dayB;
+        // Then sort by peak (peak first, then off-peak)
+        const peakA = isPeakPrice(a) ? 0 : 1;
+        const peakB = isPeakPrice(b) ? 0 : 1;
+        return peakA - peakB;
+      });
+    };
+
     const renderPriceRow = p => {
       const expanded = state.expandedPriceIds.has(p.id);
       const fmt = d => (d && d !== 'Invalid date' ? d : '');
       const dates = [fmt(p.start_date), fmt(p.end_date)].filter(Boolean);
       const period = dates.join(' → ');
-      const formatStoredSlots = value => {
-        if (!value) return '';
-        const s = String(value);
-        if (s.includes(':')) return s; // already HH:MM list
-        // Legacy numeric list
-        const set = this.parseHourSlotsToSet(s);
-        return this.formatSetToHourSlots(set);
-      };
+      const dayTypeBorderColor = getDayTypeBorderColor(p.day_type);
+      const borderStyle = dayTypeBorderColor ? { borderLeft: `4px solid ${dayTypeBorderColor}` } : {};
+      const priceDisplay = p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : null;
+      const isPeak = isPeakPrice(p);
+      const badgeStyle = getPeakBadgeStyle(isPeak);
       return (
-        <div class="card mb-2" key={p.id}>
+        <div class="card mb-2" key={p.id} style={borderStyle}>
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <strong>
-                  <Text id={`integration.energyMonitoring.contractTypes.${p.contract}`} defaultMessage={p.contract} />
-                </strong>
-                {' · '}
-                <Text id={`integration.energyMonitoring.priceTypes.${p.price_type}`} defaultMessage={p.price_type} />
-                {' · '}
-                <Text id={`integration.energyMonitoring.currencies.${p.currency}`} defaultMessage={p.currency} />
+              <div class="d-flex align-items-center flex-wrap">
+                {/* Peak/Off-peak badge for non-base contracts (only show if we can determine peak/off-peak) */}
+                {p.contract !== 'base' && isPeak !== null && badgeStyle && (
+                  <span class="badge mr-2" style={badgeStyle}>
+                    {isPeak ? (
+                      <Text id="integration.energyMonitoring.peakHours" defaultMessage="Peak hours" />
+                    ) : (
+                      <Text id="integration.energyMonitoring.offPeakHours" defaultMessage="Off-peak hours" />
+                    )}
+                  </span>
+                )}
+                {/* Day type badge for Tempo */}
                 {p.day_type && p.day_type !== 'any' && (
-                  <>
-                    {' · '}
+                  <span
+                    class="badge mr-2"
+                    style={{
+                      background: getDayTypeBorderColor(p.day_type) || '#6c757d',
+                      color: '#fff'
+                    }}
+                  >
                     <Text
                       id={`integration.energyMonitoring.dayTypeOptions.${p.day_type}`}
                       defaultMessage={p.day_type}
                     />
-                  </>
+                  </span>
                 )}
-                <div class="small text-muted">{period}</div>
+                {/* Price type badge */}
+                <span class="badge badge-secondary mr-2">
+                  <Text id={`integration.energyMonitoring.priceTypes.${p.price_type}`} defaultMessage={p.price_type} />
+                </span>
+                {/* Price value - prominent display */}
+                {priceDisplay && (
+                  <strong class="mr-3" style={{ fontSize: '1.1em' }}>
+                    {priceDisplay}{' '}
+                    <Text id={`integration.energyMonitoring.currencies.${p.currency}`} defaultMessage={p.currency} />
+                    {p.price_type === 'subscription' ? (
+                      <Text id="integration.energyMonitoring.perMonth" defaultMessage="/month" />
+                    ) : (
+                      '/kWh'
+                    )}
+                  </strong>
+                )}
+                {/* Period info */}
+                {period && <span class="small text-muted">{period}</span>}
               </div>
-              <div>
+              <div class="d-flex align-items-center">
                 <button class="btn btn-sm btn-link" onClick={() => this.togglePriceExpanded(p.id)}>
                   {expanded ? (
                     <Text id="global.collapse" defaultMessage="Collapse" />
@@ -605,7 +883,7 @@ class EnergyMonitoringPage extends Component {
                   <strong>
                     <Text id="global.price" defaultMessage="Price" />:
                   </strong>{' '}
-                  {p.price != null && p.price !== '' ? (p.price / 10000).toFixed(4) : '-'}
+                  {priceDisplay || '-'}
                 </div>
                 <div class="mb-2">
                   <strong>
@@ -635,6 +913,43 @@ class EnergyMonitoringPage extends Component {
               </div>
             )}
           </div>
+        </div>
+      );
+    };
+
+    const renderPriceGroup = (groupName, prices) => {
+      const sortedPrices = sortPricesInGroup(prices);
+      const isExpanded = state.expandedContractGroups.has(groupName);
+      return (
+        <div class="mb-3" key={groupName}>
+          <div class="card" style={{ cursor: 'pointer' }}>
+            <div
+              class="card-body py-2 px-3 d-flex align-items-center justify-content-between"
+              onClick={() => this.toggleContractGroupExpanded(groupName)}
+            >
+              <div class="d-flex align-items-center">
+                <i class={cx('fe mr-2', isExpanded ? 'fe-chevron-down' : 'fe-chevron-right')} />
+                <strong>{groupName}</strong>
+                <span class="badge badge-secondary ml-2">{prices.length}</span>
+              </div>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                onClick={e => {
+                  e.stopPropagation();
+                  if (window.confirm(this.props.intl.dictionary.integration.energyMonitoring.confirmDeleteContract)) {
+                    this.deleteContractGroup(groupName);
+                  }
+                }}
+              >
+                <i class="fe fe-trash-2" />
+              </button>
+            </div>
+          </div>
+          {isExpanded && (
+            <div class="pl-3 mt-2" style={{ borderLeft: '2px solid #e9ecef' }}>
+              {sortedPrices.map(p => renderPriceRow(p))}
+            </div>
+          )}
         </div>
       );
     };
@@ -690,7 +1005,21 @@ class EnergyMonitoringPage extends Component {
                   <Text id="integration.energyMonitoring.wizard.basics" />
                 </h5>
                 <div class="row">
-                  <div class="col-md-4">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>
+                        <Text id="integration.energyMonitoring.contractName" />
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        value={state.newPrice.contract_name}
+                        onChange={e => updateNewPrice({ contract_name: e.target.value })}
+                        placeholder={this.props.intl.dictionary.integration.energyMonitoring.contractNamePlaceholder}
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
                     <div class="form-group">
                       <label>
                         <Text id="integration.energyMonitoring.contract" />
@@ -712,6 +1041,8 @@ class EnergyMonitoringPage extends Component {
                       </select>
                     </div>
                   </div>
+                </div>
+                <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>
@@ -1182,31 +1513,37 @@ class EnergyMonitoringPage extends Component {
       </div>
     );
 
-    const renderPrices = () => (
-      <div>
-        <div class="card">
-          <div class="card-header">{renderPricesHeader()}</div>
-          <div class="card-body">
-            <div class={cx('dimmer', { active: state.loadingPrices })}>
-              <div class="loader" />
-              <div class="dimmer-content">
-                {state.priceError && (
-                  <div class="alert alert-danger" role="alert">
-                    <Text id="integration.energyMonitoring.errorLoadingPrices" />
-                  </div>
-                )}
-                {state.prices.map(p => renderPriceRow(p))}
-                {state.prices.length === 0 && !state.loadingPrices && (
-                  <div class="text-muted">
-                    <Text id="global.noData" defaultMessage="No data" />
-                  </div>
-                )}
+    const renderPrices = () => {
+      const priceGroups = groupPricesByName(state.prices);
+      // Sort group names alphabetically
+      const sortedGroupNames = Object.keys(priceGroups).sort((a, b) => a.localeCompare(b));
+
+      return (
+        <div>
+          <div class="card">
+            <div class="card-header">{renderPricesHeader()}</div>
+            <div class="card-body">
+              <div class={cx('dimmer', { active: state.loadingPrices })}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  {state.priceError && (
+                    <div class="alert alert-danger" role="alert">
+                      <Text id="integration.energyMonitoring.errorLoadingPrices" />
+                    </div>
+                  )}
+                  {sortedGroupNames.map(groupName => renderPriceGroup(groupName, priceGroups[groupName]))}
+                  {state.prices.length === 0 && !state.loadingPrices && (
+                    <div class="text-muted">
+                      <Text id="global.noData" defaultMessage="No data" />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    };
 
     const showingWizard = this.isCreatePriceRoute() || this.isEditPriceRoute();
     const showingImport = this.isImportPricesRoute();
@@ -1290,6 +1627,76 @@ class EnergyMonitoringPage extends Component {
                                 <Text id="integration.energyMonitoring.errorLoadingDevices" />
                               </div>
                             )}
+                            {(() => {
+                              const circularDeps = this.detectCircularDependencies();
+                              if (circularDeps.length > 0) {
+                                return (
+                                  <div class="alert alert-warning" role="alert">
+                                    <div class="d-flex align-items-start justify-content-between">
+                                      <div>
+                                        <h4 class="alert-heading">
+                                          <i class="fe fe-alert-triangle mr-2" />
+                                          <Text id="integration.energyMonitoring.circularDependencyDetected" />
+                                        </h4>
+                                        <p class="mb-2">
+                                          <Text id="integration.energyMonitoring.circularDependencyDescription" />
+                                        </p>
+                                        <ul class="mb-0">
+                                          {circularDeps.map((dep, idx) => {
+                                            const featureName = dep.feature.__device
+                                              ? `${dep.feature.__device.name} - ${dep.feature.name ||
+                                                  dep.feature.selector}`
+                                              : dep.feature.name || dep.feature.selector;
+                                            return (
+                                              <li key={idx}>
+                                                <strong>{featureName}</strong>
+                                                {dep.type === 'broken' && (
+                                                  <span class="text-muted ml-1">
+                                                    (<Text id="integration.energyMonitoring.brokenReference" />)
+                                                  </span>
+                                                )}
+                                                {dep.type === 'cycle' && (
+                                                  <span class="text-muted ml-1">
+                                                    (<Text id="integration.energyMonitoring.circularReference" />)
+                                                  </span>
+                                                )}
+                                                {dep.type === 'self' && (
+                                                  <span class="text-muted ml-1">
+                                                    (<Text id="integration.energyMonitoring.selfReference" />)
+                                                  </span>
+                                                )}
+                                              </li>
+                                            );
+                                          })}
+                                        </ul>
+                                      </div>
+                                      <button
+                                        class="btn btn-warning ml-3 text-nowrap flex-shrink-0"
+                                        onClick={this.fixCircularDependencies}
+                                        disabled={state.fixingCircularDependencies}
+                                      >
+                                        {state.fixingCircularDependencies ? (
+                                          <span>
+                                            <span
+                                              class="spinner-border spinner-border-sm mr-2"
+                                              role="status"
+                                              aria-hidden="true"
+                                            />
+                                            <Text id="integration.energyMonitoring.fixing" />
+                                          </span>
+                                        ) : (
+                                          <span>
+                                            <i class="fe fe-tool mr-2" />
+                                            <Text id="integration.energyMonitoring.fixAutomatically" />
+                                          </span>
+                                        )}
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                             <p>
                               <Text id="integration.energyMonitoring.hierarchicalListDescription" />
                             </p>

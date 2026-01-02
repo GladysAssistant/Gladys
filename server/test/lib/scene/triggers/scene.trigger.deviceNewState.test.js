@@ -467,4 +467,156 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+  it('should execute scene with string value equality (text device feature like Shelly Button)', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'shelly-button-1',
+          value: 'SS', // Double press event
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'shelly-button-1',
+      previous_value: 'S',
+      last_value: 'SS',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene with string value equality when value does not match', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'shelly-button-1',
+          value: 'SS', // Double press event
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'shelly-button-1',
+      previous_value: null,
+      last_value: 'S', // Single press, not double
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with string value inequality', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'shelly-button-1',
+          value: 'S', // Not single press
+          operator: '!=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'shelly-button-1',
+      previous_value: 'S',
+      last_value: 'SS', // Double press, different from 'S'
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene with string value inequality when value matches', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'shelly-button-1',
+          value: 'S',
+          operator: '!=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'shelly-button-1',
+      previous_value: 'SS',
+      last_value: 'S', // Same as trigger value, should not execute
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
 });
