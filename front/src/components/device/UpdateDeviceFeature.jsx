@@ -5,6 +5,7 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS_BY_CATEGORY
 } from '../../../../server/utils/constants';
+import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
@@ -41,6 +42,18 @@ class UpdateDeviceFeature extends Component {
     return hasConsumption;
   };
 
+    // Check if THIRTY_MINUTES_CONSUMPTION feature exists with this feature as parent
+    const hasConsumption = device.features.some(
+      f => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id
+    );
+
+    return hasConsumption;
+  };
+  createEnergyConsumptionFeatures = () => {
+    this.props.createEnergyConsumptionFeatures(this.props.featureIndex);
+  };
+
+  // render({ feature, featureIndex, canEditCategory, device, energyHelperBuilder, ...props }) {
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
     const allowModifyCategory =
       canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
