@@ -79,6 +79,34 @@ describe('Device.destroyStatesBetween', () => {
     expect(remainingStates).to.have.lengthOf(3);
   });
 
+  it('should not destroy any states when from is after to', async () => {
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date('2025-08-28T10:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T11:00:00.000Z') },
+    ]);
+
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns(null),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+
+    await deviceInstance.destroyStatesBetween(
+      'test-device-feature',
+      new Date('2025-08-28T12:00:00.000Z'),
+      new Date('2025-08-28T09:00:00.000Z'),
+    );
+
+    const remainingStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ? ORDER BY created_at',
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
+
+    expect(remainingStates).to.have.lengthOf(2);
+  });
+
   it('should throw NotFoundError when device feature does not exist', async () => {
     const variable = {
       getValue: fake.resolves(null),

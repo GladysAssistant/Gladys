@@ -17,6 +17,7 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
+const { clearDuckDb } = require('../../utils/duckdb');
 
 describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let gladys;
@@ -26,28 +27,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let serviceManager;
   let device;
   let job;
-  const clearDuckDb = async () => {
-    const tables = [
-      't_device_feature_state',
-      't_device_feature_state_aggregate',
-      't_energy_price',
-      't_device_feature',
-      't_device_param',
-      't_device',
-    ];
-    // Delete children first to avoid FK issues.
-    // eslint-disable-next-line no-restricted-syntax
-    for (const table of tables) {
-      // Ignore errors to avoid breaking tests if a table is absent in a given schema.
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        await db.duckDbWriteConnectionAllAsync(`DELETE FROM ${table}`);
-      } catch (e) {
-        // ignore
-      }
-    }
-  };
-
   // Test device IDs (using proper UUID format)
   const testDeviceId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
   const testIndexFeatureId = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';

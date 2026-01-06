@@ -50,7 +50,6 @@ class UpdateDeviceFeature extends Component {
     this.props.createEnergyConsumptionFeatures(this.props.featureIndex);
   };
 
-  // render({ feature, featureIndex, canEditCategory, device, energyHelperBuilder, ...props }) {
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
     const allowModifyCategory =
       canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];

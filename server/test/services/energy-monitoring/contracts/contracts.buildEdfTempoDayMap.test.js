@@ -20,7 +20,7 @@ describe('Contracts.buildEdfTempoDayMap', () => {
     /**
      * @description Capture LRUCache instance for assertions.
      * @param {object} options - LRU cache options.
-     * @returns {LRUCache} Wrapped cache instance.
+     * @returns {LRUCache} Cache instance captured for test assertions.
      * @example
      * new LRUCacheWrapper({ max: 1 });
      */

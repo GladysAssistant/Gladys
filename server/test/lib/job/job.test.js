@@ -82,10 +82,10 @@ describe('Job', () => {
       const promise = job.updateProgress(newJob.id, -1);
       return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
     });
-    // it('should throw when job not found', async () => {
-    //   const promise = job.updateProgress('00000000-0000-0000-0000-000000000000', 5);
-    //   await chaiAssert.isRejected(promise, 'Job not found');
-    // });
+    it('should throw when job not found', async () => {
+      const promise = job.updateProgress('00000000-0000-0000-0000-000000000000', 5);
+      await chaiAssert.isRejected(promise, 'Job not found');
+    });
   });
   describe('job.get', () => {
     const job = new Job(event);

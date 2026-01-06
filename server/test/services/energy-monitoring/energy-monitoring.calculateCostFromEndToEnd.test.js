@@ -9,6 +9,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const historicalTempoData = require('./data/tempo_mock');
+const { clearDuckDb } = require('../../utils/duckdb');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,26 +29,6 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const EnergyPrice = require('../../../lib/energy-price');
-
-const clearDuckDb = async () => {
-  const tables = [
-    't_device_feature_state',
-    't_device_feature_state_aggregate',
-    't_energy_price',
-    't_device_feature',
-    't_device_param',
-    't_device',
-  ];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const table of tables) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await db.duckDbWriteConnectionAllAsync(`DELETE FROM ${table}`);
-    } catch (e) {
-      // ignore if table not present
-    }
-  }
-};
 
 const event = new EventEmitter();
 const job = new Job(event);

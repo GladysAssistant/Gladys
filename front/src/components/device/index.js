@@ -118,7 +118,11 @@ class EditDevicePage extends Component {
 
     // Update parent feature with default electric meter feature ID if available
     let deviceUpdate;
-    if (defaultElectricMeterFeatureId && !parentFeature.energy_parent_id) {
+    if (
+      defaultElectricMeterFeatureId &&
+      !parentFeature.energy_parent_id &&
+      defaultElectricMeterFeatureId !== parentFeature.id
+    ) {
       deviceUpdate = update(this.state.device, {
         features: {
           [featureIndex]: {

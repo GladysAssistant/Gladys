@@ -1824,7 +1824,7 @@
         "description": "This feature can be used for energy monitoring. Click the button below to automatically create the consumption and cost tracking features.",
         "createButton": "Create energy monitoring features",
         "hierarchy": "Place it in the “Energy monitoring” hierarchy (My devices tab) to link cost features.",
-        "recalc": "Then rerun consumption/cost from the Parameters tab.",
+        "recalc": "Then rerun consumption/cost from the Settings tab.",
         "goToIntegration": "Open Energy monitoring"
       }
     },
