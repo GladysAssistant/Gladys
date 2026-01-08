@@ -32,6 +32,9 @@ const ForgotPasswordPage = ({ children, ...props }) => (
                 {props.forgotPasswordStatus === RequestStatus.Success && (
                   <div class="alert alert-success" role="alert">
                     <Text id="forgotPassword.success" />
+                    <br />
+                    <br />
+                    <Text id="forgotPassword.howToAccessLogs" />
                   </div>
                 )}
 

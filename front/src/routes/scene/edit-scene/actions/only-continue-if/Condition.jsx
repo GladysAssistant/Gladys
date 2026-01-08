@@ -27,8 +27,38 @@ class Condition extends Component {
   };
 
   handleValueChange = value => {
-    const newValue = !isNaN(Number.parseFloat(value)) ? Number.parseFloat(value) : undefined;
-    const evalValue = isNaN(newValue) && value ? value : undefined;
+    let newValue;
+    let evalValue;
+    // We handle the case where it's a variable
+    if (value.includes('{')) {
+      newValue = undefined;
+      evalValue = value;
+    } else if (value === '') {
+      newValue = undefined;
+      evalValue = undefined;
+    } else if (value.endsWith('.') || value.endsWith(',')) {
+      // Preserve trailing decimal separator (. or , for French locale)
+      newValue = value;
+      evalValue = undefined;
+    } else if (value.includes(',')) {
+      // Handle French decimal separator: convert comma to dot for parsing
+      const valueWithDot = value.replace(',', '.');
+      if (!Number.isNaN(Number.parseFloat(valueWithDot))) {
+        newValue = Number.parseFloat(valueWithDot);
+        evalValue = undefined;
+      } else {
+        // Allow text values for string comparison (= and != operators)
+        newValue = value;
+        evalValue = undefined;
+      }
+    } else if (!Number.isNaN(Number.parseFloat(value))) {
+      newValue = Number.parseFloat(value);
+      evalValue = undefined;
+    } else {
+      // Allow text values for string comparison (= and != operators)
+      newValue = value;
+      evalValue = undefined;
+    }
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
@@ -78,6 +108,8 @@ class Condition extends Component {
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
             </div>
           </div>
@@ -126,20 +158,22 @@ class Condition extends Component {
                 <TextWithVariablesInjected
                   text={
                     props.condition.value !== undefined
-                      ? Number(props.condition.value).toString()
+                      ? props.condition.value.toString()
                       : props.condition.evaluate_value
                   }
                   triggersVariables={props.triggersVariables}
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
+                  path={props.path}
                   updateText={this.handleValueChange}
-                  class={style.conditionTagify}
+                  singleLineInput
+                  class={`${style.conditionTagify}`}
                 />
               </Localizer>
             </div>
           </div>
           <div class="col-md-2">
-            {props.index > 0 && (
+            {props.canDeleteCondition && (
               <div class="form-group">
                 <label class="form-label">
                   <Text id="editScene.actionsCard.onlyContinueIf.removeLabel" />

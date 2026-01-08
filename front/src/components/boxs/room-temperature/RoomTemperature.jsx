@@ -63,6 +63,16 @@ class RoomTemperatureBoxComponent extends Component {
     this.props.getTemperatureInRoom(this.props.box, this.props.x, this.props.y);
   };
 
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.refreshData();
+      this.wasDisconnected = false;
+    }
+  };
+
   updateRoomTemperature = payload => {
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
   };
@@ -70,6 +80,7 @@ class RoomTemperatureBoxComponent extends Component {
   componentDidMount() {
     this.refreshData();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomTemperature);
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   componentDidUpdate(previousProps) {
@@ -81,6 +92,7 @@ class RoomTemperatureBoxComponent extends Component {
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomTemperature);
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
   render(props, {}) {

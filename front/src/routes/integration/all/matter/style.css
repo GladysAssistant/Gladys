@@ -1,0 +1,40 @@
+.loadingText {
+  text-align: center;
+  position: absolute;
+  top: 70%;
+  left: 0;
+  right: 0;
+  margin-top: 10px;
+}
+
+.scrollableCell {
+  max-width: 200px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollableCell::-webkit-scrollbar {
+  display: none;
+}
+
+/* Show scrollbar on hover for better UX */
+.scrollableCell:hover {
+  scrollbar-width: thin; /* Firefox */
+}
+
+.scrollableCell:hover::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+
+.scrollableCell:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.pairedDeviceLoadingContent {
+  height: 5rem;
+}

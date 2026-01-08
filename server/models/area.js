@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 
 module.exports = (sequelize, DataTypes) => {
   const area = sequelize.define(
@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  area.beforeValidate(addSelector);
+  area.beforeValidate(addSelectorBeforeValidateHook);
 
   return area;
 };

@@ -1,3 +1,5 @@
+const { promisify } = require('util');
+
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 /**
@@ -5,10 +7,11 @@ const logger = require('../../../utils/logger');
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
+ * @param {object} options - Optional configs.
  * @example
  * setValue(device, deviceFeature, 0);
  */
-async function setValue(device, deviceFeature, value) {
+async function setValue(device, deviceFeature, value, options) {
   const deviceName = device.external_id.split(':')[1];
   const ipAddress = this.deviceIpAddresses.get(deviceName);
   if (!ipAddress) {
@@ -19,8 +22,16 @@ async function setValue(device, deviceFeature, value) {
     const { Client, DefaultMediaReceiver } = this.googleCastLib;
     const client = new Client();
 
-    client.connect(ipAddress, () => {
+    client.connect(ipAddress, async () => {
       logger.debug('Google Cast Connected, launching app ...');
+      const getVolume = promisify(client.getVolume.bind(client));
+      const setVolume = promisify(client.setVolume.bind(client));
+
+      const { level } = await getVolume();
+
+      if (options.volume) {
+        await setVolume({ level: options.volume / 100 });
+      }
 
       client.launch(DefaultMediaReceiver, (err, player) => {
         const media = {
@@ -38,8 +49,11 @@ async function setValue(device, deviceFeature, value) {
           },
         };
 
-        player.on('status', (status) => {
+        player.on('status', async (status) => {
           logger.debug('status broadcast playerState=%s', status.playerState);
+          if (status.idleReason === 'FINISHED') {
+            await setVolume({ level });
+          }
         });
 
         logger.debug('app "%s" launched, loading media %s ...', player.session.displayName, media.contentId);

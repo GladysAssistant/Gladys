@@ -2,7 +2,9 @@ import Select from 'react-select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Localizer, Text } from 'preact-i18n';
+import get from 'get-value';
 
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 class AskAI extends Component {
@@ -31,20 +33,20 @@ class AskAI extends Component {
     }
   };
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
   handleUserChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   handleCameraChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'camera', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', undefined);
+      this.props.updateActionProperty(this.props.path, 'camera', undefined);
     }
   };
 
@@ -67,6 +69,18 @@ class AskAI extends Component {
     }
     this.setState({ selectedUserOption, selectedCameraOption });
   };
+  setVariables = () => {
+    const ASK_AI_ANSWER_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.askAi.answer');
+    this.props.setVariables(this.props.path, [
+      {
+        name: 'answer',
+        type: 'askAi',
+        ready: true,
+        label: ASK_AI_ANSWER_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -76,6 +90,7 @@ class AskAI extends Component {
   }
   componentDidMount() {
     this.getOptions();
+    this.setVariables();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
@@ -100,6 +115,7 @@ class AskAI extends Component {
             <Localizer>
               <TextWithVariablesInjected
                 text={props.action.text}
+                path={props.path}
                 triggersVariables={props.triggersVariables}
                 actionsGroupsBefore={props.actionsGroupsBefore}
                 variables={props.variables}
@@ -124,6 +140,8 @@ class AskAI extends Component {
             options={userOptions}
             value={selectedUserOption}
             onChange={this.handleUserChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -139,6 +157,8 @@ class AskAI extends Component {
             value={selectedCameraOption}
             onChange={this.handleCameraChange}
             isClearable
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>
@@ -146,4 +166,4 @@ class AskAI extends Component {
   }
 }
 
-export default connect('httpClient', {})(AskAI);
+export default connect('httpClient', {})(withIntlAsProp(AskAI));

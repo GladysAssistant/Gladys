@@ -102,10 +102,10 @@ function createActions(store) {
       });
     },
     async search(state, e) {
-      store.setState({
+      await store.setState({
         zigbee2mqttSearch: e.target.value
       });
-      await actions.getZigbee2mqttDevices(store.getState(), 20, 0);
+      actions.debouncedGetZigbee2mqttDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
@@ -114,7 +114,7 @@ function createActions(store) {
       await actions.getZigbee2mqttDevices(store.getState(), 20, 0);
     }
   };
-  actions.debouncedSearch = debounce(actions.search, 200);
+  actions.debouncedGetZigbee2mqttDevices = debounce(actions.getZigbee2mqttDevices, 200);
 
   return Object.assign({}, integrationActions, houseActions, actions);
 }

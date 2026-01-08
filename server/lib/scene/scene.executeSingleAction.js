@@ -1,5 +1,8 @@
 const logger = require('../../utils/logger');
-const { executeAction } = require('./scene.executeActions');
+const executeActionsFactory = require('./scene.executeActions');
+const actionsFunc = require('./scene.actions');
+
+const { executeAction } = executeActionsFactory(actionsFunc);
 
 /**
  * @description Execute an action coming from an event.
@@ -14,7 +17,8 @@ const { executeAction } = require('./scene.executeActions');
 async function executeSingleAction(action, scope = {}) {
   logger.debug(`Executing action of type ${action.type}`);
   try {
-    await executeAction(this, action, scope);
+    // Default path is "1.1"
+    await executeAction(this, action, scope, '1.1');
   } catch (e) {
     logger.warn(`There was an error executing action ${action.type}`);
     logger.warn(e);

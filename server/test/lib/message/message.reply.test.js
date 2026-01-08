@@ -7,6 +7,7 @@ describe('message.reply', () => {
   let messageHandler;
   let telegramService;
   let nextCloudTalkService;
+  let callmebotService;
   let apiClientSource;
   let variable;
   beforeEach(() => {
@@ -17,6 +18,12 @@ describe('message.reply', () => {
     };
 
     nextCloudTalkService = {
+      message: {
+        send: fake.resolves(null),
+      },
+    };
+
+    callmebotService = {
       message: {
         send: fake.resolves(null),
       },
@@ -41,6 +48,9 @@ describe('message.reply', () => {
         if (serviceName === 'nextcloud-talk') {
           return nextCloudTalkService;
         }
+        if (serviceName === 'callmebot') {
+          return callmebotService;
+        }
         if (serviceName === 'api-client') {
           return apiClientSource;
         }
@@ -52,6 +62,7 @@ describe('message.reply', () => {
     const state = {
       get: () => {
         return {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           telegram_user_id: 'telegram-user-id',
         };
       },
@@ -96,6 +107,7 @@ describe('message.reply', () => {
     );
     assert.calledWith(telegramService.message.send, 'telegram-user-id');
     assert.calledWith(nextCloudTalkService.message.send, 'next-cloud-talk-token');
+    assert.calledWith(callmebotService.message.send, '0cd30aef-9c4e-4a23-88e3-3547971296e5');
   });
   it('should fail to reply', async () => {
     variable.getValue = fake.rejects(new Error('cannot get'));

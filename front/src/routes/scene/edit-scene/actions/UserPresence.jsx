@@ -35,16 +35,16 @@ class UserSeenAtHome extends Component {
   };
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', null);
+      this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
   refreshSelectedOptions = nextProps => {
@@ -98,7 +98,13 @@ class UserSeenAtHome extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
+          <Select
+            options={userOptions}
+            value={selectedOption}
+            onChange={this.handleChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">
@@ -107,7 +113,13 @@ class UserSeenAtHome extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={houseOptions} value={selectedHouseOption} onChange={this.handleHouseChange} />
+          <Select
+            options={houseOptions}
+            value={selectedHouseOption}
+            onChange={this.handleHouseChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
       </div>
     );

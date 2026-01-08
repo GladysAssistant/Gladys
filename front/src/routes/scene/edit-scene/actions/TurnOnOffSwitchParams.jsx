@@ -31,9 +31,9 @@ class TurnOnOffSwitch extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const switches = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', switches);
+      this.props.updateActionProperty(this.props.path, 'devices', switches);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
+      this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
   refreshSelectedOptions = nextProps => {
@@ -82,6 +82,8 @@ class TurnOnOffSwitch extends Component {
           value={selectedOptions}
           onChange={this.handleChange}
           options={deviceOptions}
+          className="react-select-container"
+          classNamePrefix="react-select"
         />
       </div>
     );

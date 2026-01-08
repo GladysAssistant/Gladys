@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { DASHBOARD_BOX_TYPE_LIST, DASHBOARD_TYPE_LIST, DASHBOARD_VISIBILITY_LIST } = require('../utils/constants');
 
 const boxesSchema = Joi.array().items(
@@ -21,6 +21,8 @@ const boxesSchema = Joi.array().items(
       units: Joi.array().items(Joi.string().allow(null)),
       title: Joi.string(),
       interval: Joi.string(),
+      aggregate_function: Joi.string().valid('avg', 'sum', 'max', 'min', 'count'),
+      group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
       display_axes: Joi.boolean(),
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
@@ -37,6 +39,7 @@ const boxesSchema = Joi.array().items(
       temperature_min: Joi.number(),
       temperature_max: Joi.number(),
       colors: Joi.array().items(Joi.string()),
+      show_subscription_prices: Joi.boolean(),
     }),
   ),
 );
@@ -97,7 +100,7 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  dashboard.beforeValidate(addSelector);
+  dashboard.beforeValidate(addSelectorBeforeValidateHook);
 
   return dashboard;
 };

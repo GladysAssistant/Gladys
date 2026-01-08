@@ -41,29 +41,29 @@ class CheckUserPresence extends Component {
   };
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'house', null);
+      this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
   handleDeviceChange = selectedOptions => {
     if (selectedOptions && selectedOptions.length) {
       const deviceFeatures = selectedOptions.map(option => option.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', deviceFeatures);
+      this.props.updateActionProperty(this.props.path, 'device_features', deviceFeatures);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', []);
+      this.props.updateActionProperty(this.props.path, 'device_features', []);
     }
   };
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'minutes', newValue);
+    this.props.updateActionProperty(this.props.path, 'minutes', newValue);
   };
   refreshSelectedOptions = nextProps => {
     let selectedOption = '';
@@ -106,7 +106,7 @@ class CheckUserPresence extends Component {
   }
   componentDidMount() {
     if (!this.props.action.minutes) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'minutes', 10);
+      this.props.updateActionProperty(this.props.path, 'minutes', 10);
     }
     this.getOptions();
   }
@@ -136,7 +136,13 @@ class CheckUserPresence extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
+          <Select
+            options={userOptions}
+            value={selectedOption}
+            onChange={this.handleChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">
@@ -145,7 +151,13 @@ class CheckUserPresence extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={houseOptions} value={selectedHouseOption} onChange={this.handleHouseChange} />
+          <Select
+            options={houseOptions}
+            value={selectedHouseOption}
+            onChange={this.handleHouseChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">
@@ -154,7 +166,14 @@ class CheckUserPresence extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={deviceOptions} value={selectedDeviceOptions} isMulti onChange={this.handleDeviceChange} />
+          <Select
+            options={deviceOptions}
+            value={selectedDeviceOptions}
+            isMulti
+            onChange={this.handleDeviceChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">

@@ -5,6 +5,7 @@ const {
   COVER_STATE,
   SIREN_LMH_VOLUME,
   PILOT_WIRE_MODE,
+  LIQUID_STATE,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -102,6 +103,20 @@ addMapping('action', BUTTON_STATUS.HOLD_LEFT, 'hold_left');
 addMapping('action', BUTTON_STATUS.HOLD_RIGHT, 'hold_right');
 addMapping('action', BUTTON_STATUS.HOLD_BOTH, 'hold_both');
 
+// Add mappings for Aqara W100 temperature
+addMapping('action', BUTTON_STATUS.SINGLE_PLUS, 'single_plus');
+addMapping('action', BUTTON_STATUS.SINGLE_CENTER, 'single_center');
+addMapping('action', BUTTON_STATUS.SINGLE_MINUS, 'single_minus');
+addMapping('action', BUTTON_STATUS.DOUBLE_PLUS, 'double_plus');
+addMapping('action', BUTTON_STATUS.DOUBLE_CENTER, 'double_center');
+addMapping('action', BUTTON_STATUS.DOUBLE_MINUS, 'double_minus');
+addMapping('action', BUTTON_STATUS.HOLD_PLUS, 'hold_plus');
+addMapping('action', BUTTON_STATUS.HOLD_CENTER, 'hold_center');
+addMapping('action', BUTTON_STATUS.HOLD_MINUS, 'hold_minus');
+addMapping('action', BUTTON_STATUS.RELEASE_PLUS, 'release_plus');
+addMapping('action', BUTTON_STATUS.RELEASE_CENTER, 'release_center');
+addMapping('action', BUTTON_STATUS.RELEASE_MINUS, 'release_minus');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
@@ -116,6 +131,10 @@ addMapping('pilot_wire_mode', PILOT_WIRE_MODE.FROST_PROTECTION, 'frost_protectio
 addMapping('pilot_wire_mode', PILOT_WIRE_MODE.OFF, 'off');
 addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_1, 'comfort_-1');
 addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_2, 'comfort_-2');
+
+addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
+addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
+addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
 module.exports = {
   type: 'enum',
@@ -179,6 +198,12 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.HEATER,
         type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+      },
+    },
+    liquid_state: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
+        type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE,
       },
     },
   },

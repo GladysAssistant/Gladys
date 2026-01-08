@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const {
   DEVICE_FEATURE_CATEGORIES_LIST,
   DEVICE_FEATURE_TYPES_LIST,
@@ -19,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         references: {
           model: 't_device',
+          key: 'id',
+        },
+      },
+      energy_parent_id: {
+        allowNull: true,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_device_feature',
           key: 'id',
         },
       },
@@ -101,7 +109,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // add slug if needed
-  deviceFeature.beforeValidate(addSelector);
+  deviceFeature.beforeValidate(addSelectorBeforeValidateHook);
 
   deviceFeature.associate = (models) => {
     deviceFeature.belongsTo(models.Device, {
@@ -113,6 +121,17 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'device_feature_id',
       sourceKey: 'id',
       as: 'device_feature_states',
+    });
+    // self-referential energy hierarchy
+    deviceFeature.belongsTo(models.DeviceFeature, {
+      foreignKey: 'energy_parent_id',
+      targetKey: 'id',
+      as: 'energy_parent',
+    });
+    deviceFeature.hasMany(models.DeviceFeature, {
+      foreignKey: 'energy_parent_id',
+      sourceKey: 'id',
+      as: 'energy_children',
     });
   };
 

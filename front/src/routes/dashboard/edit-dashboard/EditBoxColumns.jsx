@@ -141,9 +141,21 @@ const EditBoxColumns = ({ children, ...props }) => (
               )}
               <div>
                 {column.length > 0 && (
-                  <div>
+                  <>
                     {column.map((box, y) => (
-                      <EditBox {...props} box={box} x={x} y={y} isMobileReordering={props.isMobileReordering} />
+                      <div key={`box-container-${x}-${y}`}>
+                        <EditBox {...props} box={box} x={x} y={y} isMobileReordering={props.isMobileReordering} />
+                        {y < column.length && (
+                          <div class="d-flex justify-content-center mb-2">
+                            <button
+                              class={cx('btn btn-sm btn-outline-secondary px-4 py-0', style.btnAddNewBoxAtPosition)}
+                              onClick={() => props.addBoxAtPosition(x, y)}
+                            >
+                              <i class="fe fe-plus" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     ))}
                     <BottomDropZone
                       moveCard={props.moveCard}
@@ -151,17 +163,19 @@ const EditBoxColumns = ({ children, ...props }) => (
                       y={column.length}
                       isMobileReordering={props.isMobileReordering}
                     />
-                  </div>
+                  </>
                 )}
 
                 {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
 
                 {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-                <div class="d-flex justify-content-center mb-4">
-                  <button class="btn btn-primary" onClick={() => props.addBox(x)}>
-                    <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
-                  </button>
-                </div>
+                {column.length === 0 && (
+                  <div class="d-flex justify-content-center mb-4">
+                    <button class="btn btn-primary" onClick={() => props.addBox(x)}>
+                      <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

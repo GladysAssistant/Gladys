@@ -1,4 +1,5 @@
 import createActionsProfilePicture from './profilePicture';
+import createActionsDarkMode from './darkMode';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -18,6 +19,7 @@ const OPEN_PAGES = [
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
+  const actionsDarkMode = createActionsDarkMode(store);
 
   const actions = {
     handleRoute(state, e) {
@@ -30,6 +32,11 @@ function createActions(store) {
     toggleDropDown(state) {
       store.setState({
         showDropDown: !state.showDropDown
+      });
+    },
+    closeDropDown() {
+      store.setState({
+        showDropDown: false
       });
     },
     toggleCollapsedMenu(state) {
@@ -52,6 +59,7 @@ function createActions(store) {
       }
     },
     async checkSession(state) {
+      actionsDarkMode.initDarkMode(state);
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
       }
@@ -112,7 +120,7 @@ function createActions(store) {
     }
   };
 
-  return Object.assign(actions, actionsProfilePicture);
+  return Object.assign(actions, actionsProfilePicture, actionsDarkMode);
 }
 
 export default createActions;

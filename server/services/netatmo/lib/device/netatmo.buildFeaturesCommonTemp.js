@@ -9,17 +9,18 @@ const {
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
  * @param {string} featureName - Gladys external ID.
+ * @param {string} type - Gladys feature type.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeatureTemperature(device_name, 'netatmo:device_id', 'temperature');
  */
-function buildFeatureTemperature(name, externalId, featureName) {
+function buildFeatureTemperature(name, externalId, featureName, type = DEVICE_FEATURE_TYPES.SENSOR.DECIMAL) {
   return {
     name: `Temperature - ${name}`,
     external_id: `${externalId}:${featureName}`,
     selector: `${externalId}:${featureName}`,
     category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    type,
     unit: DEVICE_FEATURE_UNITS.CELSIUS,
     read_only: true,
     keep_history: true,

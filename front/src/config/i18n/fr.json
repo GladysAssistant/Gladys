@@ -20,7 +20,20 @@
     "milesPerHour": "m/h",
     "selectPlaceholder": "Sélectionnez...",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "edit": "Éditer",
+    "delete": "Supprimer",
+    "next": "Suivant",
+    "back": "Retour",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "selectDevice": "Sélectionner un appareil",
+    "noData": "Aucune donnée",
+    "price": "Prix",
+    "collapse": "Réduire",
+    "expand": "Développer",
+    "loading": "Chargement...",
+    "preview": "Aperçu"
   },
   "color": {
     "aqua": "Aqua",
@@ -263,14 +276,16 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présents",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce",
+      "devices-in-room": "Appareils de la pièce (Déprécié)",
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
       "edf-tempo": "EDF Tempo",
       "clock": "Horloge",
       "scene": "Scène",
-      "music": "Musique"
+      "music": "Musique",
+      "gauge": "Jauge",
+      "energy-consumption": "Consommation Énergétique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -279,7 +294,7 @@
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
+        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
         "editModeLabel": "Mode d'affichage :",
@@ -303,7 +318,7 @@
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
-        "editNameLabel": "Nom du widget",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Entrez le nom du widget",
         "addADeviceLabel": "Ajouter un appareil :"
       },
@@ -348,16 +363,19 @@
       "chart": {
         "defaultInterval": "Intervalle par défaut",
         "lastHour": "Dernière heure",
+        "lastTwelveHours": "Dernières 12h",
         "lastDay": "Dernières 24h",
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
         "lastYear": "Dernière année",
+        "showAdvancedOptions": "Afficher les options avancées",
+        "hideAdvancedOptions": "Masquer les options avancées",
         "noValue": "Pas de valeurs sur cet intervalle.",
         "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
         "noChartType": "Aucun type de graphique sélectionné",
-        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition de la box et sélectionner un type de graphique.",
-        "editNameLabel": "Entrez le nom de cette box",
+        "noChartTypeWarning": "Si vous venez de configurer cet appareil, veuillez retourner sur la page d'édition du widget et sélectionner un type de graphique.",
+        "editNameLabel": "Entrez le nom de ce widget",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
         "editRoomLabel": "Sélectionnez une pièce",
@@ -379,7 +397,24 @@
         "on": "On",
         "off": "Off",
         "start_date": "Début le : ",
-        "end_date": "Fin le : "
+        "end_date": "Fin le : ",
+        "aggregateFunction": "Fonction d'agrégation",
+        "aggregateFunctions": {
+          "sum": "Somme",
+          "avg": "Moyenne",
+          "max": "Maximum",
+          "min": "Minimum",
+          "count": "Nombre"
+        },
+        "groupByLabel": "Grouper par",
+        "groupBy": {
+          "noGrouping": "Ne pas grouper",
+          "hour": "Heure",
+          "day": "Jour",
+          "week": "Semaine",
+          "month": "Mois",
+          "year": "Année"
+        }
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -414,7 +449,7 @@
         "no": "Non"
       },
       "scene": {
-        "editNameLabel": "Entrez le nom de cette box",
+        "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       },
@@ -433,6 +468,30 @@
       },
       "music": {
         "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
+      },
+      "gauge": {
+        "description": "Ce widget affichera une jauge avec la valeur de la fonctionnalité sélectionnée entre sa valeur minimale et maximale.",
+        "selectDeviceLabel": "Sélectionner la fonctionnalité à afficher",
+        "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
+        "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
+        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
+      },
+      "energyConsumption": {
+        "editName": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editDeviceFeatures": "Sélectionner un appareil de consommation énergétique",
+        "year": "Année",
+        "month": "Mois",
+        "day": "Jour",
+        "currency": "Coût (€)",
+        "kwh": "Consommation (kWh)",
+        "consumptionCost": "Coût de Consommation",
+        "totalConsumptionCost": "Coût total sur la période",
+        "totalConsumptionKwh": "Consommation totale sur la période",
+        "error": "Erreur lors du chargement des données de consommation énergétique",
+        "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
+        "showSubscriptionPrices": "Afficher les prix d'abonnement",
+        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
       }
     }
   },
@@ -450,6 +509,7 @@
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
+      "noIntegrations": "Aucune intégration trouvée",
       "menu": {
         "all": "Toutes les intégrations",
         "device": "Appareils",
@@ -460,6 +520,111 @@
         "weather": "Météo",
         "navigation": "Navigation"
       }
+    },
+    "energyMonitoring": {
+      "title": "Suivi de l'énergie",
+      "description": "Suivez votre consommation d'électricité dans Gladys",
+      "myDevicesTab": "Mes appareils",
+      "energyPriceTab": "Tarifs d'énergie",
+      "documentation": "Documentation",
+      "hierarchicalListDescription": "Voici la liste hiérarchique des capteurs d'énergie. Vous pouvez définir les relations parent/enfant pour agréger la consommation.",
+      "rootNotParent": "Aucun parent (racine)",
+      "level": "Niv {{depth}}",
+      "wizard": {
+        "basics": "Informations",
+        "periodScope": "Période & périmètre",
+        "priceAndSlots": "Prix & créneaux"
+      },
+      "contractName": "Nom du contrat",
+      "contractNamePlaceholder": "ex. EDF Heures Pleines/Creuses 2024",
+      "contractNameHelp": "Un nom personnalisé pour identifier votre contrat d'énergie (ex. nom du fournisseur et type de contrat)",
+      "deleteContract": "Supprimer le contrat",
+      "confirmDeleteContract": "Êtes-vous sûr de vouloir supprimer ce contrat et tous ses tarifs ?",
+      "contract": "Contrat",
+      "priceType": "Type de prix",
+      "currency": "Devise",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "dayType": "Type de jour",
+      "dayTypeOptions": {
+        "any": "tous",
+        "red": "rouge",
+        "white": "blanc",
+        "blue": "bleu"
+      },
+      "electricMeter": "Compteur électrique",
+      "leaveEndDateEmpty": "Laissez la date de fin vide pour une période ouverte.",
+      "priceAndTimeSlots": "Prix & créneaux horaires",
+      "price": "Prix",
+      "hourSlots": "Créneaux horaires",
+      "selectHoursHelp": "Sélectionnez les heures auxquelles ce prix s'applique.",
+      "daytime820": "Journée 8-20",
+      "clear": "Effacer",
+      "selected": "Sélectionné :",
+      "none": "aucun",
+      "subscribedPower": "Puissance souscrite",
+      "summary": "Récapitulatif",
+      "type": "Type",
+      "period": "Période",
+      "slots": "Créneaux",
+      "meter": "Compteur",
+      "contractTypes": {
+        "base": "base",
+        "peak-off-peak": "heures pleines/creuses",
+        "edf-tempo": "EDF Tempo"
+      },
+      "priceTypes": {
+        "consumption": "consommation",
+        "subscription": "abonnement"
+      },
+      "perMonth": "/mois",
+      "currencies": {
+        "euro": "euro",
+        "dollar": "dollar"
+      },
+      "errorLoadingPrices": "Erreur lors du chargement des tarifs.",
+      "errorLoadingDevices": "Erreur lors du chargement des appareils.",
+      "noDeviceFeaturesFound": "Aucune fonctionnalité d'appareil trouvée.",
+      "settings": "Paramètres",
+      "calculateConsumptionFromIndexDescription": "Ceci re-calculera la consommation d'énergie (en kWh) par tranche de 30 minutes à partir des fonctionnalités \"index\", depuis le début de votre installation Gladys.",
+      "calculateConsumptionFromIndexFromBeginning": "Calculer la consommation depuis l'index depuis le début",
+      "calculatingConsumptionFromBeginning": "Calcul de la consommation en cours...",
+      "calculateConsumptionFromBeginningStarted": "Le calcul de la consommation a été lancé. Vous pouvez suivre le progrès dans les tâches en arrière-plan.",
+      "calculateConsumptionFromBeginningError": "Une erreur est survenue lors du lancement du calcul de la consommation.",
+      "calculateCostFromBeginningDescription": "Ceci calculera le coût de votre consommation d'énergie en fonction de vos données de consommation et des tarifs d'électricité. Utilisez ceci après avoir des données de consommation et configuré vos tarifs d'électricité.",
+      "calculateCostFromBeginning": "Calculer le coût depuis le début",
+      "calculatingFromBeginning": "Calcul en cours...",
+      "calculateFromBeginningStarted": "Le calcul a été lancé. Vous pouvez suivre le progrès dans les tâches en arrière-plan.",
+      "calculateFromBeginningError": "Une erreur est survenue lors du lancement du calcul.",
+      "importPrices": "Importer",
+      "importPricesTitle": "Importer les tarifs de contrat d'énergie",
+      "selectElectricMeterDescription": "Vous pouvez soit utiliser un compteur électrique existant d'une autre intégration (ex : Enedis), soit créer automatiquement un nouveau compteur électrique ici. Si vous créez le compteur automatiquement ici, il sera créé dans l'intégration MQTT.",
+      "selectElectricMeter": "Sélectionner le compteur électrique",
+      "createElectricMeter": "+ Créer un compteur électrique",
+      "electricMeterDeviceName": "Compteur électrique (MQTT)",
+      "electricMeterFeatureName": "Index du compteur électrique (MQTT)",
+      "selectContract": "Sélectionner le contrat d'énergie",
+      "selectContractPlaceholder": "Sélectionner un contrat",
+      "selectSubscribedPower": "Sélectionner la puissance souscrite",
+      "selectPowerPlaceholder": "Sélectionner la puissance",
+      "provider": "Fournisseur",
+      "importPricesButton": "Importer les tarifs",
+      "importSuccess": "Tarifs importés avec succès !",
+      "errorLoadingContracts": "Erreur lors du chargement des contrats",
+      "availablePowers": "Puissances disponibles",
+      "contractId": "ID du contrat",
+      "hourSlotsRequiredInfo": "Ce contrat nécessite de spécifier les heures pleines pour votre localisation. Les heures restantes seront considérées comme heures creuses.",
+      "selectPeakHours": "Sélectionner les heures pleines",
+      "selectPeakHoursHelp": "Cliquez sur les créneaux horaires où le tarif heures pleines s'applique. Les créneaux non sélectionnés seront en heures creuses.",
+      "peakHours": "Heures pleines",
+      "offPeakHours": "Heures creuses",
+      "circularDependencyDetected": "Dépendances circulaires ou cassées détectées",
+      "circularDependencyDescription": "Les fonctionnalités suivantes ont des références parent invalides qui peuvent causer des problèmes de performance. Cliquez sur le bouton pour les corriger automatiquement.",
+      "brokenReference": "référence cassée",
+      "circularReference": "référence circulaire",
+      "selfReference": "auto-référence",
+      "fixAutomatically": "Corriger",
+      "fixing": "Correction en cours..."
     },
     "caldav": {
       "title": "CalDAV",
@@ -496,6 +661,7 @@
           "name": "Calendrier Synology",
           "url": "URL CalDAV Synology",
           "urlInfo": "Dans l'application Calendrier, cliquez sur 'Compte CalDAV' et copiez l'URL 'macOS/iOS'.",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur Synology",
           "usernameInfo": "Entrez votre nom d'utilisateur.",
           "password": "Mot de passe",
@@ -504,6 +670,7 @@
         "other": {
           "name": "Autre",
           "url": "URL CalDAV",
+          "verifySSL": "Vérifier le certificat SSL",
           "username": "Nom d'utilisateur CalDAV",
           "password": "Mot de passe CalDAV"
         }
@@ -580,7 +747,7 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
@@ -621,7 +788,7 @@
       "title": "Free Mobile",
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
       "documentation": "Documentation Free Mobile",
-      "introduction": "Ce plugin vous permet d’envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
+      "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
       "username": "Identifiant client Free Mobile",
       "key": "Clé d'identification au service",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
@@ -762,7 +929,7 @@
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
-        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d'accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
         "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
         "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
@@ -1032,7 +1199,9 @@
         "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus. Pour vous connecter/reconnecter, rendez-vous sur l'interface Gladys Plus, disponible ici :",
         "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
         "reconnectInfo": "Si jamais vous voulez rafraîchir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans.",
-        "dailyConsumptionFeatureName": "Consommation quotidienne"
+        "dailyConsumptionFeatureName": "Consommation quotidienne",
+        "consumptionLoadCurveFeatureName": "Consommation 30 minutes",
+        "consumptionLoadCurveCostFeatureName": "Coût 30 minutes"
       },
       "usagePoints": {
         "title": "Mes compteurs",
@@ -1056,7 +1225,8 @@
         "refreshLocal": "Synchroniser avec Gladys Plus",
         "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
         "saveButton": "Enregistrer",
-        "deleteButton": "Supprimer"
+        "deleteButton": "Supprimer",
+        "recreateButton": "Mettre à jour"
       }
     },
     "alexa": {
@@ -1095,26 +1265,6 @@
       "description": "Envoyez votre position GPS à Gladys via une application",
       "documentation": "Documentation OwnTracks",
       "longDescription": "OwnTracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser OwnTracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer OwnTracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
-    },
-    "zwave": {
-      "title": "Open-Zwave [OLD]",
-      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
-      "documentation": "Documentation Open-Zwave",
-      "device": {
-        "title": "Anciens appareils Open-Zwave",
-        "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
-        "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
-        "scanButton": "Rechercher",
-        "nameLabel": "Nom",
-        "roomLabel": "Pièce",
-        "featuresLabel": "Fonctionnalités",
-        "saveButton": "Sauvegarder",
-        "deleteButton": "Supprimer",
-        "editButton": "Éditer",
-        "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
-      }
     },
     "openWeather": {
       "title": "API OpenWeather",
@@ -1321,7 +1471,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un nombre limité d'appareils. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1445,6 +1595,13 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
+        "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrors": {
+          "name": "Le champ \"Nom\" est obligatoire",
+          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
+          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
+          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+        },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
@@ -1475,7 +1632,14 @@
         "mqttCustomObjectPathPlaceholder": "Chemin à suivre dans le JSON",
         "copied": "Copié !",
         "copyFailed": "Erreur lors de la copie",
-        "deleteLabel": "Supprimer la fonctionnalité"
+        "deleteLabel": "Supprimer la fonctionnalité",
+        "showAdvancedSettings": "Afficher les paramètres avancés",
+        "hideAdvancedSettings": "Masquer les paramètres avancés",
+        "energyMonitoring": {
+          "title": "Suivi énergétique",
+          "description": "Cette fonctionnalité peut être utilisée pour le suivi énergétique. Cliquez sur le bouton ci-dessous pour créer automatiquement les fonctionnalités de suivi de consommation et de coût.",
+          "createButton": "Créer les fonctionnalités"
+        }
       },
       "setup": {
         "title": "Configuration MQTT",
@@ -1701,7 +1865,7 @@
         "title": "Scanner de présence",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan",
         "presenceScannerFrequencyUnit": "minutes",
@@ -1789,6 +1953,115 @@
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+    },
+    "callmebot": {
+      "title": "CallMeBot",
+      "description": "Envoyez des messages via WhatsApp et Signal.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation",
+      "setup": {
+        "title": "Configurer CallMeBot",
+        "description": "Pour utiliser CallMeBot, vous devez obtenir une clé API. Suivez ces étapes :<br><br>1. Allez sur le <a href=\"https://www.callmebot.com\" target=\"_blank\" rel=\"noopener noreferrer\">site web de CallMeBot</a><br>2. Choisissez votre plateforme de messagerie préférée (WhatsApp, Signal)<br>3. Suivez les instructions pour obtenir votre clé API<br>4. Entrez votre clé API ci-dessous<br><br>⚠️ Note : Ce service est unidirectionnel (Gladys peut envoyer des messages mais ne peut pas en recevoir) et ne supporte pas l'envoi d'images.",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez votre clé API CallMeBot",
+        "apiKeyHelp": "Votre clé API est utilisée pour s'authentifier auprès du service CallMeBot",
+        "messagingServiceLabel": "Service de messagerie",
+        "messagingServiceHelp": "Choisissez le service de messagerie que vous souhaitez utiliser avec CallMeBot",
+        "phoneNumberLabel": "Numéro de téléphone",
+        "phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
+        "phoneNumberHelp": "Votre numéro de téléphone au format international (ex: +33612345678)",
+        "phoneNumberHelpSignal": "Pour Signal, ce sera un UUID fourni par CallMeBot (ex: 123e4567-e89b-12d3-a456-426614174000)",
+        "saveButton": "Sauvegarder la configuration",
+        "saved": "Configuration sauvegardée !",
+        "error": "Erreur lors de la sauvegarde de la configuration"
+      }
+    },
+    "matter": {
+      "title": "Matter",
+      "description": "Ajoutez et gérez vos appareils Matter.",
+      "deviceTab": "Appareils",
+      "addTab": "Ajouter un appareil",
+      "settingsTab": "Paramètres",
+      "documentation": "Documentation",
+      "device": {
+        "title": "Appareils Matter",
+        "refreshMatterDevices": "Rafraîchissement des appareils Matter en cours...",
+        "refreshMatterDevicesDescription": "Cela peut prendre quelques minutes si vous avez des appareils injoignables.",
+        "noDeviceFound": "Aucun appareil Matter trouvé",
+        "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
+        "addToGladys": "Ajouter à Gladys",
+        "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
+        "replaceExisting": "Mettre à jour l'appareil existant",
+        "nodeDisconnected": "Déconnecté"
+      },
+      "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Mon appareil Matter",
+      "roomLabel": "Pièce",
+      "featuresLabel": "Fonctionnalités",
+      "displayDeviceInfo": "Afficher les détails",
+      "matterParamsNames": {
+        "SERIAL_NUMBER": "Numéro de série",
+        "UNIQUE_ID": "ID unique"
+      },
+      "noFeaturesHandled": "Aucune fonctionnalité n'est gérée par cet appareil",
+      "alreadyCreatedButton": "Appareil déjà ajouté",
+      "saveButton": "Enregistrer",
+      "deleteButton": "Supprimer",
+      "error": {
+        "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
+        "conflictError": "Un appareil avec ce nom existe déjà",
+        "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
+        "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
+      },
+      "discover": {
+        "title": "Ajouter un appareil Matter",
+        "description": "Votre appareil fournit un code d'appairage à 11 ou 21 chiffres, vous devez rentrer le code ici pour l'ajouter à Gladys. Si votre appareil est un appareil Thread, il doit être connecté à un Thread Border Router (Apple TV 4K, Google Home, Alexa).",
+        "pairingCodeLabel": "Code d'appairage",
+        "pairingCodePlaceholder": "Exemple: 1234-567-9101, 12345679101",
+        "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
+        "addButton": "Ajouter à Gladys",
+        "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
+      },
+      "settings": {
+        "title": "Paramètres Matter",
+        "ipv6Enabled": "Une interface IPv6 est disponible sur cette machine ✅",
+        "ipv6NotEnabled": "Matter nécessite une connectivité IPv6, mais aucune interface IPv6 n'a été détectée sur cette machine ❌",
+        "description": "Activez ou désactivez l'intégration Matter dans Gladys. Lorsqu'elle est activée, Gladys pourra communiquer avec vos appareils Matter.",
+        "enableIntegration": "Activer l'intégration Matter",
+        "saveButton": "Enregistrer",
+        "error": "Une erreur est survenue lors de l'enregistrement des paramètres",
+        "nodesTitle": "Nœuds Matter",
+        "nodeIdLabel": "ID du nœud",
+        "nodeDetailsLabel": "Détails du nœud",
+        "actionsLabel": "Actions",
+        "decommissionButton": "Décommissionner",
+        "noNodesFound": "Aucun nœud Matter trouvé. Vous pouvez ajouter un appareil Matter en allant sur l'onglet \"Ajouter un appareil\".",
+        "disabledWarning": "Matter n'est pas activé, veuillez l'activer dans <a href=\"/dashboard/integration/device/matter/settings\">Paramètres</a> pour commencer à utiliser l'intégration.",
+        "disabledWarningSettings": "Matter n'est activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
+        "enableButton": "Activer Matter",
+        "disableButton": "Désactiver Matter",
+        "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
+      }
+    },
+    "mcp": {
+      "title": "MCP",
+      "description": "Connectez votre agent IA à Gladys.",
+      "documentation": "Documentation MCP",
+      "longDescription": "MCP est un protocol permettant d'ajouter des fonctionnalités du monde réel à votre agent. Cette intégration fait office de serveur MCP et permet à vos agents IA compatible MCP d'intéragire avec votre maison connectée. Votre agent et votre instance Gladys doivent être sur le même réseau.",
+      "urlLabel": "URL du serveur MCP",
+      "urlInstruction": "Copiez cette URL dans la configuration de votre agent.",
+      "apiKeyLabel": "Clé API du serveur MCP",
+      "apiKeyInstruction": "Générez une clé API pour authentifier votre client MCP. Dans la configuration de votre client MCP, ajoutez un header \"Authorization\" avec pour valeur cette clé.",
+      "apiKeyDifference": "Ces clés API sont locales et fonctionnent uniquement sur votre réseau local. Si vous souhaitez accéder à votre serveur MCP depuis l'extérieur de votre réseau, utilisez une clé API Gladys Plus et la route disponible via l'Open API.",
+      "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
+      "keyName": "Détails",
+      "revoke": "Révoquer",
+      "namePlaceholder": "Nom du client",
+      "generateButton": "Générer",
+      "keyNameLabel": "Clé :",
+      "registeredLabel": "Enregistré le :"
     }
   },
   "editScene": {
@@ -1804,6 +2077,8 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "deleteText": "Êtes-vous sûr(e) ?",
+    "cancelButton": "Annuler",
     "duplicateButton": "Dupliquer",
     "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
@@ -1811,8 +2086,11 @@
     "addTriggerButton": "Ajouter déclencheur",
     "selectTriggerLabel": "Sélectionnez un type de déclencheur",
     "newAction": "Nouvelle action",
+    "newCondition": "Nouvelle condition",
     "selectActionType": "Sélectionnez un type d'action",
+    "selectConditionType": "Sélectionner un type de condition",
     "addActionButton": "Nouvelle action",
+    "addActionGroupButton": "Nouveau groupe d'action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
@@ -1826,7 +2104,10 @@
         "milliseconds": "millisecondes",
         "seconds": "secondes",
         "minutes": "minutes",
-        "hours": "heures"
+        "hours": "heures",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculée",
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant."
       },
       "messageSend": {
         "userLabel": "Utilisateur",
@@ -1909,6 +2190,23 @@
         "orText": "OU",
         "orButton": "+ OU",
         "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+      },
+      "conditionIfThenElse": {
+        "conditions": "Conditions",
+        "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
+        "addCondition": "Ajouter une condition",
+        "if": "Si",
+        "then": "Alors",
+        "else": "Sinon",
+        "shortIf": "S",
+        "shortThen": "A",
+        "shortElse": "S",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
@@ -2005,14 +2303,14 @@
       },
       "mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "/gladys/my-topic",
+        "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -2021,6 +2319,7 @@
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
         "deviceLabel": "Enceinte",
+        "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }
@@ -2060,8 +2359,9 @@
         "stop": "Arrêter le service"
       },
       "condition": {
-        "only-continue-if": "Continuer seulement si",
-        "check-time": "Condition temporelle"
+        "only-continue-if": "Condition sur variables",
+        "check-time": "Condition temporelle",
+        "if-then-else": "Condition \"Si... Alors... Sinon...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
@@ -2110,6 +2410,9 @@
         "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
+      },
+      "askAi": {
+        "answer": "Réponse de l'IA"
       }
     },
     "triggers": {
@@ -2406,7 +2709,8 @@
     "wrongEmailError": "Ce n'est pas un e-mail valide",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou poster un message sur Gladys community.",
-    "success": "Succès ! Vous devriez voir un lien de réinitialisation de mot de passe dans les logs de Gladys.",
+    "success": "Succès ! Je vous ai envoyé un lien de réinitialisation de mot de passe par Telegram ou Nextcloud Talk. Si vous n'avez pas configuré ces services, le lien de réinitialisation sera dans les logs de Gladys.",
+    "howToAccessLogs": "Pour accéder aux logs de Gladys, rendez-vous en ligne de commande et tapez `docker logs gladys --tail=1000` pour afficher les 1000 dernières lignes.",
     "userNotFound": "Aucun compte n'est lié à cet e-mail.",
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
@@ -2456,7 +2760,14 @@
       "vacuum": "Nettoyage de la base de données",
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
-      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite"
+      "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
+      "service-matter-backup": "Sauvegarde Matter",
+      "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
+      "energy-monitoring-cost-calculation-yesterday": "Calcul du coût énergétique (depuis hier)",
+      "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
+      "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
+      "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
+      "service-enedis-sync": "Synchronisation des données Enedis"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2476,8 +2787,12 @@
     "operations": "Opérations",
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
-    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez l'image Raspberry Pi OS Gladys officielle. Pour une installation manuellle, vous devez avoir configuré Watchtower pour que Gladys Assistant se mette à jour.",
-    "download": "Télécharger",
+    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour tous les containers présents sur cette machine.",
+    "notConnectedToDocker": "Gladys n'est pas connectée à Docker. Pour avoir accès à Docker depuis Gladys, il faut lancer Gladys avec le bon volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
+    "updateNow": "Mettre à jour maintenant",
+    "upgradeInProgress": "Mise à jour en cours...",
+    "upgradeLogs": "Messages de Watchtower",
+    "websocketNotConnected": "Connexion Websocket perdue... Gladys est probablement en cours de redémarrage. Vous pouvez rafraichir cette page pour vérifier si Gladys est de nouveau accessible.",
     "notAvailable": "Indisponible sur l'installation personnalisée.",
     "containers": "Conteneurs",
     "containerName": "Nom",
@@ -2495,10 +2810,11 @@
     "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
     "hours": "heures",
-    "vacuumDatabaseTitle": "Nettoyer la base de données",
-    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
+    "vacuumDatabaseTitle": "Nettoyer la base de données SQLite",
+    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de données SQLite, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle réarrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Pendant le nettoyage, Gladys sera indisponible.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
     "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
+    "vacuumDatabaseFinished": "Le nettoyage a terminé. Gladys est de nouveau disponible. Temps de nettoyage : {{duration}}.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -2558,7 +2874,8 @@
     "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
     "invalidIcon": "L'icône est requise",
-    "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+    "sceneAlreadyExist": "Une scène avec le même nom existe déjà.",
+    "nameAfterCopy": "Copie de {{name}}"
   },
   "scene": {
     "title": "Scènes",
@@ -2610,7 +2927,7 @@
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
-    "forgotPasswordLabel": "J’ai oublié mon mot de passe",
+    "forgotPasswordLabel": "J'ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "loginButtonText": "Connexion",
     "wrongCredentials": "E-mail / mot de passe incorrect.",
@@ -2655,6 +2972,7 @@
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "kPa": "Kilopascal (kPa)",
     "bar": "Bar",
     "psi": "Livre-force par pouce carré (psi)",
     "milli-bar": "Millibar (mbar)",
@@ -2663,6 +2981,7 @@
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "ppb": "Partie par millard (ppb)",
+    "ppt": "Partie par billion (ppt)",
     "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt heure (kWh)",
     "megawatt-hour": "Mégawatt heure (MWh)",
@@ -2673,10 +2992,19 @@
     "volt-ampere": "Voltampère (VA)",
     "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
+    "watt-hour-per-km": "Watt heure par kilomètre (Wh/km)",
+    "kilowatt-hour-per-100-km": "Kilowatt heure aux 100 kilomètres (kWh/100km)",
+    "watt-hour-per-mile": "Watt heure par mile (Wh/mi)",
+    "kilowatt-hour-per-100-mile": "Kilowatt heure aux 100 miles (kWh/100mi)",
+    "km-per-kilowatt-hour": "Kilomètre par kilowatt heure (km/kWh)",
+    "mile-per-kilowatt-hour": "Mile par kilowatt heure (mi/kWh)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
     "m": "Mètre (m)",
     "km": "Kilomètre (km)",
+    "inch": "Pouce (in)",
+    "feet": "Pied (ft)",
+    "mile": "Mile (mi)",
     "degree": "Degré d'angle (°)",
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
@@ -2690,6 +3018,8 @@
     "pound-sterling": "livre sterling (£)",
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
+    "feet-per-second": "Pied par seconde (ft/s)",
+    "mile-per-hour": "Mile par heure (mi/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
     "millimeter-per-day": "Millimètre par jour (mm/j)",
     "uv-index": "Indice UV",
@@ -2720,7 +3050,11 @@
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
     "aqi": "Indice de Qualité de l'Air",
+    "milligram-per-cubic-meter": "Milligramme par mètre cube (mg/m³)",
     "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
+    "nanogram-per-cubic-meter": "Nanogramme par mètre cube (ng/m³)",
+    "particles-per-cubic-meter": "Particules par mètre cube (p/m³)",
+    "becquerel-per-cubic-meter": "Becquerel par mètre cube (Bq/m³)",
     "square-centimeter": "Centimètre carré (cm²)",
     "square-meter": "Mètre carré (m²)",
     "square-kilometer": "Kilomètre carré (km²)",
@@ -2733,12 +3067,14 @@
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "kPa": "kPa",
     "bar": "bar",
     "psi": "psi",
     "milli-bar": "mbar",
     "lux": "lx",
     "ppm": "ppm",
     "ppb": "ppb",
+    "ppt": "ppt",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -2751,10 +3087,19 @@
     "volt-ampere": "VA",
     "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
+    "watt-hour-per-km": "Wh/km",
+    "kilowatt-hour-per-100-km": "kWh/100km",
+    "watt-hour-per-mile": "Wh/mi",
+    "kilowatt-hour-per-100-mile": "kWh/100mi",
+    "km-per-kilowatt-hour": "km/kWh",
+    "mile-per-kilowatt-hour": "mi/kWh",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
     "km": "km",
+    "inch": "in",
+    "feet": "ft",
+    "mile": "mi",
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
@@ -2768,6 +3113,8 @@
     "pound-sterling": "£",
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
+    "feet-per-second": "ft/s",
+    "mile-per-hour": "mi/h",
     "millimeter-per-hour": "mm/h",
     "millimeter-per-day": "mm/j",
     "uv-index": "Indice UV",
@@ -2798,7 +3145,11 @@
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
     "aqi": "AQI",
+    "milligram-per-cubic-meter": "mg/m³",
     "microgram-per-cubic-meter": "µg/m³",
+    "nanogram-per-cubic-meter": "ng/m³",
+    "particles-per-cubic-meter": "p/m³",
+    "becquerel-per-cubic-meter": "Bq/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
     "square-kilometer": "km²",
@@ -2828,6 +3179,28 @@
           "zero": "Arrêter",
           "one": "Ouvrir",
           "other": "Fermer"
+        }
+      },
+      "electrical-vehicle-command": {
+        "alarm": {
+          "stateLiveFinished": {
+            "0": "Désactivée",
+            "1": "Activée"
+          },
+          "state": {
+            "0": "Activer",
+            "1": "Désactiver"
+          }
+        },
+        "lock": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
         }
       },
       "air-conditioning": {
@@ -2939,7 +3312,19 @@
           "69": "Triple sur les deux",
           "70": "Maintenu Gauche",
           "71": "Maintenu Droit",
-          "72": "Maintenu sur les deux"
+          "72": "Maintenu sur les deux",
+          "73": "Clic simple Plus",
+          "74": "Clic simple Centre",
+          "75": "Clic simple Moins",
+          "76": "Double clic Plus",
+          "77": "Double clic Centre",
+          "78": "Double clic Moins",
+          "79": "Maintien Plus",
+          "80": "Maintien Centre",
+          "81": "Maintien Moins",
+          "82": "Relâchement Plus",
+          "83": "Relâchement Centre",
+          "84": "Relâchement Moins"
         }
       },
       "heater": {
@@ -3002,6 +3387,47 @@
           "high-risk": "Élevé",
           "unknown": "Inconnu"
         }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Faible",
+          "1": "Normal",
+          "2": "Élevé",
+          "unknown": "Inconnu"
+        }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        },
+        "window-opened": {
+          "0": "Fermée(s)",
+          "1": "Ouverte(s)"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Déconnecté",
+          "1": "Connecté"
+        }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Inconnu",
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Élevé",
+          "critical": "Critique"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Faible",
+          "2": "Moyen",
+          "3": "Élevé",
+          "4": "Critique"
+        }
       }
     }
   },
@@ -3028,7 +3454,10 @@
     },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
-      "decimal": "Température"
+      "decimal": "Température",
+      "min": "Température minimale",
+      "max": "Température maximale",
+      "average": "Température moyenne"
     },
     "device-temperature-sensor": {
       "shortCategoryName": "Température de l'appareil",
@@ -3043,6 +3472,10 @@
       "shortCategoryName": "Détecteur de présence",
       "push": "Présence"
     },
+    "rain-sensor": {
+      "shortCategoryName": "Détecteur de pluie",
+      "binary": "Détection pluie Oui/Non"
+    },
     "light-sensor": {
       "shortCategoryName": "Capteur de luminosité",
       "integer": "Luminosité entière",
@@ -3055,6 +3488,13 @@
     "distance-sensor": {
       "shortCategoryName": "Distance",
       "decimal": "Distance"
+    },
+    "level-sensor": {
+      "shortCategoryName": "Capteur de niveau",
+      "decimal": "Capteur de niveau",
+      "liquid-state": "État du niveau",
+      "liquid-level-percent": "Niveau du liquide (Pourcentage)",
+      "liquid-depth": "Profondeur du liquide"
     },
     "camera": {
       "shortCategoryName": "Caméra",
@@ -3090,7 +3530,8 @@
       "dimmer": "Variateur",
       "burglar": "Antivol",
       "power": "Puissance consommée",
-      "energy": "Energie consommée"
+      "energy": "Energie consommée",
+      "target-current": "Intensité de consigne"
     },
     "siren": {
       "shortCategoryName": "Sirène",
@@ -3133,6 +3574,10 @@
       "shortCategoryName": "Capteur de PM2.5",
       "decimal": "PM2.5 (Décimale)"
     },
+    "pm10-sensor": {
+      "shortCategoryName": "Capteur de PM10",
+      "decimal": "PM10 (Décimale)"
+    },
     "formaldehyd-sensor": {
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
@@ -3158,7 +3603,58 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température"
+      "target-temperature": "Température de consigne"
+    },
+    "electrical-vehicle-battery": {
+      "shortCategoryName": "Véhicule électrique - Batterie",
+      "battery-energy-remaining": "Énergie restante",
+      "battery-level": "Niveau batterie",
+      "battery-power": "Puissance batterie",
+      "battery-range-estimate": "Autonomie estimée",
+      "battery-temperature": "Température batterie",
+      "battery-voltage": "Tension batterie"
+    },
+    "electrical-vehicle-charge": {
+      "shortCategoryName": "Véhicule électrique - Charge",
+      "charge-current": "Intensité charge",
+      "charge-energy-added-total": "Énergie totale ajoutée",
+      "charge-energy-consumption-total": "Énergie totale consommée",
+      "charge-on": "Commutateur charge",
+      "charge-power": "Puissance charge",
+      "charge-voltage": "Tension charge",
+      "last-charge-energy-added": "Énergie ajoutée (dernière charge)",
+      "last-charge-energy-consumption": "Énergie consommée (dernière charge)",
+      "plugged": "Véhicule branché",
+      "target-charge-limit": "Limite de charge",
+      "target-current": "Intensité de consigne"
+    },
+    "electrical-vehicle-climate": {
+      "shortCategoryName": "Véhicule électrique - Climatisation",
+      "climate-on": "Commutateur climatisation",
+      "indoor-temperature": "Température intérieure",
+      "target-temperature": "Température de consigne"
+    },
+    "electrical-vehicle-command": {
+      "shortCategoryName": "Véhicule électrique - Commande",
+      "alarm": "Alarme",
+      "lock": "Verrouillage"
+    },
+    "electrical-vehicle-drive": {
+      "shortCategoryName": "Véhicule électrique - Conduite",
+      "drive-energy-consumption-total": "Énergie totale consommée",
+      "speed": "Vitesse"
+    },
+    "electrical-vehicle-consumption": {
+      "shortCategoryName": "Véhicule électrique - Consommation",
+      "energy-consumption": "Consommation instantanée",
+      "energy-efficiency": "Efficacité énergétique"
+    },
+    "electrical-vehicle-state": {
+      "shortCategoryName": "Véhicule électrique - État",
+      "door-opened": "Porte ouverte",
+      "odometer": "Odomètre",
+      "tire-pressure": "Pression des pneus",
+      "window-opened": "Fenêtre ouverte"
     },
     "heater": {
       "shortCategoryName": "Chauffage",
@@ -3208,7 +3704,18 @@
       "power": "Puissance",
       "energy": "Energie",
       "index": "Index",
-      "daily-consumption": "Consommation journalière"
+      "daily-consumption": "Consommation journalière",
+      "daily-consumption-cost": "Coût journalier",
+      "thirty-minutes-consumption": "Consommation 30 minutes",
+      "thirty-minutes-consumption-cost": "Coût 30 minutes"
+    },
+    "energy-production-sensor": {
+      "shortCategoryName": "Capteur de production d'énergie",
+      "index": "Index",
+      "daily-production": "Production journalière",
+      "daily-production-revenue": "Revenu journalier",
+      "thirty-minutes-production": "Production 30 minutes",
+      "thirty-minutes-production-revenue": "Revenu 30 minutes"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
@@ -3287,7 +3794,8 @@
     },
     "precipitation-sensor": {
       "shortCategoryName": "Capteur de précipitations",
-      "decimal": "Précipitation"
+      "decimal": "Précipitation",
+      "integer": "Intensité (mV)"
     },
     "uv-sensor": {
       "shortCategoryName": "Capteur d'UV",
@@ -3303,6 +3811,10 @@
       "decimal": "COV (Décimale)"
     },
     "voc-index-sensor": {
+      "shortCategoryName": "Indice COV Sensirion",
+      "integer": "Indice COV Sensirion (entier)"
+    },
+    "voc-matter-index-sensor": {
       "shortCategoryName": "Indice COV",
       "integer": "Indice COV (entier)"
     },
@@ -3412,6 +3924,7 @@
     "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
+    "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
     "saveButton": "Sauvegarder",
     "manageBilling": "Pour gérer votre facturation, cliquez ",
     "here": "ici"

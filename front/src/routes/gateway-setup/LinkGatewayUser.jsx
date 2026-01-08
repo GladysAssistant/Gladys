@@ -54,6 +54,11 @@ const SignupLayout = ({ children, ...props }) => (
                         <Text id="gatewayLinkUser.error" />
                       </div>
                     )}
+                    {props.errorNotAcceptedLocally && (
+                      <div class="alert alert-danger">
+                        <Text id="gatewayLinkUser.errorNotAcceptedLocally" />
+                      </div>
+                    )}
                     {props.usersGetStatus === RequestStatus.Error && (
                       <div class="alert alert-danger">
                         <Text id="httpErrors.unknownError" />

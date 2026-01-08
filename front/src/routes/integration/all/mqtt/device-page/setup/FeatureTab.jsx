@@ -36,6 +36,21 @@ const FeatureTab = ({ children, ...props }) => (
               <Text id="integration.mqtt.device.saveError" />
             </div>
           )}
+          {props.saveStatus === RequestStatus.ValidationError && (
+            <div class="alert alert-danger">
+              <Text id="integration.mqtt.device.validationError" />
+              {props.erroredAttributes.length > 0 && (
+                <p>
+                  {props.erroredAttributes.map(attribute => (
+                    <>
+                      <br />
+                      - <Text id={`integration.mqtt.device.validationErrors.${attribute}`} />
+                    </>
+                  ))}
+                </p>
+              )}
+            </div>
+          )}
           {props.saveStatus === RequestStatus.ConflictError && (
             <div class="alert alert-danger">
               <Text id="integration.mqtt.device.saveConflictError" />

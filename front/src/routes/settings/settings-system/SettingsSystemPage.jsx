@@ -85,7 +85,15 @@ const SystemPage = ({ children, ...props }) => (
     </div>
     <div class="row">
       <div class="col-lg-6">
-        <SettingsSystemOperations />
+        <SettingsSystemOperations
+          upgradeGladys={props.upgradeGladys}
+          SystemUpgradeStatus={props.SystemUpgradeStatus}
+          watchtowerLogs={props.watchtowerLogs}
+          websocketConnected={props.websocketConnected}
+          checkForUpdates={props.checkForUpdates}
+          SystemGetInfosStatus={props.SystemGetInfosStatus}
+          systemInfos={props.systemInfos}
+        />
         <SettingsSystemDuckDbMigration />
         <SettingsSystemKeepDeviceHistory />
         <SettingsSystemTimeExpiryState />

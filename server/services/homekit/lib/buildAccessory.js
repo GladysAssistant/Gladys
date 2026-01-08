@@ -22,7 +22,7 @@ function buildAccessory(device) {
     };
   }, {});
 
-  const accessory = new this.hap.Accessory(device.name, device.id);
+  const accessory = new this.hap.Accessory(device.name.substring(0, 64), device.id);
   Object.keys(categories).forEach((category) => {
     const serviceConfigs = [];
 

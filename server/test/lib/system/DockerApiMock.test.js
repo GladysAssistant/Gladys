@@ -57,7 +57,7 @@ const containers = [
   {
     Id: 'b594e692-e6d3-4531-bdcc-f0afcf515113',
     Names: ['/watchtower'],
-    Image: 'containrrr/watchtower',
+    Image: 'nickfedor/watchtower',
   },
 ];
 
@@ -68,7 +68,7 @@ const images = [
   },
   {
     Id: '3eb811ca-e050-4324-a6fa-a7a09141b4fa',
-    RepoTags: ['containrrr/watchtower'],
+    RepoTags: ['nickfedor/watchtower'],
   },
 ];
 

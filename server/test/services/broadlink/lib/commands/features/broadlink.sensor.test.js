@@ -70,6 +70,7 @@ describe('broadlink.sensor', () => {
           {
             external_id: 'externalId',
             category: 'temperature-sensor',
+            type: 'decimal',
           },
         ],
       };

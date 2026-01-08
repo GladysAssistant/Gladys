@@ -1,21 +1,15 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import uuid from 'uuid';
 import Promise from 'bluebird';
 import { Text, Localizer } from 'preact-i18n';
-import get from 'get-value';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { route } from 'preact-router';
 import config from '../../../../config';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
-} from '../../../../../../server/utils/constants';
 
 import EnedisPage from './EnedisPage';
+import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
 
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
   <div class="card">
@@ -97,29 +91,26 @@ class EnedisWelcomePageComponent extends Component {
       console.error(e);
     }
   };
+  getCurrentEnedisUsagePoints = async () => {
+    try {
+      const usagePointsDevices = await this.props.httpClient.get('/api/v1/service/enedis/device');
+      return usagePointsDevices;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
   createUsagePointDevice = async (usagePointId, serviceId) => {
-    const device = {
-      name: 'Enedis',
-      selector: `enedis-${usagePointId}`,
-      external_id: `enedis:${usagePointId}`,
-      service_id: serviceId,
-      features: [
-        {
-          id: uuid.v4(),
-          name: get(this.props.intl.dictionary, 'integration.enedis.welcome.dailyConsumptionFeatureName'),
-          selector: `enedis-${usagePointId}-daily-consumption`,
-          min: 0,
-          max: 1000000,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          external_id: `enedis:${usagePointId}:daily-consumption`,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
-          read_only: true,
-          has_feedback: false,
-          keep_history: true
-        }
-      ]
-    };
+    // Get current enedis devices
+    const existingDevices = await this.getCurrentEnedisUsagePoints();
+    // Check if device already exists
+    const existingDevice = existingDevices.find(device => device.external_id.split(':')[1] === usagePointId);
+    const device = buildUsagePointDevicePayload({
+      usagePointId,
+      serviceId,
+      intlDictionary: this.props.intl.dictionary,
+      existingDevice
+    });
     await this.props.httpClient.post('/api/v1/device', device);
   };
   sync = async () => {

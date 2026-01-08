@@ -44,6 +44,12 @@ const readValues = {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice) => {
       return valueFromDevice;
     },
+    [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+    [DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
   },
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: {
     /* rf_strength: 76 or wifi_strength: 76 */

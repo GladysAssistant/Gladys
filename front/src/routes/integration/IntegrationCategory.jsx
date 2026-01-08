@@ -1,31 +1,40 @@
-import { Link } from 'preact-router/match';
 import { Text, Localizer } from 'preact-i18n';
-import get from 'get-value';
+import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 
-const IntegrationCategory = ({ category, integration, currentUrl }) => {
-  let url = `${currentUrl}/`;
-  if (!category) {
-    url += `${integration.type}/`;
-  }
-  url += get(integration, 'link', { default: integration.key }).toLowerCase();
-
+/**
+ * Component to display an integration category.
+ *
+ * @param {Object} integration
+ * @prop {string} integration.key - The key of the integration.
+ * @prop {string} integration.url - The URL of the integration.
+ * @prop {string} integration.img - The URL of the image for the integration.
+ * @prop {boolean} integration.invertInDarkMode - If true, the image will be
+ *  inverted in dark mode.
+ * @prop {boolean} integration.whiteBackground - If true, the image will have a
+ *  white background.
+ *
+ * @returns {ReactElement} The integration category component.
+ */
+const IntegrationCategory = ({ integration }) => {
   return (
     <div class="col-sm-6 col-lg-4">
       <div class="card">
-        <Link href={url}>
+        <ScrollToTopLink href={integration.url}>
           <Localizer>
             <img
-              class="card-img-top"
+              class={`card-img-top ${integration.invertInDarkMode ? 'keep-dark' : ''} ${
+                integration.whiteBackground ? 'white-bg' : ''
+              }`}
               src={integration.img}
               alt={<Text id={`integration.${integration.key}.title`} />}
             />
           </Localizer>
-        </Link>
+        </ScrollToTopLink>
         <div class="card-body d-flex flex-column">
           <h4>
-            <Link href={url}>
+            <ScrollToTopLink href={integration.url}>
               <Text id={`integration.${integration.key}.title`} />
-            </Link>
+            </ScrollToTopLink>
           </h4>
           <div class="text-muted">
             <Text id={`integration.${integration.key}.description`} />

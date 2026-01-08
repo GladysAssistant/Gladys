@@ -117,6 +117,19 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
+  addBoxAtPosition = (x, y) => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          [x]: {
+            $splice: [[y + 1, 0, {}]]
+          }
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
   removeBox = async (x, y) => {
     const newState = update(this.state, {
       currentDashboard: {
@@ -153,18 +166,20 @@ class EditDashboard extends Component {
   };
 
   updateBoxConfig = (x, y, data) => {
-    const newState = update(this.state, {
-      currentDashboard: {
-        boxes: {
-          [x]: {
-            [y]: {
-              $merge: data
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        currentDashboard: {
+          boxes: {
+            [x]: {
+              [y]: {
+                $merge: data
+              }
             }
           }
         }
-      }
+      });
+      return { ...newState, boxNotEmptyError: false };
     });
-    this.setState({ ...newState, boxNotEmptyError: false });
   };
 
   updateNewSelectedBox = (x, y, type) => {
@@ -393,6 +408,7 @@ class EditDashboard extends Component {
         moveBoxUp={this.moveBoxUp}
         moveCard={this.moveCard}
         addBox={this.addBox}
+        addBoxAtPosition={this.addBoxAtPosition}
         removeBox={this.removeBox}
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}

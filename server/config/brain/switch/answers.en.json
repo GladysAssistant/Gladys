@@ -1,0 +1,22 @@
+[
+  {
+    "label": "switch.turn-on.success",
+    "answers": ["The switch is turned on !"]
+  },
+  {
+    "label": "switch.turn-on.fail",
+    "answers": ["I was unable to turn on the switch."]
+  },
+  {
+    "label": "switch.turn-off.success",
+    "answers": ["The switch is turned off !"]
+  },
+  {
+    "label": "switch.turn-off.fail",
+    "answers": ["I was unable to turn off the switch."]
+  },
+  {
+    "label": "switch.not-found",
+    "answers": ["I didn't find any switch with this name."]
+  }
+]

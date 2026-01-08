@@ -6,11 +6,12 @@ const { generateApiKey } = require('../../utils/refreshToken');
  * @description Create and save in database a new API key.
  * @param {string} userId - The uuid of a user.
  * @param {Array} scope - Scope the api key is able to access.
+ * @param {Array} useragent - Usage of the api key.
  * @returns {Promise} Resolving with the api key.
  * @example
  * gladys.session.createApiKey('7144a75d-1ec2-4f31-a587-a4b316c28754', ['dashboard:write']);
  */
-async function createApiKey(userId, scope) {
+async function createApiKey(userId, scope, useragent) {
   const { apiKey, apiKeyHash } = await generateApiKey();
 
   const newSession = {
@@ -19,6 +20,7 @@ async function createApiKey(userId, scope) {
     token_hash: apiKeyHash,
     scope: scope.join(','),
     valid_until: null,
+    useragent,
   };
 
   const session = await db.Session.create(newSession);

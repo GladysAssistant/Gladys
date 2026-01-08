@@ -6,6 +6,8 @@ const CameraManager = require('./camera');
 const LightManager = require('./light');
 const TemperatureSensorManager = require('./temperature-sensor');
 const HumiditySensorManager = require('./humidity-sensor');
+const SwitchManager = require('./switch');
+const EnergySensorManager = require('./energy-sensor');
 
 // Functions
 const { add } = require('./device.add');
@@ -18,6 +20,7 @@ const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
 const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggregates');
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
+const { getDeviceFeatureStates } = require('./device.getDeviceFeatureStates');
 const { onPurgeStatesEvent } = require('./device.onPurgeStatesEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
@@ -35,6 +38,11 @@ const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
+const { updateFeature } = require('./device.updateFeature');
+const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
+const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
+const { destroyParam } = require('./device.destroyParam');
+const { destroyStatesFrom } = require('./device.destroyStatesFrom');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -66,6 +74,8 @@ const DeviceManager = function DeviceManager(
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
+  this.switchManager = new SwitchManager(eventManager, stateManager, messageManager, this);
+  this.energySensorManager = new EnergySensorManager(stateManager);
 
   this.purgeStatesByFeatureId = this.job.wrapper(
     JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE,
@@ -115,6 +125,7 @@ DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;
 DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregates;
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
+DeviceManager.prototype.getDeviceFeatureStates = getDeviceFeatureStates;
 DeviceManager.prototype.onPurgeStatesEvent = onPurgeStatesEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;
@@ -132,5 +143,10 @@ DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
+DeviceManager.prototype.updateFeature = updateFeature;
+DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
+DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
+DeviceManager.prototype.destroyParam = destroyParam;
+DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;
 
 module.exports = DeviceManager;

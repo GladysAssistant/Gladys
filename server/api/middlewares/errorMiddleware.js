@@ -22,6 +22,7 @@ const logger = require('../../utils/logger');
 
 module.exports = function errorMiddleware(error, req, res, next) {
   let responseError;
+  logger.debug(error);
 
   // If Joi validationError
   if (error && error.isJoi === true) {
@@ -64,7 +65,7 @@ module.exports = function errorMiddleware(error, req, res, next) {
   } else if (error instanceof TooManyRequests) {
     responseError = new Error429({ time_before_next: error.timeBeforeNext });
   } else {
-    logger.trace(error);
+    logger.warn(error);
     responseError = new Error500(error);
   }
 

@@ -29,12 +29,24 @@ function createActions(store) {
         state.signupHouseLeafletMap.remove();
       }
       const leafletMap = leaflet.map('select-house-location-map').setView([48.8583, 2.2945], 2);
+
+      // Use the global dark mode state
+      const isDarkMode = store.getState().darkMode;
+
+      // Use dark tiles if dark mode is active, otherwise use light tiles
+      // Force new tile layer by adding timestamp to URL to prevent caching
+      const tileStyle = isDarkMode ? 'dark_all' : 'light_all';
+      const timestamp = new Date().getTime();
+
+      const tileUrl = `https://{s}.basemaps.cartocdn.com/${tileStyle}/{z}/{x}/{y}.png?_=${timestamp}`;
+
       leaflet
-        .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        .tileLayer(tileUrl, {
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
           subdomains: 'abcd',
-          maxZoom: 19
+          maxZoom: 19,
+          noCache: true
         })
         .addTo(leafletMap);
       leafletMap.on('click', e => {

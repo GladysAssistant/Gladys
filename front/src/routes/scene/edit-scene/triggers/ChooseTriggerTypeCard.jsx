@@ -67,6 +67,8 @@ class ChooseTriggerType extends Component {
             value={currentTrigger}
             options={options}
             onChange={this.handleChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </div>

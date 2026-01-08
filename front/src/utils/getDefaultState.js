@@ -31,6 +31,14 @@ function getDefaultState() {
     language = AVAILABLE_LANGUAGES_LIST.includes(navLanguage) ? navLanguage : AVAILABLE_LANGUAGES.EN;
   }
 
+  // Check for dark mode preference
+  let darkMode = false;
+  try {
+    const savedMode = localStorage.getItem('dark-mode');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    darkMode = savedMode !== null ? savedMode === 'true' : systemPrefersDark.matches;
+  } catch (e) {}
+
   const state = {
     httpClient,
     session,
@@ -38,7 +46,8 @@ function getDefaultState() {
     user: {
       language
     },
-    showDropDown: false
+    showDropDown: false,
+    darkMode
   };
   return state;
 }

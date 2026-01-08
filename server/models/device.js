@@ -1,4 +1,4 @@
-const { addSelector } = require('../utils/addSelector');
+const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { DEVICE_POLL_FREQUENCIES_LIST } = require('../utils/constants');
 
 module.exports = (sequelize, DataTypes) => {
@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // add slug if needed
-  device.beforeValidate(addSelector);
+  device.beforeValidate(addSelectorBeforeValidateHook);
 
   device.associate = (models) => {
     device.belongsTo(models.Room, {

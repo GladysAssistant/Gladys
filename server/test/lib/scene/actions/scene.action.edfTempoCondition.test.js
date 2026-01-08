@@ -4,11 +4,13 @@ const EventEmitter = require('events');
 
 const { AbortScene } = require('../../../../utils/coreErrors');
 const { ACTIONS } = require('../../../../utils/constants');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const event = new EventEmitter();
 
 describe('scene.edfTempoCondition', () => {
+  const { executeActions } = executeActionsFactory(actionsFunc);
   let clock;
   const timezone = 'Europe/Paris';
   beforeEach(async () => {

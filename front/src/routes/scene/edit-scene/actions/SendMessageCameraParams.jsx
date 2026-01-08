@@ -31,20 +31,20 @@ class SendMessageCameraParams extends Component {
     }
   };
   updateText = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'text', text);
+    this.props.updateActionProperty(this.props.path, 'text', text);
   };
   handleUserChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
   handleCameraChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'camera', selectedOption.value);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'camera', null);
+      this.props.updateActionProperty(this.props.path, 'camera', null);
     }
   };
 
@@ -98,6 +98,8 @@ class SendMessageCameraParams extends Component {
             options={userOptions}
             value={selectedUserOption}
             onChange={this.handleUserChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -115,6 +117,8 @@ class SendMessageCameraParams extends Component {
             options={cameraOptions}
             value={selectedCameraOption}
             onChange={this.handleCameraChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
         <div class="form-group">
@@ -130,6 +134,7 @@ class SendMessageCameraParams extends Component {
           <div className="tags-input">
             <TextWithVariablesInjected
               text={props.action.text}
+              path={props.path}
               triggersVariables={props.triggersVariables}
               actionsGroupsBefore={props.actionsGroupsBefore}
               variables={props.variables}

@@ -463,4 +463,203 @@ describe('Build service', () => {
     expect(getCharacteristic.args[0][0]).to.equal('CONTACTSENSORSTATE');
     expect(cb.args[0][1]).to.equal(1);
   });
+
+  it('should build shutter/curtain service', async () => {
+    homekitHandler.gladys.device.getBySelector = stub().resolves({
+      features: [
+        {
+          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+          name: 'Shutter State',
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+          last_value: 0,
+        },
+        {
+          id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
+          name: 'Shutter position',
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+          last_value: 80,
+        },
+      ],
+    });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub()
+      .onCall(0)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ'],
+        },
+      })
+      .onCall(1)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ'],
+          minValue: 0,
+          maxValue: 100,
+        },
+      })
+      .onCall(2)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+          minValue: 0,
+          maxValue: 100,
+        },
+      });
+    const WindowCovering = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        CurrentPosition: 'CURRENTPOSITION',
+        PositionState: 'POSITIONSTATE',
+        TargetPosition: 'TARGETPOSITION',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        WindowCovering,
+      },
+    };
+    const device = {
+      name: 'Shutter',
+    };
+    const features = [
+      {
+        id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+        selector: 'shutter-state',
+        name: 'Shutter State',
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+      },
+      {
+        id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
+        selector: 'shutter-position',
+        name: 'Shutter Position',
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        min: 0,
+        max: 100,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SHUTTER]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+    await on.args[2][1](cb);
+    await on.args[3][1](70, cb);
+
+    expect(WindowCovering.args[0][0]).to.equal('Shutter');
+    expect(on.callCount).to.equal(4);
+    expect(getCharacteristic.args[0][0]).to.equal('POSITIONSTATE');
+    expect(getCharacteristic.args[1][0]).to.equal('CURRENTPOSITION');
+    expect(getCharacteristic.args[2][0]).to.equal('TARGETPOSITION');
+    expect(cb.args[0][1]).to.equal(2);
+    expect(cb.args[1][1]).to.equal(80);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 70,
+      device: device.selector,
+      device_feature: features[1].selector,
+    });
+  });
+
+  it('should build shutter/curtain service without real position', async () => {
+    homekitHandler.gladys.device.getBySelector = stub().resolves({
+      features: [
+        {
+          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+          name: 'Shutter State',
+          selector: 'shutter-state',
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+          last_value: 0,
+        },
+      ],
+    });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub()
+      .onCall(0)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ'],
+        },
+      })
+      .onCall(1)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+          minValue: 0,
+          maxValue: 100,
+        },
+      });
+    const WindowCovering = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        PositionState: 'POSITIONSTATE',
+        TargetPosition: 'TARGETPOSITION',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        WindowCovering,
+      },
+    };
+    const device = {
+      name: 'Shutter',
+      selector: 'shutter',
+    };
+    const features = [
+      {
+        id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+        selector: 'shutter-state',
+        name: 'Shutter State',
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+        min: -1,
+        max: 1,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SHUTTER]);
+    await on.args[0][1](cb);
+    await on.args[1][1](70, cb);
+
+    expect(WindowCovering.args[0][0]).to.equal('Shutter');
+    expect(on.callCount).to.equal(2);
+    expect(getCharacteristic.args[0][0]).to.equal('POSITIONSTATE');
+    expect(getCharacteristic.args[1][0]).to.equal('TARGETPOSITION');
+    expect(cb.args[0][1]).to.equal(2);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      // we don't have a real position, it's normalized and rounded between -1 and 1
+      value: 0,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+  });
 });

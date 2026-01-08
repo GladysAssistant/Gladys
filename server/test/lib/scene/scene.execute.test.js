@@ -90,7 +90,7 @@ describe('scene.execute', () => {
         try {
           assert.notCalled(device.setValue);
           expect(scope).to.have.property('0');
-          expect(scope['0']).to.deep.equal({ '0': { category: 'light', type: 'binary', last_value: 15 } });
+          expect(scope['0']).to.deep.equal([{ category: 'light', type: 'binary', last_value: 15 }]);
           resolve();
         } catch (e) {
           reject(e);

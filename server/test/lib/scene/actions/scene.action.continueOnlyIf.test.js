@@ -4,13 +4,15 @@ const chaiAssert = require('chai').assert;
 
 const { ACTIONS } = require('../../../../utils/constants');
 const { AbortScene } = require('../../../../utils/coreErrors');
-const { executeActions } = require('../../../../lib/scene/scene.executeActions');
+const executeActionsFactory = require('../../../../lib/scene/scene.executeActions');
 
 const StateManager = require('../../../../lib/state');
+const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 describe('scene.continue-only-if', () => {
   let event;
   let stateManager;
+  const { executeActions } = executeActionsFactory(actionsFunc);
 
   beforeEach(() => {
     event = new EventEmitter();
@@ -53,7 +55,7 @@ describe('scene.continue-only-if', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
   });
-  it('should abort scene, condition value is not a number', async () => {
+  it('should abort scene, condition value is not a number for numeric operator', async () => {
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
@@ -78,7 +80,7 @@ describe('scene.continue-only-if', () => {
             conditions: [
               {
                 variable: '0.0.last_value',
-                operator: '=',
+                operator: '>',
                 value: 'wrong_string',
               },
             ],
@@ -193,6 +195,148 @@ describe('scene.continue-only-if', () => {
       ],
       scope,
     );
+  });
+  it('should finish scene, string condition is verified with = operator', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'text',
+      type: 'text',
+      last_value_string: 'SS',
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value_string',
+                operator: '=',
+                value: 'SS',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, string condition is not verified with = operator', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'text',
+      type: 'text',
+      last_value_string: 'S',
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value_string',
+                operator: '=',
+                value: 'SS',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+  });
+  it('should finish scene, string condition is verified with != operator', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'text',
+      type: 'text',
+      last_value_string: 'SS',
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value_string',
+                operator: '!=',
+                value: 'S',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, string condition is not verified with != operator', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'text',
+      type: 'text',
+      last_value_string: 'SS',
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value_string',
+                operator: '!=',
+                value: 'SS',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
   });
   it('should finish scene, condition is verified', async () => {
     const http = {

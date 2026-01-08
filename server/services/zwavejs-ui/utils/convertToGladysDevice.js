@@ -1,7 +1,9 @@
 const cleanNames = require('./cleanNames');
 
-const { EXPOSES, PARAMS, COMMANDCLASS } = require('../lib/constants');
+const { EXPOSES, PARAMS, COMMANDCLASS, PRODUCTID } = require('../lib/constants');
 const getProperty = require('./getProperty');
+const { refineCategory } = require('./refineCategory');
+const { getDeviceFeatureName } = require('./getDeviceFeatureName');
 
 const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, featureName) => {
   const propertyKeyNameClean = cleanNames(propertyKeyName);
@@ -15,13 +17,15 @@ const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, pr
  * For example: remove a Binary Switch sent by a device on a
  * Multilevel Switch (we do manage a virtual one on Gladys).
  * @param {Array} features - Detected features on the node.
+ * @param {object} zwaveJsDevice - The ZwaveJs device.
  * @returns {Array} The cleaned up features.
  * @example cleanupFeatures(features)
  */
-function cleanupFeatures(features) {
+function cleanupFeatures(features, zwaveJsDevice) {
   let localFeatures = features;
   // ------------------------------
   // Multilevel Switch special case
+  // ------------------------------
   // Some Multilevel Switch device have an explicit Binary Switch
   // exposed some others not (Qubino vs Fibaro for example). As for
   // devices that do not expose any Binary Switch value, we manage
@@ -32,6 +36,29 @@ function cleanupFeatures(features) {
   // others features - state & position - and keeps code simpler)
   if (localFeatures.some((f) => f.command_class === COMMANDCLASS.MULTILEVEL_SWITCH)) {
     localFeatures = localFeatures.filter((f) => f.command_class !== COMMANDCLASS.BINARY_SWITCH);
+  }
+
+  // ----------------------------------------------
+  // Fibaro Motion Sensor special case (FGMS-001)
+  // ----------------------------------------------
+  // Some Fibaro Motion Sensor have an explicit Binary Sensor General Purpose some others don't.
+  // We so need to deal with those having the General Purpose and not rely on the "Any" feature.
+  // On the other hand, those not exposing the General Purpose are correctly handled by the "Any" feature.
+  // The alarm sensor seems not usefull, so we remove it.
+  if (zwaveJsDevice.deviceId === PRODUCTID.FIBARO_FGMS001) {
+    // Remove the Alarm Sensor
+    localFeatures = localFeatures.filter((f) => f.command_class !== COMMANDCLASS.ALARM_SENSOR);
+
+    // Remove the Any Binary Sensor if the General Purpose is present
+    if (
+      localFeatures.some(
+        (f) => f.command_class === COMMANDCLASS.BINARY_SENSOR && cleanNames(f.property_name) === 'general_purpose',
+      )
+    ) {
+      localFeatures = localFeatures.filter(
+        (f) => !(f.command_class === COMMANDCLASS.BINARY_SENSOR && cleanNames(f.property_name) === 'any'),
+      );
+    }
   }
 
   // Add any other special cleanup necessary... Please, provide an explanation
@@ -75,6 +102,7 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
         if (!exposeFound.feature.category) {
           return;
         }
+
         const deviceFeatureId = getDeviceFeatureId(
           zwaveJsDevice.id,
           commandClassName,
@@ -84,9 +112,11 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
           exposeFound.name,
         );
 
+        refineCategory(exposeFound, value);
+
         features.push({
           ...exposeFound.feature,
-          name: `${value.id}${exposeFound.name !== '' ? `:${exposeFound.name}` : ''}`,
+          name: getDeviceFeatureName(exposeFound, value),
           external_id: deviceFeatureId,
           selector: deviceFeatureId,
           node_id: zwaveJsDevice.id,
@@ -110,7 +140,7 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
     selector: `zwavejs-ui:${zwaveJsDevice.id}`,
     service_id: serviceId,
     should_poll: false,
-    features: cleanupFeatures(features),
+    features: cleanupFeatures(features, zwaveJsDevice),
     params,
   };
 };

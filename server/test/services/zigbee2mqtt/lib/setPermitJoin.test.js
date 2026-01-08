@@ -40,15 +40,36 @@ describe('zigbee2mqtt setPermitJoin', () => {
     sinon.reset();
   });
 
-  it('set permit join ', async () => {
+  it('set permit join to true then false', async () => {
     // EXECUTE
     await zigbee2MqttManager.setPermitJoin();
     // ASSERT
-    assert.calledWith(mqttClient.publish, 'zigbee2mqtt/bridge/request/permit_join', 'true');
+    assert.calledWith(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({
+        time: 254,
+      }),
+    );
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
+    // EXECUTE
+    await zigbee2MqttManager.setPermitJoin();
+    // ASSERT
+    assert.calledWith(
+      mqttClient.publish,
+      'zigbee2mqtt/bridge/request/permit_join',
+      JSON.stringify({
+        time: 0,
+      }),
+    );
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
+      payload: false,
+    });
+    expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
   });
 });

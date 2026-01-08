@@ -1,3 +1,4 @@
+const os = require('os');
 const Sequelize = require('sequelize');
 const duckdb = require('duckdb');
 const Umzug = require('umzug');
@@ -36,6 +37,7 @@ const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
+const EnergyPriceModel = require('./energy_price');
 const HouseModel = require('./house');
 const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
@@ -61,6 +63,7 @@ const models = {
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
+  EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
   Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),
@@ -86,7 +89,20 @@ Object.values(models)
 
 // DuckDB
 const duckDbFilePath = `${config.storage.replace('.db', '')}.duckdb`;
-const duckDb = new duckdb.Database(duckDbFilePath);
+// Configure DuckDB with memory limit to prevent excessive memory usage
+// Default to 30% of system RAM, can be overridden via DUCKDB_MEMORY_LIMIT env var
+const totalMemoryBytes = os.totalmem();
+const defaultMemoryLimitBytes = Math.floor(totalMemoryBytes * 0.3);
+const defaultMemoryLimitMB = Math.floor(defaultMemoryLimitBytes / (1024 * 1024));
+const duckDbMemoryLimit = process.env.DUCKDB_MEMORY_LIMIT || `${defaultMemoryLimitMB}MB`;
+const duckDb = new duckdb.Database(duckDbFilePath, {
+  memory_limit: duckDbMemoryLimit,
+});
+logger.info(
+  `DuckDB initialized with memory_limit=${duckDbMemoryLimit} (system RAM: ${Math.floor(
+    totalMemoryBytes / (1024 * 1024),
+  )}MB)`,
+);
 const duckDbWriteConnection = duckDb.connect();
 const duckDbReadConnection = duckDb.connect();
 const duckDbWriteConnectionAllAsync = util.promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
@@ -113,6 +129,16 @@ const duckDbInsertState = async (deviceFeatureId, value, createdAt) => {
   );
 };
 
+const duckDbUpdateState = async (deviceFeatureId, value, createdAt) => {
+  const createdAtInString = formatDateInUTC(createdAt);
+  await duckDbWriteConnectionAllAsync(
+    'UPDATE t_device_feature_state SET value = ? WHERE device_feature_id = ? AND created_at = ?',
+    value,
+    deviceFeatureId,
+    createdAtInString,
+  );
+};
+
 const duckDbBatchInsertState = async (deviceFeatureId, states) => {
   const chunks = chunk(states, 10000);
   await Promise.each(chunks, async (oneStatesChunk, chunkIndex) => {
@@ -135,6 +161,14 @@ const duckDbBatchInsertState = async (deviceFeatureId, states) => {
 const duckDbShowVersion = async () => {
   const result = await duckDbReadConnectionAllAsync('SELECT version() AS version;');
   logger.info(`DuckDB version = ${result[0].version}`);
+  const memoryLimitResult = await duckDbReadConnectionAllAsync(
+    "SELECT current_setting('memory_limit') AS memory_limit;",
+  );
+  logger.info(`DuckDB memory_limit = ${memoryLimitResult[0].memory_limit}`);
+};
+
+const duckDbSetTimezone = async (timezone) => {
+  await duckDbWriteConnectionAllAsync('set timezone=?;', timezone);
 };
 
 const db = {
@@ -148,8 +182,10 @@ const db = {
   duckDbReadConnectionAllAsync,
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
+  duckDbUpdateState,
   duckDbBatchInsertState,
   duckDbShowVersion,
+  duckDbSetTimezone,
 };
 
 module.exports = db;

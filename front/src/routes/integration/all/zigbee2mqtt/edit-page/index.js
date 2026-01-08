@@ -3,12 +3,18 @@ import { connect } from 'unistore/preact';
 // import actions from '../actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage.js';
 import UpdateDevice from '../../../../../components/device';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants.js';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants.js';
 
 const ZIGBEE2MQTT_PAGE_PATH = '/dashboard/integration/device/zigbee2mqtt';
 
 class EditZigbee2mqttDevice extends Component {
   canEditCategory = (device, feature) => {
+    // Allow editing category for:
+    // - Binary switches (to switch between SWITCH and LIGHT)
+    // - Shutters (existing behavior)
+    if (feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+      return true;
+    }
     return feature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER;
   };
 

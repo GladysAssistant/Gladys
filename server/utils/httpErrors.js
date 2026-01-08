@@ -75,6 +75,9 @@ class Error500 extends HttpError {
     this.status = 500;
     this.code = 'SERVER_ERROR';
     this.error = error;
+    if (error instanceof Error) {
+      this.message = error.toString();
+    }
   }
 }
 

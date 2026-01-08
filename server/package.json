@@ -3,8 +3,8 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "22.x",
+    "npm": "10.x"
   },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
@@ -15,7 +15,7 @@
     "prettier": "prettier --write '**/*.js' '**/*.json'",
     "eslint-fix": "eslint . --fix",
     "eslint": "eslint .",
-    "start": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=development nodemon --signal SIGINT index.js",
     "start:prod": "cross-env NODE_ENV=production node index.js",
     "db-reset:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate:undo:all",
     "db-migrate:dev": "cross-env NODE_ENV=development node_modules/.bin/sequelize db:migrate",
@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@matter/main": "^0.13.0",
     "apidoc": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
@@ -70,10 +71,11 @@
     "proxyquire": "^2.1.0",
     "shx": "^0.3.2",
     "sinon": "^8.1.1",
-    "supertest": "^3.4.2"
+    "supertest": "^3.4.2",
+    "undici": "^7.5.0"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "4.15.0",
+    "@gladysassistant/gladys-gateway-js": "^4.19.1",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "@nlpjs/similarity": "^4.26.1",
@@ -86,7 +88,7 @@
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.6",
     "dockerode": "^3.3.4",
-    "duckdb": "^1.1.1",
+    "duckdb": "^1.4.3",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "form-data": "^2.3.3",
@@ -98,6 +100,7 @@
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.intersection": "^4.4.0",
+    "lru-cache": "^11.2.2",
     "mathjs": "^11.8.0",
     "node-nlp": "^4.26.1",
     "node-schedule": "^2.1.0",

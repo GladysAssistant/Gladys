@@ -71,15 +71,19 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     // Start typing on USB port and abort
     cy.get('[data-cy=z2m-setup-local-usb-field]')
       .children()
-      .type('invalid value{esc}');
+      .as('usbField');
+    cy.get('@usbField').click();
+    cy.get('@usbField').type('invalid value{esc}');
+
     // Save button is still disabled
     cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
 
     // Start typing on USB port and confirm
     cy.get('[data-cy=z2m-setup-local-usb-field]')
       .children()
-      .click()
-      .type('{downArrow}{enter}');
+      .as('usbField');
+    cy.get('@usbField').click();
+    cy.get('@usbField').type('{downArrow}{enter}');
 
     // Save button is still enabled
     cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
@@ -87,8 +91,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     // Select a dongle name
     cy.get('[data-cy=z2m-setup-local-dongle-field]')
       .children()
-      .click()
-      .type('{downArrow}{enter}');
+      .as('dongleField');
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type('{downArrow}{enter}');
   });
 
   it('Check confirm configuration', () => {
@@ -107,8 +112,10 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     // Re-fill form
     cy.get('[data-cy=z2m-setup-local-usb-field]')
       .children()
-      .click()
-      .type('{downArrow}{enter}');
+      .as('portInput');
+
+    cy.get('@portInput').click();
+    cy.get('@portInput').type('{downArrow}{enter}');
 
     // Enter TCP port
     cy.get('[data-cy=z2m-setup-local-tcp-field]').type('12345');
@@ -146,8 +153,10 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     // Select a dongle name
     cy.get('[data-cy=z2m-setup-local-dongle-field]')
       .children()
-      .click()
-      .type('{downArrow}{enter}');
+      .as('dongleField');
+
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type('{downArrow}{enter}');
 
     // Enter TCP port
     cy.get('[data-cy=z2m-setup-local-tcp-field]').clear();

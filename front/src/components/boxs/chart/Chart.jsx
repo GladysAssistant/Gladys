@@ -1,16 +1,19 @@
-import { Component } from 'preact';
+import { Component, createRef } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
 
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
+import { checkAndConvertUnit } from '../../../../../server/utils/units';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
+import { formatHttpError } from '../../../utils/formatErrors';
 
 const ONE_HOUR_IN_MINUTES = 60;
+const TWELVE_HOURS_IN_MINUTES = 12 * 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
@@ -19,6 +22,7 @@ const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
+  'last-twelve-hours': TWELVE_HOURS_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
@@ -26,13 +30,40 @@ const intervalByName = {
   'last-year': ONE_YEAR_IN_MINUTES
 };
 
-const UNITS_WHEN_DOWN_IS_POSITIVE = [DEVICE_FEATURE_UNITS.WATT_HOUR];
+const UNITS_WHEN_DOWN_IS_POSITIVE = [
+  DEVICE_FEATURE_UNITS.WATT_HOUR,
+  DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  DEVICE_FEATURE_UNITS.WATT,
+  DEVICE_FEATURE_UNITS.KILOWATT,
+  DEVICE_FEATURE_UNITS.AQI,
+  DEVICE_FEATURE_UNITS.PPM,
+  DEVICE_FEATURE_UNITS.PPB,
+  DEVICE_FEATURE_UNITS.DECIBEL,
+  DEVICE_FEATURE_UNITS.UV_INDEX
+];
 
 const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
 };
 
 const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
+
+const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
+  if (aggregateFunction === 'min') {
+    return value.min_value;
+  } else if (aggregateFunction === 'max') {
+    return value.max_value;
+  } else if (aggregateFunction === 'sum') {
+    return value.sum_value;
+  } else if (aggregateFunction === 'count') {
+    return value.count_value;
+  } else if (aggregateFunction === 'avg') {
+    return value.value;
+  }
+  // The default is the "avg", as before this feature
+  // we were not defining an aggregate function
+  return value.value;
+};
 
 const roundWith2DecimalIfNeeded = value => {
   if (!notNullNotUndefined(value)) {
@@ -64,6 +95,14 @@ const calculateVariation = (firstValue, lastValue) => {
 const allEqual = arr => arr.every(val => val === arr[0]);
 
 class Chartbox extends Component {
+  dropdownRef = createRef();
+
+  handleClickOutside = event => {
+    if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
+      this.setState({ dropdown: false });
+    }
+  };
+
   toggleDropdown = () => {
     this.setState({
       dropdown: !this.state.dropdown
@@ -73,6 +112,14 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_HOUR_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchToLastTwelveHourView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: TWELVE_HOURS_IN_MINUTES,
       dropdown: false
     });
     this.getData();
@@ -114,6 +161,15 @@ class Chartbox extends Component {
     });
     this.getData();
   };
+  handleWebsocketConnected = ({ connected }) => {
+    // When the websocket is disconnected, we refresh the data when the websocket is reconnected
+    if (!connected) {
+      this.wasDisconnected = true;
+    } else if (this.wasDisconnected) {
+      this.getData();
+      this.wasDisconnected = false;
+    }
+  };
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     let deviceFeatureNames = this.props.box.device_feature_names;
@@ -135,12 +191,14 @@ class Chartbox extends Component {
       });
       return;
     }
-    await this.setState({ loading: true });
+    await this.setState({ loading: true, error: null, errorDetail: null });
     try {
       const maxStates = 300;
+
       const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
         interval: this.state.interval,
-        max_states: maxStates,
+        max_states: this.props.box.group_by ? undefined : maxStates,
+        group_by: this.props.box.group_by,
         device_features: deviceFeatures.join(',')
       });
 
@@ -191,7 +249,11 @@ class Chartbox extends Component {
       } else {
         series = data.map((oneFeature, index) => {
           const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          // Convert unit display format if necessary (using 0 as a dummy value since we only need the unit)
+          const userUnitPreference = this.props.user.distance_unit_preference;
+          const { unit: displayUnit } = checkAndConvertUnit(0, oneUnit, userUnitPreference);
+
+          const oneUnitTranslated = displayUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[displayUnit] : null;
           const { values, deviceFeature, device } = oneFeature;
           const deviceFeatureName = deviceFeatureNames
             ? deviceFeatureNames[index]
@@ -199,9 +261,14 @@ class Chartbox extends Component {
           const name = oneUnitTranslated ? `${deviceFeatureName} (${oneUnitTranslated})` : deviceFeatureName;
           return {
             name,
-            data: values.map(value => {
+            data: values.map(dataPoint => {
               emptySeries = false;
-              return [Math.round(new Date(value.created_at).getTime() / 1000) * 1000, value.value];
+              const rawValue = getDeviceValueByAggregateFunction(dataPoint, this.props.box.aggregate_function);
+
+              // Convert the value if it is a convertible unit
+              const { value: displayValue } = checkAndConvertUnit(rawValue, oneUnit, userUnitPreference);
+
+              return [Math.round(new Date(dataPoint.created_at).getTime() / 1000) * 1000, displayValue];
             })
           };
         });
@@ -218,6 +285,11 @@ class Chartbox extends Component {
         // Before now, there was a "unit" attribute in this box instead of "units",
         // so we need to support "unit" as some users may already have the box with that param
         const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
+
+        // Convert distance units if necessary
+        const userUnitPreference = this.props.user.distance_unit_preference;
+        let displayUnit = unit;
+
         // We check if all deviceFeatures selected are in the same unit
         const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
 
@@ -231,34 +303,71 @@ class Chartbox extends Component {
             if (values.length === 0) {
               return;
             }
-            const firstElement = values[0];
-            const lastElement = values[values.length - 1];
-            const variation = calculateVariation(firstElement.value, lastElement.value);
-            const lastValue = lastElement.value;
+            let firstElement = values[0];
+            let lastElement = values[values.length - 1];
+            // Convert the value if it is a convertible unit
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
+
+            const variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
+            const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
             variationArray.push(variation);
             lastValuesArray.push(lastValue);
           });
           newState.variation = average(variationArray);
-          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
+          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(displayUnit);
           newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
-          newState.unit = unit;
+          newState.unit = displayUnit;
         } else {
           // If not, we only display the first value
           const oneFeature = data[0];
           const { values } = oneFeature;
           if (values.length > 0) {
-            const firstElement = values[0];
-            const lastElement = values[values.length - 1];
-            newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            let firstElement = values[0];
+            let lastElement = values[values.length - 1];
+
+            // Convert the value if it is a convertible unit
+            const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
+              firstElement.value,
+              unit,
+              userUnitPreference
+            );
+            const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
+            firstElement.value = firstElementValue;
+            lastElement.value = lastElementValue;
+            displayUnit = firstElementUnit;
+
+            newState.variation = calculateVariation(
+              getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
             newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
-            newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
-            newState.unit = unit;
+            newState.lastValueRounded = roundWith2DecimalIfNeeded(
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
+            );
+            newState.unit = displayUnit;
           }
         }
       }
       await this.setState(newState);
     } catch (e) {
       console.error(e);
+      const { errorString, errorDetailString } = formatHttpError(e);
+      this.setState({
+        loading: false,
+        error: errorString,
+        errorDetail: errorDetailString
+      });
     }
   };
   updateDeviceStateWebsocket = payload => {
@@ -292,6 +401,8 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
@@ -311,6 +422,8 @@ class Chartbox extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+    this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
   render(
     props,
@@ -325,7 +438,9 @@ class Chartbox extends Component {
       interval,
       emptySeries,
       unit,
-      nbFeaturesDisplayed
+      nbFeaturesDisplayed,
+      error,
+      errorDetail
     }
   ) {
     const { box } = this.props;
@@ -341,9 +456,10 @@ class Chartbox extends Component {
             <div class={cx(style.subheader)}>{box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               {props.box.chart_type && (
-                <div class="dropdown">
+                <div class="dropdown" ref={this.dropdownRef}>
                   <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                     {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                    {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
                     {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                     {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
                     {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
@@ -362,6 +478,14 @@ class Chartbox extends Component {
                       onClick={this.switchToLastHourView}
                     >
                       <Text id="dashboard.boxes.chart.lastHour" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastTwelveHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
                     </a>
                     <a
                       class={cx(style.dropdownItemChart, {
@@ -423,8 +547,7 @@ class Chartbox extends Component {
                 <div class="d-flex align-items-baseline">
                   {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                     <div class="h1 mb-0 mr-2">
-                      {lastValueRounded}
-                      {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
+                      {lastValueRounded} {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
                     </div>
                   )}
                   <div
@@ -538,6 +661,15 @@ class Chartbox extends Component {
                 <div class={style.smallTextEmptyState}>
                   <Text id="dashboard.boxes.chart.noChartTypeWarning" />
                 </div>
+              </div>
+            )}
+            {error && (
+              <div class={cx('text-center', style.bigEmptyState)}>
+                <div>
+                  <i class="fe fe-alert-circle mr-2" />
+                  {error}
+                </div>
+                {errorDetail && <div>{errorDetail}</div>}
               </div>
             )}
             {props.box.chart_type && (

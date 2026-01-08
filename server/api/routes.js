@@ -19,6 +19,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const EnergyPriceController = require('./controllers/energy-price.controller');
 
 /**
  * @description Return object of routes.
@@ -49,6 +50,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const energyPriceController = EnergyPriceController(gladys);
 
   const routes = {};
 
@@ -231,9 +233,17 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.setValueFeature,
     },
+    'patch /api/v1/device_feature/:device_feature_selector': {
+      authenticated: true,
+      controller: deviceController.updateDeviceFeature,
+    },
     'get /api/v1/device_feature/aggregated_states': {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,
+    },
+    'get /api/v1/device_feature/energy_consumption': {
+      authenticated: true,
+      controller: deviceController.getConsumptionByDates,
     },
     // house
     'post /api/v1/house': {
@@ -358,6 +368,11 @@ function getRoutes(gladys) {
     'post /api/v1/gateway/openai/ask': {
       authenticated: true,
       controller: gatewayController.openAIAsk,
+    },
+    'post /api/v1/gateway/refresh-latest-gladys-version': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.refreshLatestGladysVersion,
     },
     // room
     'get /api/v1/room': {
@@ -548,14 +563,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: systemController.shutdown,
     },
-    'post /api/v1/system/upgrade/download': {
+    'post /api/v1/system/upgrade': {
       authenticated: true,
       admin: true,
-      controller: systemController.downloadUpgrade,
-    },
-    'get /api/v1/system/upgrade/download/status': {
-      authenticated: true,
-      controller: systemController.getUpgradeDownloadStatus,
+      controller: systemController.installUpgrade,
     },
     'post /api/v1/system/vacuum': {
       authenticated: true,
@@ -576,6 +587,27 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    // energy price
+    'get /api/v1/energy_price': {
+      authenticated: true,
+      controller: energyPriceController.get,
+    },
+    'post /api/v1/energy_price': {
+      authenticated: true,
+      controller: energyPriceController.create,
+    },
+    'patch /api/v1/energy_price/:selector': {
+      authenticated: true,
+      controller: energyPriceController.update,
+    },
+    'delete /api/v1/energy_price/:selector': {
+      authenticated: true,
+      controller: energyPriceController.destroy,
+    },
+    'get /api/v1/energy_price/default_electric_meter_feature_id': {
+      authenticated: true,
+      controller: energyPriceController.getDefaultElectricMeterFeatureId,
     },
   };
 
