@@ -86,6 +86,7 @@ describe('NodeRed installContainer', () => {
         Dns: [],
         DnsOptions: [],
         DnsSearch: [],
+        GroupAdd: ['dialout'],
         LogConfig: { Config: { 'max-size': '10m' }, Type: 'json-file' },
         PortBindings: { '1880/tcp': [{ HostPort: '1881' }] },
         RestartPolicy: { Name: 'always' },
