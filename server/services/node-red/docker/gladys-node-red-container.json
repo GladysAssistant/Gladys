@@ -6,6 +6,7 @@
   },
   "HostConfig": {
     "Privileged": true,
+    "GroupAdd": ["dialout"],
     "Binds": ["/var/lib/gladysassistant/node-red:/data"],
     "LogConfig": {
       "Type": "json-file",
