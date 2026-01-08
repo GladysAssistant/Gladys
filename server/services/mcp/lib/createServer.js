@@ -1,3 +1,5 @@
+const { EVENTS } = require('../../../utils/constants');
+
 /**
  * @description Create MCP server.
  * @returns {Promise} MCP server to expose.
@@ -5,8 +7,13 @@
  * createServer()
  */
 async function createServer() {
+  if (!this.server) {
+    this.gladys.event.on(EVENTS.DEVICE.CREATE, this.reloadCb);
+    this.gladys.event.on(EVENTS.DEVICE.UPDATE, this.reloadCb);
+  }
+
   if (this.server) {
-    this.server.close();
+    await this.server.close();
   }
 
   this.server = new this.mcp.McpServer(

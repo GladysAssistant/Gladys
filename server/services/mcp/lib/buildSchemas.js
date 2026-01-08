@@ -1,4 +1,4 @@
-const { z } = require('zod');
+const z = require('zod/v4');
 
 const noRoom = {
   id: null,
