@@ -82,7 +82,7 @@
   "env": {
     "browser": true
   },
-  "plugins": ["json", "cypress", "promise", "react", "@babel/plugin-proposal-class-properties"],
+  "plugins": ["json", "cypress", "promise", "react"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true

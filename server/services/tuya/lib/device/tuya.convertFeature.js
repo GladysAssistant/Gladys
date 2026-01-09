@@ -74,7 +74,7 @@ function convertFeature(tuyaFunctions, externalId) {
   //   logger.error(`Tuya function unable to add param for "${externalId}:${code}"`, err);
   // });
   if (Object.keys(params).length > 0) {
-    feature.params = { name: name, value: params };
+    feature.params = { name, value: params };
   }
   return feature;
 }

@@ -53,7 +53,7 @@ class ThermostatBox extends Component {
 
       const device = devices[0];
       let graphValues = this.state.graphValues || {};
-      this.props.box.device_features.forEach((feature, index) => {
+      this.props.box.device_features.forEach((feature) => {
         graphValues = this.setValueForFeature(
           graphValues,
           feature,
@@ -291,8 +291,8 @@ class ThermostatBox extends Component {
     return { currentRect, graphRadius };
   };
 
-  handleMouseMove = e => {
-    /* if (!this.draggingType) return;
+  handleMouseMove = (e) => {
+    if (!this.draggingType) return;
     const graphValues = this.state.graphValues;
     const { chartMin, chartMax } = this.getGraphMinMax();
     if ( this.lastX < e.clientX ) {
@@ -317,7 +317,7 @@ class ThermostatBox extends Component {
     this.lastX = e.clientX;
 
     // Here you would trigger the Gladys API call to save the new setpoint
-    this.setState({ graphValues: { ...this.state.graphValues } });*/
+    //this.setState({ graphValues: { ...this.state.graphValues } });
   };
 
   handleMouseUp = () => {
@@ -371,7 +371,7 @@ class ThermostatBox extends Component {
     const { chartMin, chartMax } = this.getGraphMinMax();
     for (let tick = Math.ceil(chartMin); tick <= Math.floor(chartMax); tick += 1) {
       const angle = this.getTickRotation(tick, chartMin, chartMax);
-      ticks.push(<div key={tick} style={this.getChartTickStyle(angle, tick % 5 === 0)}></div>);
+      ticks.push(<div key={tick} style={this.getChartTickStyle(angle, tick % 5 === 0)}>&nbsp;</div>);
     }
     for (let tick = 5; tick <= Math.floor(chartMax); tick += 5) {
       const angle = this.getTickRotation(tick, chartMin, chartMax);

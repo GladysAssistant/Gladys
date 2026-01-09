@@ -6,7 +6,6 @@ import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import BaseEditBox from '../baseEditBox';
-import { th } from 'date-fns/locale';
 
 class EditThermostatBox extends Component {
   state = {
