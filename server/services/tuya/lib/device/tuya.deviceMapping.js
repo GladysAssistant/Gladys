@@ -19,6 +19,11 @@ const CUR_CURRENT = 'cur_current';
 const CUR_POWER = 'cur_power';
 const CUR_VOLTAGE = 'cur_voltage';
 
+const BOOLEAN = 'Boolean';
+const ENUM = 'Enum';
+const INTEGER = 'Integer';
+const STRING = 'String';
+
 const SWITCH_1 = 'switch_1';
 const SWITCH_2 = 'switch_2';
 const SWITCH_3 = 'switch_3';
@@ -52,7 +57,22 @@ const mappings = {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,
     type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
   },
-
+  [BOOLEAN]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  [ENUM]: {
+    category: DEVICE_FEATURE_CATEGORIES.NUMBER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.ENUM,
+  },
+  [INTEGER]: {
+    category: DEVICE_FEATURE_CATEGORIES.NUMBER,
+    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+  },
+  [STRING]: {
+    category: DEVICE_FEATURE_CATEGORIES.TEXT,
+    type: DEVICE_FEATURE_TYPES.SENSOR.TEXT,
+  },
   [SWITCH_1]: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
@@ -100,6 +120,29 @@ const mappings = {
 };
 
 const writeValues = {
+    [DEVICE_FEATURE_CATEGORIES.NUMBER]: {
+      [DEVICE_FEATURE_TYPES.SENSOR.ENUM]: (valueFromDevice, param) => {
+        const values = param.value.split('|').map((v) => v.trim().replace(/'/g, ''));
+        const theValue = values.indexOf(valueFromDevice);
+        return theValue;
+       },
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice, param) => {
+      let value = parseInt(valueFromDevice, 10);
+      const values = JSON.parse(param.value);
+      let scale = 'scale' in values ? values.scale : 0;
+      while (scale > 0) {
+        value *= 10;
+        scale -= 1;
+      }
+      return `${value}`;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.TEXT]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
+
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromGladys) => {
       return valueFromGladys === 1;
@@ -144,6 +187,29 @@ const writeValues = {
 };
 
 const readValues = {
+  [DEVICE_FEATURE_CATEGORIES.NUMBER]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.ENUM]: (valueFromDevice, param) => {
+      const values = param.value.split('|').map((v) => v.trim().replace(/'/g, ''));
+      const index = values.indexOf(valueFromDevice);
+      return index;
+    },
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice, param) => {
+      let value = parseInt(valueFromDevice, 10);
+      const values = JSON.parse(param.value);
+      let scale = 'scale' in values ? values.scale : 0;
+      while (scale > 0) {
+        value /= 10.0;
+        scale -= 1;
+      }
+      // const unit = 'unit' in values ? values.unit : '';
+      return `${value}`;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.TEXT]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromDevice) => {
       return valueFromDevice === true ? 1 : 0;

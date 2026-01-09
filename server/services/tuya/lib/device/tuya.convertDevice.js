@@ -1,7 +1,6 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { convertFeature } = require('./tuya.convertFeature');
 const logger = require('../../../../utils/logger');
-
 /**
  * @description Transform Tuya device to Gladys device.
  * @param {object} tuyaDevice - Tuya device.
@@ -26,11 +25,9 @@ function convertDevice(tuyaDevice) {
     groups[code] = { ...func, readOnly: false };
   });
 
-  const features = Object.values(groups).map((group) => convertFeature(group, externalId));
-
   const device = {
     name,
-    features: features.filter((feature) => feature),
+    features: null,
     external_id: externalId,
     selector: externalId,
     model,
@@ -38,6 +35,15 @@ function convertDevice(tuyaDevice) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
   };
+  const features = Object.values(groups).map((group) => convertFeature(group, externalId));
+  
+  device.features = features.filter((feature) => feature);
+  device.params = device.features
+    .filter((feature) => feature.params)
+    .map((feature) => ({
+      external_id: feature.external_id,
+      ...feature.params,
+    }));
   return device;
 }
 

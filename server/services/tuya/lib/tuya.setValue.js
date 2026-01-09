@@ -14,7 +14,10 @@ const { writeValues } = require('./device/tuya.deviceMapping');
 async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
   const [prefix, topic, command] = deviceFeature.external_id.split(':');
-
+  const params = {};
+  device.params.forEach((param) => {
+    params[param.name] = param;
+  });
   if (prefix !== 'tuya') {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" should starts with "tuya:"`);
   }
@@ -22,7 +25,7 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
 
-  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value);
+  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value, params[deviceFeature.name] );
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
   const response = await this.connector.request({

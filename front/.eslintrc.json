@@ -82,12 +82,13 @@
   "env": {
     "browser": true
   },
-  "plugins": ["json", "cypress", "promise", "react"],
+  "plugins": ["json", "cypress", "promise", "react", "@babel/plugin-proposal-class-properties"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     }
   },
+  "parser": "@babel/eslint-parser",
   "settings": {
     "targets": null
   },
