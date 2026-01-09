@@ -120,12 +120,12 @@ const mappings = {
 };
 
 const writeValues = {
-    [DEVICE_FEATURE_CATEGORIES.NUMBER]: {
-      [DEVICE_FEATURE_TYPES.SENSOR.ENUM]: (valueFromDevice, param) => {
-        const values = param.value.split('|').map((v) => v.trim().replace(/'/g, ''));
-        const theValue = values.indexOf(valueFromDevice);
-        return theValue;
-       },
+  [DEVICE_FEATURE_CATEGORIES.NUMBER]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.ENUM]: (valueFromDevice, param) => {
+      const values = param.value.split('|').map((v) => v.trim().replace(/'/g, ''));
+      const theValue = values.indexOf(valueFromDevice);
+      return theValue;
+    },
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice, param) => {
       let value = parseInt(valueFromDevice, 10);
       const values = JSON.parse(param.value);

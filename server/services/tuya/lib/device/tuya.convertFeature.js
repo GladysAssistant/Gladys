@@ -12,7 +12,7 @@ function convertFeature(tuyaFunctions, externalId) {
   const { code, values, name, readOnly, type } = tuyaFunctions;
 
   const featuresCategoryAndType = mappings[type];
-  
+
   if (!featuresCategoryAndType) {
     logger.warn(`Tuya function with "${type}" code is not managed`);
     return undefined;
@@ -28,7 +28,6 @@ function convertFeature(tuyaFunctions, externalId) {
     max: 1,
     ...featuresCategoryAndType,
   };
-  
 
   let valuesObject = {};
   try {
@@ -37,9 +36,9 @@ function convertFeature(tuyaFunctions, externalId) {
     logger.error(
       `Tuya function as unmappable "${values}" values on "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type with "${code}" code`,
     );
-  } 
+  }
   let params = '';
-  
+
   switch (type) {
     case 'Boolean':
       break;
@@ -59,7 +58,7 @@ function convertFeature(tuyaFunctions, externalId) {
     case 'Enum': {
       if ('range' in valuesObject) {
         const enumValues = valuesObject.range;
-        params = enumValues.map(val => `'${val}'`).join(' | ');
+        params = enumValues.map((val) => `'${val}'`).join(' | ');
       }
       feature.min = 0;
       feature.max = valuesObject.range.length - 1;
@@ -71,11 +70,11 @@ function convertFeature(tuyaFunctions, externalId) {
       logger.warn(`Tuya function with "${type}" type is not managed`);
       return undefined;
   }
-    // DeviceManager.addParam(`${externalId}:${code}`, params).catch((err) => {
-    //   logger.error(`Tuya function unable to add param for "${externalId}:${code}"`, err);
-    // });
+  // DeviceManager.addParam(`${externalId}:${code}`, params).catch((err) => {
+  //   logger.error(`Tuya function unable to add param for "${externalId}:${code}"`, err);
+  // });
   if (Object.keys(params).length > 0) {
-    feature.params = { 'name': name, 'value': params};
+    feature.params = { name: name, value: params };
   }
   return feature;
 }

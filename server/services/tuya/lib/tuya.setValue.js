@@ -25,7 +25,7 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
 
-  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value, params[deviceFeature.name] );
+  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value, params[deviceFeature.name]);
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
   const response = await this.connector.request({

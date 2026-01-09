@@ -14,20 +14,17 @@ class ThermostatBox extends Component {
     annotations: []
   };
 
-
-  getIndexForFeature = ( featureSelector ) => {
-    const deviceFeatureIndex = this.props.box.device_features.findIndex(
-      df => df === featureSelector
-    );
+  getIndexForFeature = featureSelector => {
+    const deviceFeatureIndex = this.props.box.device_features.findIndex(df => df === featureSelector);
     return deviceFeatureIndex;
-  }
-   
-  setValueForFeature = ( graphValues, featureSelector, value ) => {
+  };
+
+  setValueForFeature = (graphValues, featureSelector, value) => {
     const deviceFeatureIndex = this.getIndexForFeature(featureSelector);
     if (deviceFeatureIndex === -1) {
       return graphValues;
     }
-    
+
     const updatedGraphValues = {
       ...graphValues,
       [this.props.box.device_feature_names[deviceFeatureIndex]]: value
@@ -56,7 +53,7 @@ class ThermostatBox extends Component {
 
       const device = devices[0];
       let graphValues = this.state.graphValues || {};
-      this.props.box.device_features.forEach ((feature, index) => {
+      this.props.box.device_features.forEach((feature, index) => {
         graphValues = this.setValueForFeature(
           graphValues,
           feature,
@@ -89,11 +86,11 @@ class ThermostatBox extends Component {
   getGraphMinMax = () => {
     const maxSetpoint = this.state.graphValues['max_temp_setpoint'] || 50;
     const minSetpoint = this.state.graphValues['min_temp_setpoint'] || 0;
-    const band = (Math.abs(maxSetpoint - minSetpoint))/5
-    const chartMin = minSetpoint - band
-    const chartMax = maxSetpoint + band
-    return {chartMin, chartMax};
-  }
+    const band = Math.abs(maxSetpoint - minSetpoint) / 5;
+    const chartMin = minSetpoint - band;
+    const chartMax = maxSetpoint + band;
+    return { chartMin, chartMax };
+  };
 
   updateChartValue = deviceFeature => {
     if (!deviceFeature || !this.chart) return;
@@ -185,9 +182,7 @@ class ThermostatBox extends Component {
     if (prevProps.box.device_features !== this.props.box.device_features) {
       this.getDevice();
     }
-    if (
-      prevState.graphValues['actual_temp_sensor'] !== this.state.graphValues['actual_temp_sensor']
-    ) {
+    if (prevState.graphValues['actual_temp_sensor'] !== this.state.graphValues['actual_temp_sensor']) {
       // Only initialize the chart if it doesn't exist yet
       if (!this.chart) {
         this.initChart();
@@ -200,15 +195,15 @@ class ThermostatBox extends Component {
   createTicks(value, text, color, min, max) {
     // Map the temperature to the 0-100% range of the radial bar
     const percent = ((value - min) * 100) / (max - min);
-    
+
     return {
       // In RadialBars, x is the label name
-      x: text || 'Temperature', 
+      x: text || 'Temperature',
       y: percent, // Percentage of the bar filled
       marker: {
         size: 8,
         fillColor: color,
-        strokeColor: '#fff',
+        strokeColor: '#fff'
       },
       label: {
         text: `${text}: ${value}°`,
@@ -216,7 +211,7 @@ class ThermostatBox extends Component {
       }
     };
   }
-  
+
   initChart() {
     // Defer execution to let Preact attach the element to the DOM
     setTimeout(() => {
@@ -245,10 +240,11 @@ class ThermostatBox extends Component {
               name: { show: true, offsetY: 100 },
               value: {
                 offsetY: 60,
-                formatter: () => this.formatValueWithUnit(
-                  this.state.graphValues['actual_temp_sensor'], 
-                  "°C" // TODO: update with actual centigrade or farenhiet
-                )
+                formatter: () =>
+                  this.formatValueWithUnit(
+                    this.state.graphValues['actual_temp_sensor'],
+                    '°C' // TODO: update with actual centigrade or farenhiet
+                  )
               }
             }
           }
@@ -266,7 +262,7 @@ class ThermostatBox extends Component {
         stroke: {
           dashArray: 4
         },
-      
+
         labels: [boxName || 'Temperature']
       };
 
@@ -291,12 +287,12 @@ class ThermostatBox extends Component {
 
   getBoundingClientRect = () => {
     const currentRect = this.chartElement ? this.chartElement.getBoundingClientRect() : null;
-    const graphRadius = currentRect ? currentRect.width*0.65 / 2 : 0;
-    return { currentRect, graphRadius };  
+    const graphRadius = currentRect ? (currentRect.width * 0.65) / 2 : 0;
+    return { currentRect, graphRadius };
   };
 
-  handleMouseMove = (e) => {
-   /* if (!this.draggingType) return;
+  handleMouseMove = e => {
+    /* if (!this.draggingType) return;
     const graphValues = this.state.graphValues;
     const { chartMin, chartMax } = this.getGraphMinMax();
     if ( this.lastX < e.clientX ) {
@@ -322,7 +318,7 @@ class ThermostatBox extends Component {
 
     // Here you would trigger the Gladys API call to save the new setpoint
     this.setState({ graphValues: { ...this.state.graphValues } });*/
-  }
+  };
 
   handleMouseUp = () => {
     this.draggingType = null;
@@ -330,136 +326,133 @@ class ThermostatBox extends Component {
     window.removeEventListener('mouseup', this.handleMouseUp);
     // Here you would trigger the Gladys API call to save the new setpoint
   };
-  getTickRotation = (temp, chartMin, chartMax) =>{
+  getTickRotation = (temp, chartMin, chartMax) => {
     const minTemp = chartMin;
     const maxTemp = chartMax;
     // 1. Calculate how far along the scale the temp is (0 to 1)
     const percent = (temp - minTemp) / (maxTemp - minTemp);
     // 2. Map that to your -135 to +135 range
-    const angle = (percent * 270) - 135;
+    const angle = percent * 270 - 135;
     // 3. The rotation for normality
     // If your tick is a vertical line, 'angle' is the rotation.
     return angle;
-}
+  };
   /* The base style for a single tick */
-  getChartTickStyle = (angle,major) => {
-    const {graphRadius} = this.getBoundingClientRect();
-    const radius = graphRadius*0.9;
+  getChartTickStyle = (angle, major) => {
+    const { graphRadius } = this.getBoundingClientRect();
+    const radius = graphRadius * 0.9;
     const height = major ? '15px' : '10px';
     const width = major ? '3px' : '2px';
     const backgroundColor = major ? '#99a3a4' : '#ccd1d1';
-    return ({
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: width,          /* Thickness of the tick */
-        height: height,        /* Length of the tick */
-        backgroundColor: backgroundColor,
-        transform: `rotate(${angle}deg) translateY(${-radius}px)`,
-    });
+    return {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      width: width /* Thickness of the tick */,
+      height: height /* Length of the tick */,
+      backgroundColor: backgroundColor,
+      transform: `rotate(${angle}deg) translateY(${-radius}px)`
+    };
   };
-  getChartLabelStyle = (angle) => {
-    const {graphRadius} = this.getBoundingClientRect();
-    const radius = graphRadius*0.68;
-    const displacement = angle < 0 ? radius+10 : radius;
-    return ({
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        textAlign: 'center',
-        transform: `rotate(${angle}deg) translateY(${-displacement}px) rotate(${-angle}deg)`,
-    });
+  getChartLabelStyle = angle => {
+    const { graphRadius } = this.getBoundingClientRect();
+    const radius = graphRadius * 0.68;
+    const displacement = angle < 0 ? radius + 10 : radius;
+    return {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      textAlign: 'center',
+      transform: `rotate(${angle}deg) translateY(${-displacement}px) rotate(${-angle}deg)`
+    };
   };
   renderTicks = () => {
-      const ticks = [];
-      const { chartMin, chartMax } = this.getGraphMinMax();
-      for ( let tick = Math.ceil(chartMin); tick <= Math.floor(chartMax); tick += 1 ) {
-        const angle = this.getTickRotation(tick, chartMin,  chartMax);
-        ticks.push(
-          <div 
-            key={tick}
-            style={this.getChartTickStyle(angle, tick % 5 === 0)}
-          ></div>
-        );
-      }
-    for ( let tick = 5; tick <= Math.floor(chartMax); tick += 5 ) {
-        const angle = this.getTickRotation(tick, chartMin, chartMax);
-        ticks.push(
-          <div 
-            key={tick}
-            style={this.getChartLabelStyle(angle)}
-          >{tick}</div>
-        );
-      }
-      
-      return ticks;
-  }
-////
+    const ticks = [];
+    const { chartMin, chartMax } = this.getGraphMinMax();
+    for (let tick = Math.ceil(chartMin); tick <= Math.floor(chartMax); tick += 1) {
+      const angle = this.getTickRotation(tick, chartMin, chartMax);
+      ticks.push(<div key={tick} style={this.getChartTickStyle(angle, tick % 5 === 0)}></div>);
+    }
+    for (let tick = 5; tick <= Math.floor(chartMax); tick += 5) {
+      const angle = this.getTickRotation(tick, chartMin, chartMax);
+      ticks.push(
+        <div key={tick} style={this.getChartLabelStyle(angle)}>
+          {tick}
+        </div>
+      );
+    }
+
+    return ticks;
+  };
+  ////
   render(props, { graphValues, annotations, error, noDeviceFeatureSelector, noDeviceFeatureLastValue }) {
-      // Helper to calculate CSS for placing handles on the circle
-      const getHandleStyle = (value, color) => {
-        // Map value to angle (-135 to 135)
-        const { chartMin, chartMax } = this.getGraphMinMax();
-        const angle = ((value - chartMin) / (chartMax - chartMin)) * 270 - 135;
-        return {
-          position: 'absolute',
-          top: '49%',
-          left: '49%',
-          width: '24px',
-          height: '24px',
-          marginLeft: '-4px', // Half of width
-          marginTop: '-4px',  // Half of height
-          cursor: 'grab',
-          backgroundColor: color,
-          border: '3px solid white',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-          zIndex: 10,
-          // The magic: Rotate to angle, move out to radius, rotate back to keep text upright
-          transform: `rotate(${angle}deg) translateY(-130px) rotate(${-angle}deg)`
-        };
+    // Helper to calculate CSS for placing handles on the circle
+    const getHandleStyle = (value, color) => {
+      // Map value to angle (-135 to 135)
+      const { chartMin, chartMax } = this.getGraphMinMax();
+      const angle = ((value - chartMin) / (chartMax - chartMin)) * 270 - 135;
+      return {
+        position: 'absolute',
+        top: '49%',
+        left: '49%',
+        width: '24px',
+        height: '24px',
+        marginLeft: '-4px', // Half of width
+        marginTop: '-4px', // Half of height
+        cursor: 'grab',
+        backgroundColor: color,
+        border: '3px solid white',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        zIndex: 10,
+        // The magic: Rotate to angle, move out to radius, rotate back to keep text upright
+        transform: `rotate(${angle}deg) translateY(-130px) rotate(${-angle}deg)`
       };
+    };
 
     return (
       <div class="card">
         <div style={{ position: 'relative', width: '100%', maxWidth: '350px', margin: '0 auto' }}>
-      
-        {/* 1. The ApexChart */}
-        {Object.keys(graphValues).length > 0 && (
-          <div>
-            <div ref={el => this.chartElement = el} class="gauge-chart" />
-      
-            {/* Ticks */}
-            {annotations}
-              
-            {/* 2. Interactive Handles */}
-            <div 
-              style={getHandleStyle(graphValues.min_temp_setpoint, '#00E396')}
-              onMouseDown={(e) => this.handleMouseDown(e, 'min_temp_setpoint')}
-            >
-              <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{graphValues.min_temp_setpoint}</span>
-            </div>
+          {/* 1. The ApexChart */}
+          {Object.keys(graphValues).length > 0 && (
+            <div>
+              <div ref={el => (this.chartElement = el)} class="gauge-chart" />
 
-            <div 
-              style={getHandleStyle(graphValues.max_temp_setpoint, '#FF4560')}
-              onMouseDown={(e) => this.handleMouseDown(e, 'max_temp_setpoint')}
-            >
-              <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{graphValues.max_temp_setpoint}</span>
-            </div>
+              {/* Ticks */}
+              {annotations}
 
-            {/* 4. Interactive Target Handle */}
-            <div 
-              style={getHandleStyle(graphValues.target_temp_setpoint, '#775DD0')}
-              onMouseDown={(e) => this.handleMouseDown(e, 'target_temp_setpoint')}
-            >
-              <span style={{ color: 'white', fontSize: '10px' }}>🎯</span>
+              {/* 2. Interactive Handles */}
+              <div
+                style={getHandleStyle(graphValues.min_temp_setpoint, '#00E396')}
+                onMouseDown={e => this.handleMouseDown(e, 'min_temp_setpoint')}
+              >
+                <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>
+                  {graphValues.min_temp_setpoint}
+                </span>
+              </div>
+
+              <div
+                style={getHandleStyle(graphValues.max_temp_setpoint, '#FF4560')}
+                onMouseDown={e => this.handleMouseDown(e, 'max_temp_setpoint')}
+              >
+                <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>
+                  {graphValues.max_temp_setpoint}
+                </span>
+              </div>
+
+              {/* 4. Interactive Target Handle */}
+              <div
+                style={getHandleStyle(graphValues.target_temp_setpoint, '#775DD0')}
+                onMouseDown={e => this.handleMouseDown(e, 'target_temp_setpoint')}
+              >
+                <span style={{ color: 'white', fontSize: '10px' }}>🎯</span>
+              </div>
             </div>
-          </div>
-        )}
-        {/* 5. Center Text Overlay
+          )}
+          {/* 5. Center Text Overlay
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -471,9 +464,7 @@ class ThermostatBox extends Component {
           <div style={{ fontSize: '36px', fontWeight: 'bold' }}>{graphValues.actual_temp_sensor}°</div>
           <div style={{ color: '#888', textTransform: 'uppercase', fontSize: '12px' }}>Current</div>
         </div> */}
-
-
-      </div>
+        </div>
         {error && (
           <div class="card-body">
             <div class="alert alert-danger">
@@ -493,7 +484,7 @@ class ThermostatBox extends Component {
             <div class="alert alert-warning">
               <i class="fe fe-alert-triangle mr-2" /> <Text id="dashboard.boxes.gauge.noDeviceFeatureLastValue" />
             </div>
-         </div>
+          </div>
         )}
       </div>
     );

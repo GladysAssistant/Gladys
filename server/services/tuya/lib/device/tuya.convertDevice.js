@@ -36,7 +36,7 @@ function convertDevice(tuyaDevice) {
     should_poll: true,
   };
   const features = Object.values(groups).map((group) => convertFeature(group, externalId));
-  
+
   device.features = features.filter((feature) => feature);
   device.params = device.features
     .filter((feature) => feature.params)

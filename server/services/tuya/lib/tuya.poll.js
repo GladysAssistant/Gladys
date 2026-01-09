@@ -42,11 +42,13 @@ async function poll(device) {
     const value = values[code];
     const param = params[deviceFeature.name];
     let transformedValue = value;
-    if ( readValues[deviceFeature.category] !== undefined &&
-      readValues[deviceFeature.category][deviceFeature.type] !== undefined) {
-      transformedValue = readValues[deviceFeature.category][deviceFeature.type](value, param );
+    if (
+      readValues[deviceFeature.category] !== undefined &&
+      readValues[deviceFeature.category][deviceFeature.type] !== undefined
+    ) {
+      transformedValue = readValues[deviceFeature.category][deviceFeature.type](value, param);
     }
-    
+
     if (deviceFeature.last_value !== transformedValue) {
       if (transformedValue !== null && transformedValue !== undefined) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {

@@ -15,39 +15,45 @@ class EditThermostatBox extends Component {
     loading: true,
     deviceFeatures: [],
     deviceFeatureNames: [null, null, null, null, null, null],
-    unit: "",
+    unit: ''
   };
 
   prompts = [
-    { id: 'dashboard.boxes.thermostat.selectActualTempSensor', 
+    {
+      id: 'dashboard.boxes.thermostat.selectActualTempSensor',
       key: 'actual_temp_sensor',
-      title: 'Select Actual Temperature Sensor',
+      title: 'Select Actual Temperature Sensor'
     },
-    { id: 'dashboard.boxes.thermostat.selectMinTempSetpoint',
+    {
+      id: 'dashboard.boxes.thermostat.selectMinTempSetpoint',
       key: 'min_temp_setpoint',
-      title: 'Select Minimum Temperature Setpoint',
+      title: 'Select Minimum Temperature Setpoint'
     },
-    { id: 'dashboard.boxes.thermostat.selectMaxTempSetpoint',
+    {
+      id: 'dashboard.boxes.thermostat.selectMaxTempSetpoint',
       key: 'max_temp_setpoint',
-      title: 'Select Maximum Temperature Setpoint',
+      title: 'Select Maximum Temperature Setpoint'
     },
-    { id: 'dashboard.boxes.thermostat.selectTargetTempSetpoint',
+    {
+      id: 'dashboard.boxes.thermostat.selectTargetTempSetpoint',
       key: 'target_temp_setpoint',
-      title: 'Select Target Temperature Setpoint',
+      title: 'Select Target Temperature Setpoint'
     },
-    { id: 'dashboard.boxes.thermostat.selectHeatingActiveSetpoint',
+    {
+      id: 'dashboard.boxes.thermostat.selectHeatingActiveSetpoint',
       key: 'heating_active_sensor',
-      title: 'Select Heating Active Sensor',
+      title: 'Select Heating Active Sensor'
     },
-    { id: 'dashboard.boxes.thermostat.selectAutoManualSetting',
+    {
+      id: 'dashboard.boxes.thermostat.selectAutoManualSetting',
       key: 'auto_manual_setting',
-      title: 'Select Auto/Manual Setting',
+      title: 'Select Auto/Manual Setting'
     }
   ];
 
   updateDeviceFeature = (option, key) => {
     const index = this.prompts.findIndex(prompt => prompt.key === key);
-    if ( index === -1 ) {
+    if (index === -1) {
       return;
     }
     this.state.deviceFeatures[index] = option ? option.value : null;
@@ -57,12 +63,12 @@ class EditThermostatBox extends Component {
       device_feature_names: this.state.deviceFeatureNames,
       unit: this.state.unit
     });
-    this.setState({ deviceFeatures: this.state.deviceFeatures, deviceFeatureNames: this.state.deviceFeatureNames   });
+    this.setState({ deviceFeatures: this.state.deviceFeatures, deviceFeatureNames: this.state.deviceFeatureNames });
   };
 
   getSelectedDeviceFeatureAndOptions = devices => {
     const deviceOptions = [];
-    
+
     devices.forEach(device => {
       const deviceFeatures = [];
       device.params.forEach(param => {
@@ -104,13 +110,13 @@ class EditThermostatBox extends Component {
       // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
       const deviceOptions = this.getSelectedDeviceFeatureAndOptions(devices);
-      this.setState({ 
-        deviceOptions, 
+      this.setState({
+        deviceOptions,
         loading: false,
         deviceFeatures: this.props.box.device_features,
         deviceFeatureNames: this.props.box.device_feature_names,
         unit: this.props.box.unit
-       });
+      });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -121,17 +127,16 @@ class EditThermostatBox extends Component {
     this.getDeviceFeatures();
   }
 
-
-  render(props, { deviceOptions}) {
+  render(props, { deviceOptions }) {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.thermostat" title="Thermostat">
         <p>
           <Text id="dashboard.boxes.thermostat.description" />
-        </p> 
+        </p>
         <div class="form-group">
           {this.prompts.map(prompt => {
             const index = this.prompts.findIndex(prompts => prompts.key === prompt.key);
-            const selectedSelector = !this.state.loading ? this.state.deviceFeatures[index] : "";
+            const selectedSelector = !this.state.loading ? this.state.deviceFeatures[index] : '';
 
             // Find the matching option object from deviceOptions
             let selectedOption = null;
@@ -145,21 +150,21 @@ class EditThermostatBox extends Component {
               }
             }
             return (
-            <div key={prompt.id}>
-              <label class="form-label">
-                <Text id={prompt.id}>{prompt.title}</Text>
-              </label>
-              <Select
-                defaultValue={selectedOption}
-                value={selectedOption}
-                onChange={(e) => this.updateDeviceFeature(e, prompt.key)}
-                options={deviceOptions}
-                className="react-select-container"
-                classNamePrefix="react-select"
-              />
-            </div>
-          )})}
-          
+              <div key={prompt.id}>
+                <label class="form-label">
+                  <Text id={prompt.id}>{prompt.title}</Text>
+                </label>
+                <Select
+                  defaultValue={selectedOption}
+                  value={selectedOption}
+                  onChange={e => this.updateDeviceFeature(e, prompt.key)}
+                  options={deviceOptions}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                />
+              </div>
+            );
+          })}
         </div>
       </BaseEditBox>
     );
