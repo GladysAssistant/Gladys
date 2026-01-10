@@ -53,7 +53,7 @@ class ThermostatBox extends Component {
 
       const device = devices[0];
       let graphValues = this.state.graphValues || {};
-      this.props.box.device_features.forEach((feature) => {
+      this.props.box.device_features.forEach(feature => {
         graphValues = this.setValueForFeature(
           graphValues,
           feature,
@@ -291,11 +291,11 @@ class ThermostatBox extends Component {
     return { currentRect, graphRadius };
   };
 
-  handleMouseMove = (e) => {
+  handleMouseMove = e => {
     if (!this.draggingType) return;
     const graphValues = this.state.graphValues;
     const { chartMin, chartMax } = this.getGraphMinMax();
-    if ( this.lastX < e.clientX ) {
+    if (this.lastX < e.clientX) {
       // moving right
       graphValues[this.draggingType] += 1;
       if (graphValues[this.draggingType] > chartMax) {
@@ -304,7 +304,7 @@ class ThermostatBox extends Component {
       if (graphValues[this.draggingType] > 50) {
         graphValues[this.draggingType] = 50;
       }
-    } else if ( this.lastX > e.clientX ) {
+    } else if (this.lastX > e.clientX) {
       // moving left
       graphValues[this.draggingType] -= 1;
       if (graphValues[this.draggingType] < chartMin) {
@@ -371,7 +371,11 @@ class ThermostatBox extends Component {
     const { chartMin, chartMax } = this.getGraphMinMax();
     for (let tick = Math.ceil(chartMin); tick <= Math.floor(chartMax); tick += 1) {
       const angle = this.getTickRotation(tick, chartMin, chartMax);
-      ticks.push(<div key={tick} style={this.getChartTickStyle(angle, tick % 5 === 0)}>&nbsp;</div>);
+      ticks.push(
+        <div key={tick} style={this.getChartTickStyle(angle, tick % 5 === 0)}>
+          &nbsp;
+        </div>
+      );
     }
     for (let tick = 5; tick <= Math.floor(chartMax); tick += 5) {
       const angle = this.getTickRotation(tick, chartMin, chartMax);
