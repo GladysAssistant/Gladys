@@ -3881,6 +3881,11 @@
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
+    },
+    "number": {
+      "shortCategoryName": "Number",
+      "decimal": "Number (decimal)",
+      "integer": "Number (integer)"
     }
   },
   "errorPage": {
