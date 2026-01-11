@@ -9,6 +9,11 @@ const gladys = {
         return func();
       };
     },
+    wrapperDetached: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
   },
   event: {
     on: () => {},

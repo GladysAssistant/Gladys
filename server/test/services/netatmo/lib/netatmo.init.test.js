@@ -41,6 +41,7 @@ describe('Netatmo Init', () => {
     sinon.reset();
 
     netatmoHandler.status = 'not_initialized';
+    netatmoHandler.refreshNetatmoValues = fake.resolves(null);
     netatmoHandler.gladys.variable.getValue = sinon.fake((variableName, serviceId) => {
       if (variableName === 'NETATMO_CLIENT_ID') {
         return Promise.resolve('valid_client_id');

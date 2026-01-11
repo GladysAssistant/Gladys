@@ -65,14 +65,15 @@ describe('Netatmo Load Thermostat Details', () => {
 
   it('should load thermostat details successfully with API configured', async () => {
     netatmoHandler.configuration.energyApi = true;
-    thermostatsDetailsMock.plugs.forEach((plug) => {
+    const expectedDetails = JSON.parse(JSON.stringify(thermostatsDetailsMock));
+    expectedDetails.plugs.forEach((plug) => {
       plug.apiNotConfigured = false;
       plug.modules.forEach((module) => {
         module.apiNotConfigured = false;
         module.plug.apiNotConfigured = false;
       });
     });
-    thermostatsDetailsMock.thermostats.forEach((thermostat) => {
+    expectedDetails.thermostats.forEach((thermostat) => {
       thermostat.apiNotConfigured = false;
       thermostat.plug.apiNotConfigured = false;
     });
@@ -89,8 +90,8 @@ describe('Netatmo Load Thermostat Details', () => {
       });
 
     const { plugs, thermostats } = await netatmoHandler.loadThermostatDetails();
-    expect(plugs).to.deep.eq(thermostatsDetailsMock.plugs);
-    expect(thermostats).to.deep.eq(thermostatsDetailsMock.thermostats);
+    expect(plugs).to.deep.eq(expectedDetails.plugs);
+    expect(thermostats).to.deep.eq(expectedDetails.thermostats);
     expect(plugs).to.be.an('array');
     expect(thermostats).to.be.an('array');
   });

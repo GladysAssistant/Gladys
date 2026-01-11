@@ -28,6 +28,12 @@ describe('Netatmo pollRefreshingToken', () => {
   let mockAgent;
   let netatmoMock;
   let originalDispatcher;
+  const restoreClock = () => {
+    if (clock) {
+      clock.restore();
+      clock = null;
+    }
+  };
 
   beforeEach(() => {
     sinon.reset();
@@ -59,7 +65,7 @@ describe('Netatmo pollRefreshingToken', () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    restoreClock();
     sinon.reset();
     // Clean up the mock agent
     mockAgent.close();
@@ -87,7 +93,7 @@ describe('Netatmo pollRefreshingToken', () => {
       .reply(200, tokens);
 
     clock.tick(3600 * 1000);
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(netatmoHandler.accessToken).to.equal('new-access-token');
     expect(netatmoHandler.refreshToken).to.equal('new-refresh-token2');

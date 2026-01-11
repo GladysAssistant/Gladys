@@ -14,7 +14,7 @@ async function calculateCostEveryThirtyMinutes(now, jobId) {
     const thirtyMinutesAgo = dayjs(now)
       .subtract(30, 'minute')
       .toDate();
-    await this.calculateCostFrom(thirtyMinutesAgo, jobId);
+    await this.calculateCostFrom(thirtyMinutesAgo, null, jobId, now);
   });
 }
 
