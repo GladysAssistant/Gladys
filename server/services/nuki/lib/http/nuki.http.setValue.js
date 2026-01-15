@@ -1,4 +1,5 @@
 const { NUKI_LOCK_ACTIONS } = require('../utils/nuki.constants');
+const { EVENTS, LOCK } = require('../../../../utils/constants');
 
 /**
  * @description Set value value.
@@ -9,10 +10,22 @@ const { NUKI_LOCK_ACTIONS } = require('../utils/nuki.constants');
  * nukiHTTPHandler.setValue(device, 'lock', 0);
  */
 function setValue(device, command, value) {
+  const { gladys } = this.nukiHandler;
   let action;
   value === 0 ? (action = NUKI_LOCK_ACTIONS.LOCK) : (action = NUKI_LOCK_ACTIONS.UNLOCK);
   const smartlockId = device.external_id.split(':')[1];
   this.nukiApi.setAction(smartlockId, action);
+
+  // Set the state to activity while waiting for the real state
+  gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+    device_feature_external_id: `${device.external_id}:state`,
+    state: LOCK.STATE.ACTIVITY,
+  });
+
+  // Wait 10 seconds before getting the new state
+  setTimeout(() => {
+    this.getValue(device);
+  }, 10000);
 }
 
 module.exports = {

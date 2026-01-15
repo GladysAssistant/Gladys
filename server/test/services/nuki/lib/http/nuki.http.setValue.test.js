@@ -9,7 +9,11 @@ const fakeNukiWebApi = {
   setAction: fake.returns(true),
 };
 
-const gladys = {};
+const gladys = {
+  event: {
+    emit: fake.returns(true),
+  },
+};
 
 const device = {
   external_id: 'nuki:398172F4',
@@ -34,6 +38,11 @@ describe('nuki.http.setValue command', () => {
     nukiHttpHandler.setValue(device, command, value);
     assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
     assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 2);
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'nuki:398172F4:state',
+      state: 2,
+    });
   });
 
   it('should call setAction with unlock of the Nuki Web API', async () => {
@@ -42,5 +51,10 @@ describe('nuki.http.setValue command', () => {
     nukiHttpHandler.setValue(device, command, value);
     assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
     assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 1);
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'nuki:398172F4:state',
+      state: 2,
+    });
   });
 });
