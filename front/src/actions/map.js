@@ -4,7 +4,7 @@ function createActions(store) {
   const actions = {
     async getUsersWithLocation(state) {
       store.setState({
-        getUsersWithlocationStatus: RequestStatus.Getting
+        getUsersWithLocationStatus: RequestStatus.Getting
       });
       try {
         const usersWithLocation = await state.httpClient.get(
@@ -12,11 +12,11 @@ function createActions(store) {
         );
         store.setState({
           usersWithLocation,
-          getUsersWithlocationStatus: RequestStatus.Success
+          getUsersWithLocationStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getUsersWithlocationStatus: RequestStatus.Error
+          getUsersWithLocationStatus: RequestStatus.Error
         });
       }
     },
