@@ -22,6 +22,12 @@ const serviceId = 'serviceId';
 describe('Netatmo pollRefreshingValues', () => {
   let clock;
   let netatmoHandler;
+  const restoreClock = () => {
+    if (clock) {
+      clock.restore();
+      clock = null;
+    }
+  };
 
   beforeEach(() => {
     sinon.reset();
@@ -34,7 +40,7 @@ describe('Netatmo pollRefreshingValues', () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    restoreClock();
     sinon.reset();
   });
 
@@ -46,7 +52,7 @@ describe('Netatmo pollRefreshingValues', () => {
     netatmoHandler.pollRefreshingValues();
 
     clock.tick(120 * 1000);
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
   });
@@ -58,7 +64,7 @@ describe('Netatmo pollRefreshingValues', () => {
     netatmoHandler.pollRefreshingValues();
 
     clock.tick(120 * 1000);
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     sinon.assert.called(netatmoHandler.refreshNetatmoValues);
     sinon.assert.calledOnce(logger.error);
@@ -74,7 +80,7 @@ describe('Netatmo pollRefreshingValues', () => {
 
     netatmoHandler.refreshNetatmoValues();
 
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     sinon.assert.calledOnce(netatmoHandler.loadDevices);
     sinon.assert.called(netatmoHandler.updateValues);
@@ -86,7 +92,7 @@ describe('Netatmo pollRefreshingValues', () => {
 
     await netatmoHandler.refreshNetatmoValues();
 
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     sinon.assert.called(netatmoHandler.loadDevices);
     expect(netatmoHandler.configured).to.equal(true);
@@ -103,7 +109,7 @@ describe('Netatmo pollRefreshingValues', () => {
 
     await netatmoHandler.refreshNetatmoValues();
 
-    clock.restore();
+    restoreClock();
     await new Promise((resolve) => setTimeout(resolve, 50));
     sinon.assert.called(netatmoHandler.loadDevices);
     expect(netatmoHandler.configured).to.equal(true);
