@@ -116,7 +116,7 @@ describe('TuyaHandler.discoverDevices', () => {
             unit: 'watt',
             params: {
               name: 'cur_power',
-              value: "{ \"step\": 1, \"unit\": \"null\", \"scale\": 1 }",
+              value: '{ "step": 1, "unit": "null", "scale": 1 }',
             },
           },
           {
@@ -137,7 +137,7 @@ describe('TuyaHandler.discoverDevices', () => {
           {
             external_id: 'tuya:uuid:cur_power',
             name: 'cur_power',
-            value: "{ \"step\": 1, \"unit\": \"null\", \"scale\": 1 }",
+            value: '{ "step": 1, "unit": "null", "scale": 1 }',
           },
         ],
         poll_frequency: 30000,

@@ -15,8 +15,8 @@ async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
   const [prefix, topic, command] = deviceFeature.external_id.split(':');
   const params = {};
-  if ( device.params ) {
-      device.params.forEach((param) => {
+  if (device.params) {
+    device.params.forEach((param) => {
       params[param.name] = param;
     });
   }

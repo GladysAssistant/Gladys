@@ -35,7 +35,7 @@ async function connect(configuration) {
   });
 
   this.connector.client = fakeClient || this.connector.client;
-  
+
   try {
     this.connector.client.init();
     this.status = STATUS.CONNECTED;

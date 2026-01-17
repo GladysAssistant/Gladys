@@ -33,7 +33,7 @@ async function poll(device) {
   });
 
   const params = {};
-  if ( device.params ) {
+  if (device.params) {
     device.params.forEach((param) => {
       params[param.name] = param;
     });

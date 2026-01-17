@@ -21,7 +21,7 @@ const gladys = {
   },
   variable: {
     getValue: fake.returns('abc'),
-  }
+  },
 };
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
