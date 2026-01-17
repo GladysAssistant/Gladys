@@ -11,10 +11,10 @@ const { mappings } = require('./tuya.deviceMapping');
 function convertFeature(tuyaFunctions, externalId) {
   const { code, values, name, readOnly, type } = tuyaFunctions;
 
-  const featuresCategoryAndType = mappings[type];
+  const featuresCategoryAndType = mappings[code];
 
   if (!featuresCategoryAndType) {
-    logger.warn(`Tuya function with "${type}" code is not managed`);
+    logger.warn(`Tuya function with "${code}" code is not managed`);
     return undefined;
   }
 

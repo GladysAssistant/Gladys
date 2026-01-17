@@ -13,7 +13,7 @@ const { STATUS } = require('./utils/tuya.constants');
  * connect({baseUrl, accessKey, secretKey});
  */
 async function connect(configuration) {
-  const { baseUrl, accessKey, secretKey } = configuration;
+  const { baseUrl, accessKey, secretKey, fakeClient } = configuration;
 
   if (!baseUrl || !accessKey || !secretKey) {
     this.status = STATUS.NOT_INITIALIZED;
@@ -34,6 +34,8 @@ async function connect(configuration) {
     store: this,
   });
 
+  this.connector.client = fakeClient || this.connector.client;
+  
   try {
     this.connector.client.init();
     this.status = STATUS.CONNECTED;

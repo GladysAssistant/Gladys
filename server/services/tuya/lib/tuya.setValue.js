@@ -15,9 +15,11 @@ async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
   const [prefix, topic, command] = deviceFeature.external_id.split(':');
   const params = {};
-  device.params.forEach((param) => {
-    params[param.name] = param;
-  });
+  if ( device.params ) {
+      device.params.forEach((param) => {
+      params[param.name] = param;
+    });
+  }
   if (prefix !== 'tuya') {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" should starts with "tuya:"`);
   }

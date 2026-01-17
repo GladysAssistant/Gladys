@@ -33,9 +33,11 @@ async function poll(device) {
   });
 
   const params = {};
-  device.params.forEach((param) => {
-    params[param.name] = param;
-  });
+  if ( device.params ) {
+    device.params.forEach((param) => {
+      params[param.name] = param;
+    });
+  }
   device.features.forEach((deviceFeature) => {
     const [, , code] = deviceFeature.external_id.split(':');
 
