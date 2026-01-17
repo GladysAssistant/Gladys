@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext, client } = require('../tuya.mock');
+const { TuyaContext } = require('../tuya.mock');
 
 const { assert, fake } = sinon;
 

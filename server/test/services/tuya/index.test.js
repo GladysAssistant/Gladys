@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 
-const { assert, fake } = sinon;
+const { fake } = sinon;
 
 const TuyaHandlerMock = sinon.stub();
 TuyaHandlerMock.prototype.init = fake.returns(null);
