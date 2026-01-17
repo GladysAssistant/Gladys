@@ -1,3 +1,6 @@
+// todo: Refactor this file so that it is closer to the boxs implementations
+//      doing this will make it easier to add new screens to the system
+
 import EditWeatherBox from '../../../components/boxs/weather/EditWeatherBox';
 import EditRoomTemperatureBox from '../../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditRoomHumidityBox from '../../../components/boxs/room-humidity/EditRoomHumidityBox';
@@ -17,6 +20,7 @@ import EditAlarmBox from '../../../components/boxs/alarm/EditAlarm';
 import EditEdfTempoBox from '../../../components/boxs/edf-tempo/EditEdfTempo';
 import EditGaugeBox from '../../../components/boxs/gauge/EditGaugeBox';
 import EditEnergyConsumptionBox from '../../../components/boxs/energy-consumption/EditEnergyConsumption';
+import EditThermostatBox from '../../../components/boxs/thermostat/EditThermostatBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -52,6 +56,8 @@ const Box = ({ children, ...props }) => {
       return <EditGaugeBox {...props} />;
     case 'energy-consumption':
       return <EditEnergyConsumptionBox {...props} />;
+    case 'thermostat':
+      return <EditThermostatBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }
