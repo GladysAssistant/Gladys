@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const db = require('../../models');
 const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 
 /**
  * @public
@@ -28,8 +29,15 @@ async function partialArm(selector) {
 
   // Update database
   await house.update({ alarm_mode: ALARM_MODES.PARTIALLY_ARMED });
-  // Lock all tablets in this house
-  await this.session.setTabletModeLocked(house.id);
+  const alarmCodeIsDefined = !(house.alarm_code === null || house.alarm_code === '' || house.alarm_code === undefined);
+
+  if (alarmCodeIsDefined) {
+    logger.info('House alarm code is set, locking tablets');
+    // Lock all tablets in this house
+    await this.session.setTabletModeLocked(house.id);
+  } else {
+    logger.info('House alarm code is not set, skipping setTabletModeLocked');
+  }
   // Check scene triggers
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.PARTIAL_ARM,
