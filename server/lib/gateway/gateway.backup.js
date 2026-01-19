@@ -95,19 +95,23 @@ async function backup(jobId) {
     const fileSizeMB = Math.round(fileInfos.size / 1024 / 1024);
     logger.info(`Gateway backup : SQLite file size is ${fileSizeMB}mb.`);
     logger.info(`Gateway backup : Backing up DuckDB into a Parquet folder ${duckDbBackupFolderPath}`);
-    // DuckDB backup to parquet file
-    await db.duckDbWriteConnectionAllAsync(
-      ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
-          FORMAT PARQUET,
-          COMPRESSION GZIP
-      )`,
-    );
-
-    await logMemoryUsage('after export database to parquet');
-    // Force DuckDB to release cached memory after export
-    logger.info('Gateway backup: Forcing DuckDB checkpoint to release memory');
-    await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
-    await logMemoryUsage('after checkpoint');
+    // DuckDB backup to parquet file using a dedicated connection
+    // This connection will be closed after export to release memory
+    const backupInstance = db.duckDbCreateBackupInstance();
+    try {
+      await backupInstance.allAsync(
+        ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
+            FORMAT PARQUET,
+            COMPRESSION GZIP
+        )`,
+      );
+      await logMemoryUsage('after export database to parquet');
+    } finally {
+      // Close the backup database instance to release DuckDB buffer pool memory
+      logger.info('Gateway backup: Closing DuckDB backup instance to release memory');
+      await backupInstance.close();
+      await logMemoryUsage('after closing backup instance');
+    }
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
     await exec(
