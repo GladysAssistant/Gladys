@@ -104,6 +104,10 @@ async function backup(jobId) {
     );
 
     await logMemoryUsage('after export database to parquet');
+    // Force DuckDB to release cached memory after export
+    logger.info('Gateway backup: Forcing DuckDB checkpoint to release memory');
+    await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
+    await logMemoryUsage('after checkpoint');
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
     await exec(
