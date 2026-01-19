@@ -105,12 +105,10 @@ async function backup(jobId) {
             COMPRESSION GZIP
         )`,
       );
-      await logMemoryUsage('after export database to parquet');
     } finally {
       // Close the backup database instance to release DuckDB buffer pool memory
       logger.info('Gateway backup: Closing DuckDB backup instance to release memory');
       await backupInstance.close();
-      await logMemoryUsage('after closing backup instance');
     }
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
@@ -138,7 +136,6 @@ async function backup(jobId) {
       const totalOfChunksToUpload = initializeBackupResponse.parts.length;
 
       const partsUploaded = await Promise.mapSeries(initializeBackupResponse.parts, async (part, index) => {
-        await logMemoryUsage(`before upload chunk ${index}`);
         const startPosition = index * initializeBackupResponse.chunk_size;
 
         const chunk = await readChunk(encryptedBackupFilePath, {
