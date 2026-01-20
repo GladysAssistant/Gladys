@@ -12,10 +12,10 @@ const ICON_MAP = {
     1: 'lock'
   },
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
-    0: 'unlock', 
-    1: 'lock', 
+    0: 'unlock',
+    1: 'lock',
     2: 'activity',
-    3: 'alert-triangle' 
+    3: 'alert-triangle'
   }
 };
 const IconBinaryDeviceValue = ({ deviceFeature }) => {
