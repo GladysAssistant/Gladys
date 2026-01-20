@@ -71,6 +71,7 @@ describe('Nuki - MQTT - Handle message', () => {
 
   it('should handle NUKI commandResponse', () => {
     nukiHandler.handleMessage('nuki/my_device/commandResponse', '255');
+    assert.calledOnce(gladys.event.emit);
     assert.notCalled(mqttService.device.publish);
   });
 

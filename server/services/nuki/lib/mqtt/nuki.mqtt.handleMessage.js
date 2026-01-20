@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { EVENTS, LOCK, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const {
   MAPPING_STATES_NUKI_TO_GLADYS,
   MAPPING_SWITCH_NUKI_TO_GLADYS,
@@ -60,6 +60,11 @@ function handleMessage(topic, message) {
         const code = parseInt(message, 10);
         if (code !== 0) {
           logger.error(`Error command response : ${code}`);
+          const errState = {
+            device_feature_external_id: `${main}:${deviceType}:state`,
+            state: LOCK.STATE.ERROR,
+          };
+          gladys.event.emit(EVENTS.DEVICE.NEW_STATE, errState);
         }
         break;
       }
