@@ -1371,6 +1371,6 @@ describe('alexa.onExecute', () => {
     };
     expect(() => {
       alexaHandler.onExecute(body);
-    }).to.throw('Unkown directive Alexa.UNKNOWN_COMMAND');
+    }).to.throw('Unknown directive Alexa.UNKNOWN_COMMAND');
   });
 });

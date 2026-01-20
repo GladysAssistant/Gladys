@@ -130,4 +130,37 @@ describe('house.arm', () => {
     const promise = house.arm('test-house');
     return assertChai.isRejected(promise, 'House is already armed');
   });
+  it('should call setTabletModeLocked when alarm_code is set', async () => {
+    const session = {
+      setTabletModeLocked: fake.resolves(null),
+    };
+    house = new House(event, {}, session);
+    // Set alarm_code on the house
+    await house.update('test-house', {
+      alarm_code: '1234',
+      alarm_delay_before_arming: 0,
+      alarm_mode: 'disarmed',
+    });
+
+    await house.arm('test-house', true);
+
+    assert.calledOnce(session.setTabletModeLocked);
+    assert.calledWith(session.setTabletModeLocked, 'a741dfa6-24de-4b46-afc7-370772f068d5');
+  });
+  it('should not call setTabletModeLocked when alarm_code is null', async () => {
+    const session = {
+      setTabletModeLocked: fake.resolves(null),
+    };
+    house = new House(event, {}, session);
+    // Ensure alarm_code is null
+    await house.update('test-house', {
+      alarm_code: null,
+      alarm_delay_before_arming: 0,
+      alarm_mode: 'disarmed',
+    });
+
+    await house.arm('test-house', true);
+
+    assert.notCalled(session.setTabletModeLocked);
+  });
 });
