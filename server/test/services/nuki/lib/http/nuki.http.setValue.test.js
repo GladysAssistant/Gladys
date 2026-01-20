@@ -37,7 +37,7 @@ describe('nuki.http.setValue command', () => {
     const value = 0;
     nukiHttpHandler.setValue(device, command, value);
     assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
-    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 2);
+    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 1);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'nuki:398172F4:state',
@@ -50,7 +50,7 @@ describe('nuki.http.setValue command', () => {
     const value = 1;
     nukiHttpHandler.setValue(device, command, value);
     assert.calledOnce(nukiHttpHandler.nukiApi.setAction);
-    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 1);
+    assert.calledWith(nukiHttpHandler.nukiApi.setAction, '398172F4', 2);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'nuki:398172F4:state',

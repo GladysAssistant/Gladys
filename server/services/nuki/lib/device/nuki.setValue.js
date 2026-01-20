@@ -18,8 +18,7 @@ function setValue(device, deviceFeature, value) {
   if (!topic || topic.length === 0) {
     throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" have no topic indicator`);
   }
-  let command;
-  value === 0 ? (command = 'lock') : (command = 'unlock');
+  const command = value === 1 ? 'lock' : 'unlock';
   const deviceProtocol = this.getProtocolFromDevice(device);
   this.getHandler(deviceProtocol).setValue(device, command, value);
 }

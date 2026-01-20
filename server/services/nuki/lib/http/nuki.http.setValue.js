@@ -11,8 +11,7 @@ const { EVENTS, LOCK } = require('../../../../utils/constants');
  */
 function setValue(device, command, value) {
   const { gladys } = this.nukiHandler;
-  let action;
-  value === 0 ? (action = NUKI_LOCK_ACTIONS.LOCK) : (action = NUKI_LOCK_ACTIONS.UNLOCK);
+  const action = value === 1 ? NUKI_LOCK_ACTIONS.LOCK : NUKI_LOCK_ACTIONS.UNLOCK;
   const smartlockId = device.external_id.split(':')[1];
   this.nukiApi.setAction(smartlockId, action);
 

@@ -3279,12 +3279,12 @@
       "lock": {
         "binary": {
           "stateLiveFinished": {
-            "0": "Verrouillée",
-            "1": "Déverrouillée"
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
           },
           "state": {
-            "0": "Déverrouiller",
-            "1": "Verrouiller"
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
           }
         }
       },

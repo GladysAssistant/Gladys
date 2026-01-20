@@ -11,12 +11,11 @@ const ICON_MAP = {
     0: 'unlock',
     1: 'lock'
   },
-  // server/utils/constants LOCK.STATE
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
-    255: 'alert-triangle', // 'uncalibrated', 'undefined', 'motor blocked', 'boot run'
-    0: 'lock', // 'locked'
-    1: 'unlock', //'unlocked', 'unlatched', 'unlocked (lock ‘n’ go)'
-    2: 'activity' // 'unlocking', 'locking', 'unlatching opening'
+    0: 'unlock', 
+    1: 'lock', 
+    2: 'activity',
+    3: 'alert-triangle' 
   }
 };
 const IconBinaryDeviceValue = ({ deviceFeature }) => {

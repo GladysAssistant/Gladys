@@ -28,12 +28,12 @@ const device = {
     {
       category: 'lock',
       type: 'state',
-      last_value: 0,
+      last_value: 1,
     },
     {
       category: 'lock',
       type: 'button',
-      last_value: 1,
+      last_value: 0,
     },
   ],
 };
@@ -64,7 +64,7 @@ describe('nuki.http.getValue command', () => {
   });
 
   it('should poll device values for battery and state through nuki web api and finally update button state according to results', async () => {
-    device.features[0].last_value = 1; // lock state last value
+    device.features[0].last_value = 0; // lock state last value
     await nukiHttpHandler.getValue(device);
     assert.calledThrice(gladys.event.emit);
     // battery 38

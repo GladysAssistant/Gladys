@@ -3279,12 +3279,12 @@
       "lock": {
         "binary": {
           "stateLiveFinished": {
-            "0": "Verriegelt",
-            "1": "Entriegelt"
+            "0": "Entriegelt",
+            "1": "Verriegelt"
           },
           "state": {
-            "0": "Entriegeln",
-            "1": "Verriegeln"
+            "0": "Verriegeln",
+            "1": "Entriegeln"
           }
         }
       },
