@@ -1,0 +1,25 @@
+{
+  "~": "nuki/398172F4",
+  "avty_t": "~/connected",
+  "pl_avail": "true",
+  "pl_not_avail": "false",
+  "dev": {
+    "ids": "[398172F4]",
+    "mf": "Nuki",
+    "name": "Maison",
+    "mdl": "Smart Lock 3.0 Pro"
+  },
+  "name": "Maison",
+  "uniq_id": "398172F4_lock",
+  "cmd_t": "~/lockAction",
+  "pl_lock": "2",
+  "pl_unlk": "1",
+  "pl_open": "3",
+  "stat_t": "~/state",
+  "stat_locked": "1",
+  "stat_locking": "4",
+  "stat_unlocked": "3",
+  "stat_unlocking": "2",
+  "stat_jam": "254",
+  "val_tpl": "{% if value in (\"5\",\"6\",\"7\") %}3{% else %}{{value}}{% endif %}"
+}

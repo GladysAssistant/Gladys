@@ -1939,6 +1939,79 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "nuki": {
+      "title": "Nuki",
+      "description": "Contrôlez vos apareils Nuki.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Nuki",
+      "setupTab": "Configuration Web",
+      "documentation": "Documentation Nuki",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Nuki",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte Web",
+      "protocolLabels": {
+        "mqtt": "Topic MQTT de la serrure connectée",
+        "http": "Id de la serrure connectée sur NukiWeb"
+      },
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Nuki, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Nuki.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils Nuki dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "noDeviceFound": "Aucun appareil Nuki trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "protocolLabel": "Protocole",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Nuki",
+        "description": "Les appareils Nuki sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Nuki.",
+        "noDeviceFound": "Aucun appareil Nuki n'a été découvert.",
+        "scan": "Scanner",
+        "mqtt": {
+          "title": "Découverte des appareils Nuki sur MQTT",
+          "description": "Les appareils Nuki configurés sont automatiquement découverts sur le réseau MQTT.",
+          "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Nuki dans le cloud NukiWeb",
+          "description": "Lancer une recherche pour découvrir les appareils depuis votre compte NukiWeb.",
+          "scan": "Rechercher"
+        }
+      },
+      "setup": {
+        "title": "Configuration nuki",
+        "nukiDescription": "Pour commander vos appareils par le biais de NukiWeb, Gladys doit être connectée à internet et vous devez obtenir un jeton API. Suivez ces étapes :<br><br>1. Si vous n’avez pas encore de compte Nuki Web, créez-en un en suivant <a href=\"https://help.nuki.io/hc/fr/articles/360016485718-Activer-et-désactiver-un-compte-Nuki-Web\" target=\"_blank\" rel=\"noopener noreferrer\">ces explications</a> puis  allez sur le <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">le site NukiWeb</a><br>2. Menu <a href=\"https://web.nuki.io/#/pages/web-api\" target=\"_blank\" rel=\"noopener noreferrer\">API</a>, puis \"Générer un jeton d'API\" pour obtenir votre jeton API<br>3. Entrez votre jeton API ci-dessous (Attention, il ne s’agit pas de la clé OAuth2, mais bien du jeton API créé précédemment)<br>4. Faites une recherche dans <a href=\"/dashboard/integration/device/nuki/http\">Découverte Web</a> pour ajouter vos appareils<br><br>⚠️ Note : Cette configuration est <u>facultative</u> si votre installation est paramétrée avec MQTT.<br> En utilisant ce mode, le status de la serrure ne sera mise à jour qu’une fois par minute (par ex en cas de changement sur une autre application). ",
+        "apiKeyLabel": "Jeton API",
+        "apiKeyPlaceholder": "Entrez le jeton API Nuki web",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud nuki...",
+        "connected": "Connexion réussie au compte cloud nuki !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disabledWarning": "Le service n'est pas encore activé. Pour commencer à utiliser le service, vous pouvez : <ul><li>soit <a href=\"/dashboard/integration/device/mqtt/setup\">connecter Gladys à un broker MQTT</a></li><li>soit renseigner un jeton API dans l'onglet <a href=\"/dashboard/integration/device/nuki/setup\">Configuration web</a></li></ul>"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "openai": {
       "title": "OpenAI ChatGPT",
       "documentation": "Documentation ChatGPT",
@@ -3203,6 +3276,18 @@
           }
         }
       },
+      "lock": {
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",
@@ -3861,6 +3946,12 @@
       "next": "Bouton suivant musique",
       "playback_state": "Etat de la lecture musique",
       "play_notification": "Diffuser une notification"
+    },
+    "lock": {
+      "shortCategoryName": "Serrure",
+      "integer": "Batterie",
+      "binary": "Verrouillage",
+      "state": "État"
     },
     "noise-sensor": {
       "shortCategoryName": "Capteur sonore",

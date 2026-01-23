@@ -29,6 +29,7 @@ module.exports.melcloud = require('./melcloud');
 module.exports['node-red'] = require('./node-red');
 module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
+module.exports.nuki = require('./nuki');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
 module.exports['google-cast'] = require('./google-cast');
 module.exports.airplay = require('./airplay');
