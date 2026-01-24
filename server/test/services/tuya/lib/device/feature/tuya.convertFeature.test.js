@@ -135,4 +135,17 @@ describe('Tuya convert feature', () => {
       type: undefined,
     });
   });
+it('should return converted unknown feature', () => {
+    const result = convertFeature(
+      {
+        code: 'String',
+        type: 'xyz',
+        name: 'name',
+        readOnly: false,
+        values: '{"range":["c","f"]}',
+      },
+      'externalId',
+    );
+    expect(result).eq(undefined);
+  });
 });
