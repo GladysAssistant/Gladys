@@ -59,9 +59,9 @@ function convertFeature(tuyaFunctions, externalId) {
       if ('range' in valuesObject) {
         const enumValues = valuesObject.range;
         params = enumValues.map((val) => `'${val}'`).join(' | ');
+        feature.min = 0;
+        feature.max = valuesObject.range.length - 1;
       }
-      feature.min = 0;
-      feature.max = valuesObject.range.length - 1;
       break;
     }
     case 'String':
