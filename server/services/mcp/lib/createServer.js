@@ -20,7 +20,7 @@ async function createServer() {
     {
       name: 'Gladys',
       title: 'Gladys',
-      version: '1.0.O',
+      version: '1.0.0',
     },
     {
       capabilities: {

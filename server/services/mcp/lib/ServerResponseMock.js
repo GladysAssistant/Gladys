@@ -52,6 +52,16 @@ class ServerResponseMock {
   flushHeaders() {
     return this.headers;
   }
+
+  write(chunk, encoding, cb) {
+    this.body = JSON.parse(new TextDecoder().decode(chunk));
+
+    if (cb) {
+      cb();
+    }
+
+    return true;
+  }
 }
 
 module.exports = {

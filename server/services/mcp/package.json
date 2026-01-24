@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@modelcontextprotocol/sdk": "^1.25.3",
     "@toon-format/toon": "^2.1.0",
     "fastest-levenshtein": "^1.0.16",
     "zod": "^4.3.5"
