@@ -135,7 +135,7 @@ describe('Tuya convert feature', () => {
       type: undefined,
     });
   });
-it('should return converted unknown feature', () => {
+  it('should return converted unknown feature', () => {
     const result = convertFeature(
       {
         code: 'String',
