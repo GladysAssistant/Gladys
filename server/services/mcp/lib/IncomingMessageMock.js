@@ -1,4 +1,3 @@
-
 class IncomingMessageMock {
   constructor(method, headers, body) {
     this.method = method;

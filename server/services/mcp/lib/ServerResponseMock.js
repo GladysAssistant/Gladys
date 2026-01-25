@@ -49,6 +49,10 @@ class ServerResponseMock {
     this.listeners[event] = cb;
   }
 
+  off(event, cb) {
+    delete this.listeners[event];
+  }
+
   flushHeaders() {
     return this.headers;
   }
