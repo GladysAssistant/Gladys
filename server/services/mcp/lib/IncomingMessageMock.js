@@ -1,15 +1,7 @@
 class IncomingMessageMock {
   constructor(method, headers, body) {
     this.method = method;
-    this.headers = {
-      ...headers,
-      get: (key) => {
-        return this.headers[key.toLowerCase()];
-      },
-      entries: () => {
-        return Object.entries(this.headers);
-      },
-    };
+    this.headers = headers;
     this.rawHeaders = Object.entries(headers).flatMap(([key, value]) => [key, value]);
     this.url = 'http://localhost/mock';
     this.body = body;

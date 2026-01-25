@@ -20,35 +20,6 @@ describe('IncomingMessageMock', () => {
     expect(request.reloadNavigation).to.eq(false);
   });
 
-  it('should create headers with get() method', () => {
-    const headers = {
-      'content-type': 'application/json',
-      authorization: 'Bearer token123',
-    };
-
-    const request = new IncomingMessageMock('GET', headers, '');
-
-    expect(request.headers.get('content-type')).to.eq('application/json');
-    expect(request.headers.get('authorization')).to.eq('Bearer token123');
-    expect(request.headers.get('Content-Type')).to.eq('application/json');
-  });
-
-  it('should create headers with entries() method', () => {
-    const headers = {
-      'content-type': 'application/json',
-      'x-custom-header': 'value',
-    };
-
-    const request = new IncomingMessageMock('POST', headers, '');
-
-    const entries = request.headers.entries();
-
-    expect(entries).to.deep.equal([
-      ['content-type', 'application/json'],
-      ['x-custom-header', 'value'],
-    ]);
-  });
-
   it('should create rawHeaders array', () => {
     const headers = {
       'content-type': 'application/json',
