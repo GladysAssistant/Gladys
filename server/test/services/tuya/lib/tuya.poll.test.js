@@ -82,6 +82,12 @@ describe('TuyaHandler.poll', () => {
   it('change state of device feature', async () => {
     await tuyaHandler.poll({
       external_id: 'tuya:device',
+      params: [
+        {
+          name: 'code',
+          value: true,
+        },
+      ],
       features: [
         {
           external_id: 'tuya:feature',
