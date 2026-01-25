@@ -130,4 +130,39 @@ describe('ServerResponseMock', () => {
     expect(flushedHeaders).to.deep.equal(headers);
     expect(flushedHeaders).to.eq(response.headers);
   });
+
+  it('should remove event listener with off() method', () => {
+    const callback = fake();
+    const response = new ServerResponseMock(callback);
+
+    const closeListener = fake();
+    const errorListener = fake();
+
+    response.on('close', closeListener);
+    response.on('error', errorListener);
+
+    expect(response.listeners.close).to.eq(closeListener);
+    expect(response.listeners.error).to.eq(errorListener);
+
+    response.off('close');
+
+    expect(response.listeners.close).to.eq(undefined);
+    expect(response.listeners.error).to.eq(errorListener);
+  });
+
+  it('should write chunk data and call callback with write() method', () => {
+    const callback = fake();
+    const response = new ServerResponseMock(callback);
+
+    const bodyObject = { data: 'test' };
+    const bodyString = JSON.stringify(bodyObject);
+    const chunk = new TextEncoder().encode(bodyString);
+    const writeCb = fake();
+
+    const result = response.write(chunk, 'utf8', writeCb);
+
+    expect(result).to.eq(true);
+    expect(response.body).to.deep.equal(bodyObject);
+    expect(writeCb.callCount).to.eq(1);
+  });
 });
