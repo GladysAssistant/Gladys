@@ -180,6 +180,9 @@ import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-pa
 // NodeRed integration
 import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
+// Matterbridge integration
+import MatterbridgePage from '../routes/integration/all/matterbridge/setup-page';
+
 // Free Mobile integration
 import FreeMobilePage from '../routes/integration/all/free-mobile';
 // CallMeBot integration
@@ -290,6 +293,8 @@ const AppRouter = connect(
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <NodeRedPage path="/dashboard/integration/device/node-red" />
+
+        <MatterbridgePage path="/dashboard/integration/device/matterbridge" />
 
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />

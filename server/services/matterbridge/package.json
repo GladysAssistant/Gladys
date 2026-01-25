@@ -1,0 +1,8 @@
+{
+  "name": "gladys-matterbridge",
+  "main": "index.js",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  }
+}
