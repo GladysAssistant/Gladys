@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "hap-nodejs": "^0.12.3",
+    "@homebridge/hap-nodejs": "^2.0.2",
     "uuid": "^9.0.0"
   }
 }
