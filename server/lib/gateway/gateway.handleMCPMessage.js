@@ -1,3 +1,4 @@
+const { IncomingMessageMock } = require('../../services/mcp/lib/IncomingMessageMock');
 const { ServerResponseMock } = require('../../services/mcp/lib/ServerResponseMock');
 
 /**
@@ -20,11 +21,7 @@ async function handleMCPMessage({ data }, cb) {
   const service = this.serviceManager.getService('mcp');
 
   await service.mcpHandler.proxy(
-    {
-      method: data.mcp_method,
-      headers: data.mcp_headers,
-      body: data.mcp_data,
-    },
+    new IncomingMessageMock(data.mcp_method, data.mcp_headers, data.mcp_data),
     new ServerResponseMock(cb),
   );
 }

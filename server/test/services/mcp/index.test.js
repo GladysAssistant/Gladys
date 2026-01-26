@@ -19,6 +19,7 @@ describe('MCPService', () => {
       },
       event: {
         on: () => {},
+        removeListener: () => {},
       },
     };
     mcpService = MCPService(gladys);

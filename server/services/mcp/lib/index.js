@@ -1,11 +1,11 @@
 const { createServer } = require('./createServer');
+const { stopServer } = require('./stopServer');
 const { getAllResources, getAllTools } = require('./buildSchemas');
 const { formatValue } = require('./formatValue');
 const { proxy } = require('./mcp.proxy');
 const { isSensorFeature, isSwitchableFeature, isHistoryFeature } = require('./selectFeature');
 const { findBySimilarity } = require('./findBySimilarity');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
-const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Add ability to connect to MCP.
@@ -26,11 +26,11 @@ const MCPHandler = function MCPHandler(gladys, serviceId, mcp, toon, levenshtein
   this.server = null;
   this.transports = {};
 
-  this.gladys.event.on(EVENTS.DEVICE.CREATE, eventFunctionWrapper(this.createServer.bind(this)));
-  this.gladys.event.on(EVENTS.DEVICE.UPDATE, eventFunctionWrapper(this.createServer.bind(this)));
+  this.reloadCb = eventFunctionWrapper(this.createServer.bind(this));
 };
 
 MCPHandler.prototype.createServer = createServer;
+MCPHandler.prototype.stopServer = stopServer;
 MCPHandler.prototype.getAllResources = getAllResources;
 MCPHandler.prototype.getAllTools = getAllTools;
 MCPHandler.prototype.isSensorFeature = isSensorFeature;
