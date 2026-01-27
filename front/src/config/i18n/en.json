@@ -625,7 +625,7 @@
     },
     "netatmo": {
       "title": "Netatmo",
-      "description": "Control Netatmo equipment",
+      "description": "Control Netatmo devices",
       "deviceTab": "Devices",
       "discoverTab": "Netatmo Discovery",
       "setupTab": "Setup",
@@ -1186,7 +1186,7 @@
     },
     "airplay": {
       "title": "Airplay",
-      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "description": "Control Airplay devices on your local network",
       "deviceTab": "Devices",
       "discoverTab": "Airplay Discovery",
       "setupTab": "Setup",
