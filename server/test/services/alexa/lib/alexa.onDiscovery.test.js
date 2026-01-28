@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-const get = require('get-value');
 
 const { assert, fake } = sinon;
 const AlexaHandler = require('../../../../services/alexa/lib');
@@ -60,7 +59,7 @@ describe('alexa.onDiscovery', () => {
           namespace: 'Alexa.Discovery',
           name: 'Discover.Response',
           payloadVersion: '3',
-          messageId: get(result, 'event.header.messageId'),
+          messageId: result?.event?.header?.messageId,
         },
         payload: {
           endpoints: [
@@ -146,7 +145,7 @@ describe('alexa.onDiscovery', () => {
           namespace: 'Alexa.Discovery',
           name: 'Discover.Response',
           payloadVersion: '3',
-          messageId: get(result, 'event.header.messageId'),
+          messageId: result?.event?.header?.messageId,
         },
         payload: {
           endpoints: [],

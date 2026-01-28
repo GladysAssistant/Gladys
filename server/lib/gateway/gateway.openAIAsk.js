@@ -1,4 +1,3 @@
-const get = require('get-value');
 const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
@@ -17,8 +16,8 @@ async function openAIAsk(body) {
     return response;
   } catch (e) {
     logger.debug(e);
-    const status = get(e, 'response.status');
-    const message = get(e, 'response.data.error_message');
+    const status = e?.response?.status;
+    const message = e?.response?.data?.error_message;
     if (status === 403) {
       throw new Error403(message);
     }

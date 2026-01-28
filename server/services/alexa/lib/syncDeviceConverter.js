@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { mappings } = require('./deviceMappings');
 
 /**
@@ -28,7 +27,7 @@ function syncDeviceConverter(device) {
   });
 
   uniqueDeviceFeatures.forEach((value, key) => {
-    const displayCategory = get(mappings, `${value.category}.category`);
+    const displayCategory = mappings?.[value.category]?.category;
     // We add a display category if not already present
     if (displayCategory && endpoint.displayCategories.indexOf(displayCategory) === -1) {
       endpoint.displayCategories.push(displayCategory);
@@ -36,7 +35,7 @@ function syncDeviceConverter(device) {
     // read only devices are not returned
     if (value.read_only === false) {
       // we get the capability if handled
-      const capability = get(mappings, `${value.category}.capabilities.${value.type}`);
+      const capability = mappings?.[value.category]?.capabilities?.[value.type];
       if (capability) {
         endpoint.capabilities.push(capability);
       }
