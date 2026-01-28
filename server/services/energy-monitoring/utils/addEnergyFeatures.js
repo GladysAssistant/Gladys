@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { ENERGY_INDEX_FEATURE_TYPES } = require('./constants');
@@ -12,7 +12,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
   indexFeatures.forEach((indexFeature) => {
     // Set the default id if it's not set
     if (!indexFeature.id) {
-      indexFeature.id = uuid.v4();
+      indexFeature.id = randomUUID();
     }
 
     // Set the default energy parent id if it's not set
@@ -31,7 +31,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
     let consumptionFeatureId = null;
 
     if (!consumptionFeature) {
-      consumptionFeatureId = uuid.v4();
+      consumptionFeatureId = randomUUID();
       featuresToAdd.push({
         id: consumptionFeatureId,
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -61,7 +61,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
 
     if (!costFeature) {
       featuresToAdd.push({
-        id: uuid.v4(),
+        id: randomUUID(),
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
         energy_parent_id: consumptionFeatureId,
