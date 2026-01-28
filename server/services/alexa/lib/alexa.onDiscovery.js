@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const { syncDeviceConverter } = require('./syncDeviceConverter');
 
 /**
@@ -19,7 +19,7 @@ function onDiscovery() {
         namespace: 'Alexa.Discovery',
         name: 'Discover.Response',
         payloadVersion: '3',
-        messageId: uuid.v4(),
+        messageId: randomUUID(),
       },
       payload: {
         endpoints,

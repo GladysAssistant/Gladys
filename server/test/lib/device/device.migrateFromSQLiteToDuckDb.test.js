@@ -1,6 +1,6 @@
 const { fake } = require('sinon');
 const { expect } = require('chai');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 const db = require('../../../models');
 const Device = require('../../../lib/device');
@@ -27,7 +27,7 @@ const insertStates = async () => {
   for (let i = 1; i <= 1000; i += 1) {
     const date = new Date(now.getFullYear() - 1, 10, i).toISOString();
     deviceFeatureStateToInsert.push({
-      id: uuid.v4(),
+      id: randomUUID(),
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
       value: i,
       created_at: date,

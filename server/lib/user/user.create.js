@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../../models');
 const passwordUtils = require('../../utils/password');
 const { BadParameters } = require('../../utils/coreErrors');
@@ -35,7 +35,7 @@ async function create(user) {
   // if the instance doesn't have a clientId yet, we create it.
   const clientId = await this.variable.getValue('GLADYS_INSTANCE_CLIENT_ID');
   if (clientId === null) {
-    await this.variable.setValue('GLADYS_INSTANCE_CLIENT_ID', uuid.v4());
+    await this.variable.setValue('GLADYS_INSTANCE_CLIENT_ID', randomUUID());
   }
   return plainUser;
 }

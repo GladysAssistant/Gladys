@@ -1,5 +1,5 @@
 const get = require('get-value');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
@@ -54,7 +54,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
         header: {
           namespace: 'Alexa',
           name: 'ChangeReport',
-          messageId: uuid.v4(),
+          messageId: randomUUID(),
           payloadVersion: '3',
         },
         endpoint: {
