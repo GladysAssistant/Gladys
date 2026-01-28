@@ -91,7 +91,6 @@
     "duckdb": "^1.4.3",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
-    "form-data": "^2.3.3",
     "fs-extra": "^11.1.0",
     "get-value": "^3.0.1",
     "handlebars": "^4.7.7",
