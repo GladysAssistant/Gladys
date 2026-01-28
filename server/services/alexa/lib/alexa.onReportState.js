@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const get = require('get-value');
 
 const { mappings, readValues } = require('./deviceMappings');
@@ -35,7 +35,7 @@ function onReportState(body) {
   });
   const response = {
     event: {
-      header: { ...body.directive.header, name: 'StateReport', messageId: uuid.v4() },
+      header: { ...body.directive.header, name: 'StateReport', messageId: randomUUID() },
       endpoint: body.directive.endpoint,
       payload: {},
     },

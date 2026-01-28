@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const get = require('get-value');
 const {
   EVENTS,
@@ -137,7 +137,7 @@ function onExecute(body) {
         namespace: 'Alexa',
         name: 'Response',
         payloadVersion: '3',
-        messageId: uuid.v4(),
+        messageId: randomUUID(),
         correlationToken,
       },
       endpoint: body.directive.endpoint,
