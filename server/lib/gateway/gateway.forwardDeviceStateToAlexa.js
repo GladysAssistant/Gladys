@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { randomUUID } = require('crypto');
 
 const logger = require('../../utils/logger');
@@ -29,8 +28,8 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
       return;
     }
 
-    const func = get(readValues, `${gladysFeature.category}.${gladysFeature.type}`);
-    const mapping = get(mappings, `${gladysFeature.category}.capabilities.${gladysFeature.type}`);
+    const func = readValues?.[gladysFeature.category]?.[gladysFeature.type];
+    const mapping = mappings?.[gladysFeature.category]?.capabilities?.[gladysFeature.type];
 
     if (!func || !mapping) {
       logger.debug(`Gladys Gateway: Not forwarding state, device feature doesnt seems handled.`);
@@ -42,7 +41,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
     const properties = [
       {
         namespace: mapping.interface,
-        name: get(mapping, 'properties.supported.0.name'),
+        name: mapping?.properties?.supported?.[0]?.name,
         value: func(gladysFeature.last_value, gladysFeature),
         timeOfSample: now,
         uncertaintyInMilliseconds: 0,

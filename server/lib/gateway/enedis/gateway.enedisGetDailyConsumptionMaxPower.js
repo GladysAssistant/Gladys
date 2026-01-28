@@ -1,5 +1,3 @@
-const get = require('get-value');
-
 const logger = require('../../../utils/logger');
 const { Error403 } = require('../../../utils/httpErrors');
 
@@ -19,7 +17,7 @@ async function enedisGetDailyConsumptionMaxPower(query) {
     return consumption;
   } catch (e) {
     logger.debug(e);
-    if (get(e, 'response.status') === 403) {
+    if (e?.response?.status === 403) {
       throw new Error403();
     }
     throw e;

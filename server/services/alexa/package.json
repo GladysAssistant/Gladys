@@ -14,7 +14,5 @@
     "arm64"
   ],
   "scripts": {},
-  "dependencies": {
-    "get-value": "^3.0.1"
-  }
+  "dependencies": {}
 }

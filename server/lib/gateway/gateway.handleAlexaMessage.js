@@ -1,4 +1,3 @@
-const get = require('get-value');
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { DIRECTIVE_NAMESPACES_LIST } = require('../../services/alexa/lib/alexa.constants');
@@ -32,8 +31,8 @@ async function handleAlexaMessage(data, rawMessage, cb) {
       );
       this.alexaConnected = true;
     }
-    const directiveNamespace = get(body, 'directive.header.namespace');
-    const directiveName = get(body, 'directive.header.name');
+    const directiveNamespace = body?.directive?.header?.namespace;
+    const directiveName = body?.directive?.header?.name;
     logger.debug(`gateway.handleAlexaMessage: New message : ${directiveNamespace}`);
     let response;
     if (directiveNamespace === 'Alexa.Discovery') {

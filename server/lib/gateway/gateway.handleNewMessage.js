@@ -1,5 +1,3 @@
-const get = require('get-value');
-
 const { NotFoundError } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
 
@@ -22,7 +20,7 @@ async function handleNewMessage(data, rawMessage, cb) {
       (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
     );
 
-    if ((!found || !found.accepted) && get(data, 'options.url') !== '/api/v1/user') {
+    if ((!found || !found.accepted) && data?.options?.url !== '/api/v1/user') {
       cb({
         status: 403,
         error: 'USER_NOT_ACCEPTED_LOCALLY',
@@ -30,7 +28,7 @@ async function handleNewMessage(data, rawMessage, cb) {
       });
       return;
     }
-    if (!rawMessage.local_user_id && get(data, 'options.url') !== '/api/v1/user') {
+    if (!rawMessage.local_user_id && data?.options?.url !== '/api/v1/user') {
       cb({
         status: 400,
         error: 'GATEWAY_USER_NOT_LINKED',
