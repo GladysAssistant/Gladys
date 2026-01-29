@@ -177,5 +177,5 @@
 }
 
 .msg_txt_wrap {
-  white-space: pre-line;
+  white-space: pre-wrap;
 }
