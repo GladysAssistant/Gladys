@@ -26,14 +26,15 @@ const existingDevice = {
   params: [],
 };
 
+const originalStateManagerGet = (key, externalId) => {
+  if (externalId === 'alreadyExists') {
+    return existingDevice;
+  }
+  return undefined;
+};
 const gladys = {
   stateManager: {
-    get: (key, externalId) => {
-      if (externalId === 'alreadyExists') {
-        return existingDevice;
-      }
-      return undefined;
-    },
+    get: sinon.fake(originalStateManagerGet),
   },
 };
 const serviceId = 'service-uuid-random';
@@ -48,6 +49,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
     tasmotaHandler = new TasmotaHandler(gladys, serviceId);
     protocolHandler = tasmotaHandler.protocols[protocol];
     sinon.spy(protocolHandler, 'handleMessage');
+    gladys.stateManager.get = sinon.fake(originalStateManagerGet);
   });
 
   afterEach(() => {
@@ -322,6 +324,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
     tasmotaHandler = new TasmotaHandler(gladys, serviceId);
     protocolHandler = tasmotaHandler.protocols[protocol];
     sinon.reset();
+    gladys.stateManager.get = sinon.fake(originalStateManagerGet);
   });
 
   it('nothing discovered', () => {
