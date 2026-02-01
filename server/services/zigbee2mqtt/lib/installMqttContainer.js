@@ -79,7 +79,7 @@ async function installMqttContainer(config) {
         Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
       });
 
-      // Container restart to inintialize users configuration
+      // Container restart to initialize users configuration
       logger.info('MQTT broker is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart

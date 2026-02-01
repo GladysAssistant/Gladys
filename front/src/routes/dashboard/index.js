@@ -189,7 +189,7 @@ class Dashboard extends Component {
     // Check server side if we are in tablet mode
     try {
       const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
-      if (currentSession.tablet_mode) {
+      if (currentSession.tablet_mode && currentSession.has_alarm_code) {
         this.redirectToLocked();
       }
     } catch (e) {

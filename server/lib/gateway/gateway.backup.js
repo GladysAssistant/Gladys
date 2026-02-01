@@ -25,6 +25,29 @@ const UPLOAD_ONE_CHUNK_RETRY_OPTIONS = {
   minTimeout: 50,
 };
 
+// Log DuckDB memory usage and JS heap size
+const logMemoryUsage = async (label) => {
+  // JavaScript heap memory
+  const heapUsed = process.memoryUsage();
+  const heapUsedMB = (heapUsed.heapUsed / (1024 * 1024)).toFixed(2);
+  const heapTotalMB = (heapUsed.heapTotal / (1024 * 1024)).toFixed(2);
+  const rssMB = (heapUsed.rss / (1024 * 1024)).toFixed(2);
+  logger.info(`JS memory ${label} - RSS: ${rssMB} MB, Heap: ${heapUsedMB}/${heapTotalMB} MB`);
+
+  // DuckDB memory
+  const memoryUsage = await db.duckDbReadConnectionAllAsync('SELECT * FROM duckdb_memory()');
+  const totalBytes = memoryUsage.reduce((sum, row) => sum + row.memory_usage_bytes, 0n);
+  const totalMB = Number(totalBytes) / (1024 * 1024);
+  logger.info(`DuckDB memory ${label} - Total: ${totalMB.toFixed(2)} MB`);
+  const nonZeroEntries = memoryUsage.filter((row) => row.memory_usage_bytes > 0n);
+  if (nonZeroEntries.length > 0) {
+    nonZeroEntries.forEach((row) => {
+      const mb = Number(row.memory_usage_bytes) / (1024 * 1024);
+      logger.info(`  - ${row.tag}: ${mb.toFixed(2)} MB`);
+    });
+  }
+};
+
 /**
  * @description Create a backup and upload it to the Gateway.
  * @param {string} jobId - The job id.
@@ -34,6 +57,7 @@ const UPLOAD_ONE_CHUNK_RETRY_OPTIONS = {
  */
 async function backup(jobId) {
   try {
+    await logMemoryUsage('before backup');
     const encryptKey = await this.variable.getValue('GLADYS_GATEWAY_BACKUP_KEY');
     if (encryptKey === null) {
       throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
@@ -71,13 +95,21 @@ async function backup(jobId) {
     const fileSizeMB = Math.round(fileInfos.size / 1024 / 1024);
     logger.info(`Gateway backup : SQLite file size is ${fileSizeMB}mb.`);
     logger.info(`Gateway backup : Backing up DuckDB into a Parquet folder ${duckDbBackupFolderPath}`);
-    // DuckDB backup to parquet file
-    await db.duckDbWriteConnectionAllAsync(
-      ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
-          FORMAT PARQUET,
-          COMPRESSION GZIP
-      )`,
-    );
+    // DuckDB backup to parquet file using a dedicated connection
+    // This connection will be closed after export to release memory
+    const backupInstance = db.duckDbCreateBackupInstance();
+    try {
+      await backupInstance.allAsync(
+        ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
+            FORMAT PARQUET,
+            COMPRESSION GZIP
+        )`,
+      );
+    } finally {
+      // Close the backup database instance to release DuckDB buffer pool memory
+      logger.info('Gateway backup: Closing DuckDB backup instance to release memory');
+      await backupInstance.close();
+    }
     // compress backup
     logger.info(`Gateway backup: Compressing backup`);
     await exec(
@@ -105,6 +137,7 @@ async function backup(jobId) {
 
       const partsUploaded = await Promise.mapSeries(initializeBackupResponse.parts, async (part, index) => {
         const startPosition = index * initializeBackupResponse.chunk_size;
+
         const chunk = await readChunk(encryptedBackupFilePath, {
           length: initializeBackupResponse.chunk_size,
           startPosition,
@@ -137,6 +170,7 @@ async function backup(jobId) {
       await this.job.updateProgress(jobId, 100);
       // done!
       logger.info(`Gladys backup uploaded with success to Gladys Gateway.`);
+      await logMemoryUsage('after upload');
     } catch (e) {
       await this.gladysGatewayClient.abortMultiPartBackup({
         file_key: initializeBackupResponse.file_key,

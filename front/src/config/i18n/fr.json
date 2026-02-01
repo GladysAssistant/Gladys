@@ -137,8 +137,8 @@
       "passwordPlaceHolder": "Entrez un mot de passe",
       "passwordRepeatLabel": "Répétez votre mot de passe",
       "passwordRepeatPlaceHolder": "Répétez votre mot de passe",
-      "firstnameError": "Le prénom requis.",
-      "lastnameError": "Le nom de famille requis.",
+      "firstnameError": "Le prénom est requis.",
+      "lastnameError": "Le nom de famille est requis.",
       "emailError": "L'e-mail n'est pas une adresse valide",
       "passwordError": "Le mot de passe doit contenir au moins 8 caractères.",
       "passwordRepeatError": "Le mot de passe ne correspond pas.",
@@ -158,7 +158,7 @@
     },
     "restoreBackupInProgress": {
       "title": "Restauration en cours...",
-      "description": "A la fin du processus de restauration, Gladys redémarrera automatiquement.",
+      "description": "À la fin du processus de restauration, Gladys redémarrera automatiquement.",
       "errored": "La restauration a échoué, la clé de restauration n'est peut-être pas valide",
       "updateRestoreKeyButton": "Mettre à jour la clé de restauration"
     },
@@ -201,14 +201,14 @@
       "deleteHouse": "Supprimer la maison",
       "confirmDeleteHouse": "Confirmer la suppression de la maison",
       "cancelDeleteHouse": "Annuler",
-      "conflictError": "Une maison avec le même non existe déjà.",
-      "roomConflictError": "Une pièce avec le même non existe déjà.",
-      "validationError": "Erreur de validation : Le nom d'une maison doit-être compris entre 1 et 40 caractères.",
-      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères.",
+      "conflictError": "Une maison avec le même nom existe déjà.",
+      "roomConflictError": "Une pièce avec le même nom existe déjà.",
+      "validationError": "Erreur de validation : Le nom d'une maison doit être compris entre 1 et 40 caractères.",
+      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être compris entre 1 et 40 caractères.",
       "alarmTitle": "Alarme",
       "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
       "alarmCodeLabel": "Code de l'alarme",
-      "alarmCodePlaceholder": "Entrez un code numériques entre 4 et 8 chiffres",
+      "alarmCodePlaceholder": "Entrez un code numérique entre 4 et 8 chiffres",
       "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
       "alarmCodeError": "Le code doit être numérique et entre 4 et 8 chiffres.",
       "alarmDelays": {
@@ -224,7 +224,7 @@
       "title": "Merci !",
       "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
       "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSotware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSoftware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -338,7 +338,7 @@
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
         "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
-        "emptyText": "Il n'y a aucun utilisateurs sélectionnés. Vous pouvez éditer cette box pour sélectionner des utilisateurs à afficher."
+        "emptyText": "Il n'y a aucun utilisateur sélectionné. Vous pouvez éditer cette box pour sélectionner des utilisateurs à afficher."
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -349,7 +349,7 @@
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
         "upgradeGladysPlusPlanError": "Le streaming de caméra n'est pas compris dans votre plan Gladys Plus. Vous devez le mettre à jour dans Paramètres -> Facturation.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
-        "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est peut-être pas supporté sur ce navigateur. Nous vous recommandons Firefox, Safari, ou tout navigateur basé sur Chromium.",
+        "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est peut-être pas supportée par ce navigateur. Nous vous recommandons Firefox, Safari, ou tout navigateur basé sur Chromium.",
         "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
         "liveAutoStartLabel": "Lancer automatiquement le streaming",
         "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
@@ -639,7 +639,7 @@
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
       "shareTab": "Partage",
-      "documentation": "Documentation CalDav",
+      "documentation": "Documentation CalDAV",
       "description": "Synchronisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
@@ -1942,6 +1942,79 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "nuki": {
+      "title": "Nuki",
+      "description": "Contrôlez vos appareils Nuki.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Nuki",
+      "setupTab": "Configuration Web",
+      "documentation": "Documentation Nuki",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Nuki",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "mqttDiscoverTab": "Découverte MQTT",
+      "httpDiscoverTab": "Découverte Web",
+      "protocolLabels": {
+        "mqtt": "Topic MQTT de la serrure connectée",
+        "http": "Id de la serrure connectée sur NukiWeb"
+      },
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Nuki, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Nuki.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils Nuki dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "noDeviceFound": "Aucun appareil Nuki trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
+        "protocolLabel": "Protocole",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Nuki",
+        "description": "Les appareils Nuki sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Nuki.",
+        "noDeviceFound": "Aucun appareil Nuki n'a été découvert.",
+        "scan": "Scanner",
+        "mqtt": {
+          "title": "Découverte des appareils Nuki sur MQTT",
+          "description": "Les appareils Nuki configurés sont automatiquement découverts sur le réseau MQTT.",
+          "scan": "Rechercher"
+        },
+        "http": {
+          "title": "Découverte des appareils Nuki dans le cloud NukiWeb",
+          "description": "Lancer une recherche pour découvrir les appareils depuis votre compte NukiWeb.",
+          "scan": "Rechercher"
+        }
+      },
+      "setup": {
+        "title": "Configuration nuki",
+        "nukiDescription": "Pour commander vos appareils par le biais de NukiWeb, Gladys doit être connectée à internet et vous devez obtenir un jeton API. Suivez ces étapes :<br><br>1. Si vous n’avez pas encore de compte Nuki Web, créez-en un en suivant <a href=\"https://help.nuki.io/hc/fr/articles/360016485718-Activer-et-désactiver-un-compte-Nuki-Web\" target=\"_blank\" rel=\"noopener noreferrer\">ces explications</a> puis  allez sur le <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">le site NukiWeb</a><br>2. Menu <a href=\"https://web.nuki.io/#/pages/web-api\" target=\"_blank\" rel=\"noopener noreferrer\">API</a>, puis \"Générer un jeton d'API\" pour obtenir votre jeton API<br>3. Entrez votre jeton API ci-dessous (Attention, il ne s’agit pas de la clé OAuth2, mais bien du jeton API créé précédemment)<br>4. Faites une recherche dans <a href=\"/dashboard/integration/device/nuki/http\">Découverte Web</a> pour ajouter vos appareils<br><br>⚠️ Note : Cette configuration est <u>facultative</u> si votre installation est paramétrée avec MQTT.<br> En utilisant ce mode, le status de la serrure ne sera mise à jour qu’une fois par minute (par ex en cas de changement sur une autre application). ",
+        "apiKeyLabel": "Jeton API",
+        "apiKeyPlaceholder": "Entrez le jeton API Nuki web",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud nuki...",
+        "connected": "Connexion réussie au compte cloud nuki !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "disabledWarning": "Le service n'est pas encore activé. Pour commencer à utiliser le service, vous pouvez : <ul><li>soit <a href=\"/dashboard/integration/device/mqtt/setup\">connecter Gladys à un broker MQTT</a></li><li>soit renseigner un jeton API dans l'onglet <a href=\"/dashboard/integration/device/nuki/setup\">Configuration web</a></li></ul>"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "openai": {
       "title": "OpenAI ChatGPT",
       "documentation": "Documentation ChatGPT",
@@ -2052,7 +2125,7 @@
       "title": "MCP",
       "description": "Connectez votre agent IA à Gladys.",
       "documentation": "Documentation MCP",
-      "longDescription": "MCP est un protocol permettant d'ajouter des fonctionnalités du monde réel à votre agent. Cette intégration fait office de serveur MCP et permet à vos agents IA compatible MCP d'intéragire avec votre maison connectée. Votre agent et votre instance Gladys doivent être sur le même réseau.",
+      "longDescription": "MCP est un protocole permettant d'ajouter des fonctionnalités du monde réel à votre agent. Cette intégration fait office de serveur MCP et permet à vos agents IA compatibles MCP d'intéragir avec votre maison connectée. Votre agent et votre instance Gladys doivent être sur le même réseau.",
       "urlLabel": "URL du serveur MCP",
       "urlInstruction": "Copiez cette URL dans la configuration de votre agent.",
       "apiKeyLabel": "Clé API du serveur MCP",
@@ -3206,6 +3279,18 @@
           }
         }
       },
+      "lock": {
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Déverrouillée",
+            "1": "Verrouillée"
+          },
+          "state": {
+            "0": "Verrouiller",
+            "1": "Déverrouiller"
+          }
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Auto",
@@ -3865,6 +3950,12 @@
       "playback_state": "Etat de la lecture musique",
       "play_notification": "Diffuser une notification"
     },
+    "lock": {
+      "shortCategoryName": "Serrure",
+      "integer": "Batterie",
+      "binary": "Verrouillage",
+      "state": "État"
+    },
     "noise-sensor": {
       "shortCategoryName": "Capteur sonore",
       "integer": "Bruit (entier)"
@@ -3973,7 +4064,7 @@
     "supportText": "Support à hello@gladysassistant.com",
     "createAccount": "Créez votre compte Gladys Plus",
     "emailAlreadyExistError": "Un compte avec cet e-mail existe déjà",
-    "browserNotCompatibleError": " Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto.",
+    "browserNotCompatibleError": "Désolé, votre navigateur n'est pas compatible avec la passerelle Gladys. Votre navigateur doit prendre en charge l'API WebCrypto.",
     "tokenError": "Vous devez d'abord vous abonner au pack Gladys Community sur le site Web de Gladys !",
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer plus tard ou me contacter à hello@gladysassistant.com pour comprendre ce qui s'est passé.",
     "invalidInvitationError": "Nous ne pouvons pas récupérer votre invitation. Peut-être qu'il était déjà utilisé ou a expiré ! Veuillez nous contacter à hello@gladysassistant.com."

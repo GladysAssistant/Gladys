@@ -18,7 +18,7 @@ const ConfigureHouseTab = () => (
                 <MarkupText id="signup.success.thanksForChoosingOpenSource" />
               </p>
               <p class="text">
-                <MarkupText id="signup.success.ifYouWantToSupportThisSotware" />
+                <MarkupText id="signup.success.ifYouWantToSupportThisSoftware" />
               </p>
             </div>
 

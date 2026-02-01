@@ -144,8 +144,8 @@
       "passwordRepeatError": "Passwords do not match.",
       "birthdateError": "Birthdate is required.",
       "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
-      "emailAlreadyExistError": "A user with this email already exist.",
-      "selectorAlreadyExistError": "A user with this first name already exist.",
+      "emailAlreadyExistError": "A user with this email already exists.",
+      "selectorAlreadyExistError": "A user with this first name already exists.",
       "createAccountButton": "Create Account"
     },
     "restoreBackupSetBackupKey": {
@@ -193,7 +193,7 @@
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Enter your house name",
       "houseNameError": "House name is required",
-      "houseLocationLabel": "Click where you house is located",
+      "houseLocationLabel": "Click where your house is located",
       "roomsLabel": "Add all rooms in your house",
       "roomNamePlaceHolder": "Type a new room to add",
       "addRoomButton": "Add",
@@ -201,8 +201,8 @@
       "deleteHouse": "Delete house",
       "confirmDeleteHouse": "Confirm house deletion",
       "cancelDeleteHouse": "Cancel",
-      "conflictError": "A house with the same name already exist.",
-      "roomConflictError": "A room with the same name already exist.",
+      "conflictError": "A house with the same name already exists.",
+      "roomConflictError": "A room with the same name already exists.",
       "validationError": "House name should be between 1 and 40 characters",
       "validationErrorRoom": "Room name should be between 1 and 40 characters",
       "alarmTitle": "Alarm",
@@ -224,7 +224,7 @@
       "title": "Thank you!",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a>, and I started working on Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys. I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSoftware": "I rely on contributions to make this project sustainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to the Dashboard"
     }
   },
@@ -348,7 +348,7 @@
         "latencyBoxName": "Latency",
         "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
         "upgradeGladysPlusPlanError": "Camera streaming is not included in your Gladys Plus plan. You need to update it in Settings -> Billing.",
-        "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
+        "liveStartError": "An error occurred while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
         "notNotSupportedBrowser": "This browser is not supported. To enable end-to-end encryption of this video stream, we use the MediaSource API, which may not be supported on this browser. We recommend Firefox, Safari, or any Chromium-based browser.",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
         "liveAutoStartLabel": "Start automatically the live streaming",
@@ -419,7 +419,7 @@
       "ecowatt": {
         "title": "Ecowatt France",
         "description": "This box let you check the status of the french electricity network.",
-        "error": "An error occured while fetching the RTE API. Please retry.",
+        "error": "An error occurred while fetching the RTE API. Please retry.",
         "dailyTitle": "Daily previsions",
         "nextDaysTitle": "Next days previsions",
         "ok": "Network ok",
@@ -452,7 +452,7 @@
         "description": "This widget will display a gauge with the value of the selected feature between its minimum and maximum value.",
         "selectDeviceLabel": "Select feature to display",
         "noDeviceFeatureSelector": "No feature selected",
-        "errorLoadingDevice": "An error occured while loading the device",
+        "errorLoadingDevice": "An error occurred while loading the device",
         "noDeviceFeatureLastValue": "This feature has not received any value yet"
       },
       "energyConsumption": {
@@ -500,7 +500,7 @@
     "description": "You can create as many dashboard as you want, so you can better organize the data you want to display.",
     "nameLabel": "Name",
     "dashboardAlreadyExist": "A dashboard with this name already exists.",
-    "unknownError": "An unknown error occured. Please retry!",
+    "unknownError": "An unknown error occurred. Please retry!",
     "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
     "createDashboardButton": "Create"
   },
@@ -625,7 +625,7 @@
     },
     "netatmo": {
       "title": "Netatmo",
-      "description": "Control Netatmo equipment",
+      "description": "Control Netatmo devices",
       "deviceTab": "Devices",
       "discoverTab": "Netatmo Discovery",
       "setupTab": "Setup",
@@ -913,7 +913,7 @@
         "title": "Node-RED configuration",
         "description": "This service uses Docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
         "descriptionBackup": "For the moment, Node-RED is not backup into Gladys Plus.\nIf you want a backup for Node-RED, please follow this <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">docs</a>",
-        "error": "An error occured while starting Node-RED.",
+        "error": "An error occurred while starting Node-RED.",
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
@@ -938,7 +938,7 @@
       "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Google?",
       "pageDescription": "By signin in, you are authorizing Google to access your devices.",
-      "error": "An error occured. Please retry !",
+      "error": "An error occurred. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Google will be able:",
       "seeDevices": "List all your devices",
@@ -956,7 +956,7 @@
       "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
       "pageDescription": "By signin in, you are authorizing Alexa to access your devices.",
-      "error": "An error occured. Please retry !",
+      "error": "An error occurred. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Alexa will be able:",
       "seeDevices": "List all your devices",
@@ -1103,7 +1103,7 @@
         "appAccountId": "App account UID",
         "appAccountIdPlaceholder": "Enter Tuya application UID",
         "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
+        "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",
         "connected": "Connected to the Tuya cloud account with success !",
         "connectionError": "Error while connecting, please check your configuration."
@@ -1186,7 +1186,7 @@
     },
     "airplay": {
       "title": "Airplay",
-      "description": "Contrôler les appareils Airplay sur votre réseau local",
+      "description": "Control Airplay devices on your local network",
       "deviceTab": "Devices",
       "discoverTab": "Airplay Discovery",
       "setupTab": "Setup",
@@ -1321,7 +1321,7 @@
         "password": "Password",
         "passwordPlaceholder": "Enter your MELCloud account password",
         "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
+        "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MELCloud cloud account...",
         "connected": "Connected to the MELCloud cloud account with success !",
         "connectionError": "Error while connecting, please check your configuration."
@@ -1411,7 +1411,7 @@
         "brokerDockerNotInstalled": "No broker is available yet on current Docker environment, continue to install and configure <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> broker inside a Docker container.  Warning: this option will launch a Mosquitto container on port 1883. If you already have an MQTT server on this machine on port 1883, this won't work.",
         "installBrokerButton": "Install broker on Docker",
         "installingBrokerButton": "Installation in progress...",
-        "installBrokerError": "An error occured while installing Docker container, please consult Gladys logs.",
+        "installBrokerError": "An error occurred while installing Docker container, please consult Gladys logs.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
@@ -1419,7 +1419,7 @@
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter MQTT broker password",
         "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
+        "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your MQTT broker...",
         "connected": "Connected to the MQTT broker with success !",
         "connectionError": "Error while connecting, please check your configuration.",
@@ -1495,7 +1495,7 @@
         "selectedFeatureInfoLabel": "Feature <b>{{feature}}</b> is selected.",
         "unselectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, please select an action to enter capture mode.",
         "selectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, with action <b>{{action}}</b>.",
-        "testError": "An error occured while testing feature, please check your device.",
+        "testError": "An error occurred while testing feature, please check your device.",
         "peripheralSelectLabel": "{{name}} ({{address}})",
         "testLabel": "Test",
         "unselect": "Unselect",
@@ -1760,7 +1760,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronization",
       "shareTab": "Sharing",
-      "documentation": "CalDav documentation",
+      "documentation": "CalDAV documentation",
       "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
@@ -1782,7 +1782,7 @@
           "url": "Google Calendar URL",
           "urlInfo": "Let default URL, it will be set automatically.",
           "username": "Email",
-          "usernameInfo": "Enter your Google email adress.",
+          "usernameInfo": "Enter your Google email address.",
           "password": "Password",
           "passwordInfo": "<a href=\"https://support.google.com/accounts/answer/185833?hl=en\" target=\"_blank\" rel=\"noopener noreferrer\">Generate an app-specific password</a> and use this app-specific password instead of your account password."
         },
@@ -1806,16 +1806,16 @@
       },
       "synchronizationInfo": "Calendars are synchronized every 30 minutes.",
       "configurationSuccess": "Auto-configuration done.",
-      "configurationDefaultError": "An error occured during auto-configuration.",
+      "configurationDefaultError": "An error occurred during auto-configuration.",
       "configurationError": "Check settings and CalDAV server status.",
       "configurationBadCredentialsError": "Check your username/password.",
       "configurationBadUrlError": "Check your CalDAV server URL.",
       "configurationRetrievePrincipalUrlError": "Can't retrieve your account principal URL, check settings and CalDAV server status.",
       "configurationRetrieveHomeUrlError": "Can't retrieve your account home URL, check settings and CalDAV server status.",
       "cleanUpSuccess": "Clean up completed.",
-      "cleanUpError": "An error occured while trying clean up.",
+      "cleanUpError": "An error occurred while trying clean up.",
       "synchronizationSuccess": "Synchronization completed.",
-      "synchronizationDefaultError": "An error occured while trying synchronization.",
+      "synchronizationDefaultError": "An error occurred while trying synchronization.",
       "synchronizationError": "Check CalDAV server state.",
       "synchronizationBadCredentialsError": "Service not yet configured, enter your CalDAV parameters and click 'save'.",
       "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
@@ -1930,7 +1930,7 @@
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter eWeLink password",
         "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
+        "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
         "connected": "Connected to the eWeLink cloud account with success !",
         "connectionError": "Error while connecting, please check your configuration.",
@@ -1940,6 +1940,79 @@
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
+      }
+    },
+    "nuki": {
+      "title": "Nuki",
+      "description": "Control your Nuki devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "Nuki Discovery",
+      "setupTab": "Web setup",
+      "documentation": "Nuki documentation ",
+      "discoverDeviceDescr": "Automatically scan for Nuki devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Unsupported or unavailable model",
+      "mqttDiscoverTab": "MQTT Discovery",
+      "httpDiscoverTab": "Web Discovery",
+      "protocolLabels": {
+        "mqtt": "MQTT topic of the connected lock",
+        "http": "ID of the connected lock on NukiWeb"
+      },
+      "status": {
+        "notConnected": "Gladys failed to connect to the Nuki cloud account. More information on the ",
+        "setupPageLink": "Nuki setup page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Nuki Devices in Gladys",
+        "search": "Search Devices",
+        "updates": "Check for Updates",
+        "noDeviceFound": "No Nuki device found. You can add devices with the following actions:",
+        "protocolLabel": "Protocol",
+        "protocolMQTT": "MQTT",
+        "protocolHTTP": "HTTP",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Nuki cloud account",
+        "description": "Nuki devices are automatically discovered.",
+        "error": "Error discovering Nuki devices.",
+        "noDeviceFound": "No Nuki device was discovered.",
+        "scan": "Scan",
+        "mqtt": {
+          "title": "Discover Nuki Devices on MQTT",
+          "description": "Configured Nuki devices are automatically discovered on the MQTT network.",
+          "scan": "Search"
+        },
+        "http": {
+          "title": "Discover Nuki Devices on the NukiWeb cloud",
+          "description": "Start a scan to discover the devices from your NukiWeb account.",
+          "scan": "Search"
+        }
+      },
+      "setup": {
+        "title": "Nuki Setup",
+        "nukiDescription": "To control your devices via NukiWeb, Gladys must be connected to the internet and you need to obtain an API token. Follow these steps:<br><br>1. If you don’t have a Nuki Web account yet, create one by following <a href=\"https://help.nuki.io/hc/en-us/articles/360016485718-Activer-et-désactiver-un-compte-Nuki-Web\" target=\"_blank\" rel=\"noopener noreferrer\">these instructions</a> and then go to the <a href=\"https://web.nuki.io/\" target=\"_blank\" rel=\"noopener noreferrer\">NukiWeb website</a><br>2. Go to the <a href=\"https://web.nuki.io/#/pages/web-api\" target=\"_blank\" rel=\"noopener noreferrer\">API menu</a>, then click on “Generate API token” to get your API token<br>3. Enter your API token below (Note: this is not the OAuth2 key, but the API token created earlier)<br>4. Perform a search in <a href=\"/dashboard/integration/device/nuki/http\">Web Discovery</a> to add your devices<br><br>⚠️ Note: This configuration is <u>optional</u> if your setup is configured with MQTT.<br>When using this mode, the lock status will only be updated once per minute (e.g., if a change occurs through another application). ",
+        "apiKeyLabel": "API token",
+        "apiKeyPlaceholder": "Enter your Nuki Web API token",
+        "saveLabel": "Save Configuration",
+        "error": "An error occurred while saving the configuration.",
+        "connecting": "Configuration saved. Connecting to your Nuki cloud account...",
+        "connected": "Successfully connected to the Nuki cloud account!",
+        "connectionError": "Connection error, please check your configuration.",
+        "disabledWarning": "The service is not yet activated. To start using the service, you can: <ul><li>either <a href=\"/dashboard/integration/device/mqtt/setup\">connect Gladys to an MQTT broker</a></li><li>or enter an API token in the <a href=\"/dashboard/integration/device/nuki/setup\">Configuration</a> tab</li></ul>"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "This device already exists in Gladys."
       }
     },
     "openai": {
@@ -2033,7 +2106,7 @@
       "roomLabel": "Room",
       "featuresLabel": "Features",
       "noFeaturesHandled": "No features are handled by this device",
-      "displayDeviceInfo": "Display device informations",
+      "displayDeviceInfo": "Display device information",
       "matterParamsNames": {
         "SERIAL_NUMBER": "Serial Number",
         "UNIQUE_ID": "Unique ID"
@@ -2611,10 +2684,10 @@
     "passwordRepeatError": "Passwords do not match.",
     "birthdateError": "Birthdate is required.",
     "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
-    "emailAlreadyExistError": "A user with this email already exist.",
-    "selectorAlreadyExistError": "A user with this first name already exist.",
+    "emailAlreadyExistError": "A user with this email already exists.",
+    "selectorAlreadyExistError": "A user with this first name already exists.",
     "instanceAlreadyConfiguredError": "This instance is already configured. You cannot create another account.",
-    "unknownError": "An unknown error occured. Please try again or contact Gladys community."
+    "unknownError": "An unknown error occurred. Please try again or contact Gladys community."
   },
   "settings": {
     "title": "Settings",
@@ -2711,11 +2784,11 @@
     "button": "Recover my password",
     "wrongEmailError": "This is not a valid email",
     "networkError": "Network Error: We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?",
-    "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
+    "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
     "success": "Success! I sent you a reset password link by Telegram or Nextcloud Talk. If you haven't configured these services, the reset password link will be in Gladys logs.",
     "howToAccessLogs": "To access Gladys logs, go to the command line and type `docker logs gladys --tail=1000` to display the last 1000 lines.",
     "userNotFound": "There is no account linked to this email.",
-    "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
+    "rateLimitError": "You have tried this form too many times. Please retry in 30 minutes or restart your Gladys instance now.",
     "invalidEmail": "We are unable to verify your email address.",
     "validationLinkConfirmation": "Are you sure you clicked/copied the link correctly?",
     "contactUs": "If it still not working, please contact us on <a href=\"https://twitter.com/gladysassistant\">Twitter</a> or on <a href=\"https://community.gladysassistant.com\">Gladys Community</a>.",
@@ -2741,8 +2814,8 @@
     "alreadyHaveAccount": "Already have account? <a href=\"/login\">Sign in</a>"
   },
   "httpErrors": {
-    "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
-    "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
+    "rateLimitError": "You have tried this form too many times. Please retry in 30 minutes or restart your Gladys instance now.",
+    "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
     "networkError": "Network Error:  We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?"
   },
   "jobsSettings": {
@@ -2863,21 +2936,21 @@
     "cardTitle": "New scene",
     "nameLabel": "Name",
     "namePlaceholder": "Enter the name of your scene",
-    "iconLabel": "Select an icon for you scene",
+    "iconLabel": "Select an icon for your scene",
     "createSceneButton": "Create scene",
     "invalidName": "Name is required and cannot be 'new'",
     "invalidIcon": "Icon is required",
-    "sceneAlreadyExist": "A scene with that name already exist."
+    "sceneAlreadyExist": "A scene with that name already exists."
   },
   "duplicateScene": {
     "cardTitle": "Duplicate scene \"{{name}}\"",
     "nameLabel": "Name",
     "namePlaceholder": "Enter a new name",
-    "iconLabel": "Select an icon for you scene",
+    "iconLabel": "Select an icon for your scene",
     "duplicateSceneButton": "Duplicate",
     "invalidName": "Name is required",
     "invalidIcon": "Icon is required",
-    "sceneAlreadyExist": "A scene with that name already exist.",
+    "sceneAlreadyExist": "A scene with that name already exists.",
     "nameAfterCopy": "Copy of {{name}}"
   },
   "scene": {
@@ -3196,6 +3269,18 @@
           }
         },
         "lock": {
+          "stateLiveFinished": {
+            "0": "Unlocked",
+            "1": "Locked"
+          },
+          "state": {
+            "0": "Unlock",
+            "1": "Lock"
+          }
+        }
+      },
+      "lock": {
+        "binary": {
           "stateLiveFinished": {
             "0": "Unlocked",
             "1": "Locked"
@@ -3865,6 +3950,12 @@
       "playback_state": "Music playback state",
       "play_notification": "Broadcast a notification"
     },
+    "lock": {
+      "shortCategoryName": "Lock",
+      "integer": "Battery",
+      "binary": "Locking",
+      "state": "State"
+    },
     "noise-sensor": {
       "shortCategoryName": "Sound sensor",
       "integer": "Noise (integer)"
@@ -3975,7 +4066,7 @@
     "emailAlreadyExistError": "An account with that email already exist",
     "browserNotCompatibleError": "Sorry, your browser is not compatible with the Gladys Gateway. Your browser should support the WebCrypto API.",
     "tokenError": "You have to subscribe to the Gladys Community Package on Gladys website first!",
-    "unknownError": "An unknown error occured. Please retry later or contact me at hello@gladysassistant.com to understand what happened.",
+    "unknownError": "An unknown error occurred. Please retry later or contact me at hello@gladysassistant.com to understand what happened.",
     "invalidInvitationError": "We cannot retrieve your invitation. Maybe it was already used or it has expired! Please contact us at hello@gladysassistant.com."
   },
   "gatewaySubscribe": {
@@ -4086,7 +4177,7 @@
     "upgradeToYearly": "Switch to annual plan",
     "confirmUpgradeToYearly": "Confirm switching to annual plan? Your payment method will be charged.",
     "cancelUpgradeToYearly": "Cancel",
-    "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
+    "upgradeYearlyError": "An error occurred while switching to the annual plan, please contact us by email.",
     "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
 }

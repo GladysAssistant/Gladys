@@ -10,9 +10,14 @@ const ICON_MAP = {
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: {
     0: 'unlock',
     1: 'lock'
+  },
+  [DEVICE_FEATURE_CATEGORIES.LOCK]: {
+    0: 'unlock',
+    1: 'lock',
+    2: 'activity',
+    3: 'alert-triangle'
   }
 };
-
 const IconBinaryDeviceValue = ({ deviceFeature }) => {
   const { category, last_value: lastValue = null } = deviceFeature;
   const icon = get(ICON_MAP, `${category}.${lastValue}`);
