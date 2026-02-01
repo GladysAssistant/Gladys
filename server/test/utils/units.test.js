@@ -4,6 +4,7 @@ const {
   celsiusToFahrenheit,
   fahrenheitToCelsius,
   checkAndConvertUnit,
+  convertEnergyUnit,
   smartRound,
 } = require('../../utils/units');
 const { DEVICE_FEATURE_UNITS } = require('../../utils/constants');
@@ -197,5 +198,32 @@ describe('smartRound', () => {
   it('rounds to integer for abs(value) >= 1000', () => {
     expect(smartRound(1234.56)).to.equal(1235);
     expect(smartRound(-1234.56)).to.equal(-1235);
+  });
+});
+
+describe('convertEnergyUnit', () => {
+  it('returns same value when units are identical', () => {
+    const result = convertEnergyUnit(10, DEVICE_FEATURE_UNITS.KILOWATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
+    expect(result).to.equal(10);
+  });
+
+  it('returns null when value is null', () => {
+    const result = convertEnergyUnit(null, DEVICE_FEATURE_UNITS.WATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
+    expect(result).to.equal(null);
+  });
+
+  it('returns original value when units are unknown', () => {
+    const result = convertEnergyUnit(10, 'unknown-unit', DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
+    expect(result).to.equal(10);
+  });
+
+  it('converts Wh to kWh', () => {
+    const result = convertEnergyUnit(1500, DEVICE_FEATURE_UNITS.WATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
+    expect(result).to.equal(1.5);
+  });
+
+  it('converts MWh to kWh', () => {
+    const result = convertEnergyUnit(2, DEVICE_FEATURE_UNITS.MEGAWATT_HOUR, DEVICE_FEATURE_UNITS.KILOWATT_HOUR);
+    expect(result).to.equal(2000);
   });
 });

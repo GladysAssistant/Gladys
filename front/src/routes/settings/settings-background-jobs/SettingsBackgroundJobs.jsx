@@ -1,7 +1,7 @@
 import SettingsLayout from '../SettingsLayout';
 import JobList from './JobList';
 
-const SettingsBackgroubJobsPage = ({ jobs, user, loadNextPage, loadPreviousPage, isFirstPage, isLastPage }) => (
+const SettingsBackgroundJobsPage = ({ jobs, user, loadNextPage, loadPreviousPage, isFirstPage, isLastPage }) => (
   <SettingsLayout>
     <JobList
       jobs={jobs}
@@ -14,4 +14,4 @@ const SettingsBackgroubJobsPage = ({ jobs, user, loadNextPage, loadPreviousPage,
   </SettingsLayout>
 );
 
-export default SettingsBackgroubJobsPage;
+export default SettingsBackgroundJobsPage;
