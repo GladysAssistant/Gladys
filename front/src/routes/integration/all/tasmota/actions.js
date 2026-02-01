@@ -3,6 +3,30 @@ import debounce from 'debounce';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
 
+const getDeviceSortRank = device => {
+  const features = device.features || [];
+  const validModel = features.length > 0 || device.needAuthentication;
+  if (!validModel) return 3; // Unsupported model last
+  if (!device.created_at) return 0; // New devices first
+  if (device.updatable) return 1; // Then devices with updates
+  return 2; // Then already created devices
+};
+
+const getDeviceNameKey = device => (device.name || '').toLowerCase();
+const getDeviceTopicKey = device => (device.external_id || '').replace(/^tasmota:/, '').toLowerCase();
+
+const sortDiscoveredDevices = devices => {
+  return [...devices].sort((a, b) => {
+    const rankDiff = getDeviceSortRank(a) - getDeviceSortRank(b);
+    if (rankDiff !== 0) return rankDiff;
+
+    const nameDiff = getDeviceNameKey(a).localeCompare(getDeviceNameKey(b));
+    if (nameDiff !== 0) return nameDiff;
+
+    return getDeviceTopicKey(a).localeCompare(getDeviceTopicKey(b));
+  });
+};
+
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
@@ -37,7 +61,7 @@ function createActions(store) {
       try {
         const discoveredDevices = await state.httpClient.get(`/api/v1/service/tasmota/discover/${type}`);
         store.setState({
-          discoveredDevices,
+          discoveredDevices: sortDiscoveredDevices(discoveredDevices),
           loading: false,
           errorLoading: false
         });
@@ -180,7 +204,7 @@ function createActions(store) {
       }
 
       store.setState({
-        discoveredDevices: newDevices,
+        discoveredDevices: sortDiscoveredDevices(newDevices),
         loading: false
       });
     }

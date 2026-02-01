@@ -62,6 +62,17 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.notCalled(gladys.event.emit);
     assert.notCalled(gladys.stateManager.get);
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
+  });
+
+  it('decode STATUS5 message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
+
+    expect(tasmotaHandler.pendingDevices['tasmota-device-topic'].params).to.deep.include({
+      name: 'ip',
+      value: '10.5.0.231',
+    });
   });
 
   it('decode STATUS11 message', () => {

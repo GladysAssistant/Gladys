@@ -860,6 +860,8 @@
         "mqtt": "MQTT-Topic",
         "http": "HTTP-Identifier"
       },
+      "ipLabel": "IP-Adresse",
+      "openWebUiButton": "Geräteoberfläche öffnen",
       "saveButton": "Sichern",
       "updateButton": "Aktualisieren",
       "alreadyCreatedButton": "Bereits erstellt",

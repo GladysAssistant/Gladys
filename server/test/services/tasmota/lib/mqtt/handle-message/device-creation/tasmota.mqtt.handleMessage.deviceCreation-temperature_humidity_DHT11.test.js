@@ -62,6 +62,7 @@ describe('Tasmota - MQTT - create device with DHT11 temp/humidity features', () 
     assert.notCalled(gladys.event.emit);
     assert.notCalled(gladys.stateManager.get);
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
   it('decode STATUS11 message', () => {
