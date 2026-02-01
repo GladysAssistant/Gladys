@@ -175,7 +175,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
         f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
         f.external_id === 'tasmota:device-1:ENERGY:Total_consumption',
     );
-    expect(consumptionFeature).to.exist;
+    expect(consumptionFeature).to.not.equal(undefined);
     expect(consumptionFeature.energy_parent_id).to.eq('total-id');
 
     const costFeature = result.features.find(
@@ -183,17 +183,15 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
         f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST &&
         f.external_id === 'tasmota:device-1:ENERGY:Total_cost',
     );
-    expect(costFeature).to.exist;
+    expect(costFeature).to.not.equal(undefined);
     expect(costFeature.energy_parent_id).to.eq(consumptionFeature.id);
 
-    const todayConsumptionFeature = result.features.find((f) =>
-      f.external_id.includes('ENERGY:Today_consumption'),
-    );
+    const todayConsumptionFeature = result.features.find((f) => f.external_id.includes('ENERGY:Today_consumption'));
     const yesterdayConsumptionFeature = result.features.find((f) =>
       f.external_id.includes('ENERGY:Yesterday_consumption'),
     );
-    expect(todayConsumptionFeature).to.not.exist;
-    expect(yesterdayConsumptionFeature).to.not.exist;
+    expect(todayConsumptionFeature).to.equal(undefined);
+    expect(yesterdayConsumptionFeature).to.equal(undefined);
   });
 
   it('does not duplicate existing energy consumption features with ":" external ids', () => {
@@ -310,7 +308,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
     const [result] = tasmotaHandler.getDiscoveredDevices(protocol, defaultElectricMeterFeatureId);
 
     const customFeature = result.features.find((f) => f.external_id === 'custom:feature:1');
-    expect(customFeature).to.not.exist;
+    expect(customFeature).to.equal(undefined);
   });
 });
 

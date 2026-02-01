@@ -35,8 +35,8 @@ describe('Tasmota - buildDiscoveredDevice', () => {
     };
     const device = { external_id: 'tasmota:device-1' };
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
-    expect(result.features.find((f) => f.external_id.endsWith('_consumption'))).to.exist;
-    expect(result.features.find((f) => f.external_id.endsWith('_cost'))).to.exist;
+    expect(result.features.find((f) => f.external_id.endsWith('_consumption'))).to.not.equal(undefined);
+    expect(result.features.find((f) => f.external_id.endsWith('_cost'))).to.not.equal(undefined);
   });
 
   it('does not duplicate derived energy features already present', () => {

@@ -46,11 +46,11 @@ describe('Tasmota - notifyNewDevice', () => {
     await tasmotaHandler.notifyNewDevice(device, 'test.event');
 
     sinon.assert.calledOnce(gladys.event.emit);
-    const payload = gladys.event.emit.firstCall.args[1].payload;
+    const { payload } = gladys.event.emit.firstCall.args[1];
     const consumptionFeature = payload.features.find((f) => f.external_id.endsWith('_consumption'));
     const costFeature = payload.features.find((f) => f.external_id.endsWith('_cost'));
-    expect(consumptionFeature).to.exist;
-    expect(costFeature).to.exist;
+    expect(consumptionFeature).to.not.equal(undefined);
+    expect(costFeature).to.not.equal(undefined);
   });
 
   it('preserves existing derived features in websocket payload', async () => {
@@ -104,13 +104,13 @@ describe('Tasmota - notifyNewDevice', () => {
 
     await tasmotaHandler.notifyNewDevice(device, 'test.event');
 
-    const payload = gladys.event.emit.firstCall.args[1].payload;
+    const { payload } = gladys.event.emit.firstCall.args[1];
     const preservedConsumption = payload.features.find(
       (f) => f.external_id === 'tasmota:device-1:ENERGY:Total:consumption',
     );
     const preservedCost = payload.features.find((f) => f.external_id === 'tasmota:device-1:ENERGY:Total:cost');
-    expect(preservedConsumption).to.exist;
-    expect(preservedCost).to.exist;
+    expect(preservedConsumption).to.not.equal(undefined);
+    expect(preservedCost).to.not.equal(undefined);
   });
 
   it('emits websocket payload', async () => {
