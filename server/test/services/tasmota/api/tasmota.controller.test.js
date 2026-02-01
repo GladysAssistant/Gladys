@@ -4,6 +4,11 @@ const { assert, fake } = sinon;
 const TasmotaController = require('../../../../services/tasmota/api/tasmota.controller');
 
 const discoveredDevices = [{ device: 'first' }, { device: 'second' }];
+const gladys = {
+  energyPrice: {
+    getDefaultElectricMeterFeatureId: fake.resolves('default-energy-feature-id'),
+  },
+};
 const tasmotaHandler = {
   getDiscoveredDevices: fake.returns(discoveredDevices),
   scan: fake.resolves(discoveredDevices),
@@ -13,14 +18,14 @@ describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
   let controller;
 
   beforeEach(() => {
-    controller = TasmotaController(tasmotaHandler);
+    controller = TasmotaController(gladys, tasmotaHandler);
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('Get discovered MQTT devices', () => {
+  it('Get discovered MQTT devices', async () => {
     const req = {
       params: {
         protocol: 'mqtt',
@@ -30,9 +35,10 @@ describe('GET /api/v1/service/tasmota/discover/mqtt', () => {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    await controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
     assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
     assert.notCalled(tasmotaHandler.scan);
+    assert.calledWith(tasmotaHandler.getDiscoveredDevices, req.params.protocol, 'default-energy-feature-id');
     assert.calledWith(res.json, discoveredDevices);
   });
 });
@@ -41,7 +47,7 @@ describe('POST /api/v1/service/tasmota/discover/mqtt', () => {
   let controller;
 
   beforeEach(() => {
-    controller = TasmotaController(tasmotaHandler);
+    controller = TasmotaController(gladys, tasmotaHandler);
   });
 
   afterEach(() => {
@@ -69,14 +75,14 @@ describe('GET /api/v1/service/tasmota/discover/http', () => {
   let controller;
 
   beforeEach(() => {
-    controller = TasmotaController(tasmotaHandler);
+    controller = TasmotaController(gladys, tasmotaHandler);
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('Get discovered HTTP devices', () => {
+  it('Get discovered HTTP devices', async () => {
     const req = {
       params: {
         protocol: 'http',
@@ -86,9 +92,10 @@ describe('GET /api/v1/service/tasmota/discover/http', () => {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
+    await controller['get /api/v1/service/tasmota/discover/:protocol'].controller(req, res);
     assert.calledOnce(tasmotaHandler.getDiscoveredDevices);
     assert.notCalled(tasmotaHandler.scan);
+    assert.calledWith(tasmotaHandler.getDiscoveredDevices, req.params.protocol, 'default-energy-feature-id');
     assert.calledWith(res.json, discoveredDevices);
   });
 });
@@ -97,7 +104,7 @@ describe('POST /api/v1/service/tasmota/discover/http', () => {
   let controller;
 
   beforeEach(() => {
-    controller = TasmotaController(tasmotaHandler);
+    controller = TasmotaController(gladys, tasmotaHandler);
   });
 
   afterEach(() => {

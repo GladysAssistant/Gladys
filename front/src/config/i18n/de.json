@@ -729,7 +729,7 @@
       "fixing": "Behebung läuft...",
       "featureHint": {
         "title": "Energieüberwachung",
-        "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
+        "description": "Wenn Gladys die Tracking‑Funktionen nicht automatisch erstellt hat, können Sie sie hier erstellen.",
         "createButton": "Energieüberwachungsfunktionen erstellen",
         "hierarchy": "Ordne sie der Hierarchie „Energieüberwachung“ zu (Tab „Meine Geräte“), um Kosten zu verknüpfen.",
         "recalc": "Dann Verbrauch/Kosten im Tab „Einstellungen“ neu berechnen.",
