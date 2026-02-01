@@ -22,6 +22,9 @@ const gladys = {
   event: {
     emit: fake.returns(null),
   },
+  energyPrice: {
+    getDefaultElectricMeterFeatureId: fake.resolves('default-energy-feature-id'),
+  },
   stateManager: {
     get: fake.returns(null),
   },
@@ -91,8 +94,11 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '8');
   });
 
-  it('decode STATUS8 message', () => {
+  it('decode STATUS8 message', async () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
 
     const expectedDevice = {
       name: 'Tasmota',
@@ -253,10 +259,18 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
       state: 0.001,
     });
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'tasmota:tasmota-device-topic');
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
-      payload: expectedDevice,
+    const websocketCall = gladys.event.emit.getCalls().find((call) => call.args[0] === EVENTS.WEBSOCKET.SEND_ALL);
+    expect(websocketCall).to.not.equal(undefined);
+    const { payload, type } = websocketCall.args[1];
+    expect(type).to.eq(WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
+    expect(payload.external_id).to.eq(expectedDevice.external_id);
+    const websocketExternalIds = (payload.features || []).map((f) => f.external_id);
+    const expectedExternalIds = expectedDevice.features.map((f) => f.external_id);
+    expectedExternalIds.forEach((externalId) => {
+      expect(websocketExternalIds).to.include(externalId);
     });
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
     assert.notCalled(mqttService.device.publish);
   });
 });
