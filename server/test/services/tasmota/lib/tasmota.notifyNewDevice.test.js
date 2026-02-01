@@ -125,10 +125,43 @@ describe('Tasmota - notifyNewDevice', () => {
     expect(gladys.event.emit.firstCall.args[0]).to.eq(EVENTS.WEBSOCKET.SEND_ALL);
   });
 
+  it('uses mergeWithExistingDevice when no energy feature is present', async () => {
+    const device = {
+      external_id: 'tasmota:device-1',
+      features: [
+        {
+          id: 'temp-id',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          external_id: 'tasmota:device-1:TEMP:Temperature',
+          selector: 'tasmota:device-1:TEMP:Temperature',
+        },
+      ],
+    };
+    const mergedPayload = { external_id: 'merged' };
+    tasmotaHandler.mergeWithExistingDevice = sinon.fake.returns(mergedPayload);
+
+    await tasmotaHandler.notifyNewDevice(device, 'test.event');
+
+    sinon.assert.calledOnce(tasmotaHandler.mergeWithExistingDevice);
+    sinon.assert.notCalled(gladys.energyPrice.getDefaultElectricMeterFeatureId);
+    expect(gladys.event.emit.firstCall.args[1].payload).to.eq(mergedPayload);
+  });
+
   it('falls back to mergeWithExistingDevice when an error occurs', async () => {
     const device = {
       external_id: 'tasmota:device-1',
-      features: [],
+      features: [
+        {
+          id: 'total-id',
+          name: 'Energy total',
+          category: 'energy-sensor',
+          type: 'energy',
+          external_id: 'tasmota:device-1:ENERGY:Total',
+          selector: 'tasmota:device-1:ENERGY:Total',
+        },
+      ],
     };
     const fallbackPayload = { external_id: 'fallback' };
     tasmotaHandler.mergeWithExistingDevice = sinon.fake.returns(fallbackPayload);
