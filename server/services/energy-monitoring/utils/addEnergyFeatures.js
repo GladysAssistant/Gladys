@@ -3,13 +3,19 @@ const uuid = require('uuid');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { ENERGY_INDEX_FEATURE_TYPES } = require('./constants');
 
-const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
+const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId, options = {}) => {
+  if (!device || !Array.isArray(device.features)) {
+    return device;
+  }
+
+  const { filterIndexFeature } = options;
   const featuresToAdd = [];
   const indexFeatures = device.features.filter(
     (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
   );
+  const filteredIndexFeatures = filterIndexFeature ? indexFeatures.filter(filterIndexFeature) : indexFeatures;
 
-  indexFeatures.forEach((indexFeature) => {
+  filteredIndexFeatures.forEach((indexFeature) => {
     // Set the default id if it's not set
     if (!indexFeature.id) {
       indexFeature.id = uuid.v4();
