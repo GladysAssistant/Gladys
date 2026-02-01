@@ -1,6 +1,7 @@
 const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 const { buildDiscoveredDevice, isTasmotaTotalEnergyIndex } = require('./tasmota.buildDiscoveredDevice');
+const { mergeDevices } = require('../../../utils/device');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
@@ -10,8 +11,9 @@ const { buildDiscoveredDevice, isTasmotaTotalEnergyIndex } = require('./tasmota.
  * notifyNewDevice(discorveredDevice)
  */
 async function notifyNewDevice(device, event) {
+  let existing;
   try {
-    const existing = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
+    existing = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
     const deviceFeatures = Array.isArray(device.features) ? device.features : [];
     const existingFeatures = existing && Array.isArray(existing.features) ? existing.features : [];
     const hasEnergyTotal =
@@ -24,13 +26,12 @@ async function notifyNewDevice(device, event) {
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
         ].includes(f.type),
     );
-
     let payload;
     if (hasEnergyTotal || hasDerivedEnergy) {
       const defaultElectricMeterDeviceFeatureId = await this.gladys.energyPrice.getDefaultElectricMeterFeatureId();
       payload = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
     } else {
-      payload = this.mergeWithExistingDevice(device);
+      payload = mergeDevices(device, existing);
     }
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -38,8 +39,8 @@ async function notifyNewDevice(device, event) {
       payload,
     });
   } catch (e) {
-    logger.warn(`Tasmota notifyNewDevice failed, fallback to mergeWithExistingDevice: ${e.message}`);
-    const payload = this.mergeWithExistingDevice(device);
+    logger.warn(`Tasmota notifyNewDevice failed, fallback to mergeDevices: ${e.message}`);
+    const payload = mergeDevices(device, existing);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: event,
       payload,

@@ -125,7 +125,7 @@ describe('Tasmota - notifyNewDevice', () => {
     expect(gladys.event.emit.firstCall.args[0]).to.eq(EVENTS.WEBSOCKET.SEND_ALL);
   });
 
-  it('uses mergeWithExistingDevice when no energy feature is present', async () => {
+  it('uses mergeDevices when no energy feature is present', async () => {
     const device = {
       external_id: 'tasmota:device-1',
       features: [
@@ -139,14 +139,10 @@ describe('Tasmota - notifyNewDevice', () => {
         },
       ],
     };
-    const mergedPayload = { external_id: 'merged' };
-    tasmotaHandler.mergeWithExistingDevice = sinon.fake.returns(mergedPayload);
-
     await tasmotaHandler.notifyNewDevice(device, 'test.event');
 
-    sinon.assert.calledOnce(tasmotaHandler.mergeWithExistingDevice);
     sinon.assert.notCalled(gladys.energyPrice.getDefaultElectricMeterFeatureId);
-    expect(gladys.event.emit.firstCall.args[1].payload).to.eq(mergedPayload);
+    expect(gladys.event.emit.firstCall.args[1].payload).to.deep.equal(device);
   });
 
   it('falls back to mergeWithExistingDevice when an error occurs', async () => {
@@ -163,13 +159,13 @@ describe('Tasmota - notifyNewDevice', () => {
         },
       ],
     };
-    const fallbackPayload = { external_id: 'fallback' };
-    tasmotaHandler.mergeWithExistingDevice = sinon.fake.returns(fallbackPayload);
+    const existing = { external_id: 'tasmota:device-1', features: [] };
+    gladys.stateManager.get = sinon.fake.returns(existing);
     gladys.energyPrice.getDefaultElectricMeterFeatureId = sinon.fake.throws(new Error('boom'));
 
     await tasmotaHandler.notifyNewDevice(device, 'test.event');
 
-    sinon.assert.calledOnce(tasmotaHandler.mergeWithExistingDevice);
-    expect(gladys.event.emit.firstCall.args[1].payload).to.eq(fallbackPayload);
+    const { payload } = gladys.event.emit.firstCall.args[1];
+    expect(payload.external_id).to.eq('tasmota:device-1');
   });
 });

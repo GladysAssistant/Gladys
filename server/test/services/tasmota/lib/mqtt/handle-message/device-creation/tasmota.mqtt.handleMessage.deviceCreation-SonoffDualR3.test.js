@@ -22,6 +22,9 @@ const gladys = {
   event: {
     emit: fake.returns(null),
   },
+  energyPrice: {
+    getDefaultElectricMeterFeatureId: fake.resolves('default-energy-feature-id'),
+  },
   stateManager: {
     get: fake.returns(null),
   },
@@ -125,8 +128,11 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
     });
   });
 
-  it('decode STATUS8 message', () => {
+  it('decode STATUS8 message', async () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
 
     const expectedDevice = {
       name: 'Relais_Tasmota1',
@@ -325,17 +331,33 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
         },
       ],
     };
-    expect(tasmotaHandler.discoveredDevices).to.deep.eq({
-      'tasmota-device-topic': expectedDevice,
+    const discoveredDevice = tasmotaHandler.discoveredDevices['tasmota-device-topic'];
+    expect(discoveredDevice).to.not.equal(undefined);
+    expect(discoveredDevice.external_id).to.eq(expectedDevice.external_id);
+    expect(discoveredDevice.name).to.eq(expectedDevice.name);
+    expect(discoveredDevice.model).to.eq(expectedDevice.model);
+    const discoveredExternalIds = (discoveredDevice.features || []).map((f) => f.external_id);
+    const expectedExternalIds = expectedDevice.features.map((f) => f.external_id);
+    expectedExternalIds.forEach((externalId) => {
+      expect(discoveredExternalIds).to.include(externalId);
     });
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
     expect(tasmotaHandler.pendingDevices).to.deep.eq({});
 
     assert.notCalled(mqttService.device.publish);
 
     assert.calledOnceWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'tasmota:tasmota-device-topic');
-    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE,
-      payload: expectedDevice,
+    const websocketCall = gladys.event.emit.getCalls().find((call) => call.args[0] === EVENTS.WEBSOCKET.SEND_ALL);
+    expect(websocketCall).to.not.equal(undefined);
+    const { payload, type } = websocketCall.args[1];
+    expect(type).to.eq(WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
+    expect(payload.external_id).to.eq(expectedDevice.external_id);
+    const websocketExternalIds = (payload.features || []).map((f) => f.external_id);
+    expectedExternalIds.forEach((externalId) => {
+      expect(websocketExternalIds).to.include(externalId);
     });
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
   });
 });
