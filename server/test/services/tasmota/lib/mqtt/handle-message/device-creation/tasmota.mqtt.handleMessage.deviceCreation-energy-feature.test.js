@@ -249,16 +249,32 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     };
     const discoveredDevice = tasmotaHandler.discoveredDevices['tasmota-device-topic'];
     expect(discoveredDevice).to.not.equal(undefined);
-    expect(discoveredDevice.external_id).to.eq(expectedDevice.external_id);
-    expect(discoveredDevice.name).to.eq(expectedDevice.name);
-    expect(discoveredDevice.model).to.eq(expectedDevice.model);
+    expect(discoveredDevice).to.include({
+      name: expectedDevice.name,
+      model: expectedDevice.model,
+      external_id: expectedDevice.external_id,
+      selector: expectedDevice.selector,
+      service_id: expectedDevice.service_id,
+      should_poll: expectedDevice.should_poll,
+    });
+    expect(discoveredDevice.params).to.deep.eq(expectedDevice.params);
     const discoveredExternalIds = (discoveredDevice.features || []).map((f) => f.external_id);
-    const expectedExternalIdsForSocket = expectedDevice.features.map((f) => f.external_id);
-    expectedExternalIdsForSocket.forEach((externalId) => {
+    const expectedExternalIds = expectedDevice.features.map((f) => f.external_id);
+    expectedExternalIds.forEach((externalId) => {
       expect(discoveredExternalIds).to.include(externalId);
     });
     expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
     expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
+    const totalFeature = (discoveredDevice.features || []).find(
+      (feature) => feature.external_id === 'tasmota:tasmota-device-topic:ENERGY:Total',
+    );
+    expect(totalFeature).to.include({
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+      selector: 'tasmota-tasmota-device-topic-energy-total',
+    });
+    expect(totalFeature.id).to.be.a('string');
+    expect(totalFeature.energy_parent_id).to.be.a('string');
     expect(tasmotaHandler.pendingDevices).to.deep.eq({});
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -300,7 +316,6 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     expect(type).to.eq(WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
     expect(payload.external_id).to.eq(expectedDevice.external_id);
     const websocketExternalIds = (payload.features || []).map((f) => f.external_id);
-    const expectedExternalIds = expectedDevice.features.map((f) => f.external_id);
     expectedExternalIds.forEach((externalId) => {
       expect(websocketExternalIds).to.include(externalId);
     });
