@@ -87,6 +87,10 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
             name: 'protocol',
             value: 'mqtt',
           },
+          {
+            name: 'ip',
+            value: '10.5.0.231',
+          },
         ],
         model: 13,
         external_id: 'tasmota:tasmota-device-topic',
@@ -111,6 +115,10 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
         {
           name: 'protocol',
           value: 'mqtt',
+        },
+        {
+          name: 'ip',
+          value: '10.5.0.231',
         },
       ],
       model: 13,
