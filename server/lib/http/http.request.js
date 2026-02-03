@@ -9,21 +9,21 @@ const DEFAULT_TIMEOUT = 20 * 1000;
  * @param {string} url - The URL to call.
  * @param {string} [body] - Optional body.
  * @param {string} [headers] - Options headers.
+ * @param {string} [responseType] - Optional response type.
  * @returns {Promise} Resolve with HTTP request response.
  * @example
  * request('post', 'http://localhost:3000', '{}');
  */
-async function request(method, url, body, headers) {
+async function request(method, url, body, headers, responseType) {
   const options = {
     method,
     url,
     timeout: DEFAULT_TIMEOUT,
     headers: { 'user-agent': `GladysAssistant/${this.system.gladysVersion}` },
     validateStatus: null, // we don't want axios to throw an error
+    ...(body ? { data: body } : {}),
+    ...(responseType ? { responseType } : {}),
   };
-  if (body) {
-    options.data = body;
-  }
   if (headers) {
     options.headers = Object.assign(options.headers, headers);
   }

@@ -630,7 +630,18 @@ const actionsFunc = {
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
     // Get TTS URL
-    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+    let url = '';
+    // We use Gradium if configured
+    const gradiumService = self.service.getService('gradium');
+    // if the service exist
+    if (gradiumService) {
+      url = await gradiumService.tts.getTTSApiUrl({ text: messageWithVariables });
+    }
+
+    if (url === '') {
+      // If no TTS url was generated, we use the built-in Gladys TTS
+      ;({ url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables }));
+    }
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
   },
