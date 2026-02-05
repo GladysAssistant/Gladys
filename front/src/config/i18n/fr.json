@@ -2506,6 +2506,24 @@
       "generateButton": "Générer",
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
+    },
+    "gradium": {
+      "title": "Gradium",
+      "description": "Utilisez la synthèse vocale de Gradium.",
+      "documentation": "Documentation Gradium",
+      "accountTab": "Compte",
+      "accountIntroduction" : "Paramétrez votre compte Gradium pour accéder au service de synthèse vocale.",
+      "endpointLabel": "Région des serveurs",
+      "endpointInfo": "Sélectionnez la région des serveurs Gradium sur lesquels vous avez créé votre compte.",
+      "endpoint": {
+        "eu": "Europe",
+        "us": "Amérique du Nord"
+      },
+      "apiKey": "Clé API",
+      "apiKeyInfo": "Entrez votre clé API Gradium pour utiliser le service de synthèse vocale.",
+      "buttonSave": "Sauvegarder",
+      "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration Gradium.",
+      "configurationSuccess": "La configuration Gradium a été sauvegardée avec succès."
     }
   },
   "editScene": {

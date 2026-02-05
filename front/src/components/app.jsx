@@ -88,6 +88,7 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 import MCPPage from '../routes/integration/all/mcp';
+import GradiumAccountPage from '../routes/integration/all/gradium/account-page';
 
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
@@ -371,6 +372,9 @@ const AppRouter = connect(
         <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
         <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
         <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
+
+        <Redirect path="/dashboard/integration/communication/gradium" to="/dashboard/integration/communication/gradium/account" />
+        <GradiumAccountPage path="/dashboard/integration/communication/gradium/account" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />

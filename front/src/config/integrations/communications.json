@@ -52,5 +52,10 @@
     "img": "/assets/integrations/cover/mcp.jpg",
     "gladysPlus": true,
     "local": true
+  },
+  {
+    "key": "gradium",
+    "img": "/assets/integrations/cover/gradium.jpg",
+    "cloud": true
   }
 ]
