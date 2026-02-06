@@ -1,6 +1,7 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert } = sinon;
+const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const { serviceId } = require('../../mocks/consts.test');
@@ -24,7 +25,19 @@ describe('nuki.http.connect command', () => {
   });
 
   it('should initialize http handler with apiKey and build NukiWebApi object', async () => {
-    nukiHttpHandler.connect();
+    await nukiHttpHandler.connect();
+    assert.calledOnce(nukiHttpHandler.nukiHandler.getStatus);
     assert.calledOnce(nukiHttpHandler.nukiHandler.getConfiguration);
+  });
+
+  it('should not initialize http handler since apiKey is not set', async () => {
+    nukiHttpHandler.nukiHandler.getStatus = fake.resolves({
+      mqttOk: false,
+      webOk: false,
+    });
+    await nukiHttpHandler.connect();
+    assert.calledOnce(nukiHttpHandler.nukiHandler.getStatus);
+    assert.notCalled(nukiHttpHandler.nukiHandler.getConfiguration);
+    expect(nukiHttpHandler.nukiApi).deep.eq(undefined);
   });
 });

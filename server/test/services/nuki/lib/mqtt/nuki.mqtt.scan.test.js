@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
@@ -10,11 +11,15 @@ const mqttService = {
     unsubscribe: fake.returns(true),
     subscribe: fake.returns(true),
   },
+  isUsed: fake.returns(true),
 };
 
 const gladys = {
   service: {
     getService: fake.returns(mqttService),
+  },
+  variable: {
+    getValue: fake.resolves(null),
   },
 };
 
@@ -33,7 +38,7 @@ describe('nuki.mqtt.scan command', () => {
   });
 
   it('should subscribe to mqtt topic', async () => {
-    nukiHandler.scan();
+    await nukiHandler.scan();
     assert.callCount(nukiHandler.mqttService.device.unsubscribe, 1);
     nukiHandler.mqttService.device.unsubscribe.firstCall.calledWith('homeassistant/#');
     assert.callCount(nukiHandler.mqttService.device.subscribe, 1);
@@ -41,5 +46,13 @@ describe('nuki.mqtt.scan command', () => {
       'homeassistant/#',
       nukiHandler.handleMessage.bind(nukiHandler),
     );
+  });
+
+  it('should raise an error', async () => {
+    mqttService.isUsed = fake.returns(false);
+    await expect(nukiHandler.scan()).to.be.rejectedWith(Error);
+    assert.notCalled(nukiHandler.mqttService.device.unsubscribe);
+    assert.notCalled(nukiHandler.mqttService.device.subscribe);
+    
   });
 });

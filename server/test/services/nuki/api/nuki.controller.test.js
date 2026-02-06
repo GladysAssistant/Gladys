@@ -110,7 +110,7 @@ describe('POST /api/v1/service/nuki/discover/mqtt', () => {
     sinon.reset();
   });
 
-  it('Look for MQTT devices', () => {
+  it('Look for MQTT devices', async () => {
     const req = {
       params: {
         protocol: 'mqtt',
@@ -120,7 +120,7 @@ describe('POST /api/v1/service/nuki/discover/mqtt', () => {
       json: fake.returns(null),
     };
 
-    controllers['post /api/v1/service/nuki/discover/:protocol'].controller(req, res);
+    await controllers['post /api/v1/service/nuki/discover/:protocol'].controller(req, res);
     assert.notCalled(nukiHandler.getDiscoveredDevices);
     assert.calledOnce(nukiHandler.scan);
     assert.calledWith(res.json, { success: true });

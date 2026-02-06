@@ -45,8 +45,8 @@ module.exports = function NukiController(nukiHandler) {
    * @apiName scan
    * @apiGroup Nuki
    */
-  function scan(req, res) {
-    nukiHandler.scan(req.params.protocol, req.body);
+  async function scan(req, res) {
+    await nukiHandler.scan(req.params.protocol, req.body);
     res.json({
       success: true,
     });
@@ -57,8 +57,8 @@ module.exports = function NukiController(nukiHandler) {
    * @apiName connect
    * @apiGroup Nuki
    */
-  function connect(req, res) {
-    nukiHandler.getHandler('http').connect();
+  async function connect(req, res) {
+    await nukiHandler.getHandler('http').connect();
     res.json({
       success: true,
     });

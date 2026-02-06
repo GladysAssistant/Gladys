@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Scan for HTTP devices.
@@ -9,6 +10,10 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
  */
 async function scan() {
   logger.info(`Nuki : Scan for http devices`);
+  const { webOk } = await this.nukiHandler.getStatus();
+  if (!webOk) {
+    throw new ServiceNotConfiguredError('Unable to scan Nuki devices until Nuki Web API is configured');
+  }
   try {
     const locks = await this.nukiApi.getSmartlocks();
     locks.forEach((lock) => {
