@@ -2,6 +2,7 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 
 const { fake, assert } = sinon;
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -13,17 +14,15 @@ const {
 
 const messages = require('./lock.json');
 
-const mqttService = {
-  device: {
-    publish: fake.returns(null),
-  },
-};
 const gladys = {
   event: {
     emit: fake.returns(null),
   },
   stateManager: {
     get: fake.returns(null),
+  },
+  service: {
+    getService: fake.returns(mqttService),
   },
 };
 const serviceId = 'service-uuid-random';

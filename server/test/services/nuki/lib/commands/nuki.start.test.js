@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 
 const NukiProtocolHandlerMock = require('../../mocks/nuki.protocol.mock.test');
 
@@ -22,9 +23,6 @@ describe('Nuki - start service', () => {
   });
 
   it('Should start service and connect all protocols', async () => {
-    const mqttService = {
-      isUsed: fake.resolves(true),
-    };
     const gladys = {
       variable: {
         getValue: fake.resolves(true),
@@ -40,9 +38,7 @@ describe('Nuki - start service', () => {
   });
 
   it('Should failed to start service since neither mqtt nor web is configured', async () => {
-    const mqttService = {
-      isUsed: fake.resolves(false),
-    };
+    mqttService.isUsed = fake.resolves(false);
     const gladys = {
       variable: {
         getValue: fake.resolves(false),

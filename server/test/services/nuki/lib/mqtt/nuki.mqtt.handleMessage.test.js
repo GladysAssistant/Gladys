@@ -6,6 +6,7 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
 const { MAPPING_STATES_NUKI_TO_GLADYS } = require('../../../../../services/nuki/lib/utils/nuki.constants');
@@ -20,10 +21,8 @@ const gladys = {
   stateManager: {
     get: fake.returns(null),
   },
-};
-const mqttService = {
-  device: {
-    publish: fake.returns(null),
+  service: {
+    getService: fake.returns(true),
   },
 };
 

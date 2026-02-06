@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 const { serviceId } = require('../../mocks/consts.test');
-
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const { assert, fake } = sinon;
 const NukiService = require('../../../../../services/nuki/index');
 
@@ -11,6 +11,9 @@ const gladys = {
   },
   device: {
     get: fake.resolves([]),
+  },
+  service: {
+    getService: fake.returns(mqttService),
   },
 };
 

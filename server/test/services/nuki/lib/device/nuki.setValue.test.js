@@ -3,14 +3,14 @@ const sinon = require('sinon');
 const { fake, assert } = sinon;
 const { expect } = require('chai');
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 
-const mqttService = {
-  device: {
-    publish: fake.returns(null),
+const gladys = {
+  service: {
+    getService: fake.returns(mqttService),
   },
 };
-const gladys = {};
 
 describe('NukiHandler.setValue', () => {
   let nukiHandler;

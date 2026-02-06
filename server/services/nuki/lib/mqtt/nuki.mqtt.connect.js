@@ -8,8 +8,6 @@ const { DISCOVERY_TOPIC } = require('../utils/nuki.constants');
  */
 async function connect() {
   logger.debug('MQTT Connect');
-  // Loads MQTT service
-  this.mqttService = this.nukiHandler.gladys.service.getService('mqtt');
 
   // Subscribe to Nuki topics
   // discover topic
