@@ -8,8 +8,12 @@ const { serviceId } = require('../../mocks/consts.test');
 const { NukiHandlerMock } = require('../../mocks/nuki.mock.test');
 const { NukiWebApiMock } = require('../../mocks/nuki-web-api.mock.test');
 
-const NukiHTTPHandler = proxyquire('../../../../../services/nuki/lib/http', {
+const NukiHTTConnect = proxyquire('../../../../../services/nuki/lib/http/nuki.http.connect.js', {
   'nuki-web-api': NukiWebApiMock,
+});
+
+const NukiHTTPHandler = proxyquire('../../../../../services/nuki/lib/http', {
+  './nuki.http.connect.js': NukiHTTConnect,
 });
 
 describe('nuki.http.connect command', () => {

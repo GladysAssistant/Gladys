@@ -25,6 +25,7 @@ MINOR  v1.0.1
 - FIX : at start check if service is configured and send ServiceConfigurationError if not
 - FIX : do not subscribe through to all device but only those registered for Nuki service
 - FIX : do not authorize to perform a scan (http or mqtt) if service is not configured ; stop the loading spinner and display a message
+- IMPROVEMENT : control API token in setup tab, if an error occured display an error message, then clear the api token
 - Code refactoring
 
 

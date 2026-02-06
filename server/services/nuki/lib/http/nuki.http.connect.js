@@ -11,12 +11,8 @@ async function connect() {
   const { webOk } = await this.nukiHandler.getStatus();
   if (webOk) {
     const { apiKey } = await this.nukiHandler.getConfiguration();
-    try {
-      this.nukiApi = new Nuki(apiKey);
-      await this.nukiApi.getSmartlocks();
-    } catch (error) {
-      logger.error(`Nuki : Unable to connect to Nuki Web API`, error);
-    }
+    this.nukiApi = new Nuki(apiKey);
+    await this.nukiApi.getSmartlocks(); // Test connection to Nuki Web API
     logger.info(`Nuki : Connected to Nuki Web API`);
   }
 }
