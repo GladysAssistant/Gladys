@@ -53,6 +53,5 @@ describe('nuki.mqtt.scan command', () => {
     await expect(nukiHandler.scan()).to.be.rejectedWith(Error);
     assert.notCalled(nukiHandler.mqttService.device.unsubscribe);
     assert.notCalled(nukiHandler.mqttService.device.subscribe);
-    
   });
 });
