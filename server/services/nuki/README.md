@@ -18,6 +18,15 @@ HTTP
 1. Activate and configure your Nuki Web account [Configure Nuki Web](https://help.nuki.io/hc/fr/articles/360016485718-Activer-et-d%C3%A9sactiver-un-compte-Nuki-Web#:~:text=Activez%20Nuki%20Web%20dans%20l,dans%20l'App%20de%20Nuki.  "Configure Nuki Web")
 2. Go in Gladys and configure service : API key then HTTP discovering
 
+Changelog
+=========
+
+MINOR  v1.0.1 
+- FIX : at start check if service is configured and send ServiceConfigurationError if not
+- FIX : do not subscribe through to all device but only those registered for Nuki service
+- FIX : do not authorize to do a scan (http or mqtt) if ; stop the loading spinner and display a message
+
+
 Technical infos
 ===============
 
@@ -75,12 +84,7 @@ controllers: NukiController(nukiHandler);
 Todos
 =====
 
-1. Documentation
-
-2. Real life test (Used since March 2025)
-
-3. Videos to show this working
-
+1. Videos to show this working
 
 
 Known issues
