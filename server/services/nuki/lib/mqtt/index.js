@@ -16,7 +16,7 @@ const { subscribeDeviceTopic } = require('./nuki.mqtt.subscribeDeviceTopic');
 const NukiMQTTHandler = function NukiMQTTHandler(nukiHandler) {
   this.nukiHandler = nukiHandler;
   // Gladys MQTT service
-  this.mqttService = this.nukiHandler.gladys.service.getService('mqtt');
+  this.mqttService = this.nukiHandler.gladys.service && this.nukiHandler.gladys.service.getService('mqtt'); // only to pass tests since gladys is not fully mocked
   // Found devices
   this.discoveredDevices = {};
 };
