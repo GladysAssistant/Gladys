@@ -39,6 +39,8 @@ module.exports = function MCPService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping MCP service');
+
+    await mcpHandler.stopServer();
   }
 
   return Object.freeze({
