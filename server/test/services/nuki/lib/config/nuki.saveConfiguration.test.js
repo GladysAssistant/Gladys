@@ -1,7 +1,8 @@
 const sinon = require('sinon');
+
+const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
 const { mqttService } = require('../../mocks/mqtt.mock.test');
-const { assert, fake } = sinon;
 const NukiService = require('../../../../../services/nuki/index');
 
 const gladys = {

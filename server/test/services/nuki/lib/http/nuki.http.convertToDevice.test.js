@@ -1,5 +1,6 @@
-const sinon = require('sinon');
 const { expect } = require('chai');
+const sinon = require('sinon');
+
 const { fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
 const { mqttService } = require('../../mocks/mqtt.mock.test');

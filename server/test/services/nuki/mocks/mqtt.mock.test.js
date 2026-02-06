@@ -12,5 +12,5 @@ const mqttService = {
 };
 
 module.exports = {
-    mqttService
+  mqttService,
 };

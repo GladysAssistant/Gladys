@@ -6,7 +6,6 @@ const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
 
-
 const gladys = {
   variable: {
     getValue: fake.resolves(null),
