@@ -12,13 +12,14 @@ const logger = require('../../../utils/logger');
  */
 async function getTTSApiUrl({ text }) {
   const gradiumApiKey = await this.gladys.variable.getValue('GRADIUM_API_KEY', this.serviceId);
+  const gradiumVoiceId = await this.gladys.variable.getValue('GRADIUM_VOICE_ID', this.serviceId);
   try {
     const response = await this.gladys.http.request(
       'post',
       `https://eu.api.gradium.ai/api/post/speech/tts`,
       {
         text,
-        voice_id: 'zIGaffB0kKEBG_8u',
+        voice_id: gradiumVoiceId,
         output_format: 'opus',
         only_audio: true
       },
@@ -33,7 +34,7 @@ async function getTTSApiUrl({ text }) {
 
     // save as file with an uuid as name
     const dockerBased = await this.gladys.system.isDocker();
-    let basePath = 'gradium';
+    let { basePath } = this;
     if (dockerBased) {
       const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
       basePath = `${basePathOnContainer}/${basePath}`;

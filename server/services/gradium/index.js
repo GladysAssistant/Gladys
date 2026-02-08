@@ -4,8 +4,6 @@ const GradiumHandler = require('./lib');
 const GradiumController = require('./api/gradium.controller');
 
 module.exports = function GradiumService(gladys, serviceId) {
-  let gradiumApiKey;
-
   const gradiumHandler = new GradiumHandler(gladys, serviceId);
 
   /**
@@ -16,9 +14,10 @@ module.exports = function GradiumService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Gradium service');
-    gradiumApiKey = await gladys.variable.getValue('GRADIUM_API_KEY', serviceId);
-    if (!gradiumApiKey) {
-      throw new ServiceNotConfiguredError('Gradium Service not configured');
+    const gradiumApiKey = await gladys.variable.getValue('GRADIUM_API_KEY', serviceId);
+    const gradiumVoiceId = await gladys.variable.getValue('GRADIUM_VOICE_ID', serviceId);
+    if (!gradiumApiKey || !gradiumVoiceId) {
+      throw new ServiceNotConfiguredError('Gradium Service not correctly configured');
     }
   }
 

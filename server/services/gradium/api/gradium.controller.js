@@ -16,14 +16,16 @@ module.exports = function GradiumController(gradiumHandler) {
 
     // return associated file
     const dockerBased = await gradiumHandler.gladys.system.isDocker();
-    let basePath = 'gradium';
+    let { basePath } = gradiumHandler;
     if (dockerBased) {
       const { basePathOnContainer } = await gradiumHandler.gladys.system.getGladysBasePath();
       basePath = `${basePathOnContainer}/${basePath}`;
     }
     const fileData = await fs.readFile(`${basePath}/${uuid}`);
     res.setHeader('Content-Type', 'audio/ogg');
-    return res.send(fileData);
+    res.send(fileData);
+
+    return fs.rm(`${basePath}/${uuid}`);
   }
 
   /**
