@@ -2526,6 +2526,13 @@
       "configurationSuccess": "La configuration Gradium a été sauvegardée avec succès.",
       "voiceTab": "Voix",
       "voiceIntroduction": "Choisissez une voix pour la synthèse vocale.",
+      "language": {
+        "en": "Anglais 🇬🇧",
+        "fr": "Français 🇫🇷",
+        "de": "Allemand 🇩🇪",
+        "es": "Espagnol 🇪🇸",
+        "pt": "Portugais 🇵🇹"
+      },
       "voiceUseIt": "Sélectionner",
       "voiceUsed": "Sélectionnée",
       "voiceDescriptionLabel": "Description de la voix"

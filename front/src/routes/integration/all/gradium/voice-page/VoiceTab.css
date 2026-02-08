@@ -1,12 +1,7 @@
-.errorMessage {
-  margin-bottom: 0;
-  font-style: 'italic';
-}
-
-.successMessage {
-  margin-bottom: 10px;
-}
-
 .button {
   margin-right: 10px;
+}
+
+.language-select {
+  padding: 6px 12px;
 }

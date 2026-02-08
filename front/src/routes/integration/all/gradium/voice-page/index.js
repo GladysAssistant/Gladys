@@ -9,11 +9,13 @@ class VoicePage extends Component {
   getGradiumSetting = async () => {
     let gradiumVoices = [];
     let gradiumVoiceId = '';
+    let languageFilter = this.props.user.language || 'en';
 
     this.setState({
       gradiumGetSettingsStatus: RequestStatus.Getting,
       gradiumVoices,
-      gradiumVoiceId
+      gradiumVoiceId,
+      languageFilter
     });
 
     try {
@@ -55,6 +57,37 @@ class VoicePage extends Component {
     });
   }
 
+  sortVoices = (a, b) => {
+    if (a.id === this.state.gradiumVoiceId) {
+      return -1;
+    }
+
+    if (b.id === this.state.gradiumVoiceId) {
+      return 1;
+    }
+
+    if (a.name < b.name) {
+      return -1;
+    }
+
+    return 1
+  }
+
+  updateFilterLanguage = async (event) => {
+    const languageFilter = event.currentTarget.value;
+    await this.setState({
+      languageFilter
+    });
+  }
+
+  filterVoices = (voice) => {
+    if (voice.id === this.state.gradiumVoiceId) {
+      return true;
+    }
+
+    return voice.language === this.state.languageFilter;
+  }
+
   componentWillMount() {
     this.getGradiumSetting();
   }
@@ -67,7 +100,11 @@ class VoicePage extends Component {
           gradiumVoices={state.gradiumVoices}
           gradiumVoiceId={state.gradiumVoiceId}
           gradiumGetSettingsStatus={state.gradiumGetSettingsStatus}
+          languageFilter={state.languageFilter}
           updateVoice={this.updateVoice}
+          sortVoices={this.sortVoices}
+          filterVoices={this.filterVoices}
+          updateFilterLanguage={this.updateFilterLanguage}
           loading={loading}
         />
       </GradiumPage>
