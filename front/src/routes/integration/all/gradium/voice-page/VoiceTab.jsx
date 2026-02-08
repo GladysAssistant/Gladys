@@ -1,0 +1,54 @@
+import { Text } from 'preact-i18n';
+import cx from 'classnames';
+import { RequestStatus } from '../../../../../utils/consts';
+
+import style from './VoiceTab.css';
+import VoiceBox from './VoiceBox';
+
+const VoiceTab = ({ children, ...props }) => (
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">
+        <Text id="integration.gradium.voiceTab" />
+      </h1>
+    </div>
+    <div class="card-body">
+      <div
+        class={cx('dimmer', {
+          active: props.loading
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          <p>
+            <Text id="integration.gradium.voiceIntroduction" />
+          </p>
+          <div class="row">
+            {props.gradiumVoices.map((voice, index) => (
+              <VoiceBox key={index} voice={voice} voiceSelected={voice.id === props.gradiumVoiceId} updateVoice={props.updateVoice} />
+            ))}
+          </div>
+          {(props.gradiumSaveSettingsStatus === RequestStatus.Error) && (
+            <div class="alert alert-danger">
+              <Text id="integration.gradium.configurationError" />
+            </div>
+          )}
+          {props.gradiumSaveSettingsStatus === RequestStatus.Success && (
+            <p class="alert alert-info">
+              <Text id="integration.gradium.configurationSuccess" />
+            </p>
+          )}
+          <div class="form-group">
+            <span class="input-group-append">
+              <button className={cx('btn btn-primary', style.button)} onClick={props.saveGradiumSettings}>
+                <Text id={`integration.gradium.buttonSave`} />
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default VoiceTab;

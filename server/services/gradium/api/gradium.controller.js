@@ -26,9 +26,25 @@ module.exports = function GradiumController(gradiumHandler) {
     return res.send(fileData);
   }
 
+  /**
+   * @api {get} /api/v1/service/gradium/voices Gradium TTS voices list
+   * @apiName listVoices
+   * @apiGroup Gradium
+   */
+  async function listVoices(req, res) {
+    const voices = await gradiumHandler.getVoices();
+
+    return res.json(voices);
+  }
+
   return {
     'get /api/v1/service/gradium/speech-file/:uuid': {
       controller: asyncMiddleware(speechFile),
+    },
+    'get /api/v1/service/gradium/voices': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(listVoices),
     },
   };
 };

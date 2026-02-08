@@ -15,12 +15,23 @@ const Gradium = ({ children, user }) => (
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
+                    href="/dashboard/integration/communication/gradium/voice"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-volume-2" />
+                    </span>
+                    <Text id="integration.gradium.voiceTab" />
+                  </Link>
+
+                  <Link
                     href="/dashboard/integration/communication/gradium/account"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="fe fe-user" />
                     </span>
                     <Text id="integration.gradium.accountTab" />
                   </Link>

@@ -2517,13 +2517,18 @@
       "endpointInfo": "Sélectionnez la région des serveurs Gradium sur lesquels vous avez créé votre compte.",
       "endpoint": {
         "eu": "Europe",
-        "us": "Amérique du Nord"
+        "us": "États-Unis"
       },
       "apiKey": "Clé API",
       "apiKeyInfo": "Entrez votre clé API Gradium pour utiliser le service de synthèse vocale.",
       "buttonSave": "Sauvegarder",
       "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration Gradium.",
-      "configurationSuccess": "La configuration Gradium a été sauvegardée avec succès."
+      "configurationSuccess": "La configuration Gradium a été sauvegardée avec succès.",
+      "voiceTab": "Voix",
+      "voiceIntroduction": "Choisissez une voix pour la synthèse vocale.",
+      "voiceUseIt": "Sélectionner",
+      "voiceUsed": "Sélectionnée",
+      "voiceDescriptionLabel": "Description de la voix"
     }
   },
   "editScene": {
