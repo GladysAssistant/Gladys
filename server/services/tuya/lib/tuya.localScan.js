@@ -1,0 +1,78 @@
+const dgram = require('dgram');
+const logger = require('../../../utils/logger');
+const { MessageParser } = require('tuyapi/lib/message-parser');
+const { UDP_KEY } = require('tuyapi/lib/config');
+
+const DEFAULT_PORTS = [6666, 6667, 7000];
+
+/**
+ * @description Scan local network for Tuya devices over UDP to retrieve protocol version.
+ * @param {number} timeoutSeconds - Scan duration in seconds.
+ * @returns {Promise<object>} Map of deviceId -> { ip, version, productKey }.
+ */
+async function localScan(timeoutSeconds = 10) {
+  const devices = {};
+  const sockets = [];
+  const parser = new MessageParser({ key: UDP_KEY, version: 3.1 });
+  logger.debug(`[Tuya][localScan] Starting UDP scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
+
+  const onMessage = (message) => {
+    let payload;
+    try {
+      const parsed = parser.parse(message);
+      payload = parsed && parsed[0] && parsed[0].payload;
+    } catch (e) {
+      return;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+      return;
+    }
+
+    const deviceId = payload.gwId || payload.devId || payload.id;
+    const ip = payload.ip;
+    const version = payload.version;
+    const productKey = payload.productKey;
+
+    if (!deviceId) {
+      return;
+    }
+
+    const isNew = !devices[deviceId];
+    devices[deviceId] = {
+      ip,
+      version,
+      productKey,
+    };
+    if (isNew) {
+      logger.debug(`[Tuya][localScan] Found device ${deviceId} ip=${ip || 'unknown'} version=${version || 'unknown'}`);
+    }
+  };
+
+  DEFAULT_PORTS.forEach((port) => {
+    const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+    socket.on('message', onMessage);
+    socket.on('error', (err) => {
+      logger.debug(`[Tuya][localScan] UDP socket error on port ${port}: ${err.message}`);
+    });
+    socket.bind(port);
+    sockets.push(socket);
+  });
+
+  await new Promise((resolve) => setTimeout(resolve, timeoutSeconds * 1000));
+
+  sockets.forEach((socket) => {
+    try {
+      socket.close();
+    } catch (e) {
+      // ignore
+    }
+  });
+
+  logger.debug(`[Tuya][localScan] Scan complete. Found ${Object.keys(devices).length} device(s).`);
+  return devices;
+}
+
+module.exports = {
+  localScan,
+};

@@ -1072,7 +1072,8 @@
         "noDeviceFound": "No Tuya device found.",
         "featuresLabel": "Features",
         "idLabel": "Device ID",
-        "localKeyLabel": "Local Key"
+        "localKeyLabel": "Local Key",
+        "protocolVersionLabel": "Protocol Version"
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",

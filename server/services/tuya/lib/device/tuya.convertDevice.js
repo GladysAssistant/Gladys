@@ -11,7 +11,16 @@ const logger = require('../../../../utils/logger');
  * tuya.convertDevice({ ... });
  */
 function convertDevice(tuyaDevice) {
-  const { name, product_name: productName, model, id, local_key: localKey, ip, specifications = {} } = tuyaDevice;
+  const {
+    name,
+    product_name: productName,
+    model,
+    id,
+    local_key: localKey,
+    ip,
+    protocol_version: protocolVersion,
+    specifications = {},
+  } = tuyaDevice;
   const externalId = `tuya:${id}`;
   const { functions = [], status = [] } = specifications;
   const online = tuyaDevice.online !== undefined ? tuyaDevice.online : tuyaDevice.is_online;
@@ -26,8 +35,11 @@ function convertDevice(tuyaDevice) {
   if (ip) {
     params.push({ name: DEVICE_PARAM_NAME.IP_ADDRESS, value: ip });
   }
+  if (protocolVersion) {
+    params.push({ name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: protocolVersion });
+  }
   logger.debug(`Tuya convert device specifications"`);
-  logger.debug(JSON.stringify(specifications));
+  logger.debug(JSON.stringify(tuyaDevice));
 
   logger.debug(`Tuya convert device"${name}, ${productName || model}"`);
   // Groups functions and status on same code

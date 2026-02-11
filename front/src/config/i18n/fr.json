@@ -1307,7 +1307,8 @@
         "noDeviceFound": "Aucun appareil Tuya trouvé.",
         "featuresLabel": "Fonctionnalités",
         "idLabel": "Identifiant de l'appareil",
-        "localKeyLabel": "Clé locale"
+        "localKeyLabel": "Clé locale",
+        "protocolVersionLabel": "Version du protocole"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",

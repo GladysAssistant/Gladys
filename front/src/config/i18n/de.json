@@ -1177,7 +1177,8 @@
         "noDeviceFound": "Du hast noch keine Tuya-Geräte hinzugefügt.",
         "featuresLabel": "Funktionen",
         "idLabel": "Geräte-ID",
-        "localKeyLabel": "Lokaler Schlüssel"
+        "localKeyLabel": "Lokaler Schlüssel",
+        "protocolVersionLabel": "Protokollversion"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",

@@ -114,6 +114,7 @@ class TuyaDeviceBox extends Component {
     }, {});
     const deviceId = params.DEVICE_ID || (device.external_id ? device.external_id.split(':')[1] : '');
     const localKey = params.LOCAL_KEY || device.local_key || '';
+    const protocolVersion = params.PROTOCOL_VERSION || device.protocol_version || '';
 
     return (
       <div class="col-md-6">
@@ -208,6 +209,19 @@ class TuyaDeviceBox extends Component {
                     id={`local_key_${deviceIndex}`}
                     type="text"
                     value={localKey}
+                    class="form-control"
+                    disabled="true"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for={`protocol_${deviceIndex}`}>
+                    <Text id="integration.tuya.device.protocolVersionLabel" />
+                  </label>
+                  <input
+                    id={`protocol_${deviceIndex}`}
+                    type="text"
+                    value={protocolVersion}
                     class="form-control"
                     disabled="true"
                   />
