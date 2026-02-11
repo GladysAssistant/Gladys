@@ -1175,14 +1175,18 @@
         "updates": "Nach Updates suchen",
         "editButton": "Bearbeiten",
         "noDeviceFound": "Du hast noch keine Tuya-Geräte hinzugefügt.",
-        "featuresLabel": "Funktionen"
+        "featuresLabel": "Funktionen",
+        "idLabel": "Geräte-ID",
+        "localKeyLabel": "Lokaler Schlüssel"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
         "error": "Fehler beim Entdecken von Tuya-Geräten. Bitte überprüfe deine Login-Daten auf der Einrichtungsseite.",
         "noDeviceFound": "Kein Tuya-Gerät entdeckt.",
-        "scan": "Scannen"
+        "scan": "Scannen",
+        "addSelected": "Auswahl hinzufügen",
+        "addSelectedError": "Fehler beim Hinzufügen der ausgewählten Geräte."
       },
       "setup": {
         "title": "Tuya-Konfiguration",
@@ -1201,12 +1205,14 @@
           "india": "Indien"
         },
         "endpoint": "Endpunkt",
-        "accessKey": "Access Key",
-        "accessKeyPlaceholder": "Tuya Zugangsschlüssel eingeben",
-        "secretKey": "Secret Key",
-        "secretKeyPlaceholder": "Tuya Geheimschlüssel eingeben",
-        "appAccountId": "App Account UID",
-        "appAccountIdPlaceholder": "Tuya App UID eingeben",
+        "accessKey": "Client ID",
+        "accessKeyPlaceholder": "Tuya Client ID eingeben",
+        "secretKey": "Client Secret",
+        "secretKeyPlaceholder": "Tuya Client Secret eingeben",
+        "appAccountId": "App Account User ID",
+        "appAccountIdPlaceholder": "Tuya App User ID eingeben",
+        "appUsername": "App Username",
+        "appUsernamePlaceholder": "Tuya App Username eingeben",
         "saveLabel": "Konfiguration sichern",
         "error": "Beim Sichern der Konfiguration ist ein Fehler aufgetreten.",
         "connecting": "Konfiguration gesichert. Die Verbindung mit deinem Tuya-Cloud-Account wird jetzt hergestellt …",

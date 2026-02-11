@@ -1305,14 +1305,18 @@
         "updates": "Vérifier les mises à jour",
         "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil Tuya trouvé.",
-        "featuresLabel": "Fonctionnalités"
+        "featuresLabel": "Fonctionnalités",
+        "idLabel": "Identifiant de l'appareil",
+        "localKeyLabel": "Clé locale"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
         "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
-        "scan": "Scanner"
+        "scan": "Scanner",
+        "addSelected": "Ajouter la sélection",
+        "addSelectedError": "Erreur lors de l'ajout des appareils sélectionnés."
       },
       "setup": {
         "title": "Configuration Tuya",
@@ -1331,12 +1335,14 @@
           "india": "India"
         },
         "endpoint": "Endpoint",
-        "accessKey": "Access Key",
-        "accessKeyPlaceholder": "Entrez l'Access Key de Tuya",
-        "secretKey": "Secret Key",
-        "secretKeyPlaceholder": "Entrez la Secret Key de Tuya",
-        "appAccountId": "App account UID",
+        "accessKey": "Client ID",
+        "accessKeyPlaceholder": "Entrez le 'Client ID' de Tuya",
+        "secretKey": "Client Secret",
+        "secretKeyPlaceholder": "Entrez le 'Client Secret' de Tuya",
+        "appAccountId": "App account User ID",
         "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
+        "appUsername": "App Username",
+        "appUsernamePlaceholder": "Entrez le Username de l'app de Tuya",
         "saveLabel": "Enregistrer la configuration",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",

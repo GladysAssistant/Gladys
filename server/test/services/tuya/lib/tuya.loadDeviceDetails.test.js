@@ -15,7 +15,12 @@ describe('TuyaHandler.loadDeviceDetails', () => {
   beforeEach(() => {
     sinon.reset();
     tuyaHandler.connector = {
-      request: fake.resolves({ result: { details: 'details' } }),
+      request: sinon
+        .stub()
+        .onFirstCall()
+        .resolves({ result: { details: 'specification' } })
+        .onSecondCall()
+        .resolves({ result: { local_key: 'localKey' } }),
     };
   });
 
@@ -26,12 +31,16 @@ describe('TuyaHandler.loadDeviceDetails', () => {
   it('should load device details', async () => {
     const devices = await tuyaHandler.loadDeviceDetails({ id: 1 });
 
-    expect(devices).to.deep.eq({ id: 1, specifications: { details: 'details' } });
+    expect(devices).to.deep.eq({ id: 1, local_key: 'localKey', specifications: { details: 'specification' } });
 
-    assert.callCount(tuyaHandler.connector.request, 1);
+    assert.callCount(tuyaHandler.connector.request, 2);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_2}/devices/1/specification`,
+      path: `${API.VERSION_1_0}/devices/1/specification`,
+    });
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_1_0}/devices/1`,
     });
   });
 });

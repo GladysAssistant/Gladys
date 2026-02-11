@@ -12,13 +12,25 @@ async function loadDeviceDetails(tuyaDevice) {
   const { id: deviceId } = tuyaDevice;
   logger.debug(`Loading ${deviceId} Tuya device specifications`);
 
-  const responsePage = await this.connector.request({
-    method: 'GET',
-    path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
-  });
+  const [specificationsResponse, detailsResponse] = await Promise.all([
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_1_0}/devices/${deviceId}/specification`,
+    }),
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_1_0}/devices/${deviceId}`,
+    }),
+  ]);
 
-  const { result } = responsePage;
-  return { ...tuyaDevice, specifications: result };
+  const specifications = specificationsResponse.result || {};
+  const details = detailsResponse.result || {};
+
+  // Temporary verbose logging to inspect what Tuya cloud returns
+  logger.debug(`[Tuya] Device details raw for ${deviceId}: ${JSON.stringify(details)}`);
+  logger.debug(`[Tuya] Device specifications raw for ${deviceId}: ${JSON.stringify(specifications)}`);
+
+  return { ...tuyaDevice, ...details, specifications };
 }
 
 module.exports = {

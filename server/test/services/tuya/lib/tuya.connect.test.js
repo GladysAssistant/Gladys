@@ -103,7 +103,7 @@ describe('TuyaHandler.connect', () => {
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
-      payload: { status: STATUS.CONNECTED },
+      payload: { status: STATUS.CONNECTED, error: null },
     });
   });
 
@@ -120,14 +120,18 @@ describe('TuyaHandler.connect', () => {
 
     assert.calledOnce(client.init);
 
-    assert.callCount(gladys.event.emit, 2);
+    assert.callCount(gladys.event.emit, 3);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
       payload: { status: STATUS.CONNECTING },
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.TUYA.ERROR,
+      payload: { message: 'Error' },
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
-      payload: { status: STATUS.ERROR },
+      payload: { status: STATUS.ERROR, error: 'Error' },
     });
   });
 });

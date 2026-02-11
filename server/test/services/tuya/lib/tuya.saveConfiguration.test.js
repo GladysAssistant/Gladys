@@ -30,16 +30,18 @@ describe('TuyaHandler.saveConfiguration', () => {
       accessKey: 'accessKey',
       secretKey: 'secretKey',
       appAccountId: 'appAccountUID',
+      appUsername: 'user@example.com',
     };
 
     const config = await tuyaHandler.saveConfiguration(configuration);
 
     expect(config).to.deep.eq(configuration);
 
-    assert.callCount(gladys.variable.setValue, 4);
+    assert.callCount(gladys.variable.setValue, 5);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.ENDPOINT, 'endpoint', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.ACCESS_KEY, 'accessKey', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.SECRET_KEY, 'secretKey', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, 'appAccountUID', serviceId);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.APP_USERNAME, 'user@example.com', serviceId);
   });
 });

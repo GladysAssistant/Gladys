@@ -99,23 +99,45 @@ class TuyaDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
-      housesWithRooms
+      housesWithRooms,
+      selectable,
+      selected,
+      onToggleSelected
     },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.online;
+    const params = (device.params || []).reduce((acc, param) => {
+      acc[param.name] = param.value;
+      return acc;
+    }, {});
+    const deviceId = params.DEVICE_ID || (device.external_id ? device.external_id.split(':')[1] : '');
+    const localKey = params.LOCAL_KEY || device.local_key || '';
 
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">
+          <div class="card-header d-flex align-items-center justify-content-between">
             <Localizer>
               <div title={<Text id={`integration.tuya.status.${online ? 'online' : 'offline'}`} />}>
                 <i class={`fe fe-radio text-${online ? 'success' : 'danger'}`} />
                 &nbsp;{device.name}
               </div>
             </Localizer>
+            {selectable && (
+              <div class="custom-control custom-checkbox">
+                <input
+                  id={`select_${deviceIndex}`}
+                  type="checkbox"
+                  class="custom-control-input"
+                  checked={selected === true}
+                  disabled={!validModel}
+                  onChange={() => onToggleSelected && onToggleSelected(device.external_id)}
+                />
+                <label class="custom-control-label" for={`select_${deviceIndex}`} />
+              </div>
+            )}
           </div>
           <div
             class={cx('dimmer', {
@@ -160,6 +182,32 @@ class TuyaDeviceBox extends Component {
                     id={`model_${deviceIndex}`}
                     type="text"
                     value={device.model}
+                    class="form-control"
+                    disabled="true"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for={`device_id_${deviceIndex}`}>
+                    <Text id="integration.tuya.device.idLabel" />
+                  </label>
+                  <input
+                    id={`device_id_${deviceIndex}`}
+                    type="text"
+                    value={deviceId}
+                    class="form-control"
+                    disabled="true"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for={`local_key_${deviceIndex}`}>
+                    <Text id="integration.tuya.device.localKeyLabel" />
+                  </label>
+                  <input
+                    id={`local_key_${deviceIndex}`}
+                    type="text"
+                    value={localKey}
                     class="form-control"
                     disabled="true"
                   />

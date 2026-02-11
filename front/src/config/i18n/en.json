@@ -1070,14 +1070,18 @@
         "updates": "Check updates",
         "editButton": "Edit",
         "noDeviceFound": "No Tuya device found.",
-        "featuresLabel": "Features"
+        "featuresLabel": "Features",
+        "idLabel": "Device ID",
+        "localKeyLabel": "Local Key"
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
         "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
-        "scan": "Scan"
+        "scan": "Scan",
+        "addSelected": "Add selected",
+        "addSelectedError": "Error adding selected devices."
       },
       "setup": {
         "title": "Tuya configuration",
@@ -1096,12 +1100,14 @@
           "india": "India"
         },
         "endpoint": "Endpoint",
-        "accessKey": "Access Key",
-        "accessKeyPlaceholder": "Enter Tuya access key",
-        "secretKey": "Secret Key",
-        "secretKeyPlaceholder": "Enter Tuya secret key",
-        "appAccountId": "App account UID",
-        "appAccountIdPlaceholder": "Enter Tuya application UID",
+        "accessKey": "Client ID",
+        "accessKeyPlaceholder": "Enter Tuya Client ID",
+        "secretKey": "Client Secret",
+        "secretKeyPlaceholder": "Enter Tuya Client Secret",
+        "appAccountId": "App account User ID",
+        "appAccountIdPlaceholder": "Enter Tuya app User ID",
+        "appUsername": "App Username",
+        "appUsernamePlaceholder": "Enter Tuya app Username",
         "saveLabel": "Save configuration",
         "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",

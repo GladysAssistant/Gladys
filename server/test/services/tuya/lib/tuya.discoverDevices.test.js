@@ -31,7 +31,18 @@ describe('TuyaHandler.discoverDevices', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: { list: [{ name: 'name', id: 'uuid', product_name: 'model' }] } })
+        .resolves({
+          result: [
+            {
+              name: 'name',
+              id: 'uuid',
+              product_name: 'model',
+              local_key: 'localKey',
+              ip: '1.1.1.1',
+              online: true,
+            },
+          ],
+        })
         .onSecondCall()
         .resolves({
           result: {
@@ -50,6 +61,13 @@ describe('TuyaHandler.discoverDevices', () => {
                 type: 'Integer',
               },
             ],
+          },
+        }),
+        .onThirdCall()
+        .resolves({
+          result: {
+            local_key: 'localKey',
+            ip: '1.1.1.1',
           },
         }),
     };
@@ -130,9 +148,24 @@ describe('TuyaHandler.discoverDevices', () => {
         model: 'model',
         name: 'name',
         poll_frequency: 30000,
+        params: [
+          {
+            name: 'DEVICE_ID',
+            value: 'uuid',
+          },
+          {
+            name: 'LOCAL_KEY',
+            value: 'localKey',
+          },
+          {
+            name: 'IP_ADDRESS',
+            value: '1.1.1.1',
+          },
+        ],
         selector: 'tuya:uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: true,
+        online: true,
       },
     ]);
 
@@ -146,6 +179,6 @@ describe('TuyaHandler.discoverDevices', () => {
       payload: { status: STATUS.CONNECTED },
     });
 
-    assert.calledTwice(tuyaHandler.connector.request);
+    assert.callCount(tuyaHandler.connector.request, 3);
   });
 });

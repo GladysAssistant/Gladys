@@ -5,6 +5,7 @@ const GLADYS_VARIABLES = {
   ACCESS_TOKEN: 'TUYA_ACCESS_TOKEN',
   REFRESH_TOKEN: 'TUYA_REFRESH_TOKEN',
   APP_ACCOUNT_UID: 'TUYA_APP_ACCOUNT_UID',
+  APP_USERNAME: 'TUYA_APP_USERNAME',
 };
 
 const TUYA_ENDPOINTS = {
@@ -25,10 +26,17 @@ const STATUS = {
 };
 
 const API = {
+  PUBLIC_VERSION_1_0: '/v1.0',
   VERSION_1_0: '/v1.0/iot-03',
   VERSION_1_1: '/v1.1/iot-03',
   VERSION_1_2: '/v1.2/iot-03',
   VERSION_1_3: '/v1.3/iot-03',
+};
+
+const DEVICE_PARAM_NAME = {
+  DEVICE_ID: 'DEVICE_ID',
+  LOCAL_KEY: 'LOCAL_KEY',
+  IP_ADDRESS: 'IP_ADDRESS',
 };
 
 module.exports = {
@@ -36,4 +44,5 @@ module.exports = {
   TUYA_ENDPOINTS,
   STATUS,
   API,
+  DEVICE_PARAM_NAME,
 };

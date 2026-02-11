@@ -22,9 +22,9 @@ describe('TuyaHandler.loadDevices', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: { list: [{ id: 1 }], total: 2, has_more: true, last_row_key: 'next' } })
+        .resolves({ result: [{ id: 1 }] })
         .onSecondCall()
-        .resolves({ result: { list: [{ id: 2 }], total: 2, has_more: false } }),
+        .resolves({ result: [{ id: 2 }] }),
     };
   });
 
@@ -33,20 +33,20 @@ describe('TuyaHandler.loadDevices', () => {
   });
 
   it('should loop on pages', async () => {
-    const devices = await tuyaHandler.loadDevices();
+    const devices = await tuyaHandler.loadDevices(1, 1);
 
     expect(devices).to.deep.eq([{ id: 1 }, { id: 2 }]);
 
     assert.callCount(tuyaHandler.connector.request, 2);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_3}/devices`,
-      query: { last_row_key: null, source_id: 'APP_ACCOUNT_UID', source_type: 'tuyaUser' },
+      path: `${API.PUBLIC_VERSION_1_0}/users/APP_ACCOUNT_UID/devices`,
+      query: { page_no: 1, page_size: 1 },
     });
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_3}/devices`,
-      query: { last_row_key: 'next', source_id: 'APP_ACCOUNT_UID', source_type: 'tuyaUser' },
+      path: `${API.PUBLIC_VERSION_1_0}/users/APP_ACCOUNT_UID/devices`,
+      query: { page_no: 2, page_size: 1 },
     });
   });
 });

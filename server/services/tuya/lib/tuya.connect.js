@@ -21,6 +21,7 @@ async function connect(configuration) {
   }
 
   this.status = STATUS.CONNECTING;
+  this.lastError = null;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
     payload: { status: STATUS.CONNECTING },
@@ -35,17 +36,23 @@ async function connect(configuration) {
   });
 
   try {
-    this.connector.client.init();
+    await this.connector.client.init();
     this.status = STATUS.CONNECTED;
     logger.debug('Connected to Tuya');
   } catch (e) {
     this.status = STATUS.ERROR;
+    const message = e && e.message ? e.message : 'Unknown error';
+    this.lastError = message;
     logger.error('Error connecting to Tuya:', e);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.TUYA.ERROR,
+      payload: { message },
+    });
   }
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
-    payload: { status: this.status },
+    payload: { status: this.status, error: this.lastError },
   });
 }
 
