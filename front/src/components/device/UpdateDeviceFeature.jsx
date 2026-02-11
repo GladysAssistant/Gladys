@@ -51,12 +51,12 @@ class UpdateDeviceFeature extends Component {
   };
 
   // render({ feature, featureIndex, canEditCategory, device, energyHelperBuilder, ...props }) {
-  render({ feature, featureIndex, canEditCategory, device, ...props }) {
+  render({ feature, featureIndex, canEditCategory, device, allowEnergyMonitoringFeatures, ...props }) {
     const allowModifyCategory =
       canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
     const isEnergyIndex = this.isEnergyIndexFeature();
     const hasConsumptionFeatures = this.hasEnergyConsumptionFeatures();
-    const showCreateEnergyFeaturesButton = isEnergyIndex && !hasConsumptionFeatures;
+    const showCreateEnergyFeaturesButton = allowEnergyMonitoringFeatures && isEnergyIndex && !hasConsumptionFeatures;
 
     return (
       <div class="col-md-4">
@@ -231,7 +231,7 @@ class UpdateDeviceFeature extends Component {
                 </div>
               </div>
             )}
-            {hasConsumptionFeatures && (
+            {allowEnergyMonitoringFeatures && hasConsumptionFeatures && (
               <div class="form-group">
                 <div class="alert alert-warning">
                   <h5 class="mb-2">
