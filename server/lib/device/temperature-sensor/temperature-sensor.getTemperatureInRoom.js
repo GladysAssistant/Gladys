@@ -80,7 +80,7 @@ async function getTemperatureInRoom(roomId, options) {
     // Validate temperature value
     if (!isValidTemperature(temperature, optionsWithDefault.unit)) {
       logger.warn(
-        `Invalid temperature value ${temperature} ${optionsWithDefault.unit} from device "${deviceFeature.device.name}" (${deviceFeature.device.selector}), skipping`
+        `Invalid temperature value ${temperature} ${optionsWithDefault.unit} from device "${deviceFeature.device.name}" (${deviceFeature.device.selector}), skipping`,
       );
       return; // skip this value
     }
