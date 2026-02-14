@@ -31,7 +31,7 @@ function isValidTemperature(temperature, unit) {
   if (typeof temperature !== 'number' || Number.isNaN(temperature) || !Number.isFinite(temperature)) {
     return false;
   }
-  
+
   // Convert to celsius for bounds checking if needed and check bounds
   const temperatureInCelsius =
     unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? fahrenheitToCelsius(temperature) : temperature;
