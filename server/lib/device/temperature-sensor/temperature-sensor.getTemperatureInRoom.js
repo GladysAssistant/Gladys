@@ -15,6 +15,35 @@ const TEMPERATURE_BOUNDS = {
 };
 
 /**
+ * @description Validate if a temperature value is valid.
+ * @param {number} temperature - The temperature value to validate.
+ * @param {string} unit - The unit of the temperature (celsius or fahrenheit).
+ * @returns {boolean} - True if the temperature is valid, false otherwise.
+ * @private
+ * @example
+ * isValidTemperature(25, celsius) => true
+ * isValidTemperature(-300, celsius) => false
+ * isValidTemperature(500, fahrenheit) => false
+ * isValidTemperature(100, fahrenheit) => true;
+ */
+function isValidTemperature(temperature, unit) {
+  // Check if temperature is a number and if temperature is finite
+  if (typeof temperature !== 'number' || Number.isNaN(temperature) || !Number.isFinite(temperature)) {
+    return false;
+  }
+  
+  // Convert to celsius for bounds checking if needed and check bounds
+  const temperatureInCelsius =
+    unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? fahrenheitToCelsius(temperature) : temperature;
+
+  if (temperatureInCelsius < TEMPERATURE_BOUNDS.MIN || temperatureInCelsius > TEMPERATURE_BOUNDS.MAX) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * @description Return the average value of the temperature in a room.
  * @param {string} roomId - The uuid of the room.
  * @param {object} [options] - Options of the query (units).
@@ -105,33 +134,6 @@ async function getTemperatureInRoom(roomId, options) {
     temperature: averageTemperature,
     unit: optionsWithDefault.unit,
   };
-}
-
-/**
- * @description Validate if a temperature value is valid.
- * @param {number} temperature - The temperature value to validate.
- * @param {string} unit - The unit of the temperature (celsius or fahrenheit).
- * @returns {boolean} - True if the temperature is valid, false otherwise.
- * @private
- */
-function isValidTemperature(temperature, unit) {
-  // Check if temperature is a number
-  if (typeof temperature !== 'number' || isNaN(temperature)) {
-    return false;
-  }
-  // Check if temperature is finite
-  if (!isFinite(temperature)) {
-    return false;
-  }
-  // Convert to celsius for bounds checking if needed and check bounds
-  const temperatureInCelsius =
-    unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? fahrenheitToCelsius(temperature) : temperature;
-
-  if (temperatureInCelsius < TEMPERATURE_BOUNDS.MIN || temperatureInCelsius > TEMPERATURE_BOUNDS.MAX) {
-    return false;
-  }
-
-  return true;
 }
 
 module.exports = {
