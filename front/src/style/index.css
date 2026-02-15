@@ -402,3 +402,39 @@ body {
 .rti--tag button:focus {
   outline: none !important;
 }
+
+.favorite-star {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+  position: absolute;
+  /*top: 1px;*/
+  right: 1px !important;
+  /*left: auto !important;*/
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*font-size: 32px;*/
+  color: #9aa0a6;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+  pointer-events: auto;
+  box-shadow: none;
+  outline: none;
+}
+
+.card-img-container {
+  position: relative;
+}
+
+.card-img-container > a {
+  display: block;
+  position: relative;
+  z-index: 1;
+}

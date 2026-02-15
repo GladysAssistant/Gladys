@@ -43,7 +43,7 @@ class Integration extends Component {
     const { searchKeyword = '', orderDir = 'asc' } = this.state;
 
     // Load all or category related integrations
-    let selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
+    let selectedIntegrations = category && category !== 'favorites' ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
     // Total size
@@ -62,6 +62,21 @@ class Integration extends Component {
       );
 
       totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
+    }
+
+    // Get favorites from localStorage
+    const favorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
+
+    // Add favorite status to integrations
+    selectedIntegrations = selectedIntegrations.map(integration => ({
+      ...integration,
+      isFavorite: favorites.includes(integration.key)
+    }));
+
+    // If we are in favorites view, only display favorites
+    if (category === 'favorites') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
+      totalSize = selectedIntegrations.length;
     }
 
     // Translate with i18n
@@ -104,6 +119,19 @@ class Integration extends Component {
     });
   }
 
+  toggleFavorite = (integrationKey) => {
+    const favorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
+    const newFavorites = favorites.includes(integrationKey)
+      ? favorites.filter(key => key !== integrationKey)
+      : [...favorites, integrationKey];
+    
+    localStorage.setItem('integration_favorites', JSON.stringify(newFavorites));
+    // Debug: verify favorite toggle is triggered and persisted
+    // eslint-disable-next-line no-console
+    console.log('[integration] toggleFavorite', integrationKey, newFavorites);
+    this.getIntegrations();
+  };
+
   search = async e => {
     await this.setState({
       searchKeyword: e.target.value
@@ -124,7 +152,8 @@ class Integration extends Component {
       ...props,
       ...state,
       search: this.search,
-      changeOrderDir: this.changeOrderDir
+      changeOrderDir: this.changeOrderDir,
+      toggleFavorite: this.toggleFavorite
     };
 
     return <IntegrationPage {...combinedProps} />;
