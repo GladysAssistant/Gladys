@@ -225,12 +225,18 @@ class SetupTab extends Component {
                 </div>
               )}
               <p>
+                <MarkupText id="integration.tuya.setup.cloudTitle" />
                 <MarkupText id="integration.tuya.setup.description" />
                 <MarkupText id="integration.tuya.setup.descriptionCreateAccount" />
                 <MarkupText id="integration.tuya.setup.descriptionCreateProject" />
                 <MarkupText id="integration.tuya.setup.descriptionGetKeys" />
                 <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid" />
                 <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid2" />
+                <MarkupText id="integration.tuya.setup.descriptionTrial" />
+                <MarkupText id="integration.tuya.setup.localTitle" />
+                <MarkupText id="integration.tuya.setup.descriptionLocalMode" />
+                <MarkupText id="integration.tuya.setup.limitationsTitle" />
+                <MarkupText id="integration.tuya.setup.limitationsProtocol35" />
               </p>
 
               <form>
