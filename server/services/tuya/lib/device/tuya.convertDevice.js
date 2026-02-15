@@ -1,13 +1,12 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
-const { getSupportForDevice } = require('../models');
 const { convertFeature } = require('./tuya.convertFeature');
 const logger = require('../../../../utils/logger');
 
 /**
  * @description Transform Tuya device to Gladys device.
  * @param {object} tuyaDevice - Tuya device.
- * @returns {object} Glladys device.
+ * @returns {object} Gladys device.
  * @example
  * tuya.convertDevice({ ... });
  */
@@ -70,10 +69,7 @@ function convertDevice(tuyaDevice) {
     groups[code] = { ...func, readOnly: false };
   });
 
-  const features = Object.values(groups).map((group) => convertFeature(group, externalId, tuyaDevice));
-
-  const support = getSupportForDevice(tuyaDevice);
-  const hasFeatures = features.length > 0;
+  const features = Object.values(groups).map((group) => convertFeature(group, externalId));
 
   const device = {
     name,
@@ -87,9 +83,6 @@ function convertDevice(tuyaDevice) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
     params,
-    tuya_supported: hasFeatures ? support.supported : false,
-    tuya_support_level: hasFeatures ? support.level : 'none',
-    tuya_support_model: support.model,
   };
   if (online !== undefined) {
     device.online = online;

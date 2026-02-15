@@ -1310,16 +1310,11 @@
         "localKeyLabel": "Clé locale",
         "protocolVersionLabel": "Version du protocole",
         "ipAddressLabel": "Adresse IP",
-        "productIdLabel": "Identifiant produit",
-        "productIdCloudLabel": "Identifiant produit cloud :",
         "localInfoHelp": "Saisissez l'IP locale et la version du protocole si vous souhaitez utiliser le mode local. L'IP cloud est conservée en référence.",
         "localPollButton": "Poll local des DP",
         "localPollSuccess": "Poll local OK.",
-        "localPollError": "Échec du poll local :",
-        "createGithubIssue": "Créer une issue Github",
-        "dpMapLabel": "Sortie DPS locale"
+        "localPollError": "Échec du poll local :"
       },
-      "unmanagedModelHelp": "Mode cloud : vous pouvez sauvegarder tel quel. Mode local : renseignez IP locale + protocole puis lancez le poll local des DP.",
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
@@ -3313,9 +3308,7 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Clim.",
-          "heating": "Chauffage",
-          "drying": "Déshum.",
-          "fan": "Ventilation"
+          "heating": "Chauffage"
         }
       },
       "heater": {

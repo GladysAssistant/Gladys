@@ -7,40 +7,6 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 
-const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
-
-const sanitizeDeviceForIssue = device => {
-  if (!device) {
-    return device;
-  }
-  const sanitized = { ...device };
-  const params = Array.isArray(device.params) ? device.params.map(param => ({ ...param })) : [];
-  params.forEach(param => {
-    if (['LOCAL_KEY', 'IP_ADDRESS', 'CLOUD_IP'].includes(param.name)) {
-      param.value = '<redacted>';
-    }
-  });
-  sanitized.params = params;
-  if (sanitized.local_key) {
-    sanitized.local_key = '<redacted>';
-  }
-  if (sanitized.ip) {
-    sanitized.ip = '<redacted>';
-  }
-  if (sanitized.cloud_ip) {
-    sanitized.cloud_ip = '<redacted>';
-  }
-  sanitized.mode = sanitized.local_override ? 'local' : 'cloud';
-  return sanitized;
-};
-
-const createGithubUrl = device => {
-  const title = encodeURIComponent(`Tuya: Unsupported device ${device.product_id || device.model || device.name}`);
-  const sanitized = sanitizeDeviceForIssue(device);
-  const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(sanitized, null, 2)}\n\`\`\``);
-  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
-};
-
 class TuyaDeviceBox extends Component {
   componentWillMount() {
     this.setState({
@@ -253,15 +219,11 @@ class TuyaDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
-      housesWithRooms,
-      selectable,
-      selected,
-      onToggleSelected
+      housesWithRooms
     },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber, localPollStatus, localPollError }
   ) {
-    const supportedModel = device.tuya_supported !== false;
-    const validModel = supportedModel;
+    const validModel = device.features && device.features.length > 0;
     const online = device.online;
     const paramsArray = Array.isArray(device.params) ? device.params : [];
     const params = paramsArray.reduce((acc, param) => {
@@ -275,40 +237,22 @@ class TuyaDeviceBox extends Component {
       params.LOCAL_OVERRIDE !== undefined && params.LOCAL_OVERRIDE !== null
         ? params.LOCAL_OVERRIDE
         : device.local_override;
-    const dpMapParam = paramsArray.find(param => param.name === 'TUYA_DP_MAP');
-    const dpMapValue = dpMapParam ? dpMapParam.value : null;
-    const isJsonDpMap = dpMapValue && typeof dpMapValue === 'string' && dpMapValue.trim().startsWith('{');
     const ipAddress = params.IP_ADDRESS || device.ip || '';
     const hasProtocolSelected = protocolVersion && protocolVersion.length > 0;
     const canPollLocal = ipAddress && localKey;
     const requiresProtocol = localOverride === true;
     const canSave = !requiresProtocol || hasProtocolSelected;
-    const productKey = params.PRODUCT_KEY || device.product_key || '';
-    const productId = productKey || device.product_id || '';
 
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header">
             <Localizer>
               <div title={<Text id={`integration.tuya.status.${online ? 'online' : 'offline'}`} />}>
                 <i class={`fe fe-radio text-${online ? 'success' : 'danger'}`} />
                 &nbsp;{device.name}
               </div>
             </Localizer>
-            {selectable && (
-              <div class="custom-control custom-checkbox">
-                <input
-                  id={`select_${deviceIndex}`}
-                  type="checkbox"
-                  class="custom-control-input"
-                  checked={selected === true}
-                  disabled={!validModel || (requiresProtocol && !hasProtocolSelected)}
-                  onChange={() => onToggleSelected && onToggleSelected(device.external_id)}
-                />
-                <label class="custom-control-label" for={`select_${deviceIndex}`} />
-              </div>
-            )}
           </div>
           <div
             class={cx('dimmer', {
@@ -356,24 +300,6 @@ class TuyaDeviceBox extends Component {
                     class="form-control"
                     disabled="true"
                   />
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`product_id_${deviceIndex}`}>
-                    <Text id="integration.tuya.device.productIdLabel" />
-                  </label>
-                  <input
-                    id={`product_id_${deviceIndex}`}
-                    type="text"
-                    value={productId}
-                    class="form-control"
-                    disabled="true"
-                  />
-                  {productKey && device.product_id && productKey !== device.product_id && (
-                    <small class="form-text text-muted">
-                      <Text id="integration.tuya.device.productIdCloudLabel" /> {device.product_id}
-                    </small>
-                  )}
                 </div>
 
                 <div class="form-group">
@@ -440,35 +366,25 @@ class TuyaDeviceBox extends Component {
                   </select>
                 </div>
 
-                {(validModel || !supportedModel) && (
-                  <div class="form-group">
-                    <button
-                      onClick={this.pollLocal}
-                      class="btn btn-outline-secondary"
-                      disabled={!canPollLocal || localPollStatus === RequestStatus.Getting}
-                    >
-                      <Text id="integration.tuya.device.localPollButton" />
-                    </button>
-                    {localPollStatus === RequestStatus.Success && (
-                      <span class="text-success ml-2">
-                        <Text id="integration.tuya.device.localPollSuccess" />
-                      </span>
-                    )}
-                    {localPollStatus === RequestStatus.Error && (
-                      <span class="text-danger ml-2">
-                        <Text id="integration.tuya.device.localPollError" /> {localPollError}
-                      </span>
-                    )}
-                    {!supportedModel && dpMapValue && (
-                      <div class="mt-3">
-                        <label class="form-label">
-                          <Text id="integration.tuya.device.dpMapLabel" />
-                        </label>
-                        <pre class="mb-2">{isJsonDpMap ? dpMapValue : JSON.stringify(dpMapValue, null, 2)}</pre>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div class="form-group">
+                  <button
+                    onClick={this.pollLocal}
+                    class="btn btn-outline-secondary"
+                    disabled={!canPollLocal || localPollStatus === RequestStatus.Getting}
+                  >
+                    <Text id="integration.tuya.device.localPollButton" />
+                  </button>
+                  {localPollStatus === RequestStatus.Success && (
+                    <span class="text-success ml-2">
+                      <Text id="integration.tuya.device.localPollSuccess" />
+                    </span>
+                  )}
+                  {localPollStatus === RequestStatus.Error && (
+                    <span class="text-danger ml-2">
+                      <Text id="integration.tuya.device.localPollError" /> {localPollError}
+                    </span>
+                  )}
+                </div>
 
                 <div class="form-group">
                   <label class="form-label" for={`room_${deviceIndex}`}>
@@ -530,20 +446,10 @@ class TuyaDeviceBox extends Component {
                     </button>
                   )}
 
-                  {!supportedModel && (
-                    <div>
-                      <div class="alert alert-warning">
-                        <Text id="integration.tuya.unmanagedModelButton" />
-                      </div>
-                      <div class="alert alert-warning py-1">
-                        <small>
-                          <Text id="integration.tuya.unmanagedModelHelp" />
-                        </small>
-                      </div>
-                      <a class="btn btn-gray" href={createGithubUrl(device)} target="_blank" rel="noopener noreferrer">
-                        <Text id="integration.tuya.device.createGithubIssue" />
-                      </a>
-                    </div>
+                  {!validModel && (
+                    <button class="btn btn-dark" disabled>
+                      <Text id="integration.tuya.unmanagedModelButton" />
+                    </button>
                   )}
 
                   {validModel && editButton && (

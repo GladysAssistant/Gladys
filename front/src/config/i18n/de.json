@@ -1180,16 +1180,11 @@
         "localKeyLabel": "Lokaler Schlüssel",
         "protocolVersionLabel": "Protokollversion",
         "ipAddressLabel": "IP-Adresse",
-        "productIdLabel": "Produkt-ID",
-        "productIdCloudLabel": "Cloud-Produkt-ID:",
         "localInfoHelp": "Gib die lokale IP und die Protokollversion ein, wenn du den lokalen Modus nutzen willst. Die Cloud-IP wird zur Referenz gespeichert.",
         "localPollButton": "Lokales DPS abfragen",
         "localPollSuccess": "Lokaler Poll OK.",
-        "localPollError": "Lokaler Poll fehlgeschlagen:",
-        "createGithubIssue": "Github-Issue erstellen",
-        "dpMapLabel": "Lokale DPS-Ausgabe"
+        "localPollError": "Lokaler Poll fehlgeschlagen:"
       },
-      "unmanagedModelHelp": "Cloud-Modus: du kannst so speichern. Lokaler Modus: lokale IP + Protokoll eintragen und lokalen DPS-Poll starten.",
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
@@ -3313,9 +3308,7 @@
         "mode": {
           "auto": "Automatisch",
           "cooling": "Kühlen",
-          "heating": "Heizen",
-          "drying": "Trocknen",
-          "fan": "Lüften"
+          "heating": "Heizen"
         }
       },
       "heater": {

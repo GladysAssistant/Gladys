@@ -3,7 +3,6 @@ const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
-const { getDpsMappingForDevice } = require('./models');
 const TuyAPI = require('tuyapi');
 
 const getParamValue = (params, name) => {
@@ -35,43 +34,6 @@ const getLocalDpsFromCode = (code) => {
   return null;
 };
 
-const findDpsEntry = (dpsMapping, code) => {
-  if (!dpsMapping || !Array.isArray(dpsMapping.dps)) {
-    return null;
-  }
-  return dpsMapping.dps.find((entry) => entry.code === code) || null;
-};
-
-const mapValueForDps = (entry, value) => {
-  let mappedValue = value;
-  if (entry.map && typeof entry.map === 'object') {
-    const inverse = Object.keys(entry.map).reduce((acc, key) => {
-      acc[entry.map[key]] = key;
-      return acc;
-    }, {});
-    if (inverse[mappedValue] !== undefined) {
-      mappedValue = inverse[mappedValue];
-    }
-  }
-  if (entry.type === 'integer' && typeof mappedValue === 'string') {
-    const parsed = parseFloat(mappedValue);
-    if (!Number.isNaN(parsed)) {
-      mappedValue = parsed;
-    }
-  }
-  if (entry.scale && typeof mappedValue === 'number') {
-    mappedValue = Math.round(mappedValue / entry.scale);
-    if (entry.raw && typeof entry.raw.step === 'number') {
-      const step = entry.raw.step;
-      mappedValue = Math.round(mappedValue / step) * step;
-    }
-  }
-  if (entry.type === 'boolean' && typeof mappedValue === 'number') {
-    mappedValue = mappedValue === 1;
-  }
-  return mappedValue;
-};
-
 /**
  * @description Send the new device value over device protocol.
  * @param {object} device - Updated Gladys device.
@@ -97,9 +59,6 @@ async function setValue(device, deviceFeature, value) {
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
   const params = device.params || [];
-  const dpsMapping = getDpsMappingForDevice(device);
-  const dpsEntry = findDpsEntry(dpsMapping, command);
-  const mappedValue = dpsEntry ? mapValueForDps(dpsEntry, transformedValue) : transformedValue;
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
   const protocolVersion = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
@@ -109,7 +68,7 @@ async function setValue(device, deviceFeature, value) {
   const hasLocalConfig =
     ipAddress && localKey && protocolVersion && (localOverride === true || (cloudIp && ipAddress !== cloudIp));
 
-  const localDps = dpsEntry ? dpsEntry.id : getLocalDpsFromCode(command);
+  const localDps = getLocalDpsFromCode(command);
 
   if (hasLocalConfig && localDps !== null) {
     try {
@@ -120,9 +79,9 @@ async function setValue(device, deviceFeature, value) {
         version: protocolVersion,
       });
       await tuyaLocal.connect();
-      await tuyaLocal.set({ dps: localDps, set: mappedValue });
+      await tuyaLocal.set({ dps: localDps, set: transformedValue });
       await tuyaLocal.disconnect();
-      logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${mappedValue}`);
+      logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
       return;
     } catch (e) {
       logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
@@ -136,7 +95,7 @@ async function setValue(device, deviceFeature, value) {
       commands: [
         {
           code: command,
-          value: mappedValue,
+          value: transformedValue,
         },
       ],
     },
