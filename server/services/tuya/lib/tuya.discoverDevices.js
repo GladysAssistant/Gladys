@@ -31,8 +31,6 @@ async function discoverDevices() {
   });
 
   let devices = [];
-  const localDevicesById = {};
-
   try {
     devices = await this.loadDevices();
     logger.info(`${devices.length} Tuya devices found`);

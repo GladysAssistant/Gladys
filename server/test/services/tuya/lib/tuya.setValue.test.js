@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -99,9 +100,9 @@ describe('TuyaHandler.setValue', () => {
       this.set = set;
       this.disconnect = disconnect;
     }
-    const setValue = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
-    }).setValue;
+    });
 
     const device = {
       params: [
@@ -140,9 +141,9 @@ describe('TuyaHandler.setValue', () => {
       this.set = set;
       this.disconnect = disconnect;
     }
-    const setValue = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
-    }).setValue;
+    });
 
     const device = {
       params: [

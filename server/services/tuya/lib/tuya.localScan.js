@@ -1,7 +1,7 @@
 const dgram = require('dgram');
-const logger = require('../../../utils/logger');
-const { MessageParser } = require('tuyapi/lib/message-parser');
 const { UDP_KEY } = require('tuyapi/lib/config');
+const { MessageParser } = require('tuyapi/lib/message-parser');
+const logger = require('../../../utils/logger');
 
 const DEFAULT_PORTS = [6666, 6667, 7000];
 
@@ -9,6 +9,8 @@ const DEFAULT_PORTS = [6666, 6667, 7000];
  * @description Scan local network for Tuya devices over UDP to retrieve protocol version.
  * @param {number} timeoutSeconds - Scan duration in seconds.
  * @returns {Promise<object>} Map of deviceId -> { ip, version, productKey }.
+ * @example
+ * await localScan(5);
  */
 async function localScan(timeoutSeconds = 10) {
   const devices = {};
@@ -29,10 +31,8 @@ async function localScan(timeoutSeconds = 10) {
       return;
     }
 
-    const deviceId = payload.gwId || payload.devId || payload.id;
-    const ip = payload.ip;
-    const version = payload.version;
-    const productKey = payload.productKey;
+    const { gwId, devId, id, ip, version, productKey } = payload;
+    const deviceId = gwId || devId || id;
 
     if (!deviceId) {
       return;
@@ -59,7 +59,9 @@ async function localScan(timeoutSeconds = 10) {
     sockets.push(socket);
   });
 
-  await new Promise((resolve) => setTimeout(resolve, timeoutSeconds * 1000));
+  await new Promise((resolve) => {
+    setTimeout(resolve, timeoutSeconds * 1000);
+  });
 
   sockets.forEach((socket) => {
     try {

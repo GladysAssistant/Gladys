@@ -2,6 +2,13 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const { DEVICE_PARAM_NAME } = require('../lib/utils/tuya.constants');
 
 module.exports = function TuyaController(tuyaManager) {
+  /**
+   * @description Upsert a device parameter in a params array.
+   * @param {Array} params - Device params.
+   * @param {string} name - Param name.
+   * @param {*} value - Param value.
+   * @returns {void}
+   */
   function upsertParam(params, name, value) {
     if (value === undefined || value === null) {
       return;
@@ -14,6 +21,12 @@ module.exports = function TuyaController(tuyaManager) {
     }
   }
 
+  /**
+   * @description Merge local scan data into a discovered device.
+   * @param {object} device - Discovered device.
+   * @param {object} localInfo - Local scan info.
+   * @returns {object} Updated device.
+   */
   function updateDiscoveredDeviceWithLocalInfo(device, localInfo) {
     if (!device || !localInfo) {
       return device;

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { assert } = sinon;
 
 const TuyaHandler = require('../../../../services/tuya/lib/index');
 const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');

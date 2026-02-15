@@ -142,7 +142,7 @@ class TuyaDeviceBox extends Component {
     } else {
       params.push({ name: 'IP_ADDRESS', value: ipAddress });
     }
-    const overrideValue = ipAddress && cloudIp && ipAddress !== cloudIp ? true : false;
+    const overrideValue = !!(ipAddress && cloudIp && ipAddress !== cloudIp);
     const overrideIndex = params.findIndex(param => param.name === 'LOCAL_OVERRIDE');
     if (overrideIndex >= 0) {
       params[overrideIndex] = { ...params[overrideIndex], value: overrideValue };

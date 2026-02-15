@@ -1,9 +1,9 @@
+const TuyAPI = require('tuyapi');
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
-const TuyAPI = require('tuyapi');
 
 const getParamValue = (params, name) => {
   const found = (params || []).find((param) => param.name === name);

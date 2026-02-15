@@ -1,11 +1,13 @@
-const logger = require('../../../utils/logger');
 const TuyAPI = require('tuyapi');
+const logger = require('../../../utils/logger');
 const { BadParameters } = require('../../../utils/coreErrors');
 
 /**
  * @description Poll a Tuya device locally to retrieve DPS map.
  * @param {object} payload - Local connection info.
  * @returns {Promise<object>} DPS map.
+ * @example
+ * await localPoll({ deviceId: 'id', ip: '1.1.1.1', localKey: 'key', protocolVersion: '3.3' });
  */
 async function localPoll(payload) {
   const { deviceId, ip, localKey, protocolVersion, timeoutMs = 8000 } = payload || {};
@@ -30,9 +32,9 @@ async function localPoll(payload) {
     })();
     const data = await Promise.race([
       operation,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new BadParameters('Local poll timeout')), effectiveTimeout),
-      ),
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new BadParameters('Local poll timeout')), effectiveTimeout);
+      }),
     ]);
     await tuyaLocal.disconnect();
     return data;
@@ -40,20 +42,21 @@ async function localPoll(payload) {
 
   try {
     const attempts =
-      protocolVersion === '3.5'
-        ? [{ schema: true }, { schema: true, dps: [1] }, {}]
-        : [{ schema: true }];
-    let data = null;
-    for (let i = 0; i < attempts.length; i += 1) {
+      protocolVersion === '3.5' ? [{ schema: true }, { schema: true, dps: [1] }, {}] : [{ schema: true }];
+    const tryAttempt = async (index) => {
+      if (index >= attempts.length) {
+        return null;
+      }
       try {
-        data = await runGet(attempts[i]);
-        break;
+        return await runGet(attempts[index]);
       } catch (e) {
-        if (i === attempts.length - 1) {
+        if (index === attempts.length - 1) {
           throw e;
         }
+        return tryAttempt(index + 1);
       }
-    }
+    };
+    const data = await tryAttempt(0);
     if (!data || typeof data !== 'object' || !data.dps) {
       const errorMessage =
         typeof data === 'string' ? `Invalid local poll response: ${data}` : 'Invalid local poll response';

@@ -59,9 +59,7 @@ class SetupTab extends Component {
       );
       tuyaAppAccountId = appAccountId;
 
-      const { value: appUsername } = await this.props.httpClient.get(
-        '/api/v1/service/tuya/variable/TUYA_APP_USERNAME'
-      );
+      const { value: appUsername } = await this.props.httpClient.get('/api/v1/service/tuya/variable/TUYA_APP_USERNAME');
       tuyaAppUsername = appUsername;
 
       this.setState({

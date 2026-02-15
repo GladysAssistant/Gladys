@@ -62,7 +62,7 @@ describe('TuyaHandler.discoverDevices', () => {
               },
             ],
           },
-        }),
+        })
         .onThirdCall()
         .resolves({
           result: {
