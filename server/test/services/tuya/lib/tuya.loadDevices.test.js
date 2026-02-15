@@ -49,4 +49,18 @@ describe('TuyaHandler.loadDevices', () => {
       query: { page_no: 2, page_size: 1 },
     });
   });
+
+  it('should loop on pages with array result', async () => {
+    tuyaHandler.connector.request = sinon
+      .stub()
+      .onFirstCall()
+      .resolves({ result: [{ id: 1 }] })
+      .onSecondCall()
+      .resolves({ result: [] });
+
+    const devices = await tuyaHandler.loadDevices(1, 1);
+
+    expect(devices).to.deep.eq([{ id: 1 }]);
+    assert.callCount(tuyaHandler.connector.request, 2);
+  });
 });

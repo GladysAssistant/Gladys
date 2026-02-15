@@ -44,13 +44,10 @@ async function localPoll(payload) {
     const attempts =
       protocolVersion === '3.5' ? [{ schema: true }, { schema: true, dps: [1] }, {}] : [{ schema: true }];
     const tryAttempt = async (index) => {
-      if (index >= attempts.length) {
-        return null;
-      }
       try {
         return await runGet(attempts[index]);
       } catch (e) {
-        if (index === attempts.length - 1) {
+        if (index >= attempts.length - 1) {
           throw e;
         }
         return tryAttempt(index + 1);

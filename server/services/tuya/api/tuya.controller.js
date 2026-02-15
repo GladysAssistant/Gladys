@@ -112,9 +112,6 @@ module.exports = function TuyaController(tuyaManager) {
       const updatedDevices = tuyaManager.discoveredDevices.map((device) => {
         const deviceId = device.external_id && device.external_id.split(':')[1];
         const localInfo = localDevicesById[deviceId];
-        if (!localInfo) {
-          return device;
-        }
         return updateDiscoveredDeviceWithLocalInfo(device, localInfo);
       });
       tuyaManager.discoveredDevices = updatedDevices;
