@@ -66,7 +66,7 @@ describe('TuyaHandler.init', () => {
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
-      payload: { status: STATUS.CONNECTED },
+      payload: { status: STATUS.CONNECTED, error: null },
     });
   });
 });

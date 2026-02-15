@@ -27,7 +27,7 @@ const getLocalDpsFromCode = (code) => {
   if (code === 'switch') {
     return 1;
   }
-  const match = code.match(/_(\\d+)$/);
+  const match = code.match(/_(\d+)$/);
   if (match) {
     return parseInt(match[1], 10);
   }
