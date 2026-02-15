@@ -22,9 +22,9 @@ describe('TuyaHandler.loadDevices', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: [{ id: 1 }] })
+        .resolves({ result: { list: [{ id: 1 }], has_more: true } })
         .onSecondCall()
-        .resolves({ result: [{ id: 2 }] }),
+        .resolves({ result: { list: [{ id: 2 }], has_more: false } }),
     };
   });
 

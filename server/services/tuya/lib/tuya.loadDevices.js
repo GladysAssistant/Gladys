@@ -23,8 +23,11 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
 
   const result = responsePage.result || [];
   const list = Array.isArray(result) ? result : result.list || [];
+  const hasMore = Array.isArray(result)
+    ? list.length === pageSize
+    : result.has_more === true || list.length === pageSize;
 
-  if (list.length === pageSize) {
+  if (hasMore) {
     const nextResult = await this.loadDevices(pageNo + 1, pageSize);
     nextResult.forEach((device) => list.push(device));
   }

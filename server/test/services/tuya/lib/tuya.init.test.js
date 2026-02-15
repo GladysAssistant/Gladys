@@ -43,16 +43,19 @@ describe('TuyaHandler.init', () => {
       .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
-      .returns('secretKey');
+      .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns('appUsername');
 
     await tuyaHandler.init();
 
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
-    assert.callCount(gladys.variable.getValue, 3);
+    assert.callCount(gladys.variable.getValue, 4);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_USERNAME, serviceId);
 
     assert.calledOnce(client.init);
 
