@@ -12,6 +12,7 @@ const { loadDeviceDetails } = require('./tuya.loadDeviceDetails');
 const { setValue } = require('./tuya.setValue');
 const { poll } = require('./tuya.poll');
 const { localScan } = require('./tuya.localScan');
+const { localPoll } = require('./tuya.localPoll');
 
 const { STATUS } = require('./utils/tuya.constants');
 
@@ -38,5 +39,6 @@ TuyaHandler.prototype.loadDeviceDetails = loadDeviceDetails;
 TuyaHandler.prototype.setValue = setValue;
 TuyaHandler.prototype.poll = poll;
 TuyaHandler.prototype.localScan = localScan;
+TuyaHandler.prototype.localPoll = localPoll;
 
 module.exports = TuyaHandler;

@@ -24,7 +24,8 @@ const DEFAULT_VALUE_BY_CATEGORY = {
 };
 
 const SetpointDeviceFeature = ({ children, ...props }) => {
-  const SETPOINT_STEP = SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
+  const featureStep = props.deviceFeature && props.deviceFeature.step;
+  const SETPOINT_STEP = featureStep || SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
   const DEFAULT_VALUE_IN_CASE_EMPTY = DEFAULT_VALUE_BY_CATEGORY[props.deviceFeature.category] || 0;
 
   function updateValue(value) {
@@ -73,7 +74,7 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
               </div>
               <input
                 type="number"
-                value={props.deviceFeature.last_value}
+                value={isNullOrUndefined(props.deviceFeature.last_value) ? '' : props.deviceFeature.last_value}
                 class={cx('form-control text-center', style.removeNumberArrow)}
                 onChange={updateValueEvent}
                 step={SETPOINT_STEP}
@@ -96,7 +97,7 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
                 <div>
                   <input
                     type="number"
-                    value={props.deviceFeature.last_value}
+                    value={isNullOrUndefined(props.deviceFeature.last_value) ? '' : props.deviceFeature.last_value}
                     class={cx('form-control text-center input-sm', style.removeNumberArrow)}
                     onChange={updateValueEvent}
                     step={SETPOINT_STEP}

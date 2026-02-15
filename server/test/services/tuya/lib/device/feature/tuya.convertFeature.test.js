@@ -4,7 +4,7 @@ const { convertFeature } = require('../../../../../../services/tuya/lib/device/t
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {
-    const result = convertFeature({ code: 'NOT_EXIST' }, 'externalId');
+    const result = convertFeature({ code: 'NOT_EXIST' }, 'externalId', { category: 'cz' });
     expect(result).to.eq(undefined);
   });
 
@@ -18,6 +18,7 @@ describe('Tuya convert feature', () => {
         values: '{"min":100,"max":1000}',
       },
       'externalId',
+      { category: 'cz' },
     );
     expect(result).to.deep.eq({
       category: 'switch',
@@ -42,6 +43,7 @@ describe('Tuya convert feature', () => {
         values: '{',
       },
       'externalId',
+      { category: 'cz' },
     );
     expect(result).to.deep.eq({
       category: 'switch',
@@ -53,6 +55,32 @@ describe('Tuya convert feature', () => {
       read_only: false,
       selector: 'externalId:switch_1',
       type: 'binary',
+    });
+  });
+
+  it('should use air conditioner mapping', () => {
+    const result = convertFeature(
+      {
+        code: 'temp_set',
+        type: 'Integer',
+        name: 'temp',
+        readOnly: false,
+        values: '{"min":160,"max":880,"scale":1,"step":10}',
+      },
+      'externalId',
+      { category: 'kt', product_id: 'keyquxnsj75xc8se' },
+    );
+    expect(result).to.deep.eq({
+      category: 'air-conditioning',
+      external_id: 'externalId:temp_set',
+      has_feedback: false,
+      max: 880,
+      min: 160,
+      name: 'temp',
+      read_only: false,
+      selector: 'externalId:temp_set',
+      type: 'target-temperature',
+      unit: 'celsius',
     });
   });
 });

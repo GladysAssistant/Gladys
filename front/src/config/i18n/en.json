@@ -1073,11 +1073,25 @@
         "featuresLabel": "Features",
         "idLabel": "Device ID",
         "localKeyLabel": "Local Key",
-        "protocolVersionLabel": "Protocol Version"
+        "protocolVersionLabel": "Protocol Version",
+        "ipAddressLabel": "IP Address",
+        "productIdLabel": "Product ID",
+        "productIdCloudLabel": "Cloud product ID:",
+        "localInfoHelp": "Enter the local IP and protocol version if you want to use local mode. The cloud IP is kept for reference.",
+        "localPollButton": "Poll local DPS",
+        "localPollSuccess": "Local poll OK.",
+        "localPollError": "Local poll failed:",
+        "createGithubIssue": "Create a Github issue",
+        "dpMapLabel": "Local DPS output"
       },
+      "unmanagedModelHelp": "Cloud mode: you can save as-is. Local mode: enter local IP + protocol then run local DPS poll.",
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
         "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
+        "localDiscoveryInfo": "Local discovery uses UDP broadcast. Run the local UDP scan, then if needed enter the local IP and protocol version and use \"Poll local DPS\".",
+        "scanInProgress": "Scan in progress... retrieving cloud devices.",
+        "udpScan": "Run local UDP scan",
+        "udpScanError": "Error while running local UDP scan.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
         "scan": "Scan",
@@ -3299,7 +3313,9 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Cool",
-          "heating": "Heat"
+          "heating": "Heat",
+          "drying": "Dry",
+          "fan": "Fan"
         }
       },
       "heater": {

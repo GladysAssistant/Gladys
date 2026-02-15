@@ -1,0 +1,35 @@
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
+
+const NAME = 'thermostat';
+const CATEGORY = 'cjkg';
+const PRODUCT_IDS = ['c03zek9b5daz7omr'];
+const ALLOW_CATEGORY_FALLBACK = false;
+
+const mappings = {
+  temp_set: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+    unit: DEVICE_FEATURE_UNITS.CELSIUS,
+  },
+  temp_current: {
+    category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    unit: DEVICE_FEATURE_UNITS.CELSIUS,
+  },
+  switch: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+  },
+  mode: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+  },
+};
+
+module.exports = {
+  NAME,
+  CATEGORY,
+  PRODUCT_IDS,
+  ALLOW_CATEGORY_FALLBACK,
+  mappings,
+};

@@ -1178,11 +1178,25 @@
         "featuresLabel": "Funktionen",
         "idLabel": "Geräte-ID",
         "localKeyLabel": "Lokaler Schlüssel",
-        "protocolVersionLabel": "Protokollversion"
+        "protocolVersionLabel": "Protokollversion",
+        "ipAddressLabel": "IP-Adresse",
+        "productIdLabel": "Produkt-ID",
+        "productIdCloudLabel": "Cloud-Produkt-ID:",
+        "localInfoHelp": "Gib die lokale IP und die Protokollversion ein, wenn du den lokalen Modus nutzen willst. Die Cloud-IP wird zur Referenz gespeichert.",
+        "localPollButton": "Lokales DPS abfragen",
+        "localPollSuccess": "Lokaler Poll OK.",
+        "localPollError": "Lokaler Poll fehlgeschlagen:",
+        "createGithubIssue": "Github-Issue erstellen",
+        "dpMapLabel": "Lokale DPS-Ausgabe"
       },
+      "unmanagedModelHelp": "Cloud-Modus: du kannst so speichern. Lokaler Modus: lokale IP + Protokoll eintragen und lokalen DPS-Poll starten.",
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
+        "localDiscoveryInfo": "Lokale Erkennung nutzt UDP-Broadcast. Starte den lokalen UDP-Scan und gib bei Bedarf lokale IP und Protokollversion ein und nutze \"Lokales DPS abfragen\".",
+        "scanInProgress": "Scan läuft... Cloud-Geräte werden abgerufen.",
+        "udpScan": "Lokalen UDP-Scan starten",
+        "udpScanError": "Fehler beim lokalen UDP-Scan.",
         "error": "Fehler beim Entdecken von Tuya-Geräten. Bitte überprüfe deine Login-Daten auf der Einrichtungsseite.",
         "noDeviceFound": "Kein Tuya-Gerät entdeckt.",
         "scan": "Scannen",
@@ -3299,7 +3313,9 @@
         "mode": {
           "auto": "Automatisch",
           "cooling": "Kühlen",
-          "heating": "Heizen"
+          "heating": "Heizen",
+          "drying": "Trocknen",
+          "fan": "Lüften"
         }
       },
       "heater": {

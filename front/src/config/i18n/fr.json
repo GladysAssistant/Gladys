@@ -1308,11 +1308,25 @@
         "featuresLabel": "Fonctionnalités",
         "idLabel": "Identifiant de l'appareil",
         "localKeyLabel": "Clé locale",
-        "protocolVersionLabel": "Version du protocole"
+        "protocolVersionLabel": "Version du protocole",
+        "ipAddressLabel": "Adresse IP",
+        "productIdLabel": "Identifiant produit",
+        "productIdCloudLabel": "Identifiant produit cloud :",
+        "localInfoHelp": "Saisissez l'IP locale et la version du protocole si vous souhaitez utiliser le mode local. L'IP cloud est conservée en référence.",
+        "localPollButton": "Poll local des DP",
+        "localPollSuccess": "Poll local OK.",
+        "localPollError": "Échec du poll local :",
+        "createGithubIssue": "Créer une issue Github",
+        "dpMapLabel": "Sortie DPS locale"
       },
+      "unmanagedModelHelp": "Mode cloud : vous pouvez sauvegarder tel quel. Mode local : renseignez IP locale + protocole puis lancez le poll local des DP.",
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
+        "localDiscoveryInfo": "La découverte locale utilise le broadcast UDP. Lancez le scan UDP local puis, si besoin, renseignez l'IP locale et la version du protocole, et utilisez \"Poll local des DP\".",
+        "scanInProgress": "Scan en cours... récupération cloud des appareils.",
+        "udpScan": "Scanner UDP local",
+        "udpScanError": "Erreur lors du scan UDP local.",
         "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
         "scan": "Scanner",
@@ -3299,7 +3313,9 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Clim.",
-          "heating": "Chauffage"
+          "heating": "Chauffage",
+          "drying": "Déshum.",
+          "fan": "Ventilation"
         }
       },
       "heater": {

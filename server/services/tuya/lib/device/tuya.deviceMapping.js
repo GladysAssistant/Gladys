@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
+  AC_MODE,
 } = require('../../../../utils/constants');
 
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
@@ -100,6 +101,45 @@ const mappings = {
 };
 
 const writeValues = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: (valueFromGladys) => {
+      if (valueFromGladys === AC_MODE.AUTO) {
+        return 'auto';
+      }
+      if (valueFromGladys === AC_MODE.COOLING) {
+        return 'cool';
+      }
+      if (valueFromGladys === AC_MODE.HEATING) {
+        return 'heat';
+      }
+      if (valueFromGladys === AC_MODE.DRYING) {
+        return 'dry';
+      }
+      if (valueFromGladys === AC_MODE.FAN) {
+        return 'fan_only';
+      }
+      return valueFromGladys;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: (valueFromGladys) => {
+      const parsed = parseFloat(valueFromGladys);
+      if (Number.isNaN(parsed)) {
+        return valueFromGladys;
+      }
+      // Tuya AC typically expects temperature * 10 for Celsius.
+      if (parsed > 0 && parsed < 60) {
+        return Math.round(parsed * 10);
+      }
+      return parsed;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: (valueFromGladys) => {
+      return valueFromGladys;
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromGladys) => {
       return valueFromGladys === 1;
@@ -144,6 +184,56 @@ const writeValues = {
 };
 
 const readValues = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: (valueFromDevice) => {
+      if (valueFromDevice === 'auto') {
+        return AC_MODE.AUTO;
+      }
+      if (valueFromDevice === 'cool' || valueFromDevice === 'cold' || valueFromDevice === 'cooling') {
+        return AC_MODE.COOLING;
+      }
+      if (valueFromDevice === 'heat' || valueFromDevice === 'heating' || valueFromDevice === 'hot') {
+        return AC_MODE.HEATING;
+      }
+      if (valueFromDevice === 'dry' || valueFromDevice === 'wet' || valueFromDevice === 'drying') {
+        return AC_MODE.DRYING;
+      }
+      if (valueFromDevice === 'fan' || valueFromDevice === 'fan_only') {
+        return AC_MODE.FAN;
+      }
+      return valueFromDevice;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: (valueFromDevice) => {
+      const parsed = typeof valueFromDevice === 'number' ? valueFromDevice : parseFloat(valueFromDevice);
+      if (Number.isNaN(parsed)) {
+        return valueFromDevice;
+      }
+      if (parsed >= 100) {
+        return parsed / 10;
+      }
+      return parsed;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice) => {
+      const parsed = typeof valueFromDevice === 'number' ? valueFromDevice : parseFloat(valueFromDevice);
+      if (Number.isNaN(parsed)) {
+        return valueFromDevice;
+      }
+      if (parsed >= 100) {
+        return parsed / 10;
+      }
+      return parsed;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromDevice) => {
       return valueFromDevice === true ? 1 : 0;

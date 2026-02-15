@@ -31,13 +31,7 @@ async function discoverDevices() {
   });
 
   let devices = [];
-  let localDevicesById = {};
-  try {
-    localDevicesById = await this.localScan();
-    logger.debug(`[Tuya] Local UDP scan returned ${Object.keys(localDevicesById).length} device(s)`);
-  } catch (e) {
-    logger.debug('[Tuya] Local UDP scan failed', e);
-  }
+  const localDevicesById = {};
 
   try {
     devices = await this.loadDevices();
@@ -51,15 +45,12 @@ async function discoverDevices() {
   ).then((results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value));
 
   this.discoveredDevices = this.discoveredDevices.map((device) => {
-    const localInfo = localDevicesById[device.id];
-    if (localInfo) {
-      return {
-        ...device,
-        protocol_version: localInfo.version,
-        ip: device.ip || localInfo.ip,
-      };
-    }
-    return device;
+    const cloudIp = device.cloud_ip || device.ip;
+    return {
+      ...device,
+      cloud_ip: cloudIp,
+      local_override: false,
+    };
   });
 
   this.discoveredDevices = this.discoveredDevices

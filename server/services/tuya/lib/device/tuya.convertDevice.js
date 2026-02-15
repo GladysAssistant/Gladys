@@ -1,5 +1,6 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
+const { getSupportForDevice } = require('../models');
 const { convertFeature } = require('./tuya.convertFeature');
 const logger = require('../../../../utils/logger');
 
@@ -15,10 +16,14 @@ function convertDevice(tuyaDevice) {
     name,
     product_name: productName,
     model,
+    product_id: productId,
+    product_key: productKey,
     id,
     local_key: localKey,
     ip,
+    cloud_ip: cloudIp,
     protocol_version: protocolVersion,
+    local_override: localOverride,
     specifications = {},
   } = tuyaDevice;
   const externalId = `tuya:${id}`;
@@ -35,8 +40,20 @@ function convertDevice(tuyaDevice) {
   if (ip) {
     params.push({ name: DEVICE_PARAM_NAME.IP_ADDRESS, value: ip });
   }
+  if (cloudIp) {
+    params.push({ name: DEVICE_PARAM_NAME.CLOUD_IP, value: cloudIp });
+  }
+  if (localOverride !== undefined && localOverride !== null) {
+    params.push({ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: localOverride });
+  }
   if (protocolVersion) {
     params.push({ name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: protocolVersion });
+  }
+  if (productId) {
+    params.push({ name: DEVICE_PARAM_NAME.PRODUCT_ID, value: productId });
+  }
+  if (productKey) {
+    params.push({ name: DEVICE_PARAM_NAME.PRODUCT_KEY, value: productKey });
   }
   logger.debug(`Tuya convert device specifications"`);
   logger.debug(JSON.stringify(tuyaDevice));
@@ -53,7 +70,10 @@ function convertDevice(tuyaDevice) {
     groups[code] = { ...func, readOnly: false };
   });
 
-  const features = Object.values(groups).map((group) => convertFeature(group, externalId));
+  const features = Object.values(groups).map((group) => convertFeature(group, externalId, tuyaDevice));
+
+  const support = getSupportForDevice(tuyaDevice);
+  const hasFeatures = features.length > 0;
 
   const device = {
     name,
@@ -61,10 +81,15 @@ function convertDevice(tuyaDevice) {
     external_id: externalId,
     selector: externalId,
     model: productName || model,
+    product_id: productId,
+    product_key: productKey,
     service_id: this.serviceId,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
     params,
+    tuya_supported: hasFeatures ? support.supported : false,
+    tuya_support_level: hasFeatures ? support.level : 'none',
+    tuya_support_model: support.model,
   };
   if (online !== undefined) {
     device.online = online;

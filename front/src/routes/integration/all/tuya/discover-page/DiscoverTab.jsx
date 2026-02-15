@@ -37,8 +37,7 @@ class DiscoverTab extends Component {
 
   getDiscoveredDevices = async () => {
     this.setState({
-      loading: true,
-      selectedDeviceIds: []
+      loading: true
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/tuya/discover');
@@ -55,49 +54,32 @@ class DiscoverTab extends Component {
     }
   };
 
-  toggleSelectedDevice = externalId => {
-    const selectedDeviceIds = new Set(this.state.selectedDeviceIds || []);
-    if (selectedDeviceIds.has(externalId)) {
-      selectedDeviceIds.delete(externalId);
-    } else {
-      selectedDeviceIds.add(externalId);
-    }
+  runLocalScan = async () => {
     this.setState({
-      selectedDeviceIds: Array.from(selectedDeviceIds)
+      udpScanLoading: true,
+      udpScanError: false
     });
-  };
-
-  addSelectedDevices = async () => {
-    const selectedDeviceIds = this.state.selectedDeviceIds || [];
-    const discoveredDevices = this.state.discoveredDevices || [];
-    const devicesToAdd = discoveredDevices.filter(device => selectedDeviceIds.includes(device.external_id));
-
-    if (devicesToAdd.length === 0) {
-      return;
-    }
-
-    this.setState({
-      addingSelected: true,
-      errorAddingSelected: false
-    });
-
     try {
-      await Promise.all(devicesToAdd.map(device => this.props.httpClient.post('/api/v1/device', device)));
-      await this.getDiscoveredDevices();
+      const response = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', { timeoutSeconds: 10 });
+      if (response && response.devices) {
+        this.setState({
+          discoveredDevices: response.devices
+        });
+      } else {
+        await this.getDiscoveredDevices();
+      }
       this.setState({
-        addingSelected: false,
-        selectedDeviceIds: []
+        udpScanLoading: false
       });
     } catch (e) {
       this.setState({
-        addingSelected: false,
-        errorAddingSelected: true
+        udpScanLoading: false,
+        udpScanError: true
       });
     }
   };
 
-  render(props, { loading, errorLoading, discoveredDevices, housesWithRooms, selectedDeviceIds, addingSelected, errorAddingSelected }) {
-    const selectedCount = (selectedDeviceIds || []).length;
+  render(props, { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -109,26 +91,34 @@ class DiscoverTab extends Component {
               <Text id="integration.tuya.discover.scan" /> <i class="fe fe-radio" />
             </button>
             <button
-              onClick={this.addSelectedDevices}
+              onClick={this.runLocalScan}
               class="btn btn-outline-success ml-2"
-              disabled={loading || addingSelected || selectedCount === 0}
+              disabled={loading || udpScanLoading}
             >
-              <Text id="integration.tuya.discover.addSelected" />
+              <Text id="integration.tuya.discover.udpScan" />
             </button>
           </div>
         </div>
         <div class="card-body">
+          <div class="alert alert-info">
+            <Text id="integration.tuya.discover.localDiscoveryInfo" />
+          </div>
+          {loading && (
+            <div class="alert alert-info">
+              <Text id="integration.tuya.discover.scanInProgress" />
+            </div>
+          )}
           <div class="alert alert-secondary">
             <Text id="integration.tuya.discover.description" />
           </div>
-          {errorAddingSelected && (
+          {udpScanError && (
             <div class="alert alert-danger">
-              <Text id="integration.tuya.discover.addSelectedError" />
+              <Text id="integration.tuya.discover.udpScanError" />
             </div>
           )}
           <div
             class={cx('dimmer', {
-              active: loading || addingSelected
+              active: loading || udpScanLoading
             })}
           >
             <div class="loader" />
@@ -149,9 +139,6 @@ class DiscoverTab extends Component {
                       alreadyCreatedButton={device.created_at && !device.updatable}
                       updateButton={device.updatable}
                       saveButton={!device.created_at}
-                      selectable={!device.created_at || device.updatable}
-                      selected={selectedDeviceIds && selectedDeviceIds.includes(device.external_id)}
-                      onToggleSelected={this.toggleSelectedDevice}
                       device={device}
                       deviceIndex={index}
                       housesWithRooms={housesWithRooms}

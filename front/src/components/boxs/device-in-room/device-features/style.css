@@ -56,3 +56,31 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .rangeInput {
   flex: 1;
 }
+
+.airConditioningModeGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: center;
+  align-content: center;
+  max-width: 16rem;
+  margin-left: auto;
+}
+
+.airConditioningModeButton {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.airConditioningModeLabel {
+  max-width: 10rem;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.airConditioningModeControls {
+  padding-top: 0;
+  padding-bottom: 0;
+  vertical-align: middle;
+  width: 17rem;
+}
