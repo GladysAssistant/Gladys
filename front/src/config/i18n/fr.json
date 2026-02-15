@@ -624,15 +624,7 @@
       "circularReference": "référence circulaire",
       "selfReference": "auto-référence",
       "fixAutomatically": "Corriger",
-      "fixing": "Correction en cours...",
-      "featureHint": {
-        "title": "Suivi énergétique",
-        "description": "Si Gladys n'a pas créé automatiquement les fonctionnalités de suivi, vous pouvez le faire ici.",
-        "createButton": "Créer les fonctionnalités",
-        "hierarchy": "Placez-la dans la hiérarchie « Suivi de l'énergie » (onglet Mes appareils) pour lier les coûts.",
-        "recalc": "Ensuite, relancez le calcul conso/coût depuis l'onglet Paramètres.",
-        "goToIntegration": "Ouvrir le Suivi de l'énergie"
-      }
+      "fixing": "Correction en cours..."
     },
     "caldav": {
       "title": "CalDAV",
@@ -1642,7 +1634,12 @@
         "copyFailed": "Erreur lors de la copie",
         "deleteLabel": "Supprimer la fonctionnalité",
         "showAdvancedSettings": "Afficher les paramètres avancés",
-        "hideAdvancedSettings": "Masquer les paramètres avancés"
+        "hideAdvancedSettings": "Masquer les paramètres avancés",
+        "energyMonitoring": {
+          "title": "Suivi énergétique",
+          "description": "Cette fonctionnalité peut être utilisée pour le suivi énergétique. Cliquez sur le bouton ci-dessous pour créer automatiquement les fonctionnalités de suivi de consommation et de coût.",
+          "createButton": "Créer les fonctionnalités"
+        }
       },
       "setup": {
         "title": "Configuration MQTT",
