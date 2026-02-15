@@ -1,44 +1,11 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_CATEGORIES_LIST,
-  ENERGY_MONITORING_ALLOWED_SERVICES
-} from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES_LIST } from '../../../../server/utils/constants';
 import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import UpdateDeviceFeature from './UpdateDeviceFeature';
 import UpdateDeviceForm from './UpdateDeviceForm';
 import cx from 'classnames';
 import get from 'get-value';
-
-const ENERGY_MONITORING_CATEGORIES = [
-  DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR
-];
-
-const isEnergyMonitoringService = device => {
-  if (!device) return false;
-
-  const serviceSelector = get(device, 'service.selector') || get(device, 'service.name');
-  if (serviceSelector) {
-    return ENERGY_MONITORING_ALLOWED_SERVICES.includes(serviceSelector);
-  }
-
-  const fallbackId = get(device, 'external_id') || get(device, 'selector');
-  if (!fallbackId) return false;
-
-  return ENERGY_MONITORING_ALLOWED_SERVICES.some(
-    service => fallbackId.startsWith(`${service}:`) || fallbackId.startsWith(`${service}-`) || fallbackId === service
-  );
-};
-
-const getAvailableFeatureCategories = device => {
-  if (isEnergyMonitoringService(device)) {
-    return DEVICE_FEATURE_CATEGORIES_LIST;
-  }
-
-  return DEVICE_FEATURE_CATEGORIES_LIST.filter(category => !ENERGY_MONITORING_CATEGORIES.includes(category));
-};
 
 const UpdateDevice = ({ children, ...props }) => (
   <div class="card">
@@ -93,7 +60,7 @@ const UpdateDevice = ({ children, ...props }) => (
                     <option value="" selected={!props.selectedFeature}>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {getAvailableFeatureCategories(props.device).map(category =>
+                    {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
                       Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
                         <option value={`${category}|${type}`}>
                           <Text id={`deviceFeatureCategory.${category}.${type}`} />
@@ -115,13 +82,7 @@ const UpdateDevice = ({ children, ...props }) => (
               <div class="row">
                 {props.device &&
                   props.device.features.map((feature, index) => (
-                    <UpdateDeviceFeature
-                      {...props}
-                      feature={feature}
-                      featureIndex={index}
-                      device={props.device}
-                      allowEnergyMonitoringFeatures={isEnergyMonitoringService(props.device)}
-                    />
+                    <UpdateDeviceFeature {...props} feature={feature} featureIndex={index} />
                   ))}
               </div>
 
