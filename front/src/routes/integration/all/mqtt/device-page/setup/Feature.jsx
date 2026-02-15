@@ -251,13 +251,13 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
             <div class="form-group">
               <div class="alert alert-info">
                 <h4>
-                  <Text id="integration.energyMonitoring.featureHint.title" />
+                  <Text id="integration.mqtt.feature.energyMonitoring.title" />
                 </h4>
                 <p>
-                  <Text id="integration.energyMonitoring.featureHint.description" />
+                  <Text id="integration.mqtt.feature.energyMonitoring.description" />
                 </p>
                 <button onClick={props.createEnergyConsumptionFeatures} class="btn btn-primary">
-                  <Text id="integration.energyMonitoring.featureHint.createButton" />
+                  <Text id="integration.mqtt.feature.energyMonitoring.createButton" />
                 </button>
               </div>
             </div>

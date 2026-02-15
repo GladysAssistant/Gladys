@@ -1583,7 +1583,12 @@
         "copyFailed": "Kopieren fehlgeschlagen",
         "deleteLabel": "Funktion löschen",
         "showAdvancedSettings": "Erweiterte Einstellungen anzeigen",
-        "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden"
+        "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden",
+        "energyMonitoring": {
+          "title": "Energieüberwachung",
+          "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
+          "createButton": "Energieüberwachungsfunktionen erstellen"
+        }
       },
       "setup": {
         "title": "MQTT-Konfiguration",
