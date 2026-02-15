@@ -108,12 +108,6 @@ class TuyaDeviceBox extends Component {
           newParams.push({ name: 'PROTOCOL_VERSION', value: usedProtocol });
         }
       }
-      const existingIndex = newParams.findIndex(param => param.name === 'TUYA_DP_MAP');
-      if (existingIndex >= 0) {
-        newParams[existingIndex] = { ...newParams[existingIndex], value: JSON.stringify(result) };
-      } else {
-        newParams.push({ name: 'TUYA_DP_MAP', value: JSON.stringify(result) });
-      }
       this.setState({
         device: {
           ...this.state.device,
@@ -232,6 +226,8 @@ class TuyaDeviceBox extends Component {
     }, {});
     const deviceId = params.DEVICE_ID || (device.external_id ? device.external_id.split(':')[1] : '');
     const localKey = params.LOCAL_KEY || device.local_key || '';
+    const productId = params.PRODUCT_ID || device.product_id || '';
+    const productKey = params.PRODUCT_KEY || device.product_key || '';
     const protocolVersion = params.PROTOCOL_VERSION || device.protocol_version || '';
     const localOverride =
       params.LOCAL_OVERRIDE !== undefined && params.LOCAL_OVERRIDE !== null
@@ -314,6 +310,34 @@ class TuyaDeviceBox extends Component {
                     disabled="true"
                   />
                 </div>
+
+                <div class="form-group">
+                  <label class="form-label" for={`product_id_${deviceIndex}`}>
+                    <Text id="integration.tuya.device.productIdLabel" />
+                  </label>
+                  <input
+                    id={`product_id_${deviceIndex}`}
+                    type="text"
+                    value={productId}
+                    class="form-control"
+                    disabled="true"
+                  />
+                </div>
+
+                {productKey && (
+                  <div class="form-group">
+                    <label class="form-label" for={`product_key_${deviceIndex}`}>
+                      <Text id="integration.tuya.device.productKeyLabel" />
+                    </label>
+                    <input
+                      id={`product_key_${deviceIndex}`}
+                      type="text"
+                      value={productKey}
+                      class="form-control"
+                      disabled="true"
+                    />
+                  </div>
+                )}
 
                 <div class="form-group">
                   <label class="form-label" for={`local_key_${deviceIndex}`}>

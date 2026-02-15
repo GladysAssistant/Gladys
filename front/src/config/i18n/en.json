@@ -1078,7 +1078,9 @@
         "localInfoHelp": "Enter the local IP and protocol version if you want to use local mode. The cloud IP is kept for reference.",
         "localPollButton": "Poll local DPS",
         "localPollSuccess": "Local poll OK.",
-        "localPollError": "Local poll failed:"
+        "localPollError": "Local poll failed:",
+        "productIdLabel": "Product ID",
+        "productKeyLabel": "Product Key"
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
@@ -1089,9 +1091,7 @@
         "udpScanError": "Error while running local UDP scan.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
-        "scan": "Scan",
-        "addSelected": "Add selected",
-        "addSelectedError": "Error adding selected devices."
+        "scan": "Scan"
       },
       "setup": {
         "title": "Tuya configuration",

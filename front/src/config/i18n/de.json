@@ -1183,7 +1183,9 @@
         "localInfoHelp": "Gib die lokale IP und die Protokollversion ein, wenn du den lokalen Modus nutzen willst. Die Cloud-IP wird zur Referenz gespeichert.",
         "localPollButton": "Lokales DPS abfragen",
         "localPollSuccess": "Lokaler Poll OK.",
-        "localPollError": "Lokaler Poll fehlgeschlagen:"
+        "localPollError": "Lokaler Poll fehlgeschlagen:",
+        "productIdLabel": "Produkt-ID",
+        "productKeyLabel": "Product Key"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
@@ -1194,9 +1196,7 @@
         "udpScanError": "Fehler beim lokalen UDP-Scan.",
         "error": "Fehler beim Entdecken von Tuya-Geräten. Bitte überprüfe deine Login-Daten auf der Einrichtungsseite.",
         "noDeviceFound": "Kein Tuya-Gerät entdeckt.",
-        "scan": "Scannen",
-        "addSelected": "Auswahl hinzufügen",
-        "addSelectedError": "Fehler beim Hinzufügen der ausgewählten Geräte."
+        "scan": "Scannen"
       },
       "setup": {
         "title": "Tuya-Konfiguration",

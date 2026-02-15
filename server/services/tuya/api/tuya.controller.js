@@ -35,12 +35,10 @@ module.exports = function TuyaController(tuyaManager) {
     updated.protocol_version = localInfo.version;
     updated.ip = localInfo.ip || updated.ip;
     updated.product_key = localInfo.productKey;
-    updated.local_override = true;
     updated.params = Array.isArray(updated.params) ? [...updated.params] : [];
     upsertParam(updated.params, DEVICE_PARAM_NAME.IP_ADDRESS, updated.ip);
     upsertParam(updated.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, updated.protocol_version);
     upsertParam(updated.params, DEVICE_PARAM_NAME.PRODUCT_KEY, updated.product_key);
-    upsertParam(updated.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
     return updated;
   }
   /**
@@ -79,7 +77,6 @@ module.exports = function TuyaController(tuyaManager) {
         upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
         upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
         upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
-        upsertParam(device.params, DEVICE_PARAM_NAME.DP_MAP, JSON.stringify(result));
         upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
         upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
 

@@ -1313,7 +1313,9 @@
         "localInfoHelp": "Saisissez l'IP locale et la version du protocole si vous souhaitez utiliser le mode local. L'IP cloud est conservée en référence.",
         "localPollButton": "Poll local des DP",
         "localPollSuccess": "Poll local OK.",
-        "localPollError": "Échec du poll local :"
+        "localPollError": "Échec du poll local :",
+        "productIdLabel": "Identifiant produit",
+        "productKeyLabel": "Product Key"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
@@ -1324,9 +1326,7 @@
         "udpScanError": "Erreur lors du scan UDP local.",
         "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
-        "scan": "Scanner",
-        "addSelected": "Ajouter la sélection",
-        "addSelectedError": "Erreur lors de l'ajout des appareils sélectionnés."
+        "scan": "Scanner"
       },
       "setup": {
         "title": "Configuration Tuya",
