@@ -5,11 +5,11 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
  * Component to display an integration category.
  *
  * @param {Object} integration - The key of integration.
- * @param {string} integration.url - The URL of integration.
- * @param {string} integration.img - The URL of image for integration.
- * @param {boolean} integration.invertInDarkMode - If true, image will be
+ * @prop {string} integration.url - The URL of integration.
+ * @prop {string} integration.img - The URL of image for integration.
+ * @prop {boolean} integration.invertInDarkMode - If true, image will be
  *  inverted in dark mode.
- * @param {boolean} integration.whiteBackground - If true, image will have a
+ * @prop {boolean} integration.whiteBackground - If true, image will have a
  *  white background.
  * @param {Function} integration.toggleFavorite - Function to toggle favorite status.
  *
@@ -61,12 +61,12 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => {
             onClick={onToggleFavorite}
           >
             <svg
-              width="32"
-              height="32"
+              width="26"
+              height="26"
               viewBox="0 0 24 24"
               fill={isFavorite ? '#FFD700' : 'none'}
               stroke={isFavorite ? '#FFD700' : '#9aa0a6'}
-              stroke-width="2"
+              stroke-width="1.5"
               stroke-linecap="round"
               stroke-linejoin="round"
             >

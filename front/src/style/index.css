@@ -403,6 +403,15 @@ body {
   outline: none !important;
 }
 
+.row-cards > [class*="col"] {
+  display: flex;
+}
+
+.row-cards > [class*="col"] > .card {
+  width: 100%;
+  flex: 1;
+}
+
 .favorite-star {
   -webkit-appearance: none;
   appearance: none;
@@ -427,14 +436,4 @@ body {
   pointer-events: auto;
   box-shadow: none;
   outline: none;
-}
-
-.card-img-container {
-  position: relative;
-}
-
-.card-img-container > a {
-  display: block;
-  position: relative;
-  z-index: 1;
 }
