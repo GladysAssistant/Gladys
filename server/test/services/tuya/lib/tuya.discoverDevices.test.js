@@ -27,7 +27,6 @@ describe('TuyaHandler.discoverDevices', () => {
   beforeEach(() => {
     sinon.reset();
     tuyaHandler.status = STATUS.CONNECTED;
-    tuyaHandler.localScan = fake.resolves({});
     tuyaHandler.connector = {
       request: sinon
         .stub()
@@ -160,6 +159,10 @@ describe('TuyaHandler.discoverDevices', () => {
           },
           {
             name: 'IP_ADDRESS',
+            value: '1.1.1.1',
+          },
+          {
+            name: 'CLOUD_IP',
             value: '1.1.1.1',
           },
         ],
