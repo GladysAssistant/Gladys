@@ -126,4 +126,48 @@ describe('TuyaHandler.localScan', () => {
 
     expect(result).to.deep.equal({});
   });
+
+  it('should handle socket address errors on bind', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: (port, cb) => {
+            if (cb) {
+              cb();
+            }
+          },
+          close: () => {},
+          address: () => {
+            throw new Error('address error');
+          },
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        return [{ payload: null }];
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
+      'tuyapi/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+    await clock.tickAsync(1100);
+    await promise;
+    clock.restore();
+  });
 });

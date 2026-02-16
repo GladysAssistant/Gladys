@@ -16,7 +16,7 @@ async function localScan(timeoutSeconds = 10) {
   const devices = {};
   const sockets = [];
   const parser = new MessageParser({ key: UDP_KEY, version: 3.1 });
-  logger.debug(`[Tuya][localScan] Starting UDP scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
+  logger.info(`[Tuya][localScan] Starting UDP scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
 
   const onMessage = (message) => {
     let payload;
@@ -55,7 +55,14 @@ async function localScan(timeoutSeconds = 10) {
     socket.on('error', (err) => {
       logger.debug(`[Tuya][localScan] UDP socket error on port ${port}: ${err.message}`);
     });
-    socket.bind(port);
+    socket.bind(port, () => {
+      try {
+        const address = socket.address();
+        logger.info(`[Tuya][localScan] Listening on ${address.address}:${address.port}`);
+      } catch (e) {
+        logger.info(`[Tuya][localScan] Listening on port ${port}`);
+      }
+    });
     sockets.push(socket);
   });
 
@@ -71,7 +78,7 @@ async function localScan(timeoutSeconds = 10) {
     }
   });
 
-  logger.debug(`[Tuya][localScan] Scan complete. Found ${Object.keys(devices).length} device(s).`);
+  logger.info(`[Tuya][localScan] Scan complete. Found ${Object.keys(devices).length} device(s).`);
   return devices;
 }
 

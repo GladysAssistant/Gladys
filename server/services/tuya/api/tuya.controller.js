@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const logger = require('../../../utils/logger');
 const { DEVICE_PARAM_NAME } = require('../lib/utils/tuya.constants');
 
 module.exports = function TuyaController(tuyaManager) {
@@ -103,6 +104,7 @@ module.exports = function TuyaController(tuyaManager) {
    */
   async function localScan(req, res) {
     const { timeoutSeconds } = req.body || {};
+    logger.info(`[Tuya][localScan] API request received (timeoutSeconds=${timeoutSeconds || 10})`);
     const localDevicesById = await tuyaManager.localScan(timeoutSeconds);
 
     if (Array.isArray(tuyaManager.discoveredDevices)) {
