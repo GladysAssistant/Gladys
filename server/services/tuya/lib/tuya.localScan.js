@@ -18,16 +18,46 @@ async function localScan(timeoutSeconds = 10) {
   const parser = new MessageParser({ key: UDP_KEY, version: 3.1 });
   logger.info(`[Tuya][localScan] Starting UDP scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
 
-  const onMessage = (message) => {
+  const formatHex = (buffer, maxLen = 128) => {
+    if (!buffer || !buffer.length) {
+      return '';
+    }
+    const slice = buffer.slice(0, maxLen);
+    return slice.toString('hex').match(/.{1,2}/g).join(' ');
+  };
+
+  const formatAscii = (buffer, maxLen = 256) => {
+    if (!buffer || !buffer.length) {
+      return '';
+    }
+    const slice = buffer.slice(0, maxLen);
+    return slice.toString('utf8').replace(/\s+/g, ' ').trim();
+  };
+
+  const onMessage = (message, rinfo) => {
     let payload;
+    const byteLen = message ? message.length : 0;
+    const remote = rinfo ? `${rinfo.address}:${rinfo.port}` : 'unknown';
+    logger.info(
+      `[Tuya][localScan] UDP packet received from ${remote} len=${byteLen} hex=${formatHex(message)} ascii="${formatAscii(
+        message,
+      )}"`,
+    );
     try {
       const parsed = parser.parse(message);
+      logger.info(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(parsed)}`);
       payload = parsed && parsed[0] && parsed[0].payload;
     } catch (e) {
+      logger.info(
+        `[Tuya][localScan] Unable to parse UDP payload from ${remote} (len=${byteLen}): ${e.message}`,
+      );
       return;
     }
 
     if (!payload || typeof payload !== 'object') {
+      logger.info(
+        `[Tuya][localScan] Ignoring UDP payload from ${remote} (len=${byteLen}): invalid payload`,
+      );
       return;
     }
 
@@ -35,6 +65,9 @@ async function localScan(timeoutSeconds = 10) {
     const deviceId = gwId || devId || id;
 
     if (!deviceId) {
+      logger.info(
+        `[Tuya][localScan] Ignoring UDP payload from ${remote} (len=${byteLen}): missing deviceId`,
+      );
       return;
     }
 
@@ -45,7 +78,7 @@ async function localScan(timeoutSeconds = 10) {
       productKey,
     };
     if (isNew) {
-      logger.debug(`[Tuya][localScan] Found device ${deviceId} ip=${ip || 'unknown'} version=${version || 'unknown'}`);
+      logger.info(`[Tuya][localScan] Found device ${deviceId} ip=${ip || 'unknown'} version=${version || 'unknown'}`);
     }
   };
 
