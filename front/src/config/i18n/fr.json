@@ -1322,8 +1322,10 @@
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
         "localDiscoveryInfo": "La découverte locale utilise le broadcast UDP. Lancez le scan UDP local puis, si besoin, renseignez l'IP locale et la version du protocole, et utilisez \"Poll local des DP\".",
         "scanInProgress": "Scan en cours... récupération cloud des appareils.",
-        "udpScan": "Scanner UDP local",
+        "scanCloud": "Scan Cloud",
+        "localScanAuto": "Scan local auto",
         "udpScanError": "Erreur lors du scan UDP local.",
+        "udpScanPortInUse": "Impossible d'écouter sur les ports {{ports}} (déjà utilisés). Fermez les services qui écoutent sur ces ports puis relancez le scan.",
         "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
         "scan": "Scanner"

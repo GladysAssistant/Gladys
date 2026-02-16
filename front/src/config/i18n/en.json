@@ -1087,8 +1087,10 @@
         "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
         "localDiscoveryInfo": "Local discovery uses UDP broadcast. Run the local UDP scan, then if needed enter the local IP and protocol version and use \"Poll local DPS\".",
         "scanInProgress": "Scan in progress... retrieving cloud devices.",
-        "udpScan": "Run local UDP scan",
+        "scanCloud": "Cloud Scan",
+        "localScanAuto": "Auto local scan",
         "udpScanError": "Error while running local UDP scan.",
+        "udpScanPortInUse": "Unable to listen on ports {{ports}} (already in use). Stop services using these ports and run the scan again.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
         "scan": "Scan"

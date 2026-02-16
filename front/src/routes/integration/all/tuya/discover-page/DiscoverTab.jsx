@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
@@ -57,10 +57,13 @@ class DiscoverTab extends Component {
   runLocalScan = async () => {
     this.setState({
       udpScanLoading: true,
-      udpScanError: false
+      udpScanError: false,
+      udpScanPortErrors: null
     });
     try {
-      const response = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', { timeoutSeconds: 10 });
+      const response = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', {
+        timeoutSeconds: 10
+      });
       if (response && response.devices) {
         this.setState({
           discoveredDevices: response.devices
@@ -69,7 +72,8 @@ class DiscoverTab extends Component {
         await this.getDiscoveredDevices();
       }
       this.setState({
-        udpScanLoading: false
+        udpScanLoading: false,
+        udpScanPortErrors: response && response.port_errors ? response.port_errors : null
       });
     } catch (e) {
       this.setState({
@@ -79,7 +83,12 @@ class DiscoverTab extends Component {
     }
   };
 
-  render(props, { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError }) {
+  render(
+    props,
+    { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors }
+  ) {
+    const canScanCloud = !errorLoading;
+    const portErrorPorts = udpScanPortErrors ? Object.keys(udpScanPortErrors) : [];
     return (
       <div class="card">
         <div class="card-header">
@@ -87,15 +96,19 @@ class DiscoverTab extends Component {
             <Text id="integration.tuya.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button onClick={this.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
-              <Text id="integration.tuya.discover.scan" /> <i class="fe fe-radio" />
+            <button
+              onClick={this.getDiscoveredDevices}
+              class="btn btn-outline-primary ml-2"
+              disabled={loading || !canScanCloud}
+            >
+              <Text id="integration.tuya.discover.scanCloud" /> <i class="fe fe-radio" />
             </button>
             <button
               onClick={this.runLocalScan}
               class="btn btn-outline-success ml-2"
               disabled={loading || udpScanLoading}
             >
-              <Text id="integration.tuya.discover.udpScan" />
+              <Text id="integration.tuya.discover.localScanAuto" />
             </button>
           </div>
         </div>
@@ -114,6 +127,19 @@ class DiscoverTab extends Component {
           {udpScanError && (
             <div class="alert alert-danger">
               <Text id="integration.tuya.discover.udpScanError" />
+            </div>
+          )}
+          {portErrorPorts.length > 0 && (
+            <div class="alert alert-warning">
+              <Localizer>
+                {localizer => (
+                  <span>
+                    {localizer.t('integration.tuya.discover.udpScanPortInUse', {
+                      ports: portErrorPorts.join(', ')
+                    })}
+                  </span>
+                )}
+              </Localizer>
             </div>
           )}
           <div

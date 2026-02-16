@@ -1192,8 +1192,10 @@
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
         "localDiscoveryInfo": "Lokale Erkennung nutzt UDP-Broadcast. Starte den lokalen UDP-Scan und gib bei Bedarf lokale IP und Protokollversion ein und nutze \"Lokales DPS abfragen\".",
         "scanInProgress": "Scan läuft... Cloud-Geräte werden abgerufen.",
-        "udpScan": "Lokalen UDP-Scan starten",
+        "scanCloud": "Cloud-Scan",
+        "localScanAuto": "Lokaler Auto-Scan",
         "udpScanError": "Fehler beim lokalen UDP-Scan.",
+        "udpScanPortInUse": "Auf den Ports {{ports}} kann nicht gelauscht werden (bereits belegt). Beende Dienste auf diesen Ports und starte den Scan erneut.",
         "error": "Fehler beim Entdecken von Tuya-Geräten. Bitte überprüfe deine Login-Daten auf der Einrichtungsseite.",
         "noDeviceFound": "Kein Tuya-Gerät entdeckt.",
         "scan": "Scannen"

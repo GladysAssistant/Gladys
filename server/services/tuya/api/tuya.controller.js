@@ -105,7 +105,11 @@ module.exports = function TuyaController(tuyaManager) {
   async function localScan(req, res) {
     const { timeoutSeconds } = req.body || {};
     logger.info(`[Tuya][localScan] API request received (timeoutSeconds=${timeoutSeconds || 10})`);
-    const localDevicesById = await tuyaManager.localScan(timeoutSeconds);
+    const localScanResult = await tuyaManager.localScan({
+      timeoutSeconds,
+    });
+    const localDevicesById = localScanResult.devices || {};
+    const portErrors = localScanResult.portErrors || {};
 
     if (Array.isArray(tuyaManager.discoveredDevices)) {
       const updatedDevices = tuyaManager.discoveredDevices.map((device) => {
@@ -117,12 +121,14 @@ module.exports = function TuyaController(tuyaManager) {
       res.json({
         devices: updatedDevices,
         local_devices: localDevicesById,
+        port_errors: portErrors,
       });
       return;
     }
 
     res.json({
       local_devices: localDevicesById,
+      port_errors: portErrors,
     });
   }
 
