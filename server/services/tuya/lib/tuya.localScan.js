@@ -86,9 +86,9 @@ async function localScan(timeoutSeconds = 10) {
     const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
     socket.on('message', onMessage);
     socket.on('error', (err) => {
-      logger.debug(`[Tuya][localScan] UDP socket error on port ${port}: ${err.message}`);
+      logger.info(`[Tuya][localScan] UDP socket error on port ${port}: ${err.message}`);
     });
-    socket.bind(port, () => {
+    socket.on('listening', () => {
       try {
         const address = socket.address();
         logger.info(`[Tuya][localScan] Listening on ${address.address}:${address.port}`);
@@ -96,6 +96,7 @@ async function localScan(timeoutSeconds = 10) {
         logger.info(`[Tuya][localScan] Listening on port ${port}`);
       }
     });
+    socket.bind(port);
     sockets.push(socket);
   });
 
