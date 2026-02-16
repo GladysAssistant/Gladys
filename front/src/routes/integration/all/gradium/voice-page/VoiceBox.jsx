@@ -5,12 +5,12 @@ import cx from 'classnames';
 import { connect } from 'unistore/preact';
 
 const languageToFlag = {
-  en: "🇬🇧",
-  fr: "🇫🇷",
-  de: "🇩🇪",
-  es: "🇪🇸",
-  pt: "🇵🇹"
-}
+  en: '🇬🇧',
+  fr: '🇫🇷',
+  de: '🇩🇪',
+  es: '🇪🇸',
+  pt: '🇵🇹'
+};
 
 class VoiceBox extends Component {
   componentWillMount() {
@@ -25,24 +25,24 @@ class VoiceBox extends Component {
     });
   }
 
-  render(
-    { key, voiceSelected, updateVoice },
-    { voice }
-  ) {
+  render({ key, voiceSelected, updateVoice }, { voice }) {
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
             {voice.name} {languageToFlag[voice.language]}
             <div class="page-options d-flex">
-              <button onClick={updateVoice} data-voice-id={voice.id} class={cx('btn', { 'btn-outline-primary': !voiceSelected }, { 'btn-primary': voiceSelected }, 'ml-2')} disabled={voiceSelected}>
+              <button
+                onClick={updateVoice}
+                data-voice-id={voice.id}
+                class={cx('btn', { 'btn-outline-primary': !voiceSelected }, { 'btn-primary': voiceSelected }, 'ml-2')}
+                disabled={voiceSelected}
+              >
                 <Text id={`integration.gradium.${voiceSelected ? 'voiceUsed' : 'voiceUseIt'}`} />
               </button>
             </div>
           </div>
-          <div
-            class='dimmer'
-          >
+          <div class="dimmer">
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">

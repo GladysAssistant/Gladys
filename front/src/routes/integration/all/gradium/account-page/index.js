@@ -32,14 +32,10 @@ class AccountPage extends Component {
     });
 
     try {
-      const { value: endpoint } = await this.props.httpClient.get(
-        '/api/v1/service/gradium/variable/GRADIUM_ENDPOINT'
-      );
+      const { value: endpoint } = await this.props.httpClient.get('/api/v1/service/gradium/variable/GRADIUM_ENDPOINT');
       gradiumEndpoint = endpoint;
 
-      const { value: apiKey } = await this.props.httpClient.get(
-        '/api/v1/service/gradium/variable/GRADIUM_API_KEY'
-      );
+      const { value: apiKey } = await this.props.httpClient.get('/api/v1/service/gradium/variable/GRADIUM_API_KEY');
       gradiumApiKey = apiKey;
 
       this.setState({

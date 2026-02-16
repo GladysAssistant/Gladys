@@ -2512,7 +2512,7 @@
       "description": "Utilisez la synthèse vocale de Gradium.",
       "documentation": "Documentation Gradium",
       "accountTab": "Compte",
-      "accountIntroduction" : "Paramétrez votre compte Gradium pour accéder au service de synthèse vocale.",
+      "accountIntroduction": "Paramétrez votre compte Gradium pour accéder au service de synthèse vocale.",
       "endpointLabel": "Région des serveurs",
       "endpointInfo": "Sélectionnez la région des serveurs Gradium sur lesquels vous avez créé votre compte.",
       "endpoint": {
@@ -2793,6 +2793,11 @@
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
+        "voiceLabel": "Voix",
+        "ttsService": {
+          "gplus": "Gladys Plus",
+          "gradium": "Gradium"
+        },
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }

@@ -631,7 +631,7 @@ const actionsFunc = {
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
 
     // Get TTS url
-    const url = await self.tts.getTTSApiUrl({ text: messageWithVariables });
+    const url = await self.tts.getTTSApiUrl({ service: action.tts, text: messageWithVariables });
 
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume: action.volume });

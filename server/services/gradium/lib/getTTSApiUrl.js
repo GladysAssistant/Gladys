@@ -21,13 +21,13 @@ async function getTTSApiUrl({ text }) {
         text,
         voice_id: gradiumVoiceId,
         output_format: 'opus',
-        only_audio: true
+        only_audio: true,
       },
       {
         'x-api-key': gradiumApiKey,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      'arraybuffer'
+      'arraybuffer',
     );
 
     const uuid = randomUUID();
@@ -44,15 +44,19 @@ async function getTTSApiUrl({ text }) {
 
     // send the file url with path /api/v1/service/gradium/speech-url
     const { network_interfaces: networkInterfaces } = await this.gladys.system.getInfos();
-    const { address: localIp } = Object.values(networkInterfaces).flat().find((iface) => {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return true;
-      }
+    const { address: localIp } = Object.values(networkInterfaces)
+      .flat()
+      .find((iface) => {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          return true;
+        }
 
-      return false;
-    });
+        return false;
+      });
 
-    return `http://${localIp}${process.env.NODE_ENV === 'production' ? '' : `:${process.env.PORT || 1443}`}/api/v1/service/gradium/speech-file/${uuid}.ogg`;
+    return `http://${localIp}${
+      process.env.NODE_ENV === 'production' ? '' : `:${process.env.PORT || 1443}`
+    }/api/v1/service/gradium/speech-file/${uuid}.ogg`;
   } catch (e) {
     logger.warn(e);
 

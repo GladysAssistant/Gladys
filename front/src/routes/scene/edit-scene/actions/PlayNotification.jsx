@@ -2,6 +2,7 @@ import Select from 'react-select';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
@@ -19,8 +20,11 @@ class PlayNotification extends Component {
         value: device.selector,
         label: device.name
       }));
-
-      await this.setState({ devicesOptions });
+      const voicesOptions = ['gplus', 'gradium'].map(service => ({
+        value: service,
+        label: this.props.intl.dictionary.editScene.actionsCard.playNotification.ttsService[service]
+      }));
+      await this.setState({ devicesOptions, voicesOptions });
       this.refreshSelectedOptions(this.props);
       return devicesOptions;
     } catch (e) {
@@ -40,6 +44,13 @@ class PlayNotification extends Component {
       this.props.updateActionProperty(this.props.path, 'device', null);
     }
   };
+  handleVoiceChange = selectedOption => {
+    if (selectedOption && selectedOption.value) {
+      this.props.updateActionProperty(this.props.path, 'tts', selectedOption.value);
+    } else {
+      this.props.updateActionProperty(this.props.path, 'tts', null);
+    }
+  };
 
   refreshSelectedOptions = nextProps => {
     let selectedDeviceFeatureOption = '';
@@ -50,7 +61,17 @@ class PlayNotification extends Component {
         selectedDeviceFeatureOption = deviceFeatureOption;
       }
     }
-    this.setState({ selectedDeviceFeatureOption });
+    let selectedVoiceOption = this.state.voicesOptions
+      ? this.state.voicesOptions.find(option => option.value === 'gplus')
+      : '';
+    if (nextProps.action.tts && this.state.voicesOptions) {
+      const voiceOption = this.state.voicesOptions.find(option => option.value === nextProps.action.tts);
+
+      if (voiceOption) {
+        selectedVoiceOption = voiceOption;
+      }
+    }
+    this.setState({ selectedDeviceFeatureOption, selectedVoiceOption });
   };
   constructor(props) {
     super(props);
@@ -65,7 +86,7 @@ class PlayNotification extends Component {
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedDeviceFeatureOption, devicesOptions }) {
+  render(props, { selectedDeviceFeatureOption, devicesOptions, selectedVoiceOption, voicesOptions }) {
     return (
       <div>
         <GladysPlusUpsell
@@ -117,6 +138,18 @@ class PlayNotification extends Component {
         </div>
         <div class="form-group">
           <label class="form-label">
+            <Text id="editScene.actionsCard.playNotification.voiceLabel" />
+          </label>
+          <Select
+            options={voicesOptions}
+            value={selectedVoiceOption}
+            onChange={this.handleVoiceChange}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
             <Text id="editScene.actionsCard.playNotification.textLabel" />{' '}
             <span class="form-required">
               <Text id="global.requiredField" />
@@ -141,4 +174,4 @@ class PlayNotification extends Component {
   }
 }
 
-export default connect('httpClient', {})(PlayNotification);
+export default withIntlAsProp(connect('httpClient', {})(PlayNotification));

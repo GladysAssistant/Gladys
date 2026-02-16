@@ -374,7 +374,10 @@ const AppRouter = connect(
         <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
         <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
 
-        <Redirect path="/dashboard/integration/communication/gradium" to="/dashboard/integration/communication/gradium/voice" />
+        <Redirect
+          path="/dashboard/integration/communication/gradium"
+          to="/dashboard/integration/communication/gradium/voice"
+        />
         <GradiumVoicePage path="/dashboard/integration/communication/gradium/voice" />
         <GradiumAccountPage path="/dashboard/integration/communication/gradium/account" />
 

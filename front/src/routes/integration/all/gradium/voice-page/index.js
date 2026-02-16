@@ -19,16 +19,12 @@ class VoicePage extends Component {
     });
 
     try {
-      const { value: voiceId } = await this.props.httpClient.get(
-        '/api/v1/service/gradium/variable/GRADIUM_VOICE_ID'
-      );
+      const { value: voiceId } = await this.props.httpClient.get('/api/v1/service/gradium/variable/GRADIUM_VOICE_ID');
       gradiumVoiceId = voiceId;
     } catch (e) {}
 
     try {
-      const voices = await this.props.httpClient.get(
-        '/api/v1/service/gradium/voices'
-      );
+      const voices = await this.props.httpClient.get('/api/v1/service/gradium/voices');
       gradiumVoices = voices;
 
       this.setState({
@@ -46,16 +42,16 @@ class VoicePage extends Component {
     });
   };
 
-  updateVoice = async (event) => {
+  updateVoice = async event => {
     const voiceId = event.currentTarget.getAttribute('data-voice-id');
     await this.props.httpClient.post('/api/v1/service/gradium/variable/GRADIUM_VOICE_ID', {
-        value: voiceId
-      });
+      value: voiceId
+    });
 
     this.setState({
       gradiumVoiceId: voiceId
     });
-  }
+  };
 
   sortVoices = (a, b) => {
     if (a.id === this.state.gradiumVoiceId) {
@@ -70,23 +66,23 @@ class VoicePage extends Component {
       return -1;
     }
 
-    return 1
-  }
+    return 1;
+  };
 
-  updateFilterLanguage = async (event) => {
+  updateFilterLanguage = async event => {
     const languageFilter = event.currentTarget.value;
     await this.setState({
       languageFilter
     });
-  }
+  };
 
-  filterVoices = (voice) => {
+  filterVoices = voice => {
     if (voice.id === this.state.gradiumVoiceId) {
       return true;
     }
 
     return voice.language === this.state.languageFilter;
-  }
+  };
 
   componentWillMount() {
     this.getGradiumSetting();

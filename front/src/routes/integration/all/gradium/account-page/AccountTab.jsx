@@ -50,7 +50,7 @@ const AccountTab = ({ children, ...props }) => (
               />
             </Localizer>
           </div>
-          {(props.gradiumSaveSettingsStatus === RequestStatus.Error) && (
+          {props.gradiumSaveSettingsStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
               <Text id="integration.gradium.configurationError" />
             </div>

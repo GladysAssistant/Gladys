@@ -17,7 +17,7 @@ async function getVoices() {
       {},
       {
         'x-api-key': gradiumApiKey,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     );
 
