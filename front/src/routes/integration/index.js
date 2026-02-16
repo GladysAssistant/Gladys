@@ -9,7 +9,7 @@ import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
-const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
+const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit', 'gradium'];
 
 class Integration extends Component {
   constructor(props) {

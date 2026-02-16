@@ -87,6 +87,7 @@ class AccountPage extends Component {
     return (
       <GradiumPage user={props.user}>
         <AccountTab
+          user={props.user}
           gradiumEndpoint={state.gradiumEndpoint}
           gradiumApiKey={state.gradiumApiKey}
           gradiumSaveSettingsStatus={state.gradiumSaveSettingsStatus}

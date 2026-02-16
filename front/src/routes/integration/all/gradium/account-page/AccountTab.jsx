@@ -1,6 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
+import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
 import style from './AccountTab.css';
 
@@ -18,6 +19,7 @@ const AccountTab = ({ children, ...props }) => (
         })}
       >
         <div class="loader" />
+        {props.user && props.user.role === USER_ROLE.ADMIN && (
         <div class="dimmer-content">
           <p>
             <Text id="integration.gradium.accountIntroduction" />
@@ -68,6 +70,7 @@ const AccountTab = ({ children, ...props }) => (
             </span>
           </div>
         </div>
+        )}
       </div>
     </div>
   </div>
