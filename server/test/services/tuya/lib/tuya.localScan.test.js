@@ -13,7 +13,15 @@ describe('TuyaHandler.localScan', () => {
           on: (event, cb) => {
             handlers[event] = cb;
           },
-          bind: () => {},
+          bind: (options, cb) => {
+            if (typeof options === 'function') {
+              options();
+              return;
+            }
+            if (cb) {
+              cb();
+            }
+          },
           close: () => {},
           handlers,
         };
@@ -136,7 +144,11 @@ describe('TuyaHandler.localScan', () => {
           on: (event, cb) => {
             handlers[event] = cb;
           },
-          bind: (port, cb) => {
+          bind: (options, cb) => {
+            if (typeof options === 'function') {
+              options();
+              return;
+            }
             if (cb) {
               cb();
             }

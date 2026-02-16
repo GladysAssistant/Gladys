@@ -96,7 +96,7 @@ async function localScan(timeoutSeconds = 10) {
         logger.info(`[Tuya][localScan] Listening on port ${port}`);
       }
     });
-    socket.bind(port);
+    socket.bind({ port, address: '0.0.0.0', exclusive: false });
     sockets.push(socket);
   });
 
