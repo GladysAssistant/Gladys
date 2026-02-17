@@ -417,20 +417,14 @@ body {
   appearance: none;
   border: 0;
   background: transparent;
-  padding: 0;
+  padding: 4px;
   line-height: 1;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 48px;
-  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
-  z-index: 10;
-  pointer-events: auto;
+  flex-shrink: 0;
   box-shadow: none;
   outline: none;
 }

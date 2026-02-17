@@ -42,27 +42,27 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => {
             </Localizer>
           </ScrollToTopLink>
         </div>
-        <button
-          type="button"
-          class={`favorite-star ${isFavorite ? 'favorite-star--active' : ''}`}
-          onClick={onToggleFavorite}
-        >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
-        </button>
         <div class="card-body d-flex flex-column">
-          <h4>
-            <ScrollToTopLink href={integration.url}>
+          <h4 class="d-flex align-items-center">
+            <ScrollToTopLink href={integration.url} class="flex-fill">
               <Text id={`integration.${integration.key}.title`} />
             </ScrollToTopLink>
+            <button
+              type="button"
+              class={`favorite-star ${isFavorite ? 'favorite-star--active' : ''}`}
+              onClick={onToggleFavorite}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </button>
           </h4>
           <div class="text-muted">
             <Text id={`integration.${integration.key}.description`} />
