@@ -5,11 +5,12 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
  * Component to display an integration category.
  *
  * @param {Object} integration - The key of integration.
- * @prop {string} integration.url - The URL of integration.
- * @prop {string} integration.img - The URL of image for integration.
- * @prop {boolean} integration.invertInDarkMode - If true, image will be
+ * @prop {string} integration.key - The key of the integration.
+ * @prop {string} integration.url - The URL of the integration.
+ * @prop {string} integration.img - The URL of the image for the integration.
+ * @prop {boolean} integration.invertInDarkMode - If true, the image will be
  *  inverted in dark mode.
- * @prop {boolean} integration.whiteBackground - If true, image will have a
+ * @prop {boolean} integration.whiteBackground - If true, the image will have a
  *  white background.
  * @param {Function} integration.toggleFavorite - Function to toggle favorite status.
  *
