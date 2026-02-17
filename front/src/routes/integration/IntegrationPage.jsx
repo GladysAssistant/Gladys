@@ -47,9 +47,9 @@ const IntegrationPage = ({
               <div class="col-lg-9">
                 <div class="row row-cards">
                   {integrations.map(integration => (
-                    <IntegrationCategory 
-                      currentUrl={currentUrl} 
-                      integration={integration} 
+                    <IntegrationCategory
+                      currentUrl={currentUrl}
+                      integration={integration}
                       category={category}
                       toggleFavorite={toggleFavorite}
                     />

@@ -134,7 +134,7 @@ class Integration extends Component {
     });
   }
 
-  toggleFavorite = async (integrationKey) => {
+  toggleFavorite = async integrationKey => {
     const favorites = this.state.favorites || [];
     const newFavorites = favorites.includes(integrationKey)
       ? favorites.filter(key => key !== integrationKey)

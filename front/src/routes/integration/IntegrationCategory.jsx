@@ -4,7 +4,7 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 /**
  * Component to display an integration category.
  *
- * @param {Object} integration - The key of integration.
+ * @param {Object} integration
  * @prop {string} integration.key - The key of the integration.
  * @prop {string} integration.url - The URL of the integration.
  * @prop {string} integration.img - The URL of the image for the integration.
@@ -12,14 +12,14 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
  *  inverted in dark mode.
  * @prop {boolean} integration.whiteBackground - If true, the image will have a
  *  white background.
- * @param {Function} integration.toggleFavorite - Function to toggle favorite status.
+ * @prop {Function} integration.toggleFavorite - Function to toggle favorite status.
  *
  * @returns {ReactElement} The integration category component.
  */
 const IntegrationCategory = ({ integration, toggleFavorite }) => {
   const isFavorite = !!integration.isFavorite;
 
-  const onToggleFavorite = (e) => {
+  const onToggleFavorite = e => {
     e.preventDefault();
     e.stopPropagation();
     if (toggleFavorite) {
