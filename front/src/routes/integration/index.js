@@ -25,6 +25,21 @@ class Integration extends Component {
   }
 
   componentWillMount() {
+    this.loadFavorites();
+  }
+
+  async loadFavorites() {
+    try {
+      const { httpClient } = this.props;
+      if (httpClient) {
+        const result = await httpClient.get('/api/v1/user/variable/INTEGRATION_FAVORITES');
+        const favorites = JSON.parse(result.value);
+        await this.setState({ favorites });
+      }
+    } catch (e) {
+      // Variable not found = no favorites yet
+      await this.setState({ favorites: [] });
+    }
     this.getIntegrations();
   }
 
@@ -64,8 +79,8 @@ class Integration extends Component {
       totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
     }
 
-    // Get favorites from localStorage
-    const favorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
+    // Get favorites (use cached state if available, otherwise empty)
+    const favorites = this.state.favorites || [];
 
     // Add favorite status to integrations
     selectedIntegrations = selectedIntegrations.map(integration => ({
@@ -119,17 +134,24 @@ class Integration extends Component {
     });
   }
 
-  toggleFavorite = (integrationKey) => {
-    const favorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
+  toggleFavorite = async (integrationKey) => {
+    const favorites = this.state.favorites || [];
     const newFavorites = favorites.includes(integrationKey)
       ? favorites.filter(key => key !== integrationKey)
       : [...favorites, integrationKey];
-    
-    localStorage.setItem('integration_favorites', JSON.stringify(newFavorites));
-    // Debug: verify favorite toggle is triggered and persisted
-    // eslint-disable-next-line no-console
-    console.log('[integration] toggleFavorite', integrationKey, newFavorites);
+
+    // Update state immediately for responsive UI
+    await this.setState({ favorites: newFavorites });
     this.getIntegrations();
+
+    // Persist to backend
+    try {
+      await this.props.httpClient.post('/api/v1/user/variable/INTEGRATION_FAVORITES', {
+        value: JSON.stringify(newFavorites)
+      });
+    } catch (e) {
+      console.error('[integration] Failed to save favorites', e);
+    }
   };
 
   search = async e => {
@@ -160,4 +182,4 @@ class Integration extends Component {
   }
 }
 
-export default connect('user', {})(withIntlAsProp(Integration));
+export default connect('user,httpClient', {})(withIntlAsProp(Integration));

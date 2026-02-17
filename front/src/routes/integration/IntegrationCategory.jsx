@@ -16,28 +16,14 @@ import ScrollToTopLink from '../../components/router/ScrollToTopLink';
  * @returns {ReactElement} The integration category component.
  */
 const IntegrationCategory = ({ integration, toggleFavorite }) => {
-  const favorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
-  const isFavorite = integration.isFavorite !== undefined ? integration.isFavorite : favorites.includes(integration.key);
+  const isFavorite = !!integration.isFavorite;
 
   const onToggleFavorite = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Debug: confirm click is triggered
-    // eslint-disable-next-line no-console
-    console.log('[integration] star clicked', integration.key);
-
     if (toggleFavorite) {
       toggleFavorite(integration.key);
-      return;
     }
-
-    // Fallback: if toggleFavorite is not provided, still persist in localStorage
-    const currentFavorites = JSON.parse(localStorage.getItem('integration_favorites') || '[]');
-    const newFavorites = currentFavorites.includes(integration.key)
-      ? currentFavorites.filter((key) => key !== integration.key)
-      : [...currentFavorites, integration.key];
-    localStorage.setItem('integration_favorites', JSON.stringify(newFavorites));
-    window.location.reload();
   };
 
   return (
@@ -55,25 +41,23 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => {
               />
             </Localizer>
           </ScrollToTopLink>
-          <button
-            type="button"
-            class={`favorite-star ${isFavorite ? 'favorite-star--active' : ''}`}
-            onClick={onToggleFavorite}
-          >
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill={isFavorite ? '#FFD700' : 'none'}
-              stroke={isFavorite ? '#FFD700' : '#9aa0a6'}
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          </button>
         </div>
+        <button
+          type="button"
+          class={`favorite-star ${isFavorite ? 'favorite-star--active' : ''}`}
+          onClick={onToggleFavorite}
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </button>
         <div class="card-body d-flex flex-column">
           <h4>
             <ScrollToTopLink href={integration.url}>

@@ -420,20 +420,35 @@ body {
   padding: 0;
   line-height: 1;
   position: absolute;
-  /*top: 1px;*/
-  right: 1px !important;
-  /*left: auto !important;*/
+  top: 8px;
+  right: 8px;
   width: 48px;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  /*font-size: 32px;*/
-  color: #9aa0a6;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
-  z-index: 2;
+  transition: transform 0.2s ease;
+  z-index: 10;
   pointer-events: auto;
   box-shadow: none;
   outline: none;
+}
+
+.favorite-star:focus,
+.favorite-star:active,
+.favorite-star:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.favorite-star svg {
+  fill: none;
+  stroke: #9aa0a6;
+}
+
+.favorite-star--active svg {
+  fill: #FFA000;
+  stroke: #FFA000;
 }
