@@ -1079,6 +1079,8 @@
         "localPollButton": "Poll local DPS",
         "localPollSuccess": "Local poll OK.",
         "localPollError": "Local poll failed:",
+        "protocol35Unsupported": "Protocol 3.5 is not supported locally yet.",
+        "githubIssueInfo": "A report will be sent with the device details. Sensitive data (local key and IP) is masked.",
         "productIdLabel": "Product ID",
         "productKeyLabel": "Product Key"
       },

@@ -1184,6 +1184,8 @@
         "localPollButton": "Lokales DPS abfragen",
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
+        "protocol35Unsupported": "Protokoll 3.5 wird lokal noch nicht unterstützt.",
+        "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Local Key und IP) werden maskiert.",
         "productIdLabel": "Produkt-ID",
         "productKeyLabel": "Product Key"
       },

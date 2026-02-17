@@ -7,6 +7,57 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 
+const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
+
+const maskIp = ip => {
+  if (!ip || typeof ip !== 'string') {
+    return null;
+  }
+  const parts = ip.split('.');
+  if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
+    return null;
+  }
+  return `${parts[0]}.${parts[1]}.x.x`;
+};
+
+const sanitizeParams = params => {
+  if (!Array.isArray(params)) {
+    return [];
+  }
+  return params.map(param => {
+    if (param.name === 'LOCAL_KEY') {
+      return { ...param, value: '***' };
+    }
+    if (param.name === 'IP_ADDRESS' || param.name === 'CLOUD_IP') {
+      return { ...param, value: maskIp(param.value) };
+    }
+    return param;
+  });
+};
+
+const buildIssuePayload = (device, localPollStatus, localPollError) => {
+  const sanitized = { ...device };
+  delete sanitized.local_key;
+  delete sanitized.ip;
+  delete sanitized.cloud_ip;
+  if (Array.isArray(sanitized.params)) {
+    sanitized.params = sanitizeParams(sanitized.params);
+  }
+  sanitized.local_poll = {
+    status: localPollStatus,
+    error: localPollError || null
+  };
+  sanitized.local_ip_masked = maskIp(device.ip);
+  sanitized.cloud_ip_masked = maskIp(device.cloud_ip);
+  return sanitized;
+};
+
+const createGithubUrl = (device, localPollStatus, localPollError) => {
+  const title = encodeURIComponent(`Tuya: Add support for ${device.model || device.product_name || device.name}`);
+  const body = encodeURIComponent(`\`\`\`json\n${JSON.stringify(buildIssuePayload(device, localPollStatus, localPollError), null, 2)}\n\`\`\``);
+  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
+};
+
 class TuyaDeviceBox extends Component {
   componentWillMount() {
     this.setState({
@@ -234,8 +285,13 @@ class TuyaDeviceBox extends Component {
         ? params.LOCAL_OVERRIDE
         : device.local_override;
     const ipAddress = params.IP_ADDRESS || device.ip || '';
+    const cloudIp = params.CLOUD_IP || device.cloud_ip || '';
     const hasProtocolSelected = protocolVersion && protocolVersion.length > 0;
-    const canPollLocal = ipAddress && localKey;
+    const isValidIp =
+      typeof ipAddress === 'string' &&
+      /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
+    const isDifferentFromCloud = !cloudIp || ipAddress !== cloudIp;
+    const canPollLocal = isValidIp && localKey && isDifferentFromCloud;
     const requiresProtocol = localOverride === true;
     const canSave = !requiresProtocol || hasProtocolSelected;
 
@@ -388,6 +444,11 @@ class TuyaDeviceBox extends Component {
                     <option value="3.4">3.4</option>
                     <option value="3.5">3.5</option>
                   </select>
+                  {protocolVersion === '3.5' && (
+                    <div class="text-danger mt-2">
+                      <Text id="integration.tuya.device.protocol35Unsupported" />
+                    </div>
+                  )}
                 </div>
 
                 <div class="form-group">
@@ -471,9 +532,22 @@ class TuyaDeviceBox extends Component {
                   )}
 
                   {!validModel && (
-                    <button class="btn btn-dark" disabled>
-                      <Text id="integration.tuya.unmanagedModelButton" />
-                    </button>
+                    <div>
+                      <div class="alert alert-warning">
+                        <Text id="integration.tuya.unmanagedModelButton" />
+                      </div>
+                      <a
+                        class="btn btn-gray"
+                        href={createGithubUrl(this.state.device, localPollStatus, localPollError)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Text id="integration.philipsHue.device.createGithubIssue" />
+                      </a>
+                      <div class="text-muted mt-2">
+                        <Text id="integration.tuya.device.githubIssueInfo" />
+                      </div>
+                    </div>
                   )}
 
                   {validModel && editButton && (

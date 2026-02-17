@@ -1314,6 +1314,8 @@
         "localPollButton": "Poll local des DP",
         "localPollSuccess": "Poll local OK.",
         "localPollError": "Échec du poll local :",
+        "protocol35Unsupported": "Le protocole 3.5 n'est pas pris en charge en local pour le moment.",
+        "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
         "productIdLabel": "Identifiant produit",
         "productKeyLabel": "Product Key"
       },
