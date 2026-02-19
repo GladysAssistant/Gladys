@@ -889,6 +889,7 @@
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
+      "ieeeAddressLabel": "IEEE Address",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% Zigbee2mqtt MQTT value",
       "featuresLabel": "Features",

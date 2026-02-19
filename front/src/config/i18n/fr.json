@@ -1124,6 +1124,7 @@
       "nameLabel": "Nom",
       "namePlaceholder": "Donner un nom à l'appareil",
       "roomLabel": "Pièce",
+      "ieeeAddressLabel": "Adresse IEEE",
       "topicLabel": "Sujet MQTT",
       "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
       "featuresLabel": "Fonctionnalités",

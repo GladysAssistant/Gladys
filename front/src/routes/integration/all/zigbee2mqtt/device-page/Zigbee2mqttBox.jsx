@@ -163,6 +163,15 @@ class Zigbee2mqttBox extends Component {
                   </select>
                 </div>
 
+                {props.device.ieeeAddress && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
+                    </label>
+                    <input type="text" class="form-control" value={props.device.ieeeAddress} disabled />
+                  </div>
+                )}
+
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="integration.zigbee2mqtt.featuresLabel" />

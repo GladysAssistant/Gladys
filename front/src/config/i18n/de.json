@@ -994,6 +994,7 @@
       "nameLabel": "Gerätename",
       "namePlaceholder": "Gib den Namen deines Geräts ein",
       "roomLabel": "Zimmer",
+      "ieeeAddressLabel": "IEEE-Adresse",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% Zigbee2MQTT-MQTT-Wert",
       "featuresLabel": "Funktionen",

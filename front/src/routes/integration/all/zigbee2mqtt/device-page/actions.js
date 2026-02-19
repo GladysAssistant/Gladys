@@ -29,6 +29,10 @@ function createActions(store) {
           if (model) {
             device.model = model.value;
           }
+          const ieeeAddress = device.params.find(p => p.name === 'ieee_address');
+          if (ieeeAddress) {
+            device.ieeeAddress = ieeeAddress.value;
+          }
         });
 
         let zigbee2mqttDevices;
