@@ -6,12 +6,41 @@
   min-height: 200px
 }
 
+.z2mActionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.z2mActionButtonsLeft {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+
+.z2mActionButtonsLeft > * {
+  flex: 1;
+}
+
+.z2mEditLink {
+  display: flex;
+  min-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .z2mEditLink {
+    min-width: auto;
+    flex: 1;
+  }
+}
+
 .z2mDeviceLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   text-decoration: none;
 }
+
 
 .z2mDeviceLinkLogo {
   width: 20px;

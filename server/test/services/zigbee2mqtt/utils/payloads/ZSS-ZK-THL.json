@@ -232,6 +232,7 @@
         "selector": "zigbee2mqtt-0xe0798dfffedeae2b-signal-integer-linkquality"
       }
     ],
+    "params": [{ "name": "ieee_address", "value": "0xe0798dfffedeae2b" }],
     "should_poll": false,
     "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
   },

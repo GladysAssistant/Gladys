@@ -192,15 +192,17 @@ class Zigbee2mqttBox extends Component {
                   <DeviceFeatures features={props.device.features} />
                 </div>
 
-                <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.zigbee2mqtt.saveButton" />
-                  </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
-                    <Text id="integration.zigbee2mqtt.deleteButton" />
-                  </button>
-                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
+                <div class={style.z2mActionButtons}>
+                  <div class={style.z2mActionButtonsLeft}>
+                    <button onClick={this.saveDevice} class="btn btn-success">
+                      <Text id="integration.zigbee2mqtt.saveButton" />
+                    </button>
+                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                      <Text id="integration.zigbee2mqtt.deleteButton" />
+                    </button>
+                  </div>
+                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`} class={style.z2mEditLink}>
+                    <button class="btn btn-primary btn-block">
                       <Text id="integration.zigbee2mqtt.device.editButton" />
                     </button>
                   </Link>
