@@ -8,6 +8,8 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
+import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
+import style from './style.css';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -169,6 +171,17 @@ class Zigbee2mqttBox extends Component {
                       <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
                     </label>
                     <input type="text" class="form-control" value={props.device.ieeeAddress} disabled />
+                    {props.z2mUrl && (
+                      <a
+                        href={`${props.z2mUrl}/#/device/0/${props.device.ieeeAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class={`${style.z2mDeviceLink} mt-2 text-muted`}
+                      >
+                        <img src={logoZigbee2mqtt} alt="Zigbee2mqtt" class={style.z2mDeviceLinkLogo} />
+                        <Text id="integration.zigbee2mqtt.openInZ2mButton" />
+                      </a>
+                    )}
                   </div>
                 )}
 
