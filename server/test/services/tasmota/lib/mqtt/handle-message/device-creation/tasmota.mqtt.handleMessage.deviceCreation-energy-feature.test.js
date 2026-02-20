@@ -29,12 +29,14 @@ const gladys = {
 const serviceId = 'service-uuid-random';
 
 describe('Tasmota - MQTT - create device with ENERGY features', () => {
-  const tasmota = new TasmotaHandler(gladys, serviceId);
-  const tasmotaHandler = tasmota.protocols.mqtt;
-  tasmotaHandler.mqttService = mqttService;
+  let tasmota;
+  let tasmotaHandler;
 
   beforeEach(() => {
     sinon.reset();
+    tasmota = new TasmotaHandler(gladys, serviceId);
+    tasmotaHandler = tasmota.protocols.mqtt;
+    tasmotaHandler.mqttService = mqttService;
   });
 
   it('decode STATUS message', () => {

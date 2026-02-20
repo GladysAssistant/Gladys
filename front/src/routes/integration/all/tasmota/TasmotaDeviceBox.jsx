@@ -261,7 +261,7 @@ class TasmotaDeviceBox extends Component {
                           class="btn btn-outline-primary"
                           href={`http://${deviceIpValue}/`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                         >
                           <Text id="integration.tasmota.openWebUiButton" />
                         </a>
