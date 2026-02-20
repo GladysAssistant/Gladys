@@ -113,7 +113,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '8');
   });
 
-  it('decode STATUS8 message', () => {
+  it('decode STATUS8 message', async () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
     mqttService.device.publish.resetHistory();
