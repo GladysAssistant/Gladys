@@ -46,7 +46,7 @@
     ]
   },
   "devDependencies": {
-    "@matter/main": "^0.16.8",
+    "@matter/main": "^0.16.9",
     "apidoc": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
