@@ -27,7 +27,8 @@ describe('TuyaController GET /api/v1/service/tuya/discover', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.gladys.stateManager.get.returns(null);
   });
 
   it('should return discovered devices', async () => {
@@ -47,7 +48,8 @@ describe('TuyaController POST /api/v1/service/tuya/local-poll', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.gladys.stateManager.get.returns(null);
   });
 
   it('should return local poll result', async () => {
@@ -110,7 +112,8 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.gladys.stateManager.get.returns(null);
   });
 
   it('should run local scan and return devices', async () => {

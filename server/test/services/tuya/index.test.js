@@ -6,7 +6,9 @@ const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 const { assert, fake } = sinon;
 
 const TuyaHandlerMock = sinon.stub();
-TuyaHandlerMock.prototype.init = fake.returns(null);
+TuyaHandlerMock.prototype.init = fake(function init() {
+  this.status = STATUS.CONNECTED;
+});
 TuyaHandlerMock.prototype.loadDevices = fake.returns(null);
 TuyaHandlerMock.prototype.disconnect = fake.returns(null);
 
@@ -16,14 +18,15 @@ const gladys = {};
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
 describe('TuyaService', () => {
-  const tuyaService = TuyaService(gladys, serviceId);
+  let tuyaService;
 
   beforeEach(() => {
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaService = TuyaService(gladys, serviceId);
   });
 
   afterEach(() => {
-    sinon.reset();
+    sinon.resetHistory();
   });
 
   it('should start service', async () => {

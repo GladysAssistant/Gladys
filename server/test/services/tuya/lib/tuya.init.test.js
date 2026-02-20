@@ -17,6 +17,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const gladys = {
   variable: {
     getValue: sinon.stub(),
+    setValue: sinon.stub().resolves(null),
   },
   event: {
     emit: fake.returns(null),
