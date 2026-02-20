@@ -26,6 +26,9 @@ describe('Matter.pairDevice', () => {
     const pairingCode = '1450-134-1614';
     const clusterClients = new Map();
     clusterClients.set(6, {
+      id: 6,
+      name: 'OnOff',
+      endpointId: 1,
       addOnOffAttributeListener: fake.returns(null),
     });
     matterHandler.commissioningController = {
@@ -47,13 +50,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients: new Map(),
-            childEndpoints: [
+            getClusterClientById: () => undefined,
+            getAllClusterClients: () => [],
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getClusterClientById: (id) => clusterClients.get(id),
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -68,6 +74,9 @@ describe('Matter.pairDevice', () => {
     const pairingCode = '1450-134-1614';
     const clusterClients = new Map();
     clusterClients.set(6, {
+      id: 6,
+      name: 'OnOff',
+      endpointId: 1,
       addOnOffAttributeListener: fake.returns(null),
     });
     const bridgeClusterClients = new Map();
@@ -114,13 +123,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients: bridgeClusterClients,
-            childEndpoints: [
+            getClusterClientById: (id) => bridgeClusterClients.get(id),
+            getAllClusterClients: () => Array.from(bridgeClusterClients.values()),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getClusterClientById: (id) => clusterClients.get(id),
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -128,13 +140,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-2',
             name: 'Test Device 2',
             number: 2,
-            clusterClients: bridgeClusterClients,
-            childEndpoints: [
+            getClusterClientById: (id) => bridgeClusterClients.get(id),
+            getAllClusterClients: () => Array.from(bridgeClusterClients.values()),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-2',
                 name: 'Child Endpoint 2',
                 number: 2,
-                clusterClients,
+                getClusterClientById: (id) => clusterClients.get(id),
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
               },
             ],
           },
