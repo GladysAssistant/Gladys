@@ -37,7 +37,14 @@ describe('TuyaHandler.setValue', () => {
   it('should throw an error (should starts with "tuya:")', async () => {
     try {
       await tuyaHandler.setValue(
-        {},
+        {
+          params: [
+            {
+              name: 'code',
+              value: true,
+            },
+          ],
+        },
         {
           external_id: 'test:uuid:switch_0',
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,

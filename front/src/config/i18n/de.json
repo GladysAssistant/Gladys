@@ -4005,6 +4005,11 @@
     "unknown": {
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"
+    },
+    "number": {
+      "shortCategoryName": "Number",
+      "decimal": "Number (decimal)",
+      "integer": "Number (integer)"
     }
   },
   "errorPage": {
