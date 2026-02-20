@@ -35,6 +35,8 @@ async function handleMqttMessage(topic, message) {
           this.discoveredDevices[device.friendly_name] = device;
         });
 
+      await this.migrateIeeeAddressParams();
+
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
         payload: this.getDiscoveredDevices(),

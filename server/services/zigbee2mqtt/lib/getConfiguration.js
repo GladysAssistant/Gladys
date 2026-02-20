@@ -27,6 +27,7 @@ async function getConfiguration() {
   // Load version parameters
   const dockerMqttVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_MQTT_VERSION, this.serviceId);
   const dockerZ2mVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_Z2M_VERSION, this.serviceId);
+  const z2mFrontendUrl = await this.gladys.variable.getValue(CONFIGURATION.Z2M_FRONTEND_URL, this.serviceId);
   // Gladys params
   const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
@@ -42,6 +43,7 @@ async function getConfiguration() {
     mqttPassword,
     dockerMqttVersion,
     dockerZ2mVersion,
+    z2mFrontendUrl,
     timezone,
   };
 }

@@ -92,6 +92,7 @@
     ],
     "name": "CCT5015 device",
     "model": "CCT5015",
+    "params": [],
     "should_poll": false
   },
   "values": [

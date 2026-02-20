@@ -1104,7 +1104,9 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "URL de l'interface Zigbee2mqtt",
+        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080"
       },
       "device": {
         "title": "Appareils Zigbee",
@@ -1124,6 +1126,8 @@
       "nameLabel": "Nom",
       "namePlaceholder": "Donner un nom à l'appareil",
       "roomLabel": "Pièce",
+      "ieeeAddressLabel": "Adresse IEEE",
+      "openInZ2mButton": "Ouvrir dans Zigbee2mqtt",
       "topicLabel": "Sujet MQTT",
       "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
       "featuresLabel": "Fonctionnalités",

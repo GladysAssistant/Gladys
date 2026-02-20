@@ -1,11 +1,26 @@
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
+import config from '../../../../../config';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
   const actions = {
+    async getZ2mUrl(state) {
+      try {
+        const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/configuration');
+        if (configuration.z2mFrontendUrl) {
+          store.setState({ z2mUrl: configuration.z2mFrontendUrl });
+        } else if (configuration.z2mTcpPort && state.session.gatewayClient === undefined) {
+          const url = new URL(config.localApiUrl);
+          const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort}`;
+          store.setState({ z2mUrl });
+        }
+      } catch (e) {
+        // z2mUrl stays undefined, link won't be shown
+      }
+    },
     async getDiscoveredDevices(state) {
       store.setState({
         discoverZigbee2mqtt: true,

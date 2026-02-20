@@ -5,6 +5,8 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
+import style from './style.css';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
@@ -42,8 +44,10 @@ class DiscoveredBox extends Component {
     });
   };
 
-  render({ device = {}, deviceIndex, houses = [] }, { loading, saveError }) {
-    const { features = [] } = device;
+  render({ device = {}, deviceIndex, houses = [], z2mUrl }, { loading, saveError }) {
+    const { features = [], params = [] } = device;
+    const ieeeAddressParam = params.find(p => p.name === 'ieee_address');
+    const ieeeAddress = ieeeAddressParam ? ieeeAddressParam.value : null;
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const supportedDevice = features.findIndex(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
@@ -128,6 +132,26 @@ class DiscoveredBox extends Component {
                         />
                       </Localizer>
                     </div>
+
+                    {ieeeAddress && (
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
+                        </label>
+                        <input type="text" class="form-control" value={ieeeAddress} disabled />
+                        {z2mUrl && (
+                          <a
+                            href={`${z2mUrl}/#/device/0/${ieeeAddress}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class={`${style.z2mDeviceLink} mt-2 text-muted`}
+                          >
+                            <img src={logoZigbee2mqtt} alt="Zigbee2mqtt" class={style.z2mDeviceLinkLogo} />
+                            <Text id="integration.zigbee2mqtt.openInZ2mButton" />
+                          </a>
+                        )}
+                      </div>
+                    )}
 
                     <div class="form-group">
                       <label class="form-label">

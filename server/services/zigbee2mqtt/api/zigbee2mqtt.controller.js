@@ -49,6 +49,30 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {get} /api/v1/service/zigbee2mqtt/configuration Get full configuration
+   * @apiName getConfiguration
+   * @apiGroup Zigbee2mqtt
+   */
+  async function getFullConfiguration(req, res) {
+    logger.debug('Getting full configuration');
+    const configuration = await zigbee2mqttManager.getConfiguration();
+    res.json(configuration);
+  }
+
+  /**
+   * @api {patch} /api/v1/service/zigbee2mqtt/configuration Save configuration fields
+   * @apiName saveConfiguration
+   * @apiGroup Zigbee2mqtt
+   */
+  async function patchConfiguration(req, res) {
+    logger.debug('Patching configuration');
+    const current = await zigbee2mqttManager.getConfiguration();
+    const updated = { ...current, ...req.body };
+    await zigbee2mqttManager.saveConfiguration(updated);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/v1/service/zigbee2mqtt/setup Setup
    * @apiName setup
    * @apiGroup Zigbee2mqtt
@@ -152,6 +176,14 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/setup': {
       authenticated: true,
       controller: asyncMiddleware(getCurrentSetup),
+    },
+    'get /api/v1/service/zigbee2mqtt/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(getFullConfiguration),
+    },
+    'patch /api/v1/service/zigbee2mqtt/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(patchConfiguration),
     },
     'post /api/v1/service/zigbee2mqtt/setup': {
       authenticated: true,
