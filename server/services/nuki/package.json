@@ -3,7 +3,7 @@
     "name": "Nicolas Geissel <protz@beroot.fr> (https://github.com/ngeissel/)"
   },
   "name": "gladys-nuki",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "os": [
     "darwin",
