@@ -123,6 +123,41 @@ describe('Tasmota - notifyNewDevice', () => {
     expect(gladys.event.emit.firstCall.args[0]).to.eq(EVENTS.WEBSOCKET.SEND_ALL);
   });
 
+  it('keeps features without external_id', async () => {
+    const device = {
+      external_id: 'tasmota:device-1',
+      features: [
+        {
+          id: 'unknown-feature',
+          category: 'unknown',
+          type: 'unknown',
+        },
+      ],
+    };
+
+    await tasmotaHandler.notifyNewDevice(device, 'test.event');
+
+    const { payload } = gladys.event.emit.firstCall.args[1];
+    expect(payload.features).to.have.lengthOf(1);
+    expect(payload.features[0]).to.deep.equal({
+      id: 'unknown-feature',
+      category: 'unknown',
+      type: 'unknown',
+    });
+  });
+
+  it('emits payload without features array', async () => {
+    const device = {
+      external_id: 'tasmota:device-1',
+    };
+
+    await tasmotaHandler.notifyNewDevice(device, 'test.event');
+
+    sinon.assert.notCalled(gladys.energyPrice.getDefaultElectricMeterFeatureId);
+    const { payload } = gladys.event.emit.firstCall.args[1];
+    expect(payload).to.deep.equal(device);
+  });
+
   it('uses mergeDevices when no energy feature is present', async () => {
     const device = {
       external_id: 'tasmota:device-1',

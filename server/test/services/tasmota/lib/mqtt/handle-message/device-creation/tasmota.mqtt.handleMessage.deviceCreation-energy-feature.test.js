@@ -323,4 +323,33 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
     assert.notCalled(mqttService.device.publish);
   });
+
+  it('decode STATUS5 message with discovered device', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
+
+    const device = tasmotaHandler.discoveredDevices['tasmota-device-topic'];
+    expect(device.params).to.deep.include({
+      name: 'ip',
+      value: '10.5.0.231',
+    });
+  });
+
+  it('ignores STATUS8 message when no pending device exists', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+
+    expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
+    expect(tasmotaHandler.pendingDevices).to.deep.eq({});
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('ignores STATUS11 message when no pending device exists', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
+
+    expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
+    expect(tasmotaHandler.pendingDevices).to.deep.eq({});
+    assert.notCalled(mqttService.device.publish);
+  });
 });

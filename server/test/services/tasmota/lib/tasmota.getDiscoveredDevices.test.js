@@ -139,6 +139,46 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
     expect(result).deep.eq([protocolHandler.discoveredDevices.notAlreadyExists]);
   });
 
+  it('keeps features without external_id during discovery', () => {
+    protocolHandler.discoveredDevices.withUnknownFeature = {
+      external_id: 'withUnknownFeature',
+      features: [
+        {
+          id: 'unknown-feature',
+          category: 'unknown',
+          type: 'unknown',
+        },
+        {
+          id: 'known-feature',
+          category: 'known',
+          type: 'known',
+          external_id: 'known:feature',
+        },
+      ],
+    };
+
+    const [result] = tasmotaHandler.getDiscoveredDevices(protocol, defaultElectricMeterFeatureId);
+
+    expect(result.features).to.have.lengthOf(2);
+    expect(result.features[0]).to.deep.equal({
+      id: 'unknown-feature',
+      category: 'unknown',
+      type: 'unknown',
+    });
+    expect(result.features[1].external_id).to.equal('known:feature');
+  });
+
+  it('handles discovered devices without features array', () => {
+    protocolHandler.discoveredDevices.noFeatures = {
+      external_id: 'noFeatures',
+    };
+
+    const [result] = tasmotaHandler.getDiscoveredDevices(protocol, defaultElectricMeterFeatureId);
+
+    expect(result.external_id).to.equal('noFeatures');
+    expect(result.features).to.equal(undefined);
+  });
+
   it('adds energy consumption features only for total energy index', () => {
     protocolHandler.discoveredDevices.energyDevice = {
       external_id: 'tasmota:device-1',
