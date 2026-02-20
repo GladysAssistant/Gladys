@@ -1,5 +1,7 @@
 const logger = require('../../../../utils/logger');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { setDeviceParam } = require('../../../../utils/device');
+const { DEVICE_PARAM_NAME } = require('../tasmota.constants');
 const { featureStatus } = require('../utils/tasmota.featureStatus');
 
 /**
@@ -24,6 +26,19 @@ function handleMessage(topic, message) {
       const device = this.status(deviceExternalId, message);
       this.pendingDevices[deviceExternalId] = device;
       this.mqttService.device.publish(`cmnd/${deviceExternalId}/STATUS`, '11');
+      this.mqttService.device.publish(`cmnd/${deviceExternalId}/STATUS`, '5');
+      break;
+    }
+    // Device network info
+    case 'STATUS5': {
+      const device = this.pendingDevices[deviceExternalId] || this.discoveredDevices[deviceExternalId];
+      if (device) {
+        const statusMsg = JSON.parse(message);
+        const ipAddress = statusMsg && statusMsg.StatusNET && statusMsg.StatusNET.IPAddress;
+        if (ipAddress) {
+          setDeviceParam(device, DEVICE_PARAM_NAME.IP, ipAddress);
+        }
+      }
       break;
     }
     // Device secondary features

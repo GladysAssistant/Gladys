@@ -32,12 +32,14 @@ const gladys = {
 const serviceId = 'service-uuid-random';
 
 describe('Tasmota - MQTT - create device with ENERGY features', () => {
-  const tasmota = new TasmotaHandler(gladys, serviceId);
-  const tasmotaHandler = tasmota.protocols.mqtt;
-  tasmotaHandler.mqttService = mqttService;
+  let tasmota;
+  let tasmotaHandler;
 
   beforeEach(() => {
     sinon.reset();
+    tasmota = new TasmotaHandler(gladys, serviceId);
+    tasmotaHandler = tasmota.protocols.mqtt;
+    tasmotaHandler.mqttService = mqttService;
   });
 
   it('decode STATUS message', () => {
@@ -65,9 +67,22 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.notCalled(gladys.event.emit);
     assert.notCalled(gladys.stateManager.get);
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
+  });
+
+  it('decode STATUS5 message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
+
+    expect(tasmotaHandler.pendingDevices['tasmota-device-topic'].params).to.deep.include({
+      name: 'ip',
+      value: '10.5.0.231',
+    });
   });
 
   it('decode STATUS11 message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -78,6 +93,10 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
           {
             name: 'protocol',
             value: 'mqtt',
+          },
+          {
+            name: 'ip',
+            value: '10.5.0.231',
           },
         ],
         model: 13,
@@ -95,6 +114,9 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
   });
 
   it('decode STATUS8 message', async () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
+    mqttService.device.publish.resetHistory();
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
     await new Promise((resolve) => {
       setImmediate(resolve);
@@ -106,6 +128,10 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
         {
           name: 'protocol',
           value: 'mqtt',
+        },
+        {
+          name: 'ip',
+          value: '10.5.0.231',
         },
       ],
       model: 13,

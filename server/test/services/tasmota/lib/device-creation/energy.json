@@ -19,6 +19,13 @@
       "PowerRetain": 0
     }
   },
+  "STATUS5": {
+    "StatusNET": {
+      "IPAddress": "10.5.0.231",
+      "Gateway": "10.5.0.1",
+      "Mac": "08:F9:E0:72:0B:C2"
+    }
+  },
   "STATUS8": {
     "StatusSNS": {
       "Time": "2020-01-10T22:14:14",
