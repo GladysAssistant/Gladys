@@ -83,9 +83,37 @@ const buildDiscoveredDevice = (device, existing, defaultElectricMeterDeviceFeatu
   ensureExistingEnergyDerivedFeatures(mergedDevice, existing);
   const beforeFeaturesCount = Array.isArray(mergedDevice.features) ? mergedDevice.features.length : 0;
 
-  addEnergyFeatures(mergedDevice, defaultElectricMeterDeviceFeatureId, {
-    filterIndexFeature: isTasmotaTotalEnergyIndex,
-  });
+  const shouldKeepForEnergyFeatures = (feature) => {
+    if (
+      feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+      feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY
+    ) {
+      return isTasmotaTotalEnergyIndex(feature);
+    }
+
+    return true;
+  };
+  const filteredDevice = {
+    ...mergedDevice,
+    features: Array.isArray(mergedDevice.features)
+      ? mergedDevice.features.filter((feature) => shouldKeepForEnergyFeatures(feature))
+      : [],
+  };
+
+  addEnergyFeatures(filteredDevice, defaultElectricMeterDeviceFeatureId);
+
+  if (filteredDevice.features !== mergedDevice.features) {
+    if (!Array.isArray(mergedDevice.features)) {
+      mergedDevice.features = [];
+    }
+    const mergedExternalIds = new Set(mergedDevice.features.map((feature) => feature.external_id));
+    filteredDevice.features.forEach((feature) => {
+      if (!mergedExternalIds.has(feature.external_id)) {
+        mergedExternalIds.add(feature.external_id);
+        mergedDevice.features.push(feature);
+      }
+    });
+  }
 
   if (existing && mergedDevice.features.length !== beforeFeaturesCount) {
     mergedDevice.updatable = true;
