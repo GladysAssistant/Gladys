@@ -9,11 +9,12 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId, options 
   }
 
   const { filterIndexFeature } = options;
+  const hasFilter = typeof filterIndexFeature === 'function';
   const featuresToAdd = [];
   const indexFeatures = device.features.filter(
     (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
   );
-  const filteredIndexFeatures = filterIndexFeature ? indexFeatures.filter(filterIndexFeature) : indexFeatures;
+  const filteredIndexFeatures = hasFilter ? indexFeatures.filter(filterIndexFeature) : indexFeatures;
 
   filteredIndexFeatures.forEach((indexFeature) => {
     // Set the default id if it's not set
