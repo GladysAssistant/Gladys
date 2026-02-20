@@ -483,6 +483,14 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: variableController.getValue,
     },
+    'post /api/v1/user/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.setForUser,
+    },
+    'get /api/v1/user/variable/:variable_key': {
+      authenticated: true,
+      controller: variableController.getForUser,
+    },
     // session
     'post /api/v1/session/:session_id/revoke': {
       authenticated: true,

@@ -508,17 +508,18 @@
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
-      "searchPlaceholder": "Search integrations",
-      "noIntegrations": "No integrations found",
+      "searchPlaceholder": "Search an integration",
+      "noIntegrations": "No integration found",
       "menu": {
         "all": "All integrations",
+        "favorites": "Favorites",
         "device": "Devices",
         "communication": "Communication",
         "calendar": "Calendar",
         "music": "Music",
         "health": "Health",
         "weather": "Weather",
-        "navigation": "navigation"
+        "navigation": "Navigation"
       }
     },
     "telegram": {
@@ -755,6 +756,8 @@
         "mqtt": "MQTT Topic",
         "http": "HTTP identifier"
       },
+      "ipLabel": "IP address",
+      "openWebUiButton": "Open device UI",
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",

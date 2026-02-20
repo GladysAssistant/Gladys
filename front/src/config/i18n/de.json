@@ -512,6 +512,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
+        "favorites": "Favoriten",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -860,6 +861,8 @@
         "mqtt": "MQTT-Topic",
         "http": "HTTP-Identifier"
       },
+      "ipLabel": "IP-Adresse",
+      "openWebUiButton": "Geräteoberfläche öffnen",
       "saveButton": "Sichern",
       "updateButton": "Aktualisieren",
       "alreadyCreatedButton": "Bereits erstellt",

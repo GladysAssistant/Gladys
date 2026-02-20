@@ -61,7 +61,8 @@ describe('Tasmota - MQTT - create device with DS18B20 temperature feature', () =
 
     assert.notCalled(gladys.event.emit);
     assert.notCalled(gladys.stateManager.get);
-    assert.calledOnceWithExactly(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
   it('decode STATUS11 message', () => {
