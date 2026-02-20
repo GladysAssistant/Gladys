@@ -193,3 +193,54 @@ describe('TuyaHandler.localScan', () => {
     clock.restore();
   });
 });
+
+describe('TuyaHandler.buildLocalScanResponse', () => {
+  it('should return devices and port errors when discovered devices exist', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {});
+    const tuyaManager = {
+      discoveredDevices: [{ external_id: 'tuya:device1', params: [] }],
+    };
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device1: { ip: '1.1.1.1', version: '3.3', productKey: 'pkey' } },
+      portErrors: { 6666: 'boom' },
+    });
+
+    expect(response.port_errors).to.deep.equal({ 6666: 'boom' });
+    expect(response.local_devices).to.deep.equal({ device1: { ip: '1.1.1.1', version: '3.3', productKey: 'pkey' } });
+    expect(response.devices).to.be.an('array');
+    expect(response.devices[0].ip).to.equal('1.1.1.1');
+    const ipParam = response.devices[0].params.find((param) => param.name === 'IP_ADDRESS');
+    expect(ipParam.value).to.equal('1.1.1.1');
+  });
+
+  it('should merge devices when gladys stateManager exists', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {});
+    const tuyaManager = {
+      discoveredDevices: [{ external_id: 'tuya:device1', params: [] }],
+      gladys: {
+        stateManager: {
+          get: sinon.stub().returns({
+            external_id: 'tuya:device1',
+            params: [{ name: 'LOCAL_OVERRIDE', value: true }],
+            features: [],
+          }),
+        },
+      },
+    };
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device1: { ip: '1.1.1.1', version: '3.3' } },
+      portErrors: {},
+    });
+
+    expect(response.devices[0]).to.have.property('updatable');
+    expect(response.devices[0].local_override).to.equal(true);
+  });
+
+  it('should return only local devices when no discovered devices array', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {});
+    const tuyaManager = { discoveredDevices: null };
+    const response = buildLocalScanResponse(tuyaManager, null);
+
+    expect(response).to.deep.equal({ local_devices: {}, port_errors: {} });
+  });
+});

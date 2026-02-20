@@ -4,20 +4,11 @@ const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
+const { normalizeBoolean } = require('./utils/tuya.normalize');
 
 const getParamValue = (params, name) => {
   const found = (params || []).find((param) => param.name === name);
   return found ? found.value : undefined;
-};
-
-const normalizeBoolean = (value) => {
-  if (value === true || value === 'true') {
-    return true;
-  }
-  if (value === false || value === 'false') {
-    return false;
-  }
-  return undefined;
 };
 
 const getLocalDpsFromCode = (code) => {
@@ -62,11 +53,9 @@ async function setValue(device, deviceFeature, value) {
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
   const protocolVersion = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
-  const cloudIp = getParamValue(params, DEVICE_PARAM_NAME.CLOUD_IP);
   const localOverride = normalizeBoolean(getParamValue(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE));
 
-  const hasLocalConfig =
-    ipAddress && localKey && protocolVersion && (localOverride === true || (cloudIp && ipAddress !== cloudIp));
+  const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
   const localDps = getLocalDpsFromCode(command);
 
