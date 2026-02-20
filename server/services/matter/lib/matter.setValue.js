@@ -85,7 +85,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   // Handle binary device
   if (gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
 
     if (!onOff) {
       throw new Error('Device does not support OnOff cluster');
@@ -101,7 +101,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   // Handle shutters
   if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER) {
-    const windowCovering = targetDevice.clusterClients.get(WindowCovering.Complete.id);
+    const windowCovering = targetDevice.getClusterClientById(WindowCovering.Complete.id);
     // Handle device feature shutter position
     if (gladysFeature.type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION) {
       await windowCovering.goToLiftPercentage({
@@ -125,8 +125,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
   ) {
-    const levelControl = targetDevice.clusterClients.get(LevelControl.Complete.id);
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const levelControl = targetDevice.getClusterClientById(LevelControl.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
     await levelControl.moveToLevel({
       level: value,
       transitionTime: null,
@@ -147,8 +147,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
   ) {
-    const colorControl = targetDevice.clusterClients.get(ColorControl.Complete.id);
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const colorControl = targetDevice.getClusterClientById(ColorControl.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
     const [hue, saturation] = intToHsb(value);
 
     // Convert from standard HSB ranges to Matter ranges
@@ -175,7 +175,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
   ) {
-    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedHeatingSetpointAttribute(value * 100);
   }
 
@@ -184,7 +184,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
   ) {
-    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
   }
 }

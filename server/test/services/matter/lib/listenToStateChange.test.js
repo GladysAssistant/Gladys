@@ -53,7 +53,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -70,7 +70,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -87,7 +87,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1:child_endpoint:2', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -104,7 +104,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -121,7 +121,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -139,7 +139,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -156,7 +156,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -173,7 +173,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -190,7 +190,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -207,7 +207,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -224,7 +224,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -241,7 +241,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -261,7 +261,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -281,7 +281,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -298,7 +298,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -315,7 +315,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -357,7 +357,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     // We need to make sure that we called all 4 functions before checking the events
@@ -383,7 +383,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -405,7 +405,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -427,7 +427,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -447,7 +447,7 @@ describe('Matter.listenToStateChange', () => {
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {

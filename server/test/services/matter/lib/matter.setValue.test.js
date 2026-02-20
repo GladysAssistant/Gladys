@@ -51,7 +51,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -90,7 +90,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -136,7 +136,7 @@ describe('Matter.setValue', () => {
               childEndpoints: [
                 {
                   number: 2,
-                  clusterClients,
+                  getClusterClientById: (id) => clusterClients.get(id),
                 },
               ],
             },
@@ -179,7 +179,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -218,7 +218,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -265,7 +265,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -319,7 +319,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -366,7 +366,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -404,7 +404,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -475,7 +475,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -507,7 +507,7 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          clusterClients,
+          getClusterClientById: (id) => clusterClients.get(id),
         },
       ]),
     });
@@ -542,7 +542,7 @@ describe('Matter.setValue', () => {
           childEndpoints: [
             {
               number: 1,
-              clusterClients,
+              getClusterClientById: (id) => clusterClients.get(id),
             },
           ],
         },

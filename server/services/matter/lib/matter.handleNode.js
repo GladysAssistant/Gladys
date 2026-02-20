@@ -26,7 +26,7 @@ const handleDevice = async (
   };
 
   // If we have this cluster, it means we are in a bridge device
-  const bridgedDeviceBasicInformationClusterClient = device.clusterClients.get(
+  const bridgedDeviceBasicInformationClusterClient = device.getClusterClientById(
     BridgedDeviceBasicInformation.Complete.id,
   );
 
@@ -82,8 +82,9 @@ const handleDevice = async (
     devices.push(gladysDevice);
   }
 
-  if (device.childEndpoints) {
-    await Promise.each(device.childEndpoints, async (childDevice, index) => {
+  const childEndpoints = device.getChildEndpoints();
+  if (childEndpoints && childEndpoints.length > 0) {
+    await Promise.each(childEndpoints, async (childDevice, index) => {
       await handleDevice(
         nodeId,
         childInformations,
