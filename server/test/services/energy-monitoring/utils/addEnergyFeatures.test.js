@@ -69,6 +69,14 @@ describe('addEnergyFeatures', () => {
     expect(costFeature.id).to.be.a('string');
   });
 
+  it('should return device when features are missing', () => {
+    const device = { external_id: 'device:missing-features' };
+
+    const result = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
+
+    expect(result).to.equal(device);
+  });
+
   it('should add consumption and cost features for a switch energy feature', () => {
     const device = {
       features: [
