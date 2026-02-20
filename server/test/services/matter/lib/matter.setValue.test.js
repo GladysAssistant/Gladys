@@ -130,13 +130,14 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          childEndpoints: [
+          getChildEndpoints: () => [
             {
               number: 2,
-              childEndpoints: [
+              getChildEndpoints: () => [
                 {
                   number: 2,
                   getClusterClientById: (id) => clusterClients.get(id),
+                  getChildEndpoints: () => [],
                 },
               ],
             },
@@ -539,10 +540,11 @@ describe('Matter.setValue', () => {
       getDevices: fake.returns([
         {
           number: 1,
-          childEndpoints: [
+          getChildEndpoints: () => [
             {
               number: 1,
               getClusterClientById: (id) => clusterClients.get(id),
+              getChildEndpoints: () => [],
             },
           ],
         },

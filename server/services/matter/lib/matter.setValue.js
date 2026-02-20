@@ -27,8 +27,9 @@ function findDeviceRecursively(parentDevice, path) {
   const deviceNumber = Number(currentNumber);
 
   // Look in child endpoints
-  if (parentDevice.childEndpoints) {
-    const childDevice = parentDevice.childEndpoints.find((child) => child.number === deviceNumber);
+  const childEndpoints = parentDevice.getChildEndpoints();
+  if (childEndpoints && childEndpoints.length > 0) {
+    const childDevice = childEndpoints.find((child) => child.number === deviceNumber);
     if (childDevice) {
       return findDeviceRecursively(childDevice, remainingPath);
     }
