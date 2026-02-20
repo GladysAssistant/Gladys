@@ -20,6 +20,9 @@
 
 .z2mActionButtonsLeft > * {
   flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .z2mEditLink {
