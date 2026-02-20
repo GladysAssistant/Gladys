@@ -3822,6 +3822,8 @@
       "power": "Leistung",
       "energy": "Energie",
       "index": "Index",
+      "index-today": "Index heute",
+      "index-yesterday": "Index gestern",
       "daily-consumption": "Tagesverbrauch",
       "daily-consumption-cost": "Tageskosten",
       "thirty-minutes-consumption": "Verbrauch 30 Minuten",
