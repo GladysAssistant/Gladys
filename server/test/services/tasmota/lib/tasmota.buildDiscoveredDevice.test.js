@@ -28,22 +28,22 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
         {
           id: 'cost-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          external_id: 'tasmota:device-1:ENERGY:Total_cost',
+          external_id: 'tasmota:device-1:ENERGY:Total:cost',
           energy_parent_id: 'consumption-id',
         },
       ],
     };
     const device = { external_id: 'tasmota:device-1' };
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
-    expect(result.features.find((f) => f.external_id.endsWith('_consumption'))).to.not.equal(undefined);
-    expect(result.features.find((f) => f.external_id.endsWith('_cost'))).to.not.equal(undefined);
+    expect(result.features.find((f) => f.external_id.endsWith(':consumption'))).to.not.equal(undefined);
+    expect(result.features.find((f) => f.external_id.endsWith(':cost'))).to.not.equal(undefined);
   });
 
   it('does not re-inject derived features when parent is missing', () => {
@@ -54,22 +54,22 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
         {
           id: 'cost-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          external_id: 'tasmota:device-1:ENERGY:Total_cost',
+          external_id: 'tasmota:device-1:ENERGY:Total:cost',
           energy_parent_id: 'consumption-id',
         },
       ],
     };
     const device = { external_id: 'tasmota:device-1' };
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
-    const hasConsumption = result.features.some((f) => f.external_id.endsWith('_consumption'));
-    const hasCost = result.features.some((f) => f.external_id.endsWith('_cost'));
+    const hasConsumption = result.features.some((f) => f.external_id.endsWith(':consumption'));
+    const hasCost = result.features.some((f) => f.external_id.endsWith(':cost'));
     expect(hasConsumption).to.equal(false);
     expect(hasCost).to.equal(false);
   });
@@ -82,7 +82,7 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
       ],
@@ -94,13 +94,13 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
       ],
     };
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
-    const consumptionFeatures = result.features.filter((f) => f.external_id.endsWith('_consumption'));
+    const consumptionFeatures = result.features.filter((f) => f.external_id.endsWith(':consumption'));
     expect(consumptionFeatures).to.have.lengthOf(1);
   });
 
@@ -130,8 +130,8 @@ describe('Tasmota - buildDiscoveredDevice', () => {
       ],
     };
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
-    const hasConsumption = result.features.some((f) => f.external_id.endsWith('_consumption'));
-    const hasCost = result.features.some((f) => f.external_id.endsWith('_cost'));
+    const hasConsumption = result.features.some((f) => f.external_id.endsWith(':consumption'));
+    const hasCost = result.features.some((f) => f.external_id.endsWith(':cost'));
     expect(hasConsumption).to.equal(true);
     expect(hasCost).to.equal(true);
     expect(result.updatable).to.equal(true);
@@ -152,14 +152,14 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
         {
           id: 'cost-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          external_id: 'tasmota:device-1:ENERGY:Total_cost',
+          external_id: 'tasmota:device-1:ENERGY:Total:cost',
           energy_parent_id: 'consumption-id',
         },
       ],
@@ -178,14 +178,14 @@ describe('Tasmota - buildDiscoveredDevice', () => {
           id: 'consumption-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          external_id: 'tasmota:device-1:ENERGY:Total_consumption',
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
           energy_parent_id: 'total-id',
         },
         {
           id: 'cost-id',
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          external_id: 'tasmota:device-1:ENERGY:Total_cost',
+          external_id: 'tasmota:device-1:ENERGY:Total:cost',
           energy_parent_id: 'consumption-id',
         },
       ],

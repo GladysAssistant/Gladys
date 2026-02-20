@@ -47,8 +47,8 @@ describe('Tasmota - notifyNewDevice', () => {
 
     sinon.assert.calledOnce(gladys.event.emit);
     const { payload } = gladys.event.emit.firstCall.args[1];
-    const consumptionFeature = payload.features.find((f) => f.external_id.endsWith('_consumption'));
-    const costFeature = payload.features.find((f) => f.external_id.endsWith('_cost'));
+    const consumptionFeature = payload.features.find((f) => f.external_id.endsWith(':consumption'));
+    const costFeature = payload.features.find((f) => f.external_id.endsWith(':cost'));
     expect(consumptionFeature).to.not.equal(undefined);
     expect(costFeature).to.not.equal(undefined);
   });

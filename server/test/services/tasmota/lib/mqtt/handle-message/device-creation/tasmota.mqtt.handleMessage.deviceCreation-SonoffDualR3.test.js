@@ -341,8 +341,8 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
     expectedExternalIds.forEach((externalId) => {
       expect(discoveredExternalIds).to.include(externalId);
     });
-    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
-    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:consumption');
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:cost');
     expect(tasmotaHandler.pendingDevices).to.deep.eq({});
 
     assert.notCalled(mqttService.device.publish);
@@ -357,7 +357,7 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
     expectedExternalIds.forEach((externalId) => {
       expect(websocketExternalIds).to.include(externalId);
     });
-    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
-    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:consumption');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:cost');
   });
 });
