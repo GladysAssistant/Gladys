@@ -201,7 +201,10 @@ class Zigbee2mqttBox extends Component {
                       <Text id="integration.zigbee2mqtt.deleteButton" />
                     </button>
                   </div>
-                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`} class={style.z2mEditLink}>
+                  <Link
+                    href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}
+                    class={style.z2mEditLink}
+                  >
                     <button class="btn btn-primary btn-block">
                       <Text id="integration.zigbee2mqtt.device.editButton" />
                     </button>

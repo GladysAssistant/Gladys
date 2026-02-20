@@ -12,16 +12,11 @@ async function migrateIeeeAddressParams() {
   const migratePromises = Object.values(this.discoveredDevices)
     .filter((device) => device.ieee_address)
     .map(async (device) => {
-      const existingDevice = this.gladys.stateManager.get(
-        'deviceByExternalId',
-        `zigbee2mqtt:${device.friendly_name}`,
-      );
+      const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${device.friendly_name}`);
       if (!existingDevice) {
         return;
       }
-      const alreadyHasParam = existingDevice.params && existingDevice.params.some(
-        (p) => p.name === 'ieee_address',
-      );
+      const alreadyHasParam = existingDevice.params && existingDevice.params.some((p) => p.name === 'ieee_address');
       if (alreadyHasParam) {
         return;
       }

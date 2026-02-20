@@ -75,7 +75,12 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // and also serve getDiscoveredDevices calls based on external_id argument
     stateManagerGetStub.callsFake((key, externalId) => {
       if (externalId === 'zigbee2mqtt:0x00158d00033e88d5') {
-        return { id: 'gladys-id', room_id: 'room_id', name: 'device-name', params: [{ name: 'ieee_address', value: '0x00158d00033e88d5' }] };
+        return {
+          id: 'gladys-id',
+          room_id: 'room_id',
+          name: 'device-name',
+          params: [{ name: 'ieee_address', value: '0x00158d00033e88d5' }],
+        };
       }
       if (externalId === 'zigbee2mqtt:0x00158d00033e88d1') {
         return expectedDevicesPayload[1];

@@ -160,7 +160,11 @@ describe('zigbee2mqtt migrateIeeeAddressParams', () => {
       .withArgs('deviceByExternalId', 'zigbee2mqtt:device-needs-migration')
       .returns({ id: 'id-1', name: 'device-needs-migration', params: [] })
       .withArgs('deviceByExternalId', 'zigbee2mqtt:device-already-migrated')
-      .returns({ id: 'id-2', name: 'device-already-migrated', params: [{ name: 'ieee_address', value: '0x2222222222222222' }] })
+      .returns({
+        id: 'id-2',
+        name: 'device-already-migrated',
+        params: [{ name: 'ieee_address', value: '0x2222222222222222' }],
+      })
       .withArgs('deviceByExternalId', 'zigbee2mqtt:device-not-in-db')
       .returns(null);
     // EXECUTE
