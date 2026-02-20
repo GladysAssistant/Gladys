@@ -193,4 +193,54 @@ describe('Tasmota - buildDiscoveredDevice', () => {
     const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
     expect(result.updatable).to.equal(false);
   });
+
+  it('normalizes derived features to ":" format and keeps device not updatable', () => {
+    const existing = {
+      external_id: 'tasmota:device-1',
+      features: [
+        {
+          id: 'total-id',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:device-1:ENERGY:Total',
+          selector: 'tasmota:device-1:ENERGY:Total',
+        },
+        {
+          id: 'consumption-id',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          external_id: 'tasmota:device-1:ENERGY:Total:consumption',
+          energy_parent_id: 'total-id',
+        },
+        {
+          id: 'cost-id',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          external_id: 'tasmota:device-1:ENERGY:Total:cost',
+          energy_parent_id: 'consumption-id',
+        },
+      ],
+    };
+    const device = {
+      external_id: 'tasmota:device-1',
+      features: [
+        {
+          id: 'total-id',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:device-1:ENERGY:Total',
+          selector: 'tasmota:device-1:ENERGY:Total',
+        },
+      ],
+    };
+
+    const result = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
+
+    const externalIds = result.features.map((f) => f.external_id);
+    expect(externalIds).to.include('tasmota:device-1:ENERGY:Total:consumption');
+    expect(externalIds).to.include('tasmota:device-1:ENERGY:Total:cost');
+    expect(externalIds.some((id) => id.endsWith('_consumption'))).to.equal(false);
+    expect(externalIds.some((id) => id.endsWith('_cost'))).to.equal(false);
+    expect(result.updatable).to.equal(false);
+  });
 });
