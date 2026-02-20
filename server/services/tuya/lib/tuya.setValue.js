@@ -1,4 +1,5 @@
 const TuyAPI = require('tuyapi');
+const TuyAPINewGen = require('@demirdeniz/tuyapi-newgen');
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -72,12 +73,21 @@ async function setValue(device, deviceFeature, value) {
 
   if (hasLocalConfig && localDps !== null) {
     try {
-      const tuyaLocal = new TuyAPI({
+      const isProtocol35 = protocolVersion === '3.5';
+      const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+      const tuyaOptions = {
         id: topic,
         key: localKey,
         ip: ipAddress,
         version: protocolVersion,
-      });
+        issueGetOnConnect: false,
+        issueRefreshOnConnect: false,
+        issueRefreshOnPing: false,
+      };
+      if (isProtocol35) {
+        tuyaOptions.KeepAlive = false;
+      }
+      const tuyaLocal = new TuyaLocalApi(tuyaOptions);
       await tuyaLocal.connect();
       await tuyaLocal.set({ dps: localDps, set: transformedValue });
       await tuyaLocal.disconnect();
