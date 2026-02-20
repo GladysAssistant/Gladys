@@ -512,6 +512,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
+        "favorites": "Favoriten",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -860,6 +861,8 @@
         "mqtt": "MQTT-Topic",
         "http": "HTTP-Identifier"
       },
+      "ipLabel": "IP-Adresse",
+      "openWebUiButton": "Geräteoberfläche öffnen",
       "saveButton": "Sichern",
       "updateButton": "Aktualisieren",
       "alreadyCreatedButton": "Bereits erstellt",
@@ -1035,6 +1038,36 @@
         "urlLabel": "URL der Node-RED-Oberfläche: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (nicht von Gladys Plus aus zugänglich)"
       }
     },
+    "matterbridge": {
+      "title": "Matterbridge",
+      "description": "Steuere deine Matterbridge-Geräte in Gladys.",
+      "setupTab": "Einrichtung",
+      "documentation": "Matterbridge-Dokumentation",
+      "status": {
+        "notInstalled": "Der Matterbridge-Server konnte nicht installiert werden.",
+        "notRunning": "Der Matterbridge-Server konnte nicht gestartet werden.",
+        "running": "Matterbridge wurde erfolgreich gestartet.",
+        "notEnabled": "Matterbridge ist nicht aktiviert.",
+        "nonDockerEnv": "Gladys läuft nicht unter Docker. Du kannst von hier aus keinen Matterbridge-Server installieren.",
+        "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Server von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein."
+      },
+      "setup": {
+        "title": "Matterbridge-Konfiguration",
+        "description": "Dieser Dienst verwendet einen Docker-Container. Aktiviere Matterbridge, um diesen Container bereitzustellen.\nWeitere Informationen findest du in der Matterbridge-Dokumentation.",
+        "error": "Beim Starten von Matterbridge ist ein Fehler aufgetreten.",
+        "enableMatterbridge": "Aktivieren",
+        "disableMatterbridge": "Deaktivieren",
+        "confirmDisableLabel": "Bist du sicher, dass du Matterbridge deaktivieren möchtest?",
+        "confirmDisableCancelButton": "Abbrechen",
+        "activationMatterbridge": "Aktivieren …",
+        "serviceStatus": "Status des Matterbridge-Dienstes",
+        "containersStatus": "Mit Matterbridge verbundene Container",
+        "status": "Status",
+        "matterbridge": "Matterbridge",
+        "gladys": "Gladys",
+        "urlLabel": "URL der Matterbridge-Oberfläche: <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (nicht von Gladys Plus aus zugänglich)"
+      }
+    },
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google-Home-Dokumentation",
@@ -1180,8 +1213,13 @@
         "localKeyLabel": "Lokaler Schlüssel",
         "protocolVersionLabel": "Protokollversion",
         "ipAddressLabel": "IP-Adresse",
-        "localInfoHelp": "Gib die lokale IP und die Protokollversion ein, wenn du den lokalen Modus nutzen willst. Die Cloud-IP wird zur Referenz gespeichert.",
+        "ipModeLocal": "Lokal",
+        "ipModeCloud": "Cloud",
+        "localInfoHelp": "Mit der Cloud/Lokal-Schaltfläche wählst du den Kommunikationsmodus. Im lokalen Modus kannst du die lokale IP bearbeiten. Im Cloud-Modus wird die Cloud-IP nur angezeigt (schreibgeschützt).",
         "localPollButton": "Lokales DPS abfragen",
+        "localPollInProgress": "Lokaler Poll läuft... Protokoll {{protocol}}.",
+        "localPollHelp": "Wenn du das Protokoll kennst, wähle es aus und klicke zum Prüfen. Wenn nicht, klicke direkt für einen vollständigen Scan (dauert länger).",
+        "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert (z. B. Protokoll 3.5 noch nicht unterstützt), schalte zurück in den Cloud-Modus.",
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
         "protocol35Unsupported": "Protokoll 3.5 wird lokal noch nicht unterstützt.",
@@ -1194,6 +1232,9 @@
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
         "localDiscoveryInfo": "Lokale Erkennung nutzt UDP-Broadcast. Starte den lokalen UDP-Scan und gib bei Bedarf lokale IP und Protokollversion ein und nutze \"Lokales DPS abfragen\".",
         "scanInProgress": "Scan läuft... Cloud-Geräte werden abgerufen.",
+        "scanCloudInProgress": "Scan läuft... Cloud-Geräte werden abgerufen. Das kann etwas dauern.",
+        "scanLocalInProgressConnected": "Scan läuft... Lokale Informationen der Geräte werden abgerufen. Das kann etwas dauern.",
+        "scanLocalInProgressDisconnected": "Scan läuft... Lokale Geräte werden abgerufen. Das kann etwas dauern.",
         "scanCloud": "Cloud-Scan",
         "localScanAuto": "Lokaler Auto-Scan",
         "udpScanError": "Fehler beim lokalen UDP-Scan.",

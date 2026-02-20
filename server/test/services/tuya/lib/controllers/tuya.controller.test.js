@@ -29,6 +29,8 @@ describe('TuyaController GET /api/v1/service/tuya/discover', () => {
     controller = TuyaController(tuyaManager);
     sinon.resetHistory();
     tuyaManager.gladys.stateManager.get.returns(null);
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should return discovered devices', async () => {
@@ -50,6 +52,8 @@ describe('TuyaController POST /api/v1/service/tuya/local-poll', () => {
     controller = TuyaController(tuyaManager);
     sinon.resetHistory();
     tuyaManager.gladys.stateManager.get.returns(null);
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should return local poll result', async () => {
@@ -114,6 +118,8 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     controller = TuyaController(tuyaManager);
     sinon.resetHistory();
     tuyaManager.gladys.stateManager.get.returns(null);
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should run local scan and return devices', async () => {

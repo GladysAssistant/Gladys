@@ -1,48 +1,9 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
-const { DEVICE_PARAM_NAME } = require('../lib/utils/tuya.constants');
-const { convertDevice } = require('../lib/device/tuya.convertDevice');
+const { updateDiscoveredDeviceAfterLocalPoll } = require('../lib/tuya.localPoll');
+const { buildLocalScanResponse } = require('../lib/tuya.localScan');
 
 module.exports = function TuyaController(tuyaManager) {
-  /**
-   * @description Upsert a device parameter in a params array.
-   * @param {Array} params - Device params.
-   * @param {string} name - Param name.
-   * @param {*} value - Param value.
-   * @returns {void}
-   */
-  function upsertParam(params, name, value) {
-    if (value === undefined || value === null) {
-      return;
-    }
-    const index = params.findIndex((param) => param.name === name);
-    if (index >= 0) {
-      params[index] = { ...params[index], value };
-    } else {
-      params.push({ name, value });
-    }
-  }
-
-  /**
-   * @description Merge local scan data into a discovered device.
-   * @param {object} device - Discovered device.
-   * @param {object} localInfo - Local scan info.
-   * @returns {object} Updated device.
-   */
-  function updateDiscoveredDeviceWithLocalInfo(device, localInfo) {
-    if (!device || !localInfo) {
-      return device;
-    }
-    const updated = { ...device };
-    updated.protocol_version = localInfo.version;
-    updated.ip = localInfo.ip || updated.ip;
-    updated.product_key = localInfo.productKey;
-    updated.params = Array.isArray(updated.params) ? [...updated.params] : [];
-    upsertParam(updated.params, DEVICE_PARAM_NAME.IP_ADDRESS, updated.ip);
-    upsertParam(updated.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, updated.protocol_version);
-    upsertParam(updated.params, DEVICE_PARAM_NAME.PRODUCT_KEY, updated.product_key);
-    return updated;
-  }
   /**
    * @api {get} /api/v1/service/tuya/discover Retrieve tuya devices from cloud.
    * @apiName discover
@@ -60,32 +21,7 @@ module.exports = function TuyaController(tuyaManager) {
    */
   async function localPoll(req, res) {
     const result = await tuyaManager.localPoll(req.body);
-    const { deviceId, ip, protocolVersion, localKey } = req.body || {};
-
-    let updatedDevice = null;
-    if (deviceId && Array.isArray(tuyaManager.discoveredDevices)) {
-      const externalId = `tuya:${deviceId}`;
-      const deviceIndex = tuyaManager.discoveredDevices.findIndex((device) => device.external_id === externalId);
-      if (deviceIndex >= 0) {
-        const device = { ...tuyaManager.discoveredDevices[deviceIndex] };
-        device.protocol_version = protocolVersion;
-        device.ip = ip;
-        device.local_override = true;
-        if (localKey) {
-          device.local_key = localKey;
-        }
-        device.params = Array.isArray(device.params) ? [...device.params] : [];
-        upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
-        upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
-        upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
-        upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
-        upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
-        upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
-
-        tuyaManager.discoveredDevices[deviceIndex] = device;
-        updatedDevice = device;
-      }
-    }
+    const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, req.body);
 
     if (updatedDevice) {
       res.json({
@@ -109,49 +45,7 @@ module.exports = function TuyaController(tuyaManager) {
     const localScanResult = await tuyaManager.localScan({
       timeoutSeconds,
     });
-    const localDevicesById = localScanResult.devices || {};
-    const portErrors = localScanResult.portErrors || {};
-
-    if (Array.isArray(tuyaManager.discoveredDevices)) {
-      const updatedDevices = tuyaManager.discoveredDevices.map((device) => {
-        const deviceId = device.external_id && device.external_id.split(':')[1];
-        const localInfo = localDevicesById[deviceId];
-        return updateDiscoveredDeviceWithLocalInfo(device, localInfo);
-      });
-      tuyaManager.discoveredDevices = updatedDevices;
-      res.json({
-        devices: updatedDevices,
-        local_devices: localDevicesById,
-        port_errors: portErrors,
-      });
-      return;
-    }
-
-    const localDiscoveredDevices = Object.entries(localDevicesById).map(([deviceId, localInfo]) =>
-      convertDevice.call(tuyaManager, {
-        id: deviceId,
-        name: localInfo && localInfo.name ? localInfo.name : `Tuya ${deviceId}`,
-        product_key: localInfo && localInfo.productKey,
-        ip: localInfo && localInfo.ip,
-        protocol_version: localInfo && localInfo.version,
-        local_override: true,
-        specifications: {
-          functions: [],
-          status: [],
-        },
-      }),
-    );
-
-    const filteredLocalDevices = localDiscoveredDevices.filter((device) => {
-      const existInGladys = tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id);
-      return existInGladys === null;
-    });
-
-    res.json({
-      devices: filteredLocalDevices,
-      local_devices: localDevicesById,
-      port_errors: portErrors,
-    });
+    res.json(buildLocalScanResponse(tuyaManager, localScanResult));
   }
 
   /**

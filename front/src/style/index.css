@@ -402,3 +402,47 @@ body {
 .rti--tag button:focus {
   outline: none !important;
 }
+
+.row-cards > [class*="col"] {
+  display: flex;
+}
+
+.row-cards > [class*="col"] > .card {
+  width: 100%;
+  flex: 1;
+}
+
+.favorite-star {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.favorite-star:focus,
+.favorite-star:active,
+.favorite-star:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.favorite-star svg {
+  fill: none;
+  stroke: #9aa0a6;
+}
+
+.favorite-star--active svg {
+  fill: #FFA000;
+  stroke: #FFA000;
+}

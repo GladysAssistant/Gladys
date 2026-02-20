@@ -2,6 +2,13 @@ const dgram = require('dgram');
 const { UDP_KEY } = require('@demirdeniz/tuyapi-newgen/lib/config');
 const { MessageParser } = require('@demirdeniz/tuyapi-newgen/lib/message-parser');
 const logger = require('../../../utils/logger');
+const { mergeDevices } = require('../../../utils/device');
+const { convertDevice } = require('./device/tuya.convertDevice');
+const {
+  applyExistingLocalOverride,
+  normalizeExistingDevice,
+  updateDiscoveredDeviceWithLocalInfo,
+} = require('./utils/tuya.deviceParams');
 
 const DEFAULT_PORTS = [6666, 6667, 7000];
 const formatHex = (buffer, maxLen = 128) => {
@@ -135,6 +142,80 @@ async function localScan(input = 10) {
   return { devices, portErrors };
 }
 
+/**
+ * @description Build local scan response and update discovered devices.
+ * @param {object} tuyaManager - Tuya handler instance.
+ * @param {object} localScanResult - Result of UDP scan.
+ * @returns {object} API response payload.
+ * @example
+ * buildLocalScanResponse(tuyaManager, { devices: {}, portErrors: {} });
+ */
+function buildLocalScanResponse(tuyaManager, localScanResult) {
+  const localDevicesById = (localScanResult && localScanResult.devices) || {};
+  const portErrors = (localScanResult && localScanResult.portErrors) || {};
+
+  if (tuyaManager && Array.isArray(tuyaManager.discoveredDevices)) {
+    const updatedDevices = tuyaManager.discoveredDevices.map((device) => {
+      const deviceId = device.external_id && device.external_id.split(':')[1];
+      const localInfo = localDevicesById[deviceId];
+      return updateDiscoveredDeviceWithLocalInfo(device, localInfo);
+    });
+    const mergedDevices = updatedDevices.map((device) => {
+      if (!tuyaManager.gladys || !tuyaManager.gladys.stateManager) {
+        return device;
+      }
+      const existing = normalizeExistingDevice(
+        tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id),
+      );
+      const withLocalOverride = applyExistingLocalOverride(device, existing);
+      return mergeDevices(withLocalOverride, existing);
+    });
+    tuyaManager.discoveredDevices = mergedDevices;
+    return {
+      devices: mergedDevices,
+      local_devices: localDevicesById,
+      port_errors: portErrors,
+    };
+  }
+
+  if (tuyaManager && Object.keys(localDevicesById).length > 0) {
+    const localDiscoveredDevices = Object.entries(localDevicesById).map(([deviceId, localInfo]) =>
+      convertDevice.call(tuyaManager, {
+        id: deviceId,
+        name: localInfo && localInfo.name ? localInfo.name : `Tuya ${deviceId}`,
+        product_key: localInfo && localInfo.productKey,
+        ip: localInfo && localInfo.ip,
+        protocol_version: localInfo && localInfo.version,
+        local_override: true,
+        specifications: {
+          functions: [],
+          status: [],
+        },
+      }),
+    );
+
+    const filteredLocalDevices =
+      tuyaManager.gladys && tuyaManager.gladys.stateManager
+        ? localDiscoveredDevices.filter((device) => {
+            const existInGladys = tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id);
+            return existInGladys === null;
+          })
+        : localDiscoveredDevices;
+
+    return {
+      devices: filteredLocalDevices,
+      local_devices: localDevicesById,
+      port_errors: portErrors,
+    };
+  }
+
+  return {
+    local_devices: localDevicesById,
+    port_errors: portErrors,
+  };
+}
+
 module.exports = {
   localScan,
+  buildLocalScanResponse,
 };

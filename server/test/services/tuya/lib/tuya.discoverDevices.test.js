@@ -18,6 +18,9 @@ const gladys = {
   variable: {
     getValue: fake.resolves('APP_ACCOUNT_UID'),
   },
+  device: {
+    get: fake.resolves([]),
+  },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -158,10 +161,6 @@ describe('TuyaHandler.discoverDevices', () => {
             value: 'localKey',
           },
           {
-            name: 'IP_ADDRESS',
-            value: '1.1.1.1',
-          },
-          {
             name: 'CLOUD_IP',
             value: '1.1.1.1',
           },
@@ -190,5 +189,25 @@ describe('TuyaHandler.discoverDevices', () => {
     });
 
     assert.callCount(tuyaHandler.connector.request, 3);
+  });
+
+  it('should keep local params from existing devices', async () => {
+    gladys.stateManager.get = fake.returns({
+      external_id: 'tuya:uuid',
+      params: [
+        { name: 'IP_ADDRESS', value: '2.2.2.2' },
+        { name: 'PROTOCOL_VERSION', value: '3.3' },
+        { name: 'LOCAL_OVERRIDE', value: true },
+      ],
+      features: [{ external_id: 'tuya:uuid:cur_power' }, { external_id: 'tuya:uuid:switch_1' }],
+    });
+
+    const devices = await tuyaHandler.discoverDevices();
+    const { params } = devices[0];
+    const getParam = (name) => params.find((param) => param.name === name);
+
+    expect(getParam('IP_ADDRESS').value).to.equal('2.2.2.2');
+    expect(getParam('PROTOCOL_VERSION').value).to.equal('3.3');
+    expect(getParam('LOCAL_OVERRIDE').value).to.equal(true);
   });
 });

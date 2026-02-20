@@ -1380,6 +1380,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
   },
+  MATTERBRIDGE: {
+    STATUS_CHANGE: 'matterbridge.status-change',
+  },
 };
 
 const DASHBOARD_TYPE = {

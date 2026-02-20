@@ -9,6 +9,42 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
 
+const getDeviceRank = device => {
+  const isCreated = !!device.created_at;
+  const hasFeatures = device.features && device.features.length > 0;
+  const isUpdatable = !!device.updatable;
+  if (!isCreated && hasFeatures) {
+    return 0;
+  }
+  if (isCreated && isUpdatable) {
+    return 1;
+  }
+  if (!isCreated && !hasFeatures) {
+    return 2;
+  }
+  if (isCreated && !isUpdatable) {
+    return 3;
+  }
+  return 4;
+};
+
+const sortDevices = devices =>
+  [...devices].sort((a, b) => {
+    const rankDiff = getDeviceRank(a) - getDeviceRank(b);
+    if (rankDiff !== 0) {
+      return rankDiff;
+    }
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  });
+
 class DiscoverTab extends Component {
   async componentWillMount() {
     this.getDiscoveredDevices();
@@ -88,7 +124,18 @@ class DiscoverTab extends Component {
     { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors }
   ) {
     const canScanCloud = !errorLoading;
+    const isLoading = loading || udpScanLoading;
+    const localScanTextId = errorLoading
+      ? 'integration.tuya.discover.scanLocalInProgressDisconnected'
+      : 'integration.tuya.discover.scanLocalInProgressConnected';
+    const scanTextId = udpScanLoading
+      ? localScanTextId
+      : loading
+      ? 'integration.tuya.discover.scanCloudInProgress'
+      : null;
     const portErrorPorts = udpScanPortErrors ? Object.keys(udpScanPortErrors) : [];
+    const orderedDevices = Array.isArray(discoveredDevices) ? sortDevices(discoveredDevices) : [];
+
     return (
       <div class="card">
         <div class="card-header">
@@ -116,17 +163,18 @@ class DiscoverTab extends Component {
           <div class="alert alert-info">
             <Text id="integration.tuya.discover.localDiscoveryInfo" />
           </div>
-          {loading && (
-            <div class="alert alert-info">
-              <Text id="integration.tuya.discover.scanInProgress" />
-            </div>
-          )}
           <div class="alert alert-secondary">
             <Text id="integration.tuya.discover.description" />
           </div>
           {udpScanError && (
             <div class="alert alert-danger">
               <Text id="integration.tuya.discover.udpScanError" />
+            </div>
+          )}
+          {isLoading && scanTextId && (
+            <div class={cx('alert alert-info', style.scanLoader)}>
+              <div class="loader" />
+              <Text id={scanTextId} />
             </div>
           )}
           {portErrorPorts.length > 0 && (
@@ -144,10 +192,9 @@ class DiscoverTab extends Component {
           )}
           <div
             class={cx('dimmer', {
-              active: loading || udpScanLoading
+              active: isLoading
             })}
           >
-            <div class="loader" />
             <div class={cx('dimmer-content', style.tuyaListBody)}>
               {errorLoading && (
                 <p class="alert alert-warning">
@@ -158,19 +205,18 @@ class DiscoverTab extends Component {
                 </p>
               )}
               <div class="row">
-                {discoveredDevices &&
-                  discoveredDevices.map((device, index) => (
-                    <TuyaDeviceBox
-                      editable={!device.created_at || device.updatable}
-                      alreadyCreatedButton={device.created_at && !device.updatable}
-                      updateButton={device.updatable}
-                      saveButton={!device.created_at}
-                      device={device}
-                      deviceIndex={index}
-                      housesWithRooms={housesWithRooms}
-                    />
-                  ))}
-                {!discoveredDevices || (discoveredDevices.length === 0 && <EmptyState />)}
+                {orderedDevices.map((device, index) => (
+                  <TuyaDeviceBox
+                    editable={!device.created_at || device.updatable}
+                    alreadyCreatedButton={device.created_at && !device.updatable}
+                    updateButton={device.updatable}
+                    saveButton={!device.created_at}
+                    device={device}
+                    deviceIndex={index}
+                    housesWithRooms={housesWithRooms}
+                  />
+                ))}
+                {orderedDevices.length === 0 && <EmptyState />}
               </div>
             </div>
           </div>
