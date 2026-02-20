@@ -14,9 +14,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId, options 
   const indexFeatures = device.features.filter(
     (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
   );
-  const filteredIndexFeatures = hasFilter ? indexFeatures.filter(filterIndexFeature) : indexFeatures;
-
-  filteredIndexFeatures.forEach((indexFeature) => {
+  indexFeatures.forEach((indexFeature) => {
     // Set the default id if it's not set
     if (!indexFeature.id) {
       indexFeature.id = uuid.v4();
@@ -25,6 +23,10 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId, options 
     // Set the default energy parent id if it's not set
     if (!indexFeature.energy_parent_id) {
       indexFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
+    }
+
+    if (hasFilter && !filterIndexFeature(indexFeature)) {
+      return;
     }
 
     const consumptionFeature = device.features.find(
