@@ -114,6 +114,8 @@ class TasmotaDeviceBox extends Component {
     const validModel = device.features.length > 0 || device.needAuthentication;
     // default value is 'mqtt'
     const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
+    const deviceIp = (device.params || []).find(p => p.name === 'ip');
+    const deviceIpValue = deviceIp ? deviceIp.value : null;
 
     return (
       <div class="col-md-6">
@@ -246,6 +248,27 @@ class TasmotaDeviceBox extends Component {
                     disabled="true"
                   />
                 </div>
+
+                {deviceIpValue && (
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.tasmota.ipLabel" />
+                    </label>
+                    <div class="input-group">
+                      <input type="text" value={deviceIpValue} class="form-control" disabled />
+                      <div class="input-group-append">
+                        <a
+                          class="btn btn-outline-primary"
+                          href={`http://${deviceIpValue}/`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Text id="integration.tasmota.openWebUiButton" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {props.editButton && (
                   <div class="form-group">

@@ -120,7 +120,7 @@ class RoomTemperatureBoxComponent extends Component {
 
     if (unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
       temperature_min = celsiusToFahrenheit(temperature_min);
-      temperature_max = celsiusToFahrenheit(temperature_min);
+      temperature_max = celsiusToFahrenheit(temperature_max);
     }
 
     return (

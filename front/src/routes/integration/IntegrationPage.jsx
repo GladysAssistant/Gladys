@@ -13,7 +13,8 @@ const IntegrationPage = ({
   orderDir,
   changeOrderDir,
   search,
-  integrationCategories
+  integrationCategories,
+  toggleFavorite
 }) => (
   <div class="page">
     <div class="page-main">
@@ -46,7 +47,12 @@ const IntegrationPage = ({
               <div class="col-lg-9">
                 <div class="row row-cards">
                   {integrations.map(integration => (
-                    <IntegrationCategory currentUrl={currentUrl} integration={integration} category={category} />
+                    <IntegrationCategory
+                      currentUrl={currentUrl}
+                      integration={integration}
+                      category={category}
+                      toggleFavorite={toggleFavorite}
+                    />
                   ))}
                   {integrations.length === 0 && (
                     <div class="col-12">
