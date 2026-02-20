@@ -189,8 +189,7 @@ const buildDiscoveredDevice = (device, existing, defaultElectricMeterDeviceFeatu
 
   const featuresList = Array.isArray(mergedDevice.features) ? mergedDevice.features : [];
   const isEnergyIndexFeature = (feature) =>
-    ENERGY_INDEX_FEATURE_TYPES[feature.category] &&
-    ENERGY_INDEX_FEATURE_TYPES[feature.category].includes(feature.type);
+    ENERGY_INDEX_FEATURE_TYPES[feature.category] && ENERGY_INDEX_FEATURE_TYPES[feature.category].includes(feature.type);
 
   const totalIndexFeatures = featuresList.filter(
     (feature) =>
