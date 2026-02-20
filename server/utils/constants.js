@@ -732,6 +732,8 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    INDEX_TODAY: 'index-today',
+    INDEX_YESTERDAY: 'index-yesterday',
     DAILY_CONSUMPTION: 'daily-consumption',
     DAILY_CONSUMPTION_COST: 'daily-consumption-cost',
     THIRTY_MINUTES_CONSUMPTION: 'thirty-minutes-consumption',
