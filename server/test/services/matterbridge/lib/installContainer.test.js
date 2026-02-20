@@ -160,7 +160,7 @@ describe('Matterbridge installContainer', () => {
     expect(matterbridgeManager.matterbridgeExist).to.equal(true);
   });
 
-  it('it should fail because not a Docker System', async () => {
+  it('should fail because not a Docker System', async () => {
     gladys.system.isDocker = fake.resolves(false);
 
     try {
@@ -175,7 +175,7 @@ describe('Matterbridge installContainer', () => {
     expect(matterbridgeManager.matterbridgeExist).to.equal(false);
   });
 
-  it('it should fail because not a host network', async () => {
+  it('should fail because not a host network', async () => {
     gladys.system.getNetworkMode = fake.resolves('container');
 
     try {

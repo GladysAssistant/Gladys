@@ -44,7 +44,7 @@ describe('Matterbridge init', () => {
     sinon.reset();
   });
 
-  it('it should fail because not a Docker System', async () => {
+  it('should fail because not a Docker System', async () => {
     gladys.system.isDocker = fake.resolves(false);
 
     try {
@@ -61,7 +61,7 @@ describe('Matterbridge init', () => {
     assert.notCalled(matterbridgeManager.installContainer);
   });
 
-  it('it should fail because not a host network', async () => {
+  it('should fail because not a host network', async () => {
     gladys.system.getNetworkMode = fake.resolves('container');
 
     try {
@@ -78,7 +78,7 @@ describe('Matterbridge init', () => {
     assert.notCalled(matterbridgeManager.installContainer);
   });
 
-  it('it should install containers', async () => {
+  it('should install containers', async () => {
     const config = {
       dockerMatterbridgeVersion: '1',
     };
