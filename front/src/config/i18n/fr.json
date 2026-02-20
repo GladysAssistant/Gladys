@@ -1363,11 +1363,19 @@
         "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
         "appUsername": "Identifiant Smart Life (optionnel)",
         "appUsernamePlaceholder": "Email ou téléphone du compte Smart Life",
-        "saveLabel": "Enregistrer la configuration",
+        "saveLabel": "Enregistrer la configuration et se connecter",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
-        "connected": "Connexion réussie au compte cloud Tuya !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "notConfigured": "Information de connexion au compte cloud Tuya non renseignées ou manquante !",
+        "connected": "Connexion au compte cloud Tuya réussie !",
+        "connectedAfterSave": "Connexion au compte cloud Tuya réussie !",
+        "connectedStatus": "Connecté au compte cloud Tuya.",
+        "disconnectSuccess": "Déconnexion du compte cloud Tuya réussie ! Le service local fonctionne toujours (vous ne serez pas reconnecté automatiquement au redémarrage de Gladys).",
+        "disconnectedUnexpected": "Vous avez été déconnecté du cloud Tuya ! Vérifier vos informations de connexion et l'état de votre abonnement d'essai <a href=\"https://eu.platform.tuya.com/cloud/products?productType=all\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Core</a>.",
+        "disconnectedManual": "Déconnecté du cloud Tuya ! Le service local fonctionne toujours (vous ne serez pas reconnecté automatiquement au redémarrage de Gladys).",
+        "disconnectedMissingConfig": "Déconnecté du cloud Tuya.",
+        "disconnectLabel": "Se déconnecter du cloud"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

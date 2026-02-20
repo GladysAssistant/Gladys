@@ -11,13 +11,16 @@ const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
 const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
   './tuya.connect.js': connect,
 });
-const { STATUS } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { STATUS, GLADYS_VARIABLES } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const gladys = {
   event: {
     emit: fake.returns(null),
+  },
+  variable: {
+    setValue: fake.resolves(null),
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
@@ -49,6 +52,7 @@ describe('TuyaHandler.connect', () => {
 
     assert.notCalled(gladys.event.emit);
     assert.notCalled(client.init);
+    assert.notCalled(gladys.variable.setValue);
   });
 
   it('no access key stored, should fail', async () => {
@@ -66,6 +70,7 @@ describe('TuyaHandler.connect', () => {
 
     assert.notCalled(gladys.event.emit);
     assert.notCalled(client.init);
+    assert.notCalled(gladys.variable.setValue);
   });
 
   it('no secret key stored, should fail', async () => {
@@ -83,6 +88,7 @@ describe('TuyaHandler.connect', () => {
 
     assert.notCalled(gladys.event.emit);
     assert.notCalled(client.init);
+    assert.notCalled(gladys.variable.setValue);
   });
 
   it('well connected', async () => {
@@ -95,6 +101,8 @@ describe('TuyaHandler.connect', () => {
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
     assert.calledOnce(client.init);
+    assert.calledOnce(gladys.variable.setValue);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, false, serviceId);
 
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -119,6 +127,7 @@ describe('TuyaHandler.connect', () => {
     expect(tuyaHandler.status).to.eq(STATUS.ERROR);
 
     assert.calledOnce(client.init);
+    assert.notCalled(gladys.variable.setValue);
 
     assert.callCount(gladys.event.emit, 3);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {

@@ -9,7 +9,10 @@ const formatHex = (buffer, maxLen = 128) => {
     return '';
   }
   const slice = buffer.slice(0, maxLen);
-  return slice.toString('hex').match(/.{1,2}/g).join(' ');
+  return slice
+    .toString('hex')
+    .match(/.{1,2}/g)
+    .join(' ');
 };
 
 const formatAscii = (buffer, maxLen = 256) => {
@@ -17,7 +20,10 @@ const formatAscii = (buffer, maxLen = 256) => {
     return '';
   }
   const slice = buffer.slice(0, maxLen);
-  return slice.toString('utf8').replace(/\s+/g, ' ').trim();
+  return slice
+    .toString('utf8')
+    .replace(/\s+/g, ' ')
+    .trim();
 };
 
 /**

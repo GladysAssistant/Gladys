@@ -1128,11 +1128,19 @@
         "appAccountIdPlaceholder": "Enter Tuya app User ID",
         "appUsername": "Smart Life username (optional)",
         "appUsernamePlaceholder": "Smart Life account email or phone",
-        "saveLabel": "Save configuration",
+        "saveLabel": "Save configuration and connect",
         "error": "An error occurred while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",
+        "connectionError": "Error while connecting, please check your configuration.",
+        "notConfigured": "Tuya cloud connection details are missing or incomplete.",
         "connected": "Connected to the Tuya cloud account with success !",
-        "connectionError": "Error while connecting, please check your configuration."
+        "connectedAfterSave": "Connected to the Tuya cloud account with success !",
+        "connectedStatus": "Connected to the Tuya cloud account.",
+        "disconnectSuccess": "Disconnected from the Tuya cloud account with success ! Local service still works (it will not auto-reconnect when Gladys restarts).",
+        "disconnectedUnexpected": "You have been disconnected from the Tuya cloud! Please check your credentials and your <a href=\"https://eu.platform.tuya.com/cloud/products?productType=all\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Core</a> trial status.",
+        "disconnectedManual": "Disconnected from the Tuya cloud! Local service still works (it will not auto-reconnect when Gladys restarts).",
+        "disconnectedMissingConfig": "Disconnected from the Tuya cloud.",
+        "disconnectLabel": "Disconnect from cloud"
       },
       "error": {
         "defaultError": "There was an error saving the device.",

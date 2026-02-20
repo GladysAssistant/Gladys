@@ -54,7 +54,9 @@ const buildIssuePayload = (device, localPollStatus, localPollError) => {
 
 const createGithubUrl = (device, localPollStatus, localPollError) => {
   const title = encodeURIComponent(`Tuya: Add support for ${device.model || device.product_name || device.name}`);
-  const body = encodeURIComponent(`\`\`\`json\n${JSON.stringify(buildIssuePayload(device, localPollStatus, localPollError), null, 2)}\n\`\`\``);
+  const body = encodeURIComponent(
+    `\`\`\`json\n${JSON.stringify(buildIssuePayload(device, localPollStatus, localPollError), null, 2)}\n\`\`\``
+  );
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
 
@@ -288,8 +290,7 @@ class TuyaDeviceBox extends Component {
     const cloudIp = params.CLOUD_IP || device.cloud_ip || '';
     const hasProtocolSelected = protocolVersion && protocolVersion.length > 0;
     const isValidIp =
-      typeof ipAddress === 'string' &&
-      /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
+      typeof ipAddress === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
     const isDifferentFromCloud = !cloudIp || ipAddress !== cloudIp;
     const canPollLocal = isValidIp && localKey && isDifferentFromCloud;
     const requiresProtocol = localOverride === true;

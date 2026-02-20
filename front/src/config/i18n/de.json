@@ -1233,11 +1233,19 @@
         "appAccountIdPlaceholder": "Tuya App User ID eingeben",
         "appUsername": "Smart Life Benutzername (optional)",
         "appUsernamePlaceholder": "Smart Life Konto E-Mail oder Telefon",
-        "saveLabel": "Konfiguration sichern",
+        "saveLabel": "Konfiguration sichern und verbinden",
         "error": "Beim Sichern der Konfiguration ist ein Fehler aufgetreten.",
         "connecting": "Konfiguration gesichert. Die Verbindung mit deinem Tuya-Cloud-Account wird jetzt hergestellt …",
         "connected": "Du hast dich erfolgreich mit dem Tuya-Cloud-Account verbunden!",
-        "connectionError": "Fehler beim Verbinden. Bitte überprüfe deine Konfiguration."
+        "connectionError": "Fehler beim Verbinden. Bitte überprüfe deine Konfiguration.",
+        "notConfigured": "Tuya-Cloud-Verbindungsdaten fehlen oder sind unvollständig.",
+        "connectedAfterSave": "Du hast dich erfolgreich mit dem Tuya-Cloud-Account verbunden!",
+        "connectedStatus": "Mit dem Tuya-Cloud-Account verbunden.",
+        "disconnectSuccess": "Vom Tuya-Cloud-Account erfolgreich getrennt! Der lokale Dienst funktioniert weiterhin (bei einem Neustart von Gladys wird keine automatische Verbindung hergestellt).",
+        "disconnectedUnexpected": "Du wurdest von der Tuya-Cloud getrennt! Bitte überprüfe deine Zugangsdaten und den Status deines <a href=\"https://eu.platform.tuya.com/cloud/products?productType=all\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Core</a>-Testabos.",
+        "disconnectedManual": "Von der Tuya-Cloud getrennt! Der lokale Dienst funktioniert weiterhin (bei einem Neustart von Gladys wird keine automatische Verbindung hergestellt).",
+        "disconnectedMissingConfig": "Von der Tuya-Cloud getrennt.",
+        "disconnectLabel": "Von der Cloud trennen"
       },
       "error": {
         "defaultError": "Beim Sichern des Geräts ist ein Fehler aufgetreten.",

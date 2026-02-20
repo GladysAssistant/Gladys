@@ -132,6 +132,26 @@ module.exports = function TuyaController(tuyaManager) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/tuya/status Get Tuya connection status.
+   * @apiName status
+   * @apiGroup Tuya
+   */
+  async function status(req, res) {
+    const response = await tuyaManager.getStatus();
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/service/tuya/disconnect Disconnect Tuya cloud.
+   * @apiName disconnect
+   * @apiGroup Tuya
+   */
+  async function disconnect(req, res) {
+    await tuyaManager.manualDisconnect();
+    res.json({ success: true });
+  }
+
   return {
     'get /api/v1/service/tuya/discover': {
       authenticated: true,
@@ -144,6 +164,14 @@ module.exports = function TuyaController(tuyaManager) {
     'post /api/v1/service/tuya/local-scan': {
       authenticated: true,
       controller: asyncMiddleware(localScan),
+    },
+    'get /api/v1/service/tuya/status': {
+      authenticated: true,
+      controller: asyncMiddleware(status),
+    },
+    'post /api/v1/service/tuya/disconnect': {
+      authenticated: true,
+      controller: asyncMiddleware(disconnect),
     },
   };
 };

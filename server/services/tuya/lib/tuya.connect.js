@@ -4,7 +4,7 @@ const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
-const { STATUS } = require('./utils/tuya.constants');
+const { STATUS, GLADYS_VARIABLES } = require('./utils/tuya.constants');
 
 /**
  * @description Connect to Tuya cloud.
@@ -37,6 +37,7 @@ async function connect(configuration) {
 
   try {
     await this.connector.client.init();
+    await this.gladys.variable.setValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, false, this.serviceId);
     this.status = STATUS.CONNECTED;
     logger.debug('Connected to Tuya');
   } catch (e) {

@@ -13,6 +13,8 @@ const { setValue } = require('./tuya.setValue');
 const { poll } = require('./tuya.poll');
 const { localScan } = require('./tuya.localScan');
 const { localPoll } = require('./tuya.localPoll');
+const { getStatus } = require('./tuya.getStatus');
+const { manualDisconnect } = require('./tuya.manualDisconnect');
 
 const { STATUS } = require('./utils/tuya.constants');
 
@@ -40,5 +42,7 @@ TuyaHandler.prototype.setValue = setValue;
 TuyaHandler.prototype.poll = poll;
 TuyaHandler.prototype.localScan = localScan;
 TuyaHandler.prototype.localPoll = localPoll;
+TuyaHandler.prototype.getStatus = getStatus;
+TuyaHandler.prototype.manualDisconnect = manualDisconnect;
 
 module.exports = TuyaHandler;
