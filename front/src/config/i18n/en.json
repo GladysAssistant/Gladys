@@ -932,6 +932,36 @@
         "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
+    "matterbridge": {
+      "title": "Matterbridge",
+      "description": "Control your Matterbridge devices in Gladys.",
+      "setupTab": "Setup",
+      "documentation": "Matterbridge documentation",
+      "status": {
+        "notInstalled": "Matterbridge server failed to install.",
+        "notRunning": "Matterbridge server failed to start.",
+        "running": "Matterbridge successfully started.",
+        "notEnabled": "Matterbridge is not activated.",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a Matterbridge server from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install server from here, Gladys container should be configured with \"host\" network mode."
+      },
+      "setup": {
+        "title": "Matterbridge configuration",
+        "description": "This service uses Docker container. Enable Matterbridge for deploying this container.\nLearn more on the Matterbridge documentation page.",
+        "error": "An error occurred while starting Matterbridge.",
+        "enableMatterbridge": "Enable",
+        "disableMatterbridge": "Disable",
+        "confirmDisableLabel": "Are you sure you want to disable Matterbridge?",
+        "confirmDisableCancelButton": "Cancel",
+        "activationMatterbridge": "Activating...",
+        "serviceStatus": "Matterbridge Service Status",
+        "containersStatus": "Containers related to Matterbridge",
+        "status": "Status",
+        "matterbridge": "Matterbridge",
+        "gladys": "Gladys",
+        "urlLabel": "Matterbridge interface url: <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Not accessible from Gladys Plus)"
+      }
+    },
     "googleHome": {
       "title": "Google Home",
       "documentation": "Google Home documentation",
