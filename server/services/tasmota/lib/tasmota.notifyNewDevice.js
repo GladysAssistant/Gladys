@@ -1,6 +1,6 @@
-const { EVENTS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { EVENTS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
-const { buildDiscoveredDevice, isTasmotaTotalEnergyIndex } = require('./tasmota.buildDiscoveredDevice');
+const { addEnergyFeatures } = require('../../energy-monitoring/utils/addEnergyFeatures');
 const { mergeDevices } = require('../../../utils/device');
 
 /**
@@ -14,25 +14,26 @@ async function notifyNewDevice(device, event) {
   let existing;
   try {
     existing = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-    const deviceFeatures = Array.isArray(device.features) ? device.features : [];
-    const existingFeatures = existing && Array.isArray(existing.features) ? existing.features : [];
-    const hasEnergyTotal =
-      deviceFeatures.some(isTasmotaTotalEnergyIndex) || existingFeatures.some(isTasmotaTotalEnergyIndex);
-    const hasDerivedEnergy = existingFeatures.some(
-      (f) =>
-        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-        [
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-        ].includes(f.type),
-    );
     let payload;
-    if (hasEnergyTotal || hasDerivedEnergy) {
+    if (Array.isArray(device.features)) {
+      device.features = device.features.reduce((acc, feature) => {
+        if (!feature || !feature.external_id) {
+          acc.push(feature);
+          return acc;
+        }
+        const isDuplicate = acc.some((existingFeature) => existingFeature.external_id === feature.external_id);
+        if (!isDuplicate) {
+          acc.push(feature);
+        }
+        return acc;
+      }, []);
       const defaultElectricMeterDeviceFeatureId = await this.gladys.energyPrice.getDefaultElectricMeterFeatureId();
-      payload = buildDiscoveredDevice(device, existing, defaultElectricMeterDeviceFeatureId);
+      payload = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
     } else {
-      payload = mergeDevices(device, existing);
+      payload = device;
     }
+
+    payload = mergeDevices(payload, existing);
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: event,

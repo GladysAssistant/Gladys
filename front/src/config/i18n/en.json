@@ -3870,6 +3870,8 @@
       "power": "Power",
       "energy": "Energy",
       "index": "Index",
+      "index-today": "Index today",
+      "index-yesterday": "Index yesterday",
       "daily-consumption": "Daily Consumption",
       "daily-consumption-cost": "Daily Cost",
       "thirty-minutes-consumption": "30 Minutes Consumption",

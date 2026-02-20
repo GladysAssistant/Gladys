@@ -155,7 +155,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
         },
         {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_YESTERDAY,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
           selector: 'tasmota-tasmota-device-topic-energy-yesterday',
           name: 'Energy yesterday',
@@ -169,7 +169,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
         },
         {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_TODAY,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
           selector: 'tasmota-tasmota-device-topic-energy-today',
           name: 'Energy today',
@@ -263,8 +263,8 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     expectedExternalIds.forEach((externalId) => {
       expect(discoveredExternalIds).to.include(externalId);
     });
-    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:consumption');
-    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:cost');
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
+    expect(discoveredExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
     const totalFeature = (discoveredDevice.features || []).find(
       (feature) => feature.external_id === 'tasmota:tasmota-device-topic:ENERGY:Total',
     );
@@ -319,8 +319,8 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     expectedExternalIds.forEach((externalId) => {
       expect(websocketExternalIds).to.include(externalId);
     });
-    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:consumption');
-    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total:cost');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_consumption');
+    expect(websocketExternalIds).to.include('tasmota:tasmota-device-topic:ENERGY:Total_cost');
     assert.notCalled(mqttService.device.publish);
   });
 });

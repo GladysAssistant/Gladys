@@ -3870,6 +3870,8 @@
       "power": "Puissance",
       "energy": "Energie",
       "index": "Index",
+      "index-today": "Index aujourd'hui",
+      "index-yesterday": "Index hier",
       "daily-consumption": "Consommation journalière",
       "daily-consumption-cost": "Coût journalier",
       "thirty-minutes-consumption": "Consommation 30 minutes",
