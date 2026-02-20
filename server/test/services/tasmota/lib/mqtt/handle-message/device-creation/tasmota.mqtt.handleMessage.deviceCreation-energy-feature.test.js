@@ -78,6 +78,8 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
   });
 
   it('decode STATUS11 message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -109,6 +111,9 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
   });
 
   it('decode STATUS8 message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
+    mqttService.device.publish.resetHistory();
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
 
     const expectedDevice = {
