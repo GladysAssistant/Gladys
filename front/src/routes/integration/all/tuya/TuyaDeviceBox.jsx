@@ -445,11 +445,6 @@ class TuyaDeviceBox extends Component {
                     <option value="3.4">3.4</option>
                     <option value="3.5">3.5</option>
                   </select>
-                  {protocolVersion === '3.5' && (
-                    <div class="text-danger mt-2">
-                      <Text id="integration.tuya.device.protocol35Unsupported" />
-                    </div>
-                  )}
                 </div>
 
                 <div class="form-group">

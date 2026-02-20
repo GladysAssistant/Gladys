@@ -1,6 +1,6 @@
 const dgram = require('dgram');
-const { UDP_KEY } = require('tuyapi/lib/config');
-const { MessageParser } = require('tuyapi/lib/message-parser');
+const { UDP_KEY } = require('@demirdeniz/tuyapi-newgen/lib/config');
+const { MessageParser } = require('@demirdeniz/tuyapi-newgen/lib/message-parser');
 const logger = require('../../../utils/logger');
 
 const DEFAULT_PORTS = [6666, 6667, 7000];
@@ -39,7 +39,10 @@ async function localScan(input = 10) {
   const devices = {};
   const portErrors = {};
   const sockets = [];
-  const parser = new MessageParser({ key: UDP_KEY, version: 3.1 });
+  const parsers = [
+    new MessageParser({ key: UDP_KEY, version: 3.1 }),
+    new MessageParser({ key: UDP_KEY, version: 3.5 }),
+  ];
 
   logger.info(`[Tuya][localScan] Starting udp scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
 
@@ -53,14 +56,26 @@ async function localScan(input = 10) {
         message,
       )} ascii="${formatAscii(message)}"`,
     );
-    try {
-      const parsed = parser.parse(message);
-      logger.info(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(parsed)}`);
-      payload = parsed && parsed[0] && parsed[0].payload;
-    } catch (e) {
-      logger.info(`[Tuya][localScan] Unable to parse payload from ${remote} (len=${byteLen}): ${e.message}`);
+    let parsed = null;
+    let lastError = null;
+    for (let i = 0; i < parsers.length; i += 1) {
+      try {
+        parsed = parsers[i].parse(message);
+        break;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (!parsed) {
+      logger.info(
+        `[Tuya][localScan] Unable to parse payload from ${remote} (len=${byteLen}): ${
+          lastError ? lastError.message : 'unknown'
+        }`,
+      );
       return;
     }
+    logger.info(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(parsed)}`);
+    payload = parsed && parsed[0] && parsed[0].payload;
 
     if (!payload || typeof payload !== 'object') {
       logger.info(`[Tuya][localScan] Ignoring payload from ${remote} (len=${byteLen}): invalid payload`);
