@@ -110,7 +110,6 @@ const normalizeTasmotaDerivedFeatures = (device) => {
       const baseExternalId = feature.external_id.replace(/(_consumption|:consumption)$/i, '');
       return featuresByExternalId.get(baseExternalId);
     }
-    return null;
   };
 
   const findIndexFromCost = (feature) => {
@@ -127,7 +126,6 @@ const normalizeTasmotaDerivedFeatures = (device) => {
       const baseExternalId = feature.external_id.replace(/(_cost|:cost)$/i, '');
       return featuresByExternalId.get(baseExternalId);
     }
-    return null;
   };
 
   const normalizedFeatures = [];
@@ -185,9 +183,10 @@ const normalizeTasmotaDerivedFeatures = (device) => {
 
 const buildDiscoveredDevice = (device, existing, defaultElectricMeterDeviceFeatureId) => {
   const mergedDevice = mergeDevices(device, existing);
+  mergedDevice.features = Array.isArray(mergedDevice.features) ? mergedDevice.features : [];
   ensureExistingEnergyDerivedFeatures(mergedDevice, existing);
 
-  const featuresList = Array.isArray(mergedDevice.features) ? mergedDevice.features : [];
+  const featuresList = mergedDevice.features;
   const isEnergyIndexFeature = (feature) =>
     ENERGY_INDEX_FEATURE_TYPES[feature.category] && ENERGY_INDEX_FEATURE_TYPES[feature.category].includes(feature.type);
 
@@ -253,9 +252,6 @@ const buildDiscoveredDevice = (device, existing, defaultElectricMeterDeviceFeatu
     addEnergyFeatures(filteredDevice, defaultElectricMeterDeviceFeatureId);
 
     if (filteredDevice.features !== mergedDevice.features) {
-      if (!Array.isArray(mergedDevice.features)) {
-        mergedDevice.features = [];
-      }
       const mergedExternalIds = new Set(mergedDevice.features.map((feature) => feature.external_id));
       filteredDevice.features.forEach((feature) => {
         if (!mergedExternalIds.has(feature.external_id)) {
