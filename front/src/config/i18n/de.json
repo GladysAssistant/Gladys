@@ -512,6 +512,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
+        "favorites": "Favoriten",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",

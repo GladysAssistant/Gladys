@@ -254,6 +254,7 @@ const AppRouter = connect(
         <NewDashboard path="/dashboard/create/new" />
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 
+        <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
         <IntegrationPage path="/dashboard/integration/device" category="device" />
         <IntegrationPage path="/dashboard/integration/communication" category="communication" />
         <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
