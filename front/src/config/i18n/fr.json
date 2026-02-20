@@ -990,6 +990,8 @@
         "mqtt": "Topic MQTT",
         "http": "Adresse HTTP"
       },
+      "ipLabel": "Adresse IP",
+      "openWebUiButton": "Ouvrir l'interface",
       "saveButton": "Sauvegarder",
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",

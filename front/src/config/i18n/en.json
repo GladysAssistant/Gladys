@@ -755,6 +755,8 @@
         "mqtt": "MQTT Topic",
         "http": "HTTP identifier"
       },
+      "ipLabel": "IP address",
+      "openWebUiButton": "Open device UI",
       "saveButton": "Save",
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
