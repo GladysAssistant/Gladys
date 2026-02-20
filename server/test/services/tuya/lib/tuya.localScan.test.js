@@ -66,11 +66,14 @@ describe('TuyaHandler.localScan', () => {
     clock.restore();
 
     expect(result).to.deep.equal({
-      'device-id': {
-        ip: '1.1.1.1',
-        version: '3.3',
-        productKey: 'product-key',
+      devices: {
+        'device-id': {
+          ip: '1.1.1.1',
+          version: '3.3',
+          productKey: 'product-key',
+        },
       },
+      portErrors: {},
     });
   });
 
@@ -132,7 +135,14 @@ describe('TuyaHandler.localScan', () => {
     const result = await promise;
     clock.restore();
 
-    expect(result).to.deep.equal({});
+    expect(result).to.deep.equal({
+      devices: {},
+      portErrors: {
+        6666: 'boom',
+        6667: 'boom',
+        7000: 'boom',
+      },
+    });
   });
 
   it('should handle socket address errors on bind', async () => {

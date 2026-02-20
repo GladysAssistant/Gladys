@@ -7,7 +7,7 @@ const { assert, fake } = sinon;
 const tuyaManager = {
   discoverDevices: fake.resolves([]),
   localPoll: fake.resolves({ dps: { 1: true } }),
-  localScan: fake.resolves({ device1: { ip: '1.1.1.1', version: '3.3' } }),
+  localScan: fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} }),
   discoveredDevices: [
     {
       external_id: 'tuya:device1',
@@ -21,7 +21,9 @@ describe('TuyaController GET /api/v1/service/tuya/discover', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should return discovered devices', async () => {
@@ -41,7 +43,9 @@ describe('TuyaController POST /api/v1/service/tuya/local-poll', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should return local poll result', async () => {
@@ -104,7 +108,9 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
 
   beforeEach(() => {
     controller = TuyaController(tuyaManager);
-    sinon.reset();
+    sinon.resetHistory();
+    tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
+    tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
   it('should run local scan and return devices', async () => {
@@ -129,6 +135,7 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     assert.calledOnce(tuyaManager.localScan);
     assert.calledWith(res.json, {
       local_devices: { device1: { ip: '1.1.1.1', version: '3.3' } },
+      port_errors: {},
     });
   });
 
@@ -137,7 +144,7 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     const res = {
       json: fake.returns([]),
     };
-    tuyaManager.localScan = fake.resolves({});
+    tuyaManager.localScan = fake.resolves({ devices: {}, portErrors: {} });
     tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
 
     await controller['post /api/v1/service/tuya/local-scan'].controller(req, res);
@@ -145,6 +152,7 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     assert.calledWith(res.json, {
       devices: [{ external_id: 'tuya:device1', params: [] }],
       local_devices: {},
+      port_errors: {},
     });
   });
 });

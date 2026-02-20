@@ -4,6 +4,12 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { BadParameters } = require('../../../../utils/coreErrors');
 
+const attachEventHandlers = (instance) => {
+  instance.on = sinon.stub();
+  instance.once = sinon.stub();
+  instance.removeListener = sinon.stub();
+};
+
 describe('TuyaHandler.localPoll', () => {
   it('should throw if missing parameters', async () => {
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
@@ -27,6 +33,7 @@ describe('TuyaHandler.localPoll', () => {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
+      attachEventHandlers(this);
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
@@ -51,6 +58,7 @@ describe('TuyaHandler.localPoll', () => {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
+      attachEventHandlers(this);
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
@@ -83,6 +91,7 @@ describe('TuyaHandler.localPoll', () => {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
+      attachEventHandlers(this);
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
@@ -106,6 +115,7 @@ describe('TuyaHandler.localPoll', () => {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
+      attachEventHandlers(this);
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
@@ -134,6 +144,7 @@ describe('TuyaHandler.localPoll', () => {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
+      attachEventHandlers(this);
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
