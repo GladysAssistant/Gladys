@@ -175,7 +175,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
     const consumptionFeature = result.features.find(
       (f) =>
         f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
-        f.external_id === 'tasmota:device-1:ENERGY:Total_consumption',
+        f.external_id === 'tasmota:device-1:ENERGY:Total:consumption',
     );
     expect(consumptionFeature).to.not.equal(undefined);
     expect(consumptionFeature.energy_parent_id).to.eq('total-id');
@@ -183,14 +183,14 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
     const costFeature = result.features.find(
       (f) =>
         f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST &&
-        f.external_id === 'tasmota:device-1:ENERGY:Total_cost',
+        f.external_id === 'tasmota:device-1:ENERGY:Total:cost',
     );
     expect(costFeature).to.not.equal(undefined);
     expect(costFeature.energy_parent_id).to.eq(consumptionFeature.id);
 
-    const todayConsumptionFeature = result.features.find((f) => f.external_id.includes('ENERGY:Today_consumption'));
+    const todayConsumptionFeature = result.features.find((f) => f.external_id.includes('ENERGY:Today:consumption'));
     const yesterdayConsumptionFeature = result.features.find((f) =>
-      f.external_id.includes('ENERGY:Yesterday_consumption'),
+      f.external_id.includes('ENERGY:Yesterday:consumption'),
     );
     expect(todayConsumptionFeature).to.equal(undefined);
     expect(yesterdayConsumptionFeature).to.equal(undefined);
