@@ -7,13 +7,19 @@ const { assert, fake } = sinon;
 const tuyaManager = {
   discoverDevices: fake.resolves([]),
   localPoll: fake.resolves({ dps: { 1: true } }),
-  localScan: fake.resolves({ device1: { ip: '1.1.1.1', version: '3.3' } }),
+  localScan: fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} }),
   discoveredDevices: [
     {
       external_id: 'tuya:device1',
       params: [],
     },
   ],
+  gladys: {
+    stateManager: {
+      get: sinon.stub().returns(null),
+    },
+  },
+  serviceId: 'service-id',
 };
 
 describe('TuyaController GET /api/v1/service/tuya/discover', () => {
@@ -127,9 +133,13 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
 
     await controller['post /api/v1/service/tuya/local-scan'].controller(req, res);
     assert.calledOnce(tuyaManager.localScan);
-    assert.calledWith(res.json, {
-      local_devices: { device1: { ip: '1.1.1.1', version: '3.3' } },
-    });
+    assert.calledOnce(res.json);
+    const payload = res.json.firstCall.args[0];
+    expect(payload.devices).to.have.length(1);
+    expect(payload.devices[0].external_id).to.equal('tuya:device1');
+    expect(payload.devices[0].params).to.deep.include({ name: 'IP_ADDRESS', value: '1.1.1.1' });
+    expect(payload.local_devices).to.deep.equal({ device1: { ip: '1.1.1.1', version: '3.3' } });
+    expect(payload.port_errors).to.deep.equal({});
   });
 
   it('should keep devices unchanged when local info is missing', async () => {
@@ -137,7 +147,7 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     const res = {
       json: fake.returns([]),
     };
-    tuyaManager.localScan = fake.resolves({});
+    tuyaManager.localScan = fake.resolves({ devices: {}, portErrors: {} });
     tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
 
     await controller['post /api/v1/service/tuya/local-scan'].controller(req, res);
@@ -145,6 +155,7 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     assert.calledWith(res.json, {
       devices: [{ external_id: 'tuya:device1', params: [] }],
       local_devices: {},
+      port_errors: {},
     });
   });
 });

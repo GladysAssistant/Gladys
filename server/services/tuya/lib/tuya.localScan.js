@@ -47,7 +47,6 @@ async function localScan(input = 10) {
   logger.info(`[Tuya][localScan] Starting udp scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
 
   const onMessage = (message, rinfo) => {
-    let payload;
     const byteLen = message ? message.length : 0;
     const remote = rinfo ? `${rinfo.address}:${rinfo.port}` : 'unknown';
     const source = rinfo && rinfo.source ? rinfo.source : 'udp';
@@ -75,7 +74,7 @@ async function localScan(input = 10) {
       return;
     }
     logger.info(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(parsed)}`);
-    payload = parsed && parsed[0] && parsed[0].payload;
+    const payload = parsed && parsed[0] && parsed[0].payload;
 
     if (!payload || typeof payload !== 'object') {
       logger.info(`[Tuya][localScan] Ignoring payload from ${remote} (len=${byteLen}): invalid payload`);

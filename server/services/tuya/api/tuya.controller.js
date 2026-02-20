@@ -1,6 +1,7 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 const { DEVICE_PARAM_NAME } = require('../lib/utils/tuya.constants');
+const { convertDevice } = require('../lib/device/tuya.convertDevice');
 
 module.exports = function TuyaController(tuyaManager) {
   /**
@@ -126,7 +127,28 @@ module.exports = function TuyaController(tuyaManager) {
       return;
     }
 
+    const localDiscoveredDevices = Object.entries(localDevicesById).map(([deviceId, localInfo]) =>
+      convertDevice.call(tuyaManager, {
+        id: deviceId,
+        name: localInfo && localInfo.name ? localInfo.name : `Tuya ${deviceId}`,
+        product_key: localInfo && localInfo.productKey,
+        ip: localInfo && localInfo.ip,
+        protocol_version: localInfo && localInfo.version,
+        local_override: true,
+        specifications: {
+          functions: [],
+          status: [],
+        },
+      }),
+    );
+
+    const filteredLocalDevices = localDiscoveredDevices.filter((device) => {
+      const existInGladys = tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id);
+      return existInGladys === null;
+    });
+
     res.json({
+      devices: filteredLocalDevices,
       local_devices: localDevicesById,
       port_errors: portErrors,
     });
