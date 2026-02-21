@@ -25,6 +25,7 @@ const TuyaHandler = function TuyaHandler(gladys, serviceId) {
   this.connector = null;
   this.status = STATUS.NOT_INITIALIZED;
   this.lastError = null;
+  this.autoReconnectAllowed = false;
 };
 
 TuyaHandler.prototype.init = init;

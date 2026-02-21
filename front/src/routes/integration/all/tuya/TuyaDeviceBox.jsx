@@ -453,8 +453,7 @@ class TuyaDeviceBox extends Component {
     const displayIp = showCloudIp ? cloudIp : ipAddress;
     const isValidIp =
       typeof ipAddress === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
-    const isDifferentFromCloud = !cloudIp || ipAddress !== cloudIp;
-    const canPollLocal = localOverride === true && isValidIp && localKey && isDifferentFromCloud;
+    const canPollLocal = localOverride === true && isValidIp && localKey;
     const hasLocalChanges = hasDeviceChanged(device, this.state.baselineDevice);
     const currentLocalConfig = getLocalConfig(device);
     const baselineLocalConfig = getLocalConfig(this.state.baselineDevice);

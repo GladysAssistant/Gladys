@@ -96,13 +96,20 @@ describe('TuyaHandler.connect', () => {
       baseUrl: 'apiUrl',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      appAccountId: 'appAccountId',
     });
 
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
     assert.calledOnce(client.init);
-    assert.calledOnce(gladys.variable.setValue);
+    assert.calledTwice(gladys.variable.setValue);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, 'false', serviceId);
+    assert.calledWith(
+      gladys.variable.setValue,
+      GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH,
+      sinon.match.string,
+      serviceId,
+    );
 
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -122,6 +129,7 @@ describe('TuyaHandler.connect', () => {
       baseUrl: 'apiUrl',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      appAccountId: 'appAccountId',
     });
 
     expect(tuyaHandler.status).to.eq(STATUS.ERROR);

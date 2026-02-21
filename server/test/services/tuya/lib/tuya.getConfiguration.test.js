@@ -32,6 +32,8 @@ describe('TuyaHandler.getConfiguration', () => {
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
       .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
       .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
       .returns('user@example.com');
 
@@ -42,12 +44,15 @@ describe('TuyaHandler.getConfiguration', () => {
       accessKey: 'accessKey',
       secretKey: 'secretKey',
       appUsername: 'user@example.com',
+      endpoint: 'easternAmerica',
+      appAccountId: 'appAccountId',
     });
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_USERNAME, serviceId);
   });
 });

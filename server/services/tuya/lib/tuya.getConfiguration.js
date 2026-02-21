@@ -13,6 +13,7 @@ async function getConfiguration() {
   const endpoint = await this.gladys.variable.getValue(GLADYS_VARIABLES.ENDPOINT, this.serviceId);
   const accessKey = await this.gladys.variable.getValue(GLADYS_VARIABLES.ACCESS_KEY, this.serviceId);
   const secretKey = await this.gladys.variable.getValue(GLADYS_VARIABLES.SECRET_KEY, this.serviceId);
+  const appAccountId = await this.gladys.variable.getValue(GLADYS_VARIABLES.APP_ACCOUNT_UID, this.serviceId);
   const appUsername = await this.gladys.variable.getValue(GLADYS_VARIABLES.APP_USERNAME, this.serviceId);
 
   logger.debug(`Tuya configuration: baseUrl='${endpoint}' accessKey='${accessKey}'`);
@@ -23,6 +24,8 @@ async function getConfiguration() {
     accessKey,
     secretKey,
     appUsername,
+    endpoint,
+    appAccountId,
   };
 }
 

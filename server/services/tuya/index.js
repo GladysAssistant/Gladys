@@ -15,12 +15,15 @@ module.exports = function TuyaService(gladys, serviceId) {
 
   /**
    * @description Attempt to reconnect to Tuya if configured and not manually disconnected.
-   * @returns {Promise<void>} Promise of nothing.
+   * @returns {Promise<boolean>} Returns true if reconnect should be retried, false otherwise.
    * @example
    * await tryReconnect();
    */
   async function tryReconnect() {
     try {
+      if (!tuyaHandler.autoReconnectAllowed) {
+        return false;
+      }
       const status = await tuyaHandler.getStatus();
       if (!status.configured || status.manual_disconnect) {
         return false;
@@ -35,7 +38,7 @@ module.exports = function TuyaService(gladys, serviceId) {
       logger.info('Tuya is disconnected, attempting auto-reconnect...');
       const configuration = await tuyaHandler.getConfiguration();
       await tuyaHandler.connect(configuration);
-      return true;
+      return tuyaHandler.status !== STATUS.CONNECTED;
     } catch (e) {
       logger.warn('Auto-reconnect to Tuya failed:', e.message || e);
       return true;
@@ -108,7 +111,7 @@ module.exports = function TuyaService(gladys, serviceId) {
     if (tuyaHandler.status === STATUS.CONNECTED) {
       await tuyaHandler.loadDevices();
     }
-    if (tuyaHandler.status !== STATUS.CONNECTED) {
+    if (tuyaHandler.status !== STATUS.CONNECTED && tuyaHandler.autoReconnectAllowed) {
       scheduleQuickReconnects();
     }
     if (!reconnectInterval) {

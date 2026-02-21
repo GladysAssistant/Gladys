@@ -167,11 +167,15 @@ class SetupTab extends Component {
         value: tuyaAppUsername
       });
 
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
-        value: false
+      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_LAST_CONNECTED_CONFIG_HASH', {
+        value: ''
       });
 
-      const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey);
+      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
+        value: 'false'
+      });
+
+      const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId);
       if (!configured) {
         this.setState({
           tuyaSaveSettingsStatus: RequestStatus.Success,
@@ -268,6 +272,16 @@ class SetupTab extends Component {
     });
   };
 
+  renderTuyaError = error => {
+    if (!error) {
+      return null;
+    }
+    if (typeof error === 'string' && error.startsWith('integration.tuya.setup.')) {
+      return <Text id={error} />;
+    }
+    return <code>{error}</code>;
+  };
+
   updateConfiguration = e => {
     const { name, value } = e.target;
     this.setState(prevState => {
@@ -331,9 +345,7 @@ class SetupTab extends Component {
                 <div class="alert alert-danger">
                   <Text id="integration.tuya.setup.error" />
                   {state.tuyaConnectionError && !state.tuyaConnecting && !state.tuyaConnected && (
-                    <div class="mt-2">
-                      <code>{state.tuyaConnectionError}</code>
-                    </div>
+                    <div class="mt-2">{this.renderTuyaError(state.tuyaConnectionError)}</div>
                   )}
                 </div>
               )}
@@ -383,9 +395,7 @@ class SetupTab extends Component {
                 <div class="alert alert-danger">
                   <Text id="integration.tuya.setup.connectionError" />
                   {state.tuyaConnectionError && (
-                    <div class="mt-2">
-                      <code>{state.tuyaConnectionError}</code>
-                    </div>
+                    <div class="mt-2">{this.renderTuyaError(state.tuyaConnectionError)}</div>
                   )}
                 </div>
               )}
@@ -400,8 +410,6 @@ class SetupTab extends Component {
                 <MarkupText id="integration.tuya.setup.descriptionTrial" />
                 <MarkupText id="integration.tuya.setup.localTitle" />
                 <MarkupText id="integration.tuya.setup.descriptionLocalMode" />
-                <MarkupText id="integration.tuya.setup.limitationsTitle" />
-                <MarkupText id="integration.tuya.setup.limitationsProtocol35" />
               </p>
 
               <form>
