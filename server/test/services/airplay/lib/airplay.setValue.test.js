@@ -89,11 +89,15 @@ describe('AirplayHandler.setValue', () => {
     airplayHandler.scanTimeout = 1;
     const devices = await airplayHandler.scan();
     const device = devices[0];
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout'] });
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
     await new Promise((resolve) => {
       setImmediate(resolve);
     });
+    clock.tick(7000);
     sinon.assert.calledOnce(sendPcm);
+    sinon.assert.calledOnce(stopSender);
+    clock.restore();
   });
   it('should stop sender when ffmpeg fails to start (execvp error)', async () => {
     const childProcessWithExecvpError = {
