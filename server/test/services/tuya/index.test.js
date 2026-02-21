@@ -98,6 +98,22 @@ describe('TuyaService', () => {
     assert.notCalled(tuyaService.device.connect);
   });
 
+  it('should not auto-reconnect when autoReconnectAllowed is false', async () => {
+    tuyaService.device.getStatus = fake.resolves({ configured: true, manual_disconnect: false });
+    tuyaService.device.getConfiguration = fake.resolves({ config: 'ok' });
+    tuyaService.device.connect = fake.resolves();
+
+    await tuyaService.start();
+    tuyaService.device.status = STATUS.ERROR;
+    tuyaService.device.autoReconnectAllowed = false;
+
+    await intervalCallback();
+
+    assert.notCalled(tuyaService.device.getStatus);
+    assert.notCalled(tuyaService.device.getConfiguration);
+    assert.notCalled(tuyaService.device.connect);
+  });
+
   it('should not auto-reconnect when already connecting', async () => {
     tuyaService.device.getStatus = fake.resolves({ configured: true, manual_disconnect: false });
     tuyaService.device.getConfiguration = fake.resolves({ config: 'ok' });
@@ -112,6 +128,70 @@ describe('TuyaService', () => {
     assert.calledOnce(tuyaService.device.getStatus);
     assert.notCalled(tuyaService.device.getConfiguration);
     assert.notCalled(tuyaService.device.connect);
+  });
+
+  it('should schedule quick reconnects on start when disconnected and allowed', async () => {
+    tuyaService.device.init = fake(function init() {
+      this.status = STATUS.ERROR;
+      this.autoReconnectAllowed = true;
+    });
+    tuyaService.device.getStatus = fake.resolves({ configured: false, manual_disconnect: false });
+
+    await tuyaService.start();
+
+    assert.calledOnce(tuyaService.device.getStatus);
+    assert.notCalled(tuyaService.device.loadDevices);
+  });
+
+  it('should skip quick reconnect when already in progress', async () => {
+    let resolveStatus;
+    const pendingStatus = new Promise((resolve) => {
+      resolveStatus = resolve;
+    });
+
+    tuyaService.device.getStatus = fake.returns(pendingStatus);
+    tuyaService.device.getConfiguration = fake.resolves({ config: 'ok' });
+    tuyaService.device.connect = fake.resolves();
+
+    await tuyaService.start();
+    tuyaService.device.status = STATUS.ERROR;
+    tuyaService.device.autoReconnectAllowed = true;
+
+    const firstCall = intervalCallback();
+    await intervalCallback();
+
+    assert.calledOnce(tuyaService.device.getStatus);
+
+    resolveStatus({ configured: false, manual_disconnect: false });
+    await firstCall;
+  });
+
+  it('should clear pending quick reconnect timeouts', async () => {
+    const setTimeoutStub = sinon.stub(global, 'setTimeout').callsFake(() => 456);
+    const clearTimeoutStub = sinon.stub(global, 'clearTimeout');
+
+    try {
+      tuyaService.device.init = fake(function init() {
+        this.status = STATUS.CONNECTED;
+        this.autoReconnectAllowed = true;
+      });
+      tuyaService.device.getStatus = fake.resolves({ configured: true, manual_disconnect: false });
+      tuyaService.device.getConfiguration = fake.resolves({ config: 'ok' });
+      tuyaService.device.connect = fake.resolves();
+
+      await tuyaService.start();
+      tuyaService.device.status = STATUS.ERROR;
+      tuyaService.device.autoReconnectAllowed = true;
+
+      await intervalCallback();
+      await tuyaService.stop();
+
+      assert.calledOnce(setTimeoutStub);
+      assert.calledWith(clearTimeoutStub, 456);
+    } finally {
+      setTimeoutStub.restore();
+      clearTimeoutStub.restore();
+    }
   });
 
   it('should handle auto-reconnect errors', async () => {

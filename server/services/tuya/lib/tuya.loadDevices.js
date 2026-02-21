@@ -26,7 +26,10 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
       page_size: pageSize,
     },
   });
-  if (responsePage && responsePage.success === false) {
+  if (!responsePage) {
+    throw new Error('Tuya API returned no response');
+  }
+  if (responsePage.success === false) {
     const message = responsePage.msg || responsePage.message || responsePage.code || 'Tuya API error';
     throw new Error(message);
   }
@@ -40,7 +43,7 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
 
   if (hasMore) {
     const nextResult = await this.loadDevices(pageNo + 1, pageSize);
-    nextResult.forEach((device) => list.push(device));
+    list.push(...nextResult);
   }
 
   logger.debug(`${list.length} Tuya devices loaded`);
