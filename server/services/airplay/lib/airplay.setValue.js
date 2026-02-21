@@ -24,7 +24,7 @@ async function setValue(device, deviceFeature, value, options) {
       {
         host: ipAddress,
         airplay2: true,
-        volume: options?.volume || 70,
+        volume: options?.volume ?? 70,
       },
       async (event) => {
         if (event.event === 'device' && event.message === 'ready') {
