@@ -1,5 +1,3 @@
-const get = require('get-value');
-
 const { Error403 } = require('../../../utils/httpErrors');
 
 /**
@@ -17,7 +15,7 @@ async function enedisGetDailyConsumption(query) {
     const consumption = await this.gladysGatewayClient.enedisGetDailyConsumption(query);
     return consumption;
   } catch (e) {
-    if (get(e, 'response.status') === 403) {
+    if (e?.response?.status === 403) {
       throw new Error403();
     }
     throw e;

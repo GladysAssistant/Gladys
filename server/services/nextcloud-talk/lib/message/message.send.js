@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -48,7 +48,7 @@ async function send(token, message) {
   if (message.file) {
     const now = new Date();
     const id = `${now.getFullYear()}-${now.getMonth() +
-      1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}${uuid.v4().split('-')[0]}`;
+      1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}${randomUUID().split('-')[0]}`;
 
     const path = `/Talk/${id}.jpg`;
     await this.gladys.http.request(

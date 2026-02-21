@@ -1,5 +1,3 @@
-const get = require('get-value');
-
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
@@ -16,7 +14,7 @@ async function setValue(device, deviceFeature, value, options = {}) {
   if (service === null) {
     throw new NotFoundError(`Service ${device.service.name} was not found.`);
   }
-  if (typeof get(service, 'device.setValue') !== 'function') {
+  if (typeof service?.device?.setValue !== 'function') {
     throw new NotFoundError(`Function device.setValue in service ${device.service.name} does not exist.`);
   }
   await service.device.setValue(device, deviceFeature, value, options);
