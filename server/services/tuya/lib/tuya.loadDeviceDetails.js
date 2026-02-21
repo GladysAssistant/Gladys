@@ -12,7 +12,7 @@ async function loadDeviceDetails(tuyaDevice) {
   const { id: deviceId } = tuyaDevice;
   logger.debug(`Loading ${deviceId} Tuya device specifications`);
 
-  const [specificationsResponse, detailsResponse] = await Promise.all([
+  const [specResult, detailsResult] = await Promise.allSettled([
     this.connector.request({
       method: 'GET',
       path: `${API.VERSION_1_0}/devices/${deviceId}/specification`,
@@ -23,12 +23,21 @@ async function loadDeviceDetails(tuyaDevice) {
     }),
   ]);
 
-  const specifications = specificationsResponse.result || {};
-  const details = detailsResponse.result || {};
+  if (specResult.status === 'rejected') {
+    const reason = specResult.reason && specResult.reason.message ? specResult.reason.message : specResult.reason;
+    logger.warn(`[Tuya] Failed to load specifications for ${deviceId}: ${reason}`);
+  }
+  if (detailsResult.status === 'rejected') {
+    const reason =
+      detailsResult.reason && detailsResult.reason.message ? detailsResult.reason.message : detailsResult.reason;
+    logger.warn(`[Tuya] Failed to load details for ${deviceId}: ${reason}`);
+  }
 
-  // Temporary verbose logging to inspect what Tuya cloud returns
-  logger.debug(`[Tuya] Device details raw for ${deviceId}: ${JSON.stringify(details)}`);
-  logger.debug(`[Tuya] Device specifications raw for ${deviceId}: ${JSON.stringify(specifications)}`);
+  const specifications = specResult.status === 'fulfilled' ? specResult.value.result || {} : {};
+  const details = detailsResult.status === 'fulfilled' ? detailsResult.value.result || {} : {};
+
+  logger.debug(`[Tuya] Device details loaded for ${deviceId}`);
+  logger.debug(`[Tuya] Device specifications loaded for ${deviceId}`);
 
   return { ...tuyaDevice, ...details, specifications };
 }

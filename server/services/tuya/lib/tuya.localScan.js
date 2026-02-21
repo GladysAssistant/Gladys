@@ -11,28 +11,6 @@ const {
 } = require('./utils/tuya.deviceParams');
 
 const DEFAULT_PORTS = [6666, 6667, 7000];
-const formatHex = (buffer, maxLen = 128) => {
-  if (!buffer || !buffer.length) {
-    return '';
-  }
-  const slice = buffer.slice(0, maxLen);
-  return slice
-    .toString('hex')
-    .match(/.{1,2}/g)
-    .join(' ');
-};
-
-const formatAscii = (buffer, maxLen = 256) => {
-  if (!buffer || !buffer.length) {
-    return '';
-  }
-  const slice = buffer.slice(0, maxLen);
-  return slice
-    .toString('utf8')
-    .replace(/\s+/g, ' ')
-    .trim();
-};
-
 /**
  * @description Scan local network for Tuya devices (UDP broadcast).
  * @param {number|object} input - Scan duration in seconds or options.
@@ -57,11 +35,7 @@ async function localScan(input = 10) {
     const byteLen = message ? message.length : 0;
     const remote = rinfo ? `${rinfo.address}:${rinfo.port}` : 'unknown';
     const source = rinfo && rinfo.source ? rinfo.source : 'udp';
-    logger.info(
-      `[Tuya][localScan] Packet received (${source}) from ${remote} len=${byteLen} hex=${formatHex(
-        message,
-      )} ascii="${formatAscii(message)}"`,
-    );
+    logger.debug(`[Tuya][localScan] Packet received (${source}) from ${remote} len=${byteLen}`);
     let parsed = null;
     let lastError = null;
     for (let i = 0; i < parsers.length; i += 1) {
@@ -80,7 +54,17 @@ async function localScan(input = 10) {
       );
       return;
     }
-    logger.info(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(parsed)}`);
+    const safePayload =
+      parsed && parsed[0] && parsed[0].payload
+        ? {
+            gwId: parsed[0].payload.gwId,
+            devId: parsed[0].payload.devId,
+            id: parsed[0].payload.id,
+            version: parsed[0].payload.version,
+            hasIp: !!parsed[0].payload.ip,
+          }
+        : null;
+    logger.debug(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(safePayload)}`);
     const payload = parsed && parsed[0] && parsed[0].payload;
 
     if (!payload || typeof payload !== 'object') {
@@ -89,6 +73,7 @@ async function localScan(input = 10) {
     }
 
     const { gwId, devId, id, ip, version, productKey } = payload;
+    const resolvedIp = ip || (rinfo && rinfo.address);
     const deviceId = gwId || devId || id;
 
     if (!deviceId) {
@@ -98,7 +83,7 @@ async function localScan(input = 10) {
 
     const isNew = !devices[deviceId];
     devices[deviceId] = {
-      ip,
+      ip: resolvedIp,
       version,
       productKey,
     };

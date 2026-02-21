@@ -147,37 +147,38 @@ describe('TuyaHandler.localPoll', () => {
 
   it('should timeout', async () => {
     const clock = sinon.useFakeTimers();
-    const connect = sinon.stub().resolves();
-    const get = sinon.stub().returns(new Promise(() => {}));
-    const disconnect = sinon.stub().resolves();
-    function TuyAPIStub() {
-      this.connect = connect;
-      this.get = get;
-      this.disconnect = disconnect;
-      attachEventHandlers(this);
-    }
-    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
-      tuyapi: TuyAPIStub,
-      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
-    });
-    const promise = localPoll({
-      deviceId: 'device',
-      ip: '1.1.1.1',
-      localKey: 'key',
-      protocolVersion: '3.3',
-      timeoutMs: 1000,
-    });
-    await clock.tickAsync(1100);
     try {
-      await promise;
-    } catch (e) {
-      expect(e).to.be.instanceOf(BadParameters);
-      expect(e.message).to.equal('Local poll timeout');
+      const connect = sinon.stub().resolves();
+      const get = sinon.stub().returns(new Promise(() => {}));
+      const disconnect = sinon.stub().resolves();
+      const TuyAPIStub = function TuyAPIStub() {
+        this.connect = connect;
+        this.get = get;
+        this.disconnect = disconnect;
+        attachEventHandlers(this);
+      };
+      const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+        tuyapi: TuyAPIStub,
+      });
+      const promise = localPoll({
+        deviceId: 'device',
+        ip: '1.1.1.1',
+        localKey: 'key',
+        protocolVersion: '3.3',
+        timeoutMs: 1000,
+      });
+      await clock.tickAsync(1100);
+      try {
+        await promise;
+      } catch (e) {
+        expect(e).to.be.instanceOf(BadParameters);
+        expect(e.message).to.equal('Local poll timeout');
+        return;
+      }
+      throw new Error('Expected error');
+    } finally {
       clock.restore();
-      return;
     }
-    clock.restore();
-    throw new Error('Expected error');
   });
 
   it('should reject on socket error listener', async () => {
@@ -244,6 +245,36 @@ describe('TuyaHandler.localPoll', () => {
       });
     } catch (e) {
       expect(e.message).to.equal('connect failed');
+      return;
+    }
+    throw new Error('Expected error');
+  });
+
+  it('should stop cleanup when already resolved', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().resolves({ dps: { 1: true } });
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      this.on = sinon.stub();
+      this.once = sinon.stub();
+      this.removeListener = sinon.stub().throws(new Error('removeListener error'));
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+    });
+
+    try {
+      await localPoll({
+        deviceId: 'device',
+        ip: '1.1.1.1',
+        localKey: 'key',
+        protocolVersion: '3.3',
+      });
+    } catch (e) {
+      expect(e.message).to.equal('removeListener error');
       return;
     }
     throw new Error('Expected error');

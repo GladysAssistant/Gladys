@@ -1223,15 +1223,14 @@
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
         "protocol35Unsupported": "Protokoll 3.5 wird lokal noch nicht unterstützt.",
-        "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Local Key und IP) werden maskiert.",
+        "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
         "productIdLabel": "Produkt-ID",
-        "productKeyLabel": "Product Key"
+        "productKeyLabel": "Produktschlüssel"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
         "localDiscoveryInfo": "Lokale Erkennung nutzt UDP-Broadcast. Starte den lokalen UDP-Scan und gib bei Bedarf lokale IP und Protokollversion ein und nutze \"Lokales DPS abfragen\".",
-        "scanInProgress": "Scan läuft... Cloud-Geräte werden abgerufen.",
         "scanCloudInProgress": "Scan läuft... Cloud-Geräte werden abgerufen. Das kann etwas dauern.",
         "scanLocalInProgressConnected": "Scan läuft... Lokale Informationen der Geräte werden abgerufen. Das kann etwas dauern.",
         "scanLocalInProgressDisconnected": "Scan läuft... Lokale Geräte werden abgerufen. Das kann etwas dauern.",
@@ -1277,7 +1276,6 @@
         "saveLabel": "Konfiguration sichern und verbinden",
         "error": "Beim Sichern der Konfiguration ist ein Fehler aufgetreten.",
         "connecting": "Konfiguration gesichert. Die Verbindung mit deinem Tuya-Cloud-Account wird jetzt hergestellt …",
-        "connected": "Du hast dich erfolgreich mit dem Tuya-Cloud-Account verbunden!",
         "connectionError": "Fehler beim Verbinden. Bitte überprüfe deine Konfiguration.",
         "notConfigured": "Tuya-Cloud-Verbindungsdaten fehlen oder sind unvollständig.",
         "connectedAfterSave": "Du hast dich erfolgreich mit dem Tuya-Cloud-Account verbunden!",

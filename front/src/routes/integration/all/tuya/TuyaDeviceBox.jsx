@@ -242,6 +242,7 @@ class TuyaDeviceBox extends Component {
     try {
       let result = null;
       let usedProtocol = selectedProtocol;
+      let latestDevice = null;
       const isValidResult = data => data && typeof data === 'object' && data.dps;
       for (let i = 0; i < protocolList.length; i += 1) {
         const protocolVersion = protocolList[i];
@@ -260,9 +261,7 @@ class TuyaDeviceBox extends Component {
           result = response && response.dps ? response : null;
           const updatedDevice = response && response.device ? response.device : null;
           if (updatedDevice) {
-            this.setState({
-              device: updatedDevice
-            });
+            latestDevice = updatedDevice;
           }
           if (!isValidResult(result)) {
             throw new Error('Invalid local poll response');
@@ -284,9 +283,10 @@ class TuyaDeviceBox extends Component {
           newParams.push({ name: 'PROTOCOL_VERSION', value: usedProtocol });
         }
       }
+      const baseDevice = latestDevice || this.state.device;
       this.setState({
         device: {
-          ...this.state.device,
+          ...baseDevice,
           params: newParams
         },
         localPollStatus: RequestStatus.Success,

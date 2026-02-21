@@ -61,29 +61,38 @@ async function setValue(device, deviceFeature, value) {
   const localDps = getLocalDpsFromCode(command);
 
   if (hasLocalConfig && localDps !== null) {
+    const isProtocol35 = protocolVersion === '3.5';
+    const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+    const tuyaOptions = {
+      id: topic,
+      key: localKey,
+      ip: ipAddress,
+      version: protocolVersion,
+      issueGetOnConnect: false,
+      issueRefreshOnConnect: false,
+      issueRefreshOnPing: false,
+    };
+    if (isProtocol35) {
+      tuyaOptions.KeepAlive = false;
+    }
+    const tuyaLocal = new TuyaLocalApi(tuyaOptions);
+    let connected = false;
     try {
-      const isProtocol35 = protocolVersion === '3.5';
-      const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
-      const tuyaOptions = {
-        id: topic,
-        key: localKey,
-        ip: ipAddress,
-        version: protocolVersion,
-        issueGetOnConnect: false,
-        issueRefreshOnConnect: false,
-        issueRefreshOnPing: false,
-      };
-      if (isProtocol35) {
-        tuyaOptions.KeepAlive = false;
-      }
-      const tuyaLocal = new TuyaLocalApi(tuyaOptions);
       await tuyaLocal.connect();
+      connected = true;
       await tuyaLocal.set({ dps: localDps, set: transformedValue });
-      await tuyaLocal.disconnect();
       logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
       return;
     } catch (e) {
       logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+    } finally {
+      if (connected) {
+        try {
+          await tuyaLocal.disconnect();
+        } catch (disconnectError) {
+          logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+        }
+      }
     }
   }
 

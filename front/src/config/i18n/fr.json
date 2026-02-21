@@ -1355,13 +1355,12 @@
         "protocol35Unsupported": "Le protocole 3.5 n'est pas pris en charge en local pour le moment.",
         "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
         "productIdLabel": "Identifiant produit",
-        "productKeyLabel": "Product Key"
+        "productKeyLabel": "Clé produit"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
         "localDiscoveryInfo": "La découverte locale utilise le broadcast UDP. Lancez le scan UDP local puis, si besoin, renseignez l'IP locale et la version du protocole, et utilisez \"Poll local des DP\".",
-        "scanInProgress": "Scan en cours... récupération cloud des appareils.",
         "scanCloudInProgress": "Scan en cours... récupération cloud des appareils. Cela peut prendre un moment.",
         "scanLocalInProgressConnected": "Scan en cours... récupération des informations locales des appareils. Cela peut prendre un moment.",
         "scanLocalInProgressDisconnected": "Scan en cours... récupération des appareils en local. Cela peut prendre un moment.",
@@ -1408,8 +1407,7 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
-        "notConfigured": "Information de connexion au compte cloud Tuya non renseignées ou manquante !",
-        "connected": "Connexion au compte cloud Tuya réussie !",
+        "notConfigured": "Informations de connexion au compte cloud Tuya non renseignées ou manquantes !",
         "connectedAfterSave": "Connexion au compte cloud Tuya réussie !",
         "connectedStatus": "Connecté au compte cloud Tuya.",
         "disconnectSuccess": "Déconnexion du compte cloud Tuya réussie ! Le service local fonctionne toujours (vous ne serez pas reconnecté automatiquement au redémarrage de Gladys).",

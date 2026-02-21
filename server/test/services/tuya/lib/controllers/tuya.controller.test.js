@@ -8,6 +8,8 @@ const tuyaManager = {
   discoverDevices: fake.resolves([]),
   localPoll: fake.resolves({ dps: { 1: true } }),
   localScan: fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} }),
+  getStatus: fake.resolves({ status: 'connected' }),
+  manualDisconnect: fake.resolves(),
   discoveredDevices: [
     {
       external_id: 'tuya:device1',
@@ -21,6 +23,7 @@ const tuyaManager = {
   },
   serviceId: 'service-id',
 };
+const defaultLocalScan = tuyaManager.localScan;
 
 describe('TuyaController GET /api/v1/service/tuya/discover', () => {
   let controller;
@@ -122,6 +125,10 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
   });
 
+  afterEach(() => {
+    tuyaManager.localScan = defaultLocalScan;
+  });
+
   it('should run local scan and return devices', async () => {
     const req = { body: { timeoutSeconds: 1 } };
     const res = {
@@ -166,5 +173,41 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
       local_devices: {},
       port_errors: {},
     });
+  });
+});
+
+describe('TuyaController GET /api/v1/service/tuya/status', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = TuyaController(tuyaManager);
+    sinon.resetHistory();
+  });
+
+  it('should return status', async () => {
+    const req = {};
+    const res = { json: fake.returns([]) };
+
+    await controller['get /api/v1/service/tuya/status'].controller(req, res);
+    assert.calledOnce(tuyaManager.getStatus);
+    assert.calledWith(res.json, { status: 'connected' });
+  });
+});
+
+describe('TuyaController POST /api/v1/service/tuya/disconnect', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = TuyaController(tuyaManager);
+    sinon.resetHistory();
+  });
+
+  it('should disconnect', async () => {
+    const req = {};
+    const res = { json: fake.returns([]) };
+
+    await controller['post /api/v1/service/tuya/disconnect'].controller(req, res);
+    assert.calledOnce(tuyaManager.manualDisconnect);
+    assert.calledWith(res.json, { success: true });
   });
 });

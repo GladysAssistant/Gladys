@@ -20,8 +20,9 @@ module.exports = function TuyaController(tuyaManager) {
    * @apiGroup Tuya
    */
   async function localPoll(req, res) {
-    const result = await tuyaManager.localPoll(req.body);
-    const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, req.body);
+    const payload = req.body || {};
+    const result = await tuyaManager.localPoll(payload);
+    const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload);
 
     if (updatedDevice) {
       res.json({
