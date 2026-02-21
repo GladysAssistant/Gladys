@@ -72,7 +72,8 @@ describe('TuyaService', () => {
     tuyaService.device.connect = fake.resolves();
 
     await tuyaService.start();
-    tuyaService.device.status = STATUS.DISCONNECTED;
+    tuyaService.device.status = STATUS.ERROR;
+    tuyaService.device.autoReconnectAllowed = true;
 
     await intervalCallback();
 
@@ -87,7 +88,8 @@ describe('TuyaService', () => {
     tuyaService.device.connect = fake.resolves();
 
     await tuyaService.start();
-    tuyaService.device.status = STATUS.DISCONNECTED;
+    tuyaService.device.status = STATUS.ERROR;
+    tuyaService.device.autoReconnectAllowed = true;
 
     await intervalCallback();
 
@@ -103,6 +105,7 @@ describe('TuyaService', () => {
 
     await tuyaService.start();
     tuyaService.device.status = STATUS.CONNECTING;
+    tuyaService.device.autoReconnectAllowed = true;
 
     await intervalCallback();
 
@@ -117,6 +120,8 @@ describe('TuyaService', () => {
     tuyaService.device.connect = fake.resolves();
 
     await tuyaService.start();
+    tuyaService.device.status = STATUS.ERROR;
+    tuyaService.device.autoReconnectAllowed = true;
 
     await intervalCallback();
 

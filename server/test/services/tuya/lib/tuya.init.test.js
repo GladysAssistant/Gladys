@@ -45,8 +45,12 @@ describe('TuyaHandler.init', () => {
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
       .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
       .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
       .returns('appUsername')
+      .withArgs(GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId)
+      .returns(null)
       .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
       .returns(null);
 
@@ -54,11 +58,13 @@ describe('TuyaHandler.init', () => {
 
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
-    assert.callCount(gladys.variable.getValue, 5);
+    assert.callCount(gladys.variable.getValue, 7);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_USERNAME, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId);
 
     assert.calledOnce(client.init);
@@ -82,8 +88,12 @@ describe('TuyaHandler.init', () => {
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
       .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
       .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
       .returns('appUsername')
+      .withArgs(GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId)
+      .returns(null)
       .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
       .returns('1');
 

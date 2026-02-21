@@ -10,6 +10,12 @@ const { API, GLADYS_VARIABLES } = require('./utils/tuya.constants');
  * await loadDevices();
  */
 async function loadDevices(pageNo = 1, pageSize = 100) {
+  if (!Number.isInteger(pageNo) || pageNo <= 0) {
+    throw new Error('pageNo must be a positive integer');
+  }
+  if (!Number.isInteger(pageSize) || pageSize <= 0) {
+    throw new Error('pageSize must be a positive integer');
+  }
   const sourceId = await this.gladys.variable.getValue(GLADYS_VARIABLES.APP_ACCOUNT_UID, this.serviceId);
 
   const responsePage = await this.connector.request({
@@ -20,6 +26,10 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
       page_size: pageSize,
     },
   });
+  if (responsePage && responsePage.success === false) {
+    const message = responsePage.msg || responsePage.message || responsePage.code || 'Tuya API error';
+    throw new Error(message);
+  }
 
   const result = responsePage.result || [];
   const list = Array.isArray(result) ? result : result.list || [];

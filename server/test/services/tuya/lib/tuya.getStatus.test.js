@@ -32,6 +32,8 @@ describe('TuyaHandler.getStatus', () => {
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
       .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
       .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
       .returns(null);
 
@@ -51,6 +53,7 @@ describe('TuyaHandler.getStatus', () => {
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId);
   });
 
@@ -62,6 +65,8 @@ describe('TuyaHandler.getStatus', () => {
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
       .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
       .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
       .returns('1');
 
