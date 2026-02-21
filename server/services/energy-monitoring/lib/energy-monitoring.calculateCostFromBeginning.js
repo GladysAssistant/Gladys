@@ -6,7 +6,7 @@ const { queueWrapper } = require('../utils/queueWrapper');
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return when finished.
  * @example <caption>Recalculate full history</caption>
- * calculateCostFromBeginning(null, [], null, '12345678-1234-1234-1234-1234567890ab');
+ * calculateCostFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
  */
 async function calculateCostFromBeginning(featureSelectors, jobId) {
   const selectors = Array.isArray(featureSelectors)

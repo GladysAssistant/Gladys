@@ -20,7 +20,7 @@ const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example <caption>Recalculate full history</caption>
- * calculateConsumptionFromIndexFromBeginning(null, [], null, '12345678-1234-1234-1234-1234567890ab');
+ * calculateConsumptionFromIndexFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
  */
 async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobId) {
   const selectors = Array.isArray(featureSelectors)
@@ -52,6 +52,9 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
           f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
           f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION;
         if (!isConsumption) {
+          return false;
+        }
+        if (!f.selector) {
           return false;
         }
         if (selectorSet.size === 0) {

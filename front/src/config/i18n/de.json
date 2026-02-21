@@ -716,7 +716,7 @@
       "calculateCostFromBeginningDescription": "Dies berechnet die Kosten Ihres Energieverbrauchs basierend auf Ihren Verbrauchsdaten und Strompreisen. Verwenden Sie dies, nachdem Sie Verbrauchsdaten haben und Ihre Strompreise konfiguriert haben.",
       "calculateCostFromBeginning": "Kosten von Anfang an berechnen",
       "calculateCostOnPeriod": "Kosten für den Zeitraum berechnen",
-      "calculatingCostFromBeginning": "Kostenberechnung wird gestartet...",
+      "calculatingCostFromBeginning": "Kostenberechnung läuft...",
       "calculateCostFromBeginningStarted": "Die Kostenberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen.",
       "calculateCostFromBeginningError": "Beim Starten der Kostenberechnung ist ein Fehler aufgetreten.",
       "calculateConsumptionAndCostFromBeginning": "Verbrauch und Kosten von Anfang an berechnen",
@@ -727,10 +727,10 @@
       "noFeaturesAvailable": "Keine passenden Funktionen gefunden.",
       "calculateSelectedFeaturesFromBeginning": "Verbrauch und Kosten der ausgewählten Funktionen von Anfang an berechnen",
       "calculateSelectedFeaturesOnPeriod": "Verbrauch und Kosten der ausgewählten Funktionen für den Zeitraum berechnen",
-      "calculatingSelectedFeaturesFromBeginning": "Berechnung von Verbrauch und Kosten der ausgewählten Funktionen wird gestartet...",
+      "calculatingSelectedFeaturesFromBeginning": "Berechnung von Verbrauch und Kosten der ausgewählten Funktionen läuft...",
       "calculateSelectedFeaturesCostFromBeginning": "Kosten der ausgewählten Funktionen von Anfang an berechnen",
       "calculateSelectedFeaturesCostOnPeriod": "Kosten der ausgewählten Funktionen für den Zeitraum berechnen",
-      "calculatingSelectedFeaturesCostFromBeginning": "Kostenberechnung für ausgewählte Funktionen wird gestartet...",
+      "calculatingSelectedFeaturesCostFromBeginning": "Kostenberechnung für ausgewählte Funktionen läuft...",
       "calculateSelectedFeaturesFromBeginningStarted": "Die Berechnung von Verbrauch und Kosten für die ausgewählten Funktionen wurde gestartet. Den Fortschritt finden Sie in den Hintergrundaufgaben.",
       "calculateSelectedFeaturesFromBeginningError": "Beim Starten der Berechnung von Verbrauch und Kosten für die ausgewählten Funktionen ist ein Fehler aufgetreten.",
       "calculateSelectedFeaturesCostFromBeginningStarted": "Die Kostenberechnung für die ausgewählten Funktionen wurde gestartet. Den Fortschritt finden Sie in den Hintergrundaufgaben.",
@@ -770,10 +770,8 @@
       "fixing": "Behebung läuft...",
       "featureHint": {
         "title": "Energieüberwachung",
-        "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
-        "createButton": "Energieüberwachungsfunktionen erstellen",
-        "hierarchy": "Ordne sie der Hierarchie „Energieüberwachung“ zu (Tab „Meine Geräte“), um Kosten zu verknüpfen.",
-        "recalc": "Dann Verbrauch/Kosten im Tab „Einstellungen“ neu berechnen.",
+        "hierarchy": "Ordnen Sie sie der Hierarchie „Energieüberwachung“ zu (Tab „Meine Geräte“), um Kosten zu verknüpfen.",
+        "recalc": "Berechnen Sie dann Verbrauch/Kosten im Tab „Einstellungen“ neu.",
         "goToIntegration": "Energieüberwachung öffnen"
       }
     },
@@ -1585,7 +1583,12 @@
         "copyFailed": "Kopieren fehlgeschlagen",
         "deleteLabel": "Funktion löschen",
         "showAdvancedSettings": "Erweiterte Einstellungen anzeigen",
-        "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden"
+        "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden",
+        "energyMonitoring": {
+          "title": "Energieüberwachung",
+          "description": "Diese Funktion kann zur Energieüberwachung verwendet werden. Klicken Sie auf die Schaltfläche unten, um automatisch die Verbrauchs- und Kostenverfolgungsfunktionen zu erstellen.",
+          "createButton": "Energieüberwachungsfunktionen erstellen"
+        }
       },
       "setup": {
         "title": "MQTT-Konfiguration",
