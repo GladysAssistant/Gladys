@@ -10,7 +10,7 @@ const { queueWrapper } = require('../utils/queueWrapper');
  */
 async function calculateCostFromYesterday(yesterdayDate, jobId) {
   return queueWrapper(this.queue, async () => {
-    await this.calculateCostFrom(yesterdayDate, jobId);
+    await this.calculateCostFrom(yesterdayDate, null, jobId, null);
   });
 }
 

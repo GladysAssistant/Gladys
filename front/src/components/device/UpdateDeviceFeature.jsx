@@ -29,10 +29,22 @@ class UpdateDeviceFeature extends Component {
     this.props.updateFeatureProperty(this.props.featureIndex, 'keep_history', e.target.value);
   };
   deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
+  hasEnergyConsumptionFeatures = () => {
+    const { device, feature } = this.props;
+    if (!device || !device.features) return false;
+
+    // Check if THIRTY_MINUTES_CONSUMPTION feature exists with this feature as parent
+    const hasConsumption = device.features.some(
+      f => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id
+    );
+
+    return hasConsumption;
+  };
 
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
     const allowModifyCategory =
       canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
+    const hasConsumptionFeatures = this.hasEnergyConsumptionFeatures();
 
     return (
       <div class="col-md-4">
@@ -187,6 +199,27 @@ class UpdateDeviceFeature extends Component {
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">
                   <Text id="editDeviceForm.deleteLabel" />
                 </button>
+              </div>
+            )}
+            {hasConsumptionFeatures && (
+              <div class="form-group">
+                <div class="alert alert-warning">
+                  <h5 class="mb-2">
+                    <Text id="integration.energyMonitoring.featureHint.title" />
+                  </h5>
+                  <p class="mb-2">
+                    <Text id="integration.energyMonitoring.featureHint.hierarchy" />
+                  </p>
+                  <p class="mb-3">
+                    <Text id="integration.energyMonitoring.featureHint.recalc" />
+                  </p>
+                  <a
+                    class="btn btn-outline-primary btn-sm d-block w-100 text-center"
+                    href="/dashboard/integration/device/energy-monitoring"
+                  >
+                    <Text id="integration.energyMonitoring.featureHint.goToIntegration" />
+                  </a>
+                </div>
               </div>
             )}
           </div>
