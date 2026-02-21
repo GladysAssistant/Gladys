@@ -830,7 +830,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
     const priceStub = sinon
       .stub(gladys.energyPrice, 'get')
-      .resolves([{ price_type: ENERGY_PRICE_TYPES.CONSUMPTION, price: 0.2, start_date: '2025-10-01' }]);
+      .resolves([{ price_type: ENERGY_PRICE_TYPES.CONSUMPTION, price: 2000, start_date: '2025-10-01' }]);
     const statesStub = sinon
       .stub(gladys.device, 'getDeviceFeatureStates')
       .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z'), value: 1 }]);

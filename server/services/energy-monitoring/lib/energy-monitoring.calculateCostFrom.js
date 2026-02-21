@@ -24,7 +24,8 @@ const isNullOrEmpty = (value) => value === null || value === undefined || value 
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
- * @param {Array} featureSelectors - Optional whitelist of cost feature selectors to process.
+ * @param {Array<string>|string} featureSelectors - Optional whitelist of cost feature selectors to process.
+ * When a string is provided and jobId is undefined, it is treated as the jobId (backward compatibility).
  * @param {string} jobId - The job id.
  * @param {Date|string|null} endAt - Optional end date to stop calculations.
  * @returns {Promise<null>} Return null when finished.

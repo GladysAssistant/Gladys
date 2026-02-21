@@ -24,12 +24,12 @@ describe('Device.destroyStatesBetween', () => {
   });
 
   it('should destroy states between two dates', async () => {
-    const now = new Date();
-    const oneHourAgo = new Date(now.getTime() - 1 * 60 * 60 * 1000);
-    const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
-    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
-    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
-    const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+    const base = new Date('2025-08-28T12:00:00.000Z');
+    const oneHourAgo = new Date(base.getTime() - 1 * 60 * 60 * 1000);
+    const twoHoursAgo = new Date(base.getTime() - 2 * 60 * 60 * 1000);
+    const threeHoursAgo = new Date(base.getTime() - 3 * 60 * 60 * 1000);
+    const fourHoursAgo = new Date(base.getTime() - 4 * 60 * 60 * 1000);
+    const fiveHoursAgo = new Date(base.getTime() - 5 * 60 * 60 * 1000);
 
     await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
       { value: 1, created_at: fiveHoursAgo },
