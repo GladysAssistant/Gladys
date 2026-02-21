@@ -76,7 +76,9 @@ describe('AirplayHandler.setValue', () => {
     const devices = await airplayHandler.scan();
     const device = devices[0];
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
-    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
     sinon.assert.calledOnce(sendPcm);
   });
   it('should talk on speaker with custom volume', async () => {
@@ -84,7 +86,9 @@ describe('AirplayHandler.setValue', () => {
     const devices = await airplayHandler.scan();
     const device = devices[0];
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
-    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
     sinon.assert.calledOnce(sendPcm);
   });
   it('should return device not found', async () => {
