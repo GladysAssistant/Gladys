@@ -46,5 +46,6 @@ describe('zigbee2mqtt status', () => {
     expect(result.networkModeValid).that.equal(false);
 
     expect(result.z2mEnabled).that.equal(true);
+    expect(result.coordinatorFirmware).that.equal(null);
   });
 });

@@ -53,6 +53,7 @@ async function disconnect() {
   }
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
+  this.coordinatorFirmware = null;
   this.emitStatusEvent();
 }
 

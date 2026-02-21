@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
@@ -15,7 +15,8 @@ class SetupLocalOptions extends Component {
 
   updateZigbeeDongleName = option => {
     const z2mDongleName = get(option, 'value');
-    this.setState({ z2mDongleName });
+    const z2mDongleConfigKey = get(option, 'configKey') || null;
+    this.setState({ z2mDongleName, z2mDongleConfigKey });
   };
 
   updateTcpPort = e => {
@@ -69,10 +70,11 @@ class SetupLocalOptions extends Component {
     });
 
     try {
-      const zigbeeAdapterLabels = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/adapter');
-      const zigbeeAdapters = zigbeeAdapterLabels.map(adapter => ({
-        label: adapter,
-        value: adapter
+      const adapters = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/adapter');
+      const zigbeeAdapters = adapters.map(adapter => ({
+        label: adapter.label,
+        value: adapter.label,
+        configKey: adapter.configKey
       }));
 
       this.setState({
@@ -85,6 +87,23 @@ class SetupLocalOptions extends Component {
         loadZigbeeAdaptersStatus: RequestStatus.Error
       });
     }
+  };
+
+  isEmberFirmwareTooOld = () => {
+    const { zigbee2mqttStatus = {} } = this.props;
+    const { coordinatorFirmware } = zigbee2mqttStatus;
+    const { z2mDongleConfigKey } = this.state;
+
+    if (z2mDongleConfigKey !== 'ember' || !coordinatorFirmware) {
+      return false;
+    }
+
+    const { majorrel, minorrel } = coordinatorFirmware;
+    if (majorrel === undefined || minorrel === undefined) {
+      return false;
+    }
+
+    return majorrel < 7 || (majorrel === 7 && minorrel < 4);
   };
 
   buildSelectOption = value => {
@@ -106,6 +125,7 @@ class SetupLocalOptions extends Component {
       usbPorts: [],
       loadUsbPortsStatus: RequestStatus.Getting,
       z2mDongleName,
+      z2mDongleConfigKey: null,
       zigbeeAdapters: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
       z2mTcpPort,
@@ -122,6 +142,7 @@ class SetupLocalOptions extends Component {
     { disabled },
     { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus, z2mTcpPort }
   ) {
+    const emberFirmwareTooOld = this.isEmberFirmwareTooOld();
     return (
       <div>
         <p>
@@ -182,6 +203,11 @@ class SetupLocalOptions extends Component {
             </div>
           </div>
         </div>
+        {emberFirmwareTooOld && (
+          <div class="alert alert-warning">
+            <MarkupText id="integration.zigbee2mqtt.setup.modes.local.emberFirmwareWarning" />
+          </div>
+        )}
         <div class="form-group">
           <label class="form-label">
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortLabel" />

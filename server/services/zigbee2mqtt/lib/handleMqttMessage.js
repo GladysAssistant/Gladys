@@ -79,6 +79,18 @@ async function handleMqttMessage(topic, message) {
       });
       break;
     }
+    case 'zigbee2mqtt/bridge/info': {
+      const info = JSON.parse(message);
+      const { coordinator } = info;
+      if (coordinator && coordinator.meta) {
+        this.coordinatorFirmware = {
+          ...coordinator.meta,
+          type: coordinator.type,
+        };
+      }
+      this.emitStatusEvent();
+      break;
+    }
     case 'zigbee2mqtt/bridge/response/backup': {
       const payload = JSON.parse(message);
       await this.saveZ2mBackup(payload);

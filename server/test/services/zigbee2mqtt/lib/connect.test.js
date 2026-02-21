@@ -118,6 +118,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
@@ -144,6 +145,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
   });
@@ -168,6 +170,7 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
   });

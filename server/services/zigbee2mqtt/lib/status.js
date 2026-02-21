@@ -17,6 +17,7 @@ function status() {
     z2mEnabled,
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
+    coordinatorFirmware: this.coordinatorFirmware,
   };
   return zigbee2mqttStatus;
 }
