@@ -1355,7 +1355,7 @@
         "protocol35Unsupported": "Le protocole 3.5 n'est pas pris en charge en local pour le moment.",
         "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
         "productIdLabel": "Identifiant produit",
-        "productKeyLabel": "Product Key"
+        "productKeyLabel": "Clé produit"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
@@ -1408,7 +1408,7 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
-        "notConfigured": "Information de connexion au compte cloud Tuya non renseignées ou manquante !",
+        "notConfigured": "Informations de connexion au compte cloud Tuya non renseignées ou manquantes !",
         "connected": "Connexion au compte cloud Tuya réussie !",
         "connectedAfterSave": "Connexion au compte cloud Tuya réussie !",
         "connectedStatus": "Connecté au compte cloud Tuya.",

@@ -54,8 +54,17 @@ function convertDevice(tuyaDevice) {
   if (productKey) {
     params.push({ name: DEVICE_PARAM_NAME.PRODUCT_KEY, value: productKey });
   }
+  const safeDeviceLog = {
+    id,
+    name,
+    model: productName || model,
+    product_id: productId,
+    protocol_version: protocolVersion,
+    local_override: localOverride,
+    online,
+  };
   logger.debug(`Tuya convert device specifications"`);
-  logger.debug(JSON.stringify(tuyaDevice));
+  logger.debug(JSON.stringify(safeDeviceLog));
 
   logger.debug(`Tuya convert device"${name}, ${productName || model}"`);
   // Groups functions and status on same code

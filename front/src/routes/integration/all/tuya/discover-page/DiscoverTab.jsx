@@ -172,13 +172,14 @@ class DiscoverTab extends Component {
           {portErrorPorts.length > 0 && (
             <div class="alert alert-warning">
               <Localizer>
-                {localizer => (
-                  <span>
-                    {localizer.t('integration.tuya.discover.udpScanPortInUse', {
+                <span>
+                  <Text
+                    id="integration.tuya.discover.udpScanPortInUse"
+                    fields={{
                       ports: portErrorPorts.join(', ')
-                    })}
-                  </span>
-                )}
+                    }}
+                  />
+                </span>
               </Localizer>
             </div>
           )}
@@ -199,6 +200,7 @@ class DiscoverTab extends Component {
               <div class="row">
                 {orderedDevices.map((device, index) => (
                   <TuyaDeviceBox
+                    key={device.external_id || device.id || index}
                     editable={!device.created_at || device.updatable}
                     alreadyCreatedButton={device.created_at && !device.updatable}
                     updateButton={device.updatable}

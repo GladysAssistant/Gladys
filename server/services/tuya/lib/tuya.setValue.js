@@ -60,20 +60,29 @@ async function setValue(device, deviceFeature, value) {
   const localDps = getLocalDpsFromCode(command);
 
   if (hasLocalConfig && localDps !== null) {
+    const tuyaLocal = new TuyAPI({
+      id: topic,
+      key: localKey,
+      ip: ipAddress,
+      version: protocolVersion,
+    });
+    let connected = false;
     try {
-      const tuyaLocal = new TuyAPI({
-        id: topic,
-        key: localKey,
-        ip: ipAddress,
-        version: protocolVersion,
-      });
       await tuyaLocal.connect();
+      connected = true;
       await tuyaLocal.set({ dps: localDps, set: transformedValue });
-      await tuyaLocal.disconnect();
       logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
       return;
     } catch (e) {
       logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+    } finally {
+      if (connected) {
+        try {
+          await tuyaLocal.disconnect();
+        } catch (disconnectError) {
+          logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+        }
+      }
     }
   }
 

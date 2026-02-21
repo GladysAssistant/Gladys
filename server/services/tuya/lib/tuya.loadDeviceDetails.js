@@ -26,9 +26,8 @@ async function loadDeviceDetails(tuyaDevice) {
   const specifications = specificationsResponse.result || {};
   const details = detailsResponse.result || {};
 
-  // Temporary verbose logging to inspect what Tuya cloud returns
-  logger.debug(`[Tuya] Device details raw for ${deviceId}: ${JSON.stringify(details)}`);
-  logger.debug(`[Tuya] Device specifications raw for ${deviceId}: ${JSON.stringify(specifications)}`);
+  logger.debug(`[Tuya] Device details loaded for ${deviceId}`);
+  logger.debug(`[Tuya] Device specifications loaded for ${deviceId}`);
 
   return { ...tuyaDevice, ...details, specifications };
 }

@@ -15,6 +15,7 @@ const tuyaManager = {
     },
   ],
 };
+const defaultLocalScan = tuyaManager.localScan;
 
 describe('TuyaController GET /api/v1/service/tuya/discover', () => {
   let controller;
@@ -111,6 +112,10 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
     sinon.resetHistory();
     tuyaManager.localScan = fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} });
     tuyaManager.discoveredDevices = [{ external_id: 'tuya:device1', params: [] }];
+  });
+
+  afterEach(() => {
+    tuyaManager.localScan = defaultLocalScan;
   });
 
   it('should run local scan and return devices', async () => {
