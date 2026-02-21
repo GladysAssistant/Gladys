@@ -17,9 +17,15 @@ const normalizeExistingDevice = (device) => {
   if (!device || !Array.isArray(device.params)) {
     return device;
   }
-  const normalizedParams = device.params.map((param) =>
-    param.name === DEVICE_PARAM_NAME.LOCAL_OVERRIDE ? { ...param, value: normalizeBoolean(param.value) } : param,
-  );
+  const normalizedParams = device.params.map((param) => {
+    if (param.name !== DEVICE_PARAM_NAME.LOCAL_OVERRIDE) {
+      return param;
+    }
+    if (param.value === undefined || param.value === null) {
+      return param;
+    }
+    return { ...param, value: normalizeBoolean(param.value) };
+  });
   return { ...device, params: normalizedParams };
 };
 

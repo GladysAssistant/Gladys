@@ -210,4 +210,25 @@ describe('TuyaHandler.discoverDevices', () => {
     expect(getParam('PROTOCOL_VERSION').value).to.equal('3.3');
     expect(getParam('LOCAL_OVERRIDE').value).to.equal(true);
   });
+
+  it('should append existing devices not returned by discovery', async () => {
+    gladys.device.get = fake.resolves([
+      { external_id: 'tuya:existing', name: 'Existing device', params: [] },
+      { name: 'missing external id' },
+    ]);
+
+    const devices = await tuyaHandler.discoverDevices();
+    const existing = devices.find((device) => device.external_id === 'tuya:existing');
+
+    expect(existing).to.not.equal(undefined);
+    expect(existing.updatable).to.equal(false);
+  });
+
+  it('should continue when loading existing devices fails', async () => {
+    gladys.device.get = fake.rejects(new Error('failure'));
+
+    const devices = await tuyaHandler.discoverDevices();
+    expect(devices).to.be.an('array');
+    expect(devices.length).to.be.greaterThan(0);
+  });
 });

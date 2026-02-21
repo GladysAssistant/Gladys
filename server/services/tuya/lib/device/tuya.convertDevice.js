@@ -63,10 +63,10 @@ function convertDevice(tuyaDevice) {
     local_override: localOverride,
     online,
   };
-  logger.debug(`Tuya convert device specifications"`);
+  logger.debug('Tuya convert device specifications');
   logger.debug(JSON.stringify(safeDeviceLog));
 
-  logger.debug(`Tuya convert device"${name}, ${productName || model}"`);
+  logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
   // Groups functions and status on same code
   const groups = {};
   status.forEach((stat) => {

@@ -239,6 +239,36 @@ describe('TuyaHandler.localPoll', () => {
     }
     throw new Error('Expected error');
   });
+
+  it('should stop cleanup when already resolved', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().resolves({ dps: { 1: true } });
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      this.on = sinon.stub();
+      this.once = sinon.stub();
+      this.removeListener = sinon.stub().throws(new Error('removeListener error'));
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+    });
+
+    try {
+      await localPoll({
+        deviceId: 'device',
+        ip: '1.1.1.1',
+        localKey: 'key',
+        protocolVersion: '3.3',
+      });
+    } catch (e) {
+      expect(e.message).to.equal('removeListener error');
+      return;
+    }
+    throw new Error('Expected error');
+  });
 });
 
 describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {

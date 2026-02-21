@@ -40,6 +40,15 @@ describe('Tuya device params utils', () => {
     expect(other.value).to.equal('x');
   });
 
+  it('should not normalize local override when value is null', () => {
+    const device = {
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: null }],
+    };
+    const normalized = normalizeExistingDevice(device);
+    const override = normalized.params.find((param) => param.name === DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
+    expect(override.value).to.equal(null);
+  });
+
   it('should return device when normalizeExistingDevice has no params', () => {
     const device = { id: 'device' };
     const normalized = normalizeExistingDevice(device);
@@ -95,6 +104,15 @@ describe('Tuya device params utils', () => {
     expect(updated.ip).to.equal('2.2.2.2');
     expect(updated.protocol_version).to.equal('3.3');
     expect(updated.local_override).to.equal(true);
+  });
+
+  it('should keep device values when existing params are not an array', () => {
+    const device = { ip: 'old', protocol_version: '3.1', local_override: false, params: [] };
+    const existingDevice = { params: null };
+    const updated = applyExistingLocalParams(device, existingDevice);
+    expect(updated.ip).to.equal('old');
+    expect(updated.protocol_version).to.equal('3.1');
+    expect(updated.local_override).to.equal(false);
   });
 
   it('should normalize local override when applying existing params', () => {
