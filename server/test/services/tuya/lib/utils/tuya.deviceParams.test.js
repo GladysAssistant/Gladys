@@ -62,6 +62,15 @@ describe('Tuya device params utils', () => {
     expect(productKeyParam.value).to.equal('pkey');
   });
 
+  it('should keep protocol and product key when local info is partial', () => {
+    const device = { ip: 'old', protocol_version: '3.3', product_key: 'pkey', params: [] };
+    const localInfo = { ip: '2.2.2.2' };
+    const updated = updateDiscoveredDeviceWithLocalInfo(device, localInfo);
+    expect(updated.ip).to.equal('2.2.2.2');
+    expect(updated.protocol_version).to.equal('3.3');
+    expect(updated.product_key).to.equal('pkey');
+  });
+
   it('should return device when no local info is provided', () => {
     const device = { ip: 'old' };
     const updated = updateDiscoveredDeviceWithLocalInfo(device, null);
@@ -88,6 +97,15 @@ describe('Tuya device params utils', () => {
     expect(updated.local_override).to.equal(true);
   });
 
+  it('should normalize local override when applying existing params', () => {
+    const device = { ip: 'old', protocol_version: '3.1', local_override: true, params: [] };
+    const existingDevice = {
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: 'false' }],
+    };
+    const updated = applyExistingLocalParams(device, existingDevice);
+    expect(updated.local_override).to.equal(false);
+  });
+
   it('should keep device values when existing params are missing', () => {
     const device = { ip: 'old', protocol_version: '3.1', local_override: false, params: [] };
     const existingDevice = { params: [] };
@@ -110,6 +128,15 @@ describe('Tuya device params utils', () => {
     const overrideParam = updated.params.find((param) => param.name === DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
     expect(updated.local_override).to.equal(true);
     expect(overrideParam.value).to.equal(true);
+  });
+
+  it('should normalize existing local override when applying override', () => {
+    const device = { params: [] };
+    const existingDevice = { params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: 'false' }] };
+    const updated = applyExistingLocalOverride(device, existingDevice);
+    const overrideParam = updated.params.find((param) => param.name === DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
+    expect(updated.local_override).to.equal(false);
+    expect(overrideParam.value).to.equal(false);
   });
 
   it('should return device when no local override is present', () => {

@@ -28,9 +28,13 @@ const updateDiscoveredDeviceWithLocalInfo = (device, localInfo) => {
     return device;
   }
   const updated = { ...device };
-  updated.protocol_version = localInfo.version;
+  if (localInfo.version !== undefined && localInfo.version !== null) {
+    updated.protocol_version = localInfo.version;
+  }
   updated.ip = localInfo.ip || updated.ip;
-  updated.product_key = localInfo.productKey;
+  if (localInfo.productKey !== undefined && localInfo.productKey !== null) {
+    updated.product_key = localInfo.productKey;
+  }
   updated.params = Array.isArray(updated.params) ? [...updated.params] : [];
   upsertParam(updated.params, DEVICE_PARAM_NAME.IP_ADDRESS, updated.ip);
   upsertParam(updated.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, updated.protocol_version);
@@ -53,7 +57,11 @@ const applyExistingLocalParams = (device, existingDevice) => {
   const params = Array.isArray(device.params) ? [...device.params] : [];
   const ipValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.IP_ADDRESS);
   const protocolValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
-  const localOverrideValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
+  const rawLocalOverrideValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
+  const localOverrideValue =
+    rawLocalOverrideValue !== undefined && rawLocalOverrideValue !== null
+      ? normalizeBoolean(rawLocalOverrideValue)
+      : rawLocalOverrideValue;
 
   upsertParam(params, DEVICE_PARAM_NAME.IP_ADDRESS, ipValue);
   upsertParam(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolValue);
@@ -74,13 +82,14 @@ const applyExistingLocalOverride = (device, existingDevice) => {
     return device;
   }
   const overrideParam = existingDevice.params.find((param) => param.name === DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
-  if (!overrideParam) {
+  if (!overrideParam || overrideParam.value === undefined || overrideParam.value === null) {
     return device;
   }
   const updated = { ...device };
   updated.params = Array.isArray(updated.params) ? [...updated.params] : [];
-  upsertParam(updated.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, overrideParam.value);
-  updated.local_override = overrideParam.value;
+  const normalizedOverride = normalizeBoolean(overrideParam.value);
+  upsertParam(updated.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, normalizedOverride);
+  updated.local_override = normalizedOverride;
   return updated;
 };
 

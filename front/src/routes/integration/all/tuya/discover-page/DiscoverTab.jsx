@@ -123,8 +123,8 @@ class DiscoverTab extends Component {
     props,
     { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors }
   ) {
-    const canScanCloud = !errorLoading;
     const isLoading = loading || udpScanLoading;
+    const canScanCloud = !isLoading;
     const localScanTextId = errorLoading
       ? 'integration.tuya.discover.scanLocalInProgressDisconnected'
       : 'integration.tuya.discover.scanLocalInProgressConnected';
@@ -143,18 +143,10 @@ class DiscoverTab extends Component {
             <Text id="integration.tuya.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button
-              onClick={this.getDiscoveredDevices}
-              class="btn btn-outline-primary ml-2"
-              disabled={loading || !canScanCloud}
-            >
+            <button onClick={this.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={!canScanCloud}>
               <Text id="integration.tuya.discover.scanCloud" /> <i class="fe fe-radio" />
             </button>
-            <button
-              onClick={this.runLocalScan}
-              class="btn btn-outline-success ml-2"
-              disabled={loading || udpScanLoading}
-            >
+            <button onClick={this.runLocalScan} class="btn btn-outline-success ml-2" disabled={isLoading}>
               <Text id="integration.tuya.discover.localScanAuto" />
             </button>
           </div>
