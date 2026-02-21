@@ -76,7 +76,7 @@ class SetupTab extends Component {
         tuyaSecretKey,
         tuyaAppAccountId,
         tuyaAppUsername,
-        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey)
+        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId)
       });
     } catch (e) {
       this.setState({
@@ -86,7 +86,7 @@ class SetupTab extends Component {
         tuyaSecretKey,
         tuyaAppAccountId,
         tuyaAppUsername,
-        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey)
+        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId)
       });
     }
   }
@@ -286,7 +286,12 @@ class SetupTab extends Component {
     const { name, value } = e.target;
     this.setState(prevState => {
       const nextState = { ...prevState, [name]: value };
-      const configured = !!(nextState.tuyaEndpoint && nextState.tuyaAccessKey && nextState.tuyaSecretKey);
+      const configured = !!(
+        nextState.tuyaEndpoint &&
+        nextState.tuyaAccessKey &&
+        nextState.tuyaSecretKey &&
+        nextState.tuyaAppAccountId
+      );
       return {
         [name]: value,
         tuyaConfigured: configured

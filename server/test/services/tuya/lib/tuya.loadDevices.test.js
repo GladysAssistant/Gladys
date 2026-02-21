@@ -63,4 +63,47 @@ describe('TuyaHandler.loadDevices', () => {
     expect(devices).to.deep.eq([{ id: 1 }]);
     assert.callCount(tuyaHandler.connector.request, 2);
   });
+
+  it('should throw on invalid pageNo', async () => {
+    try {
+      await tuyaHandler.loadDevices(0, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('pageNo must be a positive integer');
+    }
+  });
+
+  it('should throw on invalid pageSize', async () => {
+    try {
+      await tuyaHandler.loadDevices(1, 0);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('pageSize must be a positive integer');
+    }
+  });
+
+  it('should throw on api error response', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      msg: 'Tuya error',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya error');
+    }
+  });
+
+  it('should throw on empty api response', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves(null);
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya API returned no response');
+    }
+  });
 });
