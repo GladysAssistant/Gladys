@@ -822,7 +822,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       device.get = fake.returns([mockDevice]);
 
       device.getDeviceFeatureStates = fake((selector) => {
-        if (selector === 'test-energy-device-index') {
+        if (selector === 'test-device-index') {
           return [
             { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
             { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },

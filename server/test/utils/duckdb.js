@@ -9,6 +9,14 @@ const DEFAULT_TABLES = [
   't_device',
 ];
 
+const isMissingTableError = (error) => {
+  if (!error) {
+    return false;
+  }
+  const message = String(error.message || error);
+  return message.includes('does not exist') || message.includes('Catalog Error') || message.includes('no such table');
+};
+
 const clearDuckDb = async () => {
   // Delete children first to avoid FK issues.
   // eslint-disable-next-line no-restricted-syntax
@@ -17,7 +25,9 @@ const clearDuckDb = async () => {
       // eslint-disable-next-line no-await-in-loop
       await db.duckDbWriteConnectionAllAsync(`DELETE FROM ${table}`);
     } catch (e) {
-      // ignore missing tables for DuckDB
+      if (!isMissingTableError(e)) {
+        throw e;
+      }
     }
   }
 };

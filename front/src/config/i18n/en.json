@@ -1826,7 +1826,7 @@
       "fixing": "Fixing...",
       "featureHint": {
         "title": "Energy monitoring",
-        "hierarchy": "Place it in the “Energy monitoring” hierarchy (My devices tab) to link cost features.",
+        "hierarchy": "Place it in the 'Energy monitoring' hierarchy (My devices tab) to link cost features.",
         "recalc": "Then rerun consumption/cost from the Settings tab.",
         "goToIntegration": "Open Energy monitoring"
       }

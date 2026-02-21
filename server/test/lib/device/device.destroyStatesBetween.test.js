@@ -10,8 +10,17 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 describe('Device.destroyStatesBetween', () => {
+  let variable;
+  let stateManager;
+
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    variable = {
+      getValue: fake.resolves(null),
+    };
+    stateManager = {
+      get: fake.returns(null),
+    };
   });
 
   it('should destroy states between two dates', async () => {
@@ -30,12 +39,6 @@ describe('Device.destroyStatesBetween', () => {
       { value: 5, created_at: oneHourAgo },
     ]);
 
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const stateManager = {
-      get: fake.returns(null),
-    };
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
 
     await deviceInstance.destroyStatesBetween('test-device-feature', fourHoursAgo, twoHoursAgo);
@@ -57,12 +60,6 @@ describe('Device.destroyStatesBetween', () => {
       { value: 3, created_at: new Date('2025-08-28T12:00:00.000Z') },
     ]);
 
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const stateManager = {
-      get: fake.returns(null),
-    };
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
 
     await deviceInstance.destroyStatesBetween(
@@ -85,12 +82,6 @@ describe('Device.destroyStatesBetween', () => {
       { value: 2, created_at: new Date('2025-08-28T11:00:00.000Z') },
     ]);
 
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const stateManager = {
-      get: fake.returns(null),
-    };
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
 
     await deviceInstance.destroyStatesBetween(
@@ -108,12 +99,6 @@ describe('Device.destroyStatesBetween', () => {
   });
 
   it('should throw NotFoundError when device feature does not exist', async () => {
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const stateManager = {
-      get: fake.returns(null),
-    };
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
 
     const promise = deviceInstance.destroyStatesBetween(

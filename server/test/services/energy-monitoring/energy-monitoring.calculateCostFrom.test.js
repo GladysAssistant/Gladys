@@ -733,20 +733,23 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     const rootStub = sinon
       .stub(gladys.device.energySensorManager, 'getRootElectricMeterDevice')
       .returns({ id: 'meter-feature', device_id: 'meter-device' });
-    const res = await energyMonitoring.calculateCostFrom(
-      new Date('2025-10-01T00:00:00.000Z'),
-      undefined,
-      null,
-      '2025-10-02',
-    );
-    expect(res).to.equal(null);
-    expect(destroyBetweenStub.calledOnce).to.equal(true);
-    expect(statesStub.calledOnce).to.equal(true);
-    getStub.restore();
-    destroyBetweenStub.restore();
-    priceStub.restore();
-    statesStub.restore();
-    rootStub.restore();
+    try {
+      const res = await energyMonitoring.calculateCostFrom(
+        new Date('2025-10-01T00:00:00.000Z'),
+        undefined,
+        null,
+        '2025-10-02',
+      );
+      expect(res).to.equal(null);
+      expect(destroyBetweenStub.calledOnce).to.equal(true);
+      expect(statesStub.calledOnce).to.equal(true);
+    } finally {
+      getStub.restore();
+      destroyBetweenStub.restore();
+      priceStub.restore();
+      statesStub.restore();
+      rootStub.restore();
+    }
   });
 
   it('should return null when start date is invalid type', async () => {
@@ -833,15 +836,17 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z'), value: 1 }]);
     const saveMultipleStub = sinon.stub(gladys.device, 'saveMultipleHistoricalStates').rejects(new Error('boom')); // triggers catch
 
-    await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), undefined, 'job-error');
-    expect(errorStub.called).to.equal(true);
-
-    saveMultipleStub.restore();
-    statesStub.restore();
-    priceStub.restore();
-    destroyBetweenStub.restore();
-    rootStub.restore();
-    getStub.restore();
-    errorStub.restore();
+    try {
+      await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), undefined, 'job-error');
+      expect(errorStub.called).to.equal(true);
+    } finally {
+      saveMultipleStub.restore();
+      statesStub.restore();
+      priceStub.restore();
+      destroyBetweenStub.restore();
+      rootStub.restore();
+      getStub.restore();
+      errorStub.restore();
+    }
   });
 });

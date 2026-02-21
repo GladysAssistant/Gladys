@@ -60,7 +60,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
         if (selectorSet.size === 0) {
           return true;
         }
-        const featureSelector = f.selector || f.external_id || f.id;
+        const featureSelector = f.selector;
         return selectorSet.has(featureSelector);
       });
 

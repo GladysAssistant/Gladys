@@ -177,17 +177,17 @@ describe('Job', () => {
       new Promise((resolve) => {
         setTimeout(resolve, ms);
       });
-    const waitForStatus = async (jobId, status, attempts = 0) => {
+    const waitForStatus = async (jobId, status, startedAt = Date.now()) => {
       const jobs = await job.get();
       const current = jobs.find((oneJob) => oneJob.id === jobId);
       if (current && current.status === status) {
         return current;
       }
-      if (attempts >= 40) {
+      if (Date.now() - startedAt >= 2000) {
         throw new Error(`Timeout waiting for job ${jobId} to reach status ${status}`);
       }
-      await sleep(10);
-      return waitForStatus(jobId, status, attempts + 1);
+      await sleep(25);
+      return waitForStatus(jobId, status, startedAt);
     };
 
     it('should run wrapperDetached', async () => {

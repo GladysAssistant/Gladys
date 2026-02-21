@@ -419,12 +419,12 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     // Stub calculateConsumptionFromIndex to throw error on second call
     let callCount = 0;
     const originalCalculateConsumptionFromIndex = energyMonitoring.calculateConsumptionFromIndex;
-    energyMonitoring.calculateConsumptionFromIndex = async (jobId, windowTime) => {
+    energyMonitoring.calculateConsumptionFromIndex = async (...args) => {
       callCount += 1;
       if (callCount === 2) {
         throw new Error('Simulated error for testing');
       }
-      return originalCalculateConsumptionFromIndex.call(energyMonitoring, jobId, windowTime);
+      return originalCalculateConsumptionFromIndex.apply(energyMonitoring, args);
     };
 
     const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
