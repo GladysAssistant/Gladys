@@ -89,6 +89,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
@@ -116,6 +117,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
@@ -149,6 +151,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(false);
@@ -181,6 +184,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     expect(zigbee2mqttManager.mqttRunning).to.equal(false);
@@ -218,6 +222,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     // 2nd call - mqtt is ready
@@ -234,6 +239,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     assert.calledOnce(gladys.system.createContainer);
@@ -286,6 +292,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
       },
     });
     assert.calledOnce(gladys.system.createContainer);

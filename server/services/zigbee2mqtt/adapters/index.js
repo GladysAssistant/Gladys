@@ -56,8 +56,8 @@ const ADAPTERS_BY_CONFIG_KEY = {
   ],
 };
 
-const ADAPTERS = Object.values(ADAPTERS_BY_CONFIG_KEY)
-  .flatMap((values) => values)
-  .sort((a, b) => a.localeCompare(b));
+const ADAPTERS = Object.entries(ADAPTERS_BY_CONFIG_KEY)
+  .flatMap(([configKey, labels]) => labels.map((label) => ({ label, configKey })))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.ZSTACK };
