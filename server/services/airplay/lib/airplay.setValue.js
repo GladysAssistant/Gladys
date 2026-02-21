@@ -43,6 +43,12 @@ async function setValue(device, deviceFeature, value, options) {
             'pipe:1', // Output on stdout
           ]);
 
+          decodeProcess.on('error', (err) => {
+            logger.error('Failed to start ffmpeg');
+            logger.error(err);
+            sender.stop();
+          });
+
           decodeProcess.stdout.on('data', (chunk) => sender.sendPcm(chunk));
           decodeProcess.stdout.on('end', () => {
             setTimeout(() => {

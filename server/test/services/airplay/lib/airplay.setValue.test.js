@@ -40,6 +40,7 @@ const childProcessMock = {
         },
         setEncoding: () => {},
       },
+      on: () => {},
     };
   },
 };
@@ -67,10 +68,6 @@ describe('AirplayHandler.setValue', () => {
   const airplayHandler = new AirplayHandler(gladys, airplaySender, bonjourLib, childProcessMock, serviceId);
 
   beforeEach(() => {
-    sinon.reset();
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
@@ -109,6 +106,7 @@ describe('AirplayHandler.setValue', () => {
           },
           setEncoding: () => {},
         },
+        on: () => {},
       }),
     };
 
@@ -127,6 +125,7 @@ describe('AirplayHandler.setValue', () => {
       setImmediate(resolve);
     });
     sinon.assert.calledOnce(stopSender);
+    sinon.assert.notCalled(sendPcm);
   });
   it('should kill decode process on buffer end event', async () => {
     const killStub = sinon.stub();
@@ -141,6 +140,7 @@ describe('AirplayHandler.setValue', () => {
           on: () => {},
           setEncoding: () => {},
         },
+        on: () => {},
       }),
     };
 
@@ -168,6 +168,41 @@ describe('AirplayHandler.setValue', () => {
       setImmediate(resolve);
     });
     sinon.assert.calledOnce(killStub);
+  });
+  it('should stop sender when ffmpeg process emits an error', async () => {
+    const childProcessWithError = {
+      spawn: () => ({
+        kill: () => {},
+        stdout: {
+          on: () => {},
+        },
+        stderr: {
+          on: () => {},
+          setEncoding: () => {},
+        },
+        on: (type, cb) => {
+          if (type === 'error') {
+            cb(new Error('spawn ffmpeg ENOENT'));
+          }
+        },
+      }),
+    };
+
+    const airplayHandlerWithError = new AirplayHandler(
+      gladys,
+      airplaySender,
+      bonjourLib,
+      childProcessWithError,
+      serviceId,
+    );
+    airplayHandlerWithError.scanTimeout = 1;
+    const devices = await airplayHandlerWithError.scan();
+    const device = devices[0];
+    await airplayHandlerWithError.setValue(device, device.features[0], 'http://play-url.com');
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    sinon.assert.calledOnce(stopSender);
   });
   it('should return device not found', async () => {
     airplayHandler.scanTimeout = 1;
