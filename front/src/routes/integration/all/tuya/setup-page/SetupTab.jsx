@@ -63,11 +63,13 @@ class SetupTab extends Component {
     };
 
     try {
-      tuyaEndpoint = await getVariable('TUYA_ENDPOINT');
-      tuyaAccessKey = await getVariable('TUYA_ACCESS_KEY');
-      tuyaSecretKey = await getVariable('TUYA_SECRET_KEY');
-      tuyaAppAccountId = await getVariable('TUYA_APP_ACCOUNT_UID');
-      tuyaAppUsername = await getVariable('TUYA_APP_USERNAME');
+      [tuyaEndpoint, tuyaAccessKey, tuyaSecretKey, tuyaAppAccountId, tuyaAppUsername] = await Promise.all([
+        getVariable('TUYA_ENDPOINT'),
+        getVariable('TUYA_ACCESS_KEY'),
+        getVariable('TUYA_SECRET_KEY'),
+        getVariable('TUYA_APP_ACCOUNT_UID'),
+        getVariable('TUYA_APP_USERNAME')
+      ]);
 
       this.setState({
         tuyaGetSettingsStatus: RequestStatus.Success,
@@ -202,7 +204,9 @@ class SetupTab extends Component {
         (e && e.message && e.message !== 'TUYA_START_ERROR' ? e.message : null);
       this.setState({
         tuyaSaveSettingsStatus: RequestStatus.Error,
-        tuyaConnectionError: responseMessage
+        tuyaConnectionError: responseMessage,
+        tuyaJustSaved: false,
+        tuyaJustSavedMissing: false
       });
     }
   };
