@@ -6,7 +6,6 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/edit-device';
 import { RequestStatus } from '../../utils/consts';
 import UpdateDevice from './UpdateDevice';
-import withIntlAsProp from '../../utils/withIntlAsProp';
 
 class EditDevicePage extends Component {
   selectFeature(e) {
@@ -187,4 +186,4 @@ class EditDevicePage extends Component {
   }
 }
 
-export default withIntlAsProp(connect('user,session', actions)(EditDevicePage));
+export default connect('user,session', actions)(EditDevicePage);
