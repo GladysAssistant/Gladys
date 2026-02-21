@@ -9,41 +9,31 @@ const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
 const gladys = {};
 
-class airtunes {
-  // eslint-disable-next-line class-methods-use-this
-  add(ipAddress, options) {
-    return {
-      on: (event, cb) => {
-        cb('ready');
-      },
-    };
-  }
+const sendPcm = sinon.stub().returns(null);
+const stopSender = sinon.stub().returns(null);
 
-  // eslint-disable-next-line class-methods-use-this
-  on(event, cb) {
-    cb('end');
-  }
+const airplaySender = (options, callback) => {
+  const senderInstance = { sendPcm, stop: stopSender };
+  process.nextTick(() => callback({ event: 'device', message: 'ready' }));
+  return senderInstance;
+};
 
-  // eslint-disable-next-line class-methods-use-this
-  stopAll(cb) {
-    cb();
-  }
-}
-
-const pipe = sinon.stub().returns(null);
 const childProcessMock = {
   spawn: (command, args, options) => {
     return {
       kill: () => {},
       stdout: {
         on: (type, cb) => {
-          cb('log log log');
+          if (type === 'data') {
+            cb(Buffer.from('audio-chunk'));
+          }
         },
-        pipe,
       },
       stderr: {
         on: (type, cb) => {
-          cb('execvp() stderr log log');
+          if (type === 'data') {
+            cb('some stderr output');
+          }
         },
         setEncoding: () => {},
       },
@@ -71,7 +61,7 @@ const bonjourLib = {
 };
 
 describe('AirplayHandler.setValue', () => {
-  const airplayHandler = new AirplayHandler(gladys, airtunes, bonjourLib, childProcessMock, serviceId);
+  const airplayHandler = new AirplayHandler(gladys, airplaySender, bonjourLib, childProcessMock, serviceId);
 
   beforeEach(() => {
     sinon.reset();
@@ -86,13 +76,16 @@ describe('AirplayHandler.setValue', () => {
     const devices = await airplayHandler.scan();
     const device = devices[0];
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
-    sinon.assert.calledOnce(pipe);
+    await new Promise((resolve) => setImmediate(resolve));
+    sinon.assert.calledOnce(sendPcm);
   });
   it('should talk on speaker with custom volume', async () => {
     airplayHandler.scanTimeout = 1;
     const devices = await airplayHandler.scan();
     const device = devices[0];
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com', { volume: 30 });
+    await new Promise((resolve) => setImmediate(resolve));
+    sinon.assert.calledOnce(sendPcm);
   });
   it('should return device not found', async () => {
     airplayHandler.scanTimeout = 1;
