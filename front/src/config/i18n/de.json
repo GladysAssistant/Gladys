@@ -1222,7 +1222,8 @@
         "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert, schalte zurück in den Cloud-Modus.",
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
-        "protocol35Unsupported": "Protokoll 3.5 wird lokal noch nicht unterstützt.",
+        "protocol35Unsupported": "Protokoll 3.5 wird lokal unterstützt.",
+        "createGithubIssue": "Dieses Gerät vorschlagen",
         "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
         "productIdLabel": "Produkt-ID",
         "productKeyLabel": "Produktschlüssel"
@@ -1255,7 +1256,7 @@
         "localTitle": "<br /><strong>Lokal</strong><br />",
         "descriptionLocalMode": "Der lokale Modus kann nach der Cloud-Konfiguration genutzt werden: Trage lokale IP und Protokollversion pro Gerät ein, um lokal abzufragen. Wenn die Geräte im selben Netzwerk wie der Gladys-Host sind, werden IP-Erkennung und Protokollversion automatisch erkannt. So kannst du die Cloud-Verlängerung umgehen, aber für das Hinzufügen neuer Geräte in der Tuya-App bleibt die Cloud nötig.",
         "limitationsTitle": "<br /><strong>Aktuelle Einschränkungen</strong><br />",
-        "limitationsProtocol35": "Protokoll 3.5 wird lokal noch nicht unterstützt.",
+        "limitationsProtocol35": "Protokoll 3.5 wird lokal unterstützt.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Westamerika",

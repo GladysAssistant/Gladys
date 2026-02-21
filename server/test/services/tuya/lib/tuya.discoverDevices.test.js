@@ -26,9 +26,13 @@ const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
 describe('TuyaHandler.discoverDevices', () => {
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
+  let originalStateManagerGet;
+  let originalDeviceGet;
 
   beforeEach(() => {
     sinon.reset();
+    originalStateManagerGet = gladys.stateManager.get;
+    originalDeviceGet = gladys.device.get;
     tuyaHandler.status = STATUS.CONNECTED;
     tuyaHandler.connector = {
       request: sinon
@@ -78,6 +82,8 @@ describe('TuyaHandler.discoverDevices', () => {
 
   afterEach(() => {
     sinon.reset();
+    gladys.stateManager.get = originalStateManagerGet;
+    gladys.device.get = originalDeviceGet;
   });
 
   it('should fail because service is not ready', async () => {

@@ -377,6 +377,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {

@@ -7,7 +7,11 @@ const { STATUS } = require('./lib/utils/tuya.constants');
 module.exports = function TuyaService(gladys, serviceId) {
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
   const RECONNECT_INTERVAL_MS = 1000 * 60 * 30;
+  const QUICK_RECONNECT_ATTEMPTS = 3;
+  const QUICK_RECONNECT_DELAY_MS = 1000 * 3;
   let reconnectInterval = null;
+  let quickReconnectTimeouts = [];
+  let quickReconnectInProgress = false;
 
   /**
    * @description Attempt to reconnect to Tuya if configured and not manually disconnected.
@@ -19,21 +23,77 @@ module.exports = function TuyaService(gladys, serviceId) {
     try {
       const status = await tuyaHandler.getStatus();
       if (!status.configured || status.manual_disconnect) {
-        return;
+        return false;
       }
       if (
         tuyaHandler.status === STATUS.CONNECTED ||
         tuyaHandler.status === STATUS.CONNECTING ||
         tuyaHandler.status === STATUS.DISCOVERING_DEVICES
       ) {
-        return;
+        return false;
       }
       logger.info('Tuya is disconnected, attempting auto-reconnect...');
       const configuration = await tuyaHandler.getConfiguration();
       await tuyaHandler.connect(configuration);
+      return true;
     } catch (e) {
       logger.warn('Auto-reconnect to Tuya failed:', e.message || e);
+      return true;
     }
+  }
+
+  /**
+   * @description Clear pending quick reconnect timers and reset state.
+   * @example
+   * clearQuickReconnects();
+   */
+  function clearQuickReconnects() {
+    if (quickReconnectTimeouts.length > 0) {
+      quickReconnectTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+      quickReconnectTimeouts = [];
+    }
+    quickReconnectInProgress = false;
+  }
+
+  /**
+   * @description Schedule quick reconnect attempts when disconnected.
+   * @returns {Promise<void>} Resolves once the current attempt is finished.
+   * @example
+   * await scheduleQuickReconnects();
+   */
+  function scheduleQuickReconnects() {
+    if (quickReconnectInProgress) {
+      return Promise.resolve();
+    }
+    quickReconnectInProgress = true;
+    let attempts = 0;
+
+    const runAttempt = async () => {
+      attempts += 1;
+      const shouldRetry = await tryReconnect();
+      const isConnecting =
+        tuyaHandler.status === STATUS.CONNECTED ||
+        tuyaHandler.status === STATUS.CONNECTING ||
+        tuyaHandler.status === STATUS.DISCOVERING_DEVICES;
+
+      if (!shouldRetry || isConnecting) {
+        clearQuickReconnects();
+        return;
+      }
+
+      if (attempts < QUICK_RECONNECT_ATTEMPTS) {
+        const timeoutId = setTimeout(runAttempt, QUICK_RECONNECT_DELAY_MS);
+        if (timeoutId && typeof timeoutId.unref === 'function') {
+          timeoutId.unref();
+        }
+        quickReconnectTimeouts.push(timeoutId);
+        return;
+      }
+
+      quickReconnectInProgress = false;
+    };
+
+    return runAttempt();
   }
 
   /**
@@ -48,8 +108,11 @@ module.exports = function TuyaService(gladys, serviceId) {
     if (tuyaHandler.status === STATUS.CONNECTED) {
       await tuyaHandler.loadDevices();
     }
+    if (tuyaHandler.status !== STATUS.CONNECTED) {
+      scheduleQuickReconnects();
+    }
     if (!reconnectInterval) {
-      reconnectInterval = setInterval(tryReconnect, RECONNECT_INTERVAL_MS);
+      reconnectInterval = setInterval(scheduleQuickReconnects, RECONNECT_INTERVAL_MS);
     }
   }
 
@@ -65,6 +128,7 @@ module.exports = function TuyaService(gladys, serviceId) {
       clearInterval(reconnectInterval);
       reconnectInterval = null;
     }
+    clearQuickReconnects();
     await tuyaHandler.disconnect();
   }
 

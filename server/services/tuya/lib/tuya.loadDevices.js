@@ -10,6 +10,9 @@ const { API, GLADYS_VARIABLES } = require('./utils/tuya.constants');
  * await loadDevices();
  */
 async function loadDevices(pageNo = 1, pageSize = 100) {
+  if (!Number.isInteger(pageSize) || pageSize <= 0) {
+    throw new Error('pageSize must be a positive integer');
+  }
   const sourceId = await this.gladys.variable.getValue(GLADYS_VARIABLES.APP_ACCOUNT_UID, this.serviceId);
 
   const responsePage = await this.connector.request({

@@ -145,6 +145,55 @@ describe('TuyaHandler.localScan', () => {
     });
   });
 
+  it('should ignore payloads when all parsers fail', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: () => {},
+          close: () => {},
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        throw new Error('parse failed');
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+
+    sockets.forEach((socket) => {
+      if (socket.handlers.message) {
+        socket.handlers.message(Buffer.from('test'));
+      }
+    });
+
+    await clock.tickAsync(1100);
+    const result = await promise;
+    clock.restore();
+
+    expect(result).to.deep.equal({
+      devices: {},
+      portErrors: {},
+    });
+  });
+
   it('should handle socket address errors on bind', async () => {
     const sockets = [];
     const dgramStub = {
@@ -227,8 +276,8 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();

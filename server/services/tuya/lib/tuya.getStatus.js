@@ -1,4 +1,5 @@
 const { GLADYS_VARIABLES, STATUS } = require('./utils/tuya.constants');
+const { normalizeBoolean } = require('./utils/tuya.normalize');
 
 /**
  * @description Get Tuya connection and configuration status.
@@ -13,8 +14,7 @@ async function getStatus() {
   const manualDisconnect = await this.gladys.variable.getValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, this.serviceId);
 
   const configured = Boolean(endpoint && accessKey && secretKey);
-  const manualDisconnectEnabled =
-    manualDisconnect === true || manualDisconnect === 'true' || manualDisconnect === '1' || manualDisconnect === 1;
+  const manualDisconnectEnabled = normalizeBoolean(manualDisconnect);
 
   return {
     status: this.status || STATUS.NOT_INITIALIZED,

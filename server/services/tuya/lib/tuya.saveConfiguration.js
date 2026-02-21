@@ -17,7 +17,7 @@ async function saveConfiguration(configuration) {
   await this.gladys.variable.setValue(GLADYS_VARIABLES.SECRET_KEY, secretKey, this.serviceId);
   await this.gladys.variable.setValue(GLADYS_VARIABLES.APP_ACCOUNT_UID, appAccountId, this.serviceId);
   await this.gladys.variable.setValue(GLADYS_VARIABLES.APP_USERNAME, appUsername, this.serviceId);
-  await this.gladys.variable.setValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, false, this.serviceId);
+  await this.gladys.variable.setValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, 'false', this.serviceId);
 
   return configuration;
 }

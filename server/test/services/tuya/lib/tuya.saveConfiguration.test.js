@@ -43,6 +43,6 @@ describe('TuyaHandler.saveConfiguration', () => {
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.SECRET_KEY, 'secretKey', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, 'appAccountUID', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.APP_USERNAME, 'user@example.com', serviceId);
-    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, false, serviceId);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, 'false', serviceId);
   });
 });

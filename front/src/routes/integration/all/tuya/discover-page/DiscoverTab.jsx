@@ -25,6 +25,7 @@ const getDeviceRank = device => {
   if (isCreated && !isUpdatable) {
     return 3;
   }
+  // Fallback for unexpected combinations (should be unreachable with current flags).
   return 4;
 };
 
@@ -88,6 +89,51 @@ class DiscoverTab extends Component {
         errorLoading: true
       });
     }
+  };
+
+  handleDeviceSaved = (savedDevice, previousDevice) => {
+    const externalId =
+      (savedDevice && savedDevice.external_id) || (previousDevice && previousDevice.external_id) || null;
+    if (!externalId) {
+      return;
+    }
+    this.setState(prevState => {
+      const { discoveredDevices } = prevState;
+      if (!Array.isArray(discoveredDevices) || discoveredDevices.length === 0) {
+        return null;
+      }
+      const deviceIndex = discoveredDevices.findIndex(device => device.external_id === externalId);
+      if (deviceIndex === -1) {
+        return null;
+      }
+      const currentDevice = discoveredDevices[deviceIndex] || {};
+      const mergedDevice = {
+        ...currentDevice,
+        ...savedDevice
+      };
+      if (
+        Array.isArray(currentDevice.features) &&
+        (!Array.isArray(savedDevice.features) || savedDevice.features.length === 0)
+      ) {
+        mergedDevice.features = currentDevice.features;
+      }
+      if (
+        Array.isArray(currentDevice.params) &&
+        (!Array.isArray(savedDevice.params) || savedDevice.params.length === 0)
+      ) {
+        mergedDevice.params = currentDevice.params;
+      }
+      if (!mergedDevice.created_at && !currentDevice.created_at) {
+        mergedDevice.created_at = new Date().toISOString();
+      }
+      return {
+        discoveredDevices: [
+          ...discoveredDevices.slice(0, deviceIndex),
+          mergedDevice,
+          ...discoveredDevices.slice(deviceIndex + 1)
+        ]
+      };
+    });
   };
 
   runLocalScan = async () => {
@@ -208,6 +254,7 @@ class DiscoverTab extends Component {
                     device={device}
                     deviceIndex={index}
                     housesWithRooms={housesWithRooms}
+                    onDeviceSaved={this.handleDeviceSaved}
                   />
                 ))}
                 {orderedDevices.length === 0 && <EmptyState />}

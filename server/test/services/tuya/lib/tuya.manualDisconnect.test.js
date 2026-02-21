@@ -29,7 +29,7 @@ describe('TuyaHandler.manualDisconnect', () => {
 
     await tuyaHandler.manualDisconnect();
 
-    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, true, serviceId);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, 'true', serviceId);
     assert.calledWith(disconnectStub, { manual: true });
   });
 });

@@ -1352,7 +1352,8 @@
         "localPollRequired": "Le mode local est activé et les paramètres locaux ont changé. Lancez un poll local des DP avec succès avant de sauvegarder. Si vous n'arrivez pas à faire fonctionner le local, repassez en mode cloud.",
         "localPollSuccess": "Poll local OK.",
         "localPollError": "Échec du poll local :",
-        "protocol35Unsupported": "Le protocole 3.5 n'est pas pris en charge en local pour le moment.",
+        "protocol35Unsupported": "Le protocole 3.5 est pris en charge en local.",
+        "createGithubIssue": "Proposer ce périphérique",
         "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
         "productIdLabel": "Identifiant produit",
         "productKeyLabel": "Clé produit"
@@ -1385,7 +1386,7 @@
         "localTitle": "<br /><strong>Local</strong><br />",
         "descriptionLocalMode": "Le mode local peut être utilisé après la configuration cloud : renseignez l'IP locale et la version du protocole sur chaque appareil pour interroger en local. Si les appareils sont sur le même réseau que la machine Gladys, la découverte IP et la version du protocole sont automatiquement détectées. Ce mode permet de se passer du renouvellement cloud, mais il reste nécessaire lors de l'ajout d'un nouvel appareil depuis l'application Tuya.",
         "limitationsTitle": "<br /><strong>Limites actuelles</strong><br />",
-        "limitationsProtocol35": "Le protocole 3.5 n'est pas encore pris en charge en local.",
+        "limitationsProtocol35": "Le protocole 3.5 est pris en charge en local.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Western America",

@@ -17,6 +17,8 @@ describe('TuyaHandler.disconnect', () => {
 
   beforeEach(() => {
     tuyaHandler.status = 'UNKNOWN';
+    tuyaHandler.discoveredDevices = [{ external_id: 'tuya:123' }];
+    gladys.event.emit.resetHistory();
   });
 
   it('should reset attributes', () => {
@@ -25,6 +27,7 @@ describe('TuyaHandler.disconnect', () => {
     expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     expect(tuyaHandler.connector).to.eq(null);
     expect(tuyaHandler.lastError).to.eq(null);
+    expect(tuyaHandler.discoveredDevices).to.eq(null);
     sinon.assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
       payload: { status: STATUS.NOT_INITIALIZED, manual_disconnect: false },

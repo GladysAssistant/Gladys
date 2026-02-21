@@ -1,4 +1,5 @@
 const { GLADYS_VARIABLES, STATUS } = require('./utils/tuya.constants');
+const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
@@ -9,8 +10,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 async function init() {
   const configuration = await this.getConfiguration();
   const manualDisconnect = await this.gladys.variable.getValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, this.serviceId);
-  const manualDisconnectEnabled =
-    manualDisconnect === true || manualDisconnect === 'true' || manualDisconnect === '1' || manualDisconnect === 1;
+  const manualDisconnectEnabled = normalizeBoolean(manualDisconnect);
 
   if (manualDisconnectEnabled) {
     this.status = STATUS.NOT_INITIALIZED;

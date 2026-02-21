@@ -10,11 +10,12 @@ const { STATUS } = require('./utils/tuya.constants');
  * disconnect();
  */
 function disconnect(options = {}) {
-  logger.debug('Disonnecting from Tuya...');
+  logger.debug('Disconnecting from Tuya...');
   const { manual = false } = options;
   this.connector = null;
   this.status = STATUS.NOT_INITIALIZED;
   this.lastError = null;
+  this.discoveredDevices = null;
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,

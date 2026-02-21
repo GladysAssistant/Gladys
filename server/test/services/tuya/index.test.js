@@ -117,6 +117,7 @@ describe('TuyaService', () => {
     tuyaService.device.connect = fake.resolves();
 
     await tuyaService.start();
+    tuyaService.device.status = STATUS.DISCONNECTED;
 
     await intervalCallback();
 

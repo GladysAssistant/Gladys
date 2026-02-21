@@ -183,7 +183,7 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
       tuyaManager.gladys && tuyaManager.gladys.stateManager
         ? localDiscoveredDevices.filter((device) => {
             const existInGladys = tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id);
-            return existInGladys === null;
+            return !existInGladys;
           })
         : localDiscoveredDevices;
 

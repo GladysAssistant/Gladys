@@ -6,7 +6,7 @@ const { GLADYS_VARIABLES } = require('./utils/tuya.constants');
  * await manualDisconnect();
  */
 async function manualDisconnect() {
-  await this.gladys.variable.setValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, true, this.serviceId);
+  await this.gladys.variable.setValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, 'true', this.serviceId);
   await this.disconnect({ manual: true });
 }
 

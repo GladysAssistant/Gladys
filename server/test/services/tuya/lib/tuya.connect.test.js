@@ -102,7 +102,7 @@ describe('TuyaHandler.connect', () => {
 
     assert.calledOnce(client.init);
     assert.calledOnce(gladys.variable.setValue);
-    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, false, serviceId);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, 'false', serviceId);
 
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
