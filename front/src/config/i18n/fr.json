@@ -1349,7 +1349,7 @@
         "localPollButton": "Poll local des DP",
         "localPollInProgress": "Poll local en cours... protocole {{protocol}}.",
         "localPollHelp": "Si vous connaissez le protocole, sélectionnez-le puis cliquez pour vérifier. Sinon, cliquez directement pour un scan complet (plus long).",
-        "localPollRequired": "Le mode local est activé et les paramètres locaux ont changé. Lancez un poll local des DP avec succès avant de sauvegarder. Si vous n'arrivez pas à faire fonctionner le local (ex: protocole 3.5 non pris en charge), repassez en mode cloud.",
+        "localPollRequired": "Le mode local est activé et les paramètres locaux ont changé. Lancez un poll local des DP avec succès avant de sauvegarder. Si vous n'arrivez pas à faire fonctionner le local, repassez en mode cloud.",
         "localPollSuccess": "Poll local OK.",
         "localPollError": "Échec du poll local :",
         "protocol35Unsupported": "Le protocole 3.5 n'est pas pris en charge en local pour le moment.",

@@ -1219,7 +1219,7 @@
         "localPollButton": "Lokales DPS abfragen",
         "localPollInProgress": "Lokaler Poll läuft... Protokoll {{protocol}}.",
         "localPollHelp": "Wenn du das Protokoll kennst, wähle es aus und klicke zum Prüfen. Wenn nicht, klicke direkt für einen vollständigen Scan (dauert länger).",
-        "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert (z. B. Protokoll 3.5 noch nicht unterstützt), schalte zurück in den Cloud-Modus.",
+        "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert, schalte zurück in den Cloud-Modus.",
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
         "protocol35Unsupported": "Protokoll 3.5 wird lokal noch nicht unterstützt.",

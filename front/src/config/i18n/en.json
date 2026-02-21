@@ -1114,7 +1114,7 @@
         "localPollButton": "Poll local DPS",
         "localPollInProgress": "Local poll in progress (protocol {{protocol}})...",
         "localPollHelp": "If you know the protocol, select it then click the button to verify. If you don't, just click the button for a full scan (it takes longer).",
-        "localPollRequired": "Local mode is enabled and local settings changed. Run \"Poll local DPS\" successfully before saving. If local mode can't work (e.g. protocol 3.5 not supported yet), switch back to cloud mode.",
+        "localPollRequired": "Local mode is enabled and local settings changed. Run \"Poll local DPS\" successfully before saving. If local mode doesn't work, switch back to cloud mode.",
         "localPollSuccess": "Local poll OK.",
         "localPollError": "Local poll failed:",
         "protocol35Unsupported": "Protocol 3.5 is not supported locally yet.",
