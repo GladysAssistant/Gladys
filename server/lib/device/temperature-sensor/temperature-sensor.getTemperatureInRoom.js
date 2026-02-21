@@ -8,6 +8,41 @@ const DEFAULT_PARAMETERS = {
   unit: DEVICE_FEATURE_UNITS.CELSIUS,
 };
 
+// Define reasonable temperature bounds (in celsius)
+const TEMPERATURE_BOUNDS = {
+  MIN: -273,
+  MAX: 200,
+};
+
+/**
+ * @description Validate if a temperature value is valid.
+ * @param {number} temperature - The temperature value to validate.
+ * @param {string} unit - The unit of the temperature (celsius or fahrenheit).
+ * @returns {boolean} - True if the temperature is valid, false otherwise.
+ * @private
+ * @example
+ * isValidTemperature(25, celsius) => true
+ * isValidTemperature(-300, celsius) => false
+ * isValidTemperature(500, fahrenheit) => false
+ * isValidTemperature(100, fahrenheit) => true;
+ */
+function isValidTemperature(temperature, unit) {
+  // Check if temperature is a number and if temperature is finite
+  if (typeof temperature !== 'number' || Number.isNaN(temperature) || !Number.isFinite(temperature)) {
+    return false;
+  }
+
+  // Convert to celsius for bounds checking if needed and check bounds
+  const temperatureInCelsius =
+    unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? fahrenheitToCelsius(temperature) : temperature;
+
+  if (temperatureInCelsius < TEMPERATURE_BOUNDS.MIN || temperatureInCelsius > TEMPERATURE_BOUNDS.MAX) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * @description Return the average value of the temperature in a room.
  * @param {string} roomId - The uuid of the room.
@@ -29,6 +64,7 @@ async function getTemperatureInRoom(roomId, options) {
       {
         model: db.Device,
         as: 'device',
+        attributes: ['id', 'name', 'selector'],
         where: {
           room_id: roomId,
         },
@@ -49,14 +85,8 @@ async function getTemperatureInRoom(roomId, options) {
     },
   });
 
-  if (deviceFeatures.length === 0) {
-    return {
-      temperature: null,
-      unit: optionsWithDefault.unit,
-    };
-  }
-
   let total = 0;
+  let validTemperatureValues = 0;
 
   deviceFeatures.forEach((deviceFeature) => {
     let temperature;
@@ -75,11 +105,29 @@ async function getTemperatureInRoom(roomId, options) {
     } else {
       temperature = deviceFeature.last_value;
     }
+
+    // Validate temperature value
+    if (!isValidTemperature(temperature, optionsWithDefault.unit)) {
+      logger.warn(
+        `Invalid temperature value ${temperature} ${optionsWithDefault.unit} from device "${deviceFeature.device.name}" (${deviceFeature.device.selector}), skipping`,
+      );
+      return; // skip this value
+    }
+
     total += temperature;
+    validTemperatureValues += 1;
   });
 
+  // If no valid temperatures found, return null
+  if (validTemperatureValues === 0) {
+    return {
+      temperature: null,
+      unit: optionsWithDefault.unit,
+    };
+  }
+
   // we calculate the average value
-  const averageTemperature = total / deviceFeatures.length;
+  const averageTemperature = total / validTemperatureValues;
 
   // return temperature and unit
   return {
