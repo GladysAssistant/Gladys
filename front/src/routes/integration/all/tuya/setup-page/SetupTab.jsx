@@ -141,31 +141,37 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false
     });
     try {
+      const tuyaEndpoint = (this.state.tuyaEndpoint || '').trim();
+      const tuyaAccessKey = (this.state.tuyaAccessKey || '').trim();
+      const tuyaSecretKey = (this.state.tuyaSecretKey || '').trim();
+      const tuyaAppAccountId = (this.state.tuyaAppAccountId || '').trim();
+      const tuyaAppUsername = (this.state.tuyaAppUsername || '').trim();
+
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
-        value: this.state.tuyaEndpoint
+        value: tuyaEndpoint
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
-        value: this.state.tuyaAccessKey.trim()
+        value: tuyaAccessKey
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SECRET_KEY', {
-        value: this.state.tuyaSecretKey.trim()
+        value: tuyaSecretKey
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_ACCOUNT_UID', {
-        value: this.state.tuyaAppAccountId.trim()
+        value: tuyaAppAccountId
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_USERNAME', {
-        value: this.state.tuyaAppUsername.trim()
+        value: tuyaAppUsername
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
         value: false
       });
 
-      const configured = !!(this.state.tuyaEndpoint && this.state.tuyaAccessKey && this.state.tuyaSecretKey);
+      const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey);
       if (!configured) {
         this.setState({
           tuyaSaveSettingsStatus: RequestStatus.Success,

@@ -100,6 +100,7 @@ async function localPoll(payload) {
       throw new BadParameters(errorMessage);
     }
     logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
+    tuyaLocal.removeListener('error', onError);
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
@@ -107,6 +108,7 @@ async function localPoll(payload) {
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
     try {
+      tuyaLocal.removeListener('error', onError);
       await tuyaLocal.disconnect();
     } catch (err) {
       // ignore
