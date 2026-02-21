@@ -75,11 +75,15 @@ describe('AirplayHandler.setValue', () => {
     airplayHandler.scanTimeout = 1;
     const devices = await airplayHandler.scan();
     const device = devices[0];
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout'] });
     await airplayHandler.setValue(device, device.features[0], 'http://play-url.com');
     await new Promise((resolve) => {
       setImmediate(resolve);
     });
+    clock.tick(7000);
     sinon.assert.calledOnce(sendPcm);
+    sinon.assert.calledOnce(stopSender);
+    clock.restore();
   });
   it('should talk on speaker with custom volume', async () => {
     airplayHandler.scanTimeout = 1;
