@@ -18,10 +18,14 @@ describe('TuyaHandler.loadDeviceDetails', () => {
     tuyaHandler.connector = {
       request: sinon
         .stub()
-        .onFirstCall()
+        .onCall(0)
         .resolves({ result: { details: 'specification' } })
-        .onSecondCall()
-        .resolves({ result: { local_key: 'localKey' } }),
+        .onCall(1)
+        .resolves({ result: { local_key: 'localKey' } })
+        .onCall(2)
+        .resolves({ result: { dps: { 1: true } } })
+        .onCall(3)
+        .resolves({ result: { model: '{"services":[]}' } }),
     };
   });
 
@@ -35,16 +39,31 @@ describe('TuyaHandler.loadDeviceDetails', () => {
   it('should load device details', async () => {
     const devices = await tuyaHandler.loadDeviceDetails({ id: 1 });
 
-    expect(devices).to.deep.eq({ id: 1, local_key: 'localKey', specifications: { details: 'specification' } });
+    expect(devices).to.deep.eq({
+      id: 1,
+      local_key: 'localKey',
+      specifications: { details: 'specification' },
+      properties: { dps: { 1: true } },
+      thing_model: { services: [] },
+      thing_model_raw: '{"services":[]}',
+    });
 
-    assert.callCount(tuyaHandler.connector.request, 2);
+    assert.callCount(tuyaHandler.connector.request, 4);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_0}/devices/1/specification`,
+      path: `${API.VERSION_1_2}/devices/1/specification`,
     });
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
       path: `${API.VERSION_1_0}/devices/1`,
+    });
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/1/shadow/properties`,
+    });
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/1/model`,
     });
   });
 
@@ -52,14 +71,25 @@ describe('TuyaHandler.loadDeviceDetails', () => {
     const warnStub = sinon.stub(logger, 'warn');
     tuyaHandler.connector.request = sinon
       .stub()
-      .onFirstCall()
+      .onCall(0)
       .rejects(new Error('spec failure'))
-      .onSecondCall()
-      .resolves({ result: { local_key: 'localKey' } });
+      .onCall(1)
+      .resolves({ result: { local_key: 'localKey' } })
+      .onCall(2)
+      .resolves({ result: { dps: { 1: true } } })
+      .onCall(3)
+      .resolves({ result: { model: '{"services":[]}' } });
 
     const device = await tuyaHandler.loadDeviceDetails({ id: 1 });
 
-    expect(device).to.deep.eq({ id: 1, local_key: 'localKey', specifications: {} });
+    expect(device).to.deep.eq({
+      id: 1,
+      local_key: 'localKey',
+      specifications: {},
+      properties: { dps: { 1: true } },
+      thing_model: { services: [] },
+      thing_model_raw: '{"services":[]}',
+    });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load specifications/);
   });
@@ -68,14 +98,24 @@ describe('TuyaHandler.loadDeviceDetails', () => {
     const warnStub = sinon.stub(logger, 'warn');
     tuyaHandler.connector.request = sinon
       .stub()
-      .onFirstCall()
+      .onCall(0)
       .resolves({ result: { details: 'specification' } })
-      .onSecondCall()
-      .rejects(new Error('details failure'));
+      .onCall(1)
+      .rejects(new Error('details failure'))
+      .onCall(2)
+      .resolves({ result: { dps: { 1: true } } })
+      .onCall(3)
+      .resolves({ result: { model: '{"services":[]}' } });
 
     const device = await tuyaHandler.loadDeviceDetails({ id: 1 });
 
-    expect(device).to.deep.eq({ id: 1, specifications: { details: 'specification' } });
+    expect(device).to.deep.eq({
+      id: 1,
+      specifications: { details: 'specification' },
+      properties: { dps: { 1: true } },
+      thing_model: { services: [] },
+      thing_model_raw: '{"services":[]}',
+    });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load details/);
   });

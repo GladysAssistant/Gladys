@@ -37,7 +37,7 @@ describe('TuyaHandler.discoverDevices', () => {
     tuyaHandler.connector = {
       request: sinon
         .stub()
-        .onFirstCall()
+        .onCall(0)
         .resolves({
           result: [
             {
@@ -50,7 +50,7 @@ describe('TuyaHandler.discoverDevices', () => {
             },
           ],
         })
-        .onSecondCall()
+        .onCall(1)
         .resolves({
           result: {
             details: 'details',
@@ -70,12 +70,22 @@ describe('TuyaHandler.discoverDevices', () => {
             ],
           },
         })
-        .onThirdCall()
+        .onCall(2)
         .resolves({
           result: {
             local_key: 'localKey',
             ip: '1.1.1.1',
           },
+        })
+        .onCall(3)
+        .resolves({
+          result: {
+            dps: { 1: true },
+          },
+        })
+        .onCall(4)
+        .resolves({
+          result: { model: '{"services":[]}' },
         }),
     };
   });
@@ -148,7 +158,7 @@ describe('TuyaHandler.discoverDevices', () => {
             has_feedback: false,
             max: 1,
             min: 0,
-            name: 'name',
+            name: 'switch_1',
             read_only: false,
             selector: 'tuya-uuid-switch-1',
             type: 'binary',
@@ -175,11 +185,34 @@ describe('TuyaHandler.discoverDevices', () => {
             value: false,
           },
         ],
+        properties: {
+          dps: { 1: true },
+        },
         product_id: undefined,
         product_key: undefined,
+        specifications: {
+          functions: [
+            {
+              name: 'name',
+              code: 'switch_1',
+              type: 'Boolean',
+            },
+          ],
+          status: [
+            {
+              name: 'cur_power',
+              code: 'cur_power',
+              type: 'Integer',
+            },
+          ],
+        },
         selector: 'tuya-uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: true,
+        thing_model: {
+          services: [],
+        },
+        thing_model_raw: '{"services":[]}',
         online: true,
       },
     ]);
@@ -194,7 +227,7 @@ describe('TuyaHandler.discoverDevices', () => {
       payload: { status: STATUS.CONNECTED },
     });
 
-    assert.callCount(tuyaHandler.connector.request, 3);
+    assert.callCount(tuyaHandler.connector.request, 5);
   });
 
   it('should keep local params from existing devices', async () => {

@@ -29,8 +29,9 @@ function convertFeature(tuyaFunctions, externalId) {
   }
 
   const featureExternalId = `${externalId}:${code}`;
+  const featureName = code || name;
   const feature = {
-    name,
+    name: featureName,
     external_id: featureExternalId,
     selector: slugify(featureExternalId),
     read_only: readOnly,

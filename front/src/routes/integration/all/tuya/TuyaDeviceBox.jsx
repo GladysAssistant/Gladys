@@ -6,11 +6,13 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
+import style from './style.css';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
 const GITHUB_SEARCH_API_URL = 'https://api.github.com/search/issues?q=';
 const GITHUB_SEARCH_CACHE_TTL_MS = 1000 * 60 * 5;
+const MAX_GITHUB_URL_LENGTH = 8000;
 const githubIssueCache = new Map();
 const LOCAL_POLL_FREQUENCY_MS = 10 * 1000;
 const CLOUD_POLL_FREQUENCY_MS = 30 * 1000;
@@ -44,7 +46,7 @@ const sanitizeParams = params => {
 const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 
-const IGNORED_PARTIAL_DPS = new Set(['11']);
+const IGNORED_PARTIAL_DPS = new Set(['11', '6']);
 
 const getLocalDpsFromCode = code => {
   if (!code) {
@@ -83,6 +85,35 @@ const getUnknownDpsKeys = (localPollDps, features) => {
   }
   const knownKeys = getKnownDpsKeys(features);
   return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !IGNORED_PARTIAL_DPS.has(key));
+};
+
+const getUnknownSpecificationCodes = (specifications, features) => {
+  if (!specifications || (!Array.isArray(specifications.functions) && !Array.isArray(specifications.status))) {
+    return [];
+  }
+  const knownCodes = new Set();
+  if (Array.isArray(features)) {
+    features.forEach(feature => {
+      const parts = (feature.external_id || '').split(':');
+      const code = parts.length >= 3 ? parts[2] : null;
+      if (code) {
+        knownCodes.add(code.toLowerCase());
+      }
+    });
+  }
+  const specCodes = new Set();
+  ['functions', 'status'].forEach(key => {
+    const entries = specifications[key];
+    if (!Array.isArray(entries)) {
+      return;
+    }
+    entries.forEach(entry => {
+      if (entry && entry.code) {
+        specCodes.add(entry.code);
+      }
+    });
+  });
+  return Array.from(specCodes).filter(code => !knownCodes.has(code.toLowerCase()));
 };
 
 const getParamValue = (device, name) => {
@@ -153,33 +184,62 @@ const checkGithubIssueExists = async title => {
 };
 
 const buildIssuePayload = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
-  const sanitized = { ...device };
-  delete sanitized.local_key;
-  delete sanitized.ip;
-  delete sanitized.cloud_ip;
-  if (Array.isArray(sanitized.params)) {
-    sanitized.params = sanitizeParams(sanitized.params);
+  if (!device) {
+    return null;
   }
-  sanitized.local_poll = {
-    status: localPollStatus,
-    error: localPollError || null,
-    protocol: localPollValidation ? localPollValidation.protocol : null,
-    dps: localPollDps || null
+  const sanitizedParams = Array.isArray(device.params) ? sanitizeParams(device.params) : [];
+  const productId = device.product_id || getParamValue(device, 'PRODUCT_ID') || null;
+  const productKey = device.product_key || getParamValue(device, 'PRODUCT_KEY') || null;
+  return {
+    id: device.id || null,
+    name: device.name || null,
+    selector: device.selector || null,
+    model: device.model || device.product_name || null,
+    external_id: device.external_id || null,
+    service_id: device.service_id || null,
+    product_id: productId,
+    product_key: productKey,
+    online: device.online !== undefined ? device.online : null,
+    protocol_version: device.protocol_version || null,
+    local_override: getLocalOverrideValue(device),
+    specifications: device.specifications || device.specificationsPayload || null,
+    properties: device.properties || null,
+    thing_model: device.thing_model || null,
+    thing_model_raw: device.thing_model_raw || null,
+    features: Array.isArray(device.features) ? device.features : [],
+    params: sanitizedParams,
+    local_poll: {
+      status: localPollStatus || null,
+      error: localPollError || null,
+      protocol: localPollValidation ? localPollValidation.protocol : null,
+      dps: localPollDps || null
+    }
   };
-  return sanitized;
 };
 
-const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
+const buildIssueBody = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
+  `\`\`\`json\n${JSON.stringify(
+    buildIssuePayload(device, localPollStatus, localPollError, localPollValidation, localPollDps),
+    null,
+    2
+  )}\n\`\`\``;
+
+const createGithubIssueData = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
   const title = encodeURIComponent(buildIssueTitle(device));
-  const body = encodeURIComponent(
-    `\`\`\`json\n${JSON.stringify(
-      buildIssuePayload(device, localPollStatus, localPollError, localPollValidation, localPollDps),
-      null,
-      2
-    )}\n\`\`\``
-  );
-  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
+  const body = buildIssueBody(device, localPollStatus, localPollError, localPollValidation, localPollDps);
+  const urlWithBody = `${GITHUB_BASE_URL}?title=${title}&body=${encodeURIComponent(body)}`;
+  if (urlWithBody.length <= MAX_GITHUB_URL_LENGTH) {
+    return { url: urlWithBody, body, truncated: false };
+  }
+  return {
+    url: `${GITHUB_BASE_URL}?title=${title}`,
+    body,
+    truncated: true
+  };
 };
+
+const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
+  createGithubIssueData(device, localPollStatus, localPollError, localPollValidation, localPollDps).url;
 
 const buildParamsMap = device =>
   (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
@@ -259,7 +319,11 @@ class TuyaDeviceBox extends Component {
       localPollValidation: null,
       localPollDps: null,
       githubIssueChecking: false,
-      githubIssueExists: false
+      githubIssueExists: false,
+      githubIssuePayload: null,
+      githubIssuePayloadCopied: false,
+      githubIssuePayloadUrl: null,
+      githubIssueOpened: false
     });
   }
 
@@ -269,20 +333,28 @@ class TuyaDeviceBox extends Component {
     const isNewDevice = !currentDevice || currentDevice.external_id !== nextDevice.external_id;
     const baselineDevice = this.state.baselineDevice;
     const shouldRefreshBaseline = isNewDevice || !baselineDevice || baselineDevice.updated_at !== nextDevice.updated_at;
+    const mergedNextDevice =
+      currentDevice && currentDevice.specifications && !nextDevice.specifications
+        ? { ...nextDevice, specifications: currentDevice.specifications }
+        : nextDevice;
     if (isNewDevice) {
       this.setState({
-        device: nextDevice,
-        baselineDevice: nextDevice,
+        device: mergedNextDevice,
+        baselineDevice: mergedNextDevice,
         localPollValidation: null,
         localPollDps: null,
         githubIssueChecking: false,
-        githubIssueExists: false
+        githubIssueExists: false,
+        githubIssuePayload: null,
+        githubIssuePayloadCopied: false,
+        githubIssuePayloadUrl: null,
+        githubIssueOpened: false
       });
       return;
     }
     this.setState({
-      device: nextDevice,
-      baselineDevice: shouldRefreshBaseline ? nextDevice : baselineDevice
+      device: mergedNextDevice,
+      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice
     });
   }
 
@@ -309,7 +381,11 @@ class TuyaDeviceBox extends Component {
       localPollStatus: null,
       localPollError: null,
       localPollDps: null,
-      githubIssueExists: false
+      githubIssueExists: false,
+      githubIssuePayload: null,
+      githubIssuePayloadCopied: false,
+      githubIssuePayloadUrl: null,
+      githubIssueOpened: false
     });
   };
 
@@ -457,13 +533,14 @@ class TuyaDeviceBox extends Component {
     const { device, localPollStatus, localPollError, localPollValidation, localPollDps } = this.state;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
     const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
-    const issueUrl = createGithubUrl(
+    const issueData = createGithubIssueData(
       device,
       localPollStatus,
       localPollError,
       localPollValidation,
       effectiveLocalPollDps
     );
+    const issueUrl = issueData.url;
     const issueTitle = buildIssueTitle(device);
     const popup = window.open('about:blank', '_blank');
     if (popup) {
@@ -487,18 +564,108 @@ class TuyaDeviceBox extends Component {
       this.setState({ githubIssueChecking: false });
     }
 
-    if (popup) {
-      if (shouldOpenIssue) {
-        popup.location = issueUrl;
-      } else {
+    const closePopup = () => {
+      if (popup && !popup.closed) {
         popup.close();
       }
+    };
+
+    if (!shouldOpenIssue) {
+      closePopup();
+      this.setState({
+        githubIssuePayload: null,
+        githubIssuePayloadCopied: false,
+        githubIssuePayloadUrl: null,
+        githubIssueOpened: false
+      });
       return;
     }
 
-    if (shouldOpenIssue) {
-      window.open(issueUrl, '_blank');
+    if (issueData.truncated) {
+      closePopup();
+      this.setState({
+        githubIssuePayload: issueData.body,
+        githubIssuePayloadCopied: false,
+        githubIssuePayloadUrl: issueData.url,
+        githubIssueOpened: false
+      });
+      return;
     }
+
+    this.setState({
+      githubIssuePayload: null,
+      githubIssuePayloadCopied: false,
+      githubIssuePayloadUrl: null,
+      githubIssueOpened: true
+    });
+
+    if (popup) {
+      popup.location = issueUrl;
+      return;
+    }
+    window.open(issueUrl, '_blank');
+  };
+
+  copyGithubIssuePayload = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    const { githubIssuePayload } = this.state;
+    if (!githubIssuePayload) {
+      return;
+    }
+    let copied = false;
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(githubIssuePayload);
+        copied = true;
+      } catch (error) {
+        copied = false;
+      }
+    }
+    if (!copied && this.githubIssueTextarea) {
+      try {
+        this.githubIssueTextarea.focus();
+        this.githubIssueTextarea.select();
+        this.githubIssueTextarea.setSelectionRange(0, this.githubIssueTextarea.value.length);
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      } finally {
+        this.githubIssueTextarea.blur();
+      }
+    }
+    this.setState({ githubIssuePayloadCopied: copied });
+  };
+
+  openEmptyGithubIssue = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    const { githubIssuePayloadUrl, githubIssueChecking, githubIssueExists, githubIssueOpened, device } = this.state;
+    if (!githubIssuePayloadUrl || githubIssueChecking || githubIssueExists || githubIssueOpened || !device) {
+      return;
+    }
+    const issueTitle = buildIssueTitle(device);
+    this.setState({ githubIssueChecking: true });
+    let shouldOpenIssue = true;
+    try {
+      const exists = await checkGithubIssueExists(issueTitle);
+      if (exists) {
+        shouldOpenIssue = false;
+        this.setState({ githubIssueExists: true });
+      }
+    } catch (error) {
+      shouldOpenIssue = true;
+    } finally {
+      this.setState({ githubIssueChecking: false });
+    }
+    if (!shouldOpenIssue) {
+      return;
+    }
+    const title = encodeURIComponent(issueTitle);
+    window.open(`${GITHUB_BASE_URL}?title=${title}`, '_blank');
+    this.setState({ githubIssueOpened: true });
   };
 
   updateIpAddress = e => {
@@ -530,6 +697,7 @@ class TuyaDeviceBox extends Component {
     try {
       const isDiscoverPage = !this.props.deleteButton;
       const previousDevice = this.state.device;
+      const { specifications, ...devicePayload } = previousDevice;
       const currentLocalConfig = getLocalConfig(previousDevice);
       const nextPollFrequency = currentLocalConfig.localOverride
         ? LOCAL_POLL_FREQUENCY_MS
@@ -537,7 +705,7 @@ class TuyaDeviceBox extends Component {
         ? CLOUD_POLL_FREQUENCY_MS
         : previousDevice.poll_frequency;
       const payload = {
-        ...previousDevice,
+        ...devicePayload,
         poll_frequency: nextPollFrequency
       };
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
@@ -633,7 +801,11 @@ class TuyaDeviceBox extends Component {
       localPollValidation,
       localPollDps,
       githubIssueChecking,
-      githubIssueExists
+      githubIssueExists,
+      githubIssuePayload,
+      githubIssuePayloadCopied,
+      githubIssuePayloadUrl,
+      githubIssueOpened
     }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -675,17 +847,23 @@ class TuyaDeviceBox extends Component {
     const githubIssuesUrl = githubIssueExists ? buildGithubSearchUrl(buildIssueTitle(device)) : null;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
     const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
-    const unknownDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features);
-    const hasPartialSupport = validModel && unknownDpsKeys.length > 0;
+    const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features);
+    const unknownSpecCodes = getUnknownSpecificationCodes(device.specifications, device.features);
+    const unknownKeys = effectiveLocalPollDps ? unknownLocalDpsKeys : unknownSpecCodes;
+    const hasPartialSupport = validModel && unknownKeys.length > 0;
+    const partialCountLabelId =
+      isDiscoverPage && !device.created_at
+        ? 'integration.tuya.device.partialFeaturesCountDiscover'
+        : 'integration.tuya.device.partialFeaturesCount';
 
     const renderGithubIssueButton = (labelId, extraClass = '') => (
       <a
         class={cx('btn btn-gray', {
           [extraClass]: !!extraClass,
-          disabled: githubIssueChecking || githubIssueExists
+          disabled: githubIssueChecking || githubIssueExists || githubIssueOpened
         })}
         href={
-          githubIssueChecking || githubIssueExists
+          githubIssueChecking || githubIssueExists || githubIssueOpened
             ? '#'
             : createGithubUrl(
                 this.state.device,
@@ -696,8 +874,8 @@ class TuyaDeviceBox extends Component {
               )
         }
         onClick={this.handleCreateGithubIssue}
-        aria-disabled={githubIssueChecking || githubIssueExists}
-        tabindex={githubIssueChecking || githubIssueExists ? -1 : undefined}
+        aria-disabled={githubIssueChecking || githubIssueExists || githubIssueOpened}
+        tabindex={githubIssueChecking || githubIssueExists || githubIssueOpened ? -1 : undefined}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -707,7 +885,9 @@ class TuyaDeviceBox extends Component {
 
     const renderGithubIssueAction = () => (
       <div>
-        {renderGithubIssueButton('integration.tuya.device.createGithubIssue')}
+        <div class="d-flex flex-wrap">
+          {renderGithubIssueButton('integration.tuya.device.createGithubIssue', 'ml-sm-auto')}
+        </div>
         {githubIssueExists ? (
           <div class="alert alert-info mt-2">
             <MarkupText id="integration.tuya.device.githubIssueExistsInfo" fields={{ issuesUrl: githubIssuesUrl }} />
@@ -719,6 +899,45 @@ class TuyaDeviceBox extends Component {
         )}
       </div>
     );
+
+    const renderGithubIssuePayloadInfo = () => {
+      if (!githubIssuePayload && !githubIssuePayloadCopied) {
+        return null;
+      }
+      return (
+        <div class="alert alert-info mt-2">
+          <div>
+            <Text id="integration.tuya.device.githubIssuePayloadInfo" />
+            <textarea
+              class="form-control mt-2"
+              rows="6"
+              readOnly
+              value={githubIssuePayload || ''}
+              ref={el => {
+                this.githubIssueTextarea = el;
+              }}
+            />
+            <div class="d-flex align-items-center mt-2">
+              <button onClick={this.copyGithubIssuePayload} class="btn btn-outline-primary">
+                <Text id="integration.tuya.device.githubIssuePayloadCopyButton" />
+              </button>
+              <button
+                onClick={this.openEmptyGithubIssue}
+                class="btn btn-outline-secondary ml-auto"
+                disabled={!githubIssuePayloadUrl || githubIssueChecking || githubIssueExists || githubIssueOpened}
+              >
+                <Text id="integration.tuya.device.githubIssuePayloadOpenEmptyButton" />
+              </button>
+            </div>
+            {githubIssuePayloadCopied && (
+              <div class="text-success mt-2">
+                <Text id="integration.tuya.device.githubIssuePayloadCopied" />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
 
     return (
       <div class="col-md-6">
@@ -939,10 +1158,7 @@ class TuyaDeviceBox extends Component {
                       <Text id="integration.tuya.device.featuresLabel" />
                       {hasPartialSupport && (
                         <span class="text-muted ml-2">
-                          <Text
-                            id="integration.tuya.device.partialFeaturesCount"
-                            fields={{ count: unknownDpsKeys.length }}
-                          />
+                          <Text id={partialCountLabelId} fields={{ count: unknownKeys.length }} />
                         </span>
                       )}
                     </label>
@@ -962,33 +1178,37 @@ class TuyaDeviceBox extends Component {
                       <Text id="integration.tuya.device.localPollRequired" />
                     </div>
                   )}
-                  {showAlreadyCreatedButton && (
-                    <button class="btn btn-primary mr-2" disabled="true">
-                      <Text id="integration.tuya.alreadyCreatedButton" />
-                    </button>
-                  )}
+                  <div class={cx('d-flex flex-wrap align-items-center justify-content-between', style.tuyaActionRow)}>
+                    <div class="d-flex flex-wrap align-items-center">
+                      {showAlreadyCreatedButton && (
+                        <button class="btn btn-primary mr-2" disabled="true">
+                          <Text id="integration.tuya.alreadyCreatedButton" />
+                        </button>
+                      )}
 
-                  {showUpdateButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
-                      <Text id="integration.tuya.updateButton" />
-                    </button>
-                  )}
+                      {showUpdateButton && (
+                        <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
+                          <Text id="integration.tuya.updateButton" />
+                        </button>
+                      )}
 
-                  {validModel && saveButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
-                      <Text id="integration.tuya.saveButton" />
-                    </button>
-                  )}
+                      {validModel && saveButton && (
+                        <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
+                          <Text id="integration.tuya.saveButton" />
+                        </button>
+                      )}
 
-                  {hasPartialSupport &&
-                    isDiscoverPage &&
-                    renderGithubIssueButton('integration.tuya.device.createGithubIssuePartial', 'ml-2')}
+                      {validModel && deleteButton && (
+                        <button onClick={this.deleteDevice} class="btn btn-danger">
+                          <Text id="integration.tuya.deleteButton" />
+                        </button>
+                      )}
+                    </div>
 
-                  {validModel && deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
-                      <Text id="integration.tuya.deleteButton" />
-                    </button>
-                  )}
+                    {hasPartialSupport && isDiscoverPage && (
+                      <div>{renderGithubIssueButton('integration.tuya.device.createGithubIssuePartial')}</div>
+                    )}
+                  </div>
 
                   {!validModel && (
                     <div>
@@ -1023,6 +1243,7 @@ class TuyaDeviceBox extends Component {
                     )}
                   </>
                 )}
+                {renderGithubIssuePayloadInfo()}
               </div>
             </div>
           </div>

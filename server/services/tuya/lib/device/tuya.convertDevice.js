@@ -24,6 +24,9 @@ function convertDevice(tuyaDevice) {
     cloud_ip: cloudIp,
     protocol_version: protocolVersion,
     local_override: localOverride,
+    properties,
+    thing_model: thingModel,
+    thing_model_raw: thingModelRaw,
     specifications = {},
   } = tuyaDevice;
   const externalId = `tuya:${id}`;
@@ -81,6 +84,14 @@ function convertDevice(tuyaDevice) {
 
   const features = Object.values(groups).map((group) => convertFeature(group, externalId));
 
+  const specificationsPayload = {};
+  if (functions.length > 0) {
+    specificationsPayload.functions = functions;
+  }
+  if (status.length > 0) {
+    specificationsPayload.status = status;
+  }
+
   const device = {
     name,
     features: features.filter((feature) => feature),
@@ -93,6 +104,10 @@ function convertDevice(tuyaDevice) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
     params,
+    properties,
+    specifications: specificationsPayload,
+    thing_model: thingModel,
+    thing_model_raw: thingModelRaw,
   };
   if (online !== undefined) {
     device.online = online;
