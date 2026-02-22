@@ -200,6 +200,22 @@ describe('TuyaHandler.connect', () => {
     expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
   });
 
+  it('should map trial expired error', async () => {
+    client.init.rejects(new Error('Trial expired'));
+    tuyaHandler.autoReconnectAllowed = true;
+
+    await tuyaHandler.connect({
+      baseUrl: 'apiUrl',
+      accessKey: 'accessKey',
+      secretKey: 'secretKey',
+      appAccountId: 'appAccountId',
+    });
+
+    expect(tuyaHandler.status).to.eq(STATUS.ERROR);
+    expect(tuyaHandler.lastError).to.eq('integration.tuya.setup.errorTrialExpired');
+    expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
+  });
+
   it('should map missing app account uid error', async () => {
     client.init.resolves();
     tuyaHandler.autoReconnectAllowed = true;

@@ -4,6 +4,7 @@ const { expect } = require('chai');
 const {
   applyExistingLocalOverride,
   applyExistingLocalParams,
+  getParamValue,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
   upsertParam,
@@ -168,5 +169,10 @@ describe('Tuya device params utils', () => {
     const device = { params: [] };
     const updated = applyExistingLocalOverride(device, null);
     expect(updated).to.equal(device);
+  });
+
+  it('should return undefined when getParamValue receives non array', () => {
+    const value = getParamValue(null, DEVICE_PARAM_NAME.IP_ADDRESS);
+    expect(value).to.equal(undefined);
   });
 });
