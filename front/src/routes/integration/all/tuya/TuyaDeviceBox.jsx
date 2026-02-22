@@ -856,14 +856,17 @@ class TuyaDeviceBox extends Component {
         ? 'integration.tuya.device.partialFeaturesCountDiscover'
         : 'integration.tuya.device.partialFeaturesCount';
 
+    const disableGithubIssueButton =
+      githubIssueChecking || githubIssueExists || githubIssueOpened || githubIssuePayloadUrl || githubIssuePayload;
+
     const renderGithubIssueButton = (labelId, extraClass = '') => (
       <a
         class={cx('btn btn-gray', {
           [extraClass]: !!extraClass,
-          disabled: githubIssueChecking || githubIssueExists || githubIssueOpened
+          disabled: disableGithubIssueButton
         })}
         href={
-          githubIssueChecking || githubIssueExists || githubIssueOpened
+          disableGithubIssueButton
             ? '#'
             : createGithubUrl(
                 this.state.device,
@@ -874,8 +877,8 @@ class TuyaDeviceBox extends Component {
               )
         }
         onClick={this.handleCreateGithubIssue}
-        aria-disabled={githubIssueChecking || githubIssueExists || githubIssueOpened}
-        tabindex={githubIssueChecking || githubIssueExists || githubIssueOpened ? -1 : undefined}
+        aria-disabled={disableGithubIssueButton}
+        tabindex={disableGithubIssueButton ? -1 : undefined}
         target="_blank"
         rel="noopener noreferrer"
       >
