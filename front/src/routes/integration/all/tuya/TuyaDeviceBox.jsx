@@ -8,6 +8,12 @@ import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
+const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
+const GITHUB_SEARCH_API_URL = 'https://api.github.com/search/issues?q=';
+const GITHUB_SEARCH_CACHE_TTL_MS = 1000 * 60 * 5;
+const githubIssueCache = new Map();
+const LOCAL_POLL_FREQUENCY_MS = 10 * 1000;
+const CLOUD_POLL_FREQUENCY_MS = 30 * 1000;
 
 const maskIp = ip => {
   if (!ip || typeof ip !== 'string') {
@@ -17,7 +23,7 @@ const maskIp = ip => {
   if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
     return null;
   }
-  return `${parts[0]}.${parts[1]}.x.x`;
+  return `${parts[0]}.x.x.x`;
 };
 
 const sanitizeParams = params => {
@@ -35,7 +41,118 @@ const sanitizeParams = params => {
   });
 };
 
-const buildIssuePayload = (device, localPollStatus, localPollError) => {
+const normalizeBoolean = value =>
+  value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
+
+const IGNORED_PARTIAL_DPS = new Set(['11']);
+
+const getLocalDpsFromCode = code => {
+  if (!code) {
+    return null;
+  }
+  const normalized = code.toLowerCase();
+  if (normalized === 'switch' || normalized === 'power') {
+    return 1;
+  }
+  const match = normalized.match(/_(\d+)$/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  return null;
+};
+
+const getKnownDpsKeys = features => {
+  const keys = new Set();
+  if (!Array.isArray(features)) {
+    return keys;
+  }
+  features.forEach(feature => {
+    const parts = (feature.external_id || '').split(':');
+    const code = parts.length >= 3 ? parts[2] : null;
+    const dpsKey = getLocalDpsFromCode(code);
+    if (dpsKey !== null) {
+      keys.add(String(dpsKey));
+    }
+  });
+  return keys;
+};
+
+const getUnknownDpsKeys = (localPollDps, features) => {
+  if (!localPollDps || typeof localPollDps !== 'object') {
+    return [];
+  }
+  const knownKeys = getKnownDpsKeys(features);
+  return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !IGNORED_PARTIAL_DPS.has(key));
+};
+
+const getParamValue = (device, name) => {
+  const params = Array.isArray(device && device.params) ? device.params : [];
+  const found = params.find(param => param.name === name);
+  return found ? found.value : undefined;
+};
+
+const getLocalOverrideValue = device => {
+  if (!device) {
+    return undefined;
+  }
+  if (device.local_override !== undefined && device.local_override !== null) {
+    return device.local_override;
+  }
+  return getParamValue(device, 'LOCAL_OVERRIDE');
+};
+
+const getLocalPollDpsFromParams = device => {
+  const raw = getParamValue(device, 'LOCAL_POLL_DPS');
+  if (!raw) {
+    return null;
+  }
+  if (typeof raw === 'object') {
+    return raw;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+};
+
+const getProductIdentifier = device =>
+  device.product_id ||
+  getParamValue(device, 'PRODUCT_ID') ||
+  device.product_key ||
+  getParamValue(device, 'PRODUCT_KEY') ||
+  'unknown-product';
+
+const buildIssueTitle = device => {
+  const isLocal = normalizeBoolean(getLocalOverrideValue(device));
+  const modeLabel = isLocal ? 'local' : 'cloud';
+  const productIdentifier = getProductIdentifier(device);
+  const modelLabel = device.model || device.product_name || device.name || 'Unknown device';
+  return `Tuya (${modeLabel}) [${productIdentifier}]: Add support for ${modelLabel}`;
+};
+
+const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "${title}"`;
+
+const buildGithubSearchUrl = title => `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
+
+const checkGithubIssueExists = async title => {
+  const query = buildGithubSearchQuery(title);
+  const cached = githubIssueCache.get(query);
+  if (cached && Date.now() - cached.timestamp < GITHUB_SEARCH_CACHE_TTL_MS) {
+    return cached.exists;
+  }
+
+  const response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`);
+  if (!response.ok) {
+    throw new Error('Github search failed');
+  }
+  const data = await response.json();
+  const exists = Boolean(data && typeof data.total_count === 'number' && data.total_count > 0);
+  githubIssueCache.set(query, { exists, timestamp: Date.now() });
+  return exists;
+};
+
+const buildIssuePayload = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
   const sanitized = { ...device };
   delete sanitized.local_key;
   delete sanitized.ip;
@@ -45,23 +162,24 @@ const buildIssuePayload = (device, localPollStatus, localPollError) => {
   }
   sanitized.local_poll = {
     status: localPollStatus,
-    error: localPollError || null
+    error: localPollError || null,
+    protocol: localPollValidation ? localPollValidation.protocol : null,
+    dps: localPollDps || null
   };
-  sanitized.local_ip_masked = maskIp(device.ip);
-  sanitized.cloud_ip_masked = maskIp(device.cloud_ip);
   return sanitized;
 };
 
-const createGithubUrl = (device, localPollStatus, localPollError) => {
-  const title = encodeURIComponent(`Tuya: Add support for ${device.model || device.product_name || device.name}`);
+const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
+  const title = encodeURIComponent(buildIssueTitle(device));
   const body = encodeURIComponent(
-    `\`\`\`json\n${JSON.stringify(buildIssuePayload(device, localPollStatus, localPollError), null, 2)}\n\`\`\``
+    `\`\`\`json\n${JSON.stringify(
+      buildIssuePayload(device, localPollStatus, localPollError, localPollValidation, localPollDps),
+      null,
+      2
+    )}\n\`\`\``
   );
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
-
-const normalizeBoolean = value =>
-  value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 
 const buildParamsMap = device =>
   (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
@@ -138,7 +256,10 @@ class TuyaDeviceBox extends Component {
     this.setState({
       device: this.props.device,
       baselineDevice: this.props.device,
-      localPollValidation: null
+      localPollValidation: null,
+      localPollDps: null,
+      githubIssueChecking: false,
+      githubIssueExists: false
     });
   }
 
@@ -152,7 +273,10 @@ class TuyaDeviceBox extends Component {
       this.setState({
         device: nextDevice,
         baselineDevice: nextDevice,
-        localPollValidation: null
+        localPollValidation: null,
+        localPollDps: null,
+        githubIssueChecking: false,
+        githubIssueExists: false
       });
       return;
     }
@@ -183,7 +307,9 @@ class TuyaDeviceBox extends Component {
       },
       localPollValidation: null,
       localPollStatus: null,
-      localPollError: null
+      localPollError: null,
+      localPollDps: null,
+      githubIssueExists: false
     });
   };
 
@@ -221,7 +347,8 @@ class TuyaDeviceBox extends Component {
       },
       localPollValidation: null,
       localPollStatus: null,
-      localPollError: null
+      localPollError: null,
+      localPollDps: null
     });
   };
 
@@ -230,7 +357,8 @@ class TuyaDeviceBox extends Component {
     this.setState({
       localPollStatus: RequestStatus.Getting,
       localPollError: null,
-      localPollProtocol: null
+      localPollProtocol: null,
+      localPollDps: null
     });
     const params = Array.isArray(currentDevice.params) ? currentDevice.params : [];
     const getParam = name => {
@@ -285,6 +413,13 @@ class TuyaDeviceBox extends Component {
         }
       }
       const baseDevice = latestDevice || currentDevice;
+      const baseParams = Array.isArray(baseDevice.params) ? baseDevice.params : [];
+      baseParams.forEach(param => {
+        const exists = newParams.some(existing => existing.name === param.name);
+        if (!exists) {
+          newParams.push(param);
+        }
+      });
       this.setState({
         device: {
           ...baseDevice,
@@ -296,7 +431,8 @@ class TuyaDeviceBox extends Component {
           ip: getParam('IP_ADDRESS') || currentDevice.ip || '',
           protocol: usedProtocol || '',
           localOverride: true
-        }
+        },
+        localPollDps: result ? result.dps : null
       });
     } catch (e) {
       const message =
@@ -304,8 +440,64 @@ class TuyaDeviceBox extends Component {
       this.setState({
         localPollStatus: RequestStatus.Error,
         localPollError: message,
-        localPollProtocol: null
+        localPollProtocol: null,
+        localPollDps: null
       });
+    }
+  };
+
+  handleCreateGithubIssue = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    if (this.state.githubIssueChecking || this.state.githubIssueExists) {
+      return;
+    }
+
+    const { device, localPollStatus, localPollError, localPollValidation, localPollDps } = this.state;
+    const persistedLocalPollDps = getLocalPollDpsFromParams(device);
+    const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
+    const issueUrl = createGithubUrl(
+      device,
+      localPollStatus,
+      localPollError,
+      localPollValidation,
+      effectiveLocalPollDps
+    );
+    const issueTitle = buildIssueTitle(device);
+    const popup = window.open('about:blank', '_blank');
+    if (popup) {
+      popup.opener = null;
+      popup.document.title = 'GitHub';
+      popup.document.body.innerText = 'Recherche des issues existantes...';
+    }
+
+    this.setState({ githubIssueChecking: true });
+
+    let shouldOpenIssue = true;
+    try {
+      const exists = await checkGithubIssueExists(issueTitle);
+      if (exists) {
+        shouldOpenIssue = false;
+        this.setState({ githubIssueExists: true });
+      }
+    } catch (error) {
+      shouldOpenIssue = true;
+    } finally {
+      this.setState({ githubIssueChecking: false });
+    }
+
+    if (popup) {
+      if (shouldOpenIssue) {
+        popup.location = issueUrl;
+      } else {
+        popup.close();
+      }
+      return;
+    }
+
+    if (shouldOpenIssue) {
+      window.open(issueUrl, '_blank');
     }
   };
 
@@ -325,7 +517,8 @@ class TuyaDeviceBox extends Component {
       },
       localPollValidation: null,
       localPollStatus: null,
-      localPollError: null
+      localPollError: null,
+      localPollDps: null
     });
   };
 
@@ -337,7 +530,17 @@ class TuyaDeviceBox extends Component {
     try {
       const isDiscoverPage = !this.props.deleteButton;
       const previousDevice = this.state.device;
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, previousDevice);
+      const currentLocalConfig = getLocalConfig(previousDevice);
+      const nextPollFrequency = currentLocalConfig.localOverride
+        ? LOCAL_POLL_FREQUENCY_MS
+        : previousDevice.poll_frequency === LOCAL_POLL_FREQUENCY_MS
+        ? CLOUD_POLL_FREQUENCY_MS
+        : previousDevice.poll_frequency;
+      const payload = {
+        ...previousDevice,
+        poll_frequency: nextPollFrequency
+      };
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       const mergedDevice = {
         ...previousDevice,
         ...savedDevice
@@ -427,7 +630,10 @@ class TuyaDeviceBox extends Component {
       localPollStatus,
       localPollError,
       localPollProtocol,
-      localPollValidation
+      localPollValidation,
+      localPollDps,
+      githubIssueChecking,
+      githubIssueExists
     }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -466,6 +672,53 @@ class TuyaDeviceBox extends Component {
       validModel && isDiscoverPage && (updateButton || (alreadyCreatedButton && hasLocalChanges));
     const showAlreadyCreatedButton = validModel && alreadyCreatedButton && !hasLocalChanges;
     const pollProtocolLabel = localPollProtocol || protocolVersion || '-';
+    const githubIssuesUrl = githubIssueExists ? buildGithubSearchUrl(buildIssueTitle(device)) : null;
+    const persistedLocalPollDps = getLocalPollDpsFromParams(device);
+    const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
+    const unknownDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features);
+    const hasPartialSupport = validModel && unknownDpsKeys.length > 0;
+
+    const renderGithubIssueButton = (labelId, extraClass = '') => (
+      <a
+        class={cx('btn btn-gray', {
+          [extraClass]: !!extraClass,
+          disabled: githubIssueChecking || githubIssueExists
+        })}
+        href={
+          githubIssueChecking || githubIssueExists
+            ? '#'
+            : createGithubUrl(
+                this.state.device,
+                localPollStatus,
+                localPollError,
+                localPollValidation,
+                effectiveLocalPollDps
+              )
+        }
+        onClick={this.handleCreateGithubIssue}
+        aria-disabled={githubIssueChecking || githubIssueExists}
+        tabindex={githubIssueChecking || githubIssueExists ? -1 : undefined}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Text id={labelId} />
+      </a>
+    );
+
+    const renderGithubIssueAction = () => (
+      <div>
+        {renderGithubIssueButton('integration.tuya.device.createGithubIssue')}
+        {githubIssueExists ? (
+          <div class="alert alert-info mt-2">
+            <MarkupText id="integration.tuya.device.githubIssueExistsInfo" fields={{ issuesUrl: githubIssuesUrl }} />
+          </div>
+        ) : (
+          <div class="text-muted mt-2">
+            <Text id="integration.tuya.device.githubIssueInfo" />
+          </div>
+        )}
+      </div>
+    );
 
     return (
       <div class="col-md-6">
@@ -684,8 +937,22 @@ class TuyaDeviceBox extends Component {
                   <div class="form-group">
                     <label class="form-label">
                       <Text id="integration.tuya.device.featuresLabel" />
+                      {hasPartialSupport && (
+                        <span class="text-muted ml-2">
+                          <Text
+                            id="integration.tuya.device.partialFeaturesCount"
+                            fields={{ count: unknownDpsKeys.length }}
+                          />
+                        </span>
+                      )}
                     </label>
                     <DeviceFeatures features={device.features} />
+                  </div>
+                )}
+
+                {hasPartialSupport && (
+                  <div class="alert alert-warning mt-3 mb-3">
+                    <Text id="integration.tuya.partiallyManagedModelButton" />
                   </div>
                 )}
 
@@ -713,6 +980,10 @@ class TuyaDeviceBox extends Component {
                     </button>
                   )}
 
+                  {hasPartialSupport &&
+                    isDiscoverPage &&
+                    renderGithubIssueButton('integration.tuya.device.createGithubIssuePartial', 'ml-2')}
+
                   {validModel && deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.tuya.deleteButton" />
@@ -724,17 +995,7 @@ class TuyaDeviceBox extends Component {
                       <div class="alert alert-warning">
                         <Text id="integration.tuya.unmanagedModelButton" />
                       </div>
-                      <a
-                        class="btn btn-gray"
-                        href={createGithubUrl(this.state.device, localPollStatus, localPollError)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Text id="integration.tuya.device.createGithubIssue" />
-                      </a>
-                      <div class="text-muted mt-2">
-                        <Text id="integration.tuya.device.githubIssueInfo" />
-                      </div>
+                      {isDiscoverPage && renderGithubIssueAction()}
                     </div>
                   )}
 
@@ -746,6 +1007,22 @@ class TuyaDeviceBox extends Component {
                     </Link>
                   )}
                 </div>
+                {hasPartialSupport && isDiscoverPage && (
+                  <>
+                    {githubIssueExists ? (
+                      <div class="alert alert-info mt-2">
+                        <MarkupText
+                          id="integration.tuya.device.githubIssueExistsInfo"
+                          fields={{ issuesUrl: githubIssuesUrl }}
+                        />
+                      </div>
+                    ) : (
+                      <div class="text-muted mt-2">
+                        <Text id="integration.tuya.device.githubIssueInfo" />
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>

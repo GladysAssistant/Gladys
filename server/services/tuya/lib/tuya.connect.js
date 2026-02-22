@@ -40,6 +40,15 @@ const mapConnectionError = (error) => {
     return { key: 'integration.tuya.setup.errorInvalidAppAccountUid', disableAutoReconnect: true };
   }
 
+  if (
+    message.includes('trial') ||
+    message.includes('expired') ||
+    message.includes('resource pack') ||
+    message.includes('subscription')
+  ) {
+    return { key: 'integration.tuya.setup.errorTrialExpired', disableAutoReconnect: true };
+  }
+
   return null;
 };
 

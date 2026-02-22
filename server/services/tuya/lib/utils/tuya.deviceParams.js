@@ -48,6 +48,14 @@ const updateDiscoveredDeviceWithLocalInfo = (device, localInfo) => {
   return updated;
 };
 
+const getParamValue = (params, name) => {
+  if (!Array.isArray(params)) {
+    return undefined;
+  }
+  const found = params.find((param) => param.name === name);
+  return found ? found.value : undefined;
+};
+
 const getExistingParamValue = (existingDevice, name) => {
   if (!existingDevice || !Array.isArray(existingDevice.params)) {
     return undefined;
@@ -63,6 +71,7 @@ const applyExistingLocalParams = (device, existingDevice) => {
   const params = Array.isArray(device.params) ? [...device.params] : [];
   const ipValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.IP_ADDRESS);
   const protocolValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const localPollDpsValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_POLL_DPS);
   const rawLocalOverrideValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
   const localOverrideValue =
     rawLocalOverrideValue !== undefined && rawLocalOverrideValue !== null
@@ -72,6 +81,7 @@ const applyExistingLocalParams = (device, existingDevice) => {
   upsertParam(params, DEVICE_PARAM_NAME.IP_ADDRESS, ipValue);
   upsertParam(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolValue);
   upsertParam(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, localOverrideValue);
+  upsertParam(params, DEVICE_PARAM_NAME.LOCAL_POLL_DPS, localPollDpsValue);
 
   return {
     ...device,
@@ -102,6 +112,7 @@ const applyExistingLocalOverride = (device, existingDevice) => {
 module.exports = {
   applyExistingLocalOverride,
   applyExistingLocalParams,
+  getParamValue,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
   upsertParam,

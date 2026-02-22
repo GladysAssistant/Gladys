@@ -22,7 +22,10 @@ module.exports = function TuyaController(tuyaManager) {
   async function localPoll(req, res) {
     const payload = req.body || {};
     const result = await tuyaManager.localPoll(payload);
-    const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload);
+    const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      ...payload,
+      dps: result && result.dps ? result.dps : null,
+    });
 
     if (updatedDevice) {
       res.json({

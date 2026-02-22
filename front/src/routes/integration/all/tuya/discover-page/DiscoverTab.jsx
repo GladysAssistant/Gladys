@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
@@ -123,6 +123,7 @@ class DiscoverTab extends Component {
       ) {
         mergedDevice.params = currentDevice.params;
       }
+      mergedDevice.updatable = false;
       if (!mergedDevice.created_at && !currentDevice.created_at) {
         mergedDevice.created_at = new Date().toISOString();
       }
@@ -199,7 +200,7 @@ class DiscoverTab extends Component {
         </div>
         <div class="card-body">
           <div class="alert alert-info">
-            <Text id="integration.tuya.discover.localDiscoveryInfo" />
+            <MarkupText id="integration.tuya.discover.localDiscoveryInfo" />
           </div>
           <div class="alert alert-secondary">
             <Text id="integration.tuya.discover.description" />

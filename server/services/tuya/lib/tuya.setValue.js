@@ -6,25 +6,8 @@ const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
-
-const getParamValue = (params, name) => {
-  const found = (params || []).find((param) => param.name === name);
-  return found ? found.value : undefined;
-};
-
-const getLocalDpsFromCode = (code) => {
-  if (!code) {
-    return null;
-  }
-  if (code === 'switch') {
-    return 1;
-  }
-  const match = code.match(/_(\d+)$/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return null;
-};
+const { getParamValue } = require('./utils/tuya.deviceParams');
+const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 
 /**
  * @description Send the new device value over device protocol.
@@ -75,27 +58,36 @@ async function setValue(device, deviceFeature, value) {
     if (isProtocol35) {
       tuyaOptions.KeepAlive = false;
     }
-    const tuyaLocal = new TuyaLocalApi(tuyaOptions);
-    let connected = false;
-    try {
-      await tuyaLocal.connect();
-      connected = true;
-      await tuyaLocal.set({ dps: localDps, set: transformedValue });
-      logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
-      return;
-    } catch (e) {
-      logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
-    } finally {
-      if (connected) {
-        try {
-          await tuyaLocal.disconnect();
-        } catch (disconnectError) {
-          logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+    const runLocalSet = async () => {
+      const tuyaLocal = new TuyaLocalApi(tuyaOptions);
+      let connected = false;
+      try {
+        await tuyaLocal.connect();
+        connected = true;
+        await tuyaLocal.set({ dps: localDps, set: transformedValue });
+        logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
+        return true;
+      } catch (e) {
+        logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+        return false;
+      } finally {
+        if (connected) {
+          try {
+            await tuyaLocal.disconnect();
+          } catch (disconnectError) {
+            logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+          }
         }
       }
+    };
+
+    const localSuccess = await runLocalSet();
+    if (localSuccess) {
+      return;
     }
   }
 
+  logger.debug(`[Tuya][setValue][cloud] device=${topic} command=${command} value=${transformedValue}`);
   const response = await this.connector.request({
     method: 'POST',
     path: `${API.VERSION_1_0}/devices/${topic}/commands`,

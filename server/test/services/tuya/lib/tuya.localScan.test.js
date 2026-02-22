@@ -364,9 +364,12 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
       portErrors: {},
     });
 
-    expect(response.devices).to.have.lengthOf(1);
-    expect(response.devices[0].external_id).to.equal('tuya:device1');
-    const ipParam = response.devices[0].params.find((param) => param.name === 'IP_ADDRESS');
+    expect(response.devices).to.have.lengthOf(2);
+    const device1 = response.devices.find((device) => device.external_id === 'tuya:device1');
+    const device2 = response.devices.find((device) => device.external_id === 'tuya:device2');
+    expect(device1).to.not.equal(undefined);
+    expect(device2).to.not.equal(undefined);
+    const ipParam = device1.params.find((param) => param.name === 'IP_ADDRESS');
     expect(ipParam.value).to.equal('1.1.1.1');
   });
 });

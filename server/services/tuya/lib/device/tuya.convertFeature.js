@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { mappings } = require('./tuya.deviceMapping');
+const { slugify } = require('../../../../utils/slugify');
 
 /**
  * @description Transforms Tuya feature as Gladys feature.
@@ -12,7 +13,7 @@ const { mappings } = require('./tuya.deviceMapping');
 function convertFeature(tuyaFunctions, externalId) {
   const { code, values, name, readOnly } = tuyaFunctions;
 
-  const featuresCategoryAndType = mappings[code];
+  const featuresCategoryAndType = mappings[code] || mappings[code && code.toLowerCase()];
   if (!featuresCategoryAndType) {
     logger.warn(`Tuya function with "${code}" code is not managed`);
     return undefined;
@@ -27,10 +28,11 @@ function convertFeature(tuyaFunctions, externalId) {
     );
   }
 
+  const featureExternalId = `${externalId}:${code}`;
   const feature = {
     name,
-    external_id: `${externalId}:${code}`,
-    selector: `${externalId}:${code}`,
+    external_id: featureExternalId,
+    selector: slugify(featureExternalId),
     read_only: readOnly,
     has_feedback: false,
     min: 0,

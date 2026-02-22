@@ -5,6 +5,7 @@ const { BadParameters } = require('../../../utils/coreErrors');
 const { mergeDevices } = require('../../../utils/device');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.deviceParams');
+const { addFallbackBinaryFeature } = require('./device/tuya.localMapping');
 
 /**
  * @description Poll a Tuya device locally to retrieve DPS map.
@@ -137,7 +138,7 @@ async function localPoll(payload) {
  * updateDiscoveredDeviceAfterLocalPoll(tuyaManager, { deviceId: 'id', ip: '1.1.1.1', protocolVersion: '3.3' });
  */
 function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
-  const { deviceId, ip, protocolVersion, localKey } = payload || {};
+  const { deviceId, ip, protocolVersion, localKey, dps } = payload || {};
   if (!deviceId || !tuyaManager || !Array.isArray(tuyaManager.discoveredDevices)) {
     return null;
   }
@@ -161,6 +162,11 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
+  if (dps) {
+    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_POLL_DPS, JSON.stringify(dps));
+  }
+
+  device = addFallbackBinaryFeature(device, dps);
 
   if (tuyaManager.gladys && tuyaManager.gladys.stateManager) {
     const existing = normalizeExistingDevice(

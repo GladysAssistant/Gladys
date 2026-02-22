@@ -417,8 +417,12 @@ class SetupTab extends Component {
                 <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid" />
                 <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid2" />
                 <MarkupText id="integration.tuya.setup.descriptionTrial" />
+                <MarkupText id="integration.tuya.setup.descriptionCloudLimit" />
+                <MarkupText id="integration.tuya.setup.descriptionControllable" />
                 <MarkupText id="integration.tuya.setup.localTitle" />
                 <MarkupText id="integration.tuya.setup.descriptionLocalMode" />
+                <MarkupText id="integration.tuya.setup.descriptionLocalKeepsApp" />
+                <MarkupText id="integration.tuya.setup.descriptionCameraLimit" />
               </p>
 
               <form>

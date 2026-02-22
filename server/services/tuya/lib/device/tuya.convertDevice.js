@@ -2,6 +2,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { convertFeature } = require('./tuya.convertFeature');
 const logger = require('../../../../utils/logger');
+const { slugify } = require('../../../../utils/slugify');
 
 /**
  * @description Transform Tuya device to Gladys device.
@@ -84,7 +85,7 @@ function convertDevice(tuyaDevice) {
     name,
     features: features.filter((feature) => feature),
     external_id: externalId,
-    selector: externalId,
+    selector: slugify(externalId),
     model: productName || model,
     product_id: productId,
     product_key: productKey,

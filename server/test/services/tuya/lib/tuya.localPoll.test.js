@@ -358,4 +358,28 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
     expect(updated).to.have.property('updatable');
     expect(updated.local_override).to.equal(true);
   });
+
+  it('should add fallback binary feature when dps contains key 1', () => {
+    const tuyaManager = {
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          params: [],
+          features: [],
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.3',
+      dps: { 1: true },
+    });
+
+    expect(updated.features).to.have.lengthOf(1);
+    expect(updated.features[0].external_id).to.equal('tuya:device1:switch_1');
+    const dpsParam = updated.params.find((param) => param.name === DEVICE_PARAM_NAME.LOCAL_POLL_DPS);
+    expect(dpsParam).to.not.equal(undefined);
+  });
 });

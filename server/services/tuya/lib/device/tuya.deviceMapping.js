@@ -8,6 +8,8 @@ const {
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
 
 const SWITCH_LED = 'switch_led';
+const SWITCH = 'switch';
+const POWER = 'power';
 const BRIGHT_VALUE_V2 = 'bright_value_v2';
 const TEMP_VALUE_V2 = 'temp_value_v2';
 const COLOUR_DATA_V2 = 'colour_data_v2';
@@ -35,6 +37,14 @@ const mappings = {
   [SWITCH_LED]: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,
     type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+  },
+  [SWITCH]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  [POWER]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
   [BRIGHT_VALUE_V2]: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,

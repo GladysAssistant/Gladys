@@ -181,9 +181,15 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
 
     const filteredLocalDevices =
       tuyaManager.gladys && tuyaManager.gladys.stateManager
-        ? localDiscoveredDevices.filter((device) => {
-            const existInGladys = tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id);
-            return !existInGladys;
+        ? localDiscoveredDevices.map((device) => {
+            const existing = normalizeExistingDevice(
+              tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id),
+            );
+            if (!existing) {
+              return device;
+            }
+            const withLocalOverride = applyExistingLocalOverride(device, existing);
+            return mergeDevices(withLocalOverride, existing);
           })
         : localDiscoveredDevices;
 

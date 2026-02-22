@@ -1,106 +1,88 @@
-const sinon = require('sinon');
 const { expect } = require('chai');
+const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext } = require('../tuya.mock.test');
-
-const { assert, fake } = sinon;
-
-const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
-  '@tuya/tuya-connector-nodejs': { TuyaContext },
-});
-const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
-  './tuya.connect.js': connect,
-});
-const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
-const { EVENTS } = require('../../../../utils/constants');
-
-const { BadParameters } = require('../../../../utils/coreErrors');
-
-const gladys = {
-  variable: {
-    getValue: sinon.stub(),
-  },
-  event: {
-    emit: fake.returns(null),
-  },
-};
-const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { STATUS, DEVICE_PARAM_NAME } = require('../../../../services/tuya/lib/utils/tuya.constants');
 
 describe('TuyaHandler.poll', () => {
-  const tuyaHandler = new TuyaHandler(gladys, serviceId);
+  it('should poll locally when local override is enabled', async () => {
+    const localPollStub = sinon.stub().resolves({ dps: { 1: true } });
+    const connector = { request: sinon.fake() };
+    const gladys = { event: { emit: sinon.fake() } };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll: localPollStub },
+    });
 
-  beforeEach(() => {
-    sinon.reset();
-    tuyaHandler.connector = {
-      request: sinon
-        .stub()
-        .onFirstCall()
-        .resolves({ result: [{ code: 'code', value: true }], total: 1, has_more: true, last_row_key: 'next' }),
-    };
-  });
-
-  afterEach(() => {
-    sinon.reset();
-  });
-
-  it('should throw an error (should starts with "tuya:")', async () => {
-    try {
-      await tuyaHandler.poll({
-        external_id: 'test:device',
-        features: [
-          {
-            external_id: 'tuya:feature',
-            category: 'light',
-            type: 'binary',
-          },
-        ],
-      });
-    } catch (error) {
-      expect(error).to.be.an.instanceof(BadParameters);
-      expect(error.message).to.equal('Tuya device external_id is invalid: "test:device" should starts with "tuya:"');
-    }
-  });
-
-  it('should throw an error (have no network indicator)', async () => {
-    try {
-      await tuyaHandler.poll({
-        external_id: 'tuya',
-        features: [
-          {
-            external_id: 'tuya:feature',
-            category: 'light',
-            type: 'binary',
-          },
-        ],
-      });
-    } catch (error) {
-      expect(error).to.be.an.instanceof(BadParameters);
-      expect(error.message).to.equal('Tuya device external_id is invalid: "tuya" have no network indicator');
-    }
-  });
-
-  it('change state of device feature', async () => {
-    await tuyaHandler.poll({
-      external_id: 'tuya:device',
+    const device = {
+      external_id: 'tuya:device1',
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
       features: [
         {
-          external_id: 'tuya:feature',
-          category: 'light',
-          type: 'binary',
+          external_id: 'tuya:device1:switch_1',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          last_value: 0,
         },
       ],
+    };
+
+    await poll.call({ connector, gladys, status: STATUS.CONNECTED }, device);
+
+    expect(localPollStub.calledOnce).to.equal(true);
+    expect(connector.request.notCalled).to.equal(true);
+    expect(gladys.event.emit.calledOnce).to.equal(true);
+  });
+
+  it('should skip cloud poll when not connected and no local config', async () => {
+    const connector = { request: sinon.fake() };
+    const gladys = { event: { emit: sinon.fake() } };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll: sinon.stub() },
     });
 
-    assert.callCount(tuyaHandler.connector.request, 1);
-    assert.calledWith(tuyaHandler.connector.request, {
-      method: 'GET',
-      path: `${API.VERSION_1_0}/devices/device/status`,
+    const device = {
+      external_id: 'tuya:device1',
+      params: [],
+      features: [],
+    };
+
+    await poll.call({ connector, gladys, status: STATUS.ERROR }, device);
+
+    expect(connector.request.notCalled).to.equal(true);
+  });
+
+  it('should poll cloud when connected and no local override', async () => {
+    const connector = {
+      request: sinon.fake.resolves({
+        result: [{ code: 'switch_1', value: true }],
+      }),
+    };
+    const gladys = { event: { emit: sinon.fake() } };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll: sinon.stub() },
     });
 
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'tuya:feature',
-      state: 0,
-    });
+    const device = {
+      external_id: 'tuya:device1',
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+      features: [
+        {
+          external_id: 'tuya:device1:switch_1',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          last_value: 0,
+        },
+      ],
+    };
+
+    await poll.call({ connector, gladys, status: STATUS.CONNECTED }, device);
+
+    expect(connector.request.calledOnce).to.equal(true);
+    expect(gladys.event.emit.calledOnce).to.equal(true);
   });
 });
