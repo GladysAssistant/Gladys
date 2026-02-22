@@ -27,7 +27,7 @@ describe('Tuya convert feature', () => {
       min: 100,
       name: 'name',
       read_only: false,
-      selector: 'externalId:switch_1',
+      selector: 'externalid-switch-1',
       type: 'binary',
     });
   });
@@ -51,7 +51,7 @@ describe('Tuya convert feature', () => {
       min: 0,
       name: 'name',
       read_only: false,
-      selector: 'externalId:switch_1',
+      selector: 'externalid-switch-1',
       type: 'binary',
     });
   });
