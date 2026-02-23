@@ -1,4 +1,5 @@
 const { DEVICE_PARAM_NAME } = require('./tuya.constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 const { normalizeBoolean } = require('./tuya.normalize');
 
 const upsertParam = (params, name, value) => {
@@ -111,9 +112,55 @@ const applyExistingLocalOverride = (device, existingDevice) => {
   return updated;
 };
 
+const isTemperatureUnit = (unit) =>
+  unit === DEVICE_FEATURE_UNITS.CELSIUS || unit === DEVICE_FEATURE_UNITS.FAHRENHEIT;
+
+const isTemperatureFeature = (feature) => {
+  if (!feature) {
+    return false;
+  }
+  return (
+    (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+      feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE) ||
+    (feature.category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR &&
+      feature.type === DEVICE_FEATURE_TYPES.SENSOR.DECIMAL)
+  );
+};
+
+const applyExistingFeatureUnits = (device, existingDevice) => {
+  if (!device || !Array.isArray(device.features) || !existingDevice || !Array.isArray(existingDevice.features)) {
+    return device;
+  }
+  const existingByExternalId = new Map(
+    existingDevice.features
+      .filter((feature) => feature && feature.external_id)
+      .map((feature) => [feature.external_id, feature]),
+  );
+  const updatedFeatures = device.features.map((feature) => {
+    if (!feature || !feature.external_id) {
+      return feature;
+    }
+    const existingFeature = existingByExternalId.get(feature.external_id);
+    if (!existingFeature) {
+      return feature;
+    }
+    if (
+      isTemperatureFeature(feature) &&
+      isTemperatureFeature(existingFeature) &&
+      isTemperatureUnit(feature.unit) &&
+      isTemperatureUnit(existingFeature.unit)
+    ) {
+      return { ...feature, unit: existingFeature.unit };
+    }
+    return feature;
+  });
+  return { ...device, features: updatedFeatures };
+};
+
 module.exports = {
   applyExistingLocalOverride,
   applyExistingLocalParams,
+  applyExistingFeatureUnits,
   getParamValue,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,

@@ -4,7 +4,7 @@ const logger = require('../../../utils/logger');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { mergeDevices } = require('../../../utils/device');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
-const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.deviceParams');
+const { applyExistingFeatureUnits, normalizeExistingDevice, upsertParam } = require('./utils/tuya.deviceParams');
 const { addFallbackBinaryFeature } = require('./device/tuya.localMapping');
 
 /**
@@ -172,7 +172,8 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
     const existing = normalizeExistingDevice(
       tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id),
     );
-    device = mergeDevices(device, existing);
+    const withUnits = applyExistingFeatureUnits(device, existing);
+    device = mergeDevices(withUnits, existing);
   }
 
   tuyaManager.discoveredDevices[deviceIndex] = device;

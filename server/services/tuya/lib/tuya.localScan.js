@@ -5,6 +5,7 @@ const logger = require('../../../utils/logger');
 const { mergeDevices } = require('../../../utils/device');
 const { convertDevice } = require('./device/tuya.convertDevice');
 const {
+  applyExistingFeatureUnits,
   applyExistingLocalOverride,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
@@ -153,7 +154,8 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
         tuyaManager.gladys.stateManager.get('deviceByExternalId', device.external_id),
       );
       const withLocalOverride = applyExistingLocalOverride(device, existing);
-      return mergeDevices(withLocalOverride, existing);
+      const withUnits = applyExistingFeatureUnits(withLocalOverride, existing);
+      return mergeDevices(withUnits, existing);
     });
     tuyaManager.discoveredDevices = mergedDevices;
     return {
@@ -189,7 +191,8 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
               return device;
             }
             const withLocalOverride = applyExistingLocalOverride(device, existing);
-            return mergeDevices(withLocalOverride, existing);
+            const withUnits = applyExistingFeatureUnits(withLocalOverride, existing);
+            return mergeDevices(withUnits, existing);
           })
         : localDiscoveredDevices;
 

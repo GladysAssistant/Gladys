@@ -5,7 +5,7 @@ const { mergeDevices } = require('../../../utils/device');
 
 const { STATUS } = require('./utils/tuya.constants');
 const { convertDevice } = require('./device/tuya.convertDevice');
-const { applyExistingLocalParams, normalizeExistingDevice } = require('./utils/tuya.deviceParams');
+const { applyExistingFeatureUnits, applyExistingLocalParams, normalizeExistingDevice } = require('./utils/tuya.deviceParams');
 
 /**
  * @description Discover Tuya cloud devices.
@@ -63,7 +63,8 @@ async function discoverDevices() {
     .map((device) => {
       const existing = normalizeExistingDevice(this.gladys.stateManager.get('deviceByExternalId', device.external_id));
       const deviceWithLocalParams = applyExistingLocalParams(device, existing);
-      return mergeDevices(deviceWithLocalParams, existing);
+      const deviceWithUnits = applyExistingFeatureUnits(deviceWithLocalParams, existing);
+      return mergeDevices(deviceWithUnits, existing);
     });
 
   try {
