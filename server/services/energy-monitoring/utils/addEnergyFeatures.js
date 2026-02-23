@@ -4,10 +4,6 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } 
 const { ENERGY_INDEX_FEATURE_TYPES } = require('./constants');
 
 const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
-  if (!device || !Array.isArray(device.features)) {
-    return device;
-  }
-
   const featuresToAdd = [];
   const indexFeatures = device.features.filter(
     (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
@@ -23,27 +19,13 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
       indexFeature.energy_parent_id = defaultElectricMeterDeviceFeatureId;
     }
 
-    const consumptionFeature = device.features.find((f) => {
-      if (
-        f.category !== DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR ||
-        f.type !== DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION
-      ) {
-        return false;
-      }
-
-      if (f.energy_parent_id && f.energy_parent_id === indexFeature.id) {
-        return true;
-      }
-
-      if (!f.external_id || !indexFeature.external_id) {
-        return false;
-      }
-
-      return (
-        f.external_id === `${indexFeature.external_id}_consumption` ||
-        f.external_id === `${indexFeature.external_id}:consumption`
-      );
-    });
+    const consumptionFeature = device.features.find(
+      (f) =>
+        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION &&
+        f.energy_parent_id &&
+        f.energy_parent_id === indexFeature.id,
+    );
 
     let consumptionFeatureId = null;
 
@@ -68,26 +50,13 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
       consumptionFeatureId = consumptionFeature.id;
     }
 
-    const costFeature = device.features.find((f) => {
-      if (
-        f.category !== DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR ||
-        f.type !== DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
-      ) {
-        return false;
-      }
-
-      if (f.energy_parent_id && f.energy_parent_id === consumptionFeatureId) {
-        return true;
-      }
-
-      if (!f.external_id || !indexFeature.external_id) {
-        return false;
-      }
-
-      return (
-        f.external_id === `${indexFeature.external_id}_cost` || f.external_id === `${indexFeature.external_id}:cost`
-      );
-    });
+    const costFeature = device.features.find(
+      (f) =>
+        f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST &&
+        f.energy_parent_id &&
+        f.energy_parent_id === consumptionFeatureId,
+    );
 
     if (!costFeature) {
       featuresToAdd.push({
