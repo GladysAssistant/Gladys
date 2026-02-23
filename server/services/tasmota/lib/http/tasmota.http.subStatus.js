@@ -14,7 +14,7 @@ const { request, buildUrl } = require('./tasmota.http.request');
 function subStatus(networkAddress, username, password, statusId) {
   const device = this.discoveredDevices[networkAddress];
 
-  const fillDevice = (message) => {
+  const fillDevice = async (message) => {
     const statusMsg = JSON.parse(message);
 
     recursiveSearch(statusMsg, (featureTemplate, fullKey, command, value) => {
@@ -25,13 +25,13 @@ function subStatus(networkAddress, username, password, statusId) {
     if (statusId === 11) {
       this.subStatus(networkAddress, username, password, 8);
     } else {
-      this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+      await this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
     }
   };
 
-  const authErrorCallback = () => {
+  const authErrorCallback = async () => {
     device.needAuthentication = true;
-    this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+    await this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
   };
 
   const errorCallback = () => {

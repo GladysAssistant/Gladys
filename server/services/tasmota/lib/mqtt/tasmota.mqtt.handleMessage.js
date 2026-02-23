@@ -11,7 +11,7 @@ const { featureStatus } = require('../utils/tasmota.featureStatus');
  * @example
  * handleMessage('stat/tasmota/POWER', 'ON');
  */
-function handleMessage(topic, message) {
+async function handleMessage(topic, message) {
   const [, deviceExternalId, eventType] = topic.split('/');
 
   switch (eventType) {
@@ -50,7 +50,7 @@ function handleMessage(topic, message) {
         this.discoveredDevices[deviceExternalId] = device;
         delete this.pendingDevices[deviceExternalId];
 
-        this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
+        await this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_MQTT_DEVICE);
       }
       break;
     }
