@@ -1,6 +1,8 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
+const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 const { convertFeature } = require('./tuya.convertFeature');
+const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
 const logger = require('../../../../utils/logger');
 const { slugify } = require('../../../../utils/slugify');
 
@@ -28,6 +30,7 @@ function convertDevice(tuyaDevice) {
     thing_model: thingModel,
     thing_model_raw: thingModelRaw,
     specifications = {},
+    category,
   } = tuyaDevice;
   const externalId = `tuya:${id}`;
   const { functions = [], status = [] } = specifications;
@@ -82,9 +85,42 @@ function convertDevice(tuyaDevice) {
     groups[code] = { ...func, readOnly: false };
   });
 
-  const features = Object.values(groups).map((group) => convertFeature(group, externalId));
+  const deviceType = getDeviceType({
+    specifications,
+    model,
+    product_name: productName,
+    name,
+    category: specifications.category || category,
+  });
+  const ignoredLocalDps = getIgnoredLocalDps(deviceType);
+  const ignoredCloudCodes = getIgnoredCloudCodes(deviceType);
+
+  let temperatureUnit = null;
+  if (properties && Array.isArray(properties.properties)) {
+    const unitProperty = properties.properties.find(
+      (property) => property.code === 'temp_unit_convert' || property.code === 'unit',
+    );
+    if (unitProperty && typeof unitProperty.value === 'string') {
+      const normalized = unitProperty.value.toLowerCase();
+      if (normalized === 'f') {
+        temperatureUnit = DEVICE_FEATURE_UNITS.FAHRENHEIT;
+      } else if (normalized === 'c') {
+        temperatureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
+      }
+    }
+  }
+  if (temperatureUnit) {
+    params.push({ name: DEVICE_PARAM_NAME.TEMPERATURE_UNIT, value: temperatureUnit });
+  }
+
+  const features = Object.values(groups).map((group) =>
+    convertFeature(group, externalId, { deviceType, temperatureUnit }),
+  );
 
   const specificationsPayload = {};
+  if (specifications.category) {
+    specificationsPayload.category = specifications.category;
+  }
   if (functions.length > 0) {
     specificationsPayload.functions = functions;
   }
@@ -106,6 +142,10 @@ function convertDevice(tuyaDevice) {
     params,
     properties,
     specifications: specificationsPayload,
+    tuya_mapping: {
+      ignored_local_dps: ignoredLocalDps,
+      ignored_cloud_codes: ignoredCloudCodes,
+    },
     thing_model: thingModel,
     thing_model_raw: thingModelRaw,
   };

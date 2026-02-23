@@ -3381,7 +3381,19 @@
         "mode": {
           "auto": "Automatisch",
           "cooling": "Kühlen",
-          "heating": "Heizen"
+          "heating": "Heizen",
+          "drying": "Entfeuchten",
+          "fan": "Lüfter"
+        },
+        "fan-speed": {
+          "auto": "Automatisch",
+          "low": "Niedrig",
+          "low-mid": "Niedrig-Mittel",
+          "mid": "Mittel",
+          "mid-high": "Mittel-Hoch",
+          "high": "Hoch",
+          "mute": "Leise",
+          "turbo": "Turbo"
         }
       },
       "heater": {
@@ -3777,7 +3789,15 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "target-temperature": "Solltemperatur"
+      "target-temperature": "Solltemperatur",
+      "fan-speed": "Lüftergeschwindigkeit",
+      "eco": "Öko-Modus",
+      "drying": "Entfeuchten",
+      "cleaning": "Reinigung",
+      "aux-heat": "Zusatzheizung",
+      "light": "Licht",
+      "sleep": "Schlaf",
+      "health": "Gesundheit"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Elektrofahrzeug - Batterie",

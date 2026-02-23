@@ -5,9 +5,25 @@ const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
+const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
+
+const normalizeTemperatureUnit = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const normalized = String(value).toLowerCase();
+  if (normalized === 'c' || normalized === '℃' || normalized === DEVICE_FEATURE_UNITS.CELSIUS) {
+    return DEVICE_FEATURE_UNITS.CELSIUS;
+  }
+  if (normalized === 'f' || normalized === '℉' || normalized === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+    return DEVICE_FEATURE_UNITS.FAHRENHEIT;
+  }
+  return null;
+};
 
 /**
  * @description Send the new device value over device protocol.
@@ -28,12 +44,37 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
 
+  const params = device.params || [];
+  const deviceTemperatureUnit = normalizeTemperatureUnit(getParamValue(params, DEVICE_PARAM_NAME.TEMPERATURE_UNIT));
+
+  let valueToSend = value;
+  if (
+    command === 'temp_set' &&
+    deviceFeature.unit &&
+    deviceTemperatureUnit &&
+    deviceFeature.unit !== deviceTemperatureUnit
+  ) {
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) {
+      if (deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS && deviceTemperatureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+        valueToSend = celsiusToFahrenheit(numericValue);
+      } else if (
+        deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT &&
+        deviceTemperatureUnit === DEVICE_FEATURE_UNITS.CELSIUS
+      ) {
+        valueToSend = fahrenheitToCelsius(numericValue);
+      }
+      if (Number.isFinite(valueToSend)) {
+        valueToSend = Math.round(valueToSend);
+      }
+    }
+  }
+
   const writeCategory = writeValues[deviceFeature.category];
   const writeFn = writeCategory ? writeCategory[deviceFeature.type] : null;
-  const transformedValue = writeFn ? writeFn(value) : value;
+  const transformedValue = writeFn ? writeFn(valueToSend, deviceFeature) : valueToSend;
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
-  const params = device.params || [];
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
   const protocolVersion = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
@@ -41,7 +82,7 @@ async function setValue(device, deviceFeature, value) {
 
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
-  const localDps = getLocalDpsFromCode(command);
+  const localDps = getLocalDpsFromCode(command, device);
 
   if (hasLocalConfig && localDps !== null) {
     const isProtocol35 = protocolVersion === '3.5';

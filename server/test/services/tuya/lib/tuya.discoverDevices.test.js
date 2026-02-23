@@ -206,6 +206,10 @@ describe('TuyaHandler.discoverDevices', () => {
             },
           ],
         },
+        tuya_mapping: {
+          ignored_local_dps: [],
+          ignored_cloud_codes: [],
+        },
         selector: 'tuya-uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: true,

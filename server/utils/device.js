@@ -165,6 +165,10 @@ function mergeFeatures(newFeature, existingFeature = {}, featureIdMap = new Map(
     featureToReturn.energy_parent_id = existingFeature.energy_parent_id;
   }
 
+  if (existingFeature && existingFeature.unit !== undefined && existingFeature.unit !== null) {
+    featureToReturn.unit = existingFeature.unit;
+  }
+
   return featureToReturn;
 }
 

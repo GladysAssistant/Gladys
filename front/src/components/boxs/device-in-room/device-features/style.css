@@ -56,3 +56,16 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .rangeInput {
   flex: 1;
 }
+
+.acModeGroup {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+.acModeButton {
+  margin: 0;
+  white-space: nowrap;
+}

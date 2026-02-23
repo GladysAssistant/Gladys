@@ -72,6 +72,7 @@ const applyExistingLocalParams = (device, existingDevice) => {
   const ipValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.IP_ADDRESS);
   const protocolValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
   const localPollDpsValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_POLL_DPS);
+  const temperatureUnitValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.TEMPERATURE_UNIT);
   const rawLocalOverrideValue = getExistingParamValue(existingDevice, DEVICE_PARAM_NAME.LOCAL_OVERRIDE);
   const localOverrideValue =
     rawLocalOverrideValue !== undefined && rawLocalOverrideValue !== null
@@ -82,6 +83,7 @@ const applyExistingLocalParams = (device, existingDevice) => {
   upsertParam(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolValue);
   upsertParam(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, localOverrideValue);
   upsertParam(params, DEVICE_PARAM_NAME.LOCAL_POLL_DPS, localPollDpsValue);
+  upsertParam(params, DEVICE_PARAM_NAME.TEMPERATURE_UNIT, temperatureUnitValue);
 
   return {
     ...device,

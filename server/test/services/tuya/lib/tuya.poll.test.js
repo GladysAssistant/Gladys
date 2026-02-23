@@ -15,6 +15,7 @@ describe('TuyaHandler.poll', () => {
 
     const device = {
       external_id: 'tuya:device1',
+      model: 'Air Conditioner',
       params: [
         { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
         { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
@@ -23,9 +24,9 @@ describe('TuyaHandler.poll', () => {
       ],
       features: [
         {
-          external_id: 'tuya:device1:switch_1',
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          external_id: 'tuya:device1:switch',
+          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
           last_value: 0,
         },
       ],
@@ -48,6 +49,7 @@ describe('TuyaHandler.poll', () => {
 
     const device = {
       external_id: 'tuya:device1',
+      model: 'Air Conditioner',
       params: [
         { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
         { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },

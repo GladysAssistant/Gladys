@@ -3381,7 +3381,19 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Clim.",
-          "heating": "Chauffage"
+          "heating": "Chauffage",
+          "drying": "Déshumidification",
+          "fan": "Ventilation"
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Faible",
+          "low-mid": "Faible-Moyen",
+          "mid": "Moyen",
+          "mid-high": "Moyen-Fort",
+          "high": "Fort",
+          "mute": "Silencieux",
+          "turbo": "Turbo"
         }
       },
       "heater": {
@@ -3777,7 +3789,15 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "fan-speed": "Vitesse de ventilation",
+      "eco": "Mode éco",
+      "drying": "Mode déshumidification",
+      "cleaning": "Nettoyage",
+      "aux-heat": "Chauffage auxiliaire",
+      "light": "Lumière",
+      "sleep": "Sommeil",
+      "health": "Santé"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Véhicule électrique - Batterie",

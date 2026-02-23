@@ -71,10 +71,13 @@ async function loadDeviceDetails(tuyaDevice) {
   logger.debug(`[Tuya] Device properties loaded for ${deviceId}`);
   logger.debug(`[Tuya] Device thing model loaded for ${deviceId}`);
 
+  const category = details.category || tuyaDevice.category;
+  const specificationsWithCategory = category && !specifications.category ? { ...specifications, category } : specifications;
+
   return {
     ...tuyaDevice,
     ...details,
-    specifications,
+    specifications: specificationsWithCategory,
     properties,
     thing_model: thingModel,
     thing_model_raw: thingModelRaw,

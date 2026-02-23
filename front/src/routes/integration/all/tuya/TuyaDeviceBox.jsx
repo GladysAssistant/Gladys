@@ -46,11 +46,57 @@ const sanitizeParams = params => {
 const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 
-const IGNORED_PARTIAL_DPS = new Set(['11', '6']);
+const getIgnoredLocalDps = device => {
+  const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
+  const ignored = mapping && Array.isArray(mapping.ignored_local_dps) ? mapping.ignored_local_dps : [];
+  return new Set(ignored.map(value => String(value)));
+};
 
-const getLocalDpsFromCode = code => {
+const getIgnoredCloudCodes = device => {
+  const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
+  const ignored = mapping && Array.isArray(mapping.ignored_cloud_codes) ? mapping.ignored_cloud_codes : [];
+  return new Set(ignored.map(value => String(value).toLowerCase()));
+};
+
+const LOCAL_CODE_ALIASES = {
+  switch: ['power'],
+  power: ['switch'],
+  fan_speed_enum: ['windspeed'],
+  windspeed: ['fan_speed_enum'],
+  eco: ['mode_eco'],
+  mode_eco: ['eco'],
+  drying: ['mode_dry'],
+  mode_dry: ['drying'],
+  cleaning: ['clean'],
+  clean: ['cleaning']
+};
+
+const getLocalDpsFromProperties = (code, properties) => {
+  if (!code || !properties) {
+    return null;
+  }
+  const list = Array.isArray(properties.properties) ? properties.properties : properties;
+  if (!Array.isArray(list)) {
+    return null;
+  }
+  const normalized = code.toLowerCase();
+  const candidates = [normalized, ...(LOCAL_CODE_ALIASES[normalized] || [])];
+  for (const candidate of candidates) {
+    const match = list.find(item => item && item.code && item.code.toLowerCase() === candidate);
+    if (match && match.dp_id !== undefined && match.dp_id !== null) {
+      return match.dp_id;
+    }
+  }
+  return null;
+};
+
+const getLocalDpsFromCode = (code, device) => {
   if (!code) {
     return null;
+  }
+  const propertyMatch = getLocalDpsFromProperties(code, device && device.properties);
+  if (propertyMatch !== null) {
+    return propertyMatch;
   }
   const normalized = code.toLowerCase();
   if (normalized === 'switch' || normalized === 'power') {
@@ -63,7 +109,7 @@ const getLocalDpsFromCode = code => {
   return null;
 };
 
-const getKnownDpsKeys = features => {
+const getKnownDpsKeys = (features, device) => {
   const keys = new Set();
   if (!Array.isArray(features)) {
     return keys;
@@ -71,7 +117,7 @@ const getKnownDpsKeys = features => {
   features.forEach(feature => {
     const parts = (feature.external_id || '').split(':');
     const code = parts.length >= 3 ? parts[2] : null;
-    const dpsKey = getLocalDpsFromCode(code);
+    const dpsKey = getLocalDpsFromCode(code, device);
     if (dpsKey !== null) {
       keys.add(String(dpsKey));
     }
@@ -79,15 +125,16 @@ const getKnownDpsKeys = features => {
   return keys;
 };
 
-const getUnknownDpsKeys = (localPollDps, features) => {
+const getUnknownDpsKeys = (localPollDps, features, device) => {
   if (!localPollDps || typeof localPollDps !== 'object') {
     return [];
   }
-  const knownKeys = getKnownDpsKeys(features);
-  return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !IGNORED_PARTIAL_DPS.has(key));
+  const knownKeys = getKnownDpsKeys(features, device);
+  const ignoredDps = getIgnoredLocalDps(device);
+  return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !ignoredDps.has(String(key)));
 };
 
-const getUnknownSpecificationCodes = (specifications, features) => {
+const getUnknownSpecificationCodes = (specifications, features, device) => {
   if (!specifications || (!Array.isArray(specifications.functions) && !Array.isArray(specifications.status))) {
     return [];
   }
@@ -113,7 +160,11 @@ const getUnknownSpecificationCodes = (specifications, features) => {
       }
     });
   });
-  return Array.from(specCodes).filter(code => !knownCodes.has(code.toLowerCase()));
+  const ignoredCodes = getIgnoredCloudCodes(device);
+  return Array.from(specCodes).filter(code => {
+    const normalized = code.toLowerCase();
+    return !knownCodes.has(normalized) && !ignoredCodes.has(normalized);
+  });
 };
 
 const getParamValue = (device, name) => {
@@ -532,7 +583,7 @@ class TuyaDeviceBox extends Component {
 
     const { device, localPollStatus, localPollError, localPollValidation, localPollDps } = this.state;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
-    const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
+    const effectiveLocalPollDps = localPollDps && persistedLocalPollDps;
     const issueData = createGithubIssueData(
       device,
       localPollStatus,
@@ -846,9 +897,9 @@ class TuyaDeviceBox extends Component {
     const pollProtocolLabel = localPollProtocol || protocolVersion || '-';
     const githubIssuesUrl = githubIssueExists ? buildGithubSearchUrl(buildIssueTitle(device)) : null;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
-    const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
-    const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features);
-    const unknownSpecCodes = getUnknownSpecificationCodes(device.specifications, device.features);
+    const effectiveLocalPollDps = localPollDps && persistedLocalPollDps;
+    const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features, device);
+    const unknownSpecCodes = getUnknownSpecificationCodes(device.specifications, device.features, device);
     const unknownKeys = effectiveLocalPollDps ? unknownLocalDpsKeys : unknownSpecCodes;
     const hasPartialSupport = validModel && unknownKeys.length > 0;
     const partialCountLabelId =

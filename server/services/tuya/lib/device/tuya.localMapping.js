@@ -1,14 +1,35 @@
 const { convertFeature } = require('./tuya.convertFeature');
+const { getDeviceType, getLocalMapping, normalizeCode } = require('../mappings');
 
-const getLocalDpsFromCode = (code) => {
+const getLocalDpsFromCode = (code, device) => {
   if (!code) {
     return null;
   }
-  const normalized = code.toLowerCase();
+  const normalized = normalizeCode(code);
+  const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
+  const localMapping = getLocalMapping(deviceType);
+
+  if (localMapping.dps && localMapping.dps[normalized] !== undefined) {
+    return localMapping.dps[normalized];
+  }
+  const aliases = localMapping.codeAliases && localMapping.codeAliases[normalized];
+  if (Array.isArray(aliases)) {
+    for (const alias of aliases) {
+      const aliasKey = normalizeCode(alias);
+      if (aliasKey && localMapping.dps && localMapping.dps[aliasKey] !== undefined) {
+        return localMapping.dps[aliasKey];
+      }
+    }
+  }
+
+  if (localMapping.strict) {
+    return null;
+  }
+
   if (normalized === 'switch' || normalized === 'power') {
     return 1;
   }
-  const match = code.match(/_(\d+)$/);
+  const match = normalized.match(/_(\d+)$/);
   if (match) {
     return parseInt(match[1], 10);
   }

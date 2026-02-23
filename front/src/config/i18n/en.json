@@ -3381,7 +3381,19 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Cool",
-          "heating": "Heat"
+          "heating": "Heat",
+          "drying": "Dry",
+          "fan": "Fan"
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Low",
+          "low-mid": "Low-Med",
+          "mid": "Medium",
+          "mid-high": "Med-High",
+          "high": "High",
+          "mute": "Quiet",
+          "turbo": "Turbo"
         }
       },
       "heater": {
@@ -3777,7 +3789,15 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Target temperature"
+      "target-temperature": "Target temperature",
+      "fan-speed": "Fan speed",
+      "eco": "Eco mode",
+      "drying": "Drying mode",
+      "cleaning": "Cleaning",
+      "aux-heat": "Auxiliary heat",
+      "light": "Light",
+      "sleep": "Sleep",
+      "health": "Health"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Electric Vehicle - Battery",
