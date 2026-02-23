@@ -117,4 +117,16 @@ describe('gateway.getUsersKeys', () => {
       },
     ]);
   });
+  it('should throw Error500 when getUsersInstance returns an error with status', async () => {
+    const error = new Error();
+    error.response = { status: 400 };
+    gateway.gladysGatewayClient.getUsersInstance = fake.rejects(error);
+
+    try {
+      await gateway.getUsersKeys();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.status).to.equal(500);
+    }
+  });
 });

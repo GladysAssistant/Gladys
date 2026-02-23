@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 
 /**
@@ -19,8 +18,8 @@ async function getContainers(options = { all: true }) {
       image: container.Image,
       state: container.State,
       id: container.Id,
-      networkMode: get(container, 'HostConfig.NetworkMode'),
-      devices: get(container, 'HostConfig.Devices'),
+      networkMode: container?.HostConfig?.NetworkMode,
+      devices: container?.HostConfig?.Devices,
       created_at: container.Created,
     };
   });

@@ -1,4 +1,3 @@
-const get = require('get-value');
 /**
  * @description Get Device param by name.
  * @param {object} device - Device Object to parse.
@@ -10,7 +9,7 @@ const get = require('get-value');
  * }, 'test');
  */
 function getDeviceParam(device, paramName) {
-  if (!get(device, 'params')) {
+  if (!device?.params) {
     return null;
   }
   const param = device.params.find((oneParam) => oneParam.name === paramName);
@@ -59,7 +58,7 @@ function setDeviceParam(device, paramName, newValue) {
  * }, 'light', 'binary');
  */
 function getDeviceFeature(device, category, type) {
-  if (!get(device, 'features')) {
+  if (!device?.features) {
     return null;
   }
   const feature = device.features.find((oneFeature) => oneFeature.category === category && oneFeature.type === type);

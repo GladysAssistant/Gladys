@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { webcrypto } = require('crypto');
 const logger = require('../../utils/logger');
 const { ERROR_MESSAGES } = require('../../utils/constants');
@@ -29,7 +28,7 @@ async function login(email, password) {
     return loginResults;
   } catch (e) {
     logger.debug(e);
-    const status = get(e, 'response.status');
+    const status = e?.response?.status;
     if (status) {
       throw new Error403();
     } else {

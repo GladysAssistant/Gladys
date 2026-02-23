@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 const Device = require('../../../lib/device');
 const db = require('../../../models');
@@ -17,7 +17,7 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
     for (let i = 1; i <= 110; i += 1) {
       const date = new Date();
       deviceFeatureStateToInsert.push({
-        id: uuid.v4(),
+        id: randomUUID(),
         device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
         value: i,
         created_at: date,

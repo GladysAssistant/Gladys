@@ -1,6 +1,6 @@
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import debounce from 'debounce';
+import debounce from '../../../../../utils/debounce';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import EmptyState from './EmptyState';
@@ -20,7 +20,7 @@ class DeviceTab extends Component {
       error: null,
       nukiEnabled: null
     };
-    this.debouncedGetNukiDevices = debounce(this.getNukiDevices, 200).bind(this);
+    this.debouncedGetNukiDevices = debounce(this.getNukiDevices.bind(this), 200);
   }
 
   componentWillMount() {

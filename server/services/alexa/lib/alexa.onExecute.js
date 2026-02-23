@@ -1,5 +1,4 @@
-const uuid = require('uuid');
-const get = require('get-value');
+const { randomUUID } = require('crypto');
 const {
   EVENTS,
   ACTIONS,
@@ -20,10 +19,10 @@ const { writeValues, readValues } = require('./deviceMappings');
  * onExecute();
  */
 function onExecute(body) {
-  const directiveNamespace = get(body, 'directive.header.namespace');
-  const directiveName = get(body, 'directive.header.name');
-  const endpointId = get(body, 'directive.endpoint.endpointId');
-  const correlationToken = get(body, 'directive.header.correlationToken');
+  const directiveNamespace = body?.directive?.header?.namespace;
+  const directiveName = body?.directive?.header?.name;
+  const endpointId = body?.directive?.endpoint?.endpointId;
+  const correlationToken = body?.directive?.header?.correlationToken;
   let value;
   let nameOfAlexaFeature;
   const deviceInMemory = this.gladys.stateManager.get('device', endpointId);
@@ -94,7 +93,7 @@ function onExecute(body) {
       );
       value = writeValues[DIRECTIVE_NAMESPACES.BrightnessController](
         directiveName,
-        get(body, 'directive.payload'),
+        body?.directive?.payload,
         deviceFeature.last_value,
         binaryDeviceFeature.last_value,
         deviceFeature,
@@ -113,7 +112,7 @@ function onExecute(body) {
       deviceFeature = deviceInMemory.features.find(
         (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR,
       );
-      value = writeValues[DIRECTIVE_NAMESPACES.ColorController](get(body, 'directive.payload.color'));
+      value = writeValues[DIRECTIVE_NAMESPACES.ColorController](body?.directive?.payload?.color);
       nameOfAlexaFeature = 'color';
       // Make sure the light is on if we change the light color
       controlPower(deviceFeature.category, 1);
@@ -137,7 +136,7 @@ function onExecute(body) {
         namespace: 'Alexa',
         name: 'Response',
         payloadVersion: '3',
-        messageId: uuid.v4(),
+        messageId: randomUUID(),
         correlationToken,
       },
       endpoint: body.directive.endpoint,

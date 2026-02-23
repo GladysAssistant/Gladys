@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { getGladysDeviceFeatures } = require('./air-to-air.device');
 
@@ -17,7 +16,7 @@ function convertDevice(melCloudDevice) {
     features: [],
     external_id: externalId,
     selector: externalId,
-    model: get(melCloudDevice, 'Device.Units.0.Model', null),
+    model: melCloudDevice?.Device?.Units?.[0]?.Model ?? null,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS,
     should_poll: true,
     params: [

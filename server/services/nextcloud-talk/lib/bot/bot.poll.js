@@ -1,4 +1,3 @@
-const get = require('get-value');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -43,7 +42,7 @@ async function poll(userId) {
     interval = 15 * 1000;
   }
 
-  const newMessages = get(result, 'data.ocs.data');
+  const newMessages = result?.data?.ocs?.data;
   if (
     bot.lastKnownMessageId &&
     bot.isPolling &&
@@ -54,7 +53,7 @@ async function poll(userId) {
   }
 
   if (bot.isPolling) {
-    this.bots[userId].lastKnownMessageId = get(result, 'headers.x-chat-last-given') || bot.lastKnownMessageId;
+    this.bots[userId].lastKnownMessageId = result?.headers?.['x-chat-last-given'] || bot.lastKnownMessageId;
     setTimeout(() => this.poll(userId), interval);
   }
 }

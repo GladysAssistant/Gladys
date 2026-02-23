@@ -1,7 +1,7 @@
 import { RequestStatus } from '../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
-import debounce from 'debounce';
+import debounce from '../../../../utils/debounce';
 import {
   DEVICE_POLL_FREQUENCIES,
   DEVICE_FEATURE_CATEGORIES,

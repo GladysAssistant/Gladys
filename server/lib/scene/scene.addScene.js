@@ -1,5 +1,5 @@
 const cloneDeep = require('lodash.clonedeep');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
@@ -35,7 +35,7 @@ function addScene(sceneRaw) {
   if (scene.triggers && scene.active) {
     scene.triggers.forEach((trigger) => {
       // First, we had a trigger key, import to uniquely identify this trigger
-      trigger.key = uuid.v4();
+      trigger.key = randomUUID();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
         const rule = {};
         rule.tz = this.timezone;

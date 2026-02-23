@@ -5,7 +5,7 @@ extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 
-import debounce from 'debounce';
+import debounce from '../utils/debounce';
 import get from 'get-value';
 import uuid from 'uuid';
 
