@@ -296,10 +296,18 @@ const readValues = {
   },
   [DEVICE_FEATURE_CATEGORIES.DURATION]: {
     [DEVICE_FEATURE_TYPES.DURATION.INTEGER]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10);
+      if (valueFromDevice === null || valueFromDevice === undefined) {
+        return null;
+      }
+      const parsed = parseInt(valueFromDevice, 10);
+      return Number.isFinite(parsed) ? parsed : null;
     },
     [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: (valueFromDevice) => {
-      return parseFloat(valueFromDevice);
+      if (valueFromDevice === null || valueFromDevice === undefined) {
+        return null;
+      }
+      const parsed = parseFloat(valueFromDevice);
+      return Number.isFinite(parsed) ? parsed : null;
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {

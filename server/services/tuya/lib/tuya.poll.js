@@ -4,7 +4,7 @@ const { readValues } = require('./device/tuya.deviceMapping');
 const { API, DEVICE_PARAM_NAME, STATUS } = require('./utils/tuya.constants');
 const { EVENTS, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
-const { normalizeBoolean } = require('./utils/tuya.normalize');
+const { normalizeBoolean, normalizeTemperatureUnit } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { localPoll } = require('./tuya.localPoll');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
@@ -19,20 +19,6 @@ const emitFeatureState = (gladys, deviceFeature, transformedValue) => {
       });
     }
   }
-};
-
-const normalizeTemperatureUnit = (value) => {
-  if (value === null || value === undefined) {
-    return null;
-  }
-  const normalized = String(value).toLowerCase();
-  if (normalized === 'c' || normalized === '℃' || normalized === DEVICE_FEATURE_UNITS.CELSIUS) {
-    return DEVICE_FEATURE_UNITS.CELSIUS;
-  }
-  if (normalized === 'f' || normalized === '℉' || normalized === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-    return DEVICE_FEATURE_UNITS.FAHRENHEIT;
-  }
-  return null;
 };
 
 const isTemperatureFeature = (deviceFeature, code) => {
@@ -152,14 +138,23 @@ async function poll(device) {
     const deviceType = getDeviceType(device);
     const localMapping = getLocalMapping(deviceType);
     const isLocalStrict = localMapping.strict === true;
-    const localResult = await localPoll({
-      deviceId: topic,
-      ip: ipAddress,
-      localKey,
-      protocolVersion,
-      timeoutMs: 3000,
-      fastScan: true,
-    });
+    let localResult;
+    try {
+      localResult = await localPoll({
+        deviceId: topic,
+        ip: ipAddress,
+        localKey,
+        protocolVersion,
+        timeoutMs: 3000,
+        fastScan: true,
+      });
+    } catch (e) {
+      if (isLocalStrict || this.status !== STATUS.CONNECTED) {
+        throw e;
+      }
+      logger.warn(`[Tuya][poll] local poll failed for ${topic}, falling back to cloud`, e);
+      localResult = null;
+    }
     const dps = localResult && localResult.dps ? localResult.dps : {};
     const reportedUnit = getTemperatureUnitFromLocalDps(device, dps);
     if (reportedUnit && reportedUnit !== deviceTemperatureUnit && this.gladys && this.gladys.device) {

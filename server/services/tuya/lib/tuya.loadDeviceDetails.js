@@ -54,12 +54,11 @@ async function loadDeviceDetails(tuyaDevice) {
   const properties = propsResult.status === 'fulfilled' ? propsResult.value.result || {} : {};
   const modelPayload = modelResult.status === 'fulfilled' ? modelResult.value.result || null : null;
   let thingModel = null;
-  let thingModelRaw = null;
   if (modelPayload && typeof modelPayload.model === 'string') {
-    thingModelRaw = modelPayload.model;
     try {
       thingModel = JSON.parse(modelPayload.model);
     } catch (e) {
+      logger.warn(`[Tuya] Invalid thing model JSON for ${deviceId}`, e);
       thingModel = null;
     }
   } else if (modelPayload) {
@@ -81,7 +80,6 @@ async function loadDeviceDetails(tuyaDevice) {
     specifications: specificationsWithCategory,
     properties,
     thing_model: thingModel,
-    thing_model_raw: thingModelRaw,
   };
 }
 

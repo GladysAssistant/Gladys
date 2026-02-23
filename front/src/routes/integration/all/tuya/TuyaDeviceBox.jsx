@@ -256,7 +256,6 @@ const buildIssuePayload = (device, localPollStatus, localPollError, localPollVal
     specifications: device.specifications || device.specificationsPayload || null,
     properties: device.properties || null,
     thing_model: device.thing_model || null,
-    thing_model_raw: device.thing_model_raw || null,
     features: Array.isArray(device.features) ? device.features : [],
     params: sanitizedParams,
     local_poll: {
@@ -577,13 +576,26 @@ class TuyaDeviceBox extends Component {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
-    if (this.state.githubIssueChecking || this.state.githubIssueExists) {
+    const {
+      githubIssueChecking,
+      githubIssueExists,
+      githubIssuePayload,
+      githubIssuePayloadUrl,
+      githubIssueOpened
+    } = this.state;
+    if (
+      githubIssueChecking ||
+      githubIssueExists ||
+      githubIssuePayload ||
+      githubIssuePayloadUrl ||
+      githubIssueOpened
+    ) {
       return;
     }
 
     const { device, localPollStatus, localPollError, localPollValidation, localPollDps } = this.state;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
-    const effectiveLocalPollDps = localPollDps && persistedLocalPollDps;
+    const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
     const issueData = createGithubIssueData(
       device,
       localPollStatus,
@@ -897,7 +909,7 @@ class TuyaDeviceBox extends Component {
     const pollProtocolLabel = localPollProtocol || protocolVersion || '-';
     const githubIssuesUrl = githubIssueExists ? buildGithubSearchUrl(buildIssueTitle(device)) : null;
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
-    const effectiveLocalPollDps = localPollDps && persistedLocalPollDps;
+    const effectiveLocalPollDps = localOverride ? localPollDps || persistedLocalPollDps : null;
     const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features, device);
     const unknownSpecCodes = getUnknownSpecificationCodes(device.specifications, device.features, device);
     const unknownKeys = effectiveLocalPollDps ? unknownLocalDpsKeys : unknownSpecCodes;

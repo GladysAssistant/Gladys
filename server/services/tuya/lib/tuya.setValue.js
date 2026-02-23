@@ -7,23 +7,9 @@ const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
-const { normalizeBoolean } = require('./utils/tuya.normalize');
+const { normalizeBoolean, normalizeTemperatureUnit } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
-
-const normalizeTemperatureUnit = (value) => {
-  if (value === null || value === undefined) {
-    return null;
-  }
-  const normalized = String(value).toLowerCase();
-  if (normalized === 'c' || normalized === '℃' || normalized === DEVICE_FEATURE_UNITS.CELSIUS) {
-    return DEVICE_FEATURE_UNITS.CELSIUS;
-  }
-  if (normalized === 'f' || normalized === '℉' || normalized === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-    return DEVICE_FEATURE_UNITS.FAHRENHEIT;
-  }
-  return null;
-};
 
 /**
  * @description Send the new device value over device protocol.
@@ -80,7 +66,9 @@ async function setValue(device, deviceFeature, value) {
 
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
-  const protocolVersion = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const protocolVersionRaw = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const protocolVersion =
+    protocolVersionRaw !== null && protocolVersionRaw !== undefined ? String(protocolVersionRaw).trim() : undefined;
   const localOverride = normalizeBoolean(getParamValue(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE));
 
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;

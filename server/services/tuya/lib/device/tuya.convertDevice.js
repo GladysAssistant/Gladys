@@ -28,7 +28,6 @@ function convertDevice(tuyaDevice) {
     local_override: localOverride,
     properties,
     thing_model: thingModel,
-    thing_model_raw: thingModelRaw,
     specifications = {},
     category,
   } = tuyaDevice;
@@ -101,10 +100,12 @@ function convertDevice(tuyaDevice) {
       (property) => property.code === 'temp_unit_convert' || property.code === 'unit',
     );
     if (unitProperty && typeof unitProperty.value === 'string') {
-      const normalized = unitProperty.value.toLowerCase();
-      if (normalized === 'f') {
+      const normalized = unitProperty.value.trim().toLowerCase();
+      if (['f', '℉', 'fahrenheit'].includes(normalized)) {
         temperatureUnit = DEVICE_FEATURE_UNITS.FAHRENHEIT;
-      } else if (normalized === 'c') {
+      } else if (
+        ['c', '℃', 'celsius', 'centigrade', 'celcius'].includes(normalized)
+      ) {
         temperatureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
       }
     }
@@ -147,7 +148,6 @@ function convertDevice(tuyaDevice) {
       ignored_cloud_codes: ignoredCloudCodes,
     },
     thing_model: thingModel,
-    thing_model_raw: thingModelRaw,
   };
   if (online !== undefined) {
     device.online = online;

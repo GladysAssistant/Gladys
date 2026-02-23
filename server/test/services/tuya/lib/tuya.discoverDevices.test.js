@@ -216,7 +216,6 @@ describe('TuyaHandler.discoverDevices', () => {
         thing_model: {
           services: [],
         },
-        thing_model_raw: '{"services":[]}',
         online: true,
       },
     ]);

@@ -56,10 +56,7 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
                 onClick={() => updateValue(option.value)}
                 key={option.value}
               >
-                <Text
-                  id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`}
-                  plural={AC_MODE.HEATING}
-                />
+                <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
               </button>
             ))}
           </div>

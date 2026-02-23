@@ -45,7 +45,6 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
-      thing_model_raw: '{"services":[]}',
     });
 
     assert.callCount(tuyaHandler.connector.request, 4);
@@ -88,7 +87,6 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: {},
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
-      thing_model_raw: '{"services":[]}',
     });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load specifications/);
@@ -114,7 +112,6 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
-      thing_model_raw: '{"services":[]}',
     });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load details/);
@@ -141,7 +138,6 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: {},
       thing_model: null,
-      thing_model_raw: null,
     });
     expect(warnStub.callCount).to.equal(2);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load properties/);
@@ -168,11 +164,10 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: null,
-      thing_model_raw: 'not-json',
     });
   });
 
-  it('should keep raw thing model when model is an object', async () => {
+  it('should keep thing model when model is an object', async () => {
     tuyaHandler.connector.request = sinon
       .stub()
       .onCall(0)
@@ -192,7 +187,6 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
-      thing_model_raw: null,
     });
   });
 });

@@ -15,7 +15,7 @@ const FAN_SPEED_OPTIONS = [
   { value: AC_FAN_SPEED.TURBO, i18nKey: 'turbo', tuyaValues: ['turbo', 'strong'] }
 ];
 
-const AirConditioningFanSpeedDeviceFeature = ({ children, ...props }) => {
+const AirConditioningFanSpeedDeviceFeature = (props) => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
 
@@ -28,12 +28,8 @@ const AirConditioningFanSpeedDeviceFeature = ({ children, ...props }) => {
     : FAN_SPEED_OPTIONS;
 
   const effectiveOptions = options.length > 0 ? options : FAN_SPEED_OPTIONS;
-  const lastValue =
-    deviceFeature.last_value !== null && deviceFeature.last_value !== undefined
-      ? Number.isNaN(Number(deviceFeature.last_value))
-        ? deviceFeature.last_value
-        : Number(deviceFeature.last_value)
-      : deviceFeature.last_value;
+  const rawValue = deviceFeature.last_value;
+  const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
 
   function updateValue(e) {
     const rawValue = e.currentTarget.value;

@@ -242,14 +242,14 @@ class SetupTab extends Component {
     }
     if (status === 'error') {
       this.setState(prevState => ({
-        tuyaConnectionStatus: RequestStatus.Error,
+        tuyaConnectionStatus: manualDisconnect ? null : RequestStatus.Error,
         tuyaConnecting: false,
         tuyaConnected: false,
         tuyaDisconnected: prevState.tuyaConfigured && !manualDisconnect,
-        tuyaManuallyDisconnected: false,
+        tuyaManuallyDisconnected: !!manualDisconnect,
         tuyaManualDisconnectJustDone: false,
         tuyaJustSavedMissing: false,
-        tuyaConnectionError: error || prevState.tuyaConnectionError
+        tuyaConnectionError: manualDisconnect ? null : error || prevState.tuyaConnectionError
       }));
       return;
     }

@@ -1410,7 +1410,7 @@
         "accessKeyPlaceholder": "Entrez le 'Client ID' de Tuya",
         "secretKey": "Client Secret",
         "secretKeyPlaceholder": "Entrez le 'Client Secret' de Tuya",
-        "appAccountId": "App account User ID",
+        "appAccountId": "ID utilisateur du compte App",
         "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
         "appUsername": "Identifiant Smart Life (optionnel)",
         "appUsernamePlaceholder": "Email ou téléphone du compte Smart Life",
