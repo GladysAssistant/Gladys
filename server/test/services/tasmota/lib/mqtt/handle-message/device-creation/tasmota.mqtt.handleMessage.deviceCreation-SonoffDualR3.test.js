@@ -40,7 +40,7 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
     sinon.reset();
   });
 
-  it('decode STATUS message', async () => {
+  it('decode STATUS message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -68,7 +68,7 @@ describe('Tasmota - MQTT - create Sonoff Dual R3 device', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
-  it('decode STATUS11 message', async () => {
+  it('decode STATUS11 message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});

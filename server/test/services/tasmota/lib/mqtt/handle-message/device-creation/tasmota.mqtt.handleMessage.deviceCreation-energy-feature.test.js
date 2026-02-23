@@ -42,7 +42,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     tasmotaHandler.mqttService = mqttService;
   });
 
-  it('decode STATUS message', async () => {
+  it('decode STATUS message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -70,7 +70,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
-  it('decode STATUS5 message', async () => {
+  it('decode STATUS5 message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
 
@@ -80,7 +80,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     });
   });
 
-  it('decode STATUS11 message', async () => {
+  it('decode STATUS11 message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS5', JSON.stringify(messages.STATUS5));
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
@@ -342,7 +342,7 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('ignores STATUS11 message when no pending device exists', async () => {
+  it('ignores STATUS11 message when no pending device exists', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
