@@ -42,6 +42,22 @@ async function getTemperatureInRoom(roomId, options) {
       last_value: {
         [Op.not]: null,
       },
+      [Op.or]: [
+        {
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          last_value: {
+            [Op.gt]: -273.15,
+            [Op.lt]: 200,
+          },
+        },
+        {
+          unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+          last_value: {
+            [Op.gt]: -459.67,
+            [Op.lt]: 392,
+          },
+        },
+      ],
       last_value_changed: {
         // we want fresh value, less than 1h
         [Op.gt]: oneHourAgo,
