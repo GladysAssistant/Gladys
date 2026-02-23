@@ -36,7 +36,7 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBBWW feature', 
     sinon.reset();
   });
 
-  it('decode STATUS message', () => {
+  it('decode STATUS message', async () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS', JSON.stringify(messages.STATUS));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -64,7 +64,7 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBBWW feature', 
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
-  it('decode STATUS11 message', () => {
+  it('decode STATUS11 message', async () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS11', JSON.stringify(messages.STATUS11));
 
     expect(tasmotaHandler.discoveredDevices).to.deep.eq({});
@@ -107,8 +107,8 @@ describe('Tasmota - MQTT - create device with COLOR Channel #RRGGBBWW feature', 
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '8');
   });
 
-  it('decode STATUS8 message', () => {
-    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+  it('decode STATUS8 message', async () => {
+    await tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
 
     const expectedDevice = {
       name: 'Tasmota',
