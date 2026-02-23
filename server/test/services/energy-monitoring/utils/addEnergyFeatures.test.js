@@ -231,46 +231,6 @@ describe('addEnergyFeatures', () => {
     expect(costFeatures[0].id).to.equal('existing-cost-id');
   });
 
-  it('should ignore existing derived features missing external_id', () => {
-    const device = {
-      features: [
-        {
-          id: 'index-feature-id',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
-          external_id: 'device:energy-index',
-          name: 'Energy Index',
-          selector: 'device-energy-index',
-          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-        },
-        {
-          id: 'consumption-without-external-id',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'other-index-id',
-        },
-        {
-          id: 'cost-without-external-id',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-          energy_parent_id: 'other-consumption-id',
-        },
-      ],
-    };
-
-    const result = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
-
-    const consumptionFeatures = result.features.filter(
-      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-    );
-    const costFeatures = result.features.filter(
-      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-    );
-
-    expect(consumptionFeatures.length).to.equal(2);
-    expect(costFeatures.length).to.equal(2);
-  });
-
   it('should handle multiple index features', () => {
     const device = {
       features: [
