@@ -1,1101 +1,1041 @@
 {
-    "id": "96e8f76d-6a22-420a-bb11-9b2e3775d131",
-    "name": "Clim Bureau Ortho",
-    "selector": "tuya-bfce82fe6faf235d75ykkh",
-    "model": "Air Conditioner",
-    "external_id": "tuya:bfce82fe6faf235d75ykkh",
-    "service_id": "2ae251ee-8619-4310-9c71-f0542d7a99b7",
-    "product_id": "f3goccgfj6qino4c",
-    "product_key": null,
-    "online": true,
-    "protocol_version": "3.3",
-    "local_override": true,
-    "specifications": {
-        "functions": [
-            {
-                "code": "switch",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "开关",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "eco",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "ECO模式",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "drying",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Dry",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "cleaning",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "自清洁",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "temp_unit_convert",
-                "lang_config": {
-                    "c": "℃",
-                    "f": "℉"
-                },
-                "name": "Display Units",
-                "type": "Enum",
-                "values": "{\"range\":[\"c\",\"f\"]}"
-            },
-            {
-                "code": "temp_set",
-                "lang_config": {
-                    "unit": "℃"
-                },
-                "name": "Set Temp",
-                "type": "Integer",
-                "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
-            },
-            {
-                "code": "mode",
-                "lang_config": {
-                    "auto": "Auto",
-                    "cold": "Cool",
-                    "hot": "Heat",
-                    "wind": "Vent"
-                },
-                "name": "Mode",
-                "type": "Enum",
-                "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
-            },
-            {
-                "code": "heat",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": " Auxiliary Heat",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "light",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Light",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "sleep",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Sleep",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "health",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Health",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "fan_speed_enum",
-                "lang_config": {
-                    "auto": "Auto",
-                    "high": "High",
-                    "level_2": "Low-Med",
-                    "level_4": "Med-High",
-                    "low": "Low",
-                    "middle": "Medium",
-                    "mute": "Quiet",
-                    "strong": "Turbo"
-                },
-                "name": "WindSpeed",
-                "type": "Enum",
-                "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
-            }
-        ],
-        "status": [
-            {
-                "code": "switch",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "开关",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "fan_speed_enum",
-                "lang_config": {
-                    "auto": "Auto",
-                    "high": "High",
-                    "level_2": "Low-Med",
-                    "level_4": "Med-High",
-                    "low": "Low",
-                    "middle": "Medium",
-                    "mute": "Quiet",
-                    "strong": "Turbo"
-                },
-                "name": "WindSpeed",
-                "type": "Enum",
-                "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
-            },
-            {
-                "code": "eco",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "ECO模式",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "drying",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Dry",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "cleaning",
-                "lang_config": {
-                    "false": "",
-                    "true": ""
-                },
-                "name": "自清洁",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "temp_unit_convert",
-                "lang_config": {
-                    "c": "℃",
-                    "f": "℉"
-                },
-                "name": "Display Units",
-                "type": "Enum",
-                "values": "{\"range\":[\"c\",\"f\"]}"
-            },
-            {
-                "code": "temp_set",
-                "lang_config": {
-                    "unit": "℃"
-                },
-                "name": "Set Temp",
-                "type": "Integer",
-                "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
-            },
-            {
-                "code": "temp_current",
-                "lang_config": {
-                    "unit": "℃"
-                },
-                "name": "Temp Current",
-                "type": "Integer",
-                "values": "{\"unit\":\"℃\",\"min\":0,\"max\":600,\"scale\":1,\"step\":1}"
-            },
-            {
-                "code": "mode",
-                "lang_config": {
-                    "auto": "Auto",
-                    "cold": "Cool",
-                    "hot": "Heat",
-                    "wind": "Vent"
-                },
-                "name": "Mode",
-                "type": "Enum",
-                "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
-            },
-            {
-                "code": "heat",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": " Auxiliary Heat",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "light",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Light",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "countdown_left",
-                "lang_config": {
-                    "unit": "Min"
-                },
-                "name": "Left Time",
-                "type": "Integer",
-                "values": "{\"unit\":\"分钟\",\"min\":0,\"max\":1440,\"scale\":0,\"step\":1}"
-            },
-            {
-                "code": "sleep",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Sleep",
-                "type": "Boolean",
-                "values": "{}"
-            },
-            {
-                "code": "health",
-                "lang_config": {
-                    "false": "OFF",
-                    "true": "ON"
-                },
-                "name": "Health",
-                "type": "Boolean",
-                "values": "{}"
-            }
-        ]
-    },
-    "properties": {
+  "id": "96e8f76d-6a22-420a-bb11-9b2e3775d131",
+  "name": "Clim Bureau Ortho",
+  "selector": "tuya-bfce82fe6faf235d75ykkh",
+  "model": "Air Conditioner",
+  "external_id": "tuya:bfce82fe6faf235d75ykkh",
+  "service_id": "2ae251ee-8619-4310-9c71-f0542d7a99b7",
+  "product_id": "f3goccgfj6qino4c",
+  "product_key": null,
+  "online": true,
+  "protocol_version": "3.3",
+  "local_override": true,
+  "specifications": {
+    "functions": [
+      {
+        "code": "switch",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "开关",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "eco",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "ECO模式",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "drying",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Dry",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "cleaning",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "自清洁",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "temp_unit_convert",
+        "lang_config": {
+          "c": "℃",
+          "f": "℉"
+        },
+        "name": "Display Units",
+        "type": "Enum",
+        "values": "{\"range\":[\"c\",\"f\"]}"
+      },
+      {
+        "code": "temp_set",
+        "lang_config": {
+          "unit": "℃"
+        },
+        "name": "Set Temp",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
+      },
+      {
+        "code": "mode",
+        "lang_config": {
+          "auto": "Auto",
+          "cold": "Cool",
+          "hot": "Heat",
+          "wind": "Vent"
+        },
+        "name": "Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
+      },
+      {
+        "code": "heat",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": " Auxiliary Heat",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "light",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Light",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "sleep",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Sleep",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "health",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Health",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "fan_speed_enum",
+        "lang_config": {
+          "auto": "Auto",
+          "high": "High",
+          "level_2": "Low-Med",
+          "level_4": "Med-High",
+          "low": "Low",
+          "middle": "Medium",
+          "mute": "Quiet",
+          "strong": "Turbo"
+        },
+        "name": "WindSpeed",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
+      }
+    ],
+    "status": [
+      {
+        "code": "switch",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "开关",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "fan_speed_enum",
+        "lang_config": {
+          "auto": "Auto",
+          "high": "High",
+          "level_2": "Low-Med",
+          "level_4": "Med-High",
+          "low": "Low",
+          "middle": "Medium",
+          "mute": "Quiet",
+          "strong": "Turbo"
+        },
+        "name": "WindSpeed",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
+      },
+      {
+        "code": "eco",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "ECO模式",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "drying",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Dry",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "cleaning",
+        "lang_config": {
+          "false": "",
+          "true": ""
+        },
+        "name": "自清洁",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "temp_unit_convert",
+        "lang_config": {
+          "c": "℃",
+          "f": "℉"
+        },
+        "name": "Display Units",
+        "type": "Enum",
+        "values": "{\"range\":[\"c\",\"f\"]}"
+      },
+      {
+        "code": "temp_set",
+        "lang_config": {
+          "unit": "℃"
+        },
+        "name": "Set Temp",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
+      },
+      {
+        "code": "temp_current",
+        "lang_config": {
+          "unit": "℃"
+        },
+        "name": "Temp Current",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":0,\"max\":600,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "mode",
+        "lang_config": {
+          "auto": "Auto",
+          "cold": "Cool",
+          "hot": "Heat",
+          "wind": "Vent"
+        },
+        "name": "Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
+      },
+      {
+        "code": "heat",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": " Auxiliary Heat",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "light",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Light",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "countdown_left",
+        "lang_config": {
+          "unit": "Min"
+        },
+        "name": "Left Time",
+        "type": "Integer",
+        "values": "{\"unit\":\"分钟\",\"min\":0,\"max\":1440,\"scale\":0,\"step\":1}"
+      },
+      {
+        "code": "sleep",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Sleep",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "health",
+        "lang_config": {
+          "false": "OFF",
+          "true": "ON"
+        },
+        "name": "Health",
+        "type": "Boolean",
+        "values": "{}"
+      }
+    ]
+  },
+  "properties": {
+    "properties": [
+      {
+        "code": "Power",
+        "custom_name": "",
+        "dp_id": 1,
+        "time": 1771599953431,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "temp_set",
+        "custom_name": "",
+        "dp_id": 2,
+        "time": 1771576253706,
+        "type": "value",
+        "value": 210
+      },
+      {
+        "code": "temp_current",
+        "custom_name": "",
+        "dp_id": 3,
+        "time": 1771788265802,
+        "type": "value",
+        "value": 135
+      },
+      {
+        "code": "mode",
+        "custom_name": "",
+        "dp_id": 4,
+        "time": 1771570841711,
+        "type": "enum",
+        "value": "heat"
+      },
+      {
+        "code": "windspeed",
+        "custom_name": "",
+        "dp_id": 5,
+        "time": 1770658142820,
+        "type": "enum",
+        "value": "auto"
+      },
+      {
+        "code": "mode_ECO",
+        "custom_name": "",
+        "dp_id": 8,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "mode_dry",
+        "custom_name": "",
+        "dp_id": 9,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "heat",
+        "custom_name": "",
+        "dp_id": 12,
+        "time": 1771599953431,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "light",
+        "custom_name": "",
+        "dp_id": 13,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "windshake",
+        "custom_name": "",
+        "dp_id": 15,
+        "time": 1770541640612,
+        "type": "enum",
+        "value": "off"
+      },
+      {
+        "code": "Fault",
+        "custom_name": "",
+        "dp_id": 20,
+        "time": 1770541640692,
+        "type": "bitmap",
+        "value": 0
+      },
+      {
+        "code": "Countdown",
+        "custom_name": "",
+        "dp_id": 21,
+        "time": 1770471311004,
+        "type": "enum",
+        "value": "0"
+      },
+      {
+        "code": "countdown_left",
+        "custom_name": "",
+        "dp_id": 22,
+        "time": 1770541641492,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "use_number",
+        "custom_name": "",
+        "dp_id": 101,
+        "time": 1770541640856,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "total_time",
+        "custom_name": "",
+        "dp_id": 102,
+        "time": 1771597003445,
+        "type": "value",
+        "value": 115
+      },
+      {
+        "code": "electricity",
+        "custom_name": "",
+        "dp_id": 103,
+        "time": 1771598442000,
+        "type": "value",
+        "value": 1
+      },
+      {
+        "code": "electricity_number",
+        "custom_name": "",
+        "dp_id": 104,
+        "time": 1770471311004,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "unit",
+        "custom_name": "",
+        "dp_id": 105,
+        "time": 1770541640612,
+        "type": "enum",
+        "value": "c"
+      },
+      {
+        "code": "horizontal",
+        "custom_name": "",
+        "dp_id": 106,
+        "time": 1770541640612,
+        "type": "enum",
+        "value": "off"
+      },
+      {
+        "code": "vertical",
+        "custom_name": "",
+        "dp_id": 107,
+        "time": 1770541640612,
+        "type": "enum",
+        "value": "off"
+      },
+      {
+        "code": "swing3d",
+        "custom_name": "",
+        "dp_id": 108,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "sleep",
+        "custom_name": "",
+        "dp_id": 109,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "health",
+        "custom_name": "",
+        "dp_id": 110,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "clean",
+        "custom_name": "",
+        "dp_id": 111,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "type",
+        "custom_name": "",
+        "dp_id": 112,
+        "time": 1770541640612,
+        "type": "enum",
+        "value": "cold"
+      },
+      {
+        "code": "fault2",
+        "custom_name": "",
+        "dp_id": 113,
+        "time": 1770541640692,
+        "type": "bitmap",
+        "value": 0
+      },
+      {
+        "code": "current_mode",
+        "custom_name": "",
+        "dp_id": 114,
+        "time": 1770471311004,
+        "type": "enum",
+        "value": "cold"
+      },
+      {
+        "code": "heat8",
+        "custom_name": "",
+        "dp_id": 115,
+        "time": 1770541640612,
+        "type": "bool",
+        "value": false
+      }
+    ]
+  },
+  "thing_model": {
+    "modelId": "0000003fy5",
+    "services": [
+      {
+        "actions": [],
+        "code": "",
+        "description": "",
+        "events": [],
+        "name": "默认服务",
         "properties": [
-            {
-                "code": "Power",
-                "custom_name": "",
-                "dp_id": 1,
-                "time": 1771599953431,
-                "type": "bool",
-                "value": false
+          {
+            "abilityId": 1,
+            "accessMode": "rw",
+            "code": "Power",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_power",
+              "attribute": "1"
             },
-            {
-                "code": "temp_set",
-                "custom_name": "",
-                "dp_id": 2,
-                "time": 1771576253706,
-                "type": "value",
-                "value": 210
-            },
-            {
-                "code": "temp_current",
-                "custom_name": "",
-                "dp_id": 3,
-                "time": 1771788265802,
-                "type": "value",
-                "value": 135
-            },
-            {
-                "code": "mode",
-                "custom_name": "",
-                "dp_id": 4,
-                "time": 1771570841711,
-                "type": "enum",
-                "value": "heat"
-            },
-            {
-                "code": "windspeed",
-                "custom_name": "",
-                "dp_id": 5,
-                "time": 1770658142820,
-                "type": "enum",
-                "value": "auto"
-            },
-            {
-                "code": "mode_ECO",
-                "custom_name": "",
-                "dp_id": 8,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "mode_dry",
-                "custom_name": "",
-                "dp_id": 9,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "heat",
-                "custom_name": "",
-                "dp_id": 12,
-                "time": 1771599953431,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "light",
-                "custom_name": "",
-                "dp_id": 13,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": true
-            },
-            {
-                "code": "windshake",
-                "custom_name": "",
-                "dp_id": 15,
-                "time": 1770541640612,
-                "type": "enum",
-                "value": "off"
-            },
-            {
-                "code": "Fault",
-                "custom_name": "",
-                "dp_id": 20,
-                "time": 1770541640692,
-                "type": "bitmap",
-                "value": 0
-            },
-            {
-                "code": "Countdown",
-                "custom_name": "",
-                "dp_id": 21,
-                "time": 1770471311004,
-                "type": "enum",
-                "value": "0"
-            },
-            {
-                "code": "countdown_left",
-                "custom_name": "",
-                "dp_id": 22,
-                "time": 1770541641492,
-                "type": "value",
-                "value": 0
-            },
-            {
-                "code": "use_number",
-                "custom_name": "",
-                "dp_id": 101,
-                "time": 1770541640856,
-                "type": "value",
-                "value": 0
-            },
-            {
-                "code": "total_time",
-                "custom_name": "",
-                "dp_id": 102,
-                "time": 1771597003445,
-                "type": "value",
-                "value": 115
-            },
-            {
-                "code": "electricity",
-                "custom_name": "",
-                "dp_id": 103,
-                "time": 1771598442000,
-                "type": "value",
-                "value": 1
-            },
-            {
-                "code": "electricity_number",
-                "custom_name": "",
-                "dp_id": 104,
-                "time": 1770471311004,
-                "type": "value",
-                "value": 0
-            },
-            {
-                "code": "unit",
-                "custom_name": "",
-                "dp_id": 105,
-                "time": 1770541640612,
-                "type": "enum",
-                "value": "c"
-            },
-            {
-                "code": "horizontal",
-                "custom_name": "",
-                "dp_id": 106,
-                "time": 1770541640612,
-                "type": "enum",
-                "value": "off"
-            },
-            {
-                "code": "vertical",
-                "custom_name": "",
-                "dp_id": 107,
-                "time": 1770541640612,
-                "type": "enum",
-                "value": "off"
-            },
-            {
-                "code": "swing3d",
-                "custom_name": "",
-                "dp_id": 108,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "sleep",
-                "custom_name": "",
-                "dp_id": 109,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "health",
-                "custom_name": "",
-                "dp_id": 110,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": true
-            },
-            {
-                "code": "clean",
-                "custom_name": "",
-                "dp_id": 111,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            },
-            {
-                "code": "type",
-                "custom_name": "",
-                "dp_id": 112,
-                "time": 1770541640612,
-                "type": "enum",
-                "value": "cold"
-            },
-            {
-                "code": "fault2",
-                "custom_name": "",
-                "dp_id": 113,
-                "time": 1770541640692,
-                "type": "bitmap",
-                "value": 0
-            },
-            {
-                "code": "current_mode",
-                "custom_name": "",
-                "dp_id": 114,
-                "time": 1770471311004,
-                "type": "enum",
-                "value": "cold"
-            },
-            {
-                "code": "heat8",
-                "custom_name": "",
-                "dp_id": 115,
-                "time": 1770541640612,
-                "type": "bool",
-                "value": false
-            }
-        ]
-    },
-    "thing_model": {
-        "modelId": "0000003fy5",
-        "services": [
-            {
-                "actions": [],
-                "code": "",
-                "description": "",
-                "events": [],
-                "name": "默认服务",
-                "properties": [
-                    {
-                        "abilityId": 1,
-                        "accessMode": "rw",
-                        "code": "Power",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_power",
-                            "attribute": "1"
-                        },
-                        "name": "开关",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 2,
-                        "accessMode": "rw",
-                        "code": "temp_set",
-                        "description": "摄氏度：16-31\n华氏度：61-88",
-                        "extensions": {
-                            "iconName": "icon-dp_temp"
-                        },
-                        "name": "设置温度",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 880,
-                            "min": 160,
-                            "scale": 1,
-                            "step": 10,
-                            "unit": "℃"
-                        }
-                    },
-                    {
-                        "abilityId": 3,
-                        "accessMode": "ro",
-                        "code": "temp_current",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_sun"
-                        },
-                        "name": "当前温度",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 600,
-                            "min": 0,
-                            "scale": 1,
-                            "step": 1,
-                            "unit": "℃"
-                        }
-                    },
-                    {
-                        "abilityId": 4,
-                        "accessMode": "rw",
-                        "code": "mode",
-                        "description": "自动/制冷/除湿/制热/送风",
-                        "extensions": {
-                            "iconName": "icon-dp_mode"
-                        },
-                        "name": "工作模式",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "auto",
-                                "cold",
-                                "wet",
-                                "heat",
-                                "fan"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 5,
-                        "accessMode": "rw",
-                        "code": "windspeed",
-                        "description": "自动/低风/中低风/中风/中高风/高风/静音/超强",
-                        "extensions": {
-                            "iconName": "icon-dp_wind"
-                        },
-                        "name": "风速",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "auto",
-                                "low",
-                                "low_mid",
-                                "mid",
-                                "mid_high",
-                                "high",
-                                "mute",
-                                "turbo"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 8,
-                        "accessMode": "rw",
-                        "code": "mode_ECO",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-eco"
-                        },
-                        "name": "ECO模式",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 9,
-                        "accessMode": "rw",
-                        "code": "mode_dry",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_flower"
-                        },
-                        "name": "干燥模式",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 12,
-                        "accessMode": "rw",
-                        "code": "heat",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_light2"
-                        },
-                        "name": "辅热",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 13,
-                        "accessMode": "rw",
-                        "code": "light",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_light"
-                        },
-                        "name": "灯光",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 15,
-                        "accessMode": "rw",
-                        "code": "windshake",
-                        "description": "上下/左右/全部/关闭",
-                        "extensions": {
-                            "iconName": "icon-dp_shake"
-                        },
-                        "name": "风摆",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "un_down",
-                                "left_right",
-                                "all",
-                                "off"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 20,
-                        "accessMode": "ro",
-                        "code": "Fault",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_warming",
-                            "scope": "fault"
-                        },
-                        "name": "故障告警",
-                        "typeSpec": {
-                            "type": "bitmap",
-                            "label": [
-                                "CL",
-                                "E4",
-                                "E5",
-                                "H6",
-                                "H9",
-                                "HE",
-                                "L0",
-                                "L1",
-                                "L2",
-                                "L3",
-                                "L6",
-                                "L7",
-                                "L8",
-                                "L9",
-                                "LA",
-                                "Ld",
-                                "P0",
-                                "P1",
-                                "P6",
-                                "P8",
-                                "PA",
-                                "PC",
-                                "Pd",
-                                "PE"
-                            ],
-                            "maxlen": 24
-                        }
-                    },
-                    {
-                        "abilityId": 21,
-                        "accessMode": "rw",
-                        "code": "Countdown",
-                        "description": "0:取消，1-6小时。可根据产品实际功能进行设定。",
-                        "extensions": {
-                            "iconName": "icon-dp_time2"
-                        },
-                        "name": "倒计时",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "0",
-                                "1",
-                                "2",
-                                "3",
-                                "4",
-                                "5",
-                                "6",
-                                "7",
-                                "8",
-                                "9",
-                                "10",
-                                "11",
-                                "12",
-                                "13",
-                                "14",
-                                "15",
-                                "16",
-                                "17",
-                                "18",
-                                "19",
-                                "20",
-                                "21",
-                                "22",
-                                "23",
-                                "24"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 22,
-                        "accessMode": "ro",
-                        "code": "countdown_left",
-                        "description": "",
-                        "extensions": {
-                            "iconName": "icon-dp_time"
-                        },
-                        "name": "倒计时剩余时间",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 1440,
-                            "min": 0,
-                            "scale": 0,
-                            "step": 1,
-                            "unit": "分钟"
-                        }
-                    },
-                    {
-                        "abilityId": 101,
-                        "accessMode": "ro",
-                        "code": "use_number",
-                        "description": "",
-                        "name": "使用时间上报次数",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 100000,
-                            "min": 0,
-                            "scale": 0,
-                            "step": 1,
-                            "unit": ""
-                        }
-                    },
-                    {
-                        "abilityId": 102,
-                        "accessMode": "ro",
-                        "code": "total_time",
-                        "description": "",
-                        "name": "使用时间",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 70000,
-                            "min": 0,
-                            "scale": 0,
-                            "step": 1,
-                            "unit": ""
-                        }
-                    },
-                    {
-                        "abilityId": 103,
-                        "accessMode": "ro",
-                        "code": "electricity",
-                        "description": "",
-                        "extensions": {
-                            "trigger": "direct"
-                        },
-                        "name": "耗电量",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 70000,
-                            "min": 0,
-                            "scale": 1,
-                            "step": 1,
-                            "unit": ""
-                        }
-                    },
-                    {
-                        "abilityId": 104,
-                        "accessMode": "ro",
-                        "code": "electricity_number",
-                        "description": "",
-                        "name": "耗电量上报次数",
-                        "typeSpec": {
-                            "type": "value",
-                            "max": 10000,
-                            "min": 0,
-                            "scale": 0,
-                            "step": 1,
-                            "unit": ""
-                        }
-                    },
-                    {
-                        "abilityId": 105,
-                        "accessMode": "rw",
-                        "code": "unit",
-                        "description": "",
-                        "name": "温标切换",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "c",
-                                "f"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 106,
-                        "accessMode": "rw",
-                        "code": "horizontal",
-                        "description": "关闭/同相扫风/相向扫风",
-                        "name": "左右扫风",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "off",
-                                "same",
-                                "opposite"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 107,
-                        "accessMode": "rw",
-                        "code": "vertical",
-                        "description": "关闭/15扫风/位置1/位置2/位置3/位置4/位置5",
-                        "name": "上下扫风",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "off",
-                                "15",
-                                "1",
-                                "2",
-                                "3",
-                                "4",
-                                "5"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 108,
-                        "accessMode": "rw",
-                        "code": "swing3d",
-                        "description": "",
-                        "name": "3d扫风",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 109,
-                        "accessMode": "rw",
-                        "code": "sleep",
-                        "description": "",
-                        "name": "睡眠",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 110,
-                        "accessMode": "rw",
-                        "code": "health",
-                        "description": "",
-                        "name": "健康",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 111,
-                        "accessMode": "rw",
-                        "code": "clean",
-                        "description": "",
-                        "name": "清洁",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    },
-                    {
-                        "abilityId": 112,
-                        "accessMode": "ro",
-                        "code": "type",
-                        "description": "单冷/冷暖",
-                        "name": "机型",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "cold",
-                                "cold_heat"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 113,
-                        "accessMode": "ro",
-                        "code": "fault2",
-                        "description": "",
-                        "extensions": {
-                            "scope": "fault"
-                        },
-                        "name": "故障告警2",
-                        "typeSpec": {
-                            "type": "bitmap",
-                            "label": [
-                                "PF",
-                                "SC",
-                                "U0",
-                                "U1",
-                                "U2",
-                                "U3",
-                                "U4",
-                                "U5",
-                                "U6",
-                                "U7",
-                                "U8",
-                                "U9",
-                                "UC",
-                                "Ud",
-                                "E1",
-                                "E2"
-                            ],
-                            "maxlen": 16
-                        }
-                    },
-                    {
-                        "abilityId": 114,
-                        "accessMode": "ro",
-                        "code": "current_mode",
-                        "description": "",
-                        "name": "当前模式",
-                        "typeSpec": {
-                            "type": "enum",
-                            "range": [
-                                "cold",
-                                "wet",
-                                "heat",
-                                "fan"
-                            ]
-                        }
-                    },
-                    {
-                        "abilityId": 115,
-                        "accessMode": "rw",
-                        "code": "heat8",
-                        "description": "",
-                        "name": "八度制热",
-                        "typeSpec": {
-                            "type": "bool"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    "thing_model_raw": "{\"modelId\":\"0000003fy5\",\"services\":[{\"actions\":[],\"code\":\"\",\"description\":\"\",\"events\":[],\"name\":\"默认服务\",\"properties\":[{\"abilityId\":1,\"accessMode\":\"rw\",\"code\":\"Power\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_power\",\"attribute\":\"1\"},\"name\":\"开关\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":2,\"accessMode\":\"rw\",\"code\":\"temp_set\",\"description\":\"摄氏度：16-31\\n华氏度：61-88\",\"extensions\":{\"iconName\":\"icon-dp_temp\"},\"name\":\"设置温度\",\"typeSpec\":{\"type\":\"value\",\"max\":880,\"min\":160,\"scale\":1,\"step\":10,\"unit\":\"℃\"}},{\"abilityId\":3,\"accessMode\":\"ro\",\"code\":\"temp_current\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_sun\"},\"name\":\"当前温度\",\"typeSpec\":{\"type\":\"value\",\"max\":600,\"min\":0,\"scale\":1,\"step\":1,\"unit\":\"℃\"}},{\"abilityId\":4,\"accessMode\":\"rw\",\"code\":\"mode\",\"description\":\"自动/制冷/除湿/制热/送风\",\"extensions\":{\"iconName\":\"icon-dp_mode\"},\"name\":\"工作模式\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}},{\"abilityId\":5,\"accessMode\":\"rw\",\"code\":\"windspeed\",\"description\":\"自动/低风/中低风/中风/中高风/高风/静音/超强\",\"extensions\":{\"iconName\":\"icon-dp_wind\"},\"name\":\"风速\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}},{\"abilityId\":8,\"accessMode\":\"rw\",\"code\":\"mode_ECO\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-eco\"},\"name\":\"ECO模式\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":9,\"accessMode\":\"rw\",\"code\":\"mode_dry\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_flower\"},\"name\":\"干燥模式\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":12,\"accessMode\":\"rw\",\"code\":\"heat\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_light2\"},\"name\":\"辅热\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":13,\"accessMode\":\"rw\",\"code\":\"light\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_light\"},\"name\":\"灯光\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":15,\"accessMode\":\"rw\",\"code\":\"windshake\",\"description\":\"上下/左右/全部/关闭\",\"extensions\":{\"iconName\":\"icon-dp_shake\"},\"name\":\"风摆\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"un_down\",\"left_right\",\"all\",\"off\"]}},{\"abilityId\":20,\"accessMode\":\"ro\",\"code\":\"Fault\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_warming\",\"scope\":\"fault\"},\"name\":\"故障告警\",\"typeSpec\":{\"type\":\"bitmap\",\"label\":[\"CL\",\"E4\",\"E5\",\"H6\",\"H9\",\"HE\",\"L0\",\"L1\",\"L2\",\"L3\",\"L6\",\"L7\",\"L8\",\"L9\",\"LA\",\"Ld\",\"P0\",\"P1\",\"P6\",\"P8\",\"PA\",\"PC\",\"Pd\",\"PE\"],\"maxlen\":24}},{\"abilityId\":21,\"accessMode\":\"rw\",\"code\":\"Countdown\",\"description\":\"0:取消，1-6小时。可根据产品实际功能进行设定。\",\"extensions\":{\"iconName\":\"icon-dp_time2\"},\"name\":\"倒计时\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"10\",\"11\",\"12\",\"13\",\"14\",\"15\",\"16\",\"17\",\"18\",\"19\",\"20\",\"21\",\"22\",\"23\",\"24\"]}},{\"abilityId\":22,\"accessMode\":\"ro\",\"code\":\"countdown_left\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_time\"},\"name\":\"倒计时剩余时间\",\"typeSpec\":{\"type\":\"value\",\"max\":1440,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"分钟\"}},{\"abilityId\":101,\"accessMode\":\"ro\",\"code\":\"use_number\",\"description\":\"\",\"name\":\"使用时间上报次数\",\"typeSpec\":{\"type\":\"value\",\"max\":100000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":102,\"accessMode\":\"ro\",\"code\":\"total_time\",\"description\":\"\",\"name\":\"使用时间\",\"typeSpec\":{\"type\":\"value\",\"max\":70000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":103,\"accessMode\":\"ro\",\"code\":\"electricity\",\"description\":\"\",\"extensions\":{\"trigger\":\"direct\"},\"name\":\"耗电量\",\"typeSpec\":{\"type\":\"value\",\"max\":70000,\"min\":0,\"scale\":1,\"step\":1,\"unit\":\"\"}},{\"abilityId\":104,\"accessMode\":\"ro\",\"code\":\"electricity_number\",\"description\":\"\",\"name\":\"耗电量上报次数\",\"typeSpec\":{\"type\":\"value\",\"max\":10000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":105,\"accessMode\":\"rw\",\"code\":\"unit\",\"description\":\"\",\"name\":\"温标切换\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"c\",\"f\"]}},{\"abilityId\":106,\"accessMode\":\"rw\",\"code\":\"horizontal\",\"description\":\"关闭/同相扫风/相向扫风\",\"name\":\"左右扫风\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"off\",\"same\",\"opposite\"]}},{\"abilityId\":107,\"accessMode\":\"rw\",\"code\":\"vertical\",\"description\":\"关闭/15扫风/位置1/位置2/位置3/位置4/位置5\",\"name\":\"上下扫风\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"off\",\"15\",\"1\",\"2\",\"3\",\"4\",\"5\"]}},{\"abilityId\":108,\"accessMode\":\"rw\",\"code\":\"swing3d\",\"description\":\"\",\"name\":\"3d扫风\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":109,\"accessMode\":\"rw\",\"code\":\"sleep\",\"description\":\"\",\"name\":\"睡眠\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":110,\"accessMode\":\"rw\",\"code\":\"health\",\"description\":\"\",\"name\":\"健康\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":111,\"accessMode\":\"rw\",\"code\":\"clean\",\"description\":\"\",\"name\":\"清洁\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":112,\"accessMode\":\"ro\",\"code\":\"type\",\"description\":\"单冷/冷暖\",\"name\":\"机型\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"cold\",\"cold_heat\"]}},{\"abilityId\":113,\"accessMode\":\"ro\",\"code\":\"fault2\",\"description\":\"\",\"extensions\":{\"scope\":\"fault\"},\"name\":\"故障告警2\",\"typeSpec\":{\"type\":\"bitmap\",\"label\":[\"PF\",\"SC\",\"U0\",\"U1\",\"U2\",\"U3\",\"U4\",\"U5\",\"U6\",\"U7\",\"U8\",\"U9\",\"UC\",\"Ud\",\"E1\",\"E2\"],\"maxlen\":16}},{\"abilityId\":114,\"accessMode\":\"ro\",\"code\":\"current_mode\",\"description\":\"\",\"name\":\"当前模式\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"cold\",\"wet\",\"heat\",\"fan\"]}},{\"abilityId\":115,\"accessMode\":\"rw\",\"code\":\"heat8\",\"description\":\"\",\"name\":\"八度制热\",\"typeSpec\":{\"type\":\"bool\"}}]}]}",
-    "features": [
-        {
             "name": "开关",
-            "external_id": "tuya:bfce82fe6faf235d75ykkh:switch",
-            "selector": "tuya-bfce82fe6faf235d75ykkh-switch",
-            "read_only": false,
-            "has_feedback": false,
-            "min": 0,
-            "max": 1,
-            "category": "switch",
-            "type": "binary",
-            "keep_history": true,
-            "id": "edb25a7a-44bb-4a5b-8fbf-bd30d796ba16"
-        }
-    ],
-    "params": [
-        {
-            "name": "DEVICE_ID",
-            "value": "bfce82fe6faf235d75ykkh"
-        },
-        {
-            "name": "LOCAL_KEY",
-            "value": "***"
-        },
-        {
-            "name": "CLOUD_IP",
-            "value": "82.x.x.x"
-        },
-        {
-            "name": "LOCAL_OVERRIDE",
-            "value": true
-        },
-        {
-            "name": "PRODUCT_ID",
-            "value": "f3goccgfj6qino4c"
-        },
-        {
-            "name": "IP_ADDRESS",
-            "value": "10.x.x.x"
-        },
-        {
-            "name": "PROTOCOL_VERSION",
-            "value": "3.3"
-        },
-        {
-            "name": "LOCAL_POLL_DPS",
-            "value": "{\"1\":false,\"2\":210,\"3\":135,\"4\":\"heat\",\"5\":\"auto\",\"8\":false,\"9\":false,\"12\":false,\"13\":true,\"15\":\"off\",\"20\":0,\"22\":0,\"101\":0,\"102\":115,\"103\":1,\"105\":\"c\",\"106\":\"off\",\"107\":\"off\",\"108\":false,\"109\":false,\"110\":true,\"111\":false,\"112\":\"cold\",\"113\":0,\"115\":false}"
-        }
-    ],
-    "local_poll": {
-        "status": null,
-        "error": null,
-        "protocol": null,
-        "dps": {
-            "1": false,
-            "2": 210,
-            "3": 135,
-            "4": "heat",
-            "5": "auto",
-            "8": false,
-            "9": false,
-            "12": false,
-            "13": true,
-            "15": "off",
-            "20": 0,
-            "22": 0,
-            "101": 0,
-            "102": 115,
-            "103": 1,
-            "105": "c",
-            "106": "off",
-            "107": "off",
-            "108": false,
-            "109": false,
-            "110": true,
-            "111": false,
-            "112": "cold",
-            "113": 0,
-            "115": false
-        }
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 2,
+            "accessMode": "rw",
+            "code": "temp_set",
+            "description": "摄氏度：16-31\n华氏度：61-88",
+            "extensions": {
+              "iconName": "icon-dp_temp"
+            },
+            "name": "设置温度",
+            "typeSpec": {
+              "type": "value",
+              "max": 880,
+              "min": 160,
+              "scale": 1,
+              "step": 10,
+              "unit": "℃"
+            }
+          },
+          {
+            "abilityId": 3,
+            "accessMode": "ro",
+            "code": "temp_current",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_sun"
+            },
+            "name": "当前温度",
+            "typeSpec": {
+              "type": "value",
+              "max": 600,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": "℃"
+            }
+          },
+          {
+            "abilityId": 4,
+            "accessMode": "rw",
+            "code": "mode",
+            "description": "自动/制冷/除湿/制热/送风",
+            "extensions": {
+              "iconName": "icon-dp_mode"
+            },
+            "name": "工作模式",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["auto", "cold", "wet", "heat", "fan"]
+            }
+          },
+          {
+            "abilityId": 5,
+            "accessMode": "rw",
+            "code": "windspeed",
+            "description": "自动/低风/中低风/中风/中高风/高风/静音/超强",
+            "extensions": {
+              "iconName": "icon-dp_wind"
+            },
+            "name": "风速",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["auto", "low", "low_mid", "mid", "mid_high", "high", "mute", "turbo"]
+            }
+          },
+          {
+            "abilityId": 8,
+            "accessMode": "rw",
+            "code": "mode_ECO",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-eco"
+            },
+            "name": "ECO模式",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 9,
+            "accessMode": "rw",
+            "code": "mode_dry",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_flower"
+            },
+            "name": "干燥模式",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 12,
+            "accessMode": "rw",
+            "code": "heat",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_light2"
+            },
+            "name": "辅热",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 13,
+            "accessMode": "rw",
+            "code": "light",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_light"
+            },
+            "name": "灯光",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 15,
+            "accessMode": "rw",
+            "code": "windshake",
+            "description": "上下/左右/全部/关闭",
+            "extensions": {
+              "iconName": "icon-dp_shake"
+            },
+            "name": "风摆",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["un_down", "left_right", "all", "off"]
+            }
+          },
+          {
+            "abilityId": 20,
+            "accessMode": "ro",
+            "code": "Fault",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_warming",
+              "scope": "fault"
+            },
+            "name": "故障告警",
+            "typeSpec": {
+              "type": "bitmap",
+              "label": [
+                "CL",
+                "E4",
+                "E5",
+                "H6",
+                "H9",
+                "HE",
+                "L0",
+                "L1",
+                "L2",
+                "L3",
+                "L6",
+                "L7",
+                "L8",
+                "L9",
+                "LA",
+                "Ld",
+                "P0",
+                "P1",
+                "P6",
+                "P8",
+                "PA",
+                "PC",
+                "Pd",
+                "PE"
+              ],
+              "maxlen": 24
+            }
+          },
+          {
+            "abilityId": 21,
+            "accessMode": "rw",
+            "code": "Countdown",
+            "description": "0:取消，1-6小时。可根据产品实际功能进行设定。",
+            "extensions": {
+              "iconName": "icon-dp_time2"
+            },
+            "name": "倒计时",
+            "typeSpec": {
+              "type": "enum",
+              "range": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24"
+              ]
+            }
+          },
+          {
+            "abilityId": 22,
+            "accessMode": "ro",
+            "code": "countdown_left",
+            "description": "",
+            "extensions": {
+              "iconName": "icon-dp_time"
+            },
+            "name": "倒计时剩余时间",
+            "typeSpec": {
+              "type": "value",
+              "max": 1440,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": "分钟"
+            }
+          },
+          {
+            "abilityId": 101,
+            "accessMode": "ro",
+            "code": "use_number",
+            "description": "",
+            "name": "使用时间上报次数",
+            "typeSpec": {
+              "type": "value",
+              "max": 100000,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 102,
+            "accessMode": "ro",
+            "code": "total_time",
+            "description": "",
+            "name": "使用时间",
+            "typeSpec": {
+              "type": "value",
+              "max": 70000,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 103,
+            "accessMode": "ro",
+            "code": "electricity",
+            "description": "",
+            "extensions": {
+              "trigger": "direct"
+            },
+            "name": "耗电量",
+            "typeSpec": {
+              "type": "value",
+              "max": 70000,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 104,
+            "accessMode": "ro",
+            "code": "electricity_number",
+            "description": "",
+            "name": "耗电量上报次数",
+            "typeSpec": {
+              "type": "value",
+              "max": 10000,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 105,
+            "accessMode": "rw",
+            "code": "unit",
+            "description": "",
+            "name": "温标切换",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["c", "f"]
+            }
+          },
+          {
+            "abilityId": 106,
+            "accessMode": "rw",
+            "code": "horizontal",
+            "description": "关闭/同相扫风/相向扫风",
+            "name": "左右扫风",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["off", "same", "opposite"]
+            }
+          },
+          {
+            "abilityId": 107,
+            "accessMode": "rw",
+            "code": "vertical",
+            "description": "关闭/15扫风/位置1/位置2/位置3/位置4/位置5",
+            "name": "上下扫风",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["off", "15", "1", "2", "3", "4", "5"]
+            }
+          },
+          {
+            "abilityId": 108,
+            "accessMode": "rw",
+            "code": "swing3d",
+            "description": "",
+            "name": "3d扫风",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 109,
+            "accessMode": "rw",
+            "code": "sleep",
+            "description": "",
+            "name": "睡眠",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 110,
+            "accessMode": "rw",
+            "code": "health",
+            "description": "",
+            "name": "健康",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 111,
+            "accessMode": "rw",
+            "code": "clean",
+            "description": "",
+            "name": "清洁",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 112,
+            "accessMode": "ro",
+            "code": "type",
+            "description": "单冷/冷暖",
+            "name": "机型",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["cold", "cold_heat"]
+            }
+          },
+          {
+            "abilityId": 113,
+            "accessMode": "ro",
+            "code": "fault2",
+            "description": "",
+            "extensions": {
+              "scope": "fault"
+            },
+            "name": "故障告警2",
+            "typeSpec": {
+              "type": "bitmap",
+              "label": ["PF", "SC", "U0", "U1", "U2", "U3", "U4", "U5", "U6", "U7", "U8", "U9", "UC", "Ud", "E1", "E2"],
+              "maxlen": 16
+            }
+          },
+          {
+            "abilityId": 114,
+            "accessMode": "ro",
+            "code": "current_mode",
+            "description": "",
+            "name": "当前模式",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["cold", "wet", "heat", "fan"]
+            }
+          },
+          {
+            "abilityId": 115,
+            "accessMode": "rw",
+            "code": "heat8",
+            "description": "",
+            "name": "八度制热",
+            "typeSpec": {
+              "type": "bool"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "thing_model_raw": "{\"modelId\":\"0000003fy5\",\"services\":[{\"actions\":[],\"code\":\"\",\"description\":\"\",\"events\":[],\"name\":\"默认服务\",\"properties\":[{\"abilityId\":1,\"accessMode\":\"rw\",\"code\":\"Power\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_power\",\"attribute\":\"1\"},\"name\":\"开关\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":2,\"accessMode\":\"rw\",\"code\":\"temp_set\",\"description\":\"摄氏度：16-31\\n华氏度：61-88\",\"extensions\":{\"iconName\":\"icon-dp_temp\"},\"name\":\"设置温度\",\"typeSpec\":{\"type\":\"value\",\"max\":880,\"min\":160,\"scale\":1,\"step\":10,\"unit\":\"℃\"}},{\"abilityId\":3,\"accessMode\":\"ro\",\"code\":\"temp_current\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_sun\"},\"name\":\"当前温度\",\"typeSpec\":{\"type\":\"value\",\"max\":600,\"min\":0,\"scale\":1,\"step\":1,\"unit\":\"℃\"}},{\"abilityId\":4,\"accessMode\":\"rw\",\"code\":\"mode\",\"description\":\"自动/制冷/除湿/制热/送风\",\"extensions\":{\"iconName\":\"icon-dp_mode\"},\"name\":\"工作模式\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}},{\"abilityId\":5,\"accessMode\":\"rw\",\"code\":\"windspeed\",\"description\":\"自动/低风/中低风/中风/中高风/高风/静音/超强\",\"extensions\":{\"iconName\":\"icon-dp_wind\"},\"name\":\"风速\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}},{\"abilityId\":8,\"accessMode\":\"rw\",\"code\":\"mode_ECO\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-eco\"},\"name\":\"ECO模式\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":9,\"accessMode\":\"rw\",\"code\":\"mode_dry\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_flower\"},\"name\":\"干燥模式\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":12,\"accessMode\":\"rw\",\"code\":\"heat\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_light2\"},\"name\":\"辅热\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":13,\"accessMode\":\"rw\",\"code\":\"light\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_light\"},\"name\":\"灯光\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":15,\"accessMode\":\"rw\",\"code\":\"windshake\",\"description\":\"上下/左右/全部/关闭\",\"extensions\":{\"iconName\":\"icon-dp_shake\"},\"name\":\"风摆\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"un_down\",\"left_right\",\"all\",\"off\"]}},{\"abilityId\":20,\"accessMode\":\"ro\",\"code\":\"Fault\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_warming\",\"scope\":\"fault\"},\"name\":\"故障告警\",\"typeSpec\":{\"type\":\"bitmap\",\"label\":[\"CL\",\"E4\",\"E5\",\"H6\",\"H9\",\"HE\",\"L0\",\"L1\",\"L2\",\"L3\",\"L6\",\"L7\",\"L8\",\"L9\",\"LA\",\"Ld\",\"P0\",\"P1\",\"P6\",\"P8\",\"PA\",\"PC\",\"Pd\",\"PE\"],\"maxlen\":24}},{\"abilityId\":21,\"accessMode\":\"rw\",\"code\":\"Countdown\",\"description\":\"0:取消，1-6小时。可根据产品实际功能进行设定。\",\"extensions\":{\"iconName\":\"icon-dp_time2\"},\"name\":\"倒计时\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"10\",\"11\",\"12\",\"13\",\"14\",\"15\",\"16\",\"17\",\"18\",\"19\",\"20\",\"21\",\"22\",\"23\",\"24\"]}},{\"abilityId\":22,\"accessMode\":\"ro\",\"code\":\"countdown_left\",\"description\":\"\",\"extensions\":{\"iconName\":\"icon-dp_time\"},\"name\":\"倒计时剩余时间\",\"typeSpec\":{\"type\":\"value\",\"max\":1440,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"分钟\"}},{\"abilityId\":101,\"accessMode\":\"ro\",\"code\":\"use_number\",\"description\":\"\",\"name\":\"使用时间上报次数\",\"typeSpec\":{\"type\":\"value\",\"max\":100000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":102,\"accessMode\":\"ro\",\"code\":\"total_time\",\"description\":\"\",\"name\":\"使用时间\",\"typeSpec\":{\"type\":\"value\",\"max\":70000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":103,\"accessMode\":\"ro\",\"code\":\"electricity\",\"description\":\"\",\"extensions\":{\"trigger\":\"direct\"},\"name\":\"耗电量\",\"typeSpec\":{\"type\":\"value\",\"max\":70000,\"min\":0,\"scale\":1,\"step\":1,\"unit\":\"\"}},{\"abilityId\":104,\"accessMode\":\"ro\",\"code\":\"electricity_number\",\"description\":\"\",\"name\":\"耗电量上报次数\",\"typeSpec\":{\"type\":\"value\",\"max\":10000,\"min\":0,\"scale\":0,\"step\":1,\"unit\":\"\"}},{\"abilityId\":105,\"accessMode\":\"rw\",\"code\":\"unit\",\"description\":\"\",\"name\":\"温标切换\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"c\",\"f\"]}},{\"abilityId\":106,\"accessMode\":\"rw\",\"code\":\"horizontal\",\"description\":\"关闭/同相扫风/相向扫风\",\"name\":\"左右扫风\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"off\",\"same\",\"opposite\"]}},{\"abilityId\":107,\"accessMode\":\"rw\",\"code\":\"vertical\",\"description\":\"关闭/15扫风/位置1/位置2/位置3/位置4/位置5\",\"name\":\"上下扫风\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"off\",\"15\",\"1\",\"2\",\"3\",\"4\",\"5\"]}},{\"abilityId\":108,\"accessMode\":\"rw\",\"code\":\"swing3d\",\"description\":\"\",\"name\":\"3d扫风\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":109,\"accessMode\":\"rw\",\"code\":\"sleep\",\"description\":\"\",\"name\":\"睡眠\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":110,\"accessMode\":\"rw\",\"code\":\"health\",\"description\":\"\",\"name\":\"健康\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":111,\"accessMode\":\"rw\",\"code\":\"clean\",\"description\":\"\",\"name\":\"清洁\",\"typeSpec\":{\"type\":\"bool\"}},{\"abilityId\":112,\"accessMode\":\"ro\",\"code\":\"type\",\"description\":\"单冷/冷暖\",\"name\":\"机型\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"cold\",\"cold_heat\"]}},{\"abilityId\":113,\"accessMode\":\"ro\",\"code\":\"fault2\",\"description\":\"\",\"extensions\":{\"scope\":\"fault\"},\"name\":\"故障告警2\",\"typeSpec\":{\"type\":\"bitmap\",\"label\":[\"PF\",\"SC\",\"U0\",\"U1\",\"U2\",\"U3\",\"U4\",\"U5\",\"U6\",\"U7\",\"U8\",\"U9\",\"UC\",\"Ud\",\"E1\",\"E2\"],\"maxlen\":16}},{\"abilityId\":114,\"accessMode\":\"ro\",\"code\":\"current_mode\",\"description\":\"\",\"name\":\"当前模式\",\"typeSpec\":{\"type\":\"enum\",\"range\":[\"cold\",\"wet\",\"heat\",\"fan\"]}},{\"abilityId\":115,\"accessMode\":\"rw\",\"code\":\"heat8\",\"description\":\"\",\"name\":\"八度制热\",\"typeSpec\":{\"type\":\"bool\"}}]}]}",
+  "features": [
+    {
+      "name": "开关",
+      "external_id": "tuya:bfce82fe6faf235d75ykkh:switch",
+      "selector": "tuya-bfce82fe6faf235d75ykkh-switch",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 0,
+      "max": 1,
+      "category": "switch",
+      "type": "binary",
+      "keep_history": true,
+      "id": "edb25a7a-44bb-4a5b-8fbf-bd30d796ba16"
     }
+  ],
+  "params": [
+    {
+      "name": "DEVICE_ID",
+      "value": "bfce82fe6faf235d75ykkh"
+    },
+    {
+      "name": "LOCAL_KEY",
+      "value": "***"
+    },
+    {
+      "name": "CLOUD_IP",
+      "value": "82.x.x.x"
+    },
+    {
+      "name": "LOCAL_OVERRIDE",
+      "value": true
+    },
+    {
+      "name": "PRODUCT_ID",
+      "value": "f3goccgfj6qino4c"
+    },
+    {
+      "name": "IP_ADDRESS",
+      "value": "10.x.x.x"
+    },
+    {
+      "name": "PROTOCOL_VERSION",
+      "value": "3.3"
+    },
+    {
+      "name": "LOCAL_POLL_DPS",
+      "value": "{\"1\":false,\"2\":210,\"3\":135,\"4\":\"heat\",\"5\":\"auto\",\"8\":false,\"9\":false,\"12\":false,\"13\":true,\"15\":\"off\",\"20\":0,\"22\":0,\"101\":0,\"102\":115,\"103\":1,\"105\":\"c\",\"106\":\"off\",\"107\":\"off\",\"108\":false,\"109\":false,\"110\":true,\"111\":false,\"112\":\"cold\",\"113\":0,\"115\":false}"
+    }
+  ],
+  "local_poll": {
+    "status": null,
+    "error": null,
+    "protocol": null,
+    "dps": {
+      "1": false,
+      "2": 210,
+      "3": 135,
+      "4": "heat",
+      "5": "auto",
+      "8": false,
+      "9": false,
+      "12": false,
+      "13": true,
+      "15": "off",
+      "20": 0,
+      "22": 0,
+      "101": 0,
+      "102": 115,
+      "103": 1,
+      "105": "c",
+      "106": "off",
+      "107": "off",
+      "108": false,
+      "109": false,
+      "110": true,
+      "111": false,
+      "112": "cold",
+      "113": 0,
+      "115": false
+    }
+  }
 }

@@ -91,7 +91,7 @@ const scaleFromDevice = (valueFromDevice, deviceFeature) => {
     }
     return numericValue;
   }
-  return numericValue / Math.pow(10, scale);
+  return numericValue / 10 ** scale;
 };
 
 const scaleToDevice = (valueFromGladys, deviceFeature) => {
@@ -109,7 +109,7 @@ const scaleToDevice = (valueFromGladys, deviceFeature) => {
     }
     return numericValue;
   }
-  return Math.round(numericValue * Math.pow(10, scale));
+  return Math.round(numericValue * 10 ** scale);
 };
 
 const writeValues = {

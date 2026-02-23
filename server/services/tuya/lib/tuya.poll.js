@@ -39,10 +39,7 @@ const isTemperatureFeature = (deviceFeature, code) => {
   if (!deviceFeature || !code) {
     return false;
   }
-  if (
-    deviceFeature.unit !== DEVICE_FEATURE_UNITS.CELSIUS &&
-    deviceFeature.unit !== DEVICE_FEATURE_UNITS.FAHRENHEIT
-  ) {
+  if (deviceFeature.unit !== DEVICE_FEATURE_UNITS.CELSIUS && deviceFeature.unit !== DEVICE_FEATURE_UNITS.FAHRENHEIT) {
     return false;
   }
   return code === 'temp_set' || code === 'temp_current';

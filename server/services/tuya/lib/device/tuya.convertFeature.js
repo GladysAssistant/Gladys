@@ -10,13 +10,14 @@ const scaleNumber = (value, scale) => {
   if (!Number.isFinite(scale) || scale === 0) {
     return value;
   }
-  return value / Math.pow(10, scale);
+  return value / 10 ** scale;
 };
 
 /**
  * @description Transforms Tuya feature as Gladys feature.
  * @param {object} tuyaFunctions - Functions from Tuya.
  * @param {string} externalId - Gladys external ID.
+ * @param {object} options - Conversion options.
  * @returns {object} Gladys feature or undefined.
  * @example
  * convertFeature({ code: 'switch', type: 'Boolean', values: '{}' }, 'tuya:device_id');
@@ -30,7 +31,7 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     return undefined;
   }
 
-  let featuresCategoryAndType = getFeatureMapping(code, deviceType);
+  const featuresCategoryAndType = getFeatureMapping(code, deviceType);
   if (!featuresCategoryAndType) {
     logger.warn(`Tuya function with "${code}" code is not managed`);
     return undefined;

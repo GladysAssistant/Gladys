@@ -14,11 +14,11 @@ const getLocalDpsFromCode = (code, device) => {
   }
   const aliases = localMapping.codeAliases && localMapping.codeAliases[normalized];
   if (Array.isArray(aliases)) {
-    for (const alias of aliases) {
-      const aliasKey = normalizeCode(alias);
-      if (aliasKey && localMapping.dps && localMapping.dps[aliasKey] !== undefined) {
-        return localMapping.dps[aliasKey];
-      }
+    const matchedAlias = aliases
+      .map((alias) => normalizeCode(alias))
+      .find((aliasKey) => aliasKey && localMapping.dps && localMapping.dps[aliasKey] !== undefined);
+    if (matchedAlias) {
+      return localMapping.dps[matchedAlias];
     }
   }
 

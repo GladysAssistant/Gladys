@@ -56,7 +56,10 @@ async function setValue(device, deviceFeature, value) {
   ) {
     const numericValue = Number(value);
     if (Number.isFinite(numericValue)) {
-      if (deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS && deviceTemperatureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+      if (
+        deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS &&
+        deviceTemperatureUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT
+      ) {
         valueToSend = celsiusToFahrenheit(numericValue);
       } else if (
         deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT &&
