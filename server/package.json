@@ -75,7 +75,6 @@
     "undici": "^7.5.0"
   },
   "dependencies": {
-    "@demirdeniz/tuyapi-newgen": "^8.1.4",
     "@gladysassistant/gladys-gateway-js": "^4.19.1",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
