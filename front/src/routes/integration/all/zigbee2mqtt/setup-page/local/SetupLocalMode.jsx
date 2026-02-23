@@ -56,7 +56,12 @@ class SetupLocalMode extends Component {
     }
 
     return (
-      <SetupLocalSummary disabled={disabled} configuration={configuration} enableEditionMode={this.enableEditionMode} />
+      <SetupLocalSummary
+        disabled={disabled}
+        configuration={configuration}
+        enableEditionMode={this.enableEditionMode}
+        zigbee2mqttStatus={zigbee2mqttStatus}
+      />
     );
   }
 }

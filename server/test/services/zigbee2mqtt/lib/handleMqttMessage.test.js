@@ -65,6 +65,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
   });
@@ -318,6 +319,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
           revision: 74100,
           type: 'EmberZNet',
         },
+        z2mContainerError: null,
       },
     });
   });

@@ -1,7 +1,8 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 
-const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
+const SetupLocalSummary = ({ configuration, enableEditionMode, disabled, zigbee2mqttStatus = {} }) => {
   const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
+  const { z2mContainerError } = zigbee2mqttStatus;
   return (
     <div class="form-inline" data-cy="z2m-setup-local-summary">
       <div class="form-group">
@@ -41,6 +42,11 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
           </div>
         </div>
       </div>
+      {z2mContainerError === 'EZSP_PROTOCOL_VERSION' && (
+        <div class="alert alert-warning mt-3">
+          <MarkupText id="integration.zigbee2mqtt.setup.modes.local.ezspProtocolVersionError" />
+        </div>
+      )}
       <button class="btn btn-primary btn-sm ml-auto" onClick={enableEditionMode} disabled={disabled}>
         <Text id="integration.zigbee2mqtt.setup.changeButtonLabel" />
       </button>

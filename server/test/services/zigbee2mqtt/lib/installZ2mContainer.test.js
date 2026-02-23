@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const path = require('path');
+const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake, stub } = sinon;
@@ -71,6 +72,11 @@ describe('zigbee2mqtt installz2mContainer', () => {
           basePathOnHost: path.join(__dirname, 'host'),
           basePathOnContainer,
         }),
+        getContainerLogs: sinon.stub().callsFake(() => {
+          const stream = new EventEmitter();
+          setImmediate(() => stream.emit('end'));
+          return Promise.resolve(stream);
+        }),
       },
     };
 
@@ -108,6 +114,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -138,6 +145,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -167,6 +175,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -202,6 +211,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -236,6 +246,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
@@ -272,6 +283,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -288,6 +300,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         zigbee2mqttExist: true,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
@@ -295,5 +308,55 @@ describe('zigbee2mqtt installz2mContainer', () => {
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
     expect(config).to.deep.equal({});
+  });
+
+  it('should detect EZSP protocol version error in container logs', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([containerStopped]);
+    gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
+      const stream = new EventEmitter();
+      setImmediate(() => {
+        stream.emit('data', 'Error: Adapter EZSP protocol version (12) is not supported by Host [13-18].');
+        stream.emit('end');
+      });
+      return Promise.resolve(stream);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.equal('EZSP_PROTOCOL_VERSION');
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+  });
+
+  it('should not set error when container logs are clean', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([containerStopped]);
+    gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
+      const stream = new EventEmitter();
+      setImmediate(() => {
+        stream.emit('data', 'Zigbee2mqtt started successfully');
+        stream.emit('end');
+      });
+      return Promise.resolve(stream);
+    });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+  });
+
+  it('should not fail startup when getContainerLogs throws', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([containerStopped]);
+    gladys.system.getContainerLogs = fake.throws(new Error('docker logs error'));
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    expect(zigbee2mqttManager.z2mContainerError).to.equal(null);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
   });
 });
