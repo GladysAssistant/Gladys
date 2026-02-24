@@ -325,7 +325,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
-    expect(zigbee2mqttManager.z2mContainerError).to.equal('EZSP_PROTOCOL_VERSION');
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
   });
 

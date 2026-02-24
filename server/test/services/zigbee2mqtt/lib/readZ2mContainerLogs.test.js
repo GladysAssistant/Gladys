@@ -24,6 +24,7 @@ const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
  */
 function buildLogStream(text) {
   const stream = new EventEmitter();
+  stream.destroy = sinon.fake();
   // Emit data + end asynchronously so listeners are attached first
   setImmediate(() => {
     stream.emit('data', text);
@@ -76,12 +77,14 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
 
   it('should detect EZSP protocol version error and set z2mContainerError', async () => {
     const ezspLog = 'Adapter EZSP protocol version 13 is not supported by Host. Supported: 8, 9, 10, 11, 12';
-    gladys.system.getContainerLogs = fake.resolves(buildLogStream(ezspLog));
+    const stream = buildLogStream(ezspLog);
+    gladys.system.getContainerLogs = fake.resolves(stream);
 
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
-    expect(zigbee2mqttManager.z2mContainerError).to.equal('EZSP_PROTOCOL_VERSION');
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
     assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc');
+    assert.calledOnce(stream.destroy);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -146,5 +149,53 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     } finally {
       clock.restore();
     }
+  });
+
+  it('should set unknown error when log contains error: line but no known pattern', async () => {
+    const unknownLog = 'Something went wrong\nerror: Failed to connect to serial port /dev/ttyUSB0\nDone';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(unknownLog));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'error: Failed to connect to serial port /dev/ttyUSB0',
+    });
+  });
+
+  it('should match error: case-insensitively', async () => {
+    const log = 'Error: Something bad happened';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'Error: Something bad happened',
+    });
+  });
+
+  it('should keep the last raw error line when multiple error: lines are present', async () => {
+    const log = 'error: First error\nSome info\nERROR: Last error';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'ERROR: Last error',
+    });
+  });
+
+  it('should prefer known error code over raw error lines', async () => {
+    const log =
+      'error: some random error\nAdapter EZSP protocol version 13 is not supported by Host\nerror: another error';
+    const stream = buildLogStream(log);
+    gladys.system.getContainerLogs = fake.resolves(stream);
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
+    assert.calledOnce(stream.destroy);
   });
 });
