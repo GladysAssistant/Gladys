@@ -822,7 +822,6 @@
             "z2mTcpPortLabel": "Enter the TCP port exposed by the Zigbee2Mqtt web application",
             "z2mTcpPortDescription": "If left empty, a random port will be used.",
             "emberFirmwareWarning": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it.",
-            "ezspProtocolVersionError": "Warning: Your Ember adapter EZSP protocol version is not supported by Zigbee2mqtt. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to flash a compatible firmware.",
             "summary": {
               "title": "Configuration",
               "usbPort": "USB Port",

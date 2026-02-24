@@ -191,7 +191,7 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.be.eq(true);
   });
 
-  it('it set default adapt to zstack', async () => {
+  it('it should set default adapter to zstack', async () => {
     // PREPARE
     fs.copyFileSync(ezspConfigFilePath, configFilePath);
     const config = {};

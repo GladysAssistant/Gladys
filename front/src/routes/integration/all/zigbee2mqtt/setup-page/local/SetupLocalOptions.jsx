@@ -34,7 +34,7 @@ class SetupLocalOptions extends Component {
     const { configuration } = this.props;
     const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
 
-    this.setState({ z2mDriverPath, z2mDongleName, z2mTcpPort });
+    this.setState({ z2mDriverPath, z2mDongleName, z2mTcpPort, z2mDongleConfigKey: null });
     this.props.resetConfiguration();
   };
 

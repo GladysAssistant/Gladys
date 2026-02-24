@@ -335,6 +335,11 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify(bridgeInfo));
     // ASSERT
     expect(zigbee2mqttManager.coordinatorFirmware).to.equal(null);
-    assert.calledOnce(gladys.event.emit);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: sinon.match({
+        coordinatorFirmware: null,
+      }),
+    });
   });
 });

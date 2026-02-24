@@ -44,7 +44,7 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled, zigbee2
       </div>
       {z2mContainerError === 'EZSP_PROTOCOL_VERSION' && (
         <div class="alert alert-warning mt-3">
-          <MarkupText id="integration.zigbee2mqtt.setup.modes.local.ezspProtocolVersionError" />
+          <MarkupText id="integration.zigbee2mqtt.setup.modes.local.emberFirmwareWarning" />
         </div>
       )}
       <button class="btn btn-primary btn-sm ml-auto" onClick={enableEditionMode} disabled={disabled}>

@@ -10,15 +10,20 @@ const logger = require('../../../utils/logger');
 async function readZ2mContainerLogs(containerId) {
   try {
     const stream = await this.gladys.system.getContainerLogs(containerId);
-    const logText = await new Promise((resolve) => {
+    const logText = await new Promise((resolve, reject) => {
       const chunks = [];
+      const timeout = setTimeout(() => {
+        resolve(chunks.join(''));
+      }, 10000); // 10 second timeout
       stream.on('data', (chunk) => {
         chunks.push(chunk.toString());
       });
       stream.on('end', () => {
+        clearTimeout(timeout);
         resolve(chunks.join(''));
       });
       stream.on('error', () => {
+        clearTimeout(timeout);
         resolve(chunks.join(''));
       });
     });
@@ -33,7 +38,7 @@ async function readZ2mContainerLogs(containerId) {
       this.z2mContainerError = null;
     }
   } catch (e) {
-    logger.warn('Zigbee2mqtt: failed to read container logs:', e);
+    logger.warn(`Zigbee2mqtt: failed to read container logs: ${e.message}`);
     this.z2mContainerError = null;
   }
 

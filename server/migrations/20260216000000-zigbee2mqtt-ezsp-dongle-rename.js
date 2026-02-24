@@ -11,7 +11,7 @@ const EZSP_DONGLE_NAMES = [
 ];
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async () => {
     const service = await db.Service.findOne({
       where: { name: 'zigbee2mqtt' },
     });
@@ -35,5 +35,31 @@ module.exports = {
     variable.set({ value: `${variable.value} (legacy ezsp)` });
     await variable.save();
   },
-  down: async (queryInterface, Sequelize) => {},
+  down: async () => {
+    const service = await db.Service.findOne({
+      where: { name: 'zigbee2mqtt' },
+    });
+    if (service === null) {
+      return;
+    }
+    const variable = await db.Variable.findOne({
+      where: {
+        name: 'ZIGBEE_DONGLE_NAME',
+        service_id: service.id,
+      },
+    });
+    if (variable === null) {
+      return;
+    }
+    const suffix = ' (legacy ezsp)';
+    if (!variable.value || !variable.value.endsWith(suffix)) {
+      return;
+    }
+    const original = variable.value.slice(0, -suffix.length);
+    if (!EZSP_DONGLE_NAMES.includes(original)) {
+      return;
+    }
+    variable.set({ value: original });
+    await variable.save();
+  },
 };

@@ -87,6 +87,8 @@ async function handleMqttMessage(topic, message) {
           ...coordinator.meta,
           type: coordinator.type,
         };
+      } else {
+        this.coordinatorFirmware = null;
       }
       this.emitStatusEvent();
       break;
