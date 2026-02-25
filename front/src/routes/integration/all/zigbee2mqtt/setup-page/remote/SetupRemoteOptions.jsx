@@ -13,6 +13,10 @@ class SetupRemoteOptions extends Component {
     this.setState({ mqttUrl: e.target.value });
   };
 
+  updateZ2mFrontendUrl = e => {
+    this.setState({ z2mFrontendUrl: e.target.value });
+  };
+
   updateMqttUsername = e => {
     this.setState({ mqttUsername: e.target.value });
   };
@@ -22,12 +26,13 @@ class SetupRemoteOptions extends Component {
   };
 
   saveConfiguration = () => {
-    const { mqttMode, mqttUrl, mqttUsername, mqttPassword } = this.state;
+    const { mqttMode, mqttUrl, mqttUsername, mqttPassword, z2mFrontendUrl } = this.state;
     this.props.saveConfiguration({
       mqttMode,
       mqttUrl,
       mqttUsername,
-      mqttPassword
+      mqttPassword,
+      z2mFrontendUrl
     });
   };
 
@@ -43,18 +48,19 @@ class SetupRemoteOptions extends Component {
     super(props);
 
     const { configuration } = props;
-    const { mqttUrl, mqttPassword, mqttUsername } = configuration;
+    const { mqttUrl, mqttPassword, mqttUsername, z2mFrontendUrl } = configuration;
 
     this.state = {
       mqttMode: MQTT_MODE.EXTERNAL,
       mqttUrl,
       mqttPassword,
       mqttUsername,
+      z2mFrontendUrl,
       showPassword: false
     };
   }
 
-  render({ disabled }, { mqttMode, mqttUrl, mqttUsername, mqttPassword, showPassword }) {
+  render({ disabled }, { mqttMode, mqttUrl, mqttUsername, mqttPassword, z2mFrontendUrl, showPassword }) {
     return (
       <div>
         <p>
@@ -63,6 +69,22 @@ class SetupRemoteOptions extends Component {
         <div class="form-group">
           {mqttMode === MQTT_MODE.EXTERNAL && (
             <form>
+              <div class="form-group">
+                <label for="z2mFrontendUrl" class="form-label">
+                  <Text id="integration.zigbee2mqtt.setup.z2mFrontendUrlLabel" />
+                </label>
+                <Localizer>
+                  <input
+                    id="z2mFrontendUrl"
+                    name="z2mFrontendUrl"
+                    placeholder={<Text id="integration.zigbee2mqtt.setup.z2mFrontendUrlPlaceholder" />}
+                    value={z2mFrontendUrl}
+                    class="form-control"
+                    onInput={this.updateZ2mFrontendUrl}
+                  />
+                </Localizer>
+              </div>
+
               <div class="form-group">
                 <label for="mqttUrl" class="form-label">
                   <Text id={`integration.mqtt.setup.urlLabel`} />

@@ -15,6 +15,7 @@ describe('zigbee2mqtt convertDevice', () => {
       external_id: `zigbee2mqtt:${notManagedDevice.friendly_name}`,
       model: undefined,
       features: [],
+      params: [],
       should_poll: false,
       service_id: serviceId,
     };
@@ -57,6 +58,7 @@ describe('zigbee2mqtt convertDevice', () => {
           unit: null,
         },
       ],
+      params: [],
       should_poll: false,
       service_id: serviceId,
     };
@@ -150,6 +152,7 @@ describe('zigbee2mqtt convertDevice', () => {
       name: '0x5c0272fffxxxxx',
       model: 'E1743',
       external_id: 'zigbee2mqtt:0x5c0272fffxxxxx',
+      params: [{ name: 'ieee_address', value: '0x5c0272fffeaxxxxx' }],
       features: [
         {
           name: 'Battery',
@@ -191,6 +194,35 @@ describe('zigbee2mqtt convertDevice', () => {
       should_poll: false,
       service_id: '6a37dd9d-48c7-4d09-a7bb-33f257edb78d',
     });
+  });
+
+  it('should return device without ieee_address param when ieee_address is missing', () => {
+    const deviceWithoutIeee = {
+      friendly_name: 'device-no-ieee',
+      definition: {
+        exposes: [],
+        model: 'TEST_MODEL',
+      },
+    };
+
+    const result = convertDevice(deviceWithoutIeee, serviceId);
+
+    expect(result.params).to.deep.equal([]);
+  });
+
+  it('should return device with ieee_address param when ieee_address is present', () => {
+    const deviceWithIeee = {
+      friendly_name: 'device-with-ieee',
+      ieee_address: '0xaabbccddeeff0011',
+      definition: {
+        exposes: [],
+        model: 'TEST_MODEL',
+      },
+    };
+
+    const result = convertDevice(deviceWithIeee, serviceId);
+
+    expect(result.params).to.deep.equal([{ name: 'ieee_address', value: '0xaabbccddeeff0011' }]);
   });
 
   it('should return Lixee TIC device with custom names', () => {
@@ -256,6 +288,7 @@ describe('zigbee2mqtt convertDevice', () => {
       name: 'Lixee ZLinky TIC',
       model: 'ZLinky_TIC',
       external_id: 'zigbee2mqtt:Lixee ZLinky TIC',
+      params: [{ name: 'ieee_address', value: '0x00158d00045a8abc' }],
       features: [
         {
           name: 'Index',

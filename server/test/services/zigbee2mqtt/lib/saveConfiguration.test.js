@@ -67,7 +67,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 9);
+    assert.callCount(gladys.variable.destroy, 10);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_PASSWORD', serviceId);
@@ -77,5 +77,6 @@ describe('zigbee2mqtt saveConfiguration', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_MQTT_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_Z2M_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_MODE', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_URL', serviceId);
   });
 });

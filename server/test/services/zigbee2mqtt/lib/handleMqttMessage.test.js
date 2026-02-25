@@ -71,13 +71,22 @@ describe('zigbee2mqtt handleMqttMessage', () => {
   it('should receive devices, exclude unsupported and coordinator', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
-    stateManagerGetStub
-      .onFirstCall()
-      .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
-      .onSecondCall()
-      .returns(expectedDevicesPayload[1])
-      .onThirdCall()
-      .returns(null);
+    // Return devices with ieee_address param already set (so migrateIeeeAddressParams skips them)
+    // and also serve getDiscoveredDevices calls based on external_id argument
+    stateManagerGetStub.callsFake((key, externalId) => {
+      if (externalId === 'zigbee2mqtt:0x00158d00033e88d5') {
+        return {
+          id: 'gladys-id',
+          room_id: 'room_id',
+          name: 'device-name',
+          params: [{ name: 'ieee_address', value: '0x00158d00033e88d5' }],
+        };
+      }
+      if (externalId === 'zigbee2mqtt:0x00158d00033e88d1') {
+        return expectedDevicesPayload[1];
+      }
+      return null;
+    });
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
