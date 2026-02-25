@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
+const { DEVICE_FEATURE_UNITS } = require('../../../../../../utils/constants');
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {
@@ -54,5 +55,30 @@ describe('Tuya convert feature', () => {
       selector: 'externalid-switch-1',
       type: 'binary',
     });
+  });
+
+  it('should ignore temperature unit helper features', () => {
+    const result = convertFeature({ code: 'temp_unit_convert', values: '{}' }, 'externalId');
+    expect(result).to.equal(undefined);
+  });
+
+  it('should apply enum, scale and temperature unit', () => {
+    const result = convertFeature(
+      {
+        code: 'temp_set',
+        type: 'Integer',
+        name: 'Temp set',
+        readOnly: false,
+        values: '{"min":"100","max":300,"scale":1,"range":["low","high"]}',
+      },
+      'externalId',
+      { deviceType: 'air-conditioner', temperatureUnit: DEVICE_FEATURE_UNITS.FAHRENHEIT },
+    );
+
+    expect(result.enum).to.deep.equal(['low', 'high']);
+    expect(result.scale).to.equal(1);
+    expect(result.min).to.equal('100');
+    expect(result.max).to.equal(30);
+    expect(result.unit).to.equal(DEVICE_FEATURE_UNITS.FAHRENHEIT);
   });
 });

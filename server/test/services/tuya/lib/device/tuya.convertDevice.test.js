@@ -2,6 +2,7 @@ const { expect } = require('chai');
 
 const { convertDevice } = require('../../../../../services/tuya/lib/device/tuya.convertDevice');
 const { DEVICE_PARAM_NAME } = require('../../../../../services/tuya/lib/utils/tuya.constants');
+const { DEVICE_FEATURE_UNITS } = require('../../../../../utils/constants');
 
 describe('tuya.convertDevice', () => {
   it('should map params and features with optional fields', () => {
@@ -60,5 +61,30 @@ describe('tuya.convertDevice', () => {
     expect(device.product_key).to.equal(undefined);
     expect(device.online).to.equal(false);
     expect(device.features.length).to.equal(0);
+  });
+
+  it('should map temperature unit and specifications category', () => {
+    const tuyaDevice = {
+      id: 'device-id',
+      name: 'Device',
+      model: 'Model',
+      specifications: {
+        category: 'cjkg',
+        functions: [{ code: 'temp_set', name: 'Temp', type: 'Integer' }],
+        status: [{ code: 'temp_current', name: 'Temp', type: 'Integer' }],
+      },
+      properties: {
+        properties: [{ code: 'unit', value: '℃' }],
+      },
+    };
+
+    const device = convertDevice(tuyaDevice);
+    const params = device.params.reduce((acc, param) => {
+      acc[param.name] = param.value;
+      return acc;
+    }, {});
+
+    expect(params[DEVICE_PARAM_NAME.TEMPERATURE_UNIT]).to.equal(DEVICE_FEATURE_UNITS.CELSIUS);
+    expect(device.specifications.category).to.equal('cjkg');
   });
 });

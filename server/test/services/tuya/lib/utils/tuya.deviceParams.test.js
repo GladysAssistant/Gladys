@@ -4,12 +4,18 @@ const { expect } = require('chai');
 const {
   applyExistingLocalOverride,
   applyExistingLocalParams,
+  applyExistingFeatureUnits,
   getParamValue,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
   upsertParam,
 } = require('../../../../../services/tuya/lib/utils/tuya.deviceParams');
 const { DEVICE_PARAM_NAME } = require('../../../../../services/tuya/lib/utils/tuya.constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../../utils/constants');
 
 describe('Tuya device params utils', () => {
   it('should upsert params', () => {
@@ -174,5 +180,48 @@ describe('Tuya device params utils', () => {
   it('should return undefined when getParamValue receives non array', () => {
     const value = getParamValue(null, DEVICE_PARAM_NAME.IP_ADDRESS);
     expect(value).to.equal(undefined);
+  });
+
+  it('should keep features without external_id or missing existing match', () => {
+    const device = {
+      features: [
+        { name: 'no-id' },
+        {
+          external_id: 'tuya:device:temp_set',
+          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        },
+      ],
+    };
+    const existingDevice = { features: [] };
+    const updated = applyExistingFeatureUnits(device, existingDevice);
+    expect(updated.features[0].name).to.equal('no-id');
+    expect(updated.features[1].unit).to.equal(DEVICE_FEATURE_UNITS.CELSIUS);
+  });
+
+  it('should keep existing temperature units for matching features', () => {
+    const device = {
+      features: [
+        {
+          external_id: 'tuya:device:temp_set',
+          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        },
+      ],
+    };
+    const existingDevice = {
+      features: [
+        {
+          external_id: 'tuya:device:temp_set',
+          category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+          type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+          unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+        },
+      ],
+    };
+    const updated = applyExistingFeatureUnits(device, existingDevice);
+    expect(updated.features[0].unit).to.equal(DEVICE_FEATURE_UNITS.FAHRENHEIT);
   });
 });

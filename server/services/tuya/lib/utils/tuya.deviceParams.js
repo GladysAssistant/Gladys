@@ -61,12 +61,7 @@ const getParamValue = (params, name) => {
   return found ? found.value : undefined;
 };
 
-const getExistingParamValue = (existingDevice, name) => {
-  if (!existingDevice) {
-    return undefined;
-  }
-  return getParamValue(existingDevice.params, name);
-};
+const getExistingParamValue = (existingDevice, name) => getParamValue(existingDevice && existingDevice.params, name);
 
 const applyExistingLocalParams = (device, existingDevice) => {
   if (!existingDevice) {
