@@ -1,5 +1,6 @@
 const { addEnergyFeatures } = require('../../energy-monitoring/utils/addEnergyFeatures');
 const { mergeDevices } = require('../../../utils/device');
+const { dedupeFeaturesByExternalId } = require('./utils/tasmota.dedupeFeaturesByExternalId');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
@@ -14,18 +15,8 @@ function getDiscoveredDevices(protocol, defaultElectricMeterDeviceFeatureId) {
   return Object.values(handlerDevices).map((d) => {
     const existing = this.gladys.stateManager.get('deviceByExternalId', d.external_id);
     if (Array.isArray(d.features)) {
-      d.features = d.features.reduce((acc, feature) => {
-        if (!feature || !feature.external_id) {
-          acc.push(feature);
-          return acc;
-        }
-        const isDuplicate = acc.some((existingFeature) => existingFeature.external_id === feature.external_id);
-        if (!isDuplicate) {
-          acc.push(feature);
-        }
-        return acc;
-      }, []);
       addEnergyFeatures(d, defaultElectricMeterDeviceFeatureId);
+      d.features = dedupeFeaturesByExternalId(d.features);
     }
     return mergeDevices(d, existing);
   });
