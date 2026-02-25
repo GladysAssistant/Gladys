@@ -15,7 +15,7 @@ const FAN_SPEED_OPTIONS = [
   { value: AC_FAN_SPEED.TURBO, i18nKey: 'turbo', tuyaValues: ['turbo', 'strong'] }
 ];
 
-const AirConditioningFanSpeedDeviceFeature = (props) => {
+const AirConditioningFanSpeedDeviceFeature = props => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
 

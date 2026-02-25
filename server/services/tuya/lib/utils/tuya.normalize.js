@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 
 const normalizeBoolean = (value) => {
   if (value === true || value === 1) {
@@ -15,7 +15,9 @@ const normalizeTemperatureUnit = (value) => {
   if (value === null || value === undefined) {
     return null;
   }
-  const normalized = String(value).trim().toLowerCase();
+  const normalized = String(value)
+    .trim()
+    .toLowerCase();
   if (
     normalized === 'c' ||
     normalized === '℃' ||

@@ -5,7 +5,11 @@ const { mergeDevices } = require('../../../utils/device');
 
 const { STATUS } = require('./utils/tuya.constants');
 const { convertDevice } = require('./device/tuya.convertDevice');
-const { applyExistingFeatureUnits, applyExistingLocalParams, normalizeExistingDevice } = require('./utils/tuya.deviceParams');
+const {
+  applyExistingFeatureUnits,
+  applyExistingLocalParams,
+  normalizeExistingDevice,
+} = require('./utils/tuya.deviceParams');
 
 /**
  * @description Discover Tuya cloud devices.

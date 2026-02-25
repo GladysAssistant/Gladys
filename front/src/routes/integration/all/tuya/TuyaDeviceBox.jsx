@@ -583,13 +583,7 @@ class TuyaDeviceBox extends Component {
       githubIssuePayloadUrl,
       githubIssueOpened
     } = this.state;
-    if (
-      githubIssueChecking ||
-      githubIssueExists ||
-      githubIssuePayload ||
-      githubIssuePayloadUrl ||
-      githubIssueOpened
-    ) {
+    if (githubIssueChecking || githubIssueExists || githubIssuePayload || githubIssuePayloadUrl || githubIssueOpened) {
       return;
     }
 

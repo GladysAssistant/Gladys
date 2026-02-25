@@ -103,9 +103,7 @@ function convertDevice(tuyaDevice) {
       const normalized = unitProperty.value.trim().toLowerCase();
       if (['f', '℉', 'fahrenheit'].includes(normalized)) {
         temperatureUnit = DEVICE_FEATURE_UNITS.FAHRENHEIT;
-      } else if (
-        ['c', '℃', 'celsius', 'centigrade', 'celcius'].includes(normalized)
-      ) {
+      } else if (['c', '℃', 'celsius', 'centigrade', 'celcius'].includes(normalized)) {
         temperatureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
       }
     }

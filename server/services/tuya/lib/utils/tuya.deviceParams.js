@@ -1,5 +1,9 @@
 const { DEVICE_PARAM_NAME } = require('./tuya.constants');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../utils/constants');
 const { normalizeBoolean } = require('./tuya.normalize');
 
 const upsertParam = (params, name, value) => {
@@ -112,8 +116,7 @@ const applyExistingLocalOverride = (device, existingDevice) => {
   return updated;
 };
 
-const isTemperatureUnit = (unit) =>
-  unit === DEVICE_FEATURE_UNITS.CELSIUS || unit === DEVICE_FEATURE_UNITS.FAHRENHEIT;
+const isTemperatureUnit = (unit) => unit === DEVICE_FEATURE_UNITS.CELSIUS || unit === DEVICE_FEATURE_UNITS.FAHRENHEIT;
 
 const isTemperatureFeature = (feature) => {
   if (!feature) {
