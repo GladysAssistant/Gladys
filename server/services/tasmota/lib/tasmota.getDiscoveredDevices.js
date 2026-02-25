@@ -13,16 +13,12 @@ const { dedupeFeaturesByExternalId } = require('./utils/tasmota.dedupeFeaturesBy
 function getDiscoveredDevices(protocol, defaultElectricMeterDeviceFeatureId) {
   const handlerDevices = this.getHandler(protocol).getDiscoveredDevices();
   return Object.values(handlerDevices).map((d) => {
-    const device = {
-      ...d,
-      features: Array.isArray(d.features) ? d.features.map((feature) => ({ ...feature })) : d.features,
-    };
-    const existing = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-    if (Array.isArray(device.features)) {
-      device.features = dedupeFeaturesByExternalId(device.features);
-      addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
+    const existing = this.gladys.stateManager.get('deviceByExternalId', d.external_id);
+    if (Array.isArray(d.features)) {
+      addEnergyFeatures(d, defaultElectricMeterDeviceFeatureId);
+      d.features = dedupeFeaturesByExternalId(d.features);
     }
-    return mergeDevices(device, existing);
+    return mergeDevices(d, existing);
   });
 }
 

@@ -17,13 +17,9 @@ async function notifyNewDevice(device, event) {
     existing = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
     let payload;
     if (Array.isArray(device.features)) {
-      const payloadDevice = {
-        ...device,
-        features: device.features.map((feature) => ({ ...feature })),
-      };
-      payloadDevice.features = dedupeFeaturesByExternalId(payloadDevice.features);
       const defaultElectricMeterDeviceFeatureId = await this.gladys.energyPrice.getDefaultElectricMeterFeatureId();
-      payload = addEnergyFeatures(payloadDevice, defaultElectricMeterDeviceFeatureId);
+      payload = addEnergyFeatures(device, defaultElectricMeterDeviceFeatureId);
+      payload.features = dedupeFeaturesByExternalId(payload.features);
     } else {
       payload = device;
     }
