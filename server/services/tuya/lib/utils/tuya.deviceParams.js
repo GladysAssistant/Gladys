@@ -113,9 +113,6 @@ const applyExistingLocalOverride = (device, existingDevice) => {
 const isTemperatureUnit = (unit) => unit === DEVICE_FEATURE_UNITS.CELSIUS || unit === DEVICE_FEATURE_UNITS.FAHRENHEIT;
 
 const isTemperatureFeature = (feature) => {
-  if (!feature) {
-    return false;
-  }
   return (
     (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
       feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE) ||

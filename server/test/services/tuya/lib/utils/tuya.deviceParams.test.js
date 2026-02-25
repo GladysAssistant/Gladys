@@ -224,4 +224,28 @@ describe('Tuya device params utils', () => {
     const updated = applyExistingFeatureUnits(device, existingDevice);
     expect(updated.features[0].unit).to.equal(DEVICE_FEATURE_UNITS.FAHRENHEIT);
   });
+  it('should keep units for non-temperature features', () => {
+    const device = {
+      features: [
+        {
+          external_id: 'tuya:device:switch',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        },
+      ],
+    };
+    const existingDevice = {
+      features: [
+        {
+          external_id: 'tuya:device:switch',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+        },
+      ],
+    };
+    const updated = applyExistingFeatureUnits(device, existingDevice);
+    expect(updated.features[0].unit).to.equal(DEVICE_FEATURE_UNITS.CELSIUS);
+  });
 });

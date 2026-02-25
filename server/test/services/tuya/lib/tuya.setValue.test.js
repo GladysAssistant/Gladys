@@ -122,6 +122,31 @@ describe('TuyaHandler.setValue', () => {
     });
   });
 
+  it('should convert target temperature from fahrenheit to celsius before sending', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({});
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.TEMPERATURE_UNIT, value: DEVICE_FEATURE_UNITS.CELSIUS },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:uuid:temp_set',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+      max: 300,
+    };
+
+    await tuyaHandler.setValue(device, deviceFeature, 68);
+
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'POST',
+      path: `${API.VERSION_1_0}/devices/uuid/commands`,
+      body: { commands: [{ code: 'temp_set', value: 20 }] },
+    });
+  });
+
   it('should call local tuyapi when local params are set', async () => {
     const connect = sinon.stub().resolves();
     const set = sinon.stub().resolves();

@@ -85,9 +85,6 @@ const extractCodesFromFeatures = (features) => {
 };
 
 const isAirConditioner = (codes, modelName) => {
-  if (!codes || !(codes instanceof Set)) {
-    return false;
-  }
   const hasTempSet = codes.has('temp_set');
   const hasMode = codes.has('mode');
   const hasFan = codes.has('fan_speed_enum') || codes.has('windspeed');
@@ -103,9 +100,6 @@ const SMART_SOCKET_KEYWORDS = ['socket', 'plug', 'outlet', 'prise'];
 const isSmartSocket = (codes, modelName, category) => {
   if (category && SMART_SOCKET_CATEGORIES.has(category)) {
     return true;
-  }
-  if (!codes || !(codes instanceof Set)) {
-    return false;
   }
   const hasSwitch = codes.has('switch') || codes.has('switch_1') || codes.has('switch_2');
   if (!hasSwitch) {

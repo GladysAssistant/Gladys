@@ -28,6 +28,27 @@ describe('Tuya local mapping', () => {
     expect(dpsKey).to.equal(8);
   });
 
+  it('should resolve aliases when direct dps is missing', () => {
+    const { getLocalDpsFromCode: getLocalDpsFromCodeStub } = proxyquire(
+      '../../../../../services/tuya/lib/device/tuya.localMapping',
+      {
+        '../mappings': {
+          getDeviceType: () => 'unknown',
+          getLocalMapping: () => ({
+            strict: true,
+            codeAliases: { foo: ['bar'] },
+            dps: { bar: 7 },
+          }),
+          normalizeCode: (code) => (code ? String(code).toLowerCase() : null),
+        },
+        './tuya.convertFeature': { convertFeature: () => null },
+      },
+    );
+
+    const dpsKey = getLocalDpsFromCodeStub('foo', {});
+    expect(dpsKey).to.equal(7);
+  });
+
   it('should return null for unknown code in strict local mapping', () => {
     const device = { device_type: 'air-conditioner' };
     const dpsKey = getLocalDpsFromCode('unknown_code', device);

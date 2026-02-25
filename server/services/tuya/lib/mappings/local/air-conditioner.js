@@ -1,6 +1,6 @@
 module.exports = {
   strict: true,
-  ignoredDps: ['105'],
+  ignoredDps: ['21','22','105'],
   codeAliases: {
     eco: ['mode_eco'],
     mode_eco: ['eco'],

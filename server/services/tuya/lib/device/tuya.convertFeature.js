@@ -7,9 +7,6 @@ const scaleNumber = (value, scale) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     return value;
   }
-  if (!Number.isFinite(scale) || scale === 0) {
-    return value;
-  }
   return value / 10 ** scale;
 };
 
