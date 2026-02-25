@@ -10,6 +10,7 @@ const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/uni
 const { normalizeBoolean, normalizeTemperatureUnit } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
+const { getDeviceType, getLocalMapping } = require('./mappings');
 
 /**
  * @description Send the new device value over device protocol.
@@ -74,6 +75,13 @@ async function setValue(device, deviceFeature, value) {
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
   const localDps = getLocalDpsFromCode(command, device);
+  const deviceType = getDeviceType(device);
+  const localMapping = getLocalMapping(deviceType);
+  const isLocalStrict = localMapping && localMapping.strict === true;
+
+  if (hasLocalConfig && localDps === null && isLocalStrict) {
+    throw new Error(`[Tuya][setValue] missing local DPS mapping in strict mode for ${topic}/${command}`);
+  }
 
   if (hasLocalConfig && localDps !== null) {
     const isProtocol35 = protocolVersion === '3.5';
@@ -116,6 +124,9 @@ async function setValue(device, deviceFeature, value) {
     const localSuccess = await runLocalSet();
     if (localSuccess) {
       return;
+    }
+    if (isLocalStrict) {
+      throw new Error(`[Tuya][setValue] local set failed in strict mode for ${topic}`);
     }
   }
 

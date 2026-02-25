@@ -62,11 +62,10 @@ const getParamValue = (params, name) => {
 };
 
 const getExistingParamValue = (existingDevice, name) => {
-  if (!existingDevice || !Array.isArray(existingDevice.params)) {
+  if (!existingDevice) {
     return undefined;
   }
-  const param = existingDevice.params.find((item) => item.name === name);
-  return param ? param.value : undefined;
+  return getParamValue(existingDevice.params, name);
 };
 
 const applyExistingLocalParams = (device, existingDevice) => {

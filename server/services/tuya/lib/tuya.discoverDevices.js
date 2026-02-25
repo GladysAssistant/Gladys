@@ -48,6 +48,7 @@ async function discoverDevices() {
     devices.map((device) => this.loadDeviceDetails(device)),
   ).then((results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value));
 
+  // Reset local connection fields - they will be restored from existing device params if available.
   this.discoveredDevices = this.discoveredDevices.map((device) => {
     const cloudIp = device.cloud_ip || device.ip;
     return {

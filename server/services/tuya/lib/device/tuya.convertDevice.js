@@ -1,10 +1,10 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
-const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 const { convertFeature } = require('./tuya.convertFeature');
 const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
 const logger = require('../../../../utils/logger');
 const { slugify } = require('../../../../utils/slugify');
+const { normalizeTemperatureUnit } = require('../utils/tuya.normalize');
 
 /**
  * @description Transform Tuya device to Gladys device.
@@ -99,13 +99,8 @@ function convertDevice(tuyaDevice) {
     const unitProperty = properties.properties.find(
       (property) => property.code === 'temp_unit_convert' || property.code === 'unit',
     );
-    if (unitProperty && typeof unitProperty.value === 'string') {
-      const normalized = unitProperty.value.trim().toLowerCase();
-      if (['f', '℉', 'fahrenheit'].includes(normalized)) {
-        temperatureUnit = DEVICE_FEATURE_UNITS.FAHRENHEIT;
-      } else if (['c', '℃', 'celsius', 'centigrade', 'celcius'].includes(normalized)) {
-        temperatureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
-      }
+    if (unitProperty) {
+      temperatureUnit = normalizeTemperatureUnit(unitProperty.value);
     }
   }
   if (temperatureUnit) {
