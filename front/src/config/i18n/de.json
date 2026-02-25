@@ -1226,6 +1226,7 @@
         "createGithubIssue": "Dieses Gerät vorschlagen",
         "createGithubIssuePartial": "Neue Funktionen vorschlagen",
         "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
+        "githubIssueSearchInProgress": "Suche nach bestehenden Issues...",
         "githubIssuePayloadCopied": "Issue-Details wurden in die Zwischenablage kopiert. Bitte in den GitHub-Issue-Text einfügen.",
         "githubIssuePayloadInfo": "Die Issue-Details sind zu lang für die URL. Bitte den Inhalt unten kopieren und in den GitHub-Issue-Text einfügen.",
         "githubIssuePayloadCopyButton": "Inhalt kopieren",

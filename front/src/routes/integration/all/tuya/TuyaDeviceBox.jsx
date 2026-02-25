@@ -5,6 +5,7 @@ import { Link } from 'preact-router';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../utils/consts';
 import style from './style.css';
 
@@ -12,6 +13,7 @@ const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
 const GITHUB_SEARCH_API_URL = 'https://api.github.com/search/issues?q=';
 const GITHUB_SEARCH_CACHE_TTL_MS = 1000 * 60 * 5;
+const MAX_GITHUB_CACHE_SIZE = 100;
 const MAX_GITHUB_URL_LENGTH = 8000;
 const githubIssueCache = new Map();
 const LOCAL_POLL_FREQUENCY_MS = 10 * 1000;
@@ -217,6 +219,19 @@ const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "$
 
 const buildGithubSearchUrl = title => `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
 
+const setGithubIssueCache = (query, value) => {
+  if (githubIssueCache.has(query)) {
+    githubIssueCache.delete(query);
+  }
+  if (githubIssueCache.size >= MAX_GITHUB_CACHE_SIZE) {
+    const oldestKey = githubIssueCache.keys().next().value;
+    if (oldestKey !== undefined) {
+      githubIssueCache.delete(oldestKey);
+    }
+  }
+  githubIssueCache.set(query, value);
+};
+
 const checkGithubIssueExists = async title => {
   const query = buildGithubSearchQuery(title);
   const cached = githubIssueCache.get(query);
@@ -224,13 +239,26 @@ const checkGithubIssueExists = async title => {
     return cached.exists;
   }
 
-  const response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`);
+  let response;
+  if (typeof AbortController === 'undefined') {
+    response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`);
+  } else {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+      response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`, {
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
   if (!response.ok) {
     throw new Error('Github search failed');
   }
   const data = await response.json();
   const exists = Boolean(data && typeof data.total_count === 'number' && data.total_count > 0);
-  githubIssueCache.set(query, { exists, timestamp: Date.now() });
+  setGithubIssueCache(query, { exists, timestamp: Date.now() });
   return exists;
 };
 
@@ -362,10 +390,11 @@ const isLocalPollValidated = (validation, currentConfig) =>
   validation.protocol === currentConfig.protocol;
 
 class TuyaDeviceBox extends Component {
-  componentWillMount() {
-    this.setState({
-      device: this.props.device,
-      baselineDevice: this.props.device,
+  constructor(props) {
+    super(props);
+    this.state = {
+      device: props.device,
+      baselineDevice: props.device,
       localPollValidation: null,
       localPollDps: null,
       githubIssueChecking: false,
@@ -374,7 +403,7 @@ class TuyaDeviceBox extends Component {
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
       githubIssueOpened: false
-    });
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -506,7 +535,9 @@ class TuyaDeviceBox extends Component {
             localPollProtocol: protocolVersion
           });
           const response = await this.props.httpClient.post('/api/v1/service/tuya/local-poll', {
-            deviceId: currentDevice.external_id && currentDevice.external_id.split(':')[1],
+            deviceId: currentDevice.external_id
+              ? currentDevice.external_id.split(':')[1] || currentDevice.external_id
+              : undefined,
             ip: getParam('IP_ADDRESS') || currentDevice.ip,
             localKey: getParam('LOCAL_KEY') || currentDevice.local_key,
             protocolVersion,
@@ -599,11 +630,14 @@ class TuyaDeviceBox extends Component {
     );
     const issueUrl = issueData.url;
     const issueTitle = buildIssueTitle(device);
+    const popupMessage =
+      get(this.props, 'intl.dictionary.integration.tuya.device.githubIssueSearchInProgress') ||
+      'Searching for existing issues...';
     const popup = window.open('about:blank', '_blank');
     if (popup) {
       popup.opener = null;
       popup.document.title = 'GitHub';
-      popup.document.body.innerText = 'Recherche des issues existantes...';
+      popup.document.body.innerText = popupMessage;
     }
 
     this.setState({ githubIssueChecking: true });
@@ -794,7 +828,7 @@ class TuyaDeviceBox extends Component {
       }
     } catch (e) {
       let errorMessage = 'integration.tuya.error.defaultError';
-      if (e.response.status === 409) {
+      if (get(e, 'response.status') === 409) {
         errorMessage = 'integration.tuya.error.conflictError';
       }
       this.setState({
@@ -935,7 +969,7 @@ class TuyaDeviceBox extends Component {
         }
         onClick={this.handleCreateGithubIssue}
         aria-disabled={disableGithubIssueButton}
-        tabindex={disableGithubIssueButton ? -1 : undefined}
+        tabIndex={disableGithubIssueButton ? -1 : undefined}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -1313,4 +1347,4 @@ class TuyaDeviceBox extends Component {
   }
 }
 
-export default connect('httpClient', {})(TuyaDeviceBox);
+export default withIntlAsProp(connect('httpClient', {})(TuyaDeviceBox));

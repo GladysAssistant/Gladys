@@ -1121,6 +1121,7 @@
         "createGithubIssue": "Suggest this device",
         "createGithubIssuePartial": "Suggest new functions",
         "githubIssueInfo": "A report will be sent with the device details. Sensitive data (local key and IP) is masked.",
+        "githubIssueSearchInProgress": "Searching for existing issues...",
         "githubIssuePayloadCopied": "Issue details copied to clipboard. Paste them into the GitHub issue body.",
         "githubIssuePayloadInfo": "The issue details are too long for the URL. Copy the content below and paste it into the GitHub issue body.",
         "githubIssuePayloadCopyButton": "Copy content",

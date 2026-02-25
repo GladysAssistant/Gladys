@@ -51,7 +51,7 @@ function convertDevice(tuyaDevice) {
   if (localOverride !== undefined && localOverride !== null) {
     params.push({ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: localOverride });
   }
-  if (protocolVersion) {
+  if (protocolVersion !== undefined && protocolVersion !== null) {
     params.push({ name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: protocolVersion });
   }
   if (productId) {
@@ -130,7 +130,6 @@ function convertDevice(tuyaDevice) {
     model: productName || model,
     product_id: productId,
     product_key: productKey,
-    service_id: this.serviceId,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
     params,

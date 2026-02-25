@@ -1356,6 +1356,7 @@
         "createGithubIssue": "Proposer ce périphérique",
         "createGithubIssuePartial": "Proposer nouvelles fonctions",
         "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
+        "githubIssueSearchInProgress": "Recherche des issues existantes...",
         "githubIssuePayloadCopied": "Les détails ont été copiés dans le presse-papiers. Collez-les dans le corps de l'issue GitHub.",
         "githubIssuePayloadInfo": "Les détails sont trop longs pour l'URL. Copiez le contenu ci-dessous et collez-le dans le corps de l'issue GitHub.",
         "githubIssuePayloadCopyButton": "Copier le contenu",

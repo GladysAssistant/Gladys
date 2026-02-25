@@ -23,7 +23,7 @@ describe('tuya.convertDevice', () => {
       },
     };
 
-    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+    const device = convertDevice(tuyaDevice);
 
     expect(device.product_id).to.equal('product-id');
     expect(device.product_key).to.equal('product-key');
@@ -54,7 +54,7 @@ describe('tuya.convertDevice', () => {
       specifications: {},
     };
 
-    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+    const device = convertDevice(tuyaDevice);
 
     expect(device.product_id).to.equal(undefined);
     expect(device.product_key).to.equal(undefined);
