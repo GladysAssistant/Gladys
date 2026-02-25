@@ -16,7 +16,7 @@ const KNOWN_ERROR_PATTERNS = [
  */
 async function readZ2mContainerLogs(containerId) {
   try {
-    const stream = await this.gladys.system.getContainerLogs(containerId);
+    const stream = await this.gladys.system.getContainerLogs(containerId, { follow: true });
     await new Promise((resolve) => {
       let leftover = '';
       let knownError = null;
@@ -24,8 +24,11 @@ async function readZ2mContainerLogs(containerId) {
       let resolved = false;
 
       const processLine = (line) => {
-        // Strip Docker multiplexing control characters, preserving newlines (\x0A)
-        const cleanLine = line.replace(/[\x00-\x09\x0B-\x1F\x7F-\x9F]/g, ' ');
+        // Remove Docker stream prefix byte, strip ANSI color codes, then remaining control chars
+        const cleanLine = line
+          .slice(1)
+          .replace(/\x1B\[[0-9;]*[A-Za-z]/g, '')
+          .replace(/[\x00-\x09\x0B-\x1F\x7F-\x9F]/g, ' ');
         if (knownError === null) {
           const matchedPattern = KNOWN_ERROR_PATTERNS.find((pattern) => pattern.test(cleanLine));
           if (matchedPattern) {
@@ -61,7 +64,7 @@ async function readZ2mContainerLogs(containerId) {
         resolve();
       };
 
-      const timeout = setTimeout(finish, 10000);
+      const timeout = setTimeout(finish, 30000);
 
       stream.on('data', (chunk) => {
         const combined = leftover + chunk.toString();

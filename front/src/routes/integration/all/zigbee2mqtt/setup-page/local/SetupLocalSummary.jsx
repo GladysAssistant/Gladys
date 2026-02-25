@@ -1,8 +1,7 @@
-import { Text, MarkupText } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 
-const SetupLocalSummary = ({ configuration, enableEditionMode, disabled, zigbee2mqttStatus = {} }) => {
+const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
   const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
-  const { z2mContainerError } = zigbee2mqttStatus;
   return (
     <div class="form-inline" data-cy="z2m-setup-local-summary">
       <div class="form-group">
@@ -42,18 +41,6 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled, zigbee2
           </div>
         </div>
       </div>
-      {z2mContainerError && (
-        <div class="alert alert-warning mt-3">
-          {z2mContainerError.code ? (
-            <MarkupText id={`integration.zigbee2mqtt.setup.modes.local.containerErrors.${z2mContainerError.code}`} />
-          ) : (
-            <span>
-              <Text id="integration.zigbee2mqtt.setup.modes.local.containerErrors.unknownErrorPrefix" />
-              <code>{z2mContainerError.message}</code>
-            </span>
-          )}
-        </div>
-      )}
       <button class="btn btn-primary btn-sm ml-auto" onClick={enableEditionMode} disabled={disabled}>
         <Text id="integration.zigbee2mqtt.setup.changeButtonLabel" />
       </button>

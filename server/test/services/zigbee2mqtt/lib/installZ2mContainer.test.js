@@ -317,13 +317,17 @@ describe('zigbee2mqtt installz2mContainer', () => {
     gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
       const stream = new EventEmitter();
       setImmediate(() => {
-        stream.emit('data', 'Error: Adapter EZSP protocol version (12) is not supported by Host [13-18].');
+        stream.emit('data', '\x01Error: Adapter EZSP protocol version (12) is not supported by Host [13-18].');
         stream.emit('end');
       });
       return Promise.resolve(stream);
     });
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
+    // readZ2mContainerLogs is fire-and-forget, wait for setImmediate to emit data
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
     // ASSERT
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
@@ -336,7 +340,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
       const stream = new EventEmitter();
       setImmediate(() => {
-        stream.emit('data', 'Zigbee2mqtt started successfully');
+        stream.emit('data', '\x01Zigbee2mqtt started successfully');
         stream.emit('end');
       });
       return Promise.resolve(stream);

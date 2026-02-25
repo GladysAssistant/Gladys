@@ -205,7 +205,7 @@ class SetupLocalOptions extends Component {
         </div>
         {emberFirmwareTooOld && (
           <div class="alert alert-warning">
-            <MarkupText id="integration.zigbee2mqtt.setup.modes.local.emberFirmwareWarning" />
+            <MarkupText id="integration.zigbee2mqtt.setup.modes.local.containerErrors.EZSP_PROTOCOL_VERSION" />
           </div>
         )}
         <div class="form-group">

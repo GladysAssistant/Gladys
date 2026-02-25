@@ -25,9 +25,14 @@ const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 function buildLogStream(text) {
   const stream = new EventEmitter();
   stream.destroy = sinon.fake();
+  // Prepend Docker stream prefix byte (\x01 = stdout) to each line, matching real Docker output
+  const prefixed = text
+    .split('\n')
+    .map((line) => `\x01${line}`)
+    .join('\n');
   // Emit data + end asynchronously so listeners are attached first
   setImmediate(() => {
-    stream.emit('data', text);
+    stream.emit('data', prefixed);
     stream.emit('end');
   });
   return stream;
@@ -83,7 +88,7 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({ code: 'EZSP_PROTOCOL_VERSION', message: null });
-    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc');
+    assert.calledOnceWithExactly(gladys.system.getContainerLogs, 'container-abc', { follow: true });
     assert.calledOnce(stream.destroy);
     assert.calledOnce(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -139,8 +144,8 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
       const promise = zigbee2mqttManager.readZ2mContainerLogs('container-abc');
 
       // Let the awaited getContainerLogs promise settle and listeners attach,
-      // then fire the 10-second timeout by advancing the fake clock.
-      await clock.tickAsync(10001);
+      // then fire the 30-second timeout by advancing the fake clock.
+      await clock.tickAsync(30001);
 
       await promise;
 
@@ -160,6 +165,31 @@ describe('zigbee2mqtt readZ2mContainerLogs', () => {
     expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
       code: null,
       message: 'error: Failed to connect to serial port /dev/ttyUSB0',
+    });
+  });
+
+  it('should remove the first character of each line (Docker stream prefix byte)', async () => {
+    // buildLogStream prepends \x01 per line; without removal the match would fail
+    const log = 'error: Docker prefix byte must be stripped';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'error: Docker prefix byte must be stripped',
+    });
+  });
+
+  it('should strip ANSI color codes from log lines', async () => {
+    const log = '\x1B[31merror\x1B[39m: Failed to open serial port';
+    gladys.system.getContainerLogs = fake.resolves(buildLogStream(log));
+
+    await zigbee2mqttManager.readZ2mContainerLogs('container-abc');
+
+    expect(zigbee2mqttManager.z2mContainerError).to.deep.equal({
+      code: null,
+      message: 'error: Failed to open serial port',
     });
   });
 

@@ -85,7 +85,8 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
-      await this.readZ2mContainerLogs(container.id);
+      // We read the logs in non blocking mode
+      this.readZ2mContainerLogs(container.id);
     }
 
     logger.info('Zigbee2mqtt container successfully started');
