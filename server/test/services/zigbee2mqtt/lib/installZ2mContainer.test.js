@@ -8,7 +8,7 @@ const { assert, fake, stub } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const configureContainer = fake.resolves(false);
+const configureContainer = fake.resolves({ configChanged: false, adapterChanged: false });
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
   './configureContainer': { configureContainer },
 });
@@ -125,7 +125,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([container]);
-    zigbee2mqttManager.configureContainer = fake.resolves(true);
+    zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: false });
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -148,6 +148,31 @@ describe('zigbee2mqtt installz2mContainer', () => {
         z2mContainerError: null,
       },
     });
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+  });
+
+  it('should remove and recreate z2m container when adapter type changes', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const newContainer = { id: 'docker-test-new', state: 'stopped' };
+    const getContainersStub = stub();
+    getContainersStub
+      .onFirstCall()
+      .resolves([container])
+      .onSecondCall()
+      .resolves([container])
+      .onThirdCall()
+      .resolves([newContainer]);
+    gladys.system.getContainers = getContainersStub;
+    zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: true });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnce(gladys.system.stopContainer);
+    assert.calledOnce(gladys.system.removeContainer);
+    assert.calledOnce(gladys.system.createContainer);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, newContainer.id);
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });

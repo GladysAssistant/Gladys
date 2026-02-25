@@ -70,7 +70,7 @@ async function installZ2mContainer(config, setupMode = false) {
     }
   }
 
-  const configChanged = await this.configureContainer(basePathOnContainer, config, setupMode);
+  const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({
@@ -78,6 +78,24 @@ async function installZ2mContainer(config, setupMode = false) {
       filters: { name: [containerDescriptor.name] },
     });
     [container] = dockerContainers;
+
+    // If adapter type changed, remove and recreate container for clean state and fresh logs
+    if (adapterChanged && !creationNeeded && dockerContainers.length > 0) {
+      logger.info('Zigbee2mqtt adapter type changed, recreating container...');
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
+
+      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
+      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
+      await this.gladys.system.createContainer(containerDescriptorToMutate);
+
+      dockerContainers = await this.gladys.system.getContainers({
+        all: true,
+        filters: { name: [containerDescriptor.name] },
+      });
+      [container] = dockerContainers;
+    }
 
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
