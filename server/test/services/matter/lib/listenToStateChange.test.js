@@ -14,6 +14,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -453,6 +454,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:145:energy',
       state: 1500,
+    });
+  });
+  it('should listen to state change (HepaFilterMonitoring)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(HepaFilterMonitoring.Complete.id, {
+      addConditionAttributeListener: (callback) => {
+        callback(75); // 75% filter life remaining
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:113',
+      state: 75,
     });
   });
 });

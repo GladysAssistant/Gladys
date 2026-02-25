@@ -15,6 +15,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -62,7 +63,7 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
  * @param {string} devicePath - The path of the device.
  * @example
  * const gladysDevice = await convertToGladysDevice(serviceId, nodeId, node, device);
- * @returns {Promise<object>} The Gladys device.
+ * @returns {Promise<any>} The Gladys device.
  */
 async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceDataBasicInformation, devicePath) {
   const gladysDevice = {
@@ -376,7 +377,20 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 1000000,
           });
         }
+      } else if (clusterIndex === HepaFilterMonitoring.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
+          type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
       }
+      
     });
   }
   return gladysDevice;
