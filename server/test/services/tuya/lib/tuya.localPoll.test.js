@@ -16,6 +16,7 @@ describe('TuyaHandler.localPoll', () => {
   it('should throw if missing parameters', async () => {
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: function TuyAPIStub() {},
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({});
@@ -39,6 +40,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     const result = await localPoll({
       deviceId: 'device',
@@ -64,6 +66,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({
@@ -90,6 +93,9 @@ describe('TuyaHandler.localPoll', () => {
       .resolves({ dps: { 1: true } });
     const disconnect = sinon.stub().resolves();
     function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.5');
+    }
+    function TuyAPINewGenStub() {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
@@ -97,6 +103,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
     });
     const result = await localPoll({
       deviceId: 'device',
@@ -121,6 +128,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({
@@ -151,6 +159,7 @@ describe('TuyaHandler.localPoll', () => {
       };
       const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
         tuyapi: TuyAPIStub,
+        '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
       });
       const promise = localPoll({
         deviceId: 'device',
@@ -188,6 +197,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {
@@ -223,6 +233,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {
@@ -253,6 +264,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {

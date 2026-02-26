@@ -1,4 +1,5 @@
 const TuyAPI = require('tuyapi');
+const TuyAPINewGen = require('@demirdeniz/tuyapi-newgen');
 const logger = require('../../../utils/logger');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { mergeDevices } = require('../../../utils/device');
@@ -14,18 +15,28 @@ const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.devicePar
  */
 async function localPoll(payload) {
   const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false } = payload || {};
-  const effectiveTimeout = protocolVersion === '3.5' && !fastScan ? Math.max(timeoutMs, 5000) : timeoutMs;
+  const isProtocol35 = protocolVersion === '3.5';
+  const effectiveTimeout = isProtocol35 && !fastScan ? Math.max(timeoutMs, 5000) : timeoutMs;
+  const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
 
   if (!deviceId || !ip || !localKey || !protocolVersion) {
     throw new BadParameters('Missing local connection parameters');
   }
 
-  const tuyaLocal = new TuyAPI({
+  const tuyaOptions = {
     id: deviceId,
     key: localKey,
     ip,
     version: protocolVersion,
-  });
+    issueGetOnConnect: false,
+    issueRefreshOnConnect: false,
+    issueRefreshOnPing: false,
+  };
+  if (isProtocol35) {
+    tuyaOptions.KeepAlive = false;
+    tuyaOptions.socketTimeout = Math.max(effectiveTimeout, 5000);
+  }
+  const tuyaLocal = new TuyaLocalApi(tuyaOptions);
   let lastError = null;
   const onError = (err) => {
     lastError = err;

@@ -1,4 +1,5 @@
 const TuyAPI = require('tuyapi');
+const TuyAPINewGen = require('@demirdeniz/tuyapi-newgen');
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -60,29 +61,46 @@ async function setValue(device, deviceFeature, value) {
   const localDps = getLocalDpsFromCode(command);
 
   if (hasLocalConfig && localDps !== null) {
-    const tuyaLocal = new TuyAPI({
+    const isProtocol35 = protocolVersion === '3.5';
+    const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+    const tuyaOptions = {
       id: topic,
       key: localKey,
       ip: ipAddress,
       version: protocolVersion,
-    });
-    let connected = false;
-    try {
-      await tuyaLocal.connect();
-      connected = true;
-      await tuyaLocal.set({ dps: localDps, set: transformedValue });
-      logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
-      return;
-    } catch (e) {
-      logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
-    } finally {
-      if (connected) {
-        try {
-          await tuyaLocal.disconnect();
-        } catch (disconnectError) {
-          logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+      issueGetOnConnect: false,
+      issueRefreshOnConnect: false,
+      issueRefreshOnPing: false,
+    };
+    if (isProtocol35) {
+      tuyaOptions.KeepAlive = false;
+    }
+    const runLocalSet = async () => {
+      const tuyaLocal = new TuyaLocalApi(tuyaOptions);
+      let connected = false;
+      try {
+        await tuyaLocal.connect();
+        connected = true;
+        await tuyaLocal.set({ dps: localDps, set: transformedValue });
+        logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
+        return true;
+      } catch (e) {
+        logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+        return false;
+      } finally {
+        if (connected) {
+          try {
+            await tuyaLocal.disconnect();
+          } catch (disconnectError) {
+            logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+          }
         }
       }
+    };
+
+    const localSuccess = await runLocalSet();
+    if (localSuccess) {
+      return;
     }
   }
 

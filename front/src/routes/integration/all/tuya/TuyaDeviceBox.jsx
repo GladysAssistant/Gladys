@@ -240,7 +240,7 @@ class TuyaDeviceBox extends Component {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
-    const tryProtocols = ['3.4', '3.3', '3.1'];
+    const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
     const selectedProtocol = getParam('PROTOCOL_VERSION') || this.state.device.protocol_version;
     const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
     try {
@@ -603,15 +603,8 @@ class TuyaDeviceBox extends Component {
                     <option value="3.1">3.1</option>
                     <option value="3.3">3.3</option>
                     <option value="3.4">3.4</option>
-                    <option value="3.5" disabled>
-                      <Text id="integration.tuya.device.protocol35OptionUnsupported" />
-                    </option>
+                    <option value="3.5">3.5</option>
                   </select>
-                  {!showCloudIp && !protocolVersion && (
-                    <div class="text-danger mt-2">
-                      <Text id="integration.tuya.device.protocol35Unsupported" />
-                    </div>
-                  )}
                 </div>
 
                 <div class="form-group">

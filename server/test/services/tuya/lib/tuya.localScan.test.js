@@ -47,8 +47,8 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
@@ -113,8 +113,8 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
@@ -185,8 +185,8 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
@@ -232,8 +232,8 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
