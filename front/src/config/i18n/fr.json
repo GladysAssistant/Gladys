@@ -1347,8 +1347,6 @@
         "idLabel": "Identifiant de l'appareil",
         "localKeyLabel": "Clé locale",
         "protocolVersionLabel": "Version du protocole",
-        "protocol35OptionUnsupported": "3.5 (Non supporté)",
-        "protocol35Unsupported": "Le protocole Tuya 3.5 n'est pas pris en charge en local pour le moment. Utilisez le mode cloud ou les protocoles 3.1/3.3/3.4.",
         "ipAddressLabel": "Adresse IP",
         "ipModeLocal": "Local",
         "ipModeCloud": "Cloud",
