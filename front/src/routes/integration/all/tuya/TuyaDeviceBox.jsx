@@ -7,61 +7,65 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 
-const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
-
-const maskIp = ip => {
-  if (!ip || typeof ip !== 'string') {
-    return null;
-  }
-  const parts = ip.split('.');
-  if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
-    return null;
-  }
-  return `${parts[0]}.${parts[1]}.x.x`;
-};
-
-const sanitizeParams = params => {
-  if (!Array.isArray(params)) {
-    return [];
-  }
-  return params.map(param => {
-    if (param.name === 'LOCAL_KEY') {
-      return { ...param, value: '***' };
-    }
-    if (param.name === 'IP_ADDRESS' || param.name === 'CLOUD_IP') {
-      return { ...param, value: maskIp(param.value) };
-    }
-    return param;
-  });
-};
-
-const buildIssuePayload = (device, localPollStatus, localPollError) => {
-  const sanitized = { ...device };
-  delete sanitized.local_key;
-  delete sanitized.ip;
-  delete sanitized.cloud_ip;
-  if (Array.isArray(sanitized.params)) {
-    sanitized.params = sanitizeParams(sanitized.params);
-  }
-  sanitized.local_poll = {
-    status: localPollStatus,
-    error: localPollError || null
-  };
-  sanitized.local_ip_masked = maskIp(device.ip);
-  sanitized.cloud_ip_masked = maskIp(device.cloud_ip);
-  return sanitized;
-};
-
-const createGithubUrl = (device, localPollStatus, localPollError) => {
-  const title = encodeURIComponent(`Tuya: Add support for ${device.model || device.product_name || device.name}`);
-  const body = encodeURIComponent(
-    `\`\`\`json\n${JSON.stringify(buildIssuePayload(device, localPollStatus, localPollError), null, 2)}\n\`\`\``
-  );
-  return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
-};
-
 const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
+const ONLINE_RECENT_MINUTES = 5;
+
+const parseDate = dateValue => {
+  if (!dateValue) {
+    return null;
+  }
+  let date = new Date(dateValue);
+  if (!Number.isNaN(date.getTime())) {
+    return date;
+  }
+  if (typeof dateValue === 'string') {
+    const normalized = dateValue.replace(' ', 'T').replace(' +', '+');
+    date = new Date(normalized);
+  }
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date;
+};
+
+const getMostRecentFeatureDate = device => {
+  if (!Array.isArray(device && device.features)) {
+    return null;
+  }
+  return device.features.reduce((mostRecent, feature) => {
+    const featureDate = parseDate(feature && feature.last_value_changed);
+    if (!featureDate) {
+      return mostRecent;
+    }
+    if (!mostRecent || featureDate > mostRecent) {
+      return featureDate;
+    }
+    return mostRecent;
+  }, null);
+};
+
+const isReachableFromRecentFeatures = device => {
+  const mostRecentFeatureDate = getMostRecentFeatureDate(device);
+  if (!mostRecentFeatureDate) {
+    return false;
+  }
+  return Date.now() - mostRecentFeatureDate.getTime() <= ONLINE_RECENT_MINUTES * 60 * 1000;
+};
+
+const resolveOnlineStatus = device => {
+  if (isReachableFromRecentFeatures(device)) {
+    return true;
+  }
+  const online = device && device.online;
+  if (typeof online === 'boolean') {
+    return online;
+  }
+  if (online === 1 || online === 0) {
+    return online === 1;
+  }
+  return false;
+};
 
 const buildParamsMap = device =>
   (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
@@ -236,7 +240,7 @@ class TuyaDeviceBox extends Component {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
-    const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
+    const tryProtocols = ['3.4', '3.3', '3.1'];
     const selectedProtocol = getParam('PROTOCOL_VERSION') || this.state.device.protocol_version;
     const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
     try {
@@ -339,9 +343,12 @@ class TuyaDeviceBox extends Component {
         device: savedDevice,
         baselineDevice: savedDevice
       });
+      if (typeof this.props.onDeviceSaved === 'function') {
+        this.props.onDeviceSaved(savedDevice);
+      }
     } catch (e) {
       let errorMessage = 'integration.tuya.error.defaultError';
-      if (e.response.status === 409) {
+      if (e.response && e.response.status === 409) {
         errorMessage = 'integration.tuya.error.conflictError';
       }
       this.setState({
@@ -406,7 +413,7 @@ class TuyaDeviceBox extends Component {
     }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const online = device.online;
+    const online = resolveOnlineStatus(device);
     const paramsArray = Array.isArray(device.params) ? device.params : [];
     const params = paramsArray.reduce((acc, param) => {
       acc[param.name] = param.value;
@@ -596,9 +603,11 @@ class TuyaDeviceBox extends Component {
                     <option value="3.1">3.1</option>
                     <option value="3.3">3.3</option>
                     <option value="3.4">3.4</option>
-                    <option value="3.5">3.5</option>
+                    <option value="3.5" disabled>
+                      <Text id="integration.tuya.device.protocol35OptionUnsupported" />
+                    </option>
                   </select>
-                  {protocolVersion === '3.5' && (
+                  {!showCloudIp && !protocolVersion && (
                     <div class="text-danger mt-2">
                       <Text id="integration.tuya.device.protocol35Unsupported" />
                     </div>
@@ -703,17 +712,6 @@ class TuyaDeviceBox extends Component {
                     <div>
                       <div class="alert alert-warning">
                         <Text id="integration.tuya.unmanagedModelButton" />
-                      </div>
-                      <a
-                        class="btn btn-gray"
-                        href={createGithubUrl(this.state.device, localPollStatus, localPollError)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Text id="integration.philipsHue.device.createGithubIssue" />
-                      </a>
-                      <div class="text-muted mt-2">
-                        <Text id="integration.tuya.device.githubIssueInfo" />
                       </div>
                     </div>
                   )}

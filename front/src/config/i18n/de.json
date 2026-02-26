@@ -1197,6 +1197,7 @@
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
       "unmanagedModelButton": "Modell nicht verwaltet oder verfügbar",
+      "localModeLimitInfo": "Der lokale Modus wird noch verbessert. Bei manchen Geräten können Befehle oder Status-Updates weiterhin über die Tuya-Cloud laufen, auch wenn der lokale Modus aktiviert ist.",
       "status": {
         "notConnected": "Gladys konnte keine Verbindung zum Tuya-Cloud-Account herstellen. Bitte gehe zur ",
         "setupPageLink": "Tuya-Einrichtungsseite.",
@@ -1212,6 +1213,8 @@
         "idLabel": "Geräte-ID",
         "localKeyLabel": "Lokaler Schlüssel",
         "protocolVersionLabel": "Protokollversion",
+        "protocol35OptionUnsupported": "3.5 (Nicht unterstützt)",
+        "protocol35Unsupported": "Das Tuya-Protokoll 3.5 wird lokal noch nicht unterstützt. Bitte nutze den Cloud-Modus oder 3.1/3.3/3.4.",
         "ipAddressLabel": "IP-Adresse",
         "ipModeLocal": "Lokal",
         "ipModeCloud": "Cloud",
@@ -1222,15 +1225,13 @@
         "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert, schalte zurück in den Cloud-Modus.",
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
-        "createGithubIssue": "Dieses Gerät vorschlagen",
-        "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
         "productIdLabel": "Produkt-ID",
         "productKeyLabel": "Produktschlüssel"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",
         "description": "Tuya-Geräte werden automatisch erkannt. Deine Tuya-Geräte müssen zuerst zu deinem Tuya-Cloud-Account hinzugefügt werden.",
-        "localDiscoveryInfo": "Lokale Erkennung nutzt UDP-Broadcast. Starte den lokalen UDP-Scan und gib bei Bedarf lokale IP und Protokollversion ein und nutze \"Lokales DPS abfragen\".",
+        "localDiscoveryInfo": "<strong class=\"h5 d-block\">Cloud-Scan</strong>Aktualisiert die Cloud-Liste. Stelle sicher, dass deine Geräte in Tuya als <strong>steuerbar</strong> gesetzt sind, sonst bleiben sie <strong>schreibgeschützt</strong>. Die Testphase ist auf <strong>10 steuerbare Geräte</strong> begrenzt; zusätzliche Geräte liefern ggf. nur <strong>Statusrückmeldungen</strong>.<br /><br /><strong class=\"h5 d-block\">Lokaler Auto-Scan</strong>Startet einen Scan in deinem lokalen Netzwerk (UDP-Broadcast, gleiches Subnetz wie Gladys). Wenn ein Gerät nicht gefunden wird, trage die <strong>lokale IP</strong> und die <strong>Protokollversion</strong> ein (oder lasse es leer, wenn unbekannt) und nutze \"<strong>Lokales DPS abfragen</strong>\", um die lokale Kommunikation zu prüfen.<br /><br />Nutze <strong>Sichern</strong>, um ein Gerät zu erstellen, und <strong>Aktualisieren</strong>, um Änderungen zu übernehmen oder auf lokalen Modus umzuschalten.",
         "scanCloudInProgress": "Scan läuft... Cloud-Geräte werden abgerufen. Das kann etwas dauern.",
         "scanLocalInProgressConnected": "Scan läuft... Lokale Informationen der Geräte werden abgerufen. Das kann etwas dauern.",
         "scanLocalInProgressDisconnected": "Scan läuft... Lokale Geräte werden abgerufen. Das kann etwas dauern.",
@@ -1248,12 +1249,16 @@
         "description": "Du kannst Gladys mit deinem Tuya-Cloud-Account verbinden, um die zugehörigen Geräte zu steuern. Die Dokumentation findest du im linken Menü oder <a href=\"https://gladysassistant.com/de/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">hier</a>.",
         "descriptionCreateAccount": "Du musst einen Account bei <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> erstellen (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Registrieren</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Anmelden</a>).",
         "descriptionCreateProject": "Danach musst du ein \"Cloud-Projekt\" in deinem Tuya-Account erstellen (Konsole: <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
-        "descriptionGetKeys": "Du erhältst Zugang zur Client ID und zum Client Secret.",
-        "descriptionGetAppAccountUid": "Um deine \"App Account UID\" zu erhalten, musst du zum Abschnitt \"Geräte\" -> \"Tuya App-Account verknüpfen\" gehen und einen Anwendungsaccount hinzufügen.",
-        "descriptionGetAppAccountUid2": "Sobald das Hinzufügen abgeschlossen ist, findest du deine \"App Account UID\" in der UID-Spalte.",
-        "descriptionTrial": "Tuya-Cloud-Projekte haben eine Testphase: verlängere sie regelmäßig, um Unterbrechungen zu vermeiden.",
+        "descriptionGetKeys": "Du erhältst Zugriff auf beide Schlüssel: <strong>Client ID</strong> und <strong>Client Secret</strong>.",
+        "descriptionGetAppAccountUid": "Um deine <strong>App Account UID</strong> zu erhalten, gehe zu \"Geräte\" -> \"Tuya App-Account verknüpfen\" und füge einen App-Account hinzu.",
+        "descriptionGetAppAccountUid2": "Sobald die Verknüpfung abgeschlossen ist, steht deine <strong>App Account UID</strong> in der UID-Spalte.",
+        "descriptionTrial": "Tuya-Cloud-Projekte haben eine <strong>Testphase</strong>: denke daran, sie regelmäßig zu <strong>verlängern</strong>, um Unterbrechungen zu vermeiden.",
+        "descriptionCloudLimit": "Hinweis: Die Tuya-Cloud-Testversion erlaubt bis zu <strong>10 steuerbare Geräte</strong>. Weitere Geräte können <strong>schreibgeschützt</strong> bleiben, bis du ein Upgrade durchführst.",
+        "descriptionControllable": "Einige Geräte sind standardmäßig <strong>schreibgeschützt</strong>. Öffne in der Tuya IoT Platform <strong>Device Permission</strong> und klicke auf <strong>Change</strong>, um sie steuerbar zu machen.",
         "localTitle": "<br /><strong>Lokal</strong><br />",
         "descriptionLocalMode": "Der lokale Modus kann nach der Cloud-Konfiguration genutzt werden: Trage lokale IP und Protokollversion pro Gerät ein, um lokal abzufragen. Wenn die Geräte im selben Netzwerk wie der Gladys-Host sind, werden IP-Erkennung und Protokollversion automatisch erkannt. So kannst du die Cloud-Verlängerung umgehen, aber für das Hinzufügen neuer Geräte in der Tuya-App bleibt die Cloud nötig.",
+        "descriptionLocalKeepsApp": "<strong>Lokale Steuerung</strong> deaktiviert die Steuerung über die Tuya/Smart-Life-App nicht.",
+        "descriptionCameraLimit": "<strong>Kameras</strong>: Video-Streaming wird in Gladys derzeit nicht unterstützt.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Westamerika",
@@ -3400,7 +3405,6 @@
     "category": {
       "button": {
         "click": {
-          "unknown": "{{value}} (unbekannter Wert)",
           "1": "Einfacher Klick",
           "2": "Doppelter Klick",
           "3": "Langer Klick (drücken)",
@@ -3484,7 +3488,8 @@
           "81": "Halten Minus",
           "82": "Loslassen Plus",
           "83": "Loslassen Mitte",
-          "84": "Loslassen Minus"
+          "84": "Loslassen Minus",
+          "unknown": "{{value}} (unbekannter Wert)"
         }
       },
       "heater": {

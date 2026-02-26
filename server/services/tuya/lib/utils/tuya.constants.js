@@ -33,6 +33,7 @@ const API = {
   VERSION_1_1: '/v1.1/iot-03',
   VERSION_1_2: '/v1.2/iot-03',
   VERSION_1_3: '/v1.3/iot-03',
+  VERSION_2_0: '/v2.0/cloud',
 };
 
 const DEVICE_PARAM_NAME = {

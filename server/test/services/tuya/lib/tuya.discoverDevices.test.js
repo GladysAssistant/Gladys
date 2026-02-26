@@ -33,7 +33,7 @@ describe('TuyaHandler.discoverDevices', () => {
     tuyaHandler.connector = {
       request: sinon
         .stub()
-        .onFirstCall()
+        .onCall(0)
         .resolves({
           result: [
             {
@@ -46,7 +46,7 @@ describe('TuyaHandler.discoverDevices', () => {
             },
           ],
         })
-        .onSecondCall()
+        .onCall(1)
         .resolves({
           result: {
             details: 'details',
@@ -64,13 +64,26 @@ describe('TuyaHandler.discoverDevices', () => {
                 type: 'Integer',
               },
             ],
+            category: 'cz',
           },
         })
-        .onThirdCall()
+        .onCall(2)
         .resolves({
           result: {
             local_key: 'localKey',
             ip: '1.1.1.1',
+          },
+        })
+        .onCall(3)
+        .resolves({
+          result: {
+            properties: [{ code: 'switch_1', value: true }],
+          },
+        })
+        .onCall(4)
+        .resolves({
+          result: {
+            model: '{"services":[]}',
           },
         }),
     };
@@ -169,11 +182,35 @@ describe('TuyaHandler.discoverDevices', () => {
             value: false,
           },
         ],
+        properties: {
+          properties: [{ code: 'switch_1', value: true }],
+        },
         product_id: undefined,
         product_key: undefined,
+        specifications: {
+          details: 'details',
+          category: 'cz',
+          functions: [
+            {
+              code: 'switch_1',
+              name: 'name',
+              type: 'Boolean',
+            },
+          ],
+          status: [
+            {
+              code: 'cur_power',
+              name: 'cur_power',
+              type: 'Integer',
+            },
+          ],
+        },
         selector: 'tuya:uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: true,
+        thing_model: {
+          services: [],
+        },
         online: true,
       },
     ]);
@@ -188,7 +225,7 @@ describe('TuyaHandler.discoverDevices', () => {
       payload: { status: STATUS.CONNECTED },
     });
 
-    assert.callCount(tuyaHandler.connector.request, 3);
+    assert.callCount(tuyaHandler.connector.request, 5);
   });
 
   it('should keep local params from existing devices', async () => {

@@ -293,4 +293,32 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
 
     expect(response).to.deep.equal({ local_devices: {}, port_errors: {} });
   });
+
+  it('should append local-only devices when cloud discovered list is empty', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      './device/tuya.convertDevice': {
+        convertDevice: sinon.stub().callsFake((device) => ({
+          external_id: `tuya:${device.id}`,
+          params: [{ name: 'IP_ADDRESS', value: device.ip }],
+        })),
+      },
+    });
+    const tuyaManager = {
+      discoveredDevices: [],
+      gladys: {
+        stateManager: {
+          get: sinon.stub().returns(null),
+        },
+      },
+    };
+
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } },
+      portErrors: {},
+    });
+
+    expect(response.devices).to.have.length(1);
+    expect(response.devices[0].external_id).to.equal('tuya:device2');
+    expect(response.local_devices).to.deep.equal({ device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } });
+  });
 });

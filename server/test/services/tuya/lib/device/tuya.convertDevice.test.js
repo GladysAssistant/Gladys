@@ -17,7 +17,10 @@ describe('tuya.convertDevice', () => {
       protocol_version: '3.3',
       local_override: true,
       is_online: true,
+      properties: { properties: [{ code: 'foo', value: 'bar' }] },
+      thing_model: { services: [] },
       specifications: {
+        category: 'cz',
         functions: [{ code: 'switch_1', name: 'Switch', type: 'Boolean' }],
         status: [{ code: 'cur_power', name: 'Power', type: 'Integer' }],
       },
@@ -29,6 +32,13 @@ describe('tuya.convertDevice', () => {
     expect(device.product_key).to.equal('product-key');
     expect(device.online).to.equal(true);
     expect(device.features.length).to.equal(2);
+    expect(device.properties).to.deep.equal({ properties: [{ code: 'foo', value: 'bar' }] });
+    expect(device.thing_model).to.deep.equal({ services: [] });
+    expect(device.specifications).to.deep.equal({
+      category: 'cz',
+      functions: [{ code: 'switch_1', name: 'Switch', type: 'Boolean' }],
+      status: [{ code: 'cur_power', name: 'Power', type: 'Integer' }],
+    });
 
     const params = device.params.reduce((acc, param) => {
       acc[param.name] = param.value;
@@ -60,5 +70,6 @@ describe('tuya.convertDevice', () => {
     expect(device.product_key).to.equal(undefined);
     expect(device.online).to.equal(false);
     expect(device.features.length).to.equal(0);
+    expect(device.specifications).to.deep.equal({});
   });
 });

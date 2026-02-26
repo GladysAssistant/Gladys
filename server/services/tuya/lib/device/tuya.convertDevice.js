@@ -23,6 +23,8 @@ function convertDevice(tuyaDevice) {
     cloud_ip: cloudIp,
     protocol_version: protocolVersion,
     local_override: localOverride,
+    properties,
+    thing_model: thingModel,
     specifications = {},
   } = tuyaDevice;
   const externalId = `tuya:${id}`;
@@ -92,6 +94,9 @@ function convertDevice(tuyaDevice) {
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS,
     should_poll: true,
     params,
+    properties,
+    specifications,
+    thing_model: thingModel,
   };
   if (online !== undefined) {
     device.online = online;

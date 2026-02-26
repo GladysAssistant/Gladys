@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
@@ -119,6 +119,31 @@ class DiscoverTab extends Component {
     }
   };
 
+  handleDeviceSaved = savedDevice => {
+    if (!savedDevice || !savedDevice.external_id) {
+      this.getDiscoveredDevices();
+      return;
+    }
+    this.setState(prevState => {
+      const { discoveredDevices } = prevState;
+      if (!Array.isArray(discoveredDevices)) {
+        return null;
+      }
+      return {
+        discoveredDevices: discoveredDevices.map(device => {
+          if (device.external_id !== savedDevice.external_id) {
+            return device;
+          }
+          return {
+            ...device,
+            ...savedDevice,
+            updatable: false
+          };
+        })
+      };
+    });
+  };
+
   render(
     props,
     { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors }
@@ -153,7 +178,10 @@ class DiscoverTab extends Component {
         </div>
         <div class="card-body">
           <div class="alert alert-info">
-            <Text id="integration.tuya.discover.localDiscoveryInfo" />
+            <Text id="integration.tuya.localModeLimitInfo" />
+          </div>
+          <div class="alert alert-info">
+            <MarkupText id="integration.tuya.discover.localDiscoveryInfo" />
           </div>
           <div class="alert alert-secondary">
             <Text id="integration.tuya.discover.description" />
@@ -208,6 +236,7 @@ class DiscoverTab extends Component {
                     device={device}
                     deviceIndex={index}
                     housesWithRooms={housesWithRooms}
+                    onDeviceSaved={this.handleDeviceSaved}
                   />
                 ))}
                 {orderedDevices.length === 0 && <EmptyState />}

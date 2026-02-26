@@ -140,10 +140,12 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
 
     await controller['post /api/v1/service/tuya/local-scan'].controller(req, res);
     assert.calledOnce(tuyaManager.localScan);
-    assert.calledWith(res.json, {
-      local_devices: { device1: { ip: '1.1.1.1', version: '3.3' } },
-      port_errors: {},
-    });
+    assert.calledOnce(res.json);
+    const payload = res.json.firstCall.args[0];
+    expect(payload.devices).to.have.length(1);
+    expect(payload.devices[0].external_id).to.equal('tuya:device1');
+    expect(payload.local_devices).to.deep.equal({ device1: { ip: '1.1.1.1', version: '3.3' } });
+    expect(payload.port_errors).to.deep.equal({});
   });
 
   it('should keep devices unchanged when local info is missing', async () => {

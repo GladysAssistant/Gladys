@@ -1092,6 +1092,7 @@
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed or available",
+      "localModeLimitInfo": "Local mode is still being improved. For some devices, commands or state updates may still use Tuya cloud even if Local mode is selected.",
       "status": {
         "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
         "setupPageLink": "Tuya configuration page.",
@@ -1107,6 +1108,8 @@
         "idLabel": "Device ID",
         "localKeyLabel": "Local Key",
         "protocolVersionLabel": "Protocol Version",
+        "protocol35OptionUnsupported": "3.5 (Not supported)",
+        "protocol35Unsupported": "Tuya protocol 3.5 is not supported locally yet. Please use cloud mode or protocol 3.1/3.3/3.4.",
         "ipAddressLabel": "IP Address",
         "ipModeLocal": "Local",
         "ipModeCloud": "Cloud",
@@ -1117,15 +1120,13 @@
         "localPollRequired": "Local mode is enabled and local settings changed. Run \"Poll local DPS\" successfully before saving. If local mode doesn't work, switch back to cloud mode.",
         "localPollSuccess": "Local poll OK.",
         "localPollError": "Local poll failed:",
-        "createGithubIssue": "Suggest this device",
-        "githubIssueInfo": "A report will be sent with the device details. Sensitive data (local key and IP) is masked.",
         "productIdLabel": "Product ID",
         "productKeyLabel": "Product Key"
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
         "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
-        "localDiscoveryInfo": "Local discovery uses UDP broadcast. Run the local UDP scan, then if needed enter the local IP and protocol version and use \"Poll local DPS\".",
+        "localDiscoveryInfo": "<strong class=\"h5 d-block\">Cloud Scan</strong>Refreshes the cloud list. Make sure your devices are set as <strong>controllable</strong> in Tuya, otherwise they stay <strong>read-only</strong>. The cloud trial is limited to <strong>10 controllable devices</strong>; additional devices may only provide <strong>state updates</strong>.<br /><br /><strong class=\"h5 d-block\">Auto local scan</strong>Runs a scan on your local network (UDP broadcast, same subnet as Gladys). If a device is not found, fill in its <strong>local IP</strong> and <strong>protocol version</strong> (or leave empty if unknown), then use \"<strong>Poll local DPS</strong>\" to validate local communication.<br /><br />Use <strong>Save</strong> to create a device and <strong>Update</strong> to apply changes or switch the device to local mode.",
         "scanCloudInProgress": "Scan in progress... retrieving cloud devices. This can take a while.",
         "scanLocalInProgressConnected": "Scan in progress... retrieving local information for devices. This can take a while.",
         "scanLocalInProgressDisconnected": "Scan in progress... retrieving local devices. This can take a while.",
@@ -1143,12 +1144,16 @@
         "description": "You can connect Gladys to your Tuya cloud account to control the related devices. Documentation is available in the left menu or <a href=\"https://gladysassistant.com/en/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
         "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Sign up</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Log in</a>).",
         "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account (console: <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
-        "descriptionGetKeys": "You will have access to the Client ID and the Client Secret.",
-        "descriptionGetAppAccountUid": "To have your \"App account UID\", you must go to the \"Devices\" -> \"Link Tuya App Account\" section and add an application account.",
-        "descriptionGetAppAccountUid2": "Once the addition is finalized, your \"App account UID\" will be in the UID column.",
-        "descriptionTrial": "Tuya Cloud projects have a trial period: make sure to renew or extend it regularly to avoid service interruptions.",
+        "descriptionGetKeys": "You will have access to both keys: <strong>Client ID</strong> and <strong>Client Secret</strong>.",
+        "descriptionGetAppAccountUid": "To get your <strong>App account UID</strong>, go to \"Devices\" -> \"Link Tuya App Account\" and add an application account.",
+        "descriptionGetAppAccountUid2": "Once the account is linked, your <strong>App account UID</strong> appears in the UID column.",
+        "descriptionTrial": "Tuya Cloud projects have a <strong>trial period</strong>: make sure to <strong>renew</strong> or <strong>extend</strong> it regularly to avoid service interruptions.",
+        "descriptionCloudLimit": "Note: the Tuya Cloud trial allows up to <strong>10 controllable devices</strong>. Additional devices may stay <strong>read-only</strong> until you upgrade.",
+        "descriptionControllable": "Some devices are <strong>read-only</strong> by default. In Tuya IoT Platform, open <strong>Device Permission</strong> and click <strong>Change</strong> to make them controllable.",
         "localTitle": "<br /><strong>Local</strong><br />",
         "descriptionLocalMode": "Local mode can be used after the cloud setup: provide the local IP and protocol version on each device to poll locally. If devices are on the same network as the Gladys machine, the IP discovery and protocol version are detected automatically. This lets you avoid renewing the cloud trial, but the cloud is still needed when you add a new device from the Tuya app.",
+        "descriptionLocalKeepsApp": "<strong>Local control</strong> does not disable control from the Tuya/Smart Life app.",
+        "descriptionCameraLimit": "<strong>Cameras</strong>: video streaming is not supported in Gladys yet.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Western America",
@@ -3400,7 +3405,6 @@
     "category": {
       "button": {
         "click": {
-          "unknown": "{{value}} (unknown value)",
           "1": "Simple click",
           "2": "Double click",
           "3": "Long click press",
@@ -3484,7 +3488,8 @@
           "81": "Hold Minus",
           "82": "Release Plus (Aqara W100)",
           "83": "Release Center (Aqara W100)",
-          "84": "Release Minus (Aqara W100)"
+          "84": "Release Minus (Aqara W100)",
+          "unknown": "{{value}} (unknown value)"
         }
       },
       "heater": {
