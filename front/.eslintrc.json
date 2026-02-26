@@ -88,6 +88,7 @@
       "jsx": true
     }
   },
+  "parser": "@babel/eslint-parser",
   "settings": {
     "targets": null
   },

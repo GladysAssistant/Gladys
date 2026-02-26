@@ -32,11 +32,24 @@ async function poll(device) {
     values[feature.code] = feature.value;
   });
 
+  const params = {};
+  if (device.params) {
+    device.params.forEach((param) => {
+      params[param.name] = param;
+    });
+  }
   device.features.forEach((deviceFeature) => {
     const [, , code] = deviceFeature.external_id.split(':');
 
     const value = values[code];
-    const transformedValue = readValues[deviceFeature.category][deviceFeature.type](value);
+    const param = params[deviceFeature.name];
+    let transformedValue = value;
+    if (
+      readValues[deviceFeature.category] !== undefined &&
+      readValues[deviceFeature.category][deviceFeature.type] !== undefined
+    ) {
+      transformedValue = readValues[deviceFeature.category][deviceFeature.type](value, param);
+    }
 
     if (deviceFeature.last_value !== transformedValue) {
       if (transformedValue !== null && transformedValue !== undefined) {

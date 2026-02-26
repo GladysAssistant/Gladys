@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext } = require('../tuya.mock.test');
+const { TuyaContext } = require('../tuya.mock');
 
 const { assert, fake } = sinon;
 
@@ -82,6 +82,12 @@ describe('TuyaHandler.poll', () => {
   it('change state of device feature', async () => {
     await tuyaHandler.poll({
       external_id: 'tuya:device',
+      params: [
+        {
+          name: 'code',
+          value: true,
+        },
+      ],
       features: [
         {
           external_id: 'tuya:feature',
