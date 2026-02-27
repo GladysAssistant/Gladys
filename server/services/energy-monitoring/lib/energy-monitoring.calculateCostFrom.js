@@ -218,12 +218,11 @@ async function calculateCostFrom(startAt, featureSelectors, jobId, endAt) {
             // It's not possible to have multiple contracts for the same electrical meter device.
             const { contract } = energyPricesForDate[0];
 
-            // Convert the value in the correct unit
-            let valueInKwh = deviceFeatureState.value;
-
-            if (ecf.consumptionFeature.unit === DEVICE_FEATURE_UNITS.WATT_HOUR) {
-              valueInKwh = deviceFeatureState.value / 1000;
-            }
+            const valueInKwh = convertEnergyUnit(
+              deviceFeatureState.value,
+              ecf.consumptionFeature.unit,
+              DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            );
 
             // Calculate the cost per contract
             const cost = await contracts[contract](

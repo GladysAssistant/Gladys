@@ -3,12 +3,6 @@ const sinon = require('sinon');
 const { fake, assert } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
-
-const { fake, assert } = sinon;
-const EventEmitter = require('events');
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
