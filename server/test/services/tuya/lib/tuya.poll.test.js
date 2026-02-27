@@ -337,3 +337,245 @@ describe('TuyaHandler.poll with local mapping', () => {
     }
   });
 });
+
+describe('TuyaHandler.poll additional branch coverage', () => {
+  it('should warn and return when cloud connector is unavailable', async () => {
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: null,
+        gladys: { event: { emit: sinon.stub() } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(logger.warn.calledOnce).to.equal(true);
+  });
+
+  it('should skip cloud features when code or reader is missing', async () => {
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: [
+          { category: 'switch', type: 'binary' },
+          { external_id: 'invalid', category: 'switch', type: 'binary' },
+          { external_id: 'tuya:device:switch_1' },
+          { external_id: 'tuya:device:switch_1', category: 'unknown', type: 'binary' },
+        ],
+      },
+    );
+
+    expect(request.calledOnce).to.equal(true);
+    expect(emit.called).to.equal(false);
+  });
+
+  it('should warn when local mode is enabled with incomplete config', async () => {
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: false }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'LOCAL_OVERRIDE', value: true },
+          { name: 'IP_ADDRESS', value: '1.1.1.1' },
+        ],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(logger.warn.calledOnce).to.equal(true);
+    expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should fallback to cloud when local dps value is undefined', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: undefined } });
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'IP_ADDRESS', value: '1.1.1.1' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.3' },
+          { name: 'LOCAL_OVERRIDE', value: true },
+        ],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(localPoll.calledOnce).to.equal(true);
+    expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should warn when cloud fallback fails after local success', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: true } });
+    const request = sinon.stub().rejects(new Error('cloud down'));
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'IP_ADDRESS', value: '1.1.1.1' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.3' },
+          { name: 'LOCAL_OVERRIDE', value: true },
+        ],
+        features: [
+          { external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' },
+          { external_id: 'tuya:device:countdown', category: 'switch', type: 'binary' },
+        ],
+      },
+    );
+
+    expect(localPoll.calledOnce).to.equal(true);
+    expect(logger.warn.calledOnce).to.equal(true);
+    expect(emit.calledOnce).to.equal(true);
+  });
+
+  it('should warn and fallback to cloud when local poll throws', async () => {
+    const localPoll = sinon.stub().rejects(new Error('local down'));
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'IP_ADDRESS', value: '1.1.1.1' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.3' },
+          { name: 'LOCAL_OVERRIDE', value: true },
+        ],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(localPoll.calledOnce).to.equal(true);
+    expect(request.calledOnce).to.equal(true);
+    expect(logger.warn.calledOnce).to.equal(true);
+  });
+
+  it('should emit same value when last_value_changed is missing or invalid', async () => {
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: false }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    const context = {
+      connector: { request },
+      gladys: {
+        event: { emit },
+        stateManager: {
+          get: sinon
+            .stub()
+            .onFirstCall()
+            .returns({ last_value: 0 })
+            .onSecondCall()
+            .returns({ last_value: 0, last_value_changed: 'not-a-date' }),
+        },
+      },
+    };
+
+    const device = {
+      external_id: 'tuya:device',
+      params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+      features: [{ external_id: 'tuya:device:switch_1', selector: 'switch-1', category: 'switch', type: 'binary' }],
+    };
+
+    await poll.call(context, device);
+    await poll.call(context, device);
+
+    expect(emit.calledTwice).to.equal(true);
+  });
+
+  it('should skip emit when transformed value is null', async () => {
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+      './device/tuya.deviceMapping': {
+        readValues: {
+          switch: {
+            binary: () => null,
+          },
+        },
+      },
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(emit.called).to.equal(false);
+  });
+});

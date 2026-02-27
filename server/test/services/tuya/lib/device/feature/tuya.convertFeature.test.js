@@ -74,4 +74,29 @@ describe('Tuya convert feature', () => {
 
     expect(result).to.equal(undefined);
   });
+
+  it('should support object values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'switch_1',
+        type: 'Boolean',
+        name: 'name',
+        readOnly: false,
+        values: { min: 2, max: 8 },
+      },
+      'externalId',
+    );
+
+    expect(result).to.deep.eq({
+      category: 'switch',
+      external_id: 'externalId:switch_1',
+      has_feedback: false,
+      max: 8,
+      min: 2,
+      name: 'switch_1',
+      read_only: false,
+      selector: 'externalId:switch_1',
+      type: 'binary',
+    });
+  });
 });

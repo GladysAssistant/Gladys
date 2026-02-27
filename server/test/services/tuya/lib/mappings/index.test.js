@@ -50,6 +50,8 @@ describe('Tuya mappings index', () => {
     expect(cloud.switch_led).to.equal(undefined);
     const unknownCloud = getCloudMapping(DEVICE_TYPES.UNKNOWN);
     expect(unknownCloud.switch_led).to.be.an('object');
+    const unsupportedCloud = getCloudMapping('unsupported-device');
+    expect(unsupportedCloud.switch_led).to.be.an('object');
 
     const local = getLocalMapping(DEVICE_TYPES.SMART_SOCKET);
     expect(local.strict).to.equal(true);
@@ -58,6 +60,9 @@ describe('Tuya mappings index', () => {
     const unknownLocal = getLocalMapping(DEVICE_TYPES.UNKNOWN);
     expect(unknownLocal.strict).to.equal(false);
     expect(unknownLocal.ignoredDps).to.not.include('11');
+    const unsupportedLocal = getLocalMapping('unsupported-device');
+    expect(unsupportedLocal.strict).to.equal(false);
+    expect(unsupportedLocal.ignoredDps).to.not.include('11');
   });
 
   it('should detect device types', () => {

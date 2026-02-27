@@ -33,9 +33,6 @@ const getFeatureReader = (deviceFeature) => {
 };
 
 const hasDpsKey = (dps, key) => {
-  if (!dps || typeof dps !== 'object') {
-    return false;
-  }
   const stringKey = String(key);
   return Object.prototype.hasOwnProperty.call(dps, stringKey) || Object.prototype.hasOwnProperty.call(dps, key);
 };

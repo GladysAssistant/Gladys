@@ -39,9 +39,6 @@ const normalizeStringSet = (setLike) =>
 
 const DEVICE_TYPE_INDEX = LIST_DEVICE_TYPES.reduce((acc, definition) => {
   const typeName = normalizeCode(definition && definition.DEVICE_TYPE_NAME);
-  if (!typeName) {
-    return acc;
-  }
   acc[typeName] = {
     ...definition,
     CATEGORIES: normalizeStringSet(definition.CATEGORIES),
@@ -56,10 +53,6 @@ const DEVICE_TYPE_INDEX = LIST_DEVICE_TYPES.reduce((acc, definition) => {
 
 const matchDeviceType = (typeDefinition, context) => {
   const { category, productId, modelName, codes } = context;
-  if (!typeDefinition) {
-    return false;
-  }
-
   if (category && typeDefinition.CATEGORIES.has(category)) {
     return true;
   }
