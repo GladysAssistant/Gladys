@@ -44,6 +44,9 @@ async function setValue(device, deviceFeature, value) {
   if (!topic || topic.length === 0) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
+  if (!command || command.trim().length === 0) {
+    throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no command`);
+  }
 
   const writeCategory = writeValues[deviceFeature.category];
   const writeFn = writeCategory ? writeCategory[deviceFeature.type] : null;
@@ -73,7 +76,7 @@ async function setValue(device, deviceFeature, value) {
       issueRefreshOnPing: false,
     };
     if (isProtocol35) {
-      tuyaOptions.KeepAlive = false;
+      tuyaOptions.keepAlive = false;
     }
     const runLocalSet = async () => {
       const tuyaLocal = new TuyaLocalApi(tuyaOptions);

@@ -22,7 +22,7 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false,
       tuyaDisconnecting: false,
       tuyaStatusLoading: false,
-      showClientSecret: false
+      showClientSecret: false,
     };
   }
 
@@ -51,7 +51,7 @@ class SetupTab extends Component {
       tuyaAccessKey,
       tuyaSecretKey,
       tuyaAppAccountId,
-      tuyaAppUsername
+      tuyaAppUsername,
     });
     const getVariable = async (name, fallback = '') => {
       try {
@@ -68,7 +68,7 @@ class SetupTab extends Component {
         getVariable('TUYA_ACCESS_KEY'),
         getVariable('TUYA_SECRET_KEY'),
         getVariable('TUYA_APP_ACCOUNT_UID'),
-        getVariable('TUYA_APP_USERNAME')
+        getVariable('TUYA_APP_USERNAME'),
       ]);
 
       this.setState({
@@ -78,7 +78,7 @@ class SetupTab extends Component {
         tuyaSecretKey,
         tuyaAppAccountId,
         tuyaAppUsername,
-        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId)
+        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId),
       });
     } catch (e) {
       this.setState({
@@ -88,14 +88,14 @@ class SetupTab extends Component {
         tuyaSecretKey,
         tuyaAppAccountId,
         tuyaAppUsername,
-        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId)
+        tuyaConfigured: !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId),
       });
     }
   }
 
   async getTuyaStatus() {
     this.setState({
-      tuyaStatusLoading: true
+      tuyaStatusLoading: true,
     });
     try {
       const response = await this.props.httpClient.get('/api/v1/service/tuya/status');
@@ -119,16 +119,16 @@ class SetupTab extends Component {
         tuyaJustSaved: false,
         tuyaJustSavedMissing: false,
         tuyaConnectionStatus: isManualDisconnect ? null : isError ? RequestStatus.Error : null,
-        tuyaConnectionError: isManualDisconnect ? null : isError ? response.error : null
+        tuyaConnectionError: isManualDisconnect ? null : isError ? response.error : null,
       });
     } catch (e) {
       this.setState({
-        tuyaStatusLoading: false
+        tuyaStatusLoading: false,
       });
     }
   }
 
-  saveTuyaConfiguration = async e => {
+  saveTuyaConfiguration = async (e) => {
     e.preventDefault();
     this.setState({
       tuyaSaveSettingsStatus: RequestStatus.Getting,
@@ -140,7 +140,7 @@ class SetupTab extends Component {
       tuyaManuallyDisconnected: false,
       tuyaManualDisconnectJustDone: false,
       tuyaJustSaved: true,
-      tuyaJustSavedMissing: false
+      tuyaJustSavedMissing: false,
     });
     try {
       const tuyaEndpoint = (this.state.tuyaEndpoint || '').trim();
@@ -150,31 +150,31 @@ class SetupTab extends Component {
       const tuyaAppUsername = (this.state.tuyaAppUsername || '').trim();
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
-        value: tuyaEndpoint
+        value: tuyaEndpoint,
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
-        value: tuyaAccessKey
+        value: tuyaAccessKey,
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SECRET_KEY', {
-        value: tuyaSecretKey
+        value: tuyaSecretKey,
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_ACCOUNT_UID', {
-        value: tuyaAppAccountId
+        value: tuyaAppAccountId,
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_USERNAME', {
-        value: tuyaAppUsername
+        value: tuyaAppUsername,
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_LAST_CONNECTED_CONFIG_HASH', {
-        value: ''
+        value: '',
       });
 
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
-        value: 'false'
+        value: 'false',
       });
 
       const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId);
@@ -184,7 +184,7 @@ class SetupTab extends Component {
           tuyaConfigured: false,
           tuyaDisconnected: true,
           tuyaJustSavedMissing: true,
-          tuyaJustSaved: false
+          tuyaJustSaved: false,
         });
         return;
       }
@@ -196,7 +196,7 @@ class SetupTab extends Component {
       }
       this.setState({
         tuyaSaveSettingsStatus: RequestStatus.Success,
-        tuyaConfigured: true
+        tuyaConfigured: true,
       });
     } catch (e) {
       const responseMessage =
@@ -206,12 +206,12 @@ class SetupTab extends Component {
         tuyaSaveSettingsStatus: RequestStatus.Error,
         tuyaConnectionError: responseMessage,
         tuyaJustSaved: false,
-        tuyaJustSavedMissing: false
+        tuyaJustSavedMissing: false,
       });
     }
   };
 
-  updateConnectionStatus = event => {
+  updateConnectionStatus = (event) => {
     const status = event && event.status;
     const error = event && event.error;
     const manualDisconnect = event && event.manual_disconnect;
@@ -223,7 +223,7 @@ class SetupTab extends Component {
         tuyaDisconnected: false,
         tuyaManuallyDisconnected: false,
         tuyaManualDisconnectJustDone: false,
-        tuyaJustSavedMissing: false
+        tuyaJustSavedMissing: false,
       });
       return;
     }
@@ -236,12 +236,12 @@ class SetupTab extends Component {
         tuyaDisconnected: false,
         tuyaManuallyDisconnected: false,
         tuyaManualDisconnectJustDone: false,
-        tuyaJustSavedMissing: false
+        tuyaJustSavedMissing: false,
       });
       return;
     }
     if (status === 'error') {
-      this.setState(previousState => ({
+      this.setState((previousState) => ({
         tuyaConnectionStatus: RequestStatus.Error,
         tuyaConnecting: false,
         tuyaConnected: false,
@@ -249,34 +249,34 @@ class SetupTab extends Component {
         tuyaManuallyDisconnected: false,
         tuyaManualDisconnectJustDone: false,
         tuyaJustSavedMissing: false,
-        tuyaConnectionError: error || previousState.tuyaConnectionError
+        tuyaConnectionError: error || previousState.tuyaConnectionError,
       }));
       return;
     }
     if (status === 'not_initialized') {
-      this.setState(previousState => ({
+      this.setState((previousState) => ({
         tuyaConnectionStatus: null,
         tuyaConnecting: false,
         tuyaConnected: false,
         tuyaDisconnected: !manualDisconnect,
         tuyaManuallyDisconnected: !!manualDisconnect,
         tuyaManualDisconnectJustDone: manualDisconnect ? previousState.tuyaManualDisconnectJustDone : false,
-        tuyaJustSavedMissing: false
+        tuyaJustSavedMissing: false,
       }));
     }
   };
 
-  displayConnectionError = error => {
+  displayConnectionError = (error) => {
     const message = (error && error.message) || (error && error.payload && error.payload.message);
     this.setState({
       tuyaConnectionStatus: RequestStatus.Error,
       tuyaConnectionError: message || 'unknown',
       tuyaConnecting: false,
-      tuyaConnected: false
+      tuyaConnected: false,
     });
   };
 
-  renderTuyaError = error => {
+  renderTuyaError = (error) => {
     if (!error) {
       return null;
     }
@@ -286,9 +286,9 @@ class SetupTab extends Component {
     return <code>{error}</code>;
   };
 
-  updateConfiguration = e => {
+  updateConfiguration = (e) => {
     const { name, value } = e.target;
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const nextState = { ...prevState, [name]: value };
       const configured = !!(
         nextState.tuyaEndpoint &&
@@ -298,21 +298,21 @@ class SetupTab extends Component {
       );
       return {
         [name]: value,
-        tuyaConfigured: configured
+        tuyaConfigured: configured,
       };
     });
   };
 
   toggleClientSecret = () => {
-    this.setState(previousState => ({
-      showClientSecret: !previousState.showClientSecret
+    this.setState((previousState) => ({
+      showClientSecret: !previousState.showClientSecret,
     }));
   };
 
   disconnectFromCloud = async () => {
     this.setState({
       tuyaDisconnecting: true,
-      tuyaConnectionError: null
+      tuyaConnectionError: null,
     });
     try {
       await this.props.httpClient.post('/api/v1/service/tuya/disconnect');
@@ -323,13 +323,13 @@ class SetupTab extends Component {
         tuyaDisconnected: false,
         tuyaManuallyDisconnected: true,
         tuyaManualDisconnectJustDone: true,
-        tuyaConnectionStatus: null
+        tuyaConnectionStatus: null,
       });
     } catch (e) {
       this.setState({
         tuyaDisconnecting: false,
         tuyaConnectionStatus: RequestStatus.Error,
-        tuyaConnectionError: (e && e.message) || 'unknown'
+        tuyaConnectionError: (e && e.message) || 'unknown',
       });
     }
   };
@@ -345,7 +345,7 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: state.tuyaSaveSettingsStatus === RequestStatus.Getting
+              active: state.tuyaSaveSettingsStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />
@@ -488,7 +488,7 @@ class SetupTab extends Component {
                         placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder" />}
                         value={state.tuyaSecretKey}
                         className="form-control"
-                        autocomplete="off"
+                        autoComplete="off"
                         onInput={this.updateConfiguration}
                       />
                     </Localizer>
@@ -496,7 +496,7 @@ class SetupTab extends Component {
                       <i
                         class={cx('fe', {
                           'fe-eye': !state.showClientSecret,
-                          'fe-eye-off': state.showClientSecret
+                          'fe-eye-off': state.showClientSecret,
                         })}
                       />
                     </span>
