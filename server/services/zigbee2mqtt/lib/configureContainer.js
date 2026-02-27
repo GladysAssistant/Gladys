@@ -46,6 +46,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   const { mqtt = {} } = loadedConfig;
 
   let configChanged = false;
+  let adapterChanged = false;
   if (mqtt.user !== config.mqttUsername || mqtt.password !== config.mqttPassword) {
     mqtt.user = config.mqttUsername;
     mqtt.password = config.mqttPassword;
@@ -65,6 +66,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   if (serial.adapter !== adapterKey) {
     loadedConfig.serial.adapter = adapterKey;
     configChanged = true;
+    adapterChanged = true;
   }
 
   // Setup TCP port
@@ -109,7 +111,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     await fs.writeFile(configFilepath, yaml.stringify(loadedConfig, YAML_CONFIG));
   }
 
-  return configCreated || configChanged;
+  return { configChanged: configCreated || configChanged, adapterChanged };
 }
 
 module.exports = {

@@ -9,6 +9,7 @@ const { fake, assert } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS, JOB_ERROR_TYPES } = require('../../../utils/constants');
 
 const Job = require('../../../lib/job');
+const logger = require('../../../utils/logger');
 
 const event = {
   emit: fake.returns(null),

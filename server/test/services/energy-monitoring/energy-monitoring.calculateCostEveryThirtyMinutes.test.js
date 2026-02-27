@@ -7,8 +7,8 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+const { fake, assert } = sinon;
+const EventEmitter = require('events');
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');

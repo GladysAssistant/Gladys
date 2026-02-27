@@ -15,6 +15,7 @@ const {
   ENERGY_CONTRACT_TYPES,
   SYSTEM_VARIABLE_NAMES,
 } = require('../../../utils/constants');
+const { convertEnergyUnit } = require('../../../utils/units');
 const contracts = require('../contracts/contracts.calculateCost');
 const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDayMap');
 

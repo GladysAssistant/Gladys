@@ -168,7 +168,6 @@ const data = {
       [
         {
           type: 'chart',
-          chart_type: 'line',
           device_features: ['temperature-sensor-1'],
           interval: 'last-month',
           unit: 'celsius',
@@ -1739,23 +1738,26 @@ const data = {
     Z2M_TCP_PORT: '12000'
   },
   'get /api/v1/service/zigbee2mqtt/adapter': [
-    'ConBee',
-    'ConBee II',
-    'RaspBee',
-    'RaspBee II',
-    'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
-    "Slaesh's CC2652RB stick",
-    'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02',
-    'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter',
-    'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05',
-    'Vision CC2538+CC2592 Dongle(VS203)',
-    'Vision CC2652 dongle',
-    'XGG Gateway',
-    'XGG 52PZ2MGateway',
-    'ZigStar LAN Coordinator',
-    'ZigStar PoE Coordinator',
-    'ZigStar Stick v4',
-    'ZigStar ZigiHAT PoE'
+    { label: 'ConBee', configKey: 'deconz' },
+    { label: 'ConBee II', configKey: 'deconz' },
+    { label: 'RaspBee', configKey: 'deconz' },
+    { label: 'RaspBee II', configKey: 'deconz' },
+    { label: 'Home Assistant SkyConnect (by Nabu Casa)', configKey: 'ember' },
+    { label: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"', configKey: 'ember' },
+    { label: 'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator', configKey: 'ember' },
+    { label: 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P', configKey: 'zstack' },
+    { label: "Slaesh's CC2652RB stick", configKey: 'zstack' },
+    { label: 'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02', configKey: 'zstack' },
+    { label: 'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter', configKey: 'zstack' },
+    { label: 'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05', configKey: 'zstack' },
+    { label: 'Vision CC2538+CC2592 Dongle(VS203)', configKey: 'zstack' },
+    { label: 'Vision CC2652 dongle', configKey: 'zstack' },
+    { label: 'XGG Gateway', configKey: 'zstack' },
+    { label: 'XGG 52PZ2MGateway', configKey: 'zstack' },
+    { label: 'ZigStar LAN Coordinator', configKey: 'zstack' },
+    { label: 'ZigStar PoE Coordinator', configKey: 'zstack' },
+    { label: 'ZigStar Stick v4', configKey: 'zstack' },
+    { label: 'ZigStar ZigiHAT PoE', configKey: 'zstack' }
   ],
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
@@ -1767,8 +1769,104 @@ const data = {
     zigbee2mqttConnected: true,
     z2mEnabled: true,
     dockerBased: true,
-    networkModeValid: true
+    networkModeValid: true,
+    coordinatorFirmware: {
+      majorrel: 7,
+      minorrel: 0,
+      maintrel: 1,
+      revision: 74100,
+      type: 'EmberZNet'
+    }
   },
+  'get /api/v1/service/nuki': {},
+  'get /api/v1/service/nuki/config': {},
+  'get /api/v1/service/nuki/status': {
+    mqttOk: true,
+    webOk: true
+  },
+  'get /api/v1/service/nuki/device': [
+    {
+      external_id: 'nuki:398172f4',
+      model: 'Smart Lock 3.0 Pro',
+      name: 'Smart Lock 3.0 Pro',
+      selector: 'nuki-398172f4',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      features: [
+        {
+          category: 'battery',
+          type: 'integer'
+        },
+        {
+          category: 'lock',
+          type: 'binary'
+        },
+        {
+          category: 'lock',
+          type: 'state'
+        }
+      ],
+      params: [
+        {
+          name: 'protocol',
+          value: 'mqtt'
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/nuki/discover/mqtt': [
+    {
+      name: 'Smart Lock 2.0 Pro Plus',
+      external_id: 'nuki:398172f6',
+      created_at: '2025-02-12T07:49:07.556Z',
+      features: [
+        {
+          category: 'battery',
+          type: 'integer'
+        },
+        {
+          category: 'lock',
+          type: 'binary'
+        },
+        {
+          category: 'lock',
+          type: 'state'
+        }
+      ],
+      params: [
+        {
+          name: 'protocol',
+          value: 'mqtt'
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/nuki/discover/http': [
+    {
+      name: 'Smart Lock 2.0 Pro Plus Moins',
+      external_id: 'nuki:398172f6',
+      created_at: '2025-02-12T07:49:07.556Z',
+      features: [
+        {
+          category: 'battery',
+          type: 'integer'
+        },
+        {
+          category: 'lock',
+          type: 'binary'
+        },
+        {
+          category: 'lock',
+          type: 'state'
+        }
+      ],
+      params: [
+        {
+          name: 'protocol',
+          value: 'http'
+        }
+      ]
+    }
+  ],
   'get /api/v1/service/tasmota': {},
   'get /api/v1/service/tasmota/device': [
     {
@@ -2641,6 +2739,46 @@ const data = {
           unit: 'aqi',
           last_value: 101,
           last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+        }
+      ]
+    },
+    {
+      id: 'nuki:398172f4',
+      name: 'Smart Lock 3.0 Pro',
+      selector: 'nuki-398172f4',
+      features: [
+        {
+          name: 'Lock battery',
+          selector: 'lock-battery',
+          category: 'battery',
+          type: 'integer',
+          unit: 'percent',
+          read_only: true,
+          min: 0,
+          max: 100,
+          last_value: '69'
+        },
+        {
+          name: 'Lock',
+          selector: 'lock-button',
+          category: 'lock',
+          type: 'binary',
+          min: 0,
+          max: 1,
+          read_only: false,
+          last_value: 1,
+          last_value_changed: '2025-02-08 15:49:07.556 +00:00'
+        },
+        {
+          name: 'Lock state',
+          selector: 'lock-state',
+          category: 'lock',
+          type: 'state',
+          min: -1,
+          max: 1,
+          read_only: true,
+          last_value: 1,
+          last_value_changed: '2025-02-08 15:49:07.556 +00:00'
         }
       ]
     }
@@ -3834,7 +3972,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device_feature/aggregated_states?interval=43200&max_states=300&group_by=undefined&device_features=temperature-sensor-1': [
+  'get /api/v1/device_feature/aggregated_states?interval=43200&max_states=100&device_features=temperature-sensor-1': [
     {
       device: {
         name: 'Kitchen temperature'

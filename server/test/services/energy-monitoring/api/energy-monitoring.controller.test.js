@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { fake, assert } = require('sinon');
+const { BadParameters } = require('../../../../utils/coreErrors');
 const EnergyMonitoringController = require('../../../../services/energy-monitoring/api/energy-monitoring.controller');
 
 describe('EnergyMonitoringController', () => {

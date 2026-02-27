@@ -49,8 +49,22 @@ class ServerResponseMock {
     this.listeners[event] = cb;
   }
 
+  off(event, cb) {
+    delete this.listeners[event];
+  }
+
   flushHeaders() {
     return this.headers;
+  }
+
+  write(chunk, encoding, cb) {
+    this.body = JSON.parse(new TextDecoder().decode(chunk));
+
+    if (cb) {
+      cb();
+    }
+
+    return true;
   }
 }
 

@@ -186,10 +186,12 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
           await this.gladys.job.updateProgress(jobId, progressPercentage, { current_date: currentDate });
         }
 
-        logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
-      } catch (error) {
-        failedWindows += 1;
-        logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
+          // Update job progress
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
 
         // Continue processing other windows even if one fails
         processedWindows += 1;
@@ -201,7 +203,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
           await this.gladys.job.updateProgress(jobId, progressPercentage, { current_date: currentDate });
         }
       }
-    });
+    }
 
     logger.info(
       `Finished processing all windows. Successful: ${successfulWindows}, Failed: ${failedWindows}, Total: ${windows.length}`,

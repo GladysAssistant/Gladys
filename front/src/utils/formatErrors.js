@@ -1,7 +1,7 @@
 const formatHttpError = error => {
   const errorString = error.toString();
   let errorDetailString = '';
-  // If it's an standard Gladys http error
+  // If it's a standard Gladys HTTP error
   if (error.response && error.response.data) {
     const responseData = error.response.data;
     if (responseData.code) {

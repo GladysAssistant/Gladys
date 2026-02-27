@@ -77,6 +77,7 @@ class SetupPanel extends Component {
               saveConfiguration={this.saveConfiguration}
               resetConfiguration={this.resetConfiguration}
               disabled={disabled}
+              zigbee2mqttStatus={zigbee2mqttStatus}
             />
           </li>
         )}

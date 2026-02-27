@@ -35,15 +35,20 @@ describe('Create server', () => {
         McpServer: stub().returns(mcpServerInstance),
       },
       server: null,
+      gladys: { event: { on: stub() } },
     };
 
     await mcpHandler.createServer();
+
+    expect(mcpHandler.gladys.event.on.callCount).to.eq(2);
+    expect(mcpHandler.gladys.event.on.firstCall.args[0]).to.eq('device.create');
+    expect(mcpHandler.gladys.event.on.secondCall.args[0]).to.eq('device.update');
 
     expect(mcpHandler.mcp.McpServer.callCount).to.eq(1);
     expect(mcpHandler.mcp.McpServer.firstCall.args[0]).to.deep.equal({
       name: 'Gladys',
       title: 'Gladys',
-      version: '1.0.O',
+      version: '1.0.0',
     });
     expect(mcpHandler.mcp.McpServer.firstCall.args[1]).to.deep.equal({
       capabilities: {
@@ -115,7 +120,7 @@ describe('Create server', () => {
     expect(mcpHandler.mcp.McpServer.firstCall.args[0]).to.deep.equal({
       name: 'Gladys',
       title: 'Gladys',
-      version: '1.0.O',
+      version: '1.0.0',
     });
     expect(mcpHandler.mcp.McpServer.firstCall.args[1]).to.deep.equal({
       capabilities: {

@@ -56,6 +56,10 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     this.calculateCostRange.bind(this),
     { buildJobData: this.buildJobDataForCost.bind(this) },
   );
+  this.calculateCostRange = this.gladys.job.wrapperDetached(
+    JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_RANGE,
+    this.calculateCostRange.bind(this),
+  );
   this.calculateConsumptionFromIndexThirtyMinutes = this.gladys.job.wrapper(
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES,
     this.calculateConsumptionFromIndexThirtyMinutes.bind(this),
@@ -70,6 +74,10 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_RANGE,
     this.calculateConsumptionFromIndexRange.bind(this),
     { buildJobData: this.buildJobDataForConsumption.bind(this) },
+  );
+  this.calculateConsumptionFromIndexRange = this.gladys.job.wrapperDetached(
+    JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_RANGE,
+    this.calculateConsumptionFromIndexRange.bind(this),
   );
 };
 

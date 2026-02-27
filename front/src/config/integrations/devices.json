@@ -54,6 +54,12 @@
     "whiteBackground": true
   },
   {
+    "key": "nuki",
+    "link": "nuki",
+    "img": "/assets/integrations/cover/nuki.jpg",
+    "whiteBackground": true
+  },
+  {
     "key": "enedis",
     "img": "/assets/integrations/cover/enedis.jpg",
     "whiteBackground": true
@@ -80,6 +86,12 @@
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg",
+    "whiteBackground": true
+  },
+  {
+    "key": "matterbridge",
+    "link": "matterbridge",
+    "img": "/assets/integrations/cover/matterbridge.jpg",
     "whiteBackground": true
   },
   {

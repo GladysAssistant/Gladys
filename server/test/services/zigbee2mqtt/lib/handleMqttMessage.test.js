@@ -49,7 +49,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // PREPARE
     zigbee2mqttManager.zigbee2mqttConnected = false;
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unkown', JSON.stringify({}));
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/unknown', JSON.stringify({}));
     // ASSERT
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -64,6 +64,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
         zigbee2mqttConnected: true,
         zigbee2mqttExist: true,
         zigbee2mqttRunning: true,
+        coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
   });
@@ -272,5 +274,72 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.saveZ2mBackup, payload);
     assert.notCalled(gladys.event.emit);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
+  });
+
+  it('should parse firmware from bridge/info', async () => {
+    // PREPARE
+    const bridgeInfo = {
+      coordinator: {
+        type: 'EmberZNet',
+        meta: {
+          majorrel: 7,
+          minorrel: 4,
+          maintrel: 1,
+          revision: 74100,
+        },
+      },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify(bridgeInfo));
+    // ASSERT
+    expect(zigbee2mqttManager.coordinatorFirmware).to.deep.equal({
+      majorrel: 7,
+      minorrel: 4,
+      maintrel: 1,
+      revision: 74100,
+      type: 'EmberZNet',
+    });
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: false,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: true,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+        coordinatorFirmware: {
+          majorrel: 7,
+          minorrel: 4,
+          maintrel: 1,
+          revision: 74100,
+          type: 'EmberZNet',
+        },
+        z2mContainerError: null,
+      },
+    });
+  });
+
+  it('should handle bridge/info without coordinator meta gracefully', async () => {
+    // PREPARE
+    const bridgeInfo = {
+      coordinator: {
+        type: 'EmberZNet',
+      },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/info', JSON.stringify(bridgeInfo));
+    // ASSERT
+    expect(zigbee2mqttManager.coordinatorFirmware).to.equal(null);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: sinon.match({
+        coordinatorFirmware: null,
+      }),
+    });
   });
 });

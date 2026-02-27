@@ -129,6 +129,12 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// Nuki
+import NukiPage from '../routes/integration/all/nuki';
+import NukiSetupPage from '../routes/integration/all/nuki/setup-page';
+import NukiMqttDiscoverPage from '../routes/integration/all/nuki/discover-mqtt';
+import NukiHttpDiscoverPage from '../routes/integration/all/nuki/discover-http';
+
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
 
@@ -173,6 +179,9 @@ import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-pa
 
 // NodeRed integration
 import NodeRedPage from '../routes/integration/all/node-red/setup-page';
+
+// Matterbridge integration
+import MatterbridgePage from '../routes/integration/all/matterbridge/setup-page';
 
 // Free Mobile integration
 import FreeMobilePage from '../routes/integration/all/free-mobile';
@@ -245,6 +254,7 @@ const AppRouter = connect(
         <NewDashboard path="/dashboard/create/new" />
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 
+        <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
         <IntegrationPage path="/dashboard/integration/device" category="device" />
         <IntegrationPage path="/dashboard/integration/communication" category="communication" />
         <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
@@ -284,6 +294,8 @@ const AppRouter = connect(
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
 
         <NodeRedPage path="/dashboard/integration/device/node-red" />
+
+        <MatterbridgePage path="/dashboard/integration/device/matterbridge" />
 
         <FreeMobilePage path="dashboard/integration/communication/free-mobile" />
         <CallMeBotPage path="dashboard/integration/communication/callmebot" />
@@ -338,6 +350,11 @@ const AppRouter = connect(
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
         <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
         <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
+
+        <NukiPage path="/dashboard/integration/device/nuki" />
+        <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />
+        <NukiMqttDiscoverPage path="/dashboard/integration/device/nuki/mqtt" />
+        <NukiHttpDiscoverPage path="/dashboard/integration/device/nuki/http" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

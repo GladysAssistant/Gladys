@@ -2,6 +2,7 @@ const DEVICE_PARAM_NAME = {
   PROTOCOL: 'protocol',
   USERNAME: 'username',
   PASSWORD: 'password',
+  IP: 'ip',
 };
 
 const DEVICE_PARAM_VALUE = {

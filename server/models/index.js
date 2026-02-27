@@ -171,6 +171,44 @@ const duckDbSetTimezone = async (timezone) => {
   await duckDbWriteConnectionAllAsync('set timezone=?;', timezone);
 };
 
+/**
+ * @description Create a separate DuckDB database instance for backup operations.
+ * This opens the same database file but as a separate instance with its own buffer pool.
+ * Closing this instance will release all memory used during the backup export.
+ * @returns {object} Object with allAsync and close methods.
+ * @example
+ * const backupDb = duckDbCreateBackupInstance();
+ * await backupDb.allAsync('EXPORT DATABASE ...');
+ * await backupDb.close();
+ */
+const duckDbCreateBackupInstance = () => {
+  // Create a new database instance pointing to the same file
+  // This instance has its own buffer pool that will be released when closed
+  const backupDatabase = new duckdb.Database(duckDbFilePath, {
+    memory_limit: duckDbMemoryLimit,
+    access_mode: 'READ_ONLY',
+  });
+  const connection = backupDatabase.connect();
+  const allAsync = util.promisify(connection.all).bind(connection);
+  const close = () => {
+    return new Promise((resolve, reject) => {
+      connection.close((connErr) => {
+        if (connErr) {
+          logger.warn(`Error closing backup connection: ${connErr.message}`);
+        }
+        backupDatabase.close((dbErr) => {
+          if (dbErr) {
+            reject(dbErr);
+          } else {
+            resolve();
+          }
+        });
+      });
+    });
+  };
+  return { allAsync, close };
+};
+
 const db = {
   ...models,
   sequelize,
@@ -186,6 +224,7 @@ const db = {
   duckDbBatchInsertState,
   duckDbShowVersion,
   duckDbSetTimezone,
+  duckDbCreateBackupInstance,
 };
 
 module.exports = db;

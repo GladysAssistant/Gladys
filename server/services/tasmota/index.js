@@ -31,6 +31,6 @@ module.exports = function TasmotaService(gladys, serviceId) {
     start,
     stop,
     device: tasmotaHandler,
-    controllers: TasmotaController(tasmotaHandler),
+    controllers: TasmotaController(gladys, tasmotaHandler),
   });
 };

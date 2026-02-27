@@ -9,6 +9,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const historicalTempoData = require('./data/tempo_mock');
+const { clearDuckDb } = require('../../utils/duckdb');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
