@@ -182,9 +182,9 @@ async function poll(device) {
   const hasLocalConfig = Boolean(ipAddress && localKey && protocolVersion && localOverride === true);
   const requestedMode = localOverride === true ? 'local' : 'cloud';
   logger.debug(
-    `[Tuya][poll] device=${topic} requested=${requestedMode} has_local=${Boolean(hasLocalConfig)} protocol=${
-      protocolVersion || 'none'
-    } ip=${ipAddress || 'none'}`,
+    `[Tuya][poll] device=${topic} requested=${requestedMode} has_local=${Boolean(
+      hasLocalConfig,
+    )} protocol=${protocolVersion || 'none'} ip=${ipAddress || 'none'}`,
   );
 
   let modeUsed = 'cloud';

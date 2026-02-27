@@ -21,9 +21,7 @@ const SMART_SOCKET = {
   LOCAL_MAPPINGS: smartSocketLocal,
 };
 
-const LIST_DEVICE_TYPES = [
-  SMART_SOCKET,
-];
+const LIST_DEVICE_TYPES = [SMART_SOCKET];
 
 const normalizeCode = (code) => {
   if (!code) {
