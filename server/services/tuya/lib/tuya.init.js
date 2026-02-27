@@ -16,11 +16,11 @@ async function init() {
   );
   const currentHash = configuration ? buildConfigHash(configuration) : null;
   const hasMatchingConfig = Boolean(lastConnectedHash && currentHash && lastConnectedHash === currentHash);
-  this.autoReconnectAllowed = hasMatchingConfig;
   const manualDisconnect = await this.gladys.variable.getValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, this.serviceId);
   const manualDisconnectEnabled = normalizeBoolean(manualDisconnect);
 
   if (manualDisconnectEnabled) {
+    this.autoReconnectAllowed = false;
     this.status = STATUS.NOT_INITIALIZED;
     this.lastError = null;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -29,6 +29,7 @@ async function init() {
     });
     return;
   }
+  this.autoReconnectAllowed = hasMatchingConfig;
 
   await this.connect(configuration);
 }
