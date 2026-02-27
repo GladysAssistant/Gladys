@@ -123,6 +123,17 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const AC_FAN_SPEED = {
+  AUTO: 0,
+  LOW: 1,
+  LOW_MID: 2,
+  MID: 3,
+  MID_HIGH: 4,
+  HIGH: 5,
+  MUTE: 6,
+  TURBO: 7,
+};
+
 const PILOT_WIRE_MODE = {
   OFF: 0,
   FROST_PROTECTION: 1,
@@ -675,6 +686,14 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+    FAN_SPEED: 'fan-speed',
+    ECO: 'eco',
+    DRYING: 'drying',
+    CLEANING: 'cleaning',
+    AUX_HEAT: 'aux-heat',
+    LIGHT: 'light',
+    SLEEP: 'sleep',
+    HEALTH: 'health',
   },
   HEATER: {
     PILOT_WIRE_MODE: 'pilot-wire-mode',
@@ -1364,6 +1383,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+    ERROR: 'tuya.error',
   },
   NETATMO: {
     STATUS: 'netatmo.status',
@@ -1546,6 +1566,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;

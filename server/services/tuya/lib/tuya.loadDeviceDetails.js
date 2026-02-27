@@ -12,13 +12,70 @@ async function loadDeviceDetails(tuyaDevice) {
   const { id: deviceId } = tuyaDevice;
   logger.debug(`Loading ${deviceId} Tuya device specifications`);
 
-  const responsePage = await this.connector.request({
-    method: 'GET',
-    path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
-  });
+  const [specResult, detailsResult, propsResult, modelResult] = await Promise.allSettled([
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
+    }),
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_1_0}/devices/${deviceId}`,
+    }),
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/${deviceId}/shadow/properties`,
+    }),
+    this.connector.request({
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/${deviceId}/model`,
+    }),
+  ]);
 
-  const { result } = responsePage;
-  return { ...tuyaDevice, specifications: result };
+  if (specResult.status === 'rejected') {
+    const reason = specResult.reason && specResult.reason.message ? specResult.reason.message : specResult.reason;
+    logger.warn(`[Tuya] Failed to load specifications for ${deviceId}: ${reason}`);
+  }
+  if (detailsResult.status === 'rejected') {
+    const reason =
+      detailsResult.reason && detailsResult.reason.message ? detailsResult.reason.message : detailsResult.reason;
+    logger.warn(`[Tuya] Failed to load details for ${deviceId}: ${reason}`);
+  }
+  if (propsResult.status === 'rejected') {
+    const reason = propsResult.reason && propsResult.reason.message ? propsResult.reason.message : propsResult.reason;
+    logger.warn(`[Tuya] Failed to load properties for ${deviceId}: ${reason}`);
+  }
+  if (modelResult.status === 'rejected') {
+    const reason = modelResult.reason && modelResult.reason.message ? modelResult.reason.message : modelResult.reason;
+    logger.warn(`[Tuya] Failed to load thing model for ${deviceId}: ${reason}`);
+  }
+
+  const specifications = specResult.status === 'fulfilled' ? specResult.value.result || {} : {};
+  const details = detailsResult.status === 'fulfilled' ? detailsResult.value.result || {} : {};
+  const properties = propsResult.status === 'fulfilled' ? propsResult.value.result || {} : {};
+  const modelPayload = modelResult.status === 'fulfilled' ? modelResult.value.result || null : null;
+  let thingModel = null;
+  if (modelPayload && typeof modelPayload.model === 'string') {
+    try {
+      thingModel = JSON.parse(modelPayload.model);
+    } catch (e) {
+      logger.warn(`[Tuya] Invalid thing model JSON for ${deviceId}`, e);
+      thingModel = null;
+    }
+  } else if (modelPayload) {
+    thingModel = modelPayload;
+  }
+
+  const category = details.category || tuyaDevice.category;
+  const specificationsWithCategory =
+    category && !specifications.category ? { ...specifications, category } : specifications;
+
+  return {
+    ...tuyaDevice,
+    ...details,
+    specifications: specificationsWithCategory,
+    properties,
+    thing_model: thingModel,
+  };
 }
 
 module.exports = {

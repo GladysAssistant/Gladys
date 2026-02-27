@@ -12,6 +12,7 @@ import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
+import AirConditioningFanSpeedDeviceFeature from './device-features/AirConditioningFanSpeedDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
@@ -29,8 +30,17 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: CoverDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: SetpointDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: SetpointDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: AirConditioningFanSpeedDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.ECO]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.DRYING]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.CLEANING]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.AUX_HEAT]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.LIGHT]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SLEEP]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.HEALTH]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: PilotWireModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.LOCK.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,

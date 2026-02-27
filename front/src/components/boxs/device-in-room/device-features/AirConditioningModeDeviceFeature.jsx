@@ -4,26 +4,39 @@ import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { AC_MODE } from '../../../../../../server/utils/constants';
+import style from './style.css';
+
+const MODE_OPTIONS = [
+  { value: AC_MODE.AUTO, i18nKey: 'auto', tuyaValues: ['auto'] },
+  { value: AC_MODE.COOLING, i18nKey: 'cooling', tuyaValues: ['cold', 'cool'] },
+  { value: AC_MODE.HEATING, i18nKey: 'heating', tuyaValues: ['heat', 'hot'] },
+  { value: AC_MODE.DRYING, i18nKey: 'drying', tuyaValues: ['wet', 'dry'] },
+  { value: AC_MODE.FAN, i18nKey: 'fan', tuyaValues: ['fan', 'wind'] }
+];
 
 const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
   const { deviceFeature } = props;
-  const { category, type, last_value: lastValue } = deviceFeature;
+  const { category, type } = deviceFeature;
+  const lastValue =
+    deviceFeature.last_value !== null && deviceFeature.last_value !== undefined
+      ? Number.isNaN(Number(deviceFeature.last_value))
+        ? deviceFeature.last_value
+        : Number(deviceFeature.last_value)
+      : deviceFeature.last_value;
 
   function updateValue(value) {
     props.updateValueWithDebounce(deviceFeature, value);
   }
 
-  function auto() {
-    updateValue(AC_MODE.AUTO);
-  }
+  const supportedTuyaValues = Array.isArray(deviceFeature.enum)
+    ? deviceFeature.enum.map(value => String(value).toLowerCase())
+    : null;
 
-  function cooling() {
-    updateValue(AC_MODE.COOLING);
-  }
+  const options = supportedTuyaValues
+    ? MODE_OPTIONS.filter(option => option.tuyaValues.some(value => supportedTuyaValues.includes(value)))
+    : MODE_OPTIONS;
 
-  function heating() {
-    updateValue(AC_MODE.HEATING);
-  }
+  const effectiveOptions = options.length > 0 ? options : MODE_OPTIONS;
 
   return (
     <tr>
@@ -34,31 +47,18 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
 
       <td class="py-0">
         <div class="d-flex justify-content-end">
-          <div class="btn-group" role="group">
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === AC_MODE.AUTO
-              })}
-              onClick={auto}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.auto`} plural={AC_MODE.HEATING} />
-            </button>
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === AC_MODE.COOLING
-              })}
-              onClick={cooling}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.cooling`} plural={AC_MODE.HEATING} />
-            </button>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === AC_MODE.HEATING
-              })}
-              onClick={heating}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.heating`} plural={AC_MODE.HEATING} />
-            </button>
+          <div class={cx(style.acModeGroup)} role="group">
+            {effectiveOptions.map(option => (
+              <button
+                class={cx('btn btn-sm btn-secondary', style.acModeButton, {
+                  active: lastValue === option.value
+                })}
+                onClick={() => updateValue(option.value)}
+                key={option.value}
+              >
+                <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
+              </button>
+            ))}
           </div>
         </div>
       </td>

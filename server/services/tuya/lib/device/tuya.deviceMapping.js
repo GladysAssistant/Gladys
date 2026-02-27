@@ -1,102 +1,115 @@
 const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_UNITS,
   COVER_STATE,
+  AC_MODE,
+  AC_FAN_SPEED,
 } = require('../../../../utils/constants');
 
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
-
-const SWITCH_LED = 'switch_led';
-const BRIGHT_VALUE_V2 = 'bright_value_v2';
-const TEMP_VALUE_V2 = 'temp_value_v2';
-const COLOUR_DATA_V2 = 'colour_data_v2';
-
-const COLOUR_DATA = 'colour_data';
-
-const ADD_ELE = 'add_ele';
-const CUR_CURRENT = 'cur_current';
-const CUR_POWER = 'cur_power';
-const CUR_VOLTAGE = 'cur_voltage';
-
-const SWITCH_1 = 'switch_1';
-const SWITCH_2 = 'switch_2';
-const SWITCH_3 = 'switch_3';
-const SWITCH_4 = 'switch_4';
-
-const CONTROL = 'control';
-const PERCENT_CONTROL = 'percent_control';
 
 const OPEN = 'open';
 const CLOSE = 'close';
 const STOP = 'stop';
 
-const mappings = {
-  [SWITCH_LED]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-  },
-  [BRIGHT_VALUE_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-  },
-  [TEMP_VALUE_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-  },
-  [COLOUR_DATA_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  },
-  [COLOUR_DATA]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  },
+const TUYA_MODE_TO_GLADYS = {
+  auto: AC_MODE.AUTO,
+  cold: AC_MODE.COOLING,
+  cool: AC_MODE.COOLING,
+  heat: AC_MODE.HEATING,
+  hot: AC_MODE.HEATING,
+  wet: AC_MODE.DRYING,
+  dry: AC_MODE.DRYING,
+  fan: AC_MODE.FAN,
+  wind: AC_MODE.FAN,
+};
 
-  [SWITCH_1]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_2]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_3]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_4]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [CONTROL]: {
-    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-    type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
-  },
-  [PERCENT_CONTROL]: {
-    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-    type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
-  },
-  [ADD_ELE]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  },
-  [CUR_CURRENT]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
-    unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
-  },
-  [CUR_POWER]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
-    unit: DEVICE_FEATURE_UNITS.WATT,
-  },
-  [CUR_VOLTAGE]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
-    unit: DEVICE_FEATURE_UNITS.VOLT,
-  },
+const GLADYS_MODE_TO_TUYA = {
+  [AC_MODE.AUTO]: 'auto',
+  [AC_MODE.COOLING]: 'cold',
+  [AC_MODE.HEATING]: 'heat',
+  [AC_MODE.DRYING]: 'wet',
+  [AC_MODE.FAN]: 'fan',
+};
+
+const GLADYS_MODE_STRING_TO_TUYA = {
+  auto: 'auto',
+  cooling: 'cold',
+  heating: 'heat',
+  drying: 'wet',
+  fan: 'fan',
+};
+
+const TUYA_FAN_SPEED_TO_GLADYS = {
+  auto: AC_FAN_SPEED.AUTO,
+  low: AC_FAN_SPEED.LOW,
+  low_mid: AC_FAN_SPEED.LOW_MID,
+  level_2: AC_FAN_SPEED.LOW_MID,
+  mid: AC_FAN_SPEED.MID,
+  middle: AC_FAN_SPEED.MID,
+  mid_high: AC_FAN_SPEED.MID_HIGH,
+  level_4: AC_FAN_SPEED.MID_HIGH,
+  high: AC_FAN_SPEED.HIGH,
+  mute: AC_FAN_SPEED.MUTE,
+  turbo: AC_FAN_SPEED.TURBO,
+  strong: AC_FAN_SPEED.TURBO,
+};
+
+const GLADYS_FAN_SPEED_TO_TUYA = {
+  [AC_FAN_SPEED.AUTO]: 'auto',
+  [AC_FAN_SPEED.LOW]: 'low',
+  [AC_FAN_SPEED.LOW_MID]: 'low_mid',
+  [AC_FAN_SPEED.MID]: 'mid',
+  [AC_FAN_SPEED.MID_HIGH]: 'mid_high',
+  [AC_FAN_SPEED.HIGH]: 'high',
+  [AC_FAN_SPEED.MUTE]: 'mute',
+  [AC_FAN_SPEED.TURBO]: 'turbo',
+};
+
+const getScale = (deviceFeature) => {
+  const scale = deviceFeature && deviceFeature.scale !== undefined ? Number(deviceFeature.scale) : 0;
+  return Number.isFinite(scale) ? scale : 0;
+};
+
+const scaleFromDevice = (valueFromDevice, deviceFeature) => {
+  if (valueFromDevice === null || valueFromDevice === undefined) {
+    return null;
+  }
+  const numericValue = Number(valueFromDevice);
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+  const scale = getScale(deviceFeature);
+  if (scale === 0) {
+    if (
+      deviceFeature &&
+      Number.isFinite(deviceFeature.max) &&
+      deviceFeature.max <= 100 &&
+      numericValue > deviceFeature.max
+    ) {
+      return numericValue / 10;
+    }
+    return numericValue;
+  }
+  return numericValue / 10 ** scale;
+};
+
+const scaleToDevice = (valueFromGladys, deviceFeature) => {
+  if (valueFromGladys === null || valueFromGladys === undefined) {
+    return null;
+  }
+  const numericValue = Number(valueFromGladys);
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+  const scale = getScale(deviceFeature);
+  if (scale === 0) {
+    if (deviceFeature && Number.isFinite(deviceFeature.max) && deviceFeature.max <= 100) {
+      return Math.round(numericValue * 10);
+    }
+    return numericValue;
+  }
+  return Math.round(numericValue * 10 ** scale);
 };
 
 const writeValues = {
@@ -123,6 +136,58 @@ const writeValues = {
 
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+  },
+
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: (valueFromGladys) => {
+      if (typeof valueFromGladys === 'string') {
+        const normalized = valueFromGladys.toLowerCase();
+        const numeric = Number(normalized);
+        if (!Number.isNaN(numeric)) {
+          return GLADYS_MODE_TO_TUYA[numeric] || GLADYS_MODE_STRING_TO_TUYA[normalized] || normalized;
+        }
+        return GLADYS_MODE_STRING_TO_TUYA[normalized] || normalized;
+      }
+      return GLADYS_MODE_TO_TUYA[valueFromGladys] || valueFromGladys;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: (valueFromGladys, deviceFeature) => {
+      return scaleToDevice(valueFromGladys, deviceFeature);
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: (valueFromGladys) => {
+      if (typeof valueFromGladys === 'string') {
+        const normalized = valueFromGladys.toLowerCase();
+        const numeric = Number(normalized);
+        if (!Number.isNaN(numeric)) {
+          return GLADYS_FAN_SPEED_TO_TUYA[numeric] || normalized;
+        }
+        return normalized;
+      }
+      return GLADYS_FAN_SPEED_TO_TUYA[valueFromGladys] || valueFromGladys;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.ECO]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.DRYING]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.CLEANING]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.AUX_HEAT]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.LIGHT]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SLEEP]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.HEALTH]: (valueFromGladys) => {
       return valueFromGladys === 1;
     },
   },
@@ -179,6 +244,72 @@ const readValues = {
       return parseInt(valueFromDevice, 10) / 10;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: (valueFromDevice) => {
+      if (typeof valueFromDevice !== 'string') {
+        return valueFromDevice;
+      }
+      const normalized = valueFromDevice.toLowerCase();
+      return TUYA_MODE_TO_GLADYS[normalized] !== undefined ? TUYA_MODE_TO_GLADYS[normalized] : valueFromDevice;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: (valueFromDevice, deviceFeature) => {
+      return scaleFromDevice(valueFromDevice, deviceFeature);
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: (valueFromDevice) => {
+      if (typeof valueFromDevice !== 'string') {
+        return valueFromDevice;
+      }
+      const normalized = valueFromDevice.toLowerCase();
+      return TUYA_FAN_SPEED_TO_GLADYS[normalized] !== undefined
+        ? TUYA_FAN_SPEED_TO_GLADYS[normalized]
+        : valueFromDevice;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.ECO]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.DRYING]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.CLEANING]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.AUX_HEAT]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.LIGHT]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SLEEP]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.HEALTH]: (valueFromDevice) => {
+      return valueFromDevice === true ? 1 : 0;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice, deviceFeature) => {
+      return scaleFromDevice(valueFromDevice, deviceFeature);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.DURATION]: {
+    [DEVICE_FEATURE_TYPES.DURATION.INTEGER]: (valueFromDevice) => {
+      if (valueFromDevice === null || valueFromDevice === undefined) {
+        return null;
+      }
+      const parsed = parseInt(valueFromDevice, 10);
+      return Number.isFinite(parsed) ? parsed : null;
+    },
+    [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: (valueFromDevice) => {
+      if (valueFromDevice === null || valueFromDevice === undefined) {
+        return null;
+      }
+      const parsed = parseFloat(valueFromDevice);
+      return Number.isFinite(parsed) ? parsed : null;
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
     [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromDevice) => {
       if (valueFromDevice === OPEN) {
@@ -195,4 +326,4 @@ const readValues = {
   },
 };
 
-module.exports = { mappings, readValues, writeValues };
+module.exports = { readValues, writeValues };
