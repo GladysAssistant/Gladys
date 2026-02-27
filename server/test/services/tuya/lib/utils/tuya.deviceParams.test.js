@@ -27,7 +27,7 @@ describe('Tuya device params utils', () => {
     expect(params).to.deep.equal([{ name: 'test', value: 1 }]);
   });
 
-  it('should get param value', () => {
+  it('should get param value using device param constants', () => {
     const value = getParamValue([{ name: 'A', value: 42 }], 'A');
     expect(value).to.equal(42);
     expect(getParamValue([{ name: 'A', value: 42 }], 'B')).to.equal(undefined);

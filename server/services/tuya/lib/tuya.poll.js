@@ -104,6 +104,9 @@ const pollCloudFeatures = async function pollCloudFeatures(deviceFeatures, topic
     missing: 0,
     skipped: 0,
   };
+  if (!Array.isArray(deviceFeatures) || deviceFeatures.length === 0) {
+    return summary;
+  }
 
   if (!this.connector || typeof this.connector.request !== 'function') {
     logger.warn(`[Tuya][poll][cloud] connector unavailable for device=${topic}`);
@@ -116,7 +119,8 @@ const pollCloudFeatures = async function pollCloudFeatures(deviceFeatures, topic
   });
 
   const values = {};
-  (response.result || []).forEach((feature) => {
+  const result = Array.isArray(response && response.result) ? response.result : [];
+  result.forEach((feature) => {
     values[feature.code] = feature.value;
   });
 
@@ -170,6 +174,7 @@ async function poll(device) {
   }
 
   const params = device.params || [];
+  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
   const protocolVersionRaw = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
@@ -219,7 +224,7 @@ async function poll(device) {
       if (dps && typeof dps === 'object') {
         const pendingCloudFeatures = [];
 
-        device.features.forEach((deviceFeature) => {
+        deviceFeatures.forEach((deviceFeature) => {
           const code = getFeatureCode(deviceFeature);
           const dpsKey = getLocalDpsFromCode(code, device);
           const reader = getFeatureReader(deviceFeature);
@@ -278,7 +283,7 @@ async function poll(device) {
     }
   }
 
-  cloudSummary = await pollCloudFeatures.call(this, device.features, topic);
+  cloudSummary = await pollCloudFeatures.call(this, deviceFeatures, topic);
   logger.debug(
     `[Tuya][poll] device=${topic} mode=${modeUsed} local_handled=${localHandled} local_changed=${localChanged} cloud_handled=${cloudSummary.handled} cloud_changed=${cloudSummary.changed} cloud_missing=${cloudSummary.missing} fallback=${fallbackReason}`,
   );
