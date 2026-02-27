@@ -101,7 +101,7 @@ async function calculateConsumptionFromIndexRange(startAt, featureSelectors, end
       }
     });
 
-    const shouldRestoreLastProcessed = Boolean(parsedEndAt && parsedEndAt < nowDate);
+    const shouldRestoreLastProcessed = Boolean((parsedEndAt && parsedEndAt < nowDate) || selectorSet.size > 0);
     const originalLastProcessedByDeviceId = new Map();
     if (shouldRestoreLastProcessed) {
       devicesWithBothFeatures.forEach(({ device }) => {
@@ -208,23 +208,24 @@ async function calculateConsumptionFromIndexRange(startAt, featureSelectors, end
       }
     });
 
-    // Reset the last processed timestamp
-    await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
-      logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
-      await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
-    });
-
     // Process each window sequentially
     let processedWindows = 0;
     let successfulWindows = 0;
     let failedWindows = 0;
 
+    const selectorArray = Array.from(selectorSet);
     try {
+      // Reset the last processed timestamp
+      await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
+        logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
+        await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
+      });
+
       await Promise.each(windows, async (windowTime) => {
         try {
           // Call the existing calculateConsumptionFromIndex function for each window
           // Avoid double progress updates: outer job manages progress, so inner call runs without jobId
-          await this.calculateConsumptionFromIndex(windowTime, Array.from(selectorSet), null);
+          await this.calculateConsumptionFromIndex(windowTime, selectorArray, null);
           successfulWindows += 1;
 
           // Update job progress

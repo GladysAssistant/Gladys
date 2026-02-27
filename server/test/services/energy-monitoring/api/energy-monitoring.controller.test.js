@@ -197,6 +197,26 @@ describe('EnergyMonitoringController', () => {
       );
       assert.calledOnceWithExactly(res.json, { success: true, job_id: 'job-id' });
     });
+
+    it('should accept empty date fields', async () => {
+      req.body = { feature_selectors: ['feature-1'], start_date: '', end_date: null };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res, next);
+
+      assert.calledOnceWithExactly(energyMonitoringHandler.calculateCostRange, null, ['feature-1'], null);
+      assert.calledOnceWithExactly(res.json, { success: true, job_id: 'job-id' });
+    });
+
+    it('should reject invalid start date format', async () => {
+      req.body = { feature_selectors: ['feature-1'], start_date: '2025-02-30', end_date: '2025-01-31' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res, next);
+
+      assert.notCalled(energyMonitoringHandler.calculateCostRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
+    });
   });
 
   describe('POST /api/v1/service/energy-monitoring/calculate-consumption-from-index-range', () => {
@@ -216,6 +236,21 @@ describe('EnergyMonitoringController', () => {
         '2025-02-15',
       );
       assert.calledOnceWithExactly(res.json, { success: true, job_id: 'job-id' });
+    });
+
+    it('should reject invalid end date format', async () => {
+      req.body = { feature_selectors: ['feature-2'], start_date: '2025-02-01', end_date: 'invalid-date' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range'].controller(
+        req,
+        res,
+        next,
+      );
+
+      assert.notCalled(energyMonitoringHandler.calculateConsumptionFromIndexRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
     });
   });
 
