@@ -172,10 +172,10 @@ describe('TuyaHandler.localPoll', () => {
       const errorPromise = (async () => {
         try {
           await promise;
+          return null;
         } catch (error) {
           return error;
         }
-        return null;
       })();
       await clock.tickAsync(1100);
       const error = await errorPromise;
