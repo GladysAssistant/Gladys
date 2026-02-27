@@ -7,7 +7,7 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
 
-const normalizeBoolean = (value) =>
+const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 const ONLINE_RECENT_MINUTES = 5;
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
@@ -20,22 +20,22 @@ const MAX_GITHUB_CACHE_SIZE = 100;
 const MAX_GITHUB_URL_LENGTH = 8000;
 const githubIssueCache = new Map();
 
-const maskIp = (ip) => {
+const maskIp = ip => {
   if (!ip || typeof ip !== 'string') {
     return null;
   }
   const parts = ip.split('.');
-  if (parts.length !== 4 || parts.some((part) => part === '' || Number.isNaN(parseInt(part, 10)))) {
+  if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
     return null;
   }
   return `${parts[0]}.x.x.x`;
 };
 
-const sanitizeParams = (params) => {
+const sanitizeParams = params => {
   if (!Array.isArray(params)) {
     return [];
   }
-  return params.map((param) => {
+  return params.map(param => {
     if (param.name === 'LOCAL_KEY') {
       return { ...param, value: '***' };
     }
@@ -46,21 +46,21 @@ const sanitizeParams = (params) => {
   });
 };
 
-const getIgnoredLocalDps = (device) => {
+const getIgnoredLocalDps = device => {
   const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
   const ignored = mapping && Array.isArray(mapping.ignored_local_dps) ? mapping.ignored_local_dps : [];
-  return new Set(ignored.map((value) => String(value)));
+  return new Set(ignored.map(value => String(value)));
 };
 
-const getIgnoredCloudCodes = (device) => {
+const getIgnoredCloudCodes = device => {
   const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
   const ignored = mapping && Array.isArray(mapping.ignored_cloud_codes) ? mapping.ignored_cloud_codes : [];
-  return new Set(ignored.map((value) => String(value).toLowerCase()));
+  return new Set(ignored.map(value => String(value).toLowerCase()));
 };
 
 const LOCAL_CODE_ALIASES = {
   switch: ['power'],
-  power: ['switch'],
+  power: ['switch']
 };
 
 const getLocalDpsFromProperties = (code, properties) => {
@@ -74,7 +74,7 @@ const getLocalDpsFromProperties = (code, properties) => {
   const normalized = code.toLowerCase();
   const candidates = [normalized, ...(LOCAL_CODE_ALIASES[normalized] || [])];
   for (const candidate of candidates) {
-    const match = list.find((item) => item && item.code && item.code.toLowerCase() === candidate);
+    const match = list.find(item => item && item.code && item.code.toLowerCase() === candidate);
     if (match && match.dp_id !== undefined && match.dp_id !== null) {
       return match.dp_id;
     }
@@ -106,7 +106,7 @@ const getKnownDpsKeys = (features, device) => {
   if (!Array.isArray(features)) {
     return keys;
   }
-  features.forEach((feature) => {
+  features.forEach(feature => {
     const parts = (feature.external_id || '').split(':');
     const code = parts.length >= 3 ? parts[2] : null;
     const dpsKey = getLocalDpsFromCode(code, device);
@@ -123,7 +123,7 @@ const getUnknownDpsKeys = (localPollDps, features, device) => {
   }
   const knownKeys = getKnownDpsKeys(features, device);
   const ignoredDps = getIgnoredLocalDps(device);
-  return Object.keys(localPollDps).filter((key) => !knownKeys.has(key) && !ignoredDps.has(String(key)));
+  return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !ignoredDps.has(String(key)));
 };
 
 const getUnknownSpecificationCodes = (specifications, features, device) => {
@@ -132,7 +132,7 @@ const getUnknownSpecificationCodes = (specifications, features, device) => {
   }
   const knownCodes = new Set();
   if (Array.isArray(features)) {
-    features.forEach((feature) => {
+    features.forEach(feature => {
       const parts = (feature.external_id || '').split(':');
       const code = parts.length >= 3 ? parts[2] : null;
       if (code) {
@@ -141,25 +141,25 @@ const getUnknownSpecificationCodes = (specifications, features, device) => {
     });
   }
   const specCodes = new Set();
-  ['functions', 'status'].forEach((key) => {
+  ['functions', 'status'].forEach(key => {
     const entries = specifications[key];
     if (!Array.isArray(entries)) {
       return;
     }
-    entries.forEach((entry) => {
+    entries.forEach(entry => {
       if (entry && entry.code) {
         specCodes.add(entry.code);
       }
     });
   });
   const ignoredCodes = getIgnoredCloudCodes(device);
-  return Array.from(specCodes).filter((code) => {
+  return Array.from(specCodes).filter(code => {
     const normalized = code.toLowerCase();
     return !knownCodes.has(normalized) && !ignoredCodes.has(normalized);
   });
 };
 
-const parseDate = (dateValue) => {
+const parseDate = dateValue => {
   if (!dateValue) {
     return null;
   }
@@ -177,7 +177,7 @@ const parseDate = (dateValue) => {
   return date;
 };
 
-const getMostRecentFeatureDate = (device) => {
+const getMostRecentFeatureDate = device => {
   if (!Array.isArray(device && device.features)) {
     return null;
   }
@@ -193,7 +193,7 @@ const getMostRecentFeatureDate = (device) => {
   }, null);
 };
 
-const isReachableFromRecentFeatures = (device) => {
+const isReachableFromRecentFeatures = device => {
   const mostRecentFeatureDate = getMostRecentFeatureDate(device);
   if (!mostRecentFeatureDate) {
     return false;
@@ -201,7 +201,7 @@ const isReachableFromRecentFeatures = (device) => {
   return Date.now() - mostRecentFeatureDate.getTime() <= ONLINE_RECENT_MINUTES * 60 * 1000;
 };
 
-const resolveOnlineStatus = (device) => {
+const resolveOnlineStatus = device => {
   if (isReachableFromRecentFeatures(device)) {
     return true;
   }
@@ -215,7 +215,7 @@ const resolveOnlineStatus = (device) => {
   return false;
 };
 
-const buildParamsMap = (device) =>
+const buildParamsMap = device =>
   (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
     acc[param.name] = param.value;
     return acc;
@@ -223,11 +223,11 @@ const buildParamsMap = (device) =>
 
 const getParamValue = (device, name) => {
   const params = Array.isArray(device && device.params) ? device.params : [];
-  const found = params.find((param) => param.name === name);
+  const found = params.find(param => param.name === name);
   return found ? found.value : undefined;
 };
 
-const getLocalOverrideValue = (device) => {
+const getLocalOverrideValue = device => {
   if (!device) {
     return undefined;
   }
@@ -237,7 +237,7 @@ const getLocalOverrideValue = (device) => {
   return getParamValue(device, 'LOCAL_OVERRIDE');
 };
 
-const getLocalPollDpsFromParams = (device) => {
+const getLocalPollDpsFromParams = device => {
   const raw = getParamValue(device, 'LOCAL_POLL_DPS');
   if (!raw) {
     return null;
@@ -252,14 +252,14 @@ const getLocalPollDpsFromParams = (device) => {
   }
 };
 
-const getProductIdentifier = (device) =>
+const getProductIdentifier = device =>
   device.product_id ||
   getParamValue(device, 'PRODUCT_ID') ||
   device.product_key ||
   getParamValue(device, 'PRODUCT_KEY') ||
   'unknown-product';
 
-const buildIssueTitle = (device) => {
+const buildIssueTitle = device => {
   const isLocal = normalizeBoolean(getLocalOverrideValue(device));
   const modeLabel = isLocal ? 'local' : 'cloud';
   const productIdentifier = getProductIdentifier(device);
@@ -267,9 +267,9 @@ const buildIssueTitle = (device) => {
   return `Tuya (${modeLabel}) [${productIdentifier}]: Add support for ${modelLabel}`;
 };
 
-const buildGithubSearchQuery = (title) => `repo:GladysAssistant/Gladys in:title "${title}"`;
+const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "${title}"`;
 
-const buildGithubSearchUrl = (title) => `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
+const buildGithubSearchUrl = title => `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
 
 const setGithubIssueCache = (query, value) => {
   if (githubIssueCache.has(query)) {
@@ -284,7 +284,7 @@ const setGithubIssueCache = (query, value) => {
   githubIssueCache.set(query, value);
 };
 
-const checkGithubIssueExists = async (title) => {
+const checkGithubIssueExists = async title => {
   const query = buildGithubSearchQuery(title);
   const cached = githubIssueCache.get(query);
   if (cached && Date.now() - cached.timestamp < GITHUB_SEARCH_CACHE_TTL_MS) {
@@ -299,7 +299,7 @@ const checkGithubIssueExists = async (title) => {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
       response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`, {
-        signal: controller.signal,
+        signal: controller.signal
       });
     } finally {
       clearTimeout(timeoutId);
@@ -341,8 +341,8 @@ const buildIssuePayload = (device, localPollStatus, localPollError, localPollVal
       status: localPollStatus || null,
       error: localPollError || null,
       protocol: localPollValidation ? localPollValidation.protocol : null,
-      dps: localPollDps || null,
-    },
+      dps: localPollDps || null
+    }
   };
 };
 
@@ -350,7 +350,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
   `\`\`\`json\n${JSON.stringify(
     buildIssuePayload(device, localPollStatus, localPollError, localPollValidation, localPollDps),
     null,
-    2,
+    2
   )}\n\`\`\``;
 
 const createGithubIssueData = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
@@ -363,14 +363,14 @@ const createGithubIssueData = (device, localPollStatus, localPollError, localPol
   return {
     url: `${GITHUB_BASE_URL}?title=${title}`,
     body,
-    truncated: true,
+    truncated: true
   };
 };
 
 const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
   createGithubIssueData(device, localPollStatus, localPollError, localPollValidation, localPollDps).url;
 
-const buildComparableDevice = (device) => {
+const buildComparableDevice = device => {
   if (!device) {
     return null;
   }
@@ -384,7 +384,7 @@ const buildComparableDevice = (device) => {
     room_id: device.room_id || null,
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    local_override: normalizeBoolean(localOverrideRaw),
+    local_override: normalizeBoolean(localOverrideRaw)
   };
 };
 
@@ -403,12 +403,12 @@ const hasDeviceChanged = (device, baselineDevice) => {
   );
 };
 
-const getLocalConfig = (device) => {
+const getLocalConfig = device => {
   if (!device) {
     return {
       ip: '',
       protocol: '',
-      localOverride: false,
+      localOverride: false
     };
   }
   const params = buildParamsMap(device);
@@ -419,7 +419,7 @@ const getLocalConfig = (device) => {
   return {
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    localOverride: normalizeBoolean(localOverrideRaw),
+    localOverride: normalizeBoolean(localOverrideRaw)
   };
 };
 
@@ -446,7 +446,7 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: false,
+      githubIssueOpened: false
     });
   }
 
@@ -471,24 +471,24 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: null,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: null,
-        githubIssueOpened: false,
+        githubIssueOpened: false
       });
       return;
     }
     this.setState({
       device: mergedNextDevice,
-      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice,
+      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice
     });
   }
 
   toggleIpMode = () => {
     const device = this.state.device;
     const params = Array.isArray(device.params) ? [...device.params] : [];
-    const overrideParam = params.find((param) => param.name === 'LOCAL_OVERRIDE');
+    const overrideParam = params.find(param => param.name === 'LOCAL_OVERRIDE');
     const localOverrideRaw = overrideParam ? overrideParam.value : device.local_override;
     const currentOverride = normalizeBoolean(localOverrideRaw);
     const nextOverride = currentOverride !== true;
-    const existingIndex = params.findIndex((param) => param.name === 'LOCAL_OVERRIDE');
+    const existingIndex = params.findIndex(param => param.name === 'LOCAL_OVERRIDE');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: nextOverride };
     } else {
@@ -498,7 +498,7 @@ class TuyaDeviceBox extends Component {
       device: {
         ...device,
         params,
-        local_override: nextOverride,
+        local_override: nextOverride
       },
       localPollValidation: null,
       localPollStatus: null,
@@ -508,32 +508,32 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: false,
+      githubIssueOpened: false
     });
   };
 
-  updateName = (e) => {
+  updateName = e => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value,
-      },
+        name: e.target.value
+      }
     });
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value,
-      },
+        room_id: e.target.value
+      }
     });
   };
 
-  updateProtocol = (e) => {
+  updateProtocol = e => {
     const protocolVersion = e.target.value;
     const params = Array.isArray(this.state.device.params) ? [...this.state.device.params] : [];
-    const existingIndex = params.findIndex((param) => param.name === 'PROTOCOL_VERSION');
+    const existingIndex = params.findIndex(param => param.name === 'PROTOCOL_VERSION');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: protocolVersion };
     } else {
@@ -542,12 +542,12 @@ class TuyaDeviceBox extends Component {
     this.setState({
       device: {
         ...this.state.device,
-        params,
+        params
       },
       localPollValidation: null,
       localPollStatus: null,
       localPollError: null,
-      localPollDps: null,
+      localPollDps: null
     });
   };
 
@@ -556,11 +556,11 @@ class TuyaDeviceBox extends Component {
       localPollStatus: RequestStatus.Getting,
       localPollError: null,
       localPollProtocol: null,
-      localPollDps: null,
+      localPollDps: null
     });
     const params = Array.isArray(this.state.device.params) ? this.state.device.params : [];
-    const getParam = (name) => {
-      const found = params.find((param) => param.name === name);
+    const getParam = name => {
+      const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
     const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
@@ -570,12 +570,12 @@ class TuyaDeviceBox extends Component {
       let result = null;
       let usedProtocol = selectedProtocol;
       let latestDevice = null;
-      const isValidResult = (data) => data && typeof data === 'object' && data.dps;
+      const isValidResult = data => data && typeof data === 'object' && data.dps;
       for (let i = 0; i < protocolList.length; i += 1) {
         const protocolVersion = protocolList[i];
         try {
           this.setState({
-            localPollProtocol: protocolVersion,
+            localPollProtocol: protocolVersion
           });
           const response = await this.props.httpClient.post('/api/v1/service/tuya/local-poll', {
             deviceId: this.state.device.external_id
@@ -585,7 +585,7 @@ class TuyaDeviceBox extends Component {
             localKey: getParam('LOCAL_KEY') || this.state.device.local_key,
             protocolVersion,
             timeoutMs: 3000,
-            fastScan: true,
+            fastScan: true
           });
           result = response && response.dps ? response : null;
           const updatedDevice = response && response.device ? response.device : null;
@@ -605,7 +605,7 @@ class TuyaDeviceBox extends Component {
       }
       const newParams = [...params];
       if (usedProtocol) {
-        const protocolIndex = newParams.findIndex((param) => param.name === 'PROTOCOL_VERSION');
+        const protocolIndex = newParams.findIndex(param => param.name === 'PROTOCOL_VERSION');
         if (protocolIndex >= 0) {
           newParams[protocolIndex] = { ...newParams[protocolIndex], value: usedProtocol };
         } else {
@@ -616,16 +616,16 @@ class TuyaDeviceBox extends Component {
       this.setState({
         device: {
           ...baseDevice,
-          params: newParams,
+          params: newParams
         },
         localPollStatus: RequestStatus.Success,
         localPollProtocol: null,
         localPollValidation: {
           ip: getParam('IP_ADDRESS') || this.state.device.ip || '',
           protocol: usedProtocol || '',
-          localOverride: true,
+          localOverride: true
         },
-        localPollDps: result ? result.dps : null,
+        localPollDps: result ? result.dps : null
       });
     } catch (e) {
       const message =
@@ -634,15 +634,15 @@ class TuyaDeviceBox extends Component {
         localPollStatus: RequestStatus.Error,
         localPollError: message,
         localPollProtocol: null,
-        localPollDps: null,
+        localPollDps: null
       });
     }
   };
 
-  updateIpAddress = (e) => {
+  updateIpAddress = e => {
     const ipAddress = e.target.value;
     const params = Array.isArray(this.state.device.params) ? [...this.state.device.params] : [];
-    const existingIndex = params.findIndex((param) => param.name === 'IP_ADDRESS');
+    const existingIndex = params.findIndex(param => param.name === 'IP_ADDRESS');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: ipAddress };
     } else {
@@ -651,16 +651,16 @@ class TuyaDeviceBox extends Component {
     this.setState({
       device: {
         ...this.state.device,
-        params,
+        params
       },
       localPollValidation: null,
       localPollStatus: null,
       localPollError: null,
-      localPollDps: null,
+      localPollDps: null
     });
   };
 
-  handleCreateGithubIssue = async (e) => {
+  handleCreateGithubIssue = async e => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
@@ -674,7 +674,7 @@ class TuyaDeviceBox extends Component {
       localPollStatus,
       localPollError,
       localPollValidation,
-      localPollDps,
+      localPollDps
     } = this.state;
     if (githubIssueChecking || githubIssueExists || githubIssuePayload || githubIssuePayloadUrl || githubIssueOpened) {
       return;
@@ -686,7 +686,7 @@ class TuyaDeviceBox extends Component {
       localPollStatus,
       localPollError,
       localPollValidation,
-      effectiveLocalPollDps,
+      effectiveLocalPollDps
     );
     const issueUrl = issueData.url;
     const issueTitle = buildIssueTitle(device);
@@ -724,7 +724,7 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: null,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: null,
-        githubIssueOpened: false,
+        githubIssueOpened: false
       });
       return;
     }
@@ -735,7 +735,7 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: issueData.body,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: issueData.url,
-        githubIssueOpened: false,
+        githubIssueOpened: false
       });
       return;
     }
@@ -744,7 +744,7 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: true,
+      githubIssueOpened: true
     });
 
     if (popup) {
@@ -754,7 +754,7 @@ class TuyaDeviceBox extends Component {
     window.open(issueUrl, '_blank');
   };
 
-  copyGithubIssuePayload = async (e) => {
+  copyGithubIssuePayload = async e => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
@@ -786,7 +786,7 @@ class TuyaDeviceBox extends Component {
     this.setState({ githubIssuePayloadCopied: copied });
   };
 
-  openEmptyGithubIssue = async (e) => {
+  openEmptyGithubIssue = async e => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
@@ -819,17 +819,17 @@ class TuyaDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null,
+      errorMessage: null
     });
     try {
       const payload = {
         ...this.state.device,
-        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY,
+        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
       };
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
-        baselineDevice: savedDevice,
+        baselineDevice: savedDevice
       });
       if (typeof this.props.onDeviceSaved === 'function') {
         this.props.onDeviceSaved(savedDevice);
@@ -840,11 +840,11 @@ class TuyaDeviceBox extends Component {
         errorMessage = 'integration.tuya.error.conflictError';
       }
       this.setState({
-        errorMessage,
+        errorMessage
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -853,7 +853,7 @@ class TuyaDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined,
+      statesNumber: undefined
     });
     try {
       if (this.state.device.created_at) {
@@ -868,12 +868,12 @@ class TuyaDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.tuya.error.defaultDeletionError',
+          errorMessage: 'integration.tuya.error.defaultDeletionError'
         });
       }
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -886,7 +886,7 @@ class TuyaDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
-      housesWithRooms,
+      housesWithRooms
     },
     {
       device,
@@ -904,8 +904,8 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload,
       githubIssuePayloadCopied,
       githubIssuePayloadUrl,
-      githubIssueOpened,
-    },
+      githubIssueOpened
+    }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = resolveOnlineStatus(device);
@@ -961,7 +961,7 @@ class TuyaDeviceBox extends Component {
       <a
         class={cx('btn btn-gray', {
           [extraClass]: !!extraClass,
-          disabled: disableGithubIssueButton,
+          disabled: disableGithubIssueButton
         })}
         href={
           disableGithubIssueButton
@@ -971,7 +971,7 @@ class TuyaDeviceBox extends Component {
                 localPollStatus,
                 localPollError,
                 localPollValidation,
-                effectiveLocalPollDps,
+                effectiveLocalPollDps
               )
         }
         onClick={this.handleCreateGithubIssue}
@@ -1014,7 +1014,7 @@ class TuyaDeviceBox extends Component {
               rows="6"
               readOnly
               value={githubIssuePayload || ''}
-              ref={(el) => {
+              ref={el => {
                 this.githubIssueTextarea = el;
               }}
             />
@@ -1053,7 +1053,7 @@ class TuyaDeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -1241,9 +1241,9 @@ class TuyaDeviceBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {housesWithRooms &&
-                      housesWithRooms.map((house) => (
+                      housesWithRooms.map(house => (
                         <optgroup label={house.name}>
-                          {house.rooms.map((room) => (
+                          {house.rooms.map(room => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>
