@@ -20,7 +20,8 @@ const DEFAULT_PORTS = [6666, 6667, 7000];
  */
 async function localScan(input = 10) {
   const options = typeof input === 'object' ? input || {} : { timeoutSeconds: input };
-  const timeoutSeconds = options.timeoutSeconds || 10;
+  const parsedTimeout = Number(options.timeoutSeconds);
+  const timeoutSeconds = Number.isFinite(parsedTimeout) ? Math.min(Math.max(parsedTimeout, 1), 30) : 10;
   const devices = {};
   const portErrors = {};
   const sockets = [];
