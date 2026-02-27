@@ -241,28 +241,28 @@ class SetupTab extends Component {
       return;
     }
     if (status === 'error') {
-      this.setState({
+      this.setState(previousState => ({
         tuyaConnectionStatus: RequestStatus.Error,
         tuyaConnecting: false,
         tuyaConnected: false,
-        tuyaDisconnected: this.state.tuyaConfigured && !manualDisconnect,
+        tuyaDisconnected: previousState.tuyaConfigured && !manualDisconnect,
         tuyaManuallyDisconnected: false,
         tuyaManualDisconnectJustDone: false,
         tuyaJustSavedMissing: false,
-        tuyaConnectionError: error || this.state.tuyaConnectionError
-      });
+        tuyaConnectionError: error || previousState.tuyaConnectionError
+      }));
       return;
     }
     if (status === 'not_initialized') {
-      this.setState({
+      this.setState(previousState => ({
         tuyaConnectionStatus: null,
         tuyaConnecting: false,
         tuyaConnected: false,
         tuyaDisconnected: !manualDisconnect,
         tuyaManuallyDisconnected: !!manualDisconnect,
-        tuyaManualDisconnectJustDone: manualDisconnect ? this.state.tuyaManualDisconnectJustDone : false,
+        tuyaManualDisconnectJustDone: manualDisconnect ? previousState.tuyaManualDisconnectJustDone : false,
         tuyaJustSavedMissing: false
-      });
+      }));
     }
   };
 
@@ -304,9 +304,9 @@ class SetupTab extends Component {
   };
 
   toggleClientSecret = () => {
-    this.setState({
-      showClientSecret: !this.state.showClientSecret
-    });
+    this.setState(previousState => ({
+      showClientSecret: !previousState.showClientSecret
+    }));
   };
 
   disconnectFromCloud = async () => {
