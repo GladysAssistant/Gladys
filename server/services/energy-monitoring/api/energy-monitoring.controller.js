@@ -1,4 +1,31 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { BadParameters } = require('../../../utils/coreErrors');
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function isValidDateString(value) {
+  if (!DATE_PATTERN.test(value)) {
+    return false;
+  }
+  const [year, month, day] = value.split('-').map((part) => Number(part));
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return (
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() + 1 === month &&
+    parsed.getUTCDate() === day
+  );
+}
+
+function getOptionalDate(body, field) {
+  const value = body && body[field];
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  if (typeof value !== 'string' || !isValidDateString(value)) {
+    throw new BadParameters(`${field} must be a valid date in YYYY-MM-DD format`);
+  }
+  return value;
+}
 
 module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
   /**
@@ -37,8 +64,8 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    */
   async function calculateCostRange(req, res) {
     const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
-    const startDate = req.body && req.body.start_date;
-    const endDate = req.body && req.body.end_date;
+    const startDate = getOptionalDate(req.body, 'start_date');
+    const endDate = getOptionalDate(req.body, 'end_date');
     const job = await energyMonitoringHandler.calculateCostRange(startDate, featureSelectors, endDate);
     res.json({
       success: true,
@@ -54,8 +81,8 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    */
   async function calculateConsumptionFromIndexRange(req, res) {
     const featureSelectors = Array.isArray(req.body && req.body.feature_selectors) ? req.body.feature_selectors : [];
-    const startDate = req.body && req.body.start_date;
-    const endDate = req.body && req.body.end_date;
+    const startDate = getOptionalDate(req.body, 'start_date');
+    const endDate = getOptionalDate(req.body, 'end_date');
     const job = await energyMonitoringHandler.calculateConsumptionFromIndexRange(startDate, featureSelectors, endDate);
     res.json({
       success: true,

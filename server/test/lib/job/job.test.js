@@ -8,6 +8,7 @@ const { fake, assert } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS } = require('../../../utils/constants');
 
 const Job = require('../../../lib/job');
+const logger = require('../../../utils/logger');
 
 const event = {
   emit: fake.returns(null),
@@ -213,12 +214,16 @@ describe('Job', () => {
 
     it('should log finish error when job.finish fails in wrapperDetached', async () => {
       const finishStub = sandbox.stub(job, 'finish').rejects(new Error('finish-fail'));
+      const loggerErrorStub = sandbox.stub(logger, 'error');
       const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
         throw new Error('boom');
       });
       const startedJob = await wrapped();
       // Even if finish fails, we should still get a job object back
       expect(startedJob).to.have.property('id');
+      await sleep(50);
+      expect(loggerErrorStub.called).to.equal(true);
+      expect(loggerErrorStub.firstCall.args[0]).to.include('job.wrapperDetached');
       finishStub.restore();
     });
   });

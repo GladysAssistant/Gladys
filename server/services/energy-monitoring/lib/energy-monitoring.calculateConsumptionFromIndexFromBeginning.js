@@ -83,6 +83,17 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
       }
     });
 
+    const shouldRestoreLastProcessed = selectorSet.size > 0;
+    const originalLastProcessedByDeviceId = new Map();
+    if (shouldRestoreLastProcessed) {
+      devicesWithBothFeatures.forEach(({ device }) => {
+        const lastProcessedParam = device.params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
+        if (lastProcessedParam && lastProcessedParam.value) {
+          originalLastProcessedByDeviceId.set(device.id, lastProcessedParam.value);
+        }
+      });
+    }
+
     logger.info(
       `Found ${devicesWithBothFeatures.length} devices with both INDEX and THIRTY_MINUTES_CONSUMPTION features`,
     );
@@ -158,45 +169,58 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
       await this.gladys.device.destroyStatesFrom(selector, deletionStartTime);
     });
 
-    // Reset the last processed timestamp
-    await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
-      logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
-      await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
-    });
-
     // Process each window sequentially
     let processedWindows = 0;
     let successfulWindows = 0;
     let failedWindows = 0;
 
     const selectorArray = Array.from(selectorSet);
-    await Promise.each(windows, async (windowTime) => {
-      try {
-        // Call the existing calculateConsumptionFromIndex function for each window
-        // Avoid double progress updates: outer job manages progress, so inner call runs without jobId
-        await this.calculateConsumptionFromIndex(windowTime, selectorArray, null);
-        successfulWindows += 1;
+    try {
+      // Reset the last processed timestamp
+      await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
+        logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
+        await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
+      });
 
-        // Update job progress
-        processedWindows += 1;
-        if (jobId) {
-          const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-          await this.gladys.job.updateProgress(jobId, progressPercentage);
+      await Promise.each(windows, async (windowTime) => {
+        try {
+          // Call the existing calculateConsumptionFromIndex function for each window
+          // Avoid double progress updates: outer job manages progress, so inner call runs without jobId
+          await this.calculateConsumptionFromIndex(windowTime, selectorArray, null);
+          successfulWindows += 1;
+
+          // Update job progress
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
+
+          logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
+        } catch (error) {
+          failedWindows += 1;
+          logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
+
+          // Continue processing other windows even if one fails
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
         }
-
-        logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
-      } catch (error) {
-        failedWindows += 1;
-        logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
-
-        // Continue processing other windows even if one fails
-        processedWindows += 1;
-        if (jobId) {
-          const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-          await this.gladys.job.updateProgress(jobId, progressPercentage);
-        }
+      });
+    } finally {
+      if (shouldRestoreLastProcessed) {
+        await Promise.each(devicesWithBothFeatures, async ({ device }) => {
+          const originalValue = originalLastProcessedByDeviceId.get(device.id);
+          if (originalValue) {
+            await this.gladys.device.setParam(device, ENERGY_INDEX_LAST_PROCESSED, originalValue);
+          } else {
+            await this.gladys.device.destroyParam(device, ENERGY_INDEX_LAST_PROCESSED);
+          }
+        });
       }
-    });
+    }
 
     logger.info(
       `Finished processing all windows. Successful: ${successfulWindows}, Failed: ${failedWindows}, Total: ${windows.length}`,
