@@ -340,9 +340,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
 
   const hepaFilterMonitoring = device.clusterClients.get(HepaFilterMonitoring.Complete.id);
   if (hepaFilterMonitoring && !this.stateChangeListeners.has(hepaFilterMonitoring)) {
-    logger.debug(
-      `Matter: Adding state change listener for HepaFilterMonitoring cluster ${hepaFilterMonitoring.name}`,
-    );
+    logger.debug(`Matter: Adding state change listener for HepaFilterMonitoring cluster ${hepaFilterMonitoring.name}`);
     this.stateChangeListeners.add(hepaFilterMonitoring);
     // Subscribe to HepaFilterMonitoring attribute changes
     hepaFilterMonitoring.addConditionAttributeListener((value) => {
@@ -353,7 +351,6 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     });
   }
-
 }
 
 module.exports = {

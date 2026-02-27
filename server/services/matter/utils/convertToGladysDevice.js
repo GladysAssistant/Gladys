@@ -15,7 +15,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
-  HepaFilterMonitoring
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -390,7 +390,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 100,
         });
       }
-      
     });
   }
   return gladysDevice;
