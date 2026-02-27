@@ -932,6 +932,10 @@
               "dongleName": "Dongle",
               "unknownDongle": "Nicht definiert",
               "tcpPort": "TCP-Port"
+            },
+            "containerErrors": {
+              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
             }
           },
           "remote": {
@@ -3869,6 +3873,8 @@
       "power": "Leistung",
       "energy": "Energie",
       "index": "Index",
+      "index-today": "Index heute",
+      "index-yesterday": "Index gestern",
       "daily-consumption": "Tagesverbrauch",
       "daily-consumption-cost": "Tageskosten",
       "thirty-minutes-consumption": "Verbrauch 30 Minuten",

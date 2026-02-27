@@ -69,6 +69,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -95,6 +97,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
     assert.calledTwice(gladys.system.stopContainer);
@@ -127,6 +131,8 @@ describe('zigbee2mqtt disconnect', () => {
         zigbee2mqttConnected: false,
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
+        coordinatorFirmware: null,
+        z2mContainerError: null,
       },
     });
   });
