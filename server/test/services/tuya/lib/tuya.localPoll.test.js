@@ -169,7 +169,14 @@ describe('TuyaHandler.localPoll', () => {
         timeoutMs: 1000,
       });
       // Attach handler immediately to avoid PromiseRejectionHandledWarning with fake timers.
-      const errorPromise = promise.catch((error) => error);
+      const errorPromise = (async () => {
+        try {
+          await promise;
+          return null;
+        } catch (error) {
+          return error;
+        }
+      })();
       await clock.tickAsync(1100);
       const error = await errorPromise;
       expect(error).to.be.instanceOf(BadParameters);
