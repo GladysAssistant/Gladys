@@ -1201,6 +1201,7 @@
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
       "unmanagedModelButton": "Modell nicht verwaltet oder verfügbar",
+      "partiallyManagedModelButton": "Modell teilweise unterstützt",
       "status": {
         "notConnected": "Gladys konnte keine Verbindung zum Tuya-Cloud-Account herstellen. Bitte gehe zur ",
         "setupPageLink": "Tuya-Einrichtungsseite.",
@@ -1227,7 +1228,17 @@
         "localPollSuccess": "Lokaler Poll OK.",
         "localPollError": "Lokaler Poll fehlgeschlagen:",
         "productIdLabel": "Produkt-ID",
-        "productKeyLabel": "Produktschlüssel"
+        "productKeyLabel": "Produktschlüssel",
+        "createGithubIssue": "Dieses Gerät vorschlagen",
+        "createGithubIssuePartial": "Neue Funktionen vorschlagen",
+        "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
+        "githubIssuePayloadCopied": "Issue-Details wurden in die Zwischenablage kopiert. Bitte in den GitHub-Issue-Text einfügen.",
+        "githubIssuePayloadInfo": "Die Issue-Details sind zu lang für die URL. Bitte den Inhalt unten kopieren und in den GitHub-Issue-Text einfügen.",
+        "githubIssuePayloadCopyButton": "Inhalt kopieren",
+        "githubIssuePayloadOpenEmptyButton": "Leeres Issue erstellen",
+        "githubIssueExistsInfo": "Für dieses Gerät existiert bereits ein Issue. Ein Entwickler kümmert sich demnächst darum. Bei Fragen gerne im Forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />Die passenden GitHub-Issues findest du hier: <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">Issue-Liste</a>.",
+        "partialFeaturesCount": "({{count}} nicht unterstützt)",
+        "partialFeaturesCountDiscover": "({{count}} noch nicht unterstützt)"
       },
       "discover": {
         "title": "In deinem Tuya-Cloud-Account erkannte Geräte",

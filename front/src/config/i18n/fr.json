@@ -1331,6 +1331,7 @@
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "partiallyManagedModelButton": "Modèle partiellement pris en charge",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
         "setupPageLink": "page de configuration Tuya.",
@@ -1357,7 +1358,17 @@
         "localPollSuccess": "Lecture locale OK.",
         "localPollError": "Échec de la lecture locale :",
         "productIdLabel": "Identifiant produit",
-        "productKeyLabel": "Clé produit"
+        "productKeyLabel": "Clé produit",
+        "createGithubIssue": "Proposer ce périphérique",
+        "createGithubIssuePartial": "Proposer nouvelles fonctions",
+        "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
+        "githubIssuePayloadCopied": "Les détails ont été copiés dans le presse-papiers. Collez-les dans le corps de l'issue GitHub.",
+        "githubIssuePayloadInfo": "Les détails sont trop longs pour l'URL. Copiez le contenu ci-dessous et collez-le dans le corps de l'issue GitHub.",
+        "githubIssuePayloadCopyButton": "Copier le contenu",
+        "githubIssuePayloadOpenEmptyButton": "Créer l'issue vide",
+        "githubIssueExistsInfo": "Une issue existe déjà pour ce périphérique. Un développeur s'en occupera prochainement. N'hésitez pas à demander sur le forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />Vous pouvez consulter les issues correspondantes sur GitHub ici : <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">liste des issues</a>.",
+        "partialFeaturesCount": "({{count}} non implémentée(s))",
+        "partialFeaturesCountDiscover": "({{count}} non implémentable(s))"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
