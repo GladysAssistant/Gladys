@@ -9,6 +9,7 @@ import RunningStatus from './status/RunningStatus';
 
 const SetupTab = props => {
   const { loadZigbee2mqttStatus, loadZigbee2mqttConfig, setupZigee2mqttStatus, toggleZigee2mqttStatus } = props;
+  const { z2mContainerError } = props.zigbee2mqttStatus || {};
   const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
   const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
   const success = loadZigbee2mqttStatus === RequestStatus.Success && loadZigbee2mqttConfig === RequestStatus.Success;
@@ -58,6 +59,22 @@ const SetupTab = props => {
                       url: props.z2mUrl
                     }}
                   />
+                </li>
+              )}
+              {z2mContainerError && (
+                <li class="list-group-item">
+                  <div class="alert alert-warning my-3">
+                    {z2mContainerError.code ? (
+                      <MarkupText
+                        id={`integration.zigbee2mqtt.setup.modes.local.containerErrors.${z2mContainerError.code}`}
+                      />
+                    ) : (
+                      <span>
+                        <Text id="integration.zigbee2mqtt.setup.modes.local.containerErrors.unknownErrorPrefix" />
+                        <code>{z2mContainerError.message}</code>
+                      </span>
+                    )}
+                  </div>
                 </li>
               )}
               <li class="list-group-item" data-cy="z2m-running-status">

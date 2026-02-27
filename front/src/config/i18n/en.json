@@ -827,6 +827,10 @@
               "dongleName": "Dongle",
               "unknownDongle": "Not defined",
               "tcpPort": "TCP Port"
+            },
+            "containerErrors": {
+              "EZSP_PROTOCOL_VERSION": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it. Otherwise, select the dongle (legacy ezsp) in the configuration.",
+              "unknownErrorPrefix": "Zigbee2MQTT container error: "
             }
           },
           "remote": {
