@@ -15,7 +15,7 @@ describe('tuya.convertDevice', () => {
       ip: '1.1.1.1',
       cloud_ip: '2.2.2.2',
       protocol_version: '3.3',
-      local_override: true,
+      local_override: ' TRUE ',
       is_online: true,
       properties: { properties: [{ code: 'foo', value: 'bar' }] },
       thing_model: { services: [] },

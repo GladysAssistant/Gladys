@@ -155,7 +155,7 @@ describe('TuyaHandler.discoverDevices', () => {
             has_feedback: false,
             max: 1,
             min: 0,
-            name: 'name',
+            name: 'switch_1',
             read_only: false,
             selector: 'tuya:uuid:switch_1',
             type: 'binary',

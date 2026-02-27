@@ -4,6 +4,7 @@ const { expect } = require('chai');
 const {
   applyExistingLocalOverride,
   applyExistingLocalParams,
+  getParamValue,
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
   upsertParam,
@@ -38,6 +39,15 @@ describe('Tuya device params utils', () => {
     expect(override.value).to.equal(true);
     const other = normalized.params.find((param) => param.name === 'OTHER');
     expect(other.value).to.equal('x');
+  });
+
+  it('should get param value', () => {
+    const params = [
+      { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
+      { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+    ];
+    expect(getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS)).to.equal('1.1.1.1');
+    expect(getParamValue(params, 'MISSING')).to.equal(undefined);
   });
 
   it('should not normalize local override when value is null', () => {

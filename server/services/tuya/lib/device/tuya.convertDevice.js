@@ -1,5 +1,6 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
+const { normalizeBoolean } = require('../utils/tuya.normalize');
 const { convertFeature } = require('./tuya.convertFeature');
 const logger = require('../../../../utils/logger');
 
@@ -30,6 +31,7 @@ function convertDevice(tuyaDevice) {
   const externalId = `tuya:${id}`;
   const { functions = [], status = [] } = specifications;
   const online = tuyaDevice.online !== undefined ? tuyaDevice.online : tuyaDevice.is_online;
+  const normalizedLocalOverride = normalizeBoolean(localOverride);
 
   const params = [];
   if (id) {
@@ -45,7 +47,7 @@ function convertDevice(tuyaDevice) {
     params.push({ name: DEVICE_PARAM_NAME.CLOUD_IP, value: cloudIp });
   }
   if (localOverride !== undefined && localOverride !== null) {
-    params.push({ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: localOverride });
+    params.push({ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: normalizedLocalOverride });
   }
   if (protocolVersion) {
     params.push({ name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: protocolVersion });
@@ -62,7 +64,7 @@ function convertDevice(tuyaDevice) {
     model: productName || model,
     product_id: productId,
     protocol_version: protocolVersion,
-    local_override: localOverride,
+    local_override: normalizedLocalOverride,
     online,
   };
   logger.debug('Tuya convert device specifications');
