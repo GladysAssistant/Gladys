@@ -3,19 +3,28 @@ const { BadParameters } = require('../../../utils/coreErrors');
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * @description Validate a date string formatted as YYYY-MM-DD.
+ * @param {string} value - Date candidate.
+ * @returns {boolean} Return true if valid.
+ */
 function isValidDateString(value) {
   if (!DATE_PATTERN.test(value)) {
     return false;
   }
   const [year, month, day] = value.split('-').map((part) => Number(part));
   const parsed = new Date(Date.UTC(year, month - 1, day));
-  return (
-    parsed.getUTCFullYear() === year &&
-    parsed.getUTCMonth() + 1 === month &&
-    parsed.getUTCDate() === day
-  );
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day;
 }
 
+/**
+ * @description Read an optional date from request body and validate its format.
+ * Empty values are treated as null.
+ * @param {Object} body - Request body.
+ * @param {string} field - Field name to read.
+ * @returns {string|null} Return normalized date string or null.
+ * @throws {BadParameters} Throw if provided value is not a valid YYYY-MM-DD date.
+ */
 function getOptionalDate(body, field) {
   const value = body && body[field];
   if (value === undefined || value === null || value === '') {
