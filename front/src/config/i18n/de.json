@@ -3925,6 +3925,10 @@
       "shortCategoryName": "UV-Sensor",
       "integer": "UV-Index"
     },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "HEPA-Filterüberwachung",
+      "filter-life-remaining": "Verbleibende Filterlebensdauer"
+    },
     "duration": {
       "shortCategoryName": "Dauer",
       "decimal": "Dauer (dezimal)",
