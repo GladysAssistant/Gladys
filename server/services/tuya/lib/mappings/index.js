@@ -112,8 +112,9 @@ const extractCodesFromSpecifications = (specifications) => {
   }
   const functions = Array.isArray(specifications.functions) ? specifications.functions : [];
   const status = Array.isArray(specifications.status) ? specifications.status : [];
+  const properties = Array.isArray(specifications.properties) ? specifications.properties : [];
 
-  [...functions, ...status].forEach((item) => {
+  [...functions, ...status, ...properties].forEach((item) => {
     if (!item || !item.code) {
       return;
     }
