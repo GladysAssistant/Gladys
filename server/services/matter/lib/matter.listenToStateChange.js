@@ -14,6 +14,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -335,6 +336,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
         });
       });
     }
+  }
+
+  const hepaFilterMonitoring = device.clusterClients.get(HepaFilterMonitoring.Complete.id);
+  if (hepaFilterMonitoring && !this.stateChangeListeners.has(hepaFilterMonitoring)) {
+    logger.debug(`Matter: Adding state change listener for HepaFilterMonitoring cluster ${hepaFilterMonitoring.name}`);
+    this.stateChangeListeners.add(hepaFilterMonitoring);
+    // Subscribe to HepaFilterMonitoring attribute changes
+    hepaFilterMonitoring.addConditionAttributeListener((value) => {
+      logger.debug(`Matter: HepaFilterMonitoring Condition attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${HepaFilterMonitoring.Complete.id}`,
+        state: value,
+      });
+    });
   }
 }
 
