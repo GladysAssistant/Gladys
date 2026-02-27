@@ -341,7 +341,7 @@ describe('TuyaHandler.setValue', () => {
     expect(ctx.connector.request.calledOnce).to.equal(true);
   });
 
-  it('should fallback to cloud when command is empty', async () => {
+  it('should throw when command is empty', async () => {
     const device = {
       params: [
         { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
@@ -361,9 +361,8 @@ describe('TuyaHandler.setValue', () => {
       gladys: {},
     };
 
-    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 1);
-
-    expect(ctx.connector.request.calledOnce).to.equal(true);
+    await expect(tuyaHandler.setValue.call(ctx, device, deviceFeature, 1)).to.be.rejectedWith('have no command');
+    expect(ctx.connector.request.called).to.equal(false);
   });
 
   it('should log disconnect failures and still return on local success', async () => {

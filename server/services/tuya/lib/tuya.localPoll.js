@@ -34,7 +34,7 @@ async function localPoll(payload) {
     issueRefreshOnPing: false,
   };
   if (isProtocol35) {
-    tuyaOptions.KeepAlive = false;
+    tuyaOptions.keepAlive = false;
     tuyaOptions.socketTimeout = Math.max(effectiveTimeout, 5000);
   }
   const tuyaLocal = new TuyaLocalApi(tuyaOptions);
@@ -160,7 +160,9 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   device.params = Array.isArray(device.params) ? [...device.params] : [];
   upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
   upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
-  upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
+  if (localKey) {
+    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
+  }
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);

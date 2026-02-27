@@ -485,7 +485,7 @@ class SetupTab extends Component {
                         placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder" />}
                         value={state.tuyaSecretKey}
                         className="form-control"
-                        autocomplete="off"
+                        autoComplete="off"
                         onInput={this.updateConfiguration}
                       />
                     </Localizer>
