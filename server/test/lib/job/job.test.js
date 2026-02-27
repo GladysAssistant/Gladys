@@ -8,6 +8,7 @@ const { fake, assert } = sinon;
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES, JOB_TYPES, JOB_STATUS } = require('../../../utils/constants');
 
 const Job = require('../../../lib/job');
+const logger = require('../../../utils/logger');
 
 const event = {
   emit: fake.returns(null),
@@ -15,6 +16,18 @@ const event = {
 };
 
 describe('Job', () => {
+  let sandbox;
+
+  beforeEach(async () => {
+    sandbox = sinon.createSandbox();
+    await db.Job.destroy({ where: {}, truncate: true, cascade: true });
+  });
+
+  afterEach(async () => {
+    sandbox.restore();
+    await db.Job.destroy({ where: {}, truncate: true, cascade: true });
+  });
+
   describe('job.create', () => {
     const job = new Job(event);
     it('should create a job', async () => {
@@ -69,6 +82,10 @@ describe('Job', () => {
       const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const promise = job.updateProgress(newJob.id, -1);
       return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
+    });
+    it('should throw when job not found', async () => {
+      const promise = job.updateProgress('00000000-0000-0000-0000-000000000000', 5);
+      await chaiAssert.isRejected(promise, 'Job not found');
     });
   });
   describe('job.get', () => {
@@ -153,6 +170,61 @@ describe('Job', () => {
       expect(jobs).to.be.instanceOf(Array);
       const lastJob = jobs[0];
       expect(lastJob).to.have.property('status', JOB_STATUS.FAILED);
+    });
+  });
+  describe('job.wrapperDetached', () => {
+    const job = new Job(event);
+    const sleep = (ms) =>
+      new Promise((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    const waitForStatus = async (jobId, status, startedAt = Date.now()) => {
+      const jobs = await job.get();
+      const current = jobs.find((oneJob) => oneJob.id === jobId);
+      if (current && current.status === status) {
+        return current;
+      }
+      if (Date.now() - startedAt >= 2000) {
+        throw new Error(`Timeout waiting for job ${jobId} to reach status ${status}`);
+      }
+      await sleep(25);
+      return waitForStatus(jobId, status, startedAt);
+    };
+
+    it('should run wrapperDetached', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {});
+      const startedJob = await wrapped();
+      expect(startedJob).to.have.property('id');
+
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.SUCCESS);
+      expect(finishedJob).to.have.property('status', JOB_STATUS.SUCCESS);
+    });
+
+    it('should run wrapperDetached with failed job', async () => {
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
+        throw new Error('failed');
+      });
+      const startedJob = await wrapped();
+      expect(startedJob).to.have.property('id');
+
+      const finishedJob = await waitForStatus(startedJob.id, JOB_STATUS.FAILED);
+      expect(finishedJob).to.have.property('status', JOB_STATUS.FAILED);
+      expect(finishedJob.data.error).to.include('failed');
+    });
+
+    it('should log finish error when job.finish fails in wrapperDetached', async () => {
+      const finishStub = sandbox.stub(job, 'finish').rejects(new Error('finish-fail'));
+      const loggerErrorStub = sandbox.stub(logger, 'error');
+      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
+        throw new Error('boom');
+      });
+      const startedJob = await wrapped();
+      // Even if finish fails, we should still get a job object back
+      expect(startedJob).to.have.property('id');
+      await sleep(50);
+      expect(loggerErrorStub.called).to.equal(true);
+      expect(loggerErrorStub.firstCall.args[0]).to.include('job.wrapperDetached');
+      finishStub.restore();
     });
   });
 });

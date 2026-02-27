@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon');
+
+const { fake } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const fs = require('fs');
@@ -7,6 +9,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const historicalTempoData = require('./data/tempo_mock');
+const { clearDuckDb } = require('../../utils/duckdb');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -275,7 +278,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     await Promise.all(createPromises);
   }; */
   beforeEach(async () => {
-    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await clearDuckDb();
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
     device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
@@ -290,6 +293,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
     // We create a new electrical meter device
@@ -328,6 +332,9 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
         },
       ],
     });
+  });
+  afterEach(async () => {
+    await clearDuckDb();
   });
   it('should calculate cost from a specific date for a edf-tempo contract', async () => {
     await importAllTempoPricesFromCsv(electricalMeterDevice.id, energyPrice);
