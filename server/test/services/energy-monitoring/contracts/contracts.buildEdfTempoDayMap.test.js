@@ -17,7 +17,13 @@ describe('Contracts.buildEdfTempoDayMap', () => {
       info: sinon.stub(),
     };
 
-    // Create a constructor wrapper that captures the cache instance
+    /**
+     * @description Capture LRUCache instance for assertions.
+     * @param {object} options - LRU cache options.
+     * @returns {LRUCache} Wrapped cache instance.
+     * @example
+     * new LRUCacheWrapper({ max: 1 });
+     */
     function LRUCacheWrapper(options) {
       // When called with 'new', create real LRUCache and capture it
       const instance = new LRUCache(options);

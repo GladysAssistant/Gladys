@@ -4,7 +4,7 @@ const { init } = require('./job.init');
 const { finish } = require('./job.finish');
 const { purge } = require('./job.purge');
 const { updateProgress } = require('./job.updateProgress');
-const { wrapper } = require('./job.wrapper');
+const { wrapper, wrapperDetached } = require('./job.wrapper');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
@@ -20,5 +20,6 @@ Job.prototype.finish = finish;
 Job.prototype.purge = purge;
 Job.prototype.updateProgress = updateProgress;
 Job.prototype.wrapper = wrapper;
+Job.prototype.wrapperDetached = wrapperDetached;
 
 module.exports = Job;

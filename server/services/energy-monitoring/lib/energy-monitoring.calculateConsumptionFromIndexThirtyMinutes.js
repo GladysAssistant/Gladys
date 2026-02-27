@@ -19,10 +19,37 @@ async function calculateConsumptionFromIndexThirtyMinutes(now, jobId) {
     } else {
       thirtyMinuteWindow.setMinutes(30, 0, 0);
     }
-    await this.calculateConsumptionFromIndex(thirtyMinuteWindow, jobId);
+    await this.calculateConsumptionFromIndex(thirtyMinuteWindow, null, jobId);
   });
+}
+
+/**
+ * @description Build job data (scope/period) for the thirty-minute consumption calculation.
+ * @param {Date} now - Current date/time used to compute the 30-minute window.
+ * @returns {object} Job data payload with scope and period.
+ * @example
+ * buildConsumptionThirtyMinutesJobData(new Date());
+ */
+function buildConsumptionThirtyMinutesJobData(now) {
+  const rounded = new Date(now);
+  const minutes = rounded.getMinutes();
+  if (minutes < 30) {
+    rounded.setMinutes(0, 0, 0);
+  } else {
+    rounded.setMinutes(30, 0, 0);
+  }
+  const windowEnd = rounded.toISOString();
+  const windowStart = new Date(rounded.getTime() - 30 * 60 * 1000).toISOString();
+  return {
+    scope: 'all',
+    period: {
+      start_date: windowStart,
+      end_date: windowEnd,
+    },
+  };
 }
 
 module.exports = {
   calculateConsumptionFromIndexThirtyMinutes,
+  buildConsumptionThirtyMinutesJobData,
 };
