@@ -1,6 +1,8 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
+const proxyquire = require('proxyquire')
+  .noCallThru()
+  .noPreserveCache();
 
 const { assert, fake } = sinon;
 
