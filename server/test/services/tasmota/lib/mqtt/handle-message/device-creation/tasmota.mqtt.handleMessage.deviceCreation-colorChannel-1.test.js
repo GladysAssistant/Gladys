@@ -86,8 +86,8 @@ describe('Tasmota - MQTT - create device with COLOR Channel #WW feature', () => 
     assert.notCalled(gladys.event.emit);
   });
 
-  it('decode STATUS8 message', () => {
-    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+  it('decode STATUS8 message', async () => {
+    await tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
 
     const expectedDevice = {
       name: 'Tasmota',

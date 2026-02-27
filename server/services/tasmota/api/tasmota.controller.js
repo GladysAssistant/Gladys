@@ -1,13 +1,14 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function TasmotaController(tasmotaManager) {
+module.exports = function TasmotaController(gladys, tasmotaManager) {
   /**
    * @api {get} /api/v1/service/tasmota/discover/:protocol Get discovered Tasmota devices over selected protocol
    * @apiName discover
    * @apiGroup Tasmota
    */
-  function discover(req, res) {
-    res.json(tasmotaManager.getDiscoveredDevices(req.params.protocol));
+  async function discover(req, res) {
+    const defaultElectricMeterDeviceFeatureId = await gladys.energyPrice.getDefaultElectricMeterFeatureId();
+    res.json(tasmotaManager.getDiscoveredDevices(req.params.protocol, defaultElectricMeterDeviceFeatureId));
   }
 
   /**
