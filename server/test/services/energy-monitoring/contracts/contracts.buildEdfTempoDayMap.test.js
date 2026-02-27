@@ -18,19 +18,6 @@ describe('Contracts.buildEdfTempoDayMap', () => {
     };
 
     // Create a constructor wrapper that captures the cache instance
-    /**
-     * Thin wrapper around LRUCache that captures the created instance for test inspection.
-     * @description Intercepts the LRUCache constructor so tests can hold a reference to
-     * the cache instance (via `cacheInstance`) and clear it between test runs, while the
-     * module under test still receives a fully functional LRUCache.
-     * @param {LRUCache.Options<string, string, unknown>} options - Options forwarded verbatim
-     *  to the real LRUCache constructor.
-     * @returns {LRUCache<string, string>} The newly created LRUCache instance.
-     * @example
-     * const wrapper = new LRUCacheWrapper({ max: 100 });
-     * wrapper.set('key', 'value');
-     * console.log(cacheInstance === wrapper); // true
-     */
     function LRUCacheWrapper(options) {
       // When called with 'new', create real LRUCache and capture it
       const instance = new LRUCache(options);
