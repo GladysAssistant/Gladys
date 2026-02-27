@@ -130,6 +130,12 @@ class SetupTab extends Component {
 
   saveTuyaConfiguration = async e => {
     e.preventDefault();
+    const tuyaEndpoint = (this.state.tuyaEndpoint || '').trim();
+    const tuyaAccessKey = (this.state.tuyaAccessKey || '').trim();
+    const tuyaSecretKey = (this.state.tuyaSecretKey || '').trim();
+    const tuyaAppAccountId = (this.state.tuyaAppAccountId || '').trim();
+    const tuyaAppUsername = (this.state.tuyaAppUsername || '').trim();
+
     this.setState({
       tuyaSaveSettingsStatus: RequestStatus.Getting,
       tuyaConnectionStatus: null,
@@ -143,12 +149,6 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false
     });
     try {
-      const tuyaEndpoint = (this.state.tuyaEndpoint || '').trim();
-      const tuyaAccessKey = (this.state.tuyaAccessKey || '').trim();
-      const tuyaSecretKey = (this.state.tuyaSecretKey || '').trim();
-      const tuyaAppAccountId = (this.state.tuyaAppAccountId || '').trim();
-      const tuyaAppUsername = (this.state.tuyaAppUsername || '').trim();
-
       await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
         value: tuyaEndpoint
       });
