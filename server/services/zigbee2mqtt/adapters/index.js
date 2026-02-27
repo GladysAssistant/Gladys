@@ -1,18 +1,28 @@
 const CONFIG_KEYS = {
   DECONZ: 'deconz',
+  EMBER: 'ember',
   EZSP: 'ezsp',
   ZSTACK: 'zstack',
 };
 
 const ADAPTERS_BY_CONFIG_KEY = {
   [CONFIG_KEYS.DECONZ]: ['ConBee', 'ConBee II', 'RaspBee', 'RaspBee II'],
-  [CONFIG_KEYS.EZSP]: [
+  [CONFIG_KEYS.EMBER]: [
     'CoolKit ZB-GW04 USB dongle (a.k.a. easyiot stick)',
     'Elelabs ELU013 and Popp ZB-STICK',
     'Elelabs Zigbee Raspberry Pi Shield/Popp ZB-Shield',
     'Home Assistant SkyConnect (by Nabu Casa)',
     'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"',
     'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator',
+  ],
+  [CONFIG_KEYS.EZSP]: [
+    // Legacy entries — existing installations migrated to these names via Sequelize migration
+    'CoolKit ZB-GW04 USB dongle (a.k.a. easyiot stick) (legacy ezsp)',
+    'Elelabs ELU013 and Popp ZB-STICK (legacy ezsp)',
+    'Elelabs Zigbee Raspberry Pi Shield/Popp ZB-Shield (legacy ezsp)',
+    'Home Assistant SkyConnect (by Nabu Casa) (legacy ezsp)',
+    'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E" (legacy ezsp)',
+    'TubesZB Zigbee EFR32 pro ethernet/USB serial coordinator (legacy ezsp)',
   ],
   [CONFIG_KEYS.ZSTACK]: [
     "CircuitSetup's CC2652P2 USB Coordinator",
@@ -46,8 +56,8 @@ const ADAPTERS_BY_CONFIG_KEY = {
   ],
 };
 
-const ADAPTERS = Object.values(ADAPTERS_BY_CONFIG_KEY)
-  .flatMap((values) => values)
-  .sort((a, b) => a.localeCompare(b));
+const ADAPTERS = Object.entries(ADAPTERS_BY_CONFIG_KEY)
+  .flatMap(([configKey, labels]) => labels.map((label) => ({ label, configKey })))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.ZSTACK };
