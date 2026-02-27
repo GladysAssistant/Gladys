@@ -1,5 +1,6 @@
 const { fake, assert } = require('sinon');
 const { expect } = require('chai');
+const { JOB_TYPES } = require('../../../utils/constants');
 
 const EnergyMonitoringService = require('../../../services/energy-monitoring');
 
@@ -7,12 +8,14 @@ describe('EnergyMonitoring Service', () => {
   let gladys;
   let energyMonitoringService;
   let mockScheduler;
+  let wrapperDetachedSpy;
 
   beforeEach(() => {
     // Mock scheduler
     mockScheduler = {
       scheduleJob: fake.returns('mock-job-id'),
     };
+    wrapperDetachedSpy = fake((name, func) => func);
 
     gladys = {
       variable: {
@@ -25,7 +28,7 @@ describe('EnergyMonitoring Service', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
-        wrapperDetached: (name, func) => func,
+        wrapperDetached: wrapperDetachedSpy,
       },
     };
 
@@ -78,5 +81,22 @@ describe('EnergyMonitoring Service', () => {
 
     // Should not throw
     expect(true).to.equal(true);
+  });
+
+  it('should wrap detached range jobs once with buildJobData', async () => {
+    const detachedCalls = wrapperDetachedSpy.getCalls();
+    const costRangeCalls = detachedCalls.filter(
+      (call) => call.args[0] === JOB_TYPES.ENERGY_MONITORING_COST_CALCULATION_RANGE,
+    );
+    const consumptionRangeCalls = detachedCalls.filter(
+      (call) => call.args[0] === JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_RANGE,
+    );
+
+    expect(costRangeCalls).to.have.lengthOf(1);
+    expect(consumptionRangeCalls).to.have.lengthOf(1);
+    expect(costRangeCalls[0].args[2]).to.have.property('buildJobData');
+    expect(typeof costRangeCalls[0].args[2].buildJobData).to.equal('function');
+    expect(consumptionRangeCalls[0].args[2]).to.have.property('buildJobData');
+    expect(typeof consumptionRangeCalls[0].args[2].buildJobData).to.equal('function');
   });
 });
