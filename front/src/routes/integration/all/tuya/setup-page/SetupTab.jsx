@@ -408,9 +408,6 @@ class SetupTab extends Component {
                   )}
                 </div>
               )}
-              <div class="alert alert-info">
-                <Text id="integration.tuya.localModeLimitInfo" />
-              </div>
               <p>
                 <MarkupText id="integration.tuya.setup.cloudTitle" />
                 <MarkupText id="integration.tuya.setup.description" />

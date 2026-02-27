@@ -55,6 +55,10 @@ describe('Tuya device mapping', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY](true);
       expect(result).to.eq(1);
     });
+    it('light binary string', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY]('true');
+      expect(result).to.eq(1);
+    });
     it('light brightness', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS](50);
       expect(result).to.eq(50);
@@ -73,6 +77,14 @@ describe('Tuya device mapping', () => {
       it('switch', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
         expect(result).to.eq(1);
+      });
+      it('switch number', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](1);
+        expect(result).to.eq(1);
+      });
+      it('switch string false', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('false');
+        expect(result).to.eq(0);
       });
       it('switch string on', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('ON');

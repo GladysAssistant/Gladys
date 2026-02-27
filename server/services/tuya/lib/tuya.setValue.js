@@ -6,25 +6,8 @@ const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
-
-const getParamValue = (params, name) => {
-  const found = (params || []).find((param) => param.name === name);
-  return found ? found.value : undefined;
-};
-
-const getLocalDpsFromCode = (code) => {
-  if (!code) {
-    return null;
-  }
-  if (code === 'switch') {
-    return 1;
-  }
-  const match = code.match(/_(\d+)$/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return null;
-};
+const { getParamValue } = require('./utils/tuya.deviceParams');
+const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 
 /**
  * @description Send the new device value over device protocol.
@@ -53,12 +36,14 @@ async function setValue(device, deviceFeature, value) {
   const params = device.params || [];
   const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
   const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
-  const protocolVersion = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const protocolVersionRaw = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const protocolVersion =
+    protocolVersionRaw !== null && protocolVersionRaw !== undefined ? String(protocolVersionRaw).trim() : undefined;
   const localOverride = normalizeBoolean(getParamValue(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE));
 
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
-  const localDps = getLocalDpsFromCode(command);
+  const localDps = getLocalDpsFromCode(command, device);
 
   if (hasLocalConfig && localDps !== null) {
     const isProtocol35 = protocolVersion === '3.5';

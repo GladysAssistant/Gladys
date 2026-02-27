@@ -10,6 +10,8 @@ import { RequestStatus } from '../../../../utils/consts';
 const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 const ONLINE_RECENT_MINUTES = 5;
+const LOCAL_POLL_FREQUENCY = 10 * 1000;
+const CLOUD_POLL_FREQUENCY = 30 * 1000;
 
 const parseDate = dateValue => {
   if (!dateValue) {
@@ -338,7 +340,11 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const payload = {
+        ...this.state.device,
+        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+      };
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
         baselineDevice: savedDevice

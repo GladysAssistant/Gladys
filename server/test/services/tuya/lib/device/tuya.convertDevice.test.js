@@ -2,6 +2,8 @@ const { expect } = require('chai');
 
 const { convertDevice } = require('../../../../../services/tuya/lib/device/tuya.convertDevice');
 const { DEVICE_PARAM_NAME } = require('../../../../../services/tuya/lib/utils/tuya.constants');
+const { DEVICE_TYPES } = require('../../../../../services/tuya/lib/mappings');
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../../utils/constants');
 
 describe('tuya.convertDevice', () => {
   it('should map params and features with optional fields', () => {
@@ -30,6 +32,7 @@ describe('tuya.convertDevice', () => {
 
     expect(device.product_id).to.equal('product-id');
     expect(device.product_key).to.equal('product-key');
+    expect(device.device_type).to.equal(DEVICE_TYPES.SMART_SOCKET);
     expect(device.online).to.equal(true);
     expect(device.features.length).to.equal(2);
     expect(device.properties).to.deep.equal({ properties: [{ code: 'foo', value: 'bar' }] });
@@ -39,6 +42,11 @@ describe('tuya.convertDevice', () => {
       functions: [{ code: 'switch_1', name: 'Switch', type: 'Boolean' }],
       status: [{ code: 'cur_power', name: 'Power', type: 'Integer' }],
     });
+    expect(device.tuya_mapping).to.deep.equal({
+      ignored_local_dps: ['11'],
+      ignored_cloud_codes: ['countdown', 'countdown_1'],
+    });
+    expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
 
     const params = device.params.reduce((acc, param) => {
       acc[param.name] = param.value;
@@ -68,8 +76,10 @@ describe('tuya.convertDevice', () => {
 
     expect(device.product_id).to.equal(undefined);
     expect(device.product_key).to.equal(undefined);
+    expect(device.device_type).to.equal(DEVICE_TYPES.UNKNOWN);
     expect(device.online).to.equal(false);
     expect(device.features.length).to.equal(0);
     expect(device.specifications).to.deep.equal({});
+    expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS);
   });
 });

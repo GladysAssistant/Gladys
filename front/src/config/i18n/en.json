@@ -1096,7 +1096,6 @@
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed or available",
-      "localModeLimitInfo": "Local mode is still being improved. For some devices, commands or state updates may still use Tuya cloud even if Local mode is selected.",
       "status": {
         "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
         "setupPageLink": "Tuya configuration page.",

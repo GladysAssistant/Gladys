@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
+const { DEVICE_TYPES } = require('../../../../../../services/tuya/lib/mappings');
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {
@@ -54,5 +55,23 @@ describe('Tuya convert feature', () => {
       selector: 'externalId:switch_1',
       type: 'binary',
     });
+  });
+
+  it('should ignore cloud codes flagged in mapping', () => {
+    const result = convertFeature(
+      {
+        code: 'countdown',
+        type: 'Integer',
+        name: 'countdown',
+        readOnly: true,
+        values: '{}',
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result).to.equal(undefined);
   });
 });

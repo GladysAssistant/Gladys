@@ -169,7 +169,14 @@ describe('TuyaHandler.localPoll', () => {
         timeoutMs: 1000,
       });
       // Attach handler immediately to avoid PromiseRejectionHandledWarning with fake timers.
-      const errorPromise = promise.catch((error) => error);
+      const errorPromise = (async () => {
+        try {
+          await promise;
+        } catch (error) {
+          return error;
+        }
+        return null;
+      })();
       await clock.tickAsync(1100);
       const error = await errorPromise;
       expect(error).to.be.instanceOf(BadParameters);
@@ -358,5 +365,27 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
 
     expect(updated).to.have.property('updatable');
     expect(updated.local_override).to.equal(true);
+  });
+
+  it('should add fallback binary feature when dps includes key 1', () => {
+    const tuyaManager = {
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          params: [],
+          features: [],
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.3',
+      dps: { 1: true },
+    });
+
+    expect(updated.features).to.have.length(1);
+    expect(updated.features[0].external_id).to.equal('tuya:device1:switch_1');
   });
 });

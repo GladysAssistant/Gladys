@@ -1331,7 +1331,6 @@
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
-      "localModeLimitInfo": "Le mode local est encore en amélioration. Pour certains appareils, les commandes ou retours d'état peuvent encore passer par le cloud Tuya, même si le mode Local est activé.",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
         "setupPageLink": "page de configuration Tuya.",
@@ -1377,7 +1376,7 @@
       },
       "setup": {
         "title": "Configuration Tuya",
-        "cloudTitle": "<strong>Cloud</strong><br />",
+        "cloudTitle": "<strong class=\"h5 d-block\">Cloud</strong>",
         "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés. La documentation est disponible dans le menu de gauche ou <a href=\"https://gladysassistant.com/fr/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">ici</a>.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Créer un compte</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Se connecter</a>).",
         "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya (console : <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
@@ -1387,7 +1386,7 @@
         "descriptionTrial": "Les projets Tuya Cloud ont une <strong>période d'essai</strong> : pensez à la <strong>renouveler</strong> ou l'<strong>étendre</strong> régulièrement pour éviter les coupures.",
         "descriptionCloudLimit": "À noter : l'essai Tuya Cloud permet jusqu'à <strong>10 appareils contrôlables</strong>. Les appareils supplémentaires peuvent rester en <strong>lecture seule</strong> tant que vous n'avez pas mis à niveau.",
         "descriptionControllable": "Certains appareils sont en <strong>lecture seule</strong> par défaut. Dans la Tuya IoT Platform, ouvrez <strong>Device Permission</strong> puis cliquez sur <strong>Change</strong> pour les rendre contrôlables.",
-        "localTitle": "<br /><strong>Local</strong><br />",
+        "localTitle": "<br /><strong class=\"h5 d-block\">Local</strong><br />",
         "descriptionLocalMode": "Le mode local peut être utilisé après la configuration cloud : renseignez l'IP locale et la version du protocole sur chaque appareil pour interroger en local. Si les appareils sont sur le même réseau que la machine Gladys, la découverte IP et la version du protocole sont automatiquement détectées. Ce mode permet de se passer du renouvellement cloud, mais il reste nécessaire lors de l'ajout d'un nouvel appareil depuis l'application Tuya.",
         "descriptionLocalKeepsApp": "<strong>Le contrôle en local</strong> ne désactive pas le contrôle via l'application Tuya/Smart Life.",
         "descriptionCameraLimit": "<strong>Caméras</strong> : le flux vidéo n'est pas encore pris en charge dans Gladys.",

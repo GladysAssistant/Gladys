@@ -1201,7 +1201,6 @@
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
       "unmanagedModelButton": "Modell nicht verwaltet oder verfügbar",
-      "localModeLimitInfo": "Der lokale Modus wird noch verbessert. Bei manchen Geräten können Befehle oder Status-Updates weiterhin über die Tuya-Cloud laufen, auch wenn der lokale Modus aktiviert ist.",
       "status": {
         "notConnected": "Gladys konnte keine Verbindung zum Tuya-Cloud-Account herstellen. Bitte gehe zur ",
         "setupPageLink": "Tuya-Einrichtungsseite.",
