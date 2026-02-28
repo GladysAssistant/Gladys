@@ -58,7 +58,10 @@ class SetupTab extends Component {
         const response = await this.props.httpClient.get(`/api/v1/service/tuya/variable/${name}`);
         return response && response.value ? response.value : fallback;
       } catch (e) {
-        return fallback;
+        if (e && e.response && e.response.status === 404) {
+          return fallback;
+        }
+        throw e;
       }
     };
 
