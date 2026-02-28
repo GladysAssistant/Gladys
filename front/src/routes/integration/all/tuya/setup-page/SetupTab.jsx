@@ -26,7 +26,7 @@ class SetupTab extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.getTuyaConfiguration();
     this.getTuyaStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS, this.updateConnectionStatus);
