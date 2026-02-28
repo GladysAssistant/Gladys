@@ -20,6 +20,9 @@ const gladys = {
   variable: {
     getValue: sinon.stub(),
   },
+  stateManager: {
+    get: sinon.stub(),
+  },
   event: {
     emit: fake.returns(null),
   },
@@ -31,6 +34,9 @@ describe('TuyaHandler.poll', () => {
 
   beforeEach(() => {
     sinon.reset();
+    gladys.stateManager.get.resetHistory();
+    gladys.stateManager.get.resetBehavior();
+    gladys.stateManager.get.returns(null);
     tuyaHandler.connector = {
       request: sinon
         .stub()
@@ -100,6 +106,37 @@ describe('TuyaHandler.poll', () => {
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tuya:feature',
+      state: 0,
+    });
+  });
+
+  it('should use cached feature state to detect OFF changes', async () => {
+    tuyaHandler.connector = {
+      request: sinon.stub().resolves({
+        result: [{ code: 'switch_1', value: false }],
+      }),
+    };
+
+    gladys.stateManager.get.withArgs('deviceFeature', 'tuya:device:switch_1').returns({
+      last_value: 1,
+    });
+
+    await tuyaHandler.poll({
+      external_id: 'tuya:device',
+      features: [
+        {
+          external_id: 'tuya:device:switch_1',
+          selector: 'tuya:device:switch_1',
+          category: 'switch',
+          type: 'binary',
+          last_value: 0,
+        },
+      ],
+    });
+
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tuya:device:switch_1',
       state: 0,
     });
   });

@@ -99,6 +99,9 @@ class DeviceTab extends Component {
           </div>
         </div>
         <div class="card-body">
+          <div class="alert alert-info">
+            <Text id="integration.tuya.localModeLimitInfo" />
+          </div>
           <div
             class={cx('dimmer', {
               active: getTuyaStatus === RequestStatus.Getting

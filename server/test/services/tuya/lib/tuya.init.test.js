@@ -17,6 +17,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const gladys = {
   variable: {
     getValue: sinon.stub(),
+    setValue: sinon.stub().resolves(null),
   },
   event: {
     emit: fake.returns(null),
@@ -43,16 +44,28 @@ describe('TuyaHandler.init', () => {
       .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
-      .returns('secretKey');
+      .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns('appUsername')
+      .withArgs(GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
+      .returns(null);
 
     await tuyaHandler.init();
 
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
-    assert.callCount(gladys.variable.getValue, 3);
+    assert.callCount(gladys.variable.getValue, 7);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.APP_USERNAME, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId);
 
     assert.calledOnce(client.init);
 
@@ -63,7 +76,35 @@ describe('TuyaHandler.init', () => {
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
-      payload: { status: STATUS.CONNECTED },
+      payload: { status: STATUS.CONNECTED, error: null },
+    });
+  });
+
+  it('should not connect when manual disconnect is enabled', async () => {
+    gladys.variable.getValue
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
+      .returns('apiUrl')
+      .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
+      .returns('accessKey')
+      .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
+      .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns('appUsername')
+      .withArgs(GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
+      .returns('1');
+
+    await tuyaHandler.init();
+
+    expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
+
+    assert.notCalled(client.init);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
+      payload: { status: STATUS.NOT_INITIALIZED, manual_disconnect: true },
     });
   });
 });
