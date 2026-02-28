@@ -6,6 +6,7 @@ const client = {
 
 const TuyaContext = function TuyaContext() {
   this.client = client;
+  this.request = sinon.stub().resolves({ result: { list: [] }, success: true });
 };
 
 module.exports = {

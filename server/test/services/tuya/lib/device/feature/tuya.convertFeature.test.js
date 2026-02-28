@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
+const { DEVICE_TYPES } = require('../../../../../../services/tuya/lib/mappings');
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {
@@ -25,7 +26,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1000,
       min: 100,
-      name: 'name',
+      name: 'switch_1',
       read_only: false,
       selector: 'externalId:switch_1',
       type: 'binary',
@@ -49,10 +50,71 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1,
       min: 0,
-      name: 'name',
+      name: 'switch_1',
       read_only: false,
       selector: 'externalId:switch_1',
       type: 'binary',
     });
+  });
+
+  it('should ignore cloud codes flagged in mapping', () => {
+    const result = convertFeature(
+      {
+        code: 'countdown',
+        type: 'Integer',
+        name: 'countdown',
+        readOnly: true,
+        values: '{}',
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result).to.equal(undefined);
+  });
+
+  it('should support object values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'switch_1',
+        type: 'Boolean',
+        name: 'name',
+        readOnly: false,
+        values: { min: 2, max: 8 },
+      },
+      'externalId',
+    );
+
+    expect(result).to.deep.eq({
+      category: 'switch',
+      external_id: 'externalId:switch_1',
+      has_feedback: false,
+      max: 8,
+      min: 2,
+      name: 'switch_1',
+      read_only: false,
+      selector: 'externalId:switch_1',
+      type: 'binary',
+    });
+  });
+
+  it('should keep scale from values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'cur_power',
+        type: 'Integer',
+        name: 'power',
+        readOnly: true,
+        values: { min: 0, max: 99999, scale: 1 },
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result.scale).to.equal(1);
   });
 });
