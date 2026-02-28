@@ -27,6 +27,25 @@ class SunriseSunsetTrigger extends Component {
     this.props.updateTriggerProperty(this.props.index, 'house', houseSelector);
   };
 
+  onOffsetDirectionChange = e => {
+    const direction = e.target.value;
+    const currentMinutes = Math.abs(this.props.trigger.offset || 0) || 30;
+    if (direction === 'exact') {
+      this.props.updateTriggerProperty(this.props.index, 'offset', 0);
+    } else if (direction === 'before') {
+      this.props.updateTriggerProperty(this.props.index, 'offset', -currentMinutes);
+    } else {
+      this.props.updateTriggerProperty(this.props.index, 'offset', currentMinutes);
+    }
+  };
+
+  onOffsetMinutesChange = e => {
+    const minutes = parseInt(e.target.value, 10) || 0;
+    const currentOffset = this.props.trigger.offset || 0;
+    const newOffset = currentOffset < 0 ? -minutes : minutes;
+    this.props.updateTriggerProperty(this.props.index, 'offset', newOffset);
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -39,6 +58,9 @@ class SunriseSunsetTrigger extends Component {
   }
 
   render({}, { houses }) {
+    const offset = this.props.trigger.offset || 0;
+    const offsetDirection = offset === 0 ? 'exact' : offset > 0 ? 'after' : 'before';
+    const offsetMinutes = Math.abs(offset);
     return (
       <div>
         <div class="row">
@@ -46,6 +68,44 @@ class SunriseSunsetTrigger extends Component {
             <SelectSunriseSunset houses={houses} house={this.props.trigger.house} onHouseChange={this.onHouseChange} />
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="editScene.triggersCard.sunriseSunsetTrigger.offsetLabel" />
+              </label>
+              <select onChange={this.onOffsetDirectionChange} class="form-control">
+                <option value="exact" selected={offsetDirection === 'exact'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.atExactTime" />
+                </option>
+                <option value="before" selected={offsetDirection === 'before'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.before" />
+                </option>
+                <option value="after" selected={offsetDirection === 'after'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.after" />
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        {offsetDirection !== 'exact' && (
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group col-sm-8">
+                <input
+                  type="number"
+                  class="form-control"
+                  min="1"
+                  value={offsetMinutes}
+                  onChange={this.onOffsetMinutesChange}
+                />
+                <small class="form-text text-muted col-sm-4">
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.minutes" />
+                </small>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

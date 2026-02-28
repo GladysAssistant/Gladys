@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
+const { EVENTS } = require('../../../utils/constants');
 
 const SceneManager = proxyquire('../../../lib/scene', {
   suncalc: {
@@ -38,6 +39,7 @@ describe('SceneManager.dailyUpdate', () => {
   beforeEach(async () => {
     house.get = fake.resolves([
       {
+        selector: 'house-1',
         latitude: 12,
         longitude: 13,
       },
@@ -113,5 +115,83 @@ describe('SceneManager.dailyUpdate', () => {
     house.get = fake.resolves([]);
     await sceneManager.dailyUpdate();
     expect(sceneManager.jobs).to.have.lengthOf(0);
+  });
+
+  it('should schedule extra job for sunrise when a scene has offset=30', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-offset',
+      active: true,
+      actions: [],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+          offset: 30,
+        },
+      ],
+    });
+    await sceneManager.dailyUpdate();
+    // offset=0 sunrise + offset=30 sunrise + offset=0 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
+
+    // Trigger all jobs and verify events are emitted with correct offsets
+    const emittedOffsets = [];
+    event.emit = (eventName, payload) => {
+      emittedOffsets.push(payload.offset);
+    };
+    sceneManager.jobs.forEach((job) => {
+      job.callback();
+    });
+    expect(emittedOffsets).to.include(0);
+    expect(emittedOffsets).to.include(30);
+  });
+
+  it('should schedule extra job for sunset when a scene has negative offset=-15', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-offset-neg',
+      active: true,
+      actions: [],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNSET,
+          house: 'house-1',
+          offset: -15,
+        },
+      ],
+    });
+    await sceneManager.dailyUpdate();
+    // offset=0 sunrise + offset=0 sunset + offset=-15 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
+
+    const emittedOffsets = [];
+    event.emit = (eventName, payload) => {
+      emittedOffsets.push(payload.offset);
+    };
+    sceneManager.jobs.forEach((job) => {
+      job.callback();
+    });
+    expect(emittedOffsets).to.include(0);
+    expect(emittedOffsets).to.include(-15);
+  });
+
+  it('should deduplicate offsets when multiple scenes share the same offset', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-a',
+      active: true,
+      actions: [],
+      triggers: [{ type: 'time.sunrise', house: 'house-1', offset: 30 }],
+    });
+    sceneManager.addScene({
+      selector: 'scene-b',
+      active: true,
+      actions: [],
+      triggers: [{ type: 'time.sunrise', house: 'house-1', offset: 30 }],
+    });
+    await sceneManager.dailyUpdate();
+    // offset=0 sunrise + offset=30 sunrise (deduplicated) + offset=0 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
   });
 });
