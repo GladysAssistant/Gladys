@@ -1,10 +1,17 @@
-const sinon = require('sinon');
 const { expect } = require('chai');
+const sinon = require('sinon');
+
+const { fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiHTTPHandler = require('../../../../../services/nuki/lib/http');
 
-const gladys = {};
+const gladys = {
+  service: {
+    getService: fake.returns(mqttService),
+  },
+};
 
 describe('nuki.http.convertToDevice', () => {
   let nukiHttpHandler;

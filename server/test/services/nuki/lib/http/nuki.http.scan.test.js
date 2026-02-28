@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
@@ -32,6 +33,12 @@ describe('nuki.http.scan command', () => {
   it('should get no smart lock device through nuki web api', async () => {
     nukiHttpHandler.nukiApi.getSmartlocks = fake.returns(null);
     await nukiHttpHandler.scan();
+    assert.notCalled(nukiHttpHandler.nukiHandler.notifyNewDevice);
+  });
+
+  it('should raise an error, since http service is not configured', async () => {
+    nukiHttpHandler.nukiHandler.getStatus = fake.resolves({ webOk: false });
+    await expect(nukiHttpHandler.scan()).to.be.rejectedWith(Error);
     assert.notCalled(nukiHttpHandler.nukiHandler.notifyNewDevice);
   });
 

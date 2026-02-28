@@ -12,7 +12,6 @@ class DiscoverTab extends Component {
   async componentWillMount() {
     this.getDiscoveredDevices();
     this.getHouses();
-
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_HTTP_DEVICE, this.addDiscoveredDevice);
   }
 
@@ -58,7 +57,6 @@ class DiscoverTab extends Component {
       });
     } catch (e) {
       this.setState({
-        discoveredDevices: undefined,
         loading: false,
         errorLoading: true
       });
