@@ -370,6 +370,31 @@ describe('TuyaHandler.poll additional branch coverage', () => {
     expect(logger.warn.calledOnce).to.equal(true);
   });
 
+  it('should ignore malformed cloud status entries', async () => {
+    const request = sinon.stub().resolves({ result: [null, 'bad', { value: true }, { code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(request.calledOnce).to.equal(true);
+    expect(emit.calledOnce).to.equal(true);
+    expect(emit.firstCall.args[1].state).to.equal(1);
+  });
+
   it('should skip cloud features when code or reader is missing', async () => {
     const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
     const emit = sinon.stub();
@@ -424,6 +449,39 @@ describe('TuyaHandler.poll additional branch coverage', () => {
 
     expect(logger.warn.calledOnce).to.equal(true);
     expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should warn and fallback to cloud when local payload has no dps object', async () => {
+    const localPoll = sinon.stub().resolves({});
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'IP_ADDRESS', value: '1.1.1.1' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.3' },
+          { name: 'LOCAL_OVERRIDE', value: true },
+        ],
+        features: [{ external_id: 'tuya:device:switch_1', category: 'switch', type: 'binary' }],
+      },
+    );
+
+    expect(localPoll.calledOnce).to.equal(true);
+    expect(request.calledOnce).to.equal(true);
+    expect(logger.warn.calledOnce).to.equal(true);
+    expect(logger.warn.firstCall.args[0]).to.include('invalid DPS payload');
   });
 
   it('should fallback to cloud when local dps value is undefined', async () => {
