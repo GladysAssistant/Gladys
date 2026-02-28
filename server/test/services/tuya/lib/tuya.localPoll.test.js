@@ -222,7 +222,7 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should log last socket error when different from thrown error', async () => {
+  it('should keep the original connect error when a socket error also occurs', async () => {
     const connect = sinon.stub().rejects(new Error('connect failed'));
     const get = sinon.stub();
     const disconnect = sinon.stub().resolves();
@@ -257,7 +257,7 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should stop cleanup when already resolved', async () => {
+  it('should propagate cleanup errors after a successful poll', async () => {
     const connect = sinon.stub().resolves();
     const get = sinon.stub().resolves({ dps: { 1: true } });
     const disconnect = sinon.stub().resolves();

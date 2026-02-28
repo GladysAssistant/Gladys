@@ -199,16 +199,12 @@ const getDeviceType = (device) => {
   }
 
   const specifications = device.specifications || {};
-  let codes = extractCodesFromSpecifications(specifications);
-  if (codes.size === 0) {
-    codes = extractCodesFromThingModel(device.thing_model);
-  }
-  if (codes.size === 0) {
-    codes = extractCodesFromProperties(device.properties);
-  }
-  if (codes.size === 0) {
-    codes = extractCodesFromFeatures(device.features);
-  }
+  const codes = new Set([
+    ...extractCodesFromSpecifications(specifications),
+    ...extractCodesFromThingModel(device.thing_model),
+    ...extractCodesFromProperties(device.properties),
+    ...extractCodesFromFeatures(device.features),
+  ]);
 
   const modelName = [device.model, device.product_name, device.name]
     .filter((value) => typeof value === 'string' && value.length > 0)

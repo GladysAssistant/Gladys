@@ -121,7 +121,10 @@ const pollCloudFeatures = async function pollCloudFeatures(deviceFeatures, topic
   const values = {};
   const result = Array.isArray(response && response.result) ? response.result : [];
   result.forEach((feature) => {
-    values[feature.code] = feature.value;
+    if (!feature || typeof feature !== 'object' || feature.code === undefined || feature.code === null) {
+      return;
+    }
+    values[String(feature.code)] = feature.value;
   });
 
   deviceFeatures.forEach((deviceFeature) => {
@@ -277,6 +280,9 @@ async function poll(device) {
         );
         return;
       }
+
+      fallbackReason = 'invalid_local_payload';
+      logger.warn(`[Tuya][poll] local poll returned invalid DPS payload for ${topic}, falling back to cloud`);
     } catch (e) {
       logger.warn(`[Tuya][poll] local poll failed for ${topic}, falling back to cloud`, e);
       fallbackReason = 'local_poll_failed';

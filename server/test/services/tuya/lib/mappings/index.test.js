@@ -137,6 +137,16 @@ describe('Tuya mappings index', () => {
       model: 'DIN Smart Meter',
     });
     expect(smartMeterByThingModel).to.equal(DEVICE_TYPES.SMART_METER);
+
+    const socketByMergedSources = getDeviceType({
+      specifications: {
+        functions: [{ code: 'timer' }],
+        status: [],
+      },
+      features: [{ external_id: 'tuya:device:switch_1' }],
+      model: 'Wifi Plug Mini',
+    });
+    expect(socketByMergedSources).to.equal(DEVICE_TYPES.SMART_SOCKET);
   });
 
   it('should get feature mapping and ignore invalid candidates', () => {
