@@ -1,7 +1,8 @@
 [
   {
     "key": "telegram",
-    "img": "/assets/integrations/cover/telegram.jpg"
+    "img": "/assets/integrations/cover/telegram.jpg",
+    "cloud": true
   },
   {
     "key": "nextcloudTalk",
@@ -10,31 +11,40 @@
   {
     "key": "alexa",
     "img": "/assets/integrations/cover/alexa.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "gladysPlus": true,
+    "cloud": true
   },
   {
     "key": "googleHome",
     "img": "/assets/integrations/cover/google-home.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "gladysPlus": true,
+    "cloud": true
   },
   {
     "key": "homekit",
     "img": "/assets/integrations/cover/homekit.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "cloud": true
   },
   {
     "key": "openai",
-    "img": "/assets/integrations/cover/openai.jpg"
+    "img": "/assets/integrations/cover/openai.jpg",
+    "gladysPlus": true,
+    "cloud": true
   },
   {
     "key": "free-mobile",
     "link": "free-mobile",
     "img": "/assets/integrations/cover/free-mobile.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "cloud": true
   },
   {
     "key": "callmebot",
-    "img": "/assets/integrations/cover/callmebot.jpg"
+    "img": "/assets/integrations/cover/callmebot.jpg",
+    "cloud": true
   },
   {
     "key": "mcp",

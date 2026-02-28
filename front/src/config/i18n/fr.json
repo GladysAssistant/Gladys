@@ -505,6 +505,10 @@
     "createDashboardButton": "Créer"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud"
+    },
     "root": {
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",

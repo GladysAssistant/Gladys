@@ -41,12 +41,14 @@
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "cloud": true
   },
   {
     "key": "owntracks",
     "img": "/assets/integrations/cover/owntracks.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "gladysPlus": true
   },
   {
     "key": "broadlink",
@@ -62,7 +64,9 @@
   {
     "key": "enedis",
     "img": "/assets/integrations/cover/enedis.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "gladysPlus": true,
+    "cloud": true
   },
   {
     "key": "lanManager",
@@ -74,13 +78,15 @@
     "key": "tuya",
     "link": "tuya",
     "img": "/assets/integrations/cover/tuya.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "cloud": true
   },
   {
     "key": "melcloud",
     "link": "melcloud",
     "img": "/assets/integrations/cover/melcloud.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "cloud": true
   },
   {
     "key": "nodeRed",
@@ -97,7 +103,8 @@
   {
     "key": "netatmo",
     "link": "netatmo",
-    "img": "/assets/integrations/cover/netatmo.jpg"
+    "img": "/assets/integrations/cover/netatmo.jpg",
+    "cloud": true
   },
   {
     "key": "sonos",
