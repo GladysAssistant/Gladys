@@ -149,8 +149,8 @@ const extractCodesFromFeatures = (features) => {
       return;
     }
     const parts = String(feature.external_id).split(':');
-    if (parts.length >= 3) {
-      const code = parts[2];
+    if (parts.length >= 2) {
+      const code = parts[parts.length - 1];
       if (code) {
         codes.add(String(code).toLowerCase());
       }
