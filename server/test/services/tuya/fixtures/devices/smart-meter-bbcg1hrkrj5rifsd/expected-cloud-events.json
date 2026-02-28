@@ -1,0 +1,26 @@
+[
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:total_power",
+    "state": 70.6
+  },
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:forward_energy_total",
+    "state": 1492.41
+  },
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:voltage_a",
+    "state": 230.1
+  },
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:current_a",
+    "state": 123
+  },
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:current_b",
+    "state": 456
+  },
+  {
+    "device_feature_external_id": "tuya:smart-meter-device-id:reverse_energy_total",
+    "state": 432.22
+  }
+]

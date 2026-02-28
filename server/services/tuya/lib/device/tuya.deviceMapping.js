@@ -1,102 +1,28 @@
-const {
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_UNITS,
-  COVER_STATE,
-} = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../../utils/constants');
 
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
-
-const SWITCH_LED = 'switch_led';
-const BRIGHT_VALUE_V2 = 'bright_value_v2';
-const TEMP_VALUE_V2 = 'temp_value_v2';
-const COLOUR_DATA_V2 = 'colour_data_v2';
-
-const COLOUR_DATA = 'colour_data';
-
-const ADD_ELE = 'add_ele';
-const CUR_CURRENT = 'cur_current';
-const CUR_POWER = 'cur_power';
-const CUR_VOLTAGE = 'cur_voltage';
-
-const SWITCH_1 = 'switch_1';
-const SWITCH_2 = 'switch_2';
-const SWITCH_3 = 'switch_3';
-const SWITCH_4 = 'switch_4';
-
-const CONTROL = 'control';
-const PERCENT_CONTROL = 'percent_control';
+const { normalizeBoolean } = require('../utils/tuya.normalize');
 
 const OPEN = 'open';
 const CLOSE = 'close';
 const STOP = 'stop';
 
-const mappings = {
-  [SWITCH_LED]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-  },
-  [BRIGHT_VALUE_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-  },
-  [TEMP_VALUE_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-  },
-  [COLOUR_DATA_V2]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  },
-  [COLOUR_DATA]: {
-    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  },
+const getScale = (deviceFeature, defaultScale = 0) => {
+  const parsedScale =
+    deviceFeature && deviceFeature.scale !== undefined && deviceFeature.scale !== null
+      ? parseInt(deviceFeature.scale, 10)
+      : defaultScale;
 
-  [SWITCH_1]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_2]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_3]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [SWITCH_4]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-  },
-  [CONTROL]: {
-    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-    type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
-  },
-  [PERCENT_CONTROL]: {
-    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-    type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
-  },
-  [ADD_ELE]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  },
-  [CUR_CURRENT]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
-    unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
-  },
-  [CUR_POWER]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
-    unit: DEVICE_FEATURE_UNITS.WATT,
-  },
-  [CUR_VOLTAGE]: {
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
-    unit: DEVICE_FEATURE_UNITS.VOLT,
-  },
+  return Number.isNaN(parsedScale) ? defaultScale : parsedScale;
+};
+
+const scaleValue = (valueFromDevice, deviceFeature, defaultScale = 0) => {
+  const parsedValue = Number(valueFromDevice);
+  if (Number.isNaN(parsedValue)) {
+    return parsedValue;
+  }
+  const scale = getScale(deviceFeature, defaultScale);
+  return parsedValue / 10 ** scale;
 };
 
 const writeValues = {
@@ -146,7 +72,7 @@ const writeValues = {
 const readValues = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromDevice) => {
-      return valueFromDevice === true ? 1 : 0;
+      return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
     [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: (valueFromDevice) => {
       return valueFromDevice;
@@ -164,19 +90,38 @@ const readValues = {
 
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
-      return valueFromDevice === true ? 1 : 0;
+      return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 100;
+    [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 2);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10);
+    [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.POWER]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 10;
+    [DEVICE_FEATURE_TYPES.SWITCH.POWER]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 1);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 10;
+    [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 1);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
@@ -195,4 +140,4 @@ const readValues = {
   },
 };
 
-module.exports = { mappings, readValues, writeValues };
+module.exports = { readValues, writeValues };

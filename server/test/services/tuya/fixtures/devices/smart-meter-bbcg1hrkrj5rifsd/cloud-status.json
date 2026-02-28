@@ -1,0 +1,10 @@
+{
+  "result": [
+    { "code": "total_power", "value": 706 },
+    { "code": "forward_energy_total", "value": 149241 },
+    { "code": "voltage_a", "value": 2301 },
+    { "code": "current_a", "value": 123 },
+    { "code": "current_b", "value": 456 },
+    { "code": "reverse_energy_total", "value": 43222 }
+  ]
+}

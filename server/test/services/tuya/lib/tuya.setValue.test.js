@@ -1,10 +1,14 @@
+/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 const sinon = require('sinon');
+const proxyquire = require('proxyquire')
+  .noCallThru()
+  .noPreserveCache();
 
 const { assert, fake } = sinon;
 
 const { expect } = require('chai');
 const TuyaHandler = require('../../../../services/tuya/lib/index');
-const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { API, DEVICE_PARAM_NAME } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { BadParameters } = require('../../../../utils/coreErrors');
 
@@ -87,5 +91,323 @@ describe('TuyaHandler.setValue', () => {
       path: `${API.VERSION_1_0}/devices/uuid/commands`,
       body: { commands: [{ code: 'switch_0', value: true }] },
     });
+  });
+
+  it('should call local tuyapi when local params are set', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should call local tuyapi-newgen for protocol 3.5', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.5');
+    }
+    function TuyAPINewGenStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should call local tuyapi with switch code', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should fallback to cloud when local override is false', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: 'false' },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({}) },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.called).to.equal(false);
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+  });
+
+  it('should fallback to cloud when dps is not mapped', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:countdown',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({}) },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.called).to.equal(false);
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+  });
+
+  it('should fallback to cloud when local call fails', async () => {
+    const connect = sinon.stub().rejects(new Error('local error'));
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({}) },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+  });
+
+  it('should throw when command is empty', async () => {
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({}) },
+      gladys: {},
+    };
+
+    try {
+      await tuyaHandler.setValue.call(ctx, device, deviceFeature, 1);
+      expect.fail('Expected setValue to throw');
+    } catch (error) {
+      expect(error.message).to.include('have no command');
+    }
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should log disconnect failures and still return on local success', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().rejects(new Error('disconnect error'));
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
   });
 });

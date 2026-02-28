@@ -1,0 +1,52 @@
+{
+  "name": "Kitchen Plug",
+  "external_id": "tuya:socket-device-id",
+  "selector": "tuya:socket-device-id",
+  "device_type": "smart-socket",
+  "model": "Mini Plug",
+  "product_id": "cya3zxfd38g4qp8d",
+  "product_key": "socket-key",
+  "online": true,
+  "poll_frequency": 10000,
+  "should_poll": true,
+  "params": {
+    "DEVICE_ID": "socket-device-id",
+    "LOCAL_KEY": "local-key",
+    "IP_ADDRESS": "10.0.0.10",
+    "CLOUD_IP": "1.2.3.4",
+    "LOCAL_OVERRIDE": true,
+    "PROTOCOL_VERSION": "3.3",
+    "PRODUCT_ID": "cya3zxfd38g4qp8d",
+    "PRODUCT_KEY": "socket-key"
+  },
+  "tuya_mapping": {
+    "ignored_local_dps": ["11"],
+    "ignored_cloud_codes": ["countdown", "countdown_1"]
+  },
+  "features": [
+    {
+      "name": "switch_1",
+      "external_id": "tuya:socket-device-id:switch_1",
+      "selector": "tuya:socket-device-id:switch_1",
+      "category": "switch",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "cur_power",
+      "external_id": "tuya:socket-device-id:cur_power",
+      "selector": "tuya:socket-device-id:cur_power",
+      "category": "switch",
+      "type": "power",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999,
+      "unit": "watt",
+      "scale": 1
+    }
+  ]
+}
