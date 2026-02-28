@@ -323,6 +323,30 @@ describe('TuyaHandler.poll with local mapping', () => {
 });
 
 describe('TuyaHandler.poll additional branch coverage', () => {
+  it('should not throw when features payload is not an array', async () => {
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+    const logger = { debug: sinon.stub(), warn: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+    });
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: null,
+      },
+    );
+
+    expect(request.called).to.equal(false);
+    expect(emit.called).to.equal(false);
+  });
+
   it('should warn and return when cloud connector is unavailable', async () => {
     const logger = { debug: sinon.stub(), warn: sinon.stub() };
     const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
@@ -345,7 +369,9 @@ describe('TuyaHandler.poll additional branch coverage', () => {
   });
 
   it('should ignore malformed cloud status entries', async () => {
-    const request = sinon.stub().resolves({ result: [null, 'bad', { value: true }, { code: 'switch_1', value: true }] });
+    const request = sinon
+      .stub()
+      .resolves({ result: [null, 'bad', { value: true }, { code: 'switch_1', value: true }] });
     const emit = sinon.stub();
     const logger = { debug: sinon.stub(), warn: sinon.stub() };
     const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {

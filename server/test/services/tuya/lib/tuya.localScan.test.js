@@ -250,7 +250,7 @@ describe('TuyaHandler.localScan', () => {
     });
   });
 
-  it('should log listening address when available', async () => {
+  it('should complete local scan when listening address is available', async () => {
     const sockets = [];
     const dgramStub = {
       createSocket: () => {
