@@ -1,0 +1,60 @@
+{
+  "external_id": "tuya:smart-meter-device-id",
+  "device_type": "smart-meter",
+  "params": [
+    { "name": "IP_ADDRESS", "value": "10.0.0.20" },
+    { "name": "LOCAL_KEY", "value": "local-key" },
+    { "name": "PROTOCOL_VERSION", "value": "3.3" },
+    { "name": "LOCAL_OVERRIDE", "value": true }
+  ],
+  "features": [
+    {
+      "external_id": "tuya:smart-meter-device-id:total_power",
+      "selector": "tuya:smart-meter-device-id:total_power",
+      "category": "energy-sensor",
+      "type": "power",
+      "scale": 1,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:forward_energy_total",
+      "selector": "tuya:smart-meter-device-id:forward_energy_total",
+      "category": "energy-sensor",
+      "type": "energy",
+      "scale": 2,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:voltage_a",
+      "selector": "tuya:smart-meter-device-id:voltage_a",
+      "category": "energy-sensor",
+      "type": "voltage",
+      "scale": 1,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:current_a",
+      "selector": "tuya:smart-meter-device-id:current_a",
+      "category": "energy-sensor",
+      "type": "current",
+      "scale": 0,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:current_b",
+      "selector": "tuya:smart-meter-device-id:current_b",
+      "category": "energy-sensor",
+      "type": "current",
+      "scale": 0,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
+      "selector": "tuya:smart-meter-device-id:reverse_energy_total",
+      "category": "energy-production-sensor",
+      "type": "index",
+      "scale": 2,
+      "last_value": 0
+    }
+  ]
+}

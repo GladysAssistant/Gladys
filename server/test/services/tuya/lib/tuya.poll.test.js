@@ -11,7 +11,6 @@ const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
 const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
   './tuya.connect.js': connect,
 });
-const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { EVENTS } = require('../../../../utils/constants');
 
 const { BadParameters } = require('../../../../utils/coreErrors');
@@ -82,31 +81,6 @@ describe('TuyaHandler.poll', () => {
       expect(error).to.be.an.instanceof(BadParameters);
       expect(error.message).to.equal('Tuya device external_id is invalid: "tuya" have no network indicator');
     }
-  });
-
-  it('change state of device feature', async () => {
-    await tuyaHandler.poll({
-      external_id: 'tuya:device',
-      features: [
-        {
-          external_id: 'tuya:device:switch_1',
-          category: 'light',
-          type: 'binary',
-        },
-      ],
-    });
-
-    assert.callCount(tuyaHandler.connector.request, 1);
-    assert.calledWith(tuyaHandler.connector.request, {
-      method: 'GET',
-      path: `${API.VERSION_1_0}/devices/device/status`,
-    });
-
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'tuya:device:switch_1',
-      state: 1,
-    });
   });
 
   it('should skip cloud feature when code is missing from payload', async () => {

@@ -1,0 +1,101 @@
+{
+  "name": "Production solaire",
+  "external_id": "tuya:smart-meter-device-id",
+  "selector": "tuya:smart-meter-device-id",
+  "device_type": "smart-meter",
+  "model": "Smart Meter",
+  "product_id": "bbcg1hrkrj5rifsd",
+  "online": true,
+  "poll_frequency": 10000,
+  "should_poll": true,
+  "params": {
+    "DEVICE_ID": "smart-meter-device-id",
+    "LOCAL_OVERRIDE": true,
+    "PROTOCOL_VERSION": "3.3",
+    "PRODUCT_ID": "bbcg1hrkrj5rifsd"
+  },
+  "tuya_mapping": {
+    "ignored_local_dps": ["102", "103", "104", "110", "116", "117", "118", "119", "120", "121", "122", "123", "124", "125", "126", "127", "128", "129"],
+    "ignored_cloud_codes": ["coef_a_reset", "coef_b_reset", "current_a_calibration", "current_b_calibration", "direction_a", "direction_b", "energy_a_calibration_fwd", "energy_a_calibration_rev", "energy_b_calibration_fwd", "energy_b_calibration_rev", "freq", "freq_calibration", "power_a_calibration", "power_b_calibration", "power_factor", "power_factor_b", "report_rate_control", "tbd", "voltage_coef"]
+  },
+  "features": [
+    {
+      "name": "total_power",
+      "external_id": "tuya:smart-meter-device-id:total_power",
+      "selector": "tuya:smart-meter-device-id:total_power",
+      "category": "energy-sensor",
+      "type": "power",
+      "read_only": true,
+      "has_feedback": false,
+      "min": -99999999,
+      "max": 99999999,
+      "unit": "watt",
+      "scale": 1
+    },
+    {
+      "name": "forward_energy_total",
+      "external_id": "tuya:smart-meter-device-id:forward_energy_total",
+      "selector": "tuya:smart-meter-device-id:forward_energy_total",
+      "category": "energy-sensor",
+      "type": "energy",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999999,
+      "unit": "kilowatt-hour",
+      "scale": 2
+    },
+    {
+      "name": "voltage_a",
+      "external_id": "tuya:smart-meter-device-id:voltage_a",
+      "selector": "tuya:smart-meter-device-id:voltage_a",
+      "category": "energy-sensor",
+      "type": "voltage",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999999,
+      "unit": "volt",
+      "scale": 1
+    },
+    {
+      "name": "current_a",
+      "external_id": "tuya:smart-meter-device-id:current_a",
+      "selector": "tuya:smart-meter-device-id:current_a",
+      "category": "energy-sensor",
+      "type": "current",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999999,
+      "unit": "milliampere",
+      "scale": 0
+    },
+    {
+      "name": "current_b",
+      "external_id": "tuya:smart-meter-device-id:current_b",
+      "selector": "tuya:smart-meter-device-id:current_b",
+      "category": "energy-sensor",
+      "type": "current",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999999,
+      "unit": "milliampere",
+      "scale": 0
+    },
+    {
+      "name": "reverse_energy_total",
+      "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
+      "selector": "tuya:smart-meter-device-id:reverse_energy_total",
+      "category": "energy-production-sensor",
+      "type": "index",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 99999999,
+      "unit": "kilowatt-hour",
+      "scale": 2
+    }
+  ]
+}

@@ -63,6 +63,14 @@ describe('Tuya mappings index', () => {
     const unsupportedLocal = getLocalMapping('unsupported-device');
     expect(unsupportedLocal.strict).to.equal(false);
     expect(unsupportedLocal.ignoredDps).to.not.include('11');
+
+    const smartMeterCloud = getCloudMapping(DEVICE_TYPES.SMART_METER);
+    expect(smartMeterCloud.total_power).to.be.an('object');
+    expect(smartMeterCloud.forward_energy_total).to.be.an('object');
+
+    const smartMeterLocal = getLocalMapping(DEVICE_TYPES.SMART_METER);
+    expect(smartMeterLocal.strict).to.equal(true);
+    expect(smartMeterLocal.dps.total_power).to.equal(115);
   });
 
   it('should detect device types', () => {
@@ -107,6 +115,21 @@ describe('Tuya mappings index', () => {
       model: 'Wifi Plug Mini',
     });
     expect(socketByProperties).to.equal(DEVICE_TYPES.SMART_SOCKET);
+
+    const smartMeterByProductId = getDeviceType({
+      specifications: {},
+      product_id: 'bbcg1hrkrj5rifsd',
+    });
+    expect(smartMeterByProductId).to.equal(DEVICE_TYPES.SMART_METER);
+
+    const smartMeterByThingModel = getDeviceType({
+      specifications: {},
+      thing_model: {
+        services: [{ properties: [{ code: 'total_power' }, { code: 'forward_energy_total' }] }],
+      },
+      model: 'DIN Smart Meter',
+    });
+    expect(smartMeterByThingModel).to.equal(DEVICE_TYPES.SMART_METER);
   });
 
   it('should get feature mapping and ignore invalid candidates', () => {

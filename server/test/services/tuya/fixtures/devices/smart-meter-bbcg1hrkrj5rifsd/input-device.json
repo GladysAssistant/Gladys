@@ -1,0 +1,100 @@
+{
+  "id": "smart-meter-device-id",
+  "name": "Production solaire",
+  "model": "Smart Meter",
+  "product_id": "bbcg1hrkrj5rifsd",
+  "protocol_version": "3.3",
+  "local_override": true,
+  "online": true,
+  "specifications": {},
+  "properties": {
+    "properties": [
+      {
+        "code": "total_power",
+        "dp_id": 115,
+        "type": "value",
+        "value": 706
+      }
+    ]
+  },
+  "thing_model": {
+    "services": [
+      {
+        "properties": [
+          {
+            "code": "total_power",
+            "name": "Total_Power",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": -99999999,
+              "max": 99999999,
+              "scale": 1,
+              "unit": "W"
+            }
+          },
+          {
+            "code": "forward_energy_total",
+            "name": "Forward Energy Total",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": 0,
+              "max": 99999999,
+              "scale": 2,
+              "unit": "KWH"
+            }
+          },
+          {
+            "code": "reverse_energy_total",
+            "name": "Reverse Energy Total",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": 0,
+              "max": 99999999,
+              "scale": 2,
+              "unit": "KWH"
+            }
+          },
+          {
+            "code": "voltage_a",
+            "name": "Voltage A",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": 0,
+              "max": 99999999,
+              "scale": 1,
+              "unit": "V"
+            }
+          },
+          {
+            "code": "current_a",
+            "name": "Current A",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": 0,
+              "max": 99999999,
+              "scale": 0,
+              "unit": "mA"
+            }
+          },
+          {
+            "code": "current_b",
+            "name": "Current B",
+            "accessMode": "ro",
+            "typeSpec": {
+              "type": "value",
+              "min": 0,
+              "max": 99999999,
+              "scale": 0,
+              "unit": "mA"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

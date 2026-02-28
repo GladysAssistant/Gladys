@@ -1,0 +1,27 @@
+{
+  "external_id": "tuya:socket-device-id",
+  "device_type": "smart-socket",
+  "params": [
+    { "name": "IP_ADDRESS", "value": "10.0.0.10" },
+    { "name": "LOCAL_KEY", "value": "local-key" },
+    { "name": "PROTOCOL_VERSION", "value": "3.3" },
+    { "name": "LOCAL_OVERRIDE", "value": true }
+  ],
+  "features": [
+    {
+      "external_id": "tuya:socket-device-id:switch_1",
+      "selector": "tuya:socket-device-id:switch_1",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:socket-device-id:cur_power",
+      "selector": "tuya:socket-device-id:cur_power",
+      "category": "switch",
+      "type": "power",
+      "scale": 1,
+      "last_value": 0
+    }
+  ]
+}

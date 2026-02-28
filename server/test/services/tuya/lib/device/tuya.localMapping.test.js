@@ -95,4 +95,10 @@ describe('Tuya local mapping', () => {
     expect(result.features).to.have.length(1);
     expect(result.features[0].external_id).to.equal('tuya:device:switch_1');
   });
+
+  it('should resolve total_power in smart meter local mapping', () => {
+    const device = { device_type: 'smart-meter' };
+    const dpsKey = getLocalDpsFromCode('total_power', device);
+    expect(dpsKey).to.equal(115);
+  });
 });

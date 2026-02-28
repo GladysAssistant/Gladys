@@ -361,7 +361,12 @@ describe('TuyaHandler.setValue', () => {
       gladys: {},
     };
 
-    await expect(tuyaHandler.setValue.call(ctx, device, deviceFeature, 1)).to.be.rejectedWith('have no command');
+    try {
+      await tuyaHandler.setValue.call(ctx, device, deviceFeature, 1);
+      expect.fail('Expected setValue to throw');
+    } catch (error) {
+      expect(error.message).to.include('have no command');
+    }
     expect(ctx.connector.request.called).to.equal(false);
   });
 
