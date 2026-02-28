@@ -94,17 +94,41 @@ describe('Tuya device mapping', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30');
         expect(result).to.eq(0.3);
       });
+      it('energy with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30', {
+          scale: 1,
+        });
+        expect(result).to.eq(3);
+      });
       it('current', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('20');
         expect(result).to.eq(20);
+      });
+      it('current with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('205', {
+          scale: 1,
+        });
+        expect(result).to.eq(20.5);
       });
       it('power', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('2245');
         expect(result).to.eq(224.5);
       });
+      it('power with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('2245', {
+          scale: 2,
+        });
+        expect(result).to.eq(22.45);
+      });
       it('voltage', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]('120');
         expect(result).to.eq(12.0);
+      });
+      it('voltage with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]('2352', {
+          scale: 1,
+        });
+        expect(result).to.eq(235.2);
       });
     });
     describe('curtain state', () => {

@@ -82,4 +82,45 @@ describe('tuya.convertDevice', () => {
     expect(device.specifications).to.deep.equal({});
     expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS);
   });
+
+  it('should build features from thing model when specifications are empty', () => {
+    const tuyaDevice = {
+      id: 'device-id',
+      name: 'Wifi Plug Mini',
+      model: 'Wifi Plug Mini',
+      product_id: 'cya3zxfd38g4qp8d',
+      local_override: true,
+      thing_model: {
+        services: [
+          {
+            properties: [
+              {
+                code: 'switch_1',
+                name: 'Switch 1',
+                accessMode: 'rw',
+                typeSpec: { type: 'bool' },
+              },
+              {
+                code: 'cur_power',
+                name: 'Current Power',
+                accessMode: 'ro',
+                typeSpec: { min: 0, max: 99999, scale: 1, unit: 'W' },
+              },
+            ],
+          },
+        ],
+      },
+      specifications: {},
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+
+    expect(device.device_type).to.equal(DEVICE_TYPES.SMART_SOCKET);
+    expect(device.features.map((feature) => feature.external_id)).to.have.members([
+      'tuya:device-id:switch_1',
+      'tuya:device-id:cur_power',
+    ]);
+    expect(device.features.find((feature) => feature.external_id === 'tuya:device-id:cur_power').scale).to.equal(1);
+    expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
+  });
 });

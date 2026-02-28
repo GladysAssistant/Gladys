@@ -99,4 +99,22 @@ describe('Tuya convert feature', () => {
       type: 'binary',
     });
   });
+
+  it('should keep scale from values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'cur_power',
+        type: 'Integer',
+        name: 'power',
+        readOnly: true,
+        values: { min: 0, max: 99999, scale: 1 },
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result.scale).to.equal(1);
+  });
 });

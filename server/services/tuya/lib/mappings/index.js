@@ -146,6 +146,37 @@ const extractCodesFromFeatures = (features) => {
   return codes;
 };
 
+const extractCodesFromThingModel = (thingModel) => {
+  const codes = new Set();
+  const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
+
+  services.forEach((service) => {
+    const properties = Array.isArray(service && service.properties) ? service.properties : [];
+    properties.forEach((property) => {
+      if (!property || !property.code) {
+        return;
+      }
+      codes.add(String(property.code).toLowerCase());
+    });
+  });
+
+  return codes;
+};
+
+const extractCodesFromProperties = (propertiesPayload) => {
+  const codes = new Set();
+  const properties = Array.isArray(propertiesPayload && propertiesPayload.properties) ? propertiesPayload.properties : [];
+
+  properties.forEach((property) => {
+    if (!property || !property.code) {
+      return;
+    }
+    codes.add(String(property.code).toLowerCase());
+  });
+
+  return codes;
+};
+
 const getDeviceType = (device) => {
   if (!device || typeof device !== 'object') {
     return DEVICE_TYPES.UNKNOWN;
@@ -153,6 +184,12 @@ const getDeviceType = (device) => {
 
   const specifications = device.specifications || {};
   let codes = extractCodesFromSpecifications(specifications);
+  if (codes.size === 0) {
+    codes = extractCodesFromThingModel(device.thing_model);
+  }
+  if (codes.size === 0) {
+    codes = extractCodesFromProperties(device.properties);
+  }
   if (codes.size === 0) {
     codes = extractCodesFromFeatures(device.features);
   }
