@@ -81,8 +81,10 @@ const triggersFunc = {
     return false;
   },
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
-  [EVENTS.TIME.SUNRISE]: (self, sceneSelector, event, trigger) => event.house.selector === trigger.house,
-  [EVENTS.TIME.SUNSET]: (self, sceneSelector, event, trigger) => event.house.selector === trigger.house,
+  [EVENTS.TIME.SUNRISE]: (self, sceneSelector, event, trigger) =>
+    event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0),
+  [EVENTS.TIME.SUNSET]: (self, sceneSelector, event, trigger) =>
+    event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0),
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>
     event.house === trigger.house && event.user === trigger.user,
   [EVENTS.USER_PRESENCE.LEFT_HOME]: (self, sceneSelector, event, trigger) =>
