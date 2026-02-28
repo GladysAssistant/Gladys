@@ -123,6 +123,16 @@ describe('TuyaHandler.poll', () => {
 
     assert.callCount(gladys.event.emit, 0);
   });
+
+  it('should return without cloud request when feature list is empty', async () => {
+    await tuyaHandler.poll({
+      external_id: 'tuya:device',
+      features: [],
+    });
+
+    assert.callCount(tuyaHandler.connector.request, 0);
+    assert.callCount(gladys.event.emit, 0);
+  });
 });
 
 describe('TuyaHandler.poll with local mapping', () => {

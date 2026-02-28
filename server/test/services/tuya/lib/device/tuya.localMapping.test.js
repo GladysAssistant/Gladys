@@ -22,6 +22,12 @@ describe('Tuya local mapping', () => {
     expect(result).to.equal(device);
   });
 
+  it('should return null when code is missing', () => {
+    const device = { device_type: 'smart-socket' };
+    const dpsKey = getLocalDpsFromCode(undefined, device);
+    expect(dpsKey).to.equal(null);
+  });
+
   it('should resolve aliases in strict local mapping', () => {
     const device = { device_type: 'smart-socket' };
     const dpsKey = getLocalDpsFromCode('power', device);

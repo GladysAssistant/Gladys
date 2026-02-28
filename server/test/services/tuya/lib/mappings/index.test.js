@@ -93,7 +93,7 @@ describe('Tuya mappings index', () => {
     const socketByThingModel = getDeviceType({
       specifications: {},
       thing_model: {
-        services: [{ properties: [{ code: 'switch_1' }] }],
+        services: [{ properties: [{}, { code: 'switch_1' }] }],
       },
       model: 'Wifi Plug Mini',
     });
@@ -102,7 +102,7 @@ describe('Tuya mappings index', () => {
     const socketByProperties = getDeviceType({
       specifications: {},
       properties: {
-        properties: [{ code: 'switch_1' }],
+        properties: [{}, { code: 'switch_1' }],
       },
       model: 'Wifi Plug Mini',
     });
