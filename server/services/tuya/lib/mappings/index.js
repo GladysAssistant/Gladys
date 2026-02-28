@@ -179,7 +179,9 @@ const extractCodesFromThingModel = (thingModel) => {
 
 const extractCodesFromProperties = (propertiesPayload) => {
   const codes = new Set();
-  const properties = Array.isArray(propertiesPayload && propertiesPayload.properties) ? propertiesPayload.properties : [];
+  const properties = Array.isArray(propertiesPayload && propertiesPayload.properties)
+    ? propertiesPayload.properties
+    : [];
 
   properties.forEach((property) => {
     if (!property || !property.code) {

@@ -1,7 +1,9 @@
 const fs = require('fs');
+const { createRequire } = require('module');
 const path = require('path');
 
 const FIXTURES_ROOT = path.join(__dirname, 'devices');
+const fixtureRequire = createRequire(__filename);
 
 const sortByKey = (value) => {
   if (Array.isArray(value)) {
@@ -65,19 +67,19 @@ const normalizeFeatures = (features) =>
 
 const normalizeConvertedDevice = (device) =>
   omitUndefined({
-  name: device.name,
-  external_id: device.external_id,
-  selector: device.selector,
-  device_type: device.device_type,
-  model: device.model,
-  product_id: device.product_id,
-  product_key: device.product_key,
-  online: device.online,
-  poll_frequency: device.poll_frequency,
-  should_poll: device.should_poll,
-  params: normalizeParams(device.params),
-  tuya_mapping: sortByKey(device.tuya_mapping),
-  features: normalizeFeatures(device.features),
+    name: device.name,
+    external_id: device.external_id,
+    selector: device.selector,
+    device_type: device.device_type,
+    model: device.model,
+    product_id: device.product_id,
+    product_key: device.product_key,
+    online: device.online,
+    poll_frequency: device.poll_frequency,
+    should_poll: device.should_poll,
+    params: normalizeParams(device.params),
+    tuya_mapping: sortByKey(device.tuya_mapping),
+    features: normalizeFeatures(device.features),
   });
 
 const normalizeEvents = (calls) =>
@@ -94,7 +96,7 @@ const loadFixtureCases = (sectionName) =>
     .sort()
     .map((directoryName) => {
       const fixtureDirectory = path.join(FIXTURES_ROOT, directoryName);
-      const manifest = require(path.join(fixtureDirectory, 'manifest.js'));
+      const manifest = fixtureRequire(path.join(fixtureDirectory, 'manifest.js'));
       if (!manifest[sectionName]) {
         return null;
       }

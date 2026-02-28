@@ -1,11 +1,7 @@
 const { expect } = require('chai');
 
 const { convertDevice } = require('../../../../../services/tuya/lib/device/tuya.convertDevice');
-const {
-  loadFixtureCases,
-  normalizeConvertedDevice,
-  sortByKey,
-} = require('../../fixtures/fixtureHelper');
+const { loadFixtureCases, normalizeConvertedDevice, sortByKey } = require('../../fixtures/fixtureHelper');
 
 describe('tuya.convertDevice fixtures', () => {
   const fixtureCases = loadFixtureCases('convertDevice');

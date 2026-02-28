@@ -15,8 +15,47 @@
     "PRODUCT_ID": "bbcg1hrkrj5rifsd"
   },
   "tuya_mapping": {
-    "ignored_local_dps": ["102", "103", "104", "110", "116", "117", "118", "119", "120", "121", "122", "123", "124", "125", "126", "127", "128", "129"],
-    "ignored_cloud_codes": ["coef_a_reset", "coef_b_reset", "current_a_calibration", "current_b_calibration", "direction_a", "direction_b", "energy_a_calibration_fwd", "energy_a_calibration_rev", "energy_b_calibration_fwd", "energy_b_calibration_rev", "freq", "freq_calibration", "power_a_calibration", "power_b_calibration", "power_factor", "power_factor_b", "report_rate_control", "tbd", "voltage_coef"]
+    "ignored_local_dps": [
+      "102",
+      "103",
+      "104",
+      "110",
+      "116",
+      "117",
+      "118",
+      "119",
+      "120",
+      "121",
+      "122",
+      "123",
+      "124",
+      "125",
+      "126",
+      "127",
+      "128",
+      "129"
+    ],
+    "ignored_cloud_codes": [
+      "coef_a_reset",
+      "coef_b_reset",
+      "current_a_calibration",
+      "current_b_calibration",
+      "direction_a",
+      "direction_b",
+      "energy_a_calibration_fwd",
+      "energy_a_calibration_rev",
+      "energy_b_calibration_fwd",
+      "energy_b_calibration_rev",
+      "freq",
+      "freq_calibration",
+      "power_a_calibration",
+      "power_b_calibration",
+      "power_factor",
+      "power_factor_b",
+      "report_rate_control",
+      "tbd",
+      "voltage_coef"
+    ]
   },
   "features": [
     {

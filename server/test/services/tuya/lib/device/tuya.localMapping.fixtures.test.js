@@ -13,7 +13,9 @@ describe('Tuya local mapping fixtures', () => {
       const expectedMapping = fixtureCase.load(expected);
 
       const resolvedMapping = currentDevice.features.reduce((accumulator, feature) => {
-        const code = String(feature.external_id).split(':').pop();
+        const code = String(feature.external_id)
+          .split(':')
+          .pop();
         accumulator[code] = getLocalDpsFromCode(code, currentDevice);
         return accumulator;
       }, {});

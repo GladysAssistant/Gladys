@@ -15,6 +15,11 @@ describe('TuyaHandler.setValue fixtures', () => {
       const set = sinon.stub().resolves();
       const disconnect = sinon.stub().resolves();
 
+      /**
+       * @description Simple TuyAPI test double used for fixture-driven local setValue tests.
+       * @example
+       * new TuyAPIStub();
+       */
       function TuyAPIStub() {
         this.connect = connect;
         this.set = set;
@@ -26,8 +31,13 @@ describe('TuyaHandler.setValue fixtures', () => {
         '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
       });
 
-      const { device, featureExternalId, inputValue, expectedLocalSet, expectedCloudRequests = 0 } =
-        fixtureCase.manifest.setValueLocal;
+      const {
+        device,
+        featureExternalId,
+        inputValue,
+        expectedLocalSet,
+        expectedCloudRequests = 0,
+      } = fixtureCase.manifest.setValueLocal;
 
       const currentDevice = fixtureCase.load(device);
       const currentFeature = currentDevice.features.find((feature) => feature.external_id === featureExternalId);

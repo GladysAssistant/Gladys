@@ -4,6 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { EVENTS } = require('../../../../utils/constants');
 const { loadFixtureCases, normalizeEvents, sortByKey } = require('../fixtures/fixtureHelper');
+const { poll: pollCloud } = require('../../../../services/tuya/lib/tuya.poll');
 
 const createGladysContext = () => ({
   event: {
@@ -24,7 +25,6 @@ describe('TuyaHandler.poll fixtures', () => {
 
   cloudCases.forEach((fixtureCase) => {
     it(`should poll cloud values for ${fixtureCase.manifest.name} from fixture`, async () => {
-      const { poll } = require('../../../../services/tuya/lib/tuya.poll');
       const { device, response, expectedEvents } = fixtureCase.manifest.pollCloud;
       const connector = {
         request: sinon.stub().resolves(fixtureCase.load(response)),
@@ -32,17 +32,14 @@ describe('TuyaHandler.poll fixtures', () => {
       const gladys = createGladysContext();
       const cloudDevice = forceCloudMode(fixtureCase.load(device));
 
-      await poll.call(
+      await pollCloud.call(
         {
           connector,
           gladys,
         },
         cloudDevice,
       );
-
-      const emittedEvents = gladys.event.emit
-        .getCalls()
-        .filter((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+      const emittedEvents = gladys.event.emit.getCalls().filter((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
       expect(normalizeEvents(emittedEvents)).to.deep.equal(sortByKey(fixtureCase.load(expectedEvents)));
     });
   });
@@ -66,10 +63,7 @@ describe('TuyaHandler.poll fixtures', () => {
         },
         fixtureCase.load(device),
       );
-
-      const emittedEvents = gladys.event.emit
-        .getCalls()
-        .filter((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+      const emittedEvents = gladys.event.emit.getCalls().filter((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
       expect(normalizeEvents(emittedEvents)).to.deep.equal(sortByKey(fixtureCase.load(expectedEvents)));
       expect(connector.request.callCount).to.equal(expectedCloudRequests);
     });
