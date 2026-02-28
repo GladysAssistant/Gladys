@@ -131,9 +131,7 @@ describe('Tuya device mapping', () => {
         expect(result).to.eq(235.2);
       });
       it('switch power invalid value returns NaN', () => {
-        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER](
-          'not-a-number',
-        );
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('not-a-number');
         expect(Number.isNaN(result)).to.equal(true);
       });
     });
