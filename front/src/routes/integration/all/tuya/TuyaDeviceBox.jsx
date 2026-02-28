@@ -232,18 +232,19 @@ class TuyaDeviceBox extends Component {
   };
 
   pollLocal = async () => {
+    const currentDevice = this.state.device;
     this.setState({
       localPollStatus: RequestStatus.Getting,
       localPollError: null,
       localPollProtocol: null
     });
-    const params = Array.isArray(this.state.device.params) ? this.state.device.params : [];
+    const params = Array.isArray(currentDevice.params) ? currentDevice.params : [];
     const getParam = name => {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
     const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
-    const selectedProtocol = getParam('PROTOCOL_VERSION') || this.state.device.protocol_version;
+    const selectedProtocol = getParam('PROTOCOL_VERSION') || currentDevice.protocol_version;
     const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
     try {
       let result = null;
@@ -257,9 +258,9 @@ class TuyaDeviceBox extends Component {
             localPollProtocol: protocolVersion
           });
           const response = await this.props.httpClient.post('/api/v1/service/tuya/local-poll', {
-            deviceId: this.state.device.external_id && this.state.device.external_id.split(':')[1],
-            ip: getParam('IP_ADDRESS') || this.state.device.ip,
-            localKey: getParam('LOCAL_KEY') || this.state.device.local_key,
+            deviceId: currentDevice.external_id && currentDevice.external_id.split(':')[1],
+            ip: getParam('IP_ADDRESS') || currentDevice.ip,
+            localKey: getParam('LOCAL_KEY') || currentDevice.local_key,
             protocolVersion,
             timeoutMs: 3000,
             fastScan: true
@@ -289,7 +290,7 @@ class TuyaDeviceBox extends Component {
           newParams.push({ name: 'PROTOCOL_VERSION', value: usedProtocol });
         }
       }
-      const baseDevice = latestDevice || this.state.device;
+      const baseDevice = latestDevice || currentDevice;
       this.setState({
         device: {
           ...baseDevice,
@@ -298,7 +299,7 @@ class TuyaDeviceBox extends Component {
         localPollStatus: RequestStatus.Success,
         localPollProtocol: null,
         localPollValidation: {
-          ip: getParam('IP_ADDRESS') || this.state.device.ip || '',
+          ip: getParam('IP_ADDRESS') || currentDevice.ip || '',
           protocol: usedProtocol || '',
           localOverride: true
         }
