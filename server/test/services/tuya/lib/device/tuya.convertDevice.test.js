@@ -123,4 +123,47 @@ describe('tuya.convertDevice', () => {
     expect(device.features.find((feature) => feature.external_id === 'tuya:device-id:cur_power').scale).to.equal(1);
     expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
   });
+
+  it('should keep specification group when thing model exposes the same code', () => {
+    const tuyaDevice = {
+      id: 'device-id',
+      name: 'Device',
+      model: 'Model',
+      local_override: true,
+      specifications: {
+        category: 'cz',
+        functions: [{ code: 'switch_1', name: 'Switch From Spec', type: 'Boolean' }],
+      },
+      thing_model: {
+        services: [
+          {
+            properties: [
+              {
+                code: 'switch_1',
+                name: 'Switch From Thing Model',
+                accessMode: 'ro',
+                typeSpec: { type: 'bool' },
+              },
+              {
+                code: 'cur_power',
+                name: 'Current Power',
+                accessMode: 'ro',
+                typeSpec: { min: 0, max: 99999, scale: 1, unit: 'W' },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+
+    const switchFeature = device.features.find((feature) => feature.external_id === 'tuya:device-id:switch_1');
+    const powerFeature = device.features.find((feature) => feature.external_id === 'tuya:device-id:cur_power');
+
+    expect(device.features).to.have.length(2);
+    expect(switchFeature.read_only).to.equal(false);
+    expect(switchFeature.name).to.equal('switch_1');
+    expect(powerFeature.scale).to.equal(1);
+  });
 });
