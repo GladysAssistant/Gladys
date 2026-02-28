@@ -38,9 +38,16 @@ describe('Tuya mappings index', () => {
     const empty = extractCodesFromFeatures(null);
     expect(empty.size).to.equal(0);
 
-    const codes = extractCodesFromFeatures([{}, { external_id: 'tuya:device:switch' }, { external_id: 'tuya:device' }]);
+    const codes = extractCodesFromFeatures([
+      {},
+      { external_id: 'tuya:device:switch' },
+      { external_id: 'tuya:device' },
+      { external_id: 'tuya:device:sub:switch_2' },
+    ]);
     expect(codes.has('switch')).to.equal(true);
-    expect(codes.size).to.equal(1);
+    expect(codes.has('switch_2')).to.equal(true);
+    expect(codes.has('device')).to.equal(true);
+    expect(codes.size).to.equal(3);
   });
 
   it('should build cloud and local mappings', () => {
