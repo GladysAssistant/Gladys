@@ -114,6 +114,16 @@ describe('Tuya mappings index', () => {
       model: 'Wifi Plug Mini',
     });
     expect(socketByProperties).to.equal(DEVICE_TYPES.SMART_SOCKET);
+
+    const socketByMergedSources = getDeviceType({
+      specifications: {
+        functions: [{ code: 'timer' }],
+        status: [],
+      },
+      features: [{ external_id: 'tuya:device:switch_1' }],
+      model: 'Wifi Plug Mini',
+    });
+    expect(socketByMergedSources).to.equal(DEVICE_TYPES.SMART_SOCKET);
   });
 
   it('should get feature mapping and ignore invalid candidates', () => {
