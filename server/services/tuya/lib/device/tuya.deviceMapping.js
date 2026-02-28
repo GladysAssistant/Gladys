@@ -7,6 +7,24 @@ const OPEN = 'open';
 const CLOSE = 'close';
 const STOP = 'stop';
 
+const getScale = (deviceFeature, defaultScale = 0) => {
+  const parsedScale =
+    deviceFeature && deviceFeature.scale !== undefined && deviceFeature.scale !== null
+      ? parseInt(deviceFeature.scale, 10)
+      : defaultScale;
+
+  return Number.isNaN(parsedScale) ? defaultScale : parsedScale;
+};
+
+const scaleValue = (valueFromDevice, deviceFeature, defaultScale = 0) => {
+  const parsedValue = Number(valueFromDevice);
+  if (Number.isNaN(parsedValue)) {
+    return parsedValue;
+  }
+  const scale = getScale(deviceFeature, defaultScale);
+  return parsedValue / 10 ** scale;
+};
+
 const writeValues = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromGladys) => {
@@ -74,17 +92,17 @@ const readValues = {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
       return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 100;
+    [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 2);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10);
+    [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.POWER]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 10;
+    [DEVICE_FEATURE_TYPES.SWITCH.POWER]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 1);
     },
-    [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10) / 10;
+    [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 1);
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {

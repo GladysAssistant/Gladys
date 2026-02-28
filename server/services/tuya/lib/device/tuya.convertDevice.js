@@ -73,7 +73,18 @@ function convertDevice(tuyaDevice) {
   logger.debug(JSON.stringify(safeDeviceLog));
 
   logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
-  // Groups functions and status on same code
+  const deviceType = getDeviceType({
+    specifications,
+    model,
+    product_name: productName,
+    product_id: productId,
+    name,
+    category: specifications.category || category,
+    properties,
+    thing_model: thingModel,
+  });
+
+  // Groups cloud specification entries first, then thing model properties, then current property shadow codes.
   const groups = {};
   status.forEach((stat) => {
     const { code } = stat;
@@ -83,15 +94,36 @@ function convertDevice(tuyaDevice) {
     const { code } = func;
     groups[code] = { ...func, readOnly: false };
   });
-
-  const deviceType = getDeviceType({
-    specifications,
-    model,
-    product_name: productName,
-    product_id: productId,
-    name,
-    category: specifications.category || category,
+  const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
+  services.forEach((service) => {
+    const thingProperties = Array.isArray(service && service.properties) ? service.properties : [];
+    thingProperties.forEach((property) => {
+      const { code } = property || {};
+      if (!code || groups[code]) {
+        return;
+      }
+      groups[code] = {
+        code,
+        name: property.name,
+        values: property.typeSpec || {},
+        readOnly: property.accessMode !== 'rw',
+      };
+    });
   });
+  const currentProperties = Array.isArray(properties && properties.properties) ? properties.properties : [];
+  currentProperties.forEach((property) => {
+    const { code } = property || {};
+    if (!code || groups[code]) {
+      return;
+    }
+    groups[code] = {
+      code,
+      name: property.custom_name || property.name || code,
+      values: {},
+      readOnly: true,
+    };
+  });
+
   const ignoredCloudCodes = getIgnoredCloudCodes(deviceType);
   const ignoredLocalDps = getIgnoredLocalDps(deviceType);
   const features = Object.values(groups).map((group) =>

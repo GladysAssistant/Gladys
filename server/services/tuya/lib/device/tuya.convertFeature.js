@@ -55,6 +55,9 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
   if ('max' in valuesObject) {
     feature.max = valuesObject.max;
   }
+  if ('scale' in valuesObject) {
+    feature.scale = valuesObject.scale;
+  }
 
   return feature;
 }

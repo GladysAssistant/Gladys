@@ -89,6 +89,24 @@ describe('Tuya mappings index', () => {
       product_id: 'cya3zxfd38g4qp8d',
     });
     expect(socketByProductId).to.equal(DEVICE_TYPES.SMART_SOCKET);
+
+    const socketByThingModel = getDeviceType({
+      specifications: {},
+      thing_model: {
+        services: [{ properties: [{ code: 'switch_1' }] }],
+      },
+      model: 'Wifi Plug Mini',
+    });
+    expect(socketByThingModel).to.equal(DEVICE_TYPES.SMART_SOCKET);
+
+    const socketByProperties = getDeviceType({
+      specifications: {},
+      properties: {
+        properties: [{ code: 'switch_1' }],
+      },
+      model: 'Wifi Plug Mini',
+    });
+    expect(socketByProperties).to.equal(DEVICE_TYPES.SMART_SOCKET);
   });
 
   it('should get feature mapping and ignore invalid candidates', () => {
