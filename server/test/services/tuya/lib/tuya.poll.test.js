@@ -395,7 +395,9 @@ describe('TuyaHandler.poll additional branch coverage', () => {
   });
 
   it('should ignore malformed cloud status entries', async () => {
-    const request = sinon.stub().resolves({ result: [null, 'bad', { value: true }, { code: 'switch_1', value: true }] });
+    const request = sinon
+      .stub()
+      .resolves({ result: [null, 'bad', { value: true }, { code: 'switch_1', value: true }] });
     const emit = sinon.stub();
     const logger = { debug: sinon.stub(), warn: sinon.stub() };
     const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
