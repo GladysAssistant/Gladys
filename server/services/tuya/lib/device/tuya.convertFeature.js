@@ -28,7 +28,7 @@ function convertFeature(tuyaFunctions, externalId) {
   }
 
   const feature = {
-    name,
+    name: code || name,
     external_id: `${externalId}:${code}`,
     selector: `${externalId}:${code}`,
     read_only: readOnly,
