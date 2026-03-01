@@ -1231,6 +1231,7 @@
         "productKeyLabel": "Produktschlüssel",
         "createGithubIssue": "Dieses Gerät vorschlagen",
         "createGithubIssuePartial": "Neue Funktionen vorschlagen",
+        "githubIssueLocalPrepInfo": "Um alle lokalen Informationen im Issue zu erfassen, kannst du zuerst auf der Erkennungsseite einen <strong>Lokalen Auto-Scan</strong> starten, damit alle Geräte mit ihren lokalen Daten angereichert werden.<br />Wechsle danach das Gerät bei Bedarf in den lokalen Modus, trage IP und Protokoll ein und führe anschließend <strong>Lokales DPS abfragen</strong> erfolgreich aus, bevor du auf die Vorschlags-Schaltfläche klickst.",
         "githubIssueInfo": "Ein Bericht wird mit den Gerätedetails gesendet. Sensible Daten (Lokaler Schlüssel und IP-Adresse) werden maskiert.",
         "githubIssuePayloadCopied": "Issue-Details wurden in die Zwischenablage kopiert. Bitte in den GitHub-Issue-Text einfügen.",
         "githubIssuePayloadInfo": "Die Issue-Details sind zu lang für die URL. Bitte den Inhalt unten kopieren und in den GitHub-Issue-Text einfügen.",
