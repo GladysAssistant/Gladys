@@ -6,14 +6,14 @@ import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CardFilter from '../../../../../components/layout/CardFilter';
 import SonosDeviceBox from '../SonosDeviceBox';
-import debounce from 'debounce';
+import debounce from '../../../../../utils/debounce';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
 class DeviceTab extends Component {
   constructor(props) {
     super(props);
-    this.debouncedSearch = debounce(this.search, 200).bind(this);
+    this.debouncedSearch = debounce(this.search.bind(this), 200);
   }
 
   componentWillMount() {

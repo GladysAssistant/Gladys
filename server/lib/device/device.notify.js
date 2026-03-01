@@ -1,5 +1,3 @@
-const get = require('get-value');
-
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 
@@ -31,7 +29,7 @@ async function notify(device, event) {
     const service = this.serviceManager.getServiceById(device.service_id);
     if (service === null) {
       logger.warn(`Service ${device.service_id} was not found.`);
-    } else if (typeof get(service, `device.${serviceFuncName}`) !== 'function') {
+    } else if (typeof service?.device?.[serviceFuncName] !== 'function') {
       logger.debug(`Function device.${serviceFuncName} in service ${service.name} does not exist.`);
     } else {
       try {

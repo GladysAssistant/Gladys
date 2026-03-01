@@ -1,4 +1,3 @@
-const get = require('get-value');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 
 /**
@@ -16,7 +15,7 @@ async function getNetworkMode() {
     const containerId = await this.getGladysContainerId();
     const gladysContainer = this.dockerode.getContainer(containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
-    this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
+    this.networkMode = gladysContainerInspect?.HostConfig?.NetworkMode ?? 'unknown';
   }
 
   return this.networkMode;

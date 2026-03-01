@@ -1,5 +1,4 @@
-const uuid = require('uuid');
-const get = require('get-value');
+const { randomUUID } = require('crypto');
 
 const { mappings, readValues } = require('./deviceMappings');
 const { NotFoundError } = require('../../../utils/coreErrors');
@@ -13,7 +12,7 @@ const { NotFoundError } = require('../../../utils/coreErrors');
  * onReportState();
  */
 function onReportState(body) {
-  const deviceSelector = get(body, 'directive.endpoint.endpointId');
+  const deviceSelector = body?.directive?.endpoint?.endpointId;
   const device = this.gladys.stateManager.get('device', deviceSelector);
   if (!device) {
     throw new NotFoundError(`Device "${deviceSelector}" not found`);
@@ -21,12 +20,12 @@ function onReportState(body) {
   const properties = [];
   const now = new Date().toISOString();
   device.features.forEach((feature) => {
-    const func = get(readValues, `${feature.category}.${feature.type}`);
-    const mapping = get(mappings, `${feature.category}.capabilities.${feature.type}`);
+    const func = readValues?.[feature.category]?.[feature.type];
+    const mapping = mappings?.[feature.category]?.capabilities?.[feature.type];
     if (func && mapping && feature.read_only === false) {
       properties.push({
         namespace: mapping.interface,
-        name: get(mapping, 'properties.supported.0.name'),
+        name: mapping?.properties?.supported?.[0]?.name,
         value: func(feature.last_value, feature),
         timeOfSample: now,
         uncertaintyInMilliseconds: 0,
@@ -35,7 +34,7 @@ function onReportState(body) {
   });
   const response = {
     event: {
-      header: { ...body.directive.header, name: 'StateReport', messageId: uuid.v4() },
+      header: { ...body.directive.header, name: 'StateReport', messageId: randomUUID() },
       endpoint: body.directive.endpoint,
       payload: {},
     },

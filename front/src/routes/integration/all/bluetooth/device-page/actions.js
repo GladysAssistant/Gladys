@@ -1,7 +1,7 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import createActionsHouse from '../../../../../actions/house';
-import debounce from 'debounce';
+import debounce from '../../../../../utils/debounce';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
