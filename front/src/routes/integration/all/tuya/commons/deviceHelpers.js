@@ -87,15 +87,36 @@ export const getUnknownSpecificationCodes = (specifications, features, device) =
     return [];
   }
   const knownCodes = new Set();
+  const addKnownCode = code => {
+    if (code !== null && code !== undefined) {
+      knownCodes.add(
+        String(code)
+          .trim()
+          .toLowerCase()
+      );
+    }
+  };
   if (Array.isArray(features)) {
     features.forEach(feature => {
       const parts = (feature.external_id || '').split(':');
-      const code = parts.length >= 3 ? parts[2] : null;
-      if (code) {
-        knownCodes.add(code.toLowerCase());
-      }
+      const code = parts.length >= 2 ? parts[parts.length - 1] : null;
+      addKnownCode(code);
     });
   }
+  const services = Array.isArray(device && device.thing_model && device.thing_model.services)
+    ? device.thing_model.services
+    : [];
+  services.forEach(service => {
+    const properties = Array.isArray(service && service.properties) ? service.properties : [];
+    properties.forEach(property => addKnownCode(property && property.code));
+  });
+  const propertiesPayload = device && device.properties;
+  const properties = Array.isArray(propertiesPayload)
+    ? propertiesPayload
+    : Array.isArray(propertiesPayload && propertiesPayload.properties)
+    ? propertiesPayload.properties
+    : [];
+  properties.forEach(property => addKnownCode(property && property.code));
   const specCodes = new Set();
   ['functions', 'status'].forEach(key => {
     const entries = specifications[key];
@@ -110,7 +131,9 @@ export const getUnknownSpecificationCodes = (specifications, features, device) =
   });
   const ignoredCodes = getIgnoredCloudCodes(device);
   return Array.from(specCodes).filter(code => {
-    const normalized = code.toLowerCase();
+    const normalized = String(code)
+      .trim()
+      .toLowerCase();
     return !knownCodes.has(normalized) && !ignoredCodes.has(normalized);
   });
 };
