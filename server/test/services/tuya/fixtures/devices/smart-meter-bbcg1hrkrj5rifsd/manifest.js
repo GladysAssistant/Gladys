@@ -1,5 +1,5 @@
 module.exports = {
-  name: 'smart meter bbcg1hrkrj5rifsd',
+  name: 'Production solaire',
   convertDevice: {
     input: './input-device.json',
     expected: './expected-device.json',
@@ -7,12 +7,12 @@ module.exports = {
   pollCloud: {
     device: './poll-device.json',
     response: './cloud-status.json',
-    expectedEvents: './expected-cloud-events.json',
+    expectedEvents: './expected-events.json',
   },
   pollLocal: {
     device: './poll-device.json',
     dps: './local-dps.json',
-    expectedEvents: './expected-local-events.json',
+    expectedEvents: './expected-events.json',
     expectedCloudRequests: 0,
   },
   localMapping: {
