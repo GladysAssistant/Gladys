@@ -29,7 +29,9 @@ class SunriseSunsetTrigger extends Component {
 
   onOffsetDirectionChange = e => {
     const direction = e.target.value;
-    const currentMinutes = Math.abs(this.props.trigger.offset || 0) || 30;
+    const currentMinutes = this.state.offsetMinutesInput
+      ? Math.abs(parseInt(this.state.offsetMinutesInput, 10)) || 30
+      : 30;
     if (direction === 'exact') {
       this.props.updateTriggerProperty(this.props.index, 'offset', 0);
     } else if (direction === 'before') {
@@ -40,7 +42,12 @@ class SunriseSunsetTrigger extends Component {
   };
 
   onOffsetMinutesChange = e => {
-    const minutes = parseInt(e.target.value, 10) || 0;
+    const raw = e.target.value;
+    this.setState({ offsetMinutesInput: raw });
+    const minutes = parseInt(raw, 10);
+    if (!minutes || minutes <= 0) {
+      return;
+    }
     const currentOffset = this.props.trigger.offset || 0;
     const newOffset = currentOffset < 0 ? -minutes : minutes;
     this.props.updateTriggerProperty(this.props.index, 'offset', newOffset);
@@ -48,8 +55,10 @@ class SunriseSunsetTrigger extends Component {
 
   constructor(props) {
     super(props);
+    const initialMinutes = Math.abs(props.trigger.offset || 0);
     this.state = {
-      houses: []
+      houses: [],
+      offsetMinutesInput: initialMinutes > 0 ? String(initialMinutes) : '30'
     };
   }
 
@@ -57,10 +66,9 @@ class SunriseSunsetTrigger extends Component {
     this.getHouses();
   }
 
-  render({}, { houses }) {
+  render({}, { houses, offsetMinutesInput }) {
     const offset = this.props.trigger.offset || 0;
     const offsetDirection = offset === 0 ? 'exact' : offset > 0 ? 'after' : 'before';
-    const offsetMinutes = Math.abs(offset);
     return (
       <div>
         <div class="row">
@@ -89,20 +97,18 @@ class SunriseSunsetTrigger extends Component {
           </div>
         </div>
         {offsetDirection !== 'exact' && (
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="form-group col-sm-8">
-                <input
-                  type="number"
-                  class="form-control"
-                  min="1"
-                  value={offsetMinutes}
-                  onChange={this.onOffsetMinutesChange}
-                />
-                <small class="form-text text-muted col-sm-4">
-                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.minutes" />
-                </small>
-              </div>
+          <div class="row align-items-center">
+            <div class="col-6">
+              <input
+                type="number"
+                class="form-control"
+                min="1"
+                value={offsetMinutesInput}
+                onInput={this.onOffsetMinutesChange}
+              />
+            </div>
+            <div class="col-6">
+              <Text id="editScene.triggersCard.sunriseSunsetTrigger.minutes" />
             </div>
           </div>
         )}
