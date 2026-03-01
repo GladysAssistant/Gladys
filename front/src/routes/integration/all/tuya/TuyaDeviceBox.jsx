@@ -731,6 +731,17 @@ class TuyaDeviceBox extends Component {
       </div>
     );
 
+    const renderGithubIssuePrepAlert = titleId => (
+      <div class="alert alert-warning mt-3 mb-3">
+        <div class="font-weight-bold h5 mb-2">
+          <Text id={titleId} />
+        </div>
+        <div>
+          <MarkupText id="integration.tuya.device.githubIssueLocalPrepInfo" />
+        </div>
+      </div>
+    );
+
     const renderGithubIssuePayloadInfo = () => {
       if (!githubIssuePayload && !githubIssuePayloadCopied) {
         return null;
@@ -997,11 +1008,7 @@ class TuyaDeviceBox extends Component {
                   </div>
                 )}
 
-                {hasPartialSupport && (
-                  <div class="alert alert-warning mt-3 mb-3">
-                    <Text id="integration.tuya.partiallyManagedModelButton" />
-                  </div>
-                )}
+                {hasPartialSupport && renderGithubIssuePrepAlert('integration.tuya.partiallyManagedModelButton')}
 
                 <div class="form-group">
                   {requiresLocalPollValidation && !localPollValidated && (
@@ -1043,9 +1050,7 @@ class TuyaDeviceBox extends Component {
 
                   {!validModel && (
                     <div>
-                      <div class="alert alert-warning">
-                        <Text id="integration.tuya.unmanagedModelButton" />
-                      </div>
+                      {renderGithubIssuePrepAlert('integration.tuya.unmanagedModelButton')}
                       {isDiscoverPage && renderGithubIssueAction()}
                     </div>
                   )}

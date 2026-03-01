@@ -1126,6 +1126,7 @@
         "productKeyLabel": "Product Key",
         "createGithubIssue": "Suggest this device",
         "createGithubIssuePartial": "Suggest new functions",
+        "githubIssueLocalPrepInfo": "To include all local information in the issue, you can first run <strong>Local auto scan</strong> from the discovery page to enrich all devices with their local data.<br />Then switch the device to local mode if needed, fill in the IP and protocol, and run a successful <strong>Poll local DPS</strong> before clicking the suggestion button.",
         "githubIssueInfo": "A report will be sent with the device details. Sensitive data (local key and IP) is masked.",
         "githubIssuePayloadCopied": "Issue details copied to clipboard. Paste them into the GitHub issue body.",
         "githubIssuePayloadInfo": "The issue details are too long for the URL. Copy the content below and paste it into the GitHub issue body.",
