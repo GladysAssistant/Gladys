@@ -1,3 +1,6 @@
+// todo: Refactor this file so that it is closer to the boxs implementations
+//      doing this will make it easier to add new screens to the system
+
 import WeatherBox from '../../components/boxs/weather/WeatherBox';
 import RoomTemperatureBox from '../../components/boxs/room-temperature/RoomTemperature';
 import RoomHumidityBox from '../../components/boxs/room-humidity/RoomHumidity';
@@ -14,6 +17,7 @@ import MusicBox from '../../components/boxs/music/MusicBox';
 import EdfTempoBox from '../../components/boxs/edf-tempo/EdfTempo';
 import GaugeBox from '../../components/boxs/gauge/GaugeBox';
 import EnergyConsumptionBox from '../../components/boxs/energy-consumption/EnergyConsumption';
+import ThermostatBox from '../../components/boxs/thermostat/ThermostatBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -49,6 +53,8 @@ const Box = ({ children, ...props }) => {
       return <GaugeBox {...props} />;
     case 'energy-consumption':
       return <EnergyConsumptionBox {...props} />;
+    case 'thermostat':
+      return <ThermostatBox {...props} />;
   }
 };
 

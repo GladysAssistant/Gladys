@@ -114,6 +114,10 @@ describe('TuyaHandler.discoverDevices', () => {
             selector: 'tuya:uuid:cur_power',
             type: 'power',
             unit: 'watt',
+            params: {
+              name: 'cur_power',
+              value: '{ "step": 1, "unit": "null", "scale": 1 }',
+            },
           },
           {
             category: 'switch',
@@ -129,6 +133,13 @@ describe('TuyaHandler.discoverDevices', () => {
         ],
         model: 'model',
         name: 'name',
+        params: [
+          {
+            external_id: 'tuya:uuid:cur_power',
+            name: 'cur_power',
+            value: '{ "step": 1, "unit": "null", "scale": 1 }',
+          },
+        ],
         poll_frequency: 30000,
         selector: 'tuya:uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',

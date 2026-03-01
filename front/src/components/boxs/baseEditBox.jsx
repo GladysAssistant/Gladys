@@ -50,7 +50,7 @@ const BaseEditBox = ({ children, ...props }) => {
               <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />
             </div>
             <div class="flex-fill">
-              <Text id={props.titleKey} />
+              <Text id={props.titleKey}>{props.title}</Text>
             </div>
             <div class="flex-fill text-right">{props.titleValue && <small>{props.titleValue}</small>}</div>
           </div>
@@ -71,7 +71,7 @@ const BaseEditBox = ({ children, ...props }) => {
       <div class="card-header">
         <h3 class="card-title">
           {props.isMobileReordering && <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />}
-          {props.titleKey && <Text id={props.titleKey} />}
+          {props.titleKey && <Text id={props.titleKey}>{props.title}</Text>}
         </h3>
         <div class="card-options">
           <a class="card-options-remove">
