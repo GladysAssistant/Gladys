@@ -3,9 +3,6 @@ const LOCAL_CODE_ALIASES = {
   power: ['switch']
 };
 
-export const normalizeBoolean = value =>
-  value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
-
 const getIgnoredLocalDps = device => {
   const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
   const ignored = mapping && Array.isArray(mapping.ignored_local_dps) ? mapping.ignored_local_dps : [];

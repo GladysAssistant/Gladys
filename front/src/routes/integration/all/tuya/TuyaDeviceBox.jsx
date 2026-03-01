@@ -6,8 +6,8 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
+import { normalizeBoolean } from '../../../../../../server/services/tuya/lib/utils/tuya.normalize';
 import {
-  normalizeBoolean,
   buildParamsMap,
   getLocalPollDpsFromParams,
   getUnknownDpsKeys,

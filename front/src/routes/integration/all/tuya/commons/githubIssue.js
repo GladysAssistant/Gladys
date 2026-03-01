@@ -1,6 +1,6 @@
 import get from 'get-value';
+import { normalizeBoolean } from '../../../../../../server/services/tuya/lib/utils/tuya.normalize';
 import {
-  normalizeBoolean,
   buildParamsMap,
   getParamValue,
   getLocalOverrideValue,
