@@ -2,6 +2,7 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
+const { mergeTuyaReport } = require('../../../../services/tuya/lib/utils/tuya.report');
 
 describe('TuyaHandler.localScan', () => {
   it('should return discovered devices from udp payload', async () => {
@@ -315,6 +316,10 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
     expect(response.devices[0].ip).to.equal('1.1.1.1');
     const ipParam = response.devices[0].params.find((param) => param.name === 'IP_ADDRESS');
     expect(ipParam.value).to.equal('1.1.1.1');
+    expect(response.devices[0].tuya_report.local.scan).to.deep.equal({
+      source: 'udp',
+      response: { ip: '1.1.1.1', version: '3.3', productKey: 'pkey' },
+    });
   });
 
   it('should merge devices when gladys stateManager exists', () => {
@@ -354,6 +359,7 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
         convertDevice: sinon.stub().callsFake((device) => ({
           external_id: `tuya:${device.id}`,
           params: [{ name: 'IP_ADDRESS', value: device.ip }],
+          tuya_report: mergeTuyaReport(null, device.tuya_report),
         })),
       },
     });
@@ -374,6 +380,29 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
     expect(response.devices).to.have.length(1);
     expect(response.devices[0].external_id).to.equal('tuya:device2');
     expect(response.local_devices).to.deep.equal({ device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } });
+    expect(response.devices[0].tuya_report).to.deep.equal({
+      schema_version: 2,
+      cloud: {
+        assembled: {
+          specifications: null,
+          properties: null,
+          thing_model: null,
+        },
+        raw: {
+          device_list_entry: null,
+          device_specification: null,
+          device_details: null,
+          thing_shadow_properties: null,
+          thing_model: null,
+        },
+      },
+      local: {
+        scan: {
+          source: 'udp',
+          response: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' },
+        },
+      },
+    });
   });
 
   it('should persist local-only devices when discoveredDevices is not an array', () => {
@@ -382,6 +411,7 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
         convertDevice: sinon.stub().callsFake((device) => ({
           external_id: `tuya:${device.id}`,
           params: [{ name: 'IP_ADDRESS', value: device.ip }],
+          tuya_report: mergeTuyaReport(null, device.tuya_report),
         })),
       },
     });
@@ -402,5 +432,9 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
     expect(response.devices).to.have.length(1);
     expect(tuyaManager.discoveredDevices).to.have.length(1);
     expect(tuyaManager.discoveredDevices[0].external_id).to.equal('tuya:device2');
+    expect(tuyaManager.discoveredDevices[0].tuya_report.local.scan).to.deep.equal({
+      source: 'udp',
+      response: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' },
+    });
   });
 });

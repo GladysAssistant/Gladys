@@ -9,6 +9,7 @@ const {
   normalizeExistingDevice,
   updateDiscoveredDeviceWithLocalInfo,
 } = require('./utils/tuya.deviceParams');
+const { buildLocalScanReport } = require('./utils/tuya.report');
 
 const DEFAULT_PORTS = [6666, 6667, 7000];
 /**
@@ -161,6 +162,7 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
         functions: [],
         status: [],
       },
+      tuya_report: buildLocalScanReport(localInfo),
     });
 
   if (tuyaManager && Array.isArray(tuyaManager.discoveredDevices)) {

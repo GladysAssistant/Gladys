@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
+const { buildCloudReport } = require('./utils/tuya.report');
 
 /**
  * @description Load Tuya device details.
@@ -10,6 +11,7 @@ const { API } = require('./utils/tuya.constants');
  */
 async function loadDeviceDetails(tuyaDevice) {
   const { id: deviceId } = tuyaDevice;
+  const listDeviceEntry = tuyaDevice ? { ...tuyaDevice } : null;
   logger.debug(`Loading ${deviceId} Tuya device specifications`);
 
   const [specResult, detailsResult, propsResult, modelResult] = await Promise.allSettled([
@@ -71,12 +73,25 @@ async function loadDeviceDetails(tuyaDevice) {
   const specificationsWithCategory =
     category && !specifications.category ? { ...specifications, category } : specifications;
 
-  return {
+  const deviceWithDetails = {
     ...tuyaDevice,
     ...details,
     specifications: specificationsWithCategory,
     properties,
     thing_model: thingModel,
+  };
+
+  return {
+    ...deviceWithDetails,
+    tuya_report: buildCloudReport({
+      deviceId,
+      listDeviceEntry,
+      specResult,
+      detailsResult,
+      propsResult,
+      modelResult,
+      device: deviceWithDetails,
+    }),
   };
 }
 

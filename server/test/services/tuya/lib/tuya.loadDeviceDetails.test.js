@@ -10,6 +10,75 @@ const logger = require('../../../../utils/logger');
 const gladys = {};
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
+const buildExpectedReport = ({
+  deviceId,
+  listEntry,
+  specificationResponse,
+  detailsResponse,
+  propertiesResponse,
+  modelResponse,
+  specificationError = null,
+  detailsError = null,
+  propertiesError = null,
+  modelError = null,
+  specifications = null,
+  properties = null,
+  thingModel = null,
+}) => ({
+  schema_version: 2,
+  cloud: {
+    assembled: {
+      specifications,
+      properties,
+      thing_model: thingModel,
+    },
+    raw: {
+      device_list_entry: {
+        request: {
+          method: 'GET',
+          path: `${API.PUBLIC_VERSION_1_0}/users/{sourceId}/devices`,
+        },
+        response_item: listEntry,
+      },
+      device_specification: {
+        request: {
+          method: 'GET',
+          path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
+        },
+        response: specificationResponse,
+        error: specificationError,
+      },
+      device_details: {
+        request: {
+          method: 'GET',
+          path: `${API.VERSION_1_0}/devices/${deviceId}`,
+        },
+        response: detailsResponse,
+        error: detailsError,
+      },
+      thing_shadow_properties: {
+        request: {
+          method: 'GET',
+          path: `${API.VERSION_2_0}/thing/${deviceId}/shadow/properties`,
+        },
+        response: propertiesResponse,
+        error: propertiesError,
+      },
+      thing_model: {
+        request: {
+          method: 'GET',
+          path: `${API.VERSION_2_0}/thing/${deviceId}/model`,
+        },
+        response: modelResponse,
+        error: modelError,
+      },
+    },
+  },
+  local: {
+    scan: null,
+  },
+});
+
 describe('TuyaHandler.loadDeviceDetails', () => {
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
 
@@ -45,6 +114,17 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: { result: { details: 'specification' } },
+        detailsResponse: { result: { local_key: 'localKey' } },
+        propertiesResponse: { result: { dps: { 1: true } } },
+        modelResponse: { result: { model: '{"services":[]}' } },
+        specifications: { details: 'specification' },
+        properties: { dps: { 1: true } },
+        thingModel: { services: [] },
+      }),
     });
 
     assert.callCount(tuyaHandler.connector.request, 4);
@@ -104,6 +184,18 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: {},
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: null,
+        detailsResponse: { result: { local_key: 'localKey' } },
+        propertiesResponse: { result: { dps: { 1: true } } },
+        modelResponse: { result: { model: '{"services":[]}' } },
+        specificationError: 'spec failure',
+        specifications: {},
+        properties: { dps: { 1: true } },
+        thingModel: { services: [] },
+      }),
     });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load specifications/);
@@ -129,6 +221,18 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: { result: { details: 'specification' } },
+        detailsResponse: null,
+        propertiesResponse: { result: { dps: { 1: true } } },
+        modelResponse: { result: { model: '{"services":[]}' } },
+        detailsError: 'details failure',
+        specifications: { details: 'specification' },
+        properties: { dps: { 1: true } },
+        thingModel: { services: [] },
+      }),
     });
     expect(warnStub.calledOnce).to.equal(true);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load details/);
@@ -155,6 +259,19 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: {},
       thing_model: null,
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: { result: { details: 'specification' } },
+        detailsResponse: { result: { local_key: 'localKey' } },
+        propertiesResponse: null,
+        modelResponse: null,
+        propertiesError: 'props failure',
+        modelError: 'model failure',
+        specifications: { details: 'specification' },
+        properties: {},
+        thingModel: null,
+      }),
     });
     expect(warnStub.callCount).to.equal(2);
     expect(warnStub.firstCall.args[0]).to.match(/Failed to load properties/);
@@ -181,6 +298,17 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: null,
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: { result: { details: 'specification' } },
+        detailsResponse: { result: { local_key: 'localKey' } },
+        propertiesResponse: { result: { dps: { 1: true } } },
+        modelResponse: { result: { model: 'not-json' } },
+        specifications: { details: 'specification' },
+        properties: { dps: { 1: true } },
+        thingModel: null,
+      }),
     });
   });
 
@@ -204,6 +332,17 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: { details: 'specification' },
       properties: { dps: { 1: true } },
       thing_model: { services: [] },
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: { result: { details: 'specification' } },
+        detailsResponse: { result: { local_key: 'localKey' } },
+        propertiesResponse: { result: { dps: { 1: true } } },
+        modelResponse: { result: { services: [] } },
+        specifications: { details: 'specification' },
+        properties: { dps: { 1: true } },
+        thingModel: { services: [] },
+      }),
     });
   });
 });
