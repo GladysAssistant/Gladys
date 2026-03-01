@@ -3,10 +3,10 @@ const AirplayHandler = require('./lib');
 const airplayController = require('./api/airplay.controller');
 
 module.exports = function AirplayService(gladys, serviceId) {
-  const airtunes = require('node-airtunes2');
+  const { start: AirplaySender } = require('@lox-audioserver/node-airplay-sender');
   const bonjourLib = require('bonjour')();
   const childProcess = require('child_process');
-  const airplayHandler = new AirplayHandler(gladys, airtunes, bonjourLib, childProcess, serviceId);
+  const airplayHandler = new AirplayHandler(gladys, AirplaySender, bonjourLib, childProcess, serviceId);
 
   /**
    * @public

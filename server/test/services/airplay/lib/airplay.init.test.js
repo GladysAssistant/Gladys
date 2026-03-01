@@ -24,7 +24,7 @@ const fakeBrowser = {
   },
 };
 
-const airtunes = {};
+const airplaySender = {};
 const childProcessLib = {};
 
 const bonjourLib = {
@@ -32,7 +32,7 @@ const bonjourLib = {
 };
 
 describe('AirplayHandler.init', () => {
-  const airplayHandler = new AirplayHandler(gladys, airtunes, bonjourLib, childProcessLib, serviceId);
+  const airplayHandler = new AirplayHandler(gladys, airplaySender, bonjourLib, childProcessLib, serviceId);
 
   beforeEach(() => {
     sinon.reset();
