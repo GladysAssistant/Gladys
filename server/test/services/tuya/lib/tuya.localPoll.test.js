@@ -356,6 +356,29 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
           params: [],
           product_id: 'pid',
           product_key: 'pkey',
+          tuya_report: {
+            schema_version: 2,
+            cloud: {
+              assembled: {
+                specifications: null,
+                properties: null,
+                thing_model: null,
+              },
+              raw: {
+                device_list_entry: null,
+                device_specification: null,
+                device_details: null,
+                thing_shadow_properties: null,
+                thing_model: null,
+              },
+            },
+            local: {
+              scan: {
+                source: 'udp',
+                response: { ip: '9.9.9.9', version: '3.3' },
+              },
+            },
+          },
         },
       ],
     };
@@ -377,6 +400,10 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
     expect(findParam(DEVICE_PARAM_NAME.LOCAL_OVERRIDE).value).to.equal(true);
     expect(findParam(DEVICE_PARAM_NAME.PRODUCT_ID).value).to.equal('pid');
     expect(findParam(DEVICE_PARAM_NAME.PRODUCT_KEY).value).to.equal('pkey');
+    expect(updated.tuya_report.local.scan).to.deep.equal({
+      source: 'udp',
+      response: { ip: '9.9.9.9', version: '3.3' },
+    });
   });
 
   it('should merge when gladys stateManager exists', () => {

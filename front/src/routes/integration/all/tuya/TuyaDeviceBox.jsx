@@ -6,180 +6,25 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
-import { normalizeBoolean } from '../../../../../../server/services/tuya/lib/utils/tuya.normalize';
+import {
+  normalizeBoolean,
+  buildParamsMap,
+  getLocalPollDpsFromParams,
+  getUnknownDpsKeys,
+  getUnknownSpecificationCodes
+} from './commons/deviceHelpers';
+import {
+  buildIssueTitle,
+  buildGithubSearchUrl,
+  checkGithubIssueExists,
+  createGithubIssueData,
+  createGithubUrl,
+  createEmptyGithubIssueUrl
+} from './commons/githubIssue';
 
 const ONLINE_RECENT_MINUTES = 5;
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
 const CLOUD_POLL_FREQUENCY = 30 * 1000;
-const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
-const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
-const GITHUB_SEARCH_API_URL = 'https://api.github.com/search/issues?q=';
-const GITHUB_SEARCH_CACHE_TTL_MS = 1000 * 60 * 5;
-const MAX_GITHUB_CACHE_SIZE = 100;
-const MAX_GITHUB_URL_LENGTH = 8000;
-const githubIssueCache = new Map();
-
-const maskIp = ip => {
-  if (!ip || typeof ip !== 'string') {
-    return null;
-  }
-  const parts = ip.split('.');
-  if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
-    return null;
-  }
-  return `${parts[0]}.x.x.x`;
-};
-
-const sanitizeParams = params => {
-  if (!Array.isArray(params)) {
-    return [];
-  }
-  return params.map(param => {
-    if (param.name === 'LOCAL_KEY') {
-      return { ...param, value: '***' };
-    }
-    if (param.name === 'IP_ADDRESS' || param.name === 'CLOUD_IP') {
-      return { ...param, value: maskIp(param.value) };
-    }
-    return param;
-  });
-};
-
-const getIgnoredLocalDps = device => {
-  const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
-  const ignored = mapping && Array.isArray(mapping.ignored_local_dps) ? mapping.ignored_local_dps : [];
-  return new Set(ignored.map(value => String(value)));
-};
-
-const getIgnoredCloudCodes = device => {
-  const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
-  const ignored = mapping && Array.isArray(mapping.ignored_cloud_codes) ? mapping.ignored_cloud_codes : [];
-  return new Set(ignored.map(value => String(value).toLowerCase()));
-};
-
-const LOCAL_CODE_ALIASES = {
-  switch: ['power'],
-  power: ['switch']
-};
-
-const getLocalDpsFromProperties = (code, properties) => {
-  if (!code || !properties) {
-    return null;
-  }
-  const list = Array.isArray(properties.properties) ? properties.properties : properties;
-  if (!Array.isArray(list)) {
-    return null;
-  }
-  const normalized = code.toLowerCase();
-  const candidates = [normalized, ...(LOCAL_CODE_ALIASES[normalized] || [])];
-  for (const candidate of candidates) {
-    const match = list.find(item => item && item.code && item.code.toLowerCase() === candidate);
-    if (match && match.dp_id !== undefined && match.dp_id !== null) {
-      return match.dp_id;
-    }
-  }
-  return null;
-};
-
-const getLocalDpsFromCode = (code, device) => {
-  if (!code) {
-    return null;
-  }
-  const propertyMatch = getLocalDpsFromProperties(code, device && device.properties);
-  if (propertyMatch !== null) {
-    return propertyMatch;
-  }
-  const normalized = code.toLowerCase();
-  if (normalized === 'switch' || normalized === 'power') {
-    return 1;
-  }
-  const match = normalized.match(/_(\d+)$/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return null;
-};
-
-const getKnownDpsKeys = (features, device) => {
-  const keys = new Set();
-  if (!Array.isArray(features)) {
-    return keys;
-  }
-  features.forEach(feature => {
-    const parts = (feature.external_id || '').split(':');
-    const code = parts.length >= 3 ? parts[2] : null;
-    const dpsKey = getLocalDpsFromCode(code, device);
-    if (dpsKey !== null) {
-      keys.add(String(dpsKey));
-    }
-  });
-  return keys;
-};
-
-const getUnknownDpsKeys = (localPollDps, features, device) => {
-  if (!localPollDps || typeof localPollDps !== 'object') {
-    return [];
-  }
-  const knownKeys = getKnownDpsKeys(features, device);
-  const ignoredDps = getIgnoredLocalDps(device);
-  return Object.keys(localPollDps).filter(key => !knownKeys.has(key) && !ignoredDps.has(String(key)));
-};
-
-const getUnknownSpecificationCodes = (specifications, features, device) => {
-  if (!specifications || (!Array.isArray(specifications.functions) && !Array.isArray(specifications.status))) {
-    return [];
-  }
-  const knownCodes = new Set();
-  const addKnownCode = code => {
-    if (code !== null && code !== undefined) {
-      knownCodes.add(
-        String(code)
-          .trim()
-          .toLowerCase()
-      );
-    }
-  };
-  if (Array.isArray(features)) {
-    features.forEach(feature => {
-      const parts = (feature.external_id || '').split(':');
-      const code = parts.length >= 2 ? parts[parts.length - 1] : null;
-      addKnownCode(code);
-    });
-  }
-  const services = Array.isArray(device && device.thing_model && device.thing_model.services)
-    ? device.thing_model.services
-    : [];
-  services.forEach(service => {
-    const properties = Array.isArray(service && service.properties) ? service.properties : [];
-    properties.forEach(property => addKnownCode(property && property.code));
-  });
-  const propertiesPayload = device && device.properties;
-  const properties = Array.isArray(propertiesPayload)
-    ? propertiesPayload
-    : Array.isArray(propertiesPayload && propertiesPayload.properties)
-    ? propertiesPayload.properties
-    : [];
-  properties.forEach(property => addKnownCode(property && property.code));
-  const specCodes = new Set();
-  ['functions', 'status'].forEach(key => {
-    const entries = specifications[key];
-    if (!Array.isArray(entries)) {
-      return;
-    }
-    entries.forEach(entry => {
-      if (entry && entry.code) {
-        specCodes.add(entry.code);
-      }
-    });
-  });
-  const ignoredCodes = getIgnoredCloudCodes(device);
-  return Array.from(specCodes).filter(code => {
-    const normalized = String(code)
-      .trim()
-      .toLowerCase();
-    return !knownCodes.has(normalized) && !ignoredCodes.has(normalized);
-  });
-};
 
 const parseDate = dateValue => {
   if (!dateValue) {
@@ -236,161 +81,6 @@ const resolveOnlineStatus = device => {
   }
   return false;
 };
-
-const buildParamsMap = device =>
-  (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
-    acc[param.name] = param.value;
-    return acc;
-  }, {});
-
-const getParamValue = (device, name) => {
-  const params = Array.isArray(device && device.params) ? device.params : [];
-  const found = params.find(param => param.name === name);
-  return found ? found.value : undefined;
-};
-
-const getLocalOverrideValue = device => {
-  if (!device) {
-    return undefined;
-  }
-  if (device.local_override !== undefined && device.local_override !== null) {
-    return device.local_override;
-  }
-  return getParamValue(device, 'LOCAL_OVERRIDE');
-};
-
-const getLocalPollDpsFromParams = device => {
-  const raw = getParamValue(device, 'LOCAL_POLL_DPS');
-  if (!raw) {
-    return null;
-  }
-  if (typeof raw === 'object') {
-    return raw;
-  }
-  try {
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
-  }
-};
-
-const getProductIdentifier = device =>
-  device.product_id ||
-  getParamValue(device, 'PRODUCT_ID') ||
-  device.product_key ||
-  getParamValue(device, 'PRODUCT_KEY') ||
-  'unknown-product';
-
-const buildIssueTitle = device => {
-  const isLocal = normalizeBoolean(getLocalOverrideValue(device));
-  const modeLabel = isLocal ? 'local' : 'cloud';
-  const productIdentifier = getProductIdentifier(device);
-  const modelLabel = device.model || device.product_name || device.name || 'Unknown device';
-  return `Tuya (${modeLabel}) [${productIdentifier}]: Add support for ${modelLabel}`;
-};
-
-const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "${title}"`;
-
-const buildGithubSearchUrl = title => `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
-
-const setGithubIssueCache = (query, value) => {
-  if (githubIssueCache.has(query)) {
-    githubIssueCache.delete(query);
-  }
-  if (githubIssueCache.size >= MAX_GITHUB_CACHE_SIZE) {
-    const oldestKey = githubIssueCache.keys().next().value;
-    if (oldestKey !== undefined) {
-      githubIssueCache.delete(oldestKey);
-    }
-  }
-  githubIssueCache.set(query, value);
-};
-
-const checkGithubIssueExists = async title => {
-  const query = buildGithubSearchQuery(title);
-  const cached = githubIssueCache.get(query);
-  if (cached && Date.now() - cached.timestamp < GITHUB_SEARCH_CACHE_TTL_MS) {
-    return cached.exists;
-  }
-
-  let response;
-  if (typeof AbortController === 'undefined') {
-    response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`);
-  } else {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-      response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`, {
-        signal: controller.signal
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  }
-  if (!response.ok) {
-    throw new Error('Github search failed');
-  }
-  const data = await response.json();
-  const exists = Boolean(data && typeof data.total_count === 'number' && data.total_count > 0);
-  setGithubIssueCache(query, { exists, timestamp: Date.now() });
-  return exists;
-};
-
-const buildIssuePayload = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
-  if (!device) {
-    return null;
-  }
-  const productId = device.product_id || getParamValue(device, 'PRODUCT_ID') || null;
-  const productKey = device.product_key || getParamValue(device, 'PRODUCT_KEY') || null;
-  return {
-    id: device.id || null,
-    name: device.name || null,
-    selector: device.selector || null,
-    model: device.model || device.product_name || null,
-    external_id: device.external_id || null,
-    service_id: device.service_id || null,
-    product_id: productId,
-    product_key: productKey,
-    online: device.online !== undefined ? device.online : null,
-    protocol_version: device.protocol_version || null,
-    local_override: getLocalOverrideValue(device),
-    specifications: device.specifications || null,
-    properties: device.properties || null,
-    thing_model: device.thing_model || null,
-    features: Array.isArray(device.features) ? device.features : [],
-    params: sanitizeParams(device.params),
-    local_poll: {
-      status: localPollStatus || null,
-      error: localPollError || null,
-      protocol: localPollValidation ? localPollValidation.protocol : null,
-      dps: localPollDps || null
-    }
-  };
-};
-
-const buildIssueBody = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
-  `\`\`\`json\n${JSON.stringify(
-    buildIssuePayload(device, localPollStatus, localPollError, localPollValidation, localPollDps),
-    null,
-    2
-  )}\n\`\`\``;
-
-const createGithubIssueData = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
-  const title = encodeURIComponent(buildIssueTitle(device));
-  const body = buildIssueBody(device, localPollStatus, localPollError, localPollValidation, localPollDps);
-  const urlWithBody = `${GITHUB_BASE_URL}?title=${title}&body=${encodeURIComponent(body)}`;
-  if (urlWithBody.length <= MAX_GITHUB_URL_LENGTH) {
-    return { url: urlWithBody, body, truncated: false };
-  }
-  return {
-    url: `${GITHUB_BASE_URL}?title=${title}`,
-    body,
-    truncated: true
-  };
-};
-
-const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
-  createGithubIssueData(device, localPollStatus, localPollError, localPollValidation, localPollDps).url;
 
 const buildComparableDevice = device => {
   if (!device) {
@@ -478,10 +168,16 @@ class TuyaDeviceBox extends Component {
     const isNewDevice = !currentDevice || currentDevice.external_id !== nextDevice.external_id;
     const baselineDevice = this.state.baselineDevice;
     const shouldRefreshBaseline = isNewDevice || !baselineDevice || baselineDevice.updated_at !== nextDevice.updated_at;
-    const mergedNextDevice =
+    let mergedNextDevice =
       currentDevice && currentDevice.specifications && !nextDevice.specifications
         ? { ...nextDevice, specifications: currentDevice.specifications }
         : nextDevice;
+    if (currentDevice && currentDevice.tuya_report && !mergedNextDevice.tuya_report) {
+      mergedNextDevice = {
+        ...mergedNextDevice,
+        tuya_report: currentDevice.tuya_report
+      };
+    }
     if (isNewDevice) {
       this.setState({
         device: mergedNextDevice,
@@ -858,11 +554,10 @@ class TuyaDeviceBox extends Component {
     if (!shouldOpenIssue) {
       return;
     }
-    const title = encodeURIComponent(issueTitle);
     if (popup && !popup.closed) {
-      popup.location.href = `${GITHUB_BASE_URL}?title=${title}`;
+      popup.location.href = createEmptyGithubIssueUrl(issueTitle);
     } else {
-      window.open(`${GITHUB_BASE_URL}?title=${title}`, '_blank');
+      window.open(createEmptyGithubIssueUrl(issueTitle), '_blank');
     }
     this.setState({ githubIssueOpened: true });
   };
