@@ -67,6 +67,16 @@ describe('Tuya local mapping', () => {
     expect(dpsKey).to.equal(null);
   });
 
+  it('should resolve smart socket telemetry dps in strict local mapping', () => {
+    const device = { device_type: 'smart-socket' };
+
+    expect(getLocalDpsFromCode('add_ele', device)).to.equal(17);
+    expect(getLocalDpsFromCode('cur_current', device)).to.equal(18);
+    expect(getLocalDpsFromCode('cur_power', device)).to.equal(19);
+    expect(getLocalDpsFromCode('cur_voltage', device)).to.equal(20);
+    expect(getLocalDpsFromCode('child_lock', device)).to.equal(41);
+  });
+
   it('should fallback to switch dps in non-strict mapping without dps', () => {
     const { getLocalDpsFromCode: getLocalDpsFromCodeStub } = proxyquire(
       '../../../../../services/tuya/lib/device/tuya.localMapping',

@@ -24,6 +24,10 @@ describe('Tuya device mapping', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](1);
       expect(result).to.eq(true);
     });
+    it('child lock binary', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.CHILD_LOCK][DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY](1);
+      expect(result).to.eq(true);
+    });
     describe('curtain state', () => {
       it('open', () => {
         const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE](
@@ -88,6 +92,10 @@ describe('Tuya device mapping', () => {
       });
       it('switch string on', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('ON');
+        expect(result).to.eq(1);
+      });
+      it('child lock', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CHILD_LOCK][DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY]('true');
         expect(result).to.eq(1);
       });
       it('energy', () => {

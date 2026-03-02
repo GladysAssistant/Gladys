@@ -53,6 +53,12 @@ const writeValues = {
     },
   },
 
+  [DEVICE_FEATURE_CATEGORIES.CHILD_LOCK]: {
+    [DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY]: (valueFromGladys) => {
+      return valueFromGladys === 1;
+    },
+  },
+
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
     [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromGladys) => {
       if (valueFromGladys === COVER_STATE.OPEN) {
@@ -103,6 +109,11 @@ const readValues = {
     },
     [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 1);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.CHILD_LOCK]: {
+    [DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY]: (valueFromDevice) => {
+      return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
   },
   [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: {

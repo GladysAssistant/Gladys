@@ -32,7 +32,7 @@ describe('TuyaHandler.setValue fixtures', () => {
 
       const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
         tuyapi: TuyAPIStub,
-        '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+        '@demirdeniz/tuyapi-newgen': TuyAPIStub,
       });
 
       const {

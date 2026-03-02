@@ -2,6 +2,7 @@ module.exports = {
   strict: true,
   ignoredDps: ['11'],
   codeAliases: {
+    child_lock: [],
     switch: ['power'],
     power: ['switch'],
     switch_1: ['switch', 'power'],
@@ -10,6 +11,11 @@ module.exports = {
     switch_4: ['switch'],
   },
   dps: {
+    add_ele: 17,
+    cur_current: 18,
+    cur_power: 19,
+    cur_voltage: 20,
+    child_lock: 41,
     switch: 1,
     power: 1,
     switch_1: 1,
