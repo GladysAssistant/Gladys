@@ -35,10 +35,14 @@ async function dailyUpdate() {
       const sunriseBase = dayjs(times.sunrise).tz(this.timezone);
       const sunsetBase = dayjs(times.sunset).tz(this.timezone);
       logger.info(
-        `Sunrise today is at ${sunriseBase.get('hour')}:${sunriseBase.get('minute')} today, in your timezone = ${this.timezone}`,
+        `Sunrise today is at ${sunriseBase.get('hour')}:${sunriseBase.get('minute')} today, in your timezone = ${
+          this.timezone
+        }`,
       );
       logger.info(
-        `Sunset today is at ${sunsetBase.get('hour')}:${sunsetBase.get('minute')} today, in your timezone = ${this.timezone}`,
+        `Sunset today is at ${sunsetBase.get('hour')}:${sunsetBase.get('minute')} today, in your timezone = ${
+          this.timezone
+        }`,
       );
 
       // Collect all distinct offsets for this house from active scene triggers
