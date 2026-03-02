@@ -176,6 +176,32 @@ describe('SceneManager.dailyUpdate', () => {
     expect(emittedOffsets).to.include(-15);
   });
 
+  it('should not add extra jobs for an inactive scene with a sunrise trigger', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-inactive',
+      active: false,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
+    });
+    await sceneManager.dailyUpdate();
+    // Inactive scene offsets must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should not add extra jobs for a scene with no triggers', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-no-triggers',
+      active: true,
+      actions: [],
+      triggers: null,
+    });
+    await sceneManager.dailyUpdate();
+    // Scene without triggers must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
   it('should deduplicate offsets when multiple scenes share the same offset', async () => {
     brain.addNamedEntity = fake.returns(null);
     sceneManager.addScene({
