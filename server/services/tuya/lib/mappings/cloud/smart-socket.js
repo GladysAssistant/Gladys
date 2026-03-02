@@ -5,7 +5,21 @@ const {
 } = require('../../../../../utils/constants');
 
 module.exports = {
-  ignoredCodes: ['countdown', 'countdown_1'],
+  ignoredCodes: [
+    'countdown',
+    'countdown_1',
+    'relay_status',
+    'overcharge_switch',
+    'light_mode',
+    'cycle_time',
+    'random_time',
+    'switch_inching',
+    'voltage_coe',
+    'electric_coe',
+    'power_coe',
+    'electricity_coe',
+    'test_bit',
+  ],
   switch: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,

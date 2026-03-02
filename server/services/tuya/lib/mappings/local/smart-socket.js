@@ -1,6 +1,6 @@
 module.exports = {
   strict: true,
-  ignoredDps: ['11'],
+  ignoredDps: ['9', '11', '21', '22', '23', '24', '25', '38', '39', '40', '42', '43', '44'],
   codeAliases: {
     child_lock: [],
     switch: ['power'],

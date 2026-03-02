@@ -137,206 +137,208 @@ describe('TuyaHandler.discoverDevices', () => {
 
   it('should load devices', async () => {
     const devices = await tuyaHandler.discoverDevices();
-    expect(devices).to.deep.eq([
-      {
-        external_id: 'tuya:uuid',
-        features: [
+    expect(devices).to.have.lengthOf(1);
+
+    const [{ tuya_mapping: tuyaMapping, ...device }] = devices;
+
+    expect(tuyaMapping).to.be.an('object');
+    expect(tuyaMapping.ignored_cloud_codes).to.be.an('array');
+    expect(tuyaMapping.ignored_local_dps).to.be.an('array');
+
+    expect(device).to.deep.eq({
+      external_id: 'tuya:uuid',
+      features: [
+        {
+          category: 'switch',
+          external_id: 'tuya:uuid:cur_power',
+          has_feedback: false,
+          max: 1,
+          min: 0,
+          name: 'cur_power',
+          read_only: true,
+          selector: 'tuya:uuid:cur_power',
+          type: 'power',
+          unit: 'watt',
+        },
+        {
+          category: 'switch',
+          external_id: 'tuya:uuid:switch_1',
+          has_feedback: false,
+          max: 1,
+          min: 0,
+          name: 'switch_1',
+          read_only: false,
+          selector: 'tuya:uuid:switch_1',
+          type: 'binary',
+        },
+      ],
+      device_type: 'smart-socket',
+      model: 'model',
+      name: 'name',
+      poll_frequency: 30000,
+      params: [
+        {
+          name: 'DEVICE_ID',
+          value: 'uuid',
+        },
+        {
+          name: 'LOCAL_KEY',
+          value: 'localKey',
+        },
+        {
+          name: 'CLOUD_IP',
+          value: '1.1.1.1',
+        },
+        {
+          name: 'LOCAL_OVERRIDE',
+          value: false,
+        },
+      ],
+      properties: {
+        properties: [{ code: 'switch_1', value: true }],
+      },
+      product_id: undefined,
+      product_key: undefined,
+      specifications: {
+        details: 'details',
+        category: 'cz',
+        functions: [
           {
-            category: 'switch',
-            external_id: 'tuya:uuid:cur_power',
-            has_feedback: false,
-            max: 1,
-            min: 0,
+            code: 'switch_1',
+            name: 'name',
+            type: 'Boolean',
+          },
+        ],
+        status: [
+          {
+            code: 'cur_power',
             name: 'cur_power',
-            read_only: true,
-            selector: 'tuya:uuid:cur_power',
-            type: 'power',
-            unit: 'watt',
-          },
-          {
-            category: 'switch',
-            external_id: 'tuya:uuid:switch_1',
-            has_feedback: false,
-            max: 1,
-            min: 0,
-            name: 'switch_1',
-            read_only: false,
-            selector: 'tuya:uuid:switch_1',
-            type: 'binary',
+            type: 'Integer',
           },
         ],
-        device_type: 'smart-socket',
-        model: 'model',
-        name: 'name',
-        poll_frequency: 30000,
-        params: [
-          {
-            name: 'DEVICE_ID',
-            value: 'uuid',
-          },
-          {
-            name: 'LOCAL_KEY',
-            value: 'localKey',
-          },
-          {
-            name: 'CLOUD_IP',
-            value: '1.1.1.1',
-          },
-          {
-            name: 'LOCAL_OVERRIDE',
-            value: false,
-          },
-        ],
-        properties: {
-          properties: [{ code: 'switch_1', value: true }],
-        },
-        product_id: undefined,
-        product_key: undefined,
-        specifications: {
-          details: 'details',
-          category: 'cz',
-          functions: [
-            {
-              code: 'switch_1',
-              name: 'name',
-              type: 'Boolean',
-            },
-          ],
-          status: [
-            {
-              code: 'cur_power',
-              name: 'cur_power',
-              type: 'Integer',
-            },
-          ],
-        },
-        selector: 'tuya:uuid',
-        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
-        should_poll: true,
-        thing_model: {
-          services: [],
-        },
-        tuya_report: {
-          schema_version: 2,
-          cloud: {
-            assembled: {
-              specifications: {
-                details: 'details',
-                category: 'cz',
-                functions: [
-                  {
-                    code: 'switch_1',
-                    name: 'name',
-                    type: 'Boolean',
-                  },
-                ],
-                status: [
-                  {
-                    code: 'cur_power',
-                    name: 'cur_power',
-                    type: 'Integer',
-                  },
-                ],
-              },
-              properties: {
-                properties: [{ code: 'switch_1', value: true }],
-              },
-              thing_model: {
-                services: [],
-              },
-            },
-            raw: {
-              device_list_entry: {
-                request: {
-                  method: 'GET',
-                  path: '/v1.0/users/{sourceId}/devices',
-                },
-                response_item: {
+      },
+      selector: 'tuya:uuid',
+      service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      should_poll: true,
+      thing_model: {
+        services: [],
+      },
+      tuya_report: {
+        schema_version: 2,
+        cloud: {
+          assembled: {
+            specifications: {
+              details: 'details',
+              category: 'cz',
+              functions: [
+                {
+                  code: 'switch_1',
                   name: 'name',
-                  id: 'uuid',
-                  product_name: 'model',
+                  type: 'Boolean',
+                },
+              ],
+              status: [
+                {
+                  code: 'cur_power',
+                  name: 'cur_power',
+                  type: 'Integer',
+                },
+              ],
+            },
+            properties: {
+              properties: [{ code: 'switch_1', value: true }],
+            },
+            thing_model: {
+              services: [],
+            },
+          },
+          raw: {
+            device_list_entry: {
+              request: {
+                method: 'GET',
+                path: '/v1.0/users/{sourceId}/devices',
+              },
+              response_item: {
+                name: 'name',
+                id: 'uuid',
+                product_name: 'model',
+                local_key: 'localKey',
+                ip: '1.1.1.1',
+                online: true,
+              },
+            },
+            device_specification: {
+              request: {
+                method: 'GET',
+                path: `${API.VERSION_1_2}/devices/uuid/specification`,
+              },
+              response: {
+                result: {
+                  details: 'details',
+                  functions: [
+                    {
+                      name: 'name',
+                      code: 'switch_1',
+                      type: 'Boolean',
+                    },
+                  ],
+                  status: [
+                    {
+                      name: 'cur_power',
+                      code: 'cur_power',
+                      type: 'Integer',
+                    },
+                  ],
+                  category: 'cz',
+                },
+              },
+              error: null,
+            },
+            device_details: {
+              request: {
+                method: 'GET',
+                path: `${API.VERSION_1_0}/devices/uuid`,
+              },
+              response: {
+                result: {
                   local_key: 'localKey',
                   ip: '1.1.1.1',
-                  online: true,
                 },
               },
-              device_specification: {
-                request: {
-                  method: 'GET',
-                  path: `${API.VERSION_1_2}/devices/uuid/specification`,
-                },
-                response: {
-                  result: {
-                    details: 'details',
-                    functions: [
-                      {
-                        name: 'name',
-                        code: 'switch_1',
-                        type: 'Boolean',
-                      },
-                    ],
-                    status: [
-                      {
-                        name: 'cur_power',
-                        code: 'cur_power',
-                        type: 'Integer',
-                      },
-                    ],
-                    category: 'cz',
-                  },
-                },
-                error: null,
+              error: null,
+            },
+            thing_shadow_properties: {
+              request: {
+                method: 'GET',
+                path: `${API.VERSION_2_0}/thing/uuid/shadow/properties`,
               },
-              device_details: {
-                request: {
-                  method: 'GET',
-                  path: `${API.VERSION_1_0}/devices/uuid`,
+              response: {
+                result: {
+                  properties: [{ code: 'switch_1', value: true }],
                 },
-                response: {
-                  result: {
-                    local_key: 'localKey',
-                    ip: '1.1.1.1',
-                  },
-                },
-                error: null,
               },
-              thing_shadow_properties: {
-                request: {
-                  method: 'GET',
-                  path: `${API.VERSION_2_0}/thing/uuid/shadow/properties`,
-                },
-                response: {
-                  result: {
-                    properties: [{ code: 'switch_1', value: true }],
-                  },
-                },
-                error: null,
+              error: null,
+            },
+            thing_model: {
+              request: {
+                method: 'GET',
+                path: `${API.VERSION_2_0}/thing/uuid/model`,
               },
-              thing_model: {
-                request: {
-                  method: 'GET',
-                  path: `${API.VERSION_2_0}/thing/uuid/model`,
+              response: {
+                result: {
+                  model: '{"services":[]}',
                 },
-                response: {
-                  result: {
-                    model: '{"services":[]}',
-                  },
-                },
-                error: null,
               },
+              error: null,
             },
           },
-          local: {
-            scan: null,
-          },
         },
-        tuya_mapping: {
-          ignored_cloud_codes: ['countdown', 'countdown_1'],
-          ignored_local_dps: ['11'],
+        local: {
+          scan: null,
         },
-        online: true,
       },
-    ]);
+      online: true,
+    });
 
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {

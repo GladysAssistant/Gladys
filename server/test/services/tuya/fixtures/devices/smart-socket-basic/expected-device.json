@@ -20,8 +20,22 @@
     "PRODUCT_KEY": "socket-key"
   },
   "tuya_mapping": {
-    "ignored_local_dps": ["11"],
-    "ignored_cloud_codes": ["countdown", "countdown_1"]
+    "ignored_local_dps": ["9", "11", "21", "22", "23", "24", "25", "38", "39", "40", "42", "43", "44"],
+    "ignored_cloud_codes": [
+      "countdown",
+      "countdown_1",
+      "relay_status",
+      "overcharge_switch",
+      "light_mode",
+      "cycle_time",
+      "random_time",
+      "switch_inching",
+      "voltage_coe",
+      "electric_coe",
+      "power_coe",
+      "electricity_coe",
+      "test_bit"
+    ]
   },
   "features": [
     {

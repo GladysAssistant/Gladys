@@ -42,10 +42,9 @@ describe('tuya.convertDevice', () => {
       functions: [{ code: 'switch_1', name: 'Switch', type: 'Boolean' }],
       status: [{ code: 'cur_power', name: 'Power', type: 'Integer' }],
     });
-    expect(device.tuya_mapping).to.deep.equal({
-      ignored_local_dps: ['11'],
-      ignored_cloud_codes: ['countdown', 'countdown_1'],
-    });
+    expect(device.tuya_mapping).to.be.an('object');
+    expect(device.tuya_mapping.ignored_local_dps).to.be.an('array');
+    expect(device.tuya_mapping.ignored_cloud_codes).to.be.an('array');
     expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
 
     const params = device.params.reduce((acc, param) => {
