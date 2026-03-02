@@ -2615,7 +2615,7 @@
       },
       "sunriseSunsetTrigger": {
         "offsetLabel": "Quand",
-        "atExactTime": "A l'heure exacte",
+        "atExactTime": "À l'heure exacte",
         "before": "Avant",
         "after": "Après",
         "minutes": "minutes"

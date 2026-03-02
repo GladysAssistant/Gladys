@@ -182,13 +182,13 @@ describe('SceneManager.dailyUpdate', () => {
       selector: 'scene-a',
       active: true,
       actions: [],
-      triggers: [{ type: 'time.sunrise', house: 'house-1', offset: 30 }],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
     });
     sceneManager.addScene({
       selector: 'scene-b',
       active: true,
       actions: [],
-      triggers: [{ type: 'time.sunrise', house: 'house-1', offset: 30 }],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
     });
     await sceneManager.dailyUpdate();
     // offset=0 sunrise + offset=30 sunrise (deduplicated) + offset=0 sunset = 3 jobs
