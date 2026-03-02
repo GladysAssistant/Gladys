@@ -378,4 +378,60 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       }),
     });
   });
+
+  it('should use raw rejection reasons when requests reject without Error instances', async () => {
+    const warnStub = sinon.stub(logger, 'warn');
+    tuyaHandler.connector.request = sinon
+      .stub()
+      .onCall(0)
+      .rejects('specification failure')
+      .onCall(1)
+      .rejects('details failure')
+      .onCall(2)
+      .rejects('properties failure')
+      .onCall(3)
+      .rejects('model failure');
+
+    const device = await tuyaHandler.loadDeviceDetails({ id: 1 });
+
+    expect(device.id).to.equal(1);
+    expect(device.specifications).to.deep.equal({});
+    expect(device.properties).to.deep.equal({});
+    expect(device.thing_model).to.equal(null);
+    expect(device.tuya_report.cloud.assembled).to.deep.equal({
+      specifications: {},
+      properties: {},
+      thing_model: null,
+    });
+    expect(String(device.tuya_report.cloud.raw.device_specification.error)).to.equal('specification failure');
+    expect(String(device.tuya_report.cloud.raw.device_details.error)).to.equal('details failure');
+    expect(String(device.tuya_report.cloud.raw.thing_shadow_properties.error)).to.equal('properties failure');
+    expect(String(device.tuya_report.cloud.raw.thing_model.error)).to.equal('model failure');
+    expect(warnStub.callCount).to.equal(4);
+  });
+
+  it('should handle fulfilled responses without result payload', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({});
+
+    const device = await tuyaHandler.loadDeviceDetails({ id: 1, category: 'switch' });
+
+    expect(device).to.deep.eq({
+      id: 1,
+      category: 'switch',
+      specifications: { category: 'switch' },
+      properties: {},
+      thing_model: null,
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1, category: 'switch' },
+        specificationResponse: {},
+        detailsResponse: {},
+        propertiesResponse: {},
+        modelResponse: {},
+        specifications: { category: 'switch' },
+        properties: {},
+        thingModel: null,
+      }),
+    });
+  });
 });

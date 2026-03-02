@@ -97,6 +97,47 @@ describe('TuyaHandler.loadDevices', () => {
     }
   });
 
+  it('should use error message field when msg is missing', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      message: 'Tuya message error',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya message error');
+    }
+  });
+
+  it('should use error code field when msg and message are missing', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      code: 'TUYA_ERR_CODE',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('TUYA_ERR_CODE');
+    }
+  });
+
+  it('should fallback to default api error message when error payload is empty', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya API error');
+    }
+  });
+
   it('should throw on empty api response', async () => {
     tuyaHandler.connector.request = sinon.stub().resolves(null);
 
