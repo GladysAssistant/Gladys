@@ -3538,6 +3538,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "Netzbetrieb",
+      "binary": "Netzstrom verbunden (ja/nein)"
+    },
     "light": {
       "shortCategoryName": "Licht",
       "binary": "Licht: ein/aus",

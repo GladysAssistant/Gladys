@@ -3538,6 +3538,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "AC Connected",
+      "binary": "AC Connected (yes/no)"
+    },
     "light": {
       "shortCategoryName": "Light",
       "binary": "Light On/Off",

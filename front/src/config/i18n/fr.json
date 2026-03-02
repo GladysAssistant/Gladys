@@ -3538,6 +3538,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "Secteur Connecté",
+      "binary": "Secteur Connecté (Oui/Non)"
+    },
     "light": {
       "shortCategoryName": "Lumière",
       "binary": "Eclairage On/Off",

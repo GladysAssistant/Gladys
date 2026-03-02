@@ -531,6 +531,7 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
+  AC_CONNECTED: 'ac-connected',
   CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
@@ -621,6 +622,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     PUSH: 'push',
     UNKNOWN: 'unknown',
+  },
+  AC_CONNECTED: {
+    BINARY: 'binary',
   },
   TEMPERATURE_SENSOR: {
     MIN: 'min',
