@@ -365,6 +365,17 @@ describe('TuyaHandler.loadDeviceDetails', () => {
       specifications: {},
       properties: {},
       thing_model: null,
+      tuya_report: buildExpectedReport({
+        deviceId: 1,
+        listEntry: { id: 1 },
+        specificationResponse: null,
+        detailsResponse: null,
+        propertiesResponse: null,
+        modelResponse: null,
+        specifications: {},
+        properties: {},
+        thingModel: null,
+      }),
     });
   });
 });
