@@ -366,6 +366,212 @@ describe('TuyaHandler.localScan', () => {
       portErrors: {},
     });
   });
+
+  it('should support object input and ignore parser results that return null', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: (options, cb) => {
+            if (typeof options === 'function') {
+              options();
+              return;
+            }
+            if (cb) {
+              cb();
+            }
+          },
+          close: () => {},
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        return null;
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan({ timeoutSeconds: 1 });
+
+    sockets.forEach((socket) => {
+      if (socket.handlers.message) {
+        socket.handlers.message(null);
+      }
+    });
+
+    await clock.tickAsync(1100);
+    const result = await promise;
+    clock.restore();
+
+    expect(result).to.deep.equal({
+      devices: {},
+      portErrors: {},
+    });
+  });
+
+  it('should resolve device id from devId and fallback to rinfo address', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: (options, cb) => {
+            if (typeof options === 'function') {
+              options();
+              return;
+            }
+            if (cb) {
+              cb();
+            }
+          },
+          close: () => {},
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        return [
+          {
+            payload: {
+              devId: 'device-dev-id',
+              version: '3.5',
+              productKey: 'product-key',
+            },
+          },
+        ];
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+
+    sockets.forEach((socket) => {
+      if (socket.handlers.message) {
+        socket.handlers.message(Buffer.from('test'), {
+          address: '9.9.9.9',
+          port: 6666,
+          source: 'lan',
+        });
+      }
+    });
+
+    await clock.tickAsync(1100);
+    const result = await promise;
+    clock.restore();
+
+    expect(result).to.deep.equal({
+      devices: {
+        'device-dev-id': {
+          ip: '9.9.9.9',
+          version: '3.5',
+          productKey: 'product-key',
+        },
+      },
+      portErrors: {},
+    });
+  });
+
+  it('should resolve device id from payload id when gwId and devId are missing', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: (options, cb) => {
+            if (typeof options === 'function') {
+              options();
+              return;
+            }
+            if (cb) {
+              cb();
+            }
+          },
+          close: () => {},
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        return [
+          {
+            payload: {
+              id: 'device-payload-id',
+              ip: '8.8.8.8',
+              version: '3.3',
+            },
+          },
+        ];
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+
+    sockets.forEach((socket) => {
+      if (socket.handlers.message) {
+        socket.handlers.message(Buffer.from('test'), {
+          address: '7.7.7.7',
+          port: 6667,
+        });
+      }
+    });
+
+    await clock.tickAsync(1100);
+    const result = await promise;
+    clock.restore();
+
+    expect(result).to.deep.equal({
+      devices: {
+        'device-payload-id': {
+          ip: '8.8.8.8',
+          version: '3.3',
+          productKey: undefined,
+        },
+      },
+      portErrors: {},
+    });
+  });
 });
 
 describe('TuyaHandler.buildLocalScanResponse', () => {
@@ -505,5 +711,36 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
       source: 'udp',
       response: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' },
     });
+  });
+
+  it('should keep local device name when creating a local-only discovered device', () => {
+    const convertDevice = sinon.stub().callsFake((device) => ({
+      external_id: `tuya:${device.id}`,
+      name: device.name,
+      params: [{ name: 'IP_ADDRESS', value: device.ip }],
+      tuya_report: mergeTuyaReport(null, device.tuya_report),
+    }));
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      './device/tuya.convertDevice': {
+        convertDevice,
+      },
+    });
+    const tuyaManager = {
+      discoveredDevices: [],
+      gladys: {
+        stateManager: {
+          get: sinon.stub().returns(null),
+        },
+      },
+    };
+
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device3: { name: 'Kitchen Plug', ip: '3.3.3.3', version: '3.5' } },
+      portErrors: {},
+    });
+
+    expect(convertDevice.calledOnce).to.equal(true);
+    expect(convertDevice.firstCall.args[0].name).to.equal('Kitchen Plug');
+    expect(response.devices[0].name).to.equal('Kitchen Plug');
   });
 });
