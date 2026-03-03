@@ -10,6 +10,7 @@
   "poll_frequency": 10000,
   "should_poll": true,
   "params": {
+    "CLOUD_READ_STRATEGY": "legacy",
     "DEVICE_ID": "socket-device-id",
     "LOCAL_KEY": "local-key",
     "IP_ADDRESS": "10.0.0.10",

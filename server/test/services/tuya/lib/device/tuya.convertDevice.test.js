@@ -61,6 +61,7 @@ describe('tuya.convertDevice', () => {
     expect(params[DEVICE_PARAM_NAME.LOCAL_OVERRIDE]).to.equal(true);
     expect(params[DEVICE_PARAM_NAME.PRODUCT_ID]).to.equal('product-id');
     expect(params[DEVICE_PARAM_NAME.PRODUCT_KEY]).to.equal('product-key');
+    expect(params[DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY]).to.equal('legacy');
   });
 
   it('should handle missing optional fields', () => {
@@ -122,6 +123,11 @@ describe('tuya.convertDevice', () => {
     ]);
     expect(device.features.find((feature) => feature.external_id === 'tuya:device-id:cur_power').scale).to.equal(1);
     expect(device.poll_frequency).to.equal(DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS);
+    const params = device.params.reduce((acc, param) => {
+      acc[param.name] = param.value;
+      return acc;
+    }, {});
+    expect(params[DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY]).to.equal('shadow');
   });
 
   it('should keep specification group when thing model exposes the same code', () => {
