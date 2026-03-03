@@ -1,3 +1,18 @@
 .emptyDiv {
   min-height: 200px;
 }
+
+.mqttActionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mqttActionButtons > a {
+  display: flex; 
+  flex: 1 1 100%;
+}
+
+.mqttActionButtons > a button {
+  width: 100%;
+}

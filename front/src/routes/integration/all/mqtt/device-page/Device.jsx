@@ -5,6 +5,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import MqttDeviceForm from './DeviceForm';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
@@ -86,16 +87,16 @@ class MqttDeviceBox extends Component {
 
                 <MqttDeviceForm {...props} mostRecentValueAt={mostRecentValueAt} />
 
-                <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                <div class={style.mqttActionButtons}>
+                  <button onClick={this.saveDevice} class="btn btn-success flex-fill">
                     <Text id="integration.mqtt.device.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                  <button onClick={this.deleteDevice} class="btn btn-danger flex-fill">
                     <Text id="integration.mqtt.device.deleteButton" />
                   </button>
 
-                  <Link href={`/dashboard/integration/device/mqtt/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
+                  <Link href={`/dashboard/integration/device/mqtt/edit/${props.device.selector}`} class="flex-fill">
+                    <button class="btn btn-primary w-100">
                       <Text id="integration.mqtt.device.editButton" />
                     </button>
                   </Link>
