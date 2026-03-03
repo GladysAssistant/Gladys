@@ -193,6 +193,10 @@ describe('TuyaHandler.discoverDevices', () => {
           name: 'LOCAL_OVERRIDE',
           value: false,
         },
+        {
+          name: 'CLOUD_READ_STRATEGY',
+          value: 'legacy',
+        },
       ],
       properties: {
         properties: [{ code: 'switch_1', value: true }],

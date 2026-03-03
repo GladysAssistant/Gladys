@@ -1,6 +1,7 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
+const { resolveCloudReadStrategy } = require('../utils/tuya.cloudStrategy');
 const { mergeTuyaReport } = require('../utils/tuya.report');
 const { convertFeature } = require('./tuya.convertFeature');
 const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
@@ -37,6 +38,19 @@ function convertDevice(tuyaDevice) {
   const online = tuyaDevice.online !== undefined ? tuyaDevice.online : tuyaDevice.is_online;
   const normalizedLocalOverride = normalizeBoolean(localOverride);
 
+  logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
+  const deviceType = getDeviceType({
+    specifications,
+    model,
+    product_name: productName,
+    product_id: productId,
+    name,
+    category: specifications.category || category,
+    properties,
+    thing_model: thingModel,
+  });
+  const cloudReadStrategy = resolveCloudReadStrategy(tuyaDevice, deviceType);
+
   const params = [];
   if (id) {
     params.push({ name: DEVICE_PARAM_NAME.DEVICE_ID, value: id });
@@ -62,6 +76,9 @@ function convertDevice(tuyaDevice) {
   if (productKey) {
     params.push({ name: DEVICE_PARAM_NAME.PRODUCT_KEY, value: productKey });
   }
+  if (cloudReadStrategy) {
+    params.push({ name: DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY, value: cloudReadStrategy });
+  }
   const safeDeviceLog = {
     id,
     name,
@@ -73,18 +90,6 @@ function convertDevice(tuyaDevice) {
   };
   logger.debug('Tuya convert device specifications');
   logger.debug(JSON.stringify(safeDeviceLog));
-
-  logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
-  const deviceType = getDeviceType({
-    specifications,
-    model,
-    product_name: productName,
-    product_id: productId,
-    name,
-    category: specifications.category || category,
-    properties,
-    thing_model: thingModel,
-  });
 
   // Groups cloud specification entries first, then thing model properties, then current property shadow codes.
   const groups = {};

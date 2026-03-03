@@ -171,6 +171,38 @@ describe('TuyaHandler.poll', () => {
     });
   });
 
+  it('should read cloud values from thing shadow when strategy is shadow', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      result: {
+        properties: [{ code: 'power_a', value: 706 }],
+      },
+    });
+
+    await tuyaHandler.poll({
+      external_id: 'tuya:device',
+      params: [{ name: 'CLOUD_READ_STRATEGY', value: 'shadow' }],
+      features: [
+        {
+          external_id: 'tuya:device:power_a',
+          category: 'energy-sensor',
+          type: 'power',
+          scale: 1,
+        },
+      ],
+    });
+
+    assert.callCount(tuyaHandler.connector.request, 1);
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/device/shadow/properties`,
+    });
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tuya:device:power_a',
+      state: 70.6,
+    });
+  });
+
   it('should return without cloud request when feature list is empty', async () => {
     await tuyaHandler.poll({
       external_id: 'tuya:device',
