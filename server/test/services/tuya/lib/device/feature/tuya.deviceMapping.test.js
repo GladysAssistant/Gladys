@@ -42,6 +42,14 @@ describe('Tuya device mapping', () => {
       });
       expect(result).to.eq(215);
     });
+    it('thermostat target temperature invalid value returns NaN', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.THERMOSTAT][
+        DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
+      ]('not-a-number', {
+        scale: 1,
+      });
+      expect(Number.isNaN(result)).to.equal(true);
+    });
     it('heater pilot wire mode', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.HEATER][DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE](
         PILOT_WIRE_MODE.PROGRAMMING,

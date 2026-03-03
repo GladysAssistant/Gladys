@@ -139,43 +139,29 @@ const emitFeatureState = (gladys, deviceFeature, transformedValue, previousValue
 };
 
 const isTemperatureFeature = (deviceFeature, code) => {
-  if (!deviceFeature || !code) {
-    return false;
-  }
-  if (deviceFeature.unit !== DEVICE_FEATURE_UNITS.CELSIUS && deviceFeature.unit !== DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-    return false;
-  }
-  return code === 'temp_set' || code === 'temp_current';
+  return Boolean(
+    deviceFeature &&
+      (deviceFeature.unit === DEVICE_FEATURE_UNITS.CELSIUS || deviceFeature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) &&
+      (code === 'temp_set' || code === 'temp_current'),
+  );
 };
 
 const roundTemperatureValue = (value, code) => {
-  if (!Number.isFinite(value)) {
-    return value;
-  }
   if (code === 'temp_set') {
     return Math.round(value);
   }
-  if (code === 'temp_current') {
-    return Math.round(value * 10) / 10;
-  }
-  return value;
+  return Math.round(value * 10) / 10;
 };
 
 const convertTemperatureValue = (value, fromUnit, toUnit, deviceFeature, code) => {
-  if (value === null || value === undefined) {
-    return value;
-  }
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue) || !fromUnit || !toUnit || fromUnit === toUnit) {
     return value;
   }
-  let convertedValue = numericValue;
-  if (fromUnit === DEVICE_FEATURE_UNITS.CELSIUS && toUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-    convertedValue = celsiusToFahrenheit(numericValue);
-  }
-  if (fromUnit === DEVICE_FEATURE_UNITS.FAHRENHEIT && toUnit === DEVICE_FEATURE_UNITS.CELSIUS) {
-    convertedValue = fahrenheitToCelsius(numericValue);
-  }
+  const convertedValue =
+    fromUnit === DEVICE_FEATURE_UNITS.CELSIUS
+      ? celsiusToFahrenheit(numericValue)
+      : fahrenheitToCelsius(numericValue);
   const roundedValue = roundTemperatureValue(convertedValue, code);
   if (code === 'temp_current' && deviceFeature) {
     const min = Number(deviceFeature.min);
@@ -209,10 +195,7 @@ const getTemperatureUnitFromLocalDps = (device, dps) => {
 };
 
 const getTemperatureUnitFromValues = (values) => {
-  if (!values) {
-    return null;
-  }
-  return normalizeTemperatureUnit(values.temp_unit_convert || values.unit);
+  return normalizeTemperatureUnit(values && (values.temp_unit_convert || values.unit));
 };
 
 const extractValuesFromResultArray = (device, result) => {

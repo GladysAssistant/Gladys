@@ -306,6 +306,103 @@ describe('TuyaHandler.setValue', () => {
     });
   });
 
+  it('should convert thermostat target temperature from fahrenheit to celsius before sending', async () => {
+    const device = {
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+      properties: {
+        properties: [{ code: 'temp_unit_convert', value: 'c' }],
+      },
+      specifications: {
+        functions: [{ code: 'temp_set' }],
+      },
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:temp_set',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+      scale: 1,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({ success: true }) },
+      gladys: {},
+      feedbackPollDelayMs: 0,
+      poll: sinon.stub().resolves(),
+    };
+
+    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 68);
+
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+    expect(ctx.connector.request.firstCall.args[0]).to.deep.equal({
+      method: 'POST',
+      path: `${API.VERSION_1_0}/devices/device/commands`,
+      body: { commands: [{ code: 'temp_set', value: 200 }] },
+    });
+  });
+
+  it('should keep invalid thermostat target temperature values untouched before write conversion', async () => {
+    const device = {
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+      properties: {
+        properties: [{ code: 'temp_unit_convert', value: 'f' }],
+      },
+      specifications: {
+        functions: [{ code: 'temp_set' }],
+      },
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:temp_set',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      scale: 1,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({ success: true }) },
+      gladys: {},
+      feedbackPollDelayMs: 0,
+      poll: sinon.stub().resolves(),
+    };
+
+    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 'not-a-number');
+
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+    expect(Number.isNaN(ctx.connector.request.firstCall.args[0].body.commands[0].value)).to.equal(true);
+  });
+
+  it('should keep thermostat value unchanged when unit conversion is not recognized', async () => {
+    const device = {
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+      properties: {
+        properties: [{ code: 'temp_unit_convert', value: 'c' }],
+      },
+      specifications: {
+        functions: [{ code: 'temp_set' }],
+      },
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:temp_set',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+      unit: 'kelvin',
+      scale: 1,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({ success: true }) },
+      gladys: {},
+      feedbackPollDelayMs: 0,
+      poll: sinon.stub().resolves(),
+    };
+
+    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 20);
+
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+    expect(ctx.connector.request.firstCall.args[0].body.commands[0].value).to.equal(200);
+  });
+
   it('should fallback to mapping scale for thermostat target temperature when feature scale is missing', async () => {
     const device = {
       device_type: 'pilot-thermostat',
@@ -540,6 +637,78 @@ describe('TuyaHandler.setValue', () => {
     }
 
     expect(ctx.poll.calledOnceWithExactly(device)).to.equal(true);
+  });
+
+  it('should delay feedback poll after a successful cloud command', async () => {
+    const clock = sinon.useFakeTimers();
+    try {
+      const device = {
+        external_id: 'tuya:device',
+        params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+        specifications: {
+          functions: [{ code: 'child_lock' }],
+        },
+      };
+      const deviceFeature = {
+        external_id: 'tuya:device:child_lock',
+        category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+        type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+      };
+
+      const ctx = {
+        connector: {
+          request: sinon.stub().resolves({ success: true }),
+        },
+        gladys: {},
+        poll: sinon.stub().resolves(),
+      };
+
+      const promise = tuyaHandler.setValue.call(ctx, device, deviceFeature, 1);
+      await clock.tickAsync(999);
+      expect(ctx.poll.called).to.equal(false);
+      await clock.tickAsync(1);
+      await promise;
+      expect(ctx.poll.calledOnceWithExactly(device)).to.equal(true);
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('should warn when delayed feedback poll fails after a successful cloud command', async () => {
+    const logger = {
+      debug: sinon.stub(),
+      warn: sinon.stub(),
+    };
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      '../../../utils/logger': logger,
+    });
+
+    const device = {
+      external_id: 'tuya:device',
+      params: [{ name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false }],
+      specifications: {
+        functions: [{ code: 'child_lock' }],
+      },
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:child_lock',
+      category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+      type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+    };
+
+    const ctx = {
+      connector: {
+        request: sinon.stub().resolves({ success: true }),
+      },
+      gladys: {},
+      feedbackPollDelayMs: 0,
+      poll: sinon.stub().rejects(new Error('poll failed')),
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(logger.warn.calledOnce).to.equal(true);
+    expect(logger.warn.firstCall.args[0]).to.include('feedback poll failed');
   });
 
   it('should reject when the selected cloud strategy command fails', async () => {
