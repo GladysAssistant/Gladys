@@ -159,9 +159,7 @@ const convertTemperatureValue = (value, fromUnit, toUnit, deviceFeature, code) =
     return value;
   }
   const convertedValue =
-    fromUnit === DEVICE_FEATURE_UNITS.CELSIUS
-      ? celsiusToFahrenheit(numericValue)
-      : fahrenheitToCelsius(numericValue);
+    fromUnit === DEVICE_FEATURE_UNITS.CELSIUS ? celsiusToFahrenheit(numericValue) : fahrenheitToCelsius(numericValue);
   const roundedValue = roundTemperatureValue(convertedValue, code);
   if (code === 'temp_current' && deviceFeature) {
     const min = Number(deviceFeature.min);
