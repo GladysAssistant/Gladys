@@ -178,7 +178,10 @@ class Zigbee2mqttBox extends Component {
                   <button onClick={this.deleteDevice} class="btn btn-danger flex-fill">
                     <Text id="integration.zigbee2mqtt.deleteButton" />
                   </button>
-                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`} class="flex-fill">
+                  <Link
+                    href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}
+                    class="flex-fill"
+                  >
                     <button class="btn btn-primary w-100">
                       <Text id="integration.zigbee2mqtt.device.editButton" />
                     </button>
