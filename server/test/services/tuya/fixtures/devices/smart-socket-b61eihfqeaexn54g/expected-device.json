@@ -14,6 +14,7 @@
     "LOCAL_KEY": "local-key",
     "IP_ADDRESS": "192.168.1.50",
     "CLOUD_IP": "91.0.0.1",
+    "CLOUD_READ_STRATEGY": "legacy",
     "LOCAL_OVERRIDE": true,
     "PROTOCOL_VERSION": "3.5",
     "PRODUCT_ID": "b61eihfqeaexn54g"
