@@ -27,16 +27,22 @@ const getThingModelProperties = (device) => {
   );
 };
 
-const resolveCloudReadStrategy = (device, deviceType) => {
+const resolveCloudStrategy = (device, deviceType) => {
   const ignoredCloudCodes = getIgnoredCloudCodes(deviceType);
+  const functions = Array.isArray(device && device.specifications && device.specifications.functions)
+    ? device.specifications.functions
+    : [];
   const status = Array.isArray(device && device.specifications && device.specifications.status)
     ? device.specifications.status
     : [];
-  if (status.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes))) {
+  if (
+    functions.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes)) ||
+    status.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes))
+  ) {
     return CLOUD_STRATEGY.LEGACY;
   }
   const thingProperties = getThingModelProperties(device);
-  if (thingProperties.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes))) {
+  if (thingProperties.some((entry) => entry && isSupportedCloudCode(entry.code, deviceType, ignoredCloudCodes))) {
     return CLOUD_STRATEGY.SHADOW;
   }
   return null;
@@ -45,11 +51,11 @@ const resolveCloudReadStrategy = (device, deviceType) => {
 const normalizeCloudStrategy = (value) =>
   value === CLOUD_STRATEGY.SHADOW ? CLOUD_STRATEGY.SHADOW : CLOUD_STRATEGY.LEGACY;
 
-const getConfiguredCloudReadStrategy = (device) =>
-  normalizeCloudStrategy(getParamValue(device && device.params, DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY));
+const getConfiguredCloudStrategy = (device) =>
+  normalizeCloudStrategy(getParamValue(device && device.params, DEVICE_PARAM_NAME.CLOUD_STRATEGY));
 
 module.exports = {
   CLOUD_STRATEGY,
-  getConfiguredCloudReadStrategy,
-  resolveCloudReadStrategy,
+  getConfiguredCloudStrategy,
+  resolveCloudStrategy,
 };

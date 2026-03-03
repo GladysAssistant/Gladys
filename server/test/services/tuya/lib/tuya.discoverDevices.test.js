@@ -163,7 +163,7 @@ describe('TuyaHandler.discoverDevices', () => {
         {
           category: 'switch',
           external_id: 'tuya:uuid:switch_1',
-          has_feedback: false,
+          has_feedback: true,
           max: 1,
           min: 0,
           name: 'switch_1',
@@ -194,7 +194,7 @@ describe('TuyaHandler.discoverDevices', () => {
           value: false,
         },
         {
-          name: 'CLOUD_READ_STRATEGY',
+          name: 'CLOUD_STRATEGY',
           value: 'legacy',
         },
       ],

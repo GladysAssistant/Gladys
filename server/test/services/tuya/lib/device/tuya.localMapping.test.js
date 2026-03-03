@@ -111,4 +111,17 @@ describe('Tuya local mapping', () => {
     const dpsKey = getLocalDpsFromCode('total_power', device);
     expect(dpsKey).to.equal(115);
   });
+
+  it('should resolve pilot thermostat dps in strict local mapping', () => {
+    const device = { device_type: 'pilot-thermostat' };
+
+    expect(getLocalDpsFromCode('mode', device)).to.equal(101);
+    expect(getLocalDpsFromCode('child_lock', device)).to.equal(102);
+    expect(getLocalDpsFromCode('electricity_statistics', device)).to.equal(112);
+    expect(getLocalDpsFromCode('temp_current', device)).to.equal(116);
+    expect(getLocalDpsFromCode('average_power', device)).to.equal(117);
+    expect(getLocalDpsFromCode('window_state', device)).to.equal(123);
+    expect(getLocalDpsFromCode('temp_set', device)).to.equal(125);
+    expect(getLocalDpsFromCode('running_mode', device)).to.equal(131);
+  });
 });

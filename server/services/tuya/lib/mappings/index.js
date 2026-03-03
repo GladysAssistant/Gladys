@@ -1,19 +1,40 @@
 const globalCloud = require('./cloud/global');
+const pilotThermostatCloud = require('./cloud/pilot-thermostat');
 const smartMeterCloud = require('./cloud/smart-meter');
 const smartSocketCloud = require('./cloud/smart-socket');
 
 const globalLocal = require('./local/global');
+const pilotThermostatLocal = require('./local/pilot-thermostat');
 const smartMeterLocal = require('./local/smart-meter');
 const smartSocketLocal = require('./local/smart-socket');
 
 const DEVICE_TYPES = {
+  PILOT_THERMOSTAT: 'pilot-thermostat',
   SMART_METER: 'smart-meter',
   SMART_SOCKET: 'smart-socket',
   UNKNOWN: 'unknown',
 };
 
+const PILOT_THERMOSTAT_CODES = new Set([
+  'mode',
+  'running_mode',
+  'child_lock',
+  'temp_set',
+  'temp_current',
+  'window_state',
+]);
 const SWITCH_CODES = new Set(['switch', 'switch_1', 'switch_2', 'power']);
 const SMART_METER_CODES = new Set(['total_power', 'forward_energy_total', 'voltage_a', 'current_a']);
+
+const PILOT_THERMOSTAT = {
+  DEVICE_TYPE_NAME: DEVICE_TYPES.PILOT_THERMOSTAT,
+  CATEGORIES: new Set(),
+  PRODUCT_IDS: new Set(['c03zek9b5daz7omr']),
+  KEYWORDS: ['thermostat', 'pilote', 'pilot'],
+  REQUIRED_CODES: PILOT_THERMOSTAT_CODES,
+  CLOUD_MAPPINGS: pilotThermostatCloud,
+  LOCAL_MAPPINGS: pilotThermostatLocal,
+};
 
 const SMART_SOCKET = {
   DEVICE_TYPE_NAME: DEVICE_TYPES.SMART_SOCKET,
@@ -35,7 +56,7 @@ const SMART_METER = {
   LOCAL_MAPPINGS: smartMeterLocal,
 };
 
-const LIST_DEVICE_TYPES = [SMART_SOCKET, SMART_METER];
+const LIST_DEVICE_TYPES = [PILOT_THERMOSTAT, SMART_SOCKET, SMART_METER];
 
 const normalizeCode = (code) => {
   if (!code) {

@@ -1,11 +1,19 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
-const { normalizeBoolean } = require('../utils/tuya.normalize');
-const { resolveCloudReadStrategy } = require('../utils/tuya.cloudStrategy');
+const { normalizeBoolean, normalizeTemperatureUnit } = require('../utils/tuya.normalize');
+const { resolveCloudStrategy } = require('../utils/tuya.cloudStrategy');
 const { mergeTuyaReport } = require('../utils/tuya.report');
 const { convertFeature } = require('./tuya.convertFeature');
 const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
 const logger = require('../../../../utils/logger');
+
+const getTemperatureUnit = (properties) => {
+  const currentProperties = Array.isArray(properties && properties.properties) ? properties.properties : [];
+  const unitProperty = currentProperties.find(
+    (property) => property && (property.code === 'temp_unit_convert' || property.code === 'unit'),
+  );
+  return normalizeTemperatureUnit(unitProperty && unitProperty.value);
+};
 
 /**
  * @description Transform Tuya device to Gladys device.
@@ -37,6 +45,19 @@ function convertDevice(tuyaDevice) {
   const { functions = [], status = [] } = specifications;
   const online = tuyaDevice.online !== undefined ? tuyaDevice.online : tuyaDevice.is_online;
   const normalizedLocalOverride = normalizeBoolean(localOverride);
+  const temperatureUnit = getTemperatureUnit(properties);
+
+  const safeDeviceLog = {
+    id,
+    name,
+    model: productName || model,
+    product_id: productId,
+    protocol_version: protocolVersion,
+    local_override: normalizedLocalOverride,
+    online,
+  };
+  logger.debug('Tuya convert device specifications');
+  logger.debug(JSON.stringify(safeDeviceLog));
 
   logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
   const deviceType = getDeviceType({
@@ -49,7 +70,7 @@ function convertDevice(tuyaDevice) {
     properties,
     thing_model: thingModel,
   });
-  const cloudReadStrategy = resolveCloudReadStrategy(tuyaDevice, deviceType);
+  const cloudStrategy = resolveCloudStrategy(tuyaDevice, deviceType);
 
   const params = [];
   if (id) {
@@ -76,20 +97,9 @@ function convertDevice(tuyaDevice) {
   if (productKey) {
     params.push({ name: DEVICE_PARAM_NAME.PRODUCT_KEY, value: productKey });
   }
-  if (cloudReadStrategy) {
-    params.push({ name: DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY, value: cloudReadStrategy });
+  if (cloudStrategy) {
+    params.push({ name: DEVICE_PARAM_NAME.CLOUD_STRATEGY, value: cloudStrategy });
   }
-  const safeDeviceLog = {
-    id,
-    name,
-    model: productName || model,
-    product_id: productId,
-    protocol_version: protocolVersion,
-    local_override: normalizedLocalOverride,
-    online,
-  };
-  logger.debug('Tuya convert device specifications');
-  logger.debug(JSON.stringify(safeDeviceLog));
 
   // Groups cloud specification entries first, then thing model properties, then current property shadow codes.
   const groups = {};
@@ -137,6 +147,7 @@ function convertDevice(tuyaDevice) {
     convertFeature(group, externalId, {
       deviceType,
       ignoredCloudCodes,
+      temperatureUnit,
     }),
   );
 

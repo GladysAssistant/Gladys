@@ -3395,7 +3395,9 @@
           "off": "Off",
           "frost-protection": "Frost Protection",
           "comfort_-1": "Comfort -1°C",
-          "comfort_-2": "Comfort -2°C"
+          "comfort_-2": "Comfort -2°C",
+          "programming": "Programming",
+          "thermostat": "Thermostat"
         }
       },
       "siren": {
@@ -3512,7 +3514,9 @@
           "2": "Eco",
           "3": "Comfort -1°C",
           "4": "Comfort -2°C",
-          "5": "Comfort"
+          "5": "Comfort",
+          "6": "Programming",
+          "7": "Thermostat"
         }
       },
       "opening-sensor": {

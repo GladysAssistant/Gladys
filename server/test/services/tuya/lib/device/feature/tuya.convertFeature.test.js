@@ -23,7 +23,7 @@ describe('Tuya convert feature', () => {
     expect(result).to.deep.eq({
       category: 'switch',
       external_id: 'externalId:switch_1',
-      has_feedback: false,
+      has_feedback: true,
       max: 1000,
       min: 100,
       name: 'switch_1',
@@ -47,7 +47,7 @@ describe('Tuya convert feature', () => {
     expect(result).to.deep.eq({
       category: 'switch',
       external_id: 'externalId:switch_1',
-      has_feedback: false,
+      has_feedback: true,
       max: 1,
       min: 0,
       name: 'switch_1',
@@ -90,7 +90,7 @@ describe('Tuya convert feature', () => {
     expect(result).to.deep.eq({
       category: 'switch',
       external_id: 'externalId:switch_1',
-      has_feedback: false,
+      has_feedback: true,
       max: 8,
       min: 2,
       name: 'switch_1',

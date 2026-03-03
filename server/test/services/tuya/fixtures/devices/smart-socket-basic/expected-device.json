@@ -10,7 +10,7 @@
   "poll_frequency": 10000,
   "should_poll": true,
   "params": {
-    "CLOUD_READ_STRATEGY": "legacy",
+    "CLOUD_STRATEGY": "legacy",
     "DEVICE_ID": "socket-device-id",
     "LOCAL_KEY": "local-key",
     "IP_ADDRESS": "10.0.0.10",
@@ -46,7 +46,7 @@
       "category": "switch",
       "type": "binary",
       "read_only": false,
-      "has_feedback": false,
+      "has_feedback": true,
       "min": 0,
       "max": 1
     },

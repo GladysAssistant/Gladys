@@ -1,4 +1,10 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  COVER_STATE,
+  OPENING_SENSOR_STATE,
+  PILOT_WIRE_MODE,
+} = require('../../../../utils/constants');
 
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
@@ -6,6 +12,25 @@ const { normalizeBoolean } = require('../utils/tuya.normalize');
 const OPEN = 'open';
 const CLOSE = 'close';
 const STOP = 'stop';
+
+const TUYA_PILOT_WIRE_MODE_TO_GLADYS = {
+  Standby: PILOT_WIRE_MODE.OFF,
+  Anti_forst: PILOT_WIRE_MODE.FROST_PROTECTION,
+  ECO: PILOT_WIRE_MODE.ECO,
+  Comfort_1: PILOT_WIRE_MODE.COMFORT_1,
+  Comfort_2: PILOT_WIRE_MODE.COMFORT_2,
+  Comfort: PILOT_WIRE_MODE.COMFORT,
+  Programming: PILOT_WIRE_MODE.PROGRAMMING,
+  Thermostat: PILOT_WIRE_MODE.THERMOSTAT,
+};
+
+const GLADYS_PILOT_WIRE_MODE_TO_TUYA = Object.entries(TUYA_PILOT_WIRE_MODE_TO_GLADYS).reduce(
+  (accumulator, [tuyaValue, gladysValue]) => {
+    accumulator[gladysValue] = tuyaValue;
+    return accumulator;
+  },
+  {},
+);
 
 const getScale = (deviceFeature, defaultScale = 0) => {
   const parsedScale =
@@ -23,6 +48,15 @@ const scaleValue = (valueFromDevice, deviceFeature, defaultScale = 0) => {
   }
   const scale = getScale(deviceFeature, defaultScale);
   return parsedValue / 10 ** scale;
+};
+
+const unscaleValue = (valueFromGladys, deviceFeature, defaultScale = 0) => {
+  const parsedValue = Number(valueFromGladys);
+  if (Number.isNaN(parsedValue)) {
+    return parsedValue;
+  }
+  const scale = getScale(deviceFeature, defaultScale);
+  return Math.round(parsedValue * 10 ** scale);
 };
 
 const writeValues = {
@@ -56,6 +90,17 @@ const writeValues = {
   [DEVICE_FEATURE_CATEGORIES.CHILD_LOCK]: {
     [DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY]: (valueFromGladys) => {
       return valueFromGladys === 1;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromGladys, deviceFeature) => {
+      return unscaleValue(valueFromGladys, deviceFeature, 0);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.HEATER]: {
+    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromGladys) => {
+      const parsedValue = parseInt(valueFromGladys, 10);
+      return GLADYS_PILOT_WIRE_MODE_TO_TUYA[parsedValue];
     },
   },
 
@@ -116,11 +161,24 @@ const readValues = {
       return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: {
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
     },
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_TODAY]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
     },
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE]: (valueFromDevice, deviceFeature) => {
@@ -133,6 +191,18 @@ const readValues = {
   [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: {
     [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: (valueFromDevice) => {
+      return normalizeBoolean(valueFromDevice) ? OPENING_SENSOR_STATE.OPEN : OPENING_SENSOR_STATE.CLOSE;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.HEATER]: {
+    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromDevice) => {
+      return Object.prototype.hasOwnProperty.call(TUYA_PILOT_WIRE_MODE_TO_GLADYS, valueFromDevice)
+        ? TUYA_PILOT_WIRE_MODE_TO_GLADYS[valueFromDevice]
+        : null;
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {

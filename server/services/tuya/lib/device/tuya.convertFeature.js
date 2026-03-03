@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../mappings');
 
 /**
@@ -12,7 +13,7 @@ const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../m
  */
 function convertFeature(tuyaFunctions, externalId, options = {}) {
   const { code, values, name, readOnly } = tuyaFunctions;
-  const { deviceType, ignoredCloudCodes } = options;
+  const { deviceType, ignoredCloudCodes, temperatureUnit } = options;
 
   const codeLower = normalizeCode(code);
   const ignoredCodes = Array.isArray(ignoredCloudCodes) ? ignoredCloudCodes : getIgnoredCloudCodes(deviceType);
@@ -57,6 +58,25 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
   }
   if ('scale' in valuesObject) {
     feature.scale = valuesObject.scale;
+  }
+  if (temperatureUnit && (codeLower === 'temp_set' || codeLower === 'temp_current') && feature.unit !== undefined) {
+    feature.unit = temperatureUnit;
+  }
+  if (
+    feature.scale !== undefined &&
+    feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
+  ) {
+    const divider = 10 ** feature.scale;
+    if (typeof feature.min === 'number') {
+      feature.min /= divider;
+    }
+    if (typeof feature.max === 'number') {
+      feature.max /= divider;
+    }
+  }
+  if (feature.read_only === false) {
+    feature.has_feedback = true;
   }
 
   return feature;
