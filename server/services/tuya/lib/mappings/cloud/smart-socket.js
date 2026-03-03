@@ -1,0 +1,71 @@
+const {
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../../utils/constants');
+
+module.exports = {
+  ignoredCodes: [
+    'countdown',
+    'countdown_1',
+    'relay_status',
+    'overcharge_switch',
+    'light_mode',
+    'cycle_time',
+    'random_time',
+    'switch_inching',
+    'voltage_coe',
+    'electric_coe',
+    'power_coe',
+    'electricity_coe',
+    'test_bit',
+  ],
+  switch: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  power: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  switch_1: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  switch_2: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  switch_3: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  switch_4: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  },
+  child_lock: {
+    category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+    type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+  },
+  add_ele: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  },
+  cur_current: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+    unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
+  },
+  cur_power: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+    unit: DEVICE_FEATURE_UNITS.WATT,
+  },
+  cur_voltage: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+    unit: DEVICE_FEATURE_UNITS.VOLT,
+  },
+};

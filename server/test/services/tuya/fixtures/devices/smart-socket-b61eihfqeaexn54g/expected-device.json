@@ -1,0 +1,115 @@
+{
+  "name": "Chauffage cabinet",
+  "external_id": "tuya:bf2be3c32ea4d8f561ujmu",
+  "selector": "tuya:bf2be3c32ea4d8f561ujmu",
+  "device_type": "smart-socket",
+  "model": "LSC Power Plug FR incl. Power meter",
+  "product_id": "b61eihfqeaexn54g",
+  "online": true,
+  "poll_frequency": 10000,
+  "should_poll": true,
+  "params": {
+    "DEVICE_ID": "bf2be3c32ea4d8f561ujmu",
+    "LOCAL_KEY": "local-key",
+    "IP_ADDRESS": "192.168.1.50",
+    "CLOUD_IP": "91.0.0.1",
+    "CLOUD_READ_STRATEGY": "legacy",
+    "LOCAL_OVERRIDE": true,
+    "PROTOCOL_VERSION": "3.5",
+    "PRODUCT_ID": "b61eihfqeaexn54g"
+  },
+  "tuya_mapping": {
+    "ignored_local_dps": ["9", "11", "21", "22", "23", "24", "25", "38", "39", "40", "42", "43", "44"],
+    "ignored_cloud_codes": [
+      "countdown",
+      "countdown_1",
+      "relay_status",
+      "overcharge_switch",
+      "light_mode",
+      "cycle_time",
+      "random_time",
+      "switch_inching",
+      "voltage_coe",
+      "electric_coe",
+      "power_coe",
+      "electricity_coe",
+      "test_bit"
+    ]
+  },
+  "features": [
+    {
+      "name": "switch_1",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+      "category": "switch",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "child_lock",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+      "category": "child-lock",
+      "type": "binary",
+      "read_only": false,
+      "has_feedback": false,
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "add_ele",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+      "category": "switch",
+      "type": "energy",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 50000,
+      "unit": "kilowatt-hour",
+      "scale": 3
+    },
+    {
+      "name": "cur_current",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+      "category": "switch",
+      "type": "current",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 30000,
+      "unit": "milliampere",
+      "scale": 0
+    },
+    {
+      "name": "cur_power",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+      "category": "switch",
+      "type": "power",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 80000,
+      "unit": "watt",
+      "scale": 1
+    },
+    {
+      "name": "cur_voltage",
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+      "category": "switch",
+      "type": "voltage",
+      "read_only": true,
+      "has_feedback": false,
+      "min": 0,
+      "max": 5000,
+      "unit": "volt",
+      "scale": 1
+    }
+  ]
+}

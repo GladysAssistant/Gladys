@@ -1,0 +1,26 @@
+module.exports = {
+  strict: true,
+  ignoredDps: ['9', '11', '21', '22', '23', '24', '25', '38', '39', '40', '42', '43', '44'],
+  codeAliases: {
+    child_lock: [],
+    switch: ['power'],
+    power: ['switch'],
+    switch_1: ['switch', 'power'],
+    switch_2: ['switch'],
+    switch_3: ['switch'],
+    switch_4: ['switch'],
+  },
+  dps: {
+    add_ele: 17,
+    cur_current: 18,
+    cur_power: 19,
+    cur_voltage: 20,
+    child_lock: 41,
+    switch: 1,
+    power: 1,
+    switch_1: 1,
+    switch_2: 2,
+    switch_3: 3,
+    switch_4: 4,
+  },
+};
