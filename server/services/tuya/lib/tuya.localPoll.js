@@ -41,9 +41,22 @@ async function localPoll(payload) {
   }
   const tuyaLocal = new TuyaLocalApi(tuyaOptions);
   let lastError = null;
+  const formatSocketError = (err) => {
+    if (!err || !err.message) {
+      return 'Local poll socket error';
+    }
+    const networkErrorCodes = ['EHOSTUNREACH', 'EHOSTDOWN', 'ENETUNREACH', 'ECONNREFUSED', 'ETIMEDOUT'];
+    if (networkErrorCodes.includes(err.code)) {
+      return `Local device unreachable at ${ip}:6668 (${err.code}). Device may be offline, unplugged, or no longer connected to Wi-Fi.`;
+    }
+    if (typeof err.message === 'string' && err.message.includes('EHOSTUNREACH')) {
+      return `Local device unreachable at ${ip}:6668 (EHOSTUNREACH). Device may be offline, unplugged, or no longer connected to Wi-Fi.`;
+    }
+    return `Local poll socket error: ${err.message}`;
+  };
   const onError = (err) => {
     lastError = err;
-    logger.info(`[Tuya][localPoll] socket error for device=${deviceId}: ${err.message}`);
+    logger.info(`[Tuya][localPoll] socket error for device=${deviceId}: ${formatSocketError(err)}`);
   };
   tuyaLocal.on('error', onError);
 
@@ -81,7 +94,7 @@ async function localPoll(payload) {
         }),
         new Promise((_, reject) => {
           errorListener = (err) => {
-            reject(new BadParameters(`Local poll socket error: ${err.message}`));
+            reject(new BadParameters(formatSocketError(err)));
           };
           tuyaLocal.once('error', errorListener);
         }),
@@ -116,15 +129,13 @@ async function localPoll(payload) {
     if (logDps) {
       logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
     }
-    tuyaLocal.removeListener('error', onError);
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
-      logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
+      logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${formatSocketError(lastError)}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
     try {
-      tuyaLocal.removeListener('error', onError);
       await tuyaLocal.disconnect();
     } catch (err) {
       // ignore
