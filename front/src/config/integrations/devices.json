@@ -89,6 +89,12 @@
     "whiteBackground": true
   },
   {
+    "key": "matterbridge",
+    "link": "matterbridge",
+    "img": "/assets/integrations/cover/matterbridge.jpg",
+    "whiteBackground": true
+  },
+  {
     "key": "netatmo",
     "link": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg"

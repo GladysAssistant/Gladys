@@ -25,6 +25,21 @@ class Integration extends Component {
   }
 
   componentWillMount() {
+    this.loadFavorites();
+  }
+
+  async loadFavorites() {
+    try {
+      const { httpClient } = this.props;
+      if (httpClient) {
+        const result = await httpClient.get('/api/v1/user/variable/INTEGRATION_FAVORITES');
+        const favorites = JSON.parse(result.value);
+        await this.setState({ favorites });
+      }
+    } catch (e) {
+      // Variable not found = no favorites yet
+      await this.setState({ favorites: [] });
+    }
     this.getIntegrations();
   }
 
@@ -43,7 +58,7 @@ class Integration extends Component {
     const { searchKeyword = '', orderDir = 'asc' } = this.state;
 
     // Load all or category related integrations
-    let selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
+    let selectedIntegrations = category && category !== 'favorites' ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
     // Total size
@@ -62,6 +77,21 @@ class Integration extends Component {
       );
 
       totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
+    }
+
+    // Get favorites (use cached state if available, otherwise empty)
+    const favorites = this.state.favorites || [];
+
+    // Add favorite status to integrations
+    selectedIntegrations = selectedIntegrations.map(integration => ({
+      ...integration,
+      isFavorite: favorites.includes(integration.key)
+    }));
+
+    // If we are in favorites view, only display favorites
+    if (category === 'favorites') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
+      totalSize = selectedIntegrations.length;
     }
 
     // Translate with i18n
@@ -104,6 +134,26 @@ class Integration extends Component {
     });
   }
 
+  toggleFavorite = async integrationKey => {
+    const favorites = this.state.favorites || [];
+    const newFavorites = favorites.includes(integrationKey)
+      ? favorites.filter(key => key !== integrationKey)
+      : [...favorites, integrationKey];
+
+    // Update state immediately for responsive UI
+    await this.setState({ favorites: newFavorites });
+    this.getIntegrations();
+
+    // Persist to backend
+    try {
+      await this.props.httpClient.post('/api/v1/user/variable/INTEGRATION_FAVORITES', {
+        value: JSON.stringify(newFavorites)
+      });
+    } catch (e) {
+      console.error('[integration] Failed to save favorites', e);
+    }
+  };
+
   search = async e => {
     await this.setState({
       searchKeyword: e.target.value
@@ -124,11 +174,12 @@ class Integration extends Component {
       ...props,
       ...state,
       search: this.search,
-      changeOrderDir: this.changeOrderDir
+      changeOrderDir: this.changeOrderDir,
+      toggleFavorite: this.toggleFavorite
     };
 
     return <IntegrationPage {...combinedProps} />;
   }
 }
 
-export default connect('user', {})(withIntlAsProp(Integration));
+export default connect('user,httpClient', {})(withIntlAsProp(Integration));

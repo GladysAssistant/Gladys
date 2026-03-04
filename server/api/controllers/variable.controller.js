@@ -44,6 +44,30 @@ module.exports = function VariableController(gladys) {
   }
 
   /**
+   * @api {post} /api/user/variable/:variable_key Save user variable
+   * @apiName SaveUserVariable
+   * @apiGroup Variable
+   * @apiParam {string} value value to save
+   */
+  async function setForUser(req, res) {
+    const variable = await gladys.variable.setValue(req.params.variable_key, req.body.value, null, req.user.id);
+    res.json(variable);
+  }
+
+  /**
+   * @api {get} /api/user/variable/:variable_key Get user variable
+   * @apiName GetUserVariable
+   * @apiGroup Variable
+   */
+  async function getForUser(req, res) {
+    const value = await gladys.variable.getValue(req.params.variable_key, null, req.user.id);
+    if (!value) {
+      throw new NotFoundError('VARIABLE_NOT_FOUND');
+    }
+    res.json({ value });
+  }
+
+  /**
    * @api {get} /api/variable/:variable_key Get variable
    * @apiName getVariable
    * @apiGroup Variable
@@ -62,5 +86,7 @@ module.exports = function VariableController(gladys) {
     setValue: asyncMiddleware(setValue),
     getValue: asyncMiddleware(getValue),
     getByLocalService: asyncMiddleware(getByLocalService),
+    setForUser: asyncMiddleware(setForUser),
+    getForUser: asyncMiddleware(getForUser),
   });
 };

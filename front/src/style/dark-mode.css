@@ -168,6 +168,11 @@ body.dark-mode {
   filter: none;
 }
 
+/* Preserve favorite star colors in dark mode */
+.dark-mode .favorite-star {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
 /* Dark mode toggle button */
 .mode-toggle {
   padding: 0.5rem;

@@ -14,6 +14,16 @@ const IntegrationMenu = ({ integrationCategories }) => {
         </span>
         <Text id="integration.root.menu.all" />
       </Link>
+      <Link
+        activeClassName="active"
+        href="/dashboard/integration/favorites"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+      >
+        <span class="icon mr-3">
+          <i class="fe fe-star" />
+        </span>
+        <Text id="integration.root.menu.favorites" />
+      </Link>
       {integrationCategories.map(category => (
         <Link
           activeClassName="active"

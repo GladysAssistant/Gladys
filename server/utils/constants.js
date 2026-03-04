@@ -732,6 +732,8 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    INDEX_TODAY: 'index-today',
+    INDEX_YESTERDAY: 'index-yesterday',
     DAILY_CONSUMPTION: 'daily-consumption',
     DAILY_CONSUMPTION_COST: 'daily-consumption-cost',
     THIRTY_MINUTES_CONSUMPTION: 'thirty-minutes-consumption',
@@ -1378,6 +1380,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   NODERED: {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
+  },
+  MATTERBRIDGE: {
+    STATUS_CHANGE: 'matterbridge.status-change',
   },
 };
 

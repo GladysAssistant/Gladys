@@ -8,6 +8,10 @@ const { fake, assert } = sinon;
 const requestMock = {
   request: (url, dataCallback, authErrorCallback, errorCallback) => {
     switch (url) {
+      case 'success-sts': {
+        dataCallback('{ "StatusSTS": {"POWER":"ON"} }');
+        break;
+      }
       case 'auth-error': {
         authErrorCallback();
         break;
@@ -88,6 +92,23 @@ describe('Tasmota - HTTP - status', () => {
       [address]: { name: address },
     });
     assert.calledOnce(gladys.event.emit);
+  });
+
+  it('status with success (status = 8) adds feature from StatusSTS', () => {
+    const address = 'success-sts';
+    tasmotaHandler.discoveredDevices[address] = {
+      name: address,
+      external_id: 'tasmota:device-1',
+      features: [],
+    };
+
+    const username = undefined;
+    const password = undefined;
+    tasmotaHandler.subStatus(address, username, password, 8);
+
+    expect(tasmotaHandler.discoveredDevices[address].features).to.have.lengthOf(1);
+    expect(tasmotaHandler.discoveredDevices[address].features[0].external_id).to.eq('tasmota:device-1:POWER');
+    expect(tasmotaHandler.discoveredDevices[address].features[0].last_value).to.eq(1);
   });
 
   it('status with auth-error', () => {

@@ -512,6 +512,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "menu": {
         "all": "Alle Integrationen",
+        "favorites": "Favoriten",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -860,6 +861,8 @@
         "mqtt": "MQTT-Topic",
         "http": "HTTP-Identifier"
       },
+      "ipLabel": "IP-Adresse",
+      "openWebUiButton": "Geräteoberfläche öffnen",
       "saveButton": "Sichern",
       "updateButton": "Aktualisieren",
       "alreadyCreatedButton": "Bereits erstellt",
@@ -929,6 +932,10 @@
               "dongleName": "Dongle",
               "unknownDongle": "Nicht definiert",
               "tcpPort": "TCP-Port"
+            },
+            "containerErrors": {
+              "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
+              "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
             }
           },
           "remote": {
@@ -1033,6 +1040,36 @@
         "usernameLabel": "Benutzername",
         "passwordLabel": "Passwort",
         "urlLabel": "URL der Node-RED-Oberfläche: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (nicht von Gladys Plus aus zugänglich)"
+      }
+    },
+    "matterbridge": {
+      "title": "Matterbridge",
+      "description": "Steuere deine Matterbridge-Geräte in Gladys.",
+      "setupTab": "Einrichtung",
+      "documentation": "Matterbridge-Dokumentation",
+      "status": {
+        "notInstalled": "Der Matterbridge-Server konnte nicht installiert werden.",
+        "notRunning": "Der Matterbridge-Server konnte nicht gestartet werden.",
+        "running": "Matterbridge wurde erfolgreich gestartet.",
+        "notEnabled": "Matterbridge ist nicht aktiviert.",
+        "nonDockerEnv": "Gladys läuft nicht unter Docker. Du kannst von hier aus keinen Matterbridge-Server installieren.",
+        "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Server von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein."
+      },
+      "setup": {
+        "title": "Matterbridge-Konfiguration",
+        "description": "Dieser Dienst verwendet einen Docker-Container. Aktiviere Matterbridge, um diesen Container bereitzustellen.\nWeitere Informationen findest du in der Matterbridge-Dokumentation.",
+        "error": "Beim Starten von Matterbridge ist ein Fehler aufgetreten.",
+        "enableMatterbridge": "Aktivieren",
+        "disableMatterbridge": "Deaktivieren",
+        "confirmDisableLabel": "Bist du sicher, dass du Matterbridge deaktivieren möchtest?",
+        "confirmDisableCancelButton": "Abbrechen",
+        "activationMatterbridge": "Aktivieren …",
+        "serviceStatus": "Status des Matterbridge-Dienstes",
+        "containersStatus": "Mit Matterbridge verbundene Container",
+        "status": "Status",
+        "matterbridge": "Matterbridge",
+        "gladys": "Gladys",
+        "urlLabel": "URL der Matterbridge-Oberfläche: <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (nicht von Gladys Plus aus zugänglich)"
       }
     },
     "googleHome": {
@@ -3789,6 +3826,8 @@
       "power": "Leistung",
       "energy": "Energie",
       "index": "Index",
+      "index-today": "Index heute",
+      "index-yesterday": "Index gestern",
       "daily-consumption": "Tagesverbrauch",
       "daily-consumption-cost": "Tageskosten",
       "thirty-minutes-consumption": "Verbrauch 30 Minuten",
