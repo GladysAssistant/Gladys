@@ -50,10 +50,10 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     max: 1,
     ...featuresCategoryAndType,
   };
-  if ('min' in valuesObject) {
+  if (typeof valuesObject.min === 'number') {
     feature.min = valuesObject.min;
   }
-  if ('max' in valuesObject) {
+  if (typeof valuesObject.max === 'number') {
     feature.max = valuesObject.max;
   }
   if ('scale' in valuesObject) {
@@ -68,12 +68,8 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
   ) {
     const divider = 10 ** feature.scale;
-    if (typeof feature.min === 'number') {
-      feature.min /= divider;
-    }
-    if (typeof feature.max === 'number') {
-      feature.max /= divider;
-    }
+    feature.min /= divider;
+    feature.max /= divider;
   }
   if (feature.read_only === false) {
     feature.has_feedback = true;

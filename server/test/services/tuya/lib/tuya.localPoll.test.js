@@ -304,6 +304,80 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
+  it('should fallback to a generic socket error when socket error has no message', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().returns(new Promise(() => {}));
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      this.on = sinon.stub();
+      this.once = sinon.stub().callsFake((event, cb) => {
+        if (event === 'error') {
+          cb({});
+        }
+      });
+      this.removeListener = sinon.stub();
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    try {
+      await localPoll({
+        deviceId: 'device',
+        ip: '10.1.0.53',
+        localKey: 'key',
+        protocolVersion: '3.3',
+      });
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.equal('Local poll socket error');
+      return;
+    }
+    throw new Error('Expected error');
+  });
+
+  it('should normalize unreachable device errors when EHOSTUNREACH is only present in the message', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().returns(new Promise(() => {}));
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      this.on = sinon.stub();
+      this.once = sinon.stub().callsFake((event, cb) => {
+        if (event === 'error') {
+          cb({ message: 'Error from socket: connect EHOSTUNREACH 10.1.0.53:6668' });
+        }
+      });
+      this.removeListener = sinon.stub();
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    try {
+      await localPoll({
+        deviceId: 'device',
+        ip: '10.1.0.53',
+        localKey: 'key',
+        protocolVersion: '3.3',
+      });
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.equal(
+        'Local device unreachable at 10.1.0.53:6668 (EHOSTUNREACH). Device may be offline, unplugged, or no longer connected to Wi-Fi.',
+      );
+      return;
+    }
+    throw new Error('Expected error');
+  });
+
   it('should keep the original connect error when a socket error also occurs', async () => {
     const connect = sinon.stub().rejects(new Error('connect failed'));
     const get = sinon.stub();

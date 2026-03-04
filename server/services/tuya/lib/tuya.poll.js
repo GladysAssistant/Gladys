@@ -218,9 +218,6 @@ const extractShadowValues = (device, response) => {
 const transformFeatureValue = (device, deviceFeature, code, rawValue, deviceTemperatureUnit) => {
   const featureWithFallbackScale = getFeatureWithFallbackScale(device, deviceFeature, code);
   const reader = getFeatureReader(featureWithFallbackScale);
-  if (!reader) {
-    return { skipped: true };
-  }
   let transformedValue = reader(rawValue, featureWithFallbackScale);
   if (isTemperatureFeature(featureWithFallbackScale, code)) {
     transformedValue = convertTemperatureValue(
@@ -289,12 +286,7 @@ const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeature
       return;
     }
     try {
-      const resultValue = transformFeatureValue(device, deviceFeature, code, value, deviceTemperatureUnit);
-      if (resultValue.skipped) {
-        summary.skipped += 1;
-        return;
-      }
-      const { transformedValue } = resultValue;
+      const { transformedValue } = transformFeatureValue(device, deviceFeature, code, value, deviceTemperatureUnit);
       const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
       const { changed } = emitFeatureState(this.gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
       if (changed) {
@@ -400,12 +392,13 @@ async function poll(device) {
             return;
           }
           try {
-            const resultValue = transformFeatureValue(device, deviceFeature, code, rawValue, deviceTemperatureUnit);
-            if (resultValue.skipped) {
-              pendingCloudFeatures.push(deviceFeature);
-              return;
-            }
-            const { transformedValue } = resultValue;
+            const { transformedValue } = transformFeatureValue(
+              device,
+              deviceFeature,
+              code,
+              rawValue,
+              deviceTemperatureUnit,
+            );
             const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
             const { changed } = emitFeatureState(
               this.gladys,

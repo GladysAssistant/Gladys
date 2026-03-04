@@ -535,41 +535,6 @@ describe('TuyaHandler.poll with local mapping', () => {
     expect(emit.called).to.equal(false);
   });
 
-  it('should skip cloud feature when transform loses the reader', async () => {
-    const request = sinon.stub().resolves({
-      result: [{ code: 'temp_set', value: 210 }],
-    });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
-    const emit = sinon.stub();
-
-    let categoryAccessCount = 0;
-    const feature = {
-      external_id: 'tuya:device:temp_set',
-      get category() {
-        categoryAccessCount += 1;
-        return categoryAccessCount === 1 ? DEVICE_FEATURE_CATEGORIES.THERMOSTAT : null;
-      },
-      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-      unit: DEVICE_FEATURE_UNITS.CELSIUS,
-    };
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        features: [feature],
-      },
-    );
-
-    expect(request.calledOnce).to.equal(true);
-    expect(emit.called).to.equal(false);
-  });
-
   it('should convert cloud thermostat temperatures from reported unit', async () => {
     const request = sinon.stub().resolves({
       result: [
@@ -710,50 +675,6 @@ describe('TuyaHandler.poll with local mapping', () => {
       device_feature_external_id: 'tuya:device:temp_current',
       state: 20,
     });
-  });
-
-  it('should fallback to cloud when local transform loses the reader', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 125: 210 } });
-    const request = sinon.stub().resolves({ result: [] });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-    const emit = sinon.stub();
-
-    let categoryAccessCount = 0;
-    const feature = {
-      external_id: 'tuya:device:temp_set',
-      get category() {
-        categoryAccessCount += 1;
-        return categoryAccessCount === 1 ? DEVICE_FEATURE_CATEGORIES.THERMOSTAT : null;
-      },
-      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-      unit: DEVICE_FEATURE_UNITS.CELSIUS,
-    };
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [feature],
-      },
-    );
-
-    expect(localPoll.calledOnce).to.equal(true);
-    expect(request.calledOnce).to.equal(true);
-    expect(emit.called).to.equal(false);
   });
 
   it('should keep existing temperature unit when local unit property has no dp_id', async () => {
