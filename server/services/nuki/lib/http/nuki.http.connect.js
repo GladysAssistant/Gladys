@@ -8,8 +8,13 @@ const logger = require('../../../../utils/logger');
  */
 async function connect() {
   logger.info(`Nuki : Test http connection to Nuki Web API`);
-  const { apiKey } = await this.nukiHandler.getConfiguration();
-  this.nukiApi = new Nuki(apiKey);
+  const { webOk } = await this.nukiHandler.getStatus();
+  if (webOk) {
+    const { apiKey } = await this.nukiHandler.getConfiguration();
+    this.nukiApi = new Nuki(apiKey);
+    await this.nukiApi.getSmartlocks(); // Test connection to Nuki Web API
+    logger.info(`Nuki : Connected to Nuki Web API`);
+  }
 }
 
 module.exports = {

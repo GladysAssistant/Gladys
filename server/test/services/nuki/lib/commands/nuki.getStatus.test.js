@@ -4,10 +4,7 @@ const sinon = require('sinon');
 const { fake } = sinon;
 const NukiService = require('../../../../../services/nuki');
 const { serviceId } = require('../../mocks/consts.test');
-
-const mqttService = {
-  isUsed: fake.resolves(true),
-};
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 
 const gladys = {
   variable: {
