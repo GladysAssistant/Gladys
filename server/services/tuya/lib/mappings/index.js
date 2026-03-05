@@ -1,20 +1,24 @@
 const globalCloud = require('./cloud/global');
+const airConditionerCloud = require('./cloud/air-conditioner');
 const pilotThermostatCloud = require('./cloud/pilot-thermostat');
 const smartMeterCloud = require('./cloud/smart-meter');
 const smartSocketCloud = require('./cloud/smart-socket');
 
 const globalLocal = require('./local/global');
+const airConditionerLocal = require('./local/air-conditioner');
 const pilotThermostatLocal = require('./local/pilot-thermostat');
 const smartMeterLocal = require('./local/smart-meter');
 const smartSocketLocal = require('./local/smart-socket');
 
 const DEVICE_TYPES = {
+  AIR_CONDITIONER: 'air-conditioner',
   PILOT_THERMOSTAT: 'pilot-thermostat',
   SMART_METER: 'smart-meter',
   SMART_SOCKET: 'smart-socket',
   UNKNOWN: 'unknown',
 };
 
+const AIR_CONDITIONER_CODES = new Set(['temp_set', 'mode', 'windspeed', 'horizontal', 'vertical']);
 const PILOT_THERMOSTAT_CODES = new Set([
   'mode',
   'running_mode',
@@ -25,6 +29,16 @@ const PILOT_THERMOSTAT_CODES = new Set([
 ]);
 const SWITCH_CODES = new Set(['switch', 'switch_1', 'switch_2', 'power']);
 const SMART_METER_CODES = new Set(['total_power', 'forward_energy_total', 'voltage_a', 'current_a']);
+
+const AIR_CONDITIONER = {
+  DEVICE_TYPE_NAME: DEVICE_TYPES.AIR_CONDITIONER,
+  CATEGORIES: new Set(['kt']),
+  PRODUCT_IDS: new Set(['f3goccgfj6qino4c']),
+  KEYWORDS: ['air conditioner', 'conditioner', 'clim'],
+  REQUIRED_CODES: AIR_CONDITIONER_CODES,
+  CLOUD_MAPPINGS: airConditionerCloud,
+  LOCAL_MAPPINGS: airConditionerLocal,
+};
 
 const PILOT_THERMOSTAT = {
   DEVICE_TYPE_NAME: DEVICE_TYPES.PILOT_THERMOSTAT,
@@ -56,7 +70,7 @@ const SMART_METER = {
   LOCAL_MAPPINGS: smartMeterLocal,
 };
 
-const LIST_DEVICE_TYPES = [PILOT_THERMOSTAT, SMART_SOCKET, SMART_METER];
+const LIST_DEVICE_TYPES = [AIR_CONDITIONER, PILOT_THERMOSTAT, SMART_SOCKET, SMART_METER];
 
 const normalizeCode = (code) => {
   if (!code) {
