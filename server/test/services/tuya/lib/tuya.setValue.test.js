@@ -464,6 +464,42 @@ describe('TuyaHandler.setValue', () => {
     });
   });
 
+  it('should write air conditioning target temperature through thing shadow', async () => {
+    const device = {
+      device_type: 'air-conditioner',
+      params: [
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: false },
+        { name: DEVICE_PARAM_NAME.CLOUD_STRATEGY, value: 'shadow' },
+      ],
+      properties: {
+        properties: [{ code: 'unit', value: 'c' }],
+      },
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:temp_set',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      scale: 1,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub().resolves({ success: true }) },
+      gladys: {},
+      feedbackPollDelayMs: 0,
+      poll: sinon.stub().resolves(),
+    };
+
+    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 20);
+
+    expect(ctx.connector.request.calledOnce).to.equal(true);
+    expect(ctx.connector.request.firstCall.args[0]).to.deep.equal({
+      method: 'POST',
+      path: `${API.VERSION_2_0}/thing/device/shadow/properties/issue`,
+      body: { properties: JSON.stringify({ temp_set: 200 }) },
+    });
+  });
+
   it('should fallback to cloud when dps is not mapped', async () => {
     const connect = sinon.stub().resolves();
     const set = sinon.stub().resolves();

@@ -3385,7 +3385,33 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Cool",
-          "heating": "Heat"
+          "heating": "Heat",
+          "drying": "Dry",
+          "fan": "Fan"
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Low",
+          "low-mid": "Low-Med",
+          "mid": "Medium",
+          "mid-high": "Med-High",
+          "high": "High",
+          "mute": "Quiet",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Off",
+          "same": "Same Direction",
+          "opposite": "Opposite Direction"
+        },
+        "swing-vertical": {
+          "off": "Off",
+          "swing": "Swing",
+          "position-1": "Position 1 (Top)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Bottom)"
         }
       },
       "heater": {
@@ -3785,7 +3811,10 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Target temperature"
+      "target-temperature": "Target temperature",
+      "fan-speed": "Fan speed",
+      "swing-horizontal": "Horizontal swing",
+      "swing-vertical": "Vertical swing"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Electric Vehicle - Battery",

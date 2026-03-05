@@ -27,6 +27,13 @@ const getThingModelProperties = (device) => {
   );
 };
 
+const getSupportedCodes = (entries, deviceType, ignoredCloudCodes) =>
+  new Set(
+    entries
+      .filter((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes))
+      .map((entry) => normalizeCode(entry && entry.code)),
+  );
+
 const resolveCloudStrategy = (device, deviceType) => {
   const ignoredCloudCodes = getIgnoredCloudCodes(deviceType);
   const functions = Array.isArray(device && device.specifications && device.specifications.functions)
@@ -35,17 +42,17 @@ const resolveCloudStrategy = (device, deviceType) => {
   const status = Array.isArray(device && device.specifications && device.specifications.status)
     ? device.specifications.status
     : [];
-  if (
-    functions.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes)) ||
-    status.some((entry) => isSupportedCloudCode(entry && entry.code, deviceType, ignoredCloudCodes))
-  ) {
-    return CLOUD_STRATEGY.LEGACY;
-  }
   const thingProperties = getThingModelProperties(device);
-  if (thingProperties.some((entry) => entry && isSupportedCloudCode(entry.code, deviceType, ignoredCloudCodes))) {
+  const legacyCodes = getSupportedCodes([...functions, ...status], deviceType, ignoredCloudCodes);
+  const shadowCodes = getSupportedCodes(thingProperties, deviceType, ignoredCloudCodes);
+
+  if (shadowCodes.size > 0 && [...shadowCodes].some((code) => !legacyCodes.has(code))) {
     return CLOUD_STRATEGY.SHADOW;
   }
-  return null;
+  if (legacyCodes.size > 0) {
+    return CLOUD_STRATEGY.LEGACY;
+  }
+  return shadowCodes.size > 0 ? CLOUD_STRATEGY.SHADOW : null;
 };
 
 const normalizeCloudStrategy = (value) =>

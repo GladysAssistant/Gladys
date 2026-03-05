@@ -64,8 +64,10 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
   }
   if (
     feature.scale !== undefined &&
-    feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
-    feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
+    ((feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
+      feature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE) ||
+      (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+        feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE))
   ) {
     const divider = 10 ** feature.scale;
     feature.min /= divider;

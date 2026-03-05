@@ -1,0 +1,229 @@
+{
+  "id": "bf5638fc7cc3f25e32i45q",
+  "name": "Clim Salle d'attente",
+  "product_name": "Air Conditioner",
+  "model": "Air Conditioner",
+  "product_id": "f3goccgfj6qino4c",
+  "product_key": "keyquxnsj75xc8se",
+  "local_key": "local-key",
+  "ip": "10.0.0.20",
+  "cloud_ip": "82.0.0.1",
+  "protocol_version": "3.3",
+  "local_override": true,
+  "online": true,
+  "specifications": {
+    "category": "kt",
+    "functions": [
+      {
+        "code": "switch",
+        "name": "开关",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "temp_unit_convert",
+        "name": "Display Units",
+        "type": "Enum",
+        "values": "{\"range\":[\"c\",\"f\"]}"
+      },
+      {
+        "code": "temp_set",
+        "name": "Set Temp",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
+      },
+      {
+        "code": "mode",
+        "name": "Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
+      },
+      {
+        "code": "fan_speed_enum",
+        "name": "WindSpeed",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
+      }
+    ],
+    "status": [
+      {
+        "code": "switch",
+        "name": "开关",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "fan_speed_enum",
+        "name": "WindSpeed",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"low\",\"low_mid\",\"mid\",\"mid_high\",\"high\",\"mute\",\"turbo\"]}"
+      },
+      {
+        "code": "temp_unit_convert",
+        "name": "Display Units",
+        "type": "Enum",
+        "values": "{\"range\":[\"c\",\"f\"]}"
+      },
+      {
+        "code": "temp_set",
+        "name": "Set Temp",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":160,\"max\":880,\"scale\":1,\"step\":10}"
+      },
+      {
+        "code": "temp_current",
+        "name": "Temp Current",
+        "type": "Integer",
+        "values": "{\"unit\":\"℃\",\"min\":0,\"max\":600,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "mode",
+        "name": "Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"auto\",\"cold\",\"wet\",\"heat\",\"fan\"]}"
+      }
+    ]
+  },
+  "properties": {
+    "properties": [
+      {
+        "code": "Power",
+        "dp_id": 1,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "temp_set",
+        "dp_id": 2,
+        "type": "value",
+        "value": 200
+      },
+      {
+        "code": "temp_current",
+        "dp_id": 3,
+        "type": "value",
+        "value": 230
+      },
+      {
+        "code": "mode",
+        "dp_id": 4,
+        "type": "enum",
+        "value": "heat"
+      },
+      {
+        "code": "windspeed",
+        "dp_id": 5,
+        "type": "enum",
+        "value": "auto"
+      },
+      {
+        "code": "unit",
+        "dp_id": 105,
+        "type": "enum",
+        "value": "c"
+      },
+      {
+        "code": "horizontal",
+        "dp_id": 106,
+        "type": "enum",
+        "value": "off"
+      },
+      {
+        "code": "vertical",
+        "dp_id": 107,
+        "type": "enum",
+        "value": "off"
+      }
+    ]
+  },
+  "thing_model": {
+    "modelId": "0000003fy5",
+    "services": [
+      {
+        "code": "",
+        "name": "默认服务",
+        "properties": [
+          {
+            "accessMode": "rw",
+            "code": "Power",
+            "name": "开关",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "temp_set",
+            "name": "设置温度",
+            "typeSpec": {
+              "type": "value",
+              "max": 880,
+              "min": 160,
+              "scale": 1,
+              "step": 10,
+              "unit": "℃"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "temp_current",
+            "name": "当前温度",
+            "typeSpec": {
+              "type": "value",
+              "max": 600,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": "℃"
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "mode",
+            "name": "工作模式",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["auto", "cold", "wet", "heat", "fan"]
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "windspeed",
+            "name": "风速",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["auto", "low", "low_mid", "mid", "mid_high", "high", "mute", "turbo"]
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "unit",
+            "name": "温标切换",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["c", "f"]
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "horizontal",
+            "name": "左右扫风",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["off", "same", "opposite"]
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "vertical",
+            "name": "上下扫风",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["off", "15", "1", "2", "3", "4", "5"]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

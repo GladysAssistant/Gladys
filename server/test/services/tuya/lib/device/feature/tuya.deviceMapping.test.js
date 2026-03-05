@@ -4,6 +4,10 @@ const {
   DEVICE_FEATURE_TYPES,
   COVER_STATE,
   OPENING_SENSOR_STATE,
+  AC_MODE,
+  AC_FAN_SPEED,
+  AC_SWING_HORIZONTAL,
+  AC_SWING_VERTICAL,
   PILOT_WIRE_MODE,
 } = require('../../../../../../utils/constants');
 const { writeValues, readValues } = require('../../../../../../services/tuya/lib/device/tuya.deviceMapping');
@@ -34,6 +38,12 @@ describe('Tuya device mapping', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.CHILD_LOCK][DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY](1);
       expect(result).to.eq(true);
     });
+    it('air conditioning binary', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY
+      ](1);
+      expect(result).to.eq(true);
+    });
     it('thermostat target temperature', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.THERMOSTAT][
         DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
@@ -55,6 +65,38 @@ describe('Tuya device mapping', () => {
         PILOT_WIRE_MODE.PROGRAMMING,
       );
       expect(result).to.eq('Programming');
+    });
+    it('air conditioning mode', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE
+      ](AC_MODE.HEATING);
+      expect(result).to.eq('heat');
+    });
+    it('air conditioning target temperature', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
+      ]('20', {
+        scale: 1,
+      });
+      expect(result).to.eq(200);
+    });
+    it('air conditioning fan speed', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED
+      ](AC_FAN_SPEED.TURBO);
+      expect(result).to.eq('turbo');
+    });
+    it('air conditioning horizontal swing', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL
+      ](AC_SWING_HORIZONTAL.OPPOSITE);
+      expect(result).to.eq('opposite');
+    });
+    it('air conditioning vertical swing', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+        DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_VERTICAL
+      ](AC_SWING_VERTICAL.SWING);
+      expect(result).to.eq('15');
     });
     describe('curtain state', () => {
       it('open', () => {
@@ -133,6 +175,44 @@ describe('Tuya device mapping', () => {
           scale: 1,
         });
         expect(result).to.eq(21);
+      });
+      it('air conditioning binary', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY
+        ](true);
+        expect(result).to.eq(1);
+      });
+      it('air conditioning mode', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE
+        ]('heat');
+        expect(result).to.eq(AC_MODE.HEATING);
+      });
+      it('air conditioning target temperature with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
+        ]('200', {
+          scale: 1,
+        });
+        expect(result).to.eq(20);
+      });
+      it('air conditioning fan speed', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED
+        ]('auto');
+        expect(result).to.eq(AC_FAN_SPEED.AUTO);
+      });
+      it('air conditioning horizontal swing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL
+        ]('same');
+        expect(result).to.eq(AC_SWING_HORIZONTAL.SAME);
+      });
+      it('air conditioning vertical swing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING][
+          DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_VERTICAL
+        ]('15');
+        expect(result).to.eq(AC_SWING_VERTICAL.SWING);
       });
       it('temperature sensor decimal with explicit scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR][DEVICE_FEATURE_TYPES.SENSOR.DECIMAL](
