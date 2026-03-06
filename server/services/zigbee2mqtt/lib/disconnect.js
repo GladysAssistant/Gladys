@@ -35,11 +35,7 @@ async function disconnect() {
   });
   if (dockerContainer.length > 0) {
     [container] = dockerContainer;
-    try {
-      await this.gladys.system.stopContainer(container.id);
-    } catch (e) {
-      logger.warn(`Zigbee2mqtt: error stopping MQTT container (may already be stopped): ${e.message}`);
-    }
+    await this.gladys.system.stopContainer(container.id);
     await this.gladys.system.removeContainer(container.id);
   }
   this.mqttRunning = false;
@@ -52,11 +48,7 @@ async function disconnect() {
   });
   if (dockerContainer.length > 0) {
     [container] = dockerContainer;
-    try {
-      await this.gladys.system.stopContainer(container.id);
-    } catch (e) {
-      logger.warn(`Zigbee2mqtt: error stopping Z2M container (may already be stopped): ${e.message}`);
-    }
+    await this.gladys.system.stopContainer(container.id);
     await this.gladys.system.removeContainer(container.id);
   }
   this.zigbee2mqttRunning = false;
