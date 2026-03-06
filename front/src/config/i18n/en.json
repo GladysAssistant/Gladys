@@ -507,7 +507,8 @@
   "integration": {
     "tags": {
       "gladysPlus": "Gladys Plus",
-      "cloud": "Cloud"
+      "cloud": "Cloud",
+      "local": "Local"
     },
     "root": {
       "title": "Integrations",

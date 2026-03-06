@@ -2,41 +2,49 @@
   {
     "key": "rtspCamera",
     "link": "rtsp-camera",
-    "img": "/assets/integrations/cover/rtsp-camera.jpg"
+    "img": "/assets/integrations/cover/rtsp-camera.jpg",
+    "local": true
   },
   {
     "key": "xiaomi",
-    "img": "/assets/integrations/cover/xiaomi.jpg"
+    "img": "/assets/integrations/cover/xiaomi.jpg",
+    "local": true
   },
   {
     "key": "mqtt",
     "img": "/assets/integrations/cover/mqtt.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "zigbee2mqtt",
     "img": "/assets/integrations/cover/zigbee2mqtt.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "philipsHue",
     "link": "philips-hue",
-    "img": "/assets/integrations/cover/philips-hue.jpg"
+    "img": "/assets/integrations/cover/philips-hue.jpg",
+    "local": true
   },
   {
     "key": "tasmota",
-    "img": "/assets/integrations/cover/tasmota.jpg"
+    "img": "/assets/integrations/cover/tasmota.jpg",
+    "local": true
   },
   {
     "key": "tpLink",
     "link": "tp-link",
     "img": "/assets/integrations/cover/tp-link.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "eWeLink",
@@ -53,13 +61,16 @@
   {
     "key": "broadlink",
     "img": "/assets/integrations/cover/broadlink.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "nuki",
     "link": "nuki",
     "img": "/assets/integrations/cover/nuki.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true,
+    "cloud": true
   },
   {
     "key": "enedis",
@@ -72,7 +83,8 @@
     "key": "lanManager",
     "link": "lan-manager",
     "img": "/assets/integrations/cover/lan-manager.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "tuya",
@@ -92,13 +104,15 @@
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "matterbridge",
     "link": "matterbridge",
     "img": "/assets/integrations/cover/matterbridge.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "local": true
   },
   {
     "key": "netatmo",
@@ -110,35 +124,42 @@
     "key": "sonos",
     "link": "sonos",
     "img": "/assets/integrations/cover/sonos.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "zwavejs-ui",
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "google-cast",
     "link": "google-cast",
-    "img": "/assets/integrations/cover/google-cast.jpg"
+    "img": "/assets/integrations/cover/google-cast.jpg",
+    "local": true
   },
   {
     "key": "airplay",
     "link": "airplay",
     "img": "/assets/integrations/cover/airplay.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "matter",
     "link": "matter",
     "img": "/assets/integrations/cover/matter.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true
   },
   {
     "key": "energyMonitoring",
     "link": "energy-monitoring",
     "img": "/assets/integrations/cover/energy-monitoring.jpg",
-    "invertInDarkMode": true
+    "invertInDarkMode": true,
+    "local": true,
+    "cloud": true
   }
 ]
