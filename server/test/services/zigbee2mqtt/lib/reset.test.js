@@ -1,9 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
-
-const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -19,8 +18,19 @@ const mqtt = {
 describe('zigbee2mqtt reset', () => {
   let zigbee2MqttManager;
   let gladys;
+  let fsRmStub;
 
   beforeEach(() => {
+    fsRmStub = fake.resolves(null);
+
+    const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
+      './reset': proxyquire('../../../../services/zigbee2mqtt/lib/reset', {
+        'fs/promises': {
+          rm: fsRmStub,
+        },
+      }),
+    });
+
     gladys = {
       job: {
         wrapper: (type, func) => {
@@ -89,8 +99,10 @@ describe('zigbee2mqtt reset', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_MQTT_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_Z2M_VERSION', serviceId);
 
-    // Should call getGladysBasePath to delete folder
+    // Should call fs.rm on the zigbee2mqtt folder
     assert.calledOnce(gladys.system.getGladysBasePath);
+    assert.calledOnce(fsRmStub);
+    assert.calledWithExactly(fsRmStub, '/var/lib/gladysassistant/zigbee2mqtt', { recursive: true, force: true });
 
     // Should reset in-memory state
     expect(zigbee2MqttManager.discoveredDevices).to.deep.equal({});
@@ -109,19 +121,29 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2MqttManager.dockerBased).to.equal(false);
 
-    // Should emit status event (disconnect emits 3 + reset emits 1 = 4)
+    // Should emit status event
     assert.called(gladys.event.emit);
   });
 
-  it('should handle folder deletion error gracefully', async () => {
-    gladys.system.getGladysBasePath = fake.rejects(new Error('File system error'));
+  it('should throw when folder deletion fails', async () => {
+    fsRmStub = fake.rejects(new Error('Permission denied'));
 
-    await zigbee2MqttManager.reset();
+    const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
+      './reset': proxyquire('../../../../services/zigbee2mqtt/lib/reset', {
+        'fs/promises': {
+          rm: fsRmStub,
+        },
+      }),
+    });
 
-    // Should still complete reset even if folder deletion fails
-    assert.callCount(gladys.variable.destroy, 12);
-    expect(zigbee2MqttManager.discoveredDevices).to.deep.equal({});
-    expect(zigbee2MqttManager.gladysConnected).to.equal(false);
+    zigbee2MqttManager = new Zigbee2mqttManager(gladys, mqtt, serviceId);
+
+    try {
+      await zigbee2MqttManager.reset();
+      expect.fail('Expected reset to throw');
+    } catch (e) {
+      expect(e.message).to.equal('Permission denied');
+    }
   });
 
   it('should disconnect MQTT client during reset', async () => {
@@ -136,6 +158,7 @@ describe('zigbee2mqtt reset', () => {
 
     // Should destroy all variables
     assert.callCount(gladys.variable.destroy, 12);
+    assert.calledOnce(fsRmStub);
   });
 
   it('should cancel backup scheduled job during reset', async () => {
@@ -148,5 +171,6 @@ describe('zigbee2mqtt reset', () => {
 
     assert.calledOnce(cancelFake);
     assert.callCount(gladys.variable.destroy, 12);
+    assert.calledOnce(fsRmStub);
   });
 });

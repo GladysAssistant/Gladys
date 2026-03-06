@@ -34,14 +34,10 @@ async function reset() {
   await Promise.all(ALL_CONFIGURATION_KEYS.map((key) => this.gladys.variable.destroy(key, this.serviceId)));
 
   // 3. Delete zigbee2mqtt folder on disk
-  try {
-    const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
-    const zigbee2mqttFolderPath = path.join(basePathOnContainer, 'zigbee2mqtt');
-    await fs.rm(zigbee2mqttFolderPath, { recursive: true, force: true });
-    logger.info('Zigbee2mqtt: folder deleted successfully');
-  } catch (e) {
-    logger.warn('Zigbee2mqtt: error deleting folder on disk', e);
-  }
+  const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
+  const zigbee2mqttFolderPath = path.join(basePathOnContainer, 'zigbee2mqtt');
+  await fs.rm(zigbee2mqttFolderPath, { recursive: true, force: true });
+  logger.info('Zigbee2mqtt: folder deleted successfully');
 
   // 4. Reset in-memory state
   this.discoveredDevices = {};
