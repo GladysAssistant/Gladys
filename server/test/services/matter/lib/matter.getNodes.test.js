@@ -37,13 +37,13 @@ describe('Matter.getNodes', () => {
           {
             number: 1,
             name: 'Test Device',
-            clusterClients: new Map(),
-            childEndpoints: [
+            getAllClusterClients: () => [],
+            getChildEndpoints: () => [
               {
                 name: 'Test Device child',
                 number: 2,
-                clusterClients,
-                childEndpoints: [],
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
               },
             ],
           },

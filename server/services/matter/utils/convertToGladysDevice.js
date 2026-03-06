@@ -98,8 +98,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
   // Add endpoint number to the name so the user can identify the device
   gladysDevice.name += ` ${device.number}`;
 
-  if (device.clusterClients) {
-    await Promise.each(Array.from(device.clusterClients.entries()), async ([clusterIndex, clusterClient]) => {
+  const allClusterClients = device.getAllClusterClients();
+  if (allClusterClients && allClusterClients.length > 0) {
+    await Promise.each(allClusterClients, async (clusterClient) => {
+      const clusterIndex = clusterClient.id;
       const commonNewFeature = {
         name: `${clusterClient.name} - ${clusterClient.endpointId}`,
         selector: slugify(`matter-${device.name}-${clusterClient.name}`, true),
