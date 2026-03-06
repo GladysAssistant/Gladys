@@ -31,9 +31,7 @@ async function reset() {
   await this.disconnect();
 
   // 2. Destroy all configuration variables in database
-  await Promise.all(
-    ALL_CONFIGURATION_KEYS.map((key) => this.gladys.variable.destroy(key, this.serviceId)),
-  );
+  await Promise.all(ALL_CONFIGURATION_KEYS.map((key) => this.gladys.variable.destroy(key, this.serviceId)));
 
   // 3. Delete zigbee2mqtt folder on disk
   try {
