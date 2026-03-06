@@ -50,6 +50,16 @@ class SetupPanel extends Component {
     if (setupZigee2mqttStatus === RequestStatus.Success && setupZigee2mqttStatus !== this.props.setupZigee2mqttStatus) {
       this.setState({ configuration });
     }
+
+    if (configuration.mqttMode !== this.props.configuration.mqttMode) {
+      let setupMode = null;
+      if (configuration.mqttMode === MQTT_MODE.LOCAL) {
+        setupMode = SETUP_MODES.LOCAL;
+      } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
+        setupMode = SETUP_MODES.REMOTE;
+      }
+      this.setState({ setupMode, configuration });
+    }
   }
 
   render({ zigbee2mqttStatus = {}, httpClient, disabled, setupZigee2mqttStatus }, { setupMode, configuration }) {

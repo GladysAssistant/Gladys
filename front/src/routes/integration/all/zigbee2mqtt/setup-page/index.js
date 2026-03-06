@@ -100,6 +100,27 @@ class Zigbee2mqttSetupPage extends Component {
     }
   };
 
+  resetZ2M = async () => {
+    this.setState({
+      resetZigbee2mqttStatus: RequestStatus.Getting
+    });
+    try {
+      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/reset');
+      this.setState({
+        resetZigbee2mqttStatus: RequestStatus.Success,
+        configuration: {},
+        z2mUrl: null
+      });
+      await this.loadZ2MStatus();
+      await this.loadZ2MConfig();
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        resetZigbee2mqttStatus: RequestStatus.Error
+      });
+    }
+  };
+
   constructor(props) {
     super(props);
 
@@ -126,7 +147,13 @@ class Zigbee2mqttSetupPage extends Component {
   render(props, state) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <SetupTab {...props} {...state} saveConfiguration={this.saveConfiguration} toggleZ2M={this.toggleZ2M} />
+        <SetupTab
+          {...props}
+          {...state}
+          saveConfiguration={this.saveConfiguration}
+          toggleZ2M={this.toggleZ2M}
+          resetZ2M={this.resetZ2M}
+        />
       </Zigbee2mqttPage>
     );
   }

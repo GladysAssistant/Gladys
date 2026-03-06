@@ -14,7 +14,15 @@ async function removeContainer(containerId, options = {}) {
   }
 
   const container = await this.dockerode.getContainer(containerId);
-  return container.remove(options);
+  try {
+    await container.remove(options);
+  } catch (e) {
+    // Docker returns HTTP 404 when the container no longer exists
+    if (e.statusCode === 404) {
+      return;
+    }
+    throw e;
+  }
 }
 
 module.exports = {
