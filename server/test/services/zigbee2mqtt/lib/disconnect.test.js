@@ -109,6 +109,17 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
   });
 
+  it('container already stopped', async () => {
+    // PREPARE
+    gladys.system.stopContainer = fake.rejects(new Error('(HTTP code 304) container already stopped'));
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledTwice(gladys.system.stopContainer);
+    assert.calledTwice(gladys.system.removeContainer);
+    assert.calledThrice(gladys.event.emit);
+  });
+
   it('clear backup interval', async () => {
     // PREPARE
     zigbee2MqttManager.backupScheduledJob = {
