@@ -41,6 +41,21 @@ const featureColor = {
   type: 'color',
 };
 
+const featureWarningMode = {
+  external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:mode:mode',
+  type: 'mode',
+};
+
+const featureWarningLevel = {
+  external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:level:level',
+  type: 'level',
+};
+
+const featureWarningStrobe = {
+  external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:strobe:strobe',
+  type: 'binary',
+};
+
 describe('zigbee2mqtt setValue', () => {
   // PREPARE
   let zigbee2MqttManager;
@@ -129,6 +144,36 @@ describe('zigbee2mqtt setValue', () => {
       mqttClient.publish,
       `zigbee2mqtt/0x00158d00045b2740/set`,
       JSON.stringify({ alarm: false }),
+    );
+  });
+
+  it('set value warning mode (composite sub-feature)', async () => {
+    // EXECUTE
+    await zigbee2MqttManager.setValue(null, featureWarningMode, 1);
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      `zigbee2mqtt/0x00158d00045b2741/set`,
+      JSON.stringify({ warning: { mode: 'burglar' } }),
+    );
+  });
+
+  it('set value warning level (composite sub-feature)', async () => {
+    // EXECUTE
+    await zigbee2MqttManager.setValue(null, featureWarningLevel, 2);
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      `zigbee2mqtt/0x00158d00045b2741/set`,
+      JSON.stringify({ warning: { level: 'high' } }),
+    );
+  });
+
+  it('set value warning strobe (composite sub-feature)', async () => {
+    // EXECUTE
+    await zigbee2MqttManager.setValue(null, featureWarningStrobe, 1);
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      `zigbee2mqtt/0x00158d00045b2741/set`,
+      JSON.stringify({ warning: { strobe: true } }),
     );
   });
 });

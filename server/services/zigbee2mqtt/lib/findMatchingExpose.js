@@ -1,14 +1,16 @@
 const logger = require('../../../utils/logger');
 
-const recursiveSearch = (expose, type, search) => {
+const recursiveSearch = (expose, type, search, parent = undefined) => {
   const { property, features = [] } = expose;
   if (property === search) {
-    return expose;
+    return { expose, parent };
   }
+
+  const currentParent = expose.type === 'composite' ? expose : parent;
 
   for (let i = 0; i < features.length; i += 1) {
     const feature = features[i];
-    const result = recursiveSearch(feature, type || feature.type, search);
+    const result = recursiveSearch(feature, type || feature.type, search, currentParent);
     if (result) {
       return result;
     }
@@ -35,12 +37,12 @@ function findMatchingExpose(deviceName, property) {
 
   // Looks for matching "expose" or sub-feature
   const { exposes } = discoveredDevice.definition;
-  const expose = recursiveSearch({ features: exposes }, undefined, property);
-  if (!expose) {
+  const result = recursiveSearch({ features: exposes }, undefined, property);
+  if (!result) {
     logger.debug(`Exposed property "${property}" on device "${deviceName}" not found`);
   }
 
-  return expose;
+  return result;
 }
 
 module.exports = {

@@ -321,6 +321,106 @@
     "type": "EndDevice"
   },
   {
+    "date_code": "20200101",
+    "definition": {
+      "description": "Siren with warning composite",
+      "exposes": [
+        {
+          "type": "composite",
+          "name": "warning",
+          "property": "warning",
+          "features": [
+            {
+              "access": 7,
+              "description": "Mode of the warning",
+              "name": "mode",
+              "property": "mode",
+              "type": "enum",
+              "values": ["stop", "burglar", "fire", "emergency", "police_panic", "fire_panic", "emergency_panic"]
+            },
+            {
+              "access": 7,
+              "description": "Sound level",
+              "name": "level",
+              "property": "level",
+              "type": "enum",
+              "values": ["low", "medium", "high", "very_high"]
+            },
+            {
+              "access": 7,
+              "description": "Turn on/off the strobe",
+              "name": "strobe",
+              "property": "strobe",
+              "type": "binary",
+              "value_on": true,
+              "value_off": false
+            },
+            {
+              "access": 7,
+              "description": "Strobe light level",
+              "name": "strobe_level",
+              "property": "strobe_level",
+              "type": "enum",
+              "values": ["low", "medium", "high", "very_high"]
+            },
+            {
+              "access": 7,
+              "description": "Strobe duty cycle",
+              "name": "strobe_duty_cycle",
+              "property": "strobe_duty_cycle",
+              "type": "numeric",
+              "value_min": 0,
+              "value_max": 10
+            },
+            {
+              "access": 7,
+              "description": "Duration in seconds",
+              "name": "duration",
+              "property": "duration",
+              "type": "numeric",
+              "unit": "s",
+              "value_min": 0,
+              "value_max": 600
+            }
+          ]
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "TS0216",
+      "supports_ota": false,
+      "vendor": "TuYa"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": ["genBasic", "ssIasWd"],
+          "output": []
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d00045b2741",
+    "ieee_address": "0x00158d00045b2741",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "TuYa",
+    "model_id": "TS0216",
+    "network_address": 23008,
+    "power_source": "Mains (single phase)",
+    "supported": true,
+    "type": "Router"
+  },
+  {
     "date_code": "20181129",
     "definition": null,
     "endpoints": {

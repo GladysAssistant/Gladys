@@ -4,11 +4,17 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
 module.exports = {
   type: 'composite',
   writeValue: (expose, value) => {
-    const [r, g, b] = intToRgb(parseInt(value, 10));
-    return { rgb: `${r},${g},${b}` };
+    if (expose && expose.name === 'color_xy') {
+      const [r, g, b] = intToRgb(parseInt(value, 10));
+      return { rgb: `${r},${g},${b}` };
+    }
+    return value;
   },
   readValue: (expose, value) => {
-    return xyToInt(value.x, value.y);
+    if (expose && expose.name === 'color_xy') {
+      return xyToInt(value.x, value.y);
+    }
+    return value;
   },
   names: {
     color_xy: {

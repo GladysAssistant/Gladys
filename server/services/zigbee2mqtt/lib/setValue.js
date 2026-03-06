@@ -28,12 +28,19 @@ function setValue(device, deviceFeature, value) {
   let zigbeeValue;
 
   // Looks mapping from exposes
-  const expose = this.findMatchingExpose(topic, property);
-  if (expose) {
+  const result = this.findMatchingExpose(topic, property);
+  if (result) {
+    const { expose, parent } = result;
     zigbeeValue = exposesMap[expose.type].writeValue(expose, value, featureIndex);
     // Send message to Zigbee2mqtt topics
-    const mqttPaylad = JSON.stringify({ [property]: zigbeeValue });
-    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPaylad);
+    let mqttPayload;
+    if (parent && parent.property) {
+      // Composite sub-feature: wrap value inside parent property (e.g. {"warning": {"mode": value}})
+      mqttPayload = JSON.stringify({ [parent.property]: { [property]: zigbeeValue } });
+    } else {
+      mqttPayload = JSON.stringify({ [property]: zigbeeValue });
+    }
+    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPayload);
   } else {
     throw new BadParameters(`Zigbee2mqtt expose not found: "${externalId}" with property "${property}"`);
   }

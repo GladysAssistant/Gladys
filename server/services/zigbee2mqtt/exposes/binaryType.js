@@ -1,6 +1,12 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 const names = {
+  ac_connected: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.AC_CONNECTED,
+      type: DEVICE_FEATURE_TYPES.AC_CONNECTED.BINARY,
+    },
+  },
   alarm: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.SIREN,
@@ -106,6 +112,14 @@ const names = {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.INPUT,
       type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
+    },
+  },
+  strobe: {
+    types: {
+      composite: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.STROBE,
+      },
     },
   },
 };

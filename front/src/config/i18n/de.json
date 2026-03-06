@@ -3356,6 +3356,27 @@
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
+        },
+        "mode": {
+          "stop": "Stopp",
+          "burglar": "Einbruch",
+          "fire": "Feuer",
+          "emergency": "Notfall",
+          "police_panic": "Polizei-Panik",
+          "fire_panic": "Feuer-Panik",
+          "emergency_panic": "Notfall-Panik"
+        },
+        "level": {
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "very_high": "Sehr hoch"
+        },
+        "strobe_level": {
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "very_high": "Sehr hoch"
         }
       }
     }
@@ -3563,6 +3584,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "Netzbetrieb",
+      "binary": "Netzstrom verbunden (ja/nein)"
+    },
     "light": {
       "shortCategoryName": "Licht",
       "binary": "Licht: ein/aus",
@@ -3668,7 +3693,12 @@
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
-      "melody": "Melodie"
+      "melody": "Melodie",
+      "mode": "Warnmodus",
+      "level": "Lautstärke",
+      "strobe": "Blitzlicht",
+      "strobe_level": "Blitzintensität",
+      "strobe_duty_cycle": "Blitzzyklus"
     },
     "cube": {
       "shortCategoryName": "Würfel",
