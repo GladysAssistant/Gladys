@@ -41,6 +41,12 @@ const PilotWireModeDeviceFeature = ({ children, ...props }) => {
               <option value={PILOT_WIRE_MODE.COMFORT}>
                 <Text id={`deviceFeatureAction.category.${category}.${type}.comfort`} />
               </option>
+              <option value={PILOT_WIRE_MODE.PROGRAMMING}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.programming`} />
+              </option>
+              <option value={PILOT_WIRE_MODE.THERMOSTAT}>
+                <Text id={`deviceFeatureAction.category.${category}.${type}.thermostat`} />
+              </option>
             </select>
           </div>
         </div>

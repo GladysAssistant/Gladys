@@ -1,0 +1,155 @@
+{
+  "external_id": "tuya:smart-meter-device-id",
+  "device_type": "smart-meter",
+  "params": [
+    { "name": "DEVICE_ID", "value": "smart-meter-device-id" },
+    { "name": "LOCAL_KEY", "value": "local-key" },
+    { "name": "IP_ADDRESS", "value": "10.0.0.20" },
+    { "name": "CLOUD_IP", "value": "82.0.0.10" },
+    { "name": "CLOUD_STRATEGY", "value": "shadow" },
+    { "name": "LOCAL_OVERRIDE", "value": true },
+    { "name": "PROTOCOL_VERSION", "value": "3.3" },
+    { "name": "PRODUCT_ID", "value": "bbcg1hrkrj5rifsd" }
+  ],
+  "features": [
+    {
+      "external_id": "tuya:smart-meter-device-id:power_a",
+      "selector": "tuya:smart-meter-device-id:power_a",
+      "category": "energy-sensor",
+      "type": "power",
+      "last_value": 0,
+      "scale": 1
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:power_b",
+      "selector": "tuya:smart-meter-device-id:power_b",
+      "category": "energy-sensor",
+      "type": "power",
+      "last_value": 0,
+      "scale": 1
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:energy_forword_a",
+      "selector": "tuya:smart-meter-device-id:energy_forword_a",
+      "category": "energy-sensor",
+      "type": "energy",
+      "last_value": 0,
+      "scale": 2
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:energy_reverse_a",
+      "selector": "tuya:smart-meter-device-id:energy_reverse_a",
+      "category": "energy-production-sensor",
+      "type": "index",
+      "last_value": 0,
+      "scale": 2
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:energy_forword_b",
+      "selector": "tuya:smart-meter-device-id:energy_forword_b",
+      "category": "energy-sensor",
+      "type": "energy",
+      "last_value": 0,
+      "scale": 2
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:energy_reserse_b",
+      "selector": "tuya:smart-meter-device-id:energy_reserse_b",
+      "category": "energy-production-sensor",
+      "type": "index",
+      "last_value": 0,
+      "scale": 2
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:voltage_a",
+      "selector": "tuya:smart-meter-device-id:voltage_a",
+      "category": "energy-sensor",
+      "type": "voltage",
+      "last_value": 0,
+      "scale": 1
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:current_a",
+      "selector": "tuya:smart-meter-device-id:current_a",
+      "category": "energy-sensor",
+      "type": "current",
+      "last_value": 0,
+      "scale": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:current_b",
+      "selector": "tuya:smart-meter-device-id:current_b",
+      "category": "energy-sensor",
+      "type": "current",
+      "last_value": 0,
+      "scale": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:total_power",
+      "selector": "tuya:smart-meter-device-id:total_power",
+      "category": "energy-sensor",
+      "type": "power",
+      "scale": 1,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:forward_energy_total",
+      "selector": "tuya:smart-meter-device-id:forward_energy_total",
+      "category": "energy-sensor",
+      "type": "energy",
+      "scale": 2,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
+      "selector": "tuya:smart-meter-device-id:reverse_energy_total",
+      "category": "energy-production-sensor",
+      "type": "index",
+      "scale": 2,
+      "last_value": 0
+    }
+  ],
+  "tuya_mapping": {
+    "ignored_local_dps": [
+      "102",
+      "103",
+      "104",
+      "110",
+      "116",
+      "117",
+      "118",
+      "119",
+      "120",
+      "121",
+      "122",
+      "123",
+      "124",
+      "125",
+      "126",
+      "127",
+      "128",
+      "129"
+    ],
+    "ignored_cloud_codes": [
+      "coef_a_reset",
+      "coef_b_reset",
+      "current_a_calibration",
+      "current_b_calibration",
+      "direction_a",
+      "direction_b",
+      "energy_a_calibration_fwd",
+      "energy_a_calibration_rev",
+      "energy_b_calibration_fwd",
+      "energy_b_calibration_rev",
+      "freq",
+      "freq_calibration",
+      "power_a_calibration",
+      "power_b_calibration",
+      "power_factor",
+      "power_factor_b",
+      "report_rate_control",
+      "tbd",
+      "voltage_coef"
+    ]
+  }
+}
