@@ -203,11 +203,11 @@ async function setValue(device, deviceFeature, value) {
             ],
           },
         });
-  logger.debug(`[Tuya][setValue] ${JSON.stringify(response)}`);
+  logger.debug(`[Tuya][setValue][cloud] ${JSON.stringify(response)}`);
   if (!response || response.success === false) {
     await pollFeedbackIfAvailable(this, effectiveDevice, topic, command, 'rejected cloud command');
     throw new BadParameters(
-      `[Tuya][setValue] command rejected for ${topic}/${command}: ${
+      `[Tuya][setValue][cloud] command rejected for ${topic}/${command}: ${
         response && response.msg ? response.msg : 'unknown error'
       }`,
     );
