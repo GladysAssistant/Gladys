@@ -2622,6 +2622,13 @@
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       },
+      "sunriseSunsetTrigger": {
+        "offsetLabel": "Quand",
+        "atExactTime": "À l'heure exacte",
+        "before": "Avant",
+        "after": "Après",
+        "minutes": "minutes"
+      },
       "userPresence": {
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",
         "leftHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné partira de la maison sélectionnée.",

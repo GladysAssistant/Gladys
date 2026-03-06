@@ -461,6 +461,120 @@ describe('scene.checkTrigger', () => {
       });
     }).to.throw(Error, 'Trigger type "one-unknown-event" has no checker function.');
   });
+  it('should not execute scene, sunrise trigger with offset=30 when event has offset=0', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+          offset: 30,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 0,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene, sunrise trigger with offset=30 when event has offset=30', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+          offset: 30,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 30,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene, sunset trigger with offset=-15 when event has offset=0', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNSET,
+          house: 'house-1',
+          offset: -15,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNSET,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 0,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should execute scene, event & key matching', async () => {
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
