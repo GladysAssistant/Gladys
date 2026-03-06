@@ -1154,7 +1154,16 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "reset": {
+          "title": "Réinitialiser l'intégration",
+          "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Zigbee2mqtt. Cela peut être utile si votre configuration est corrompue ou si vous souhaitez changer de coordinateur Zigbee.",
+          "button": "Réinitialiser",
+          "confirmMessage": "Attention, réinitialiser l'intégration supprimera tous les fichiers liés à Zigbee2mqtt sur le disque et tous les paramètres enregistrés. Tous les appareils Zigbee actuellement appairés à Zigbee2mqtt devront être ré-appairés.",
+          "confirmButton": "Oui, tout réinitialiser",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        }
       },
       "device": {
         "title": "Appareils Zigbee",

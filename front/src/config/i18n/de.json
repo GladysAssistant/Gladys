@@ -1024,7 +1024,16 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
-        "connectionUrl": "URL der Zigbee2mqtt-Schnittstelle: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL der Zigbee2mqtt-Schnittstelle: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "reset": {
+          "title": "Integration zurücksetzen",
+          "description": "Verwenden Sie diese Option, wenn Sie mit Zigbee2mqtt von vorne beginnen möchten. Dies kann nützlich sein, wenn Ihre Konfiguration beschädigt ist oder wenn Sie Ihren Zigbee-Koordinator wechseln möchten.",
+          "button": "Zurücksetzen",
+          "confirmMessage": "Achtung, das Zurücksetzen der Integration löscht alle Zigbee2mqtt-Dateien auf der Festplatte und alle gespeicherten Einstellungen. Alle derzeit mit Zigbee2mqtt gekoppelten Zigbee-Geräte müssen erneut gekoppelt werden.",
+          "confirmButton": "Ja, alles zurücksetzen",
+          "cancelButton": "Abbrechen",
+          "error": "Beim Zurücksetzen der Integration ist ein Fehler aufgetreten."
+        }
       },
       "device": {
         "title": "Meine Geräte",

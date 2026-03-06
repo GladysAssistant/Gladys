@@ -13,7 +13,15 @@ async function stopContainer(containerId) {
   }
 
   const container = await this.dockerode.getContainer(containerId);
-  return container.stop();
+  try {
+    await container.stop();
+  } catch (e) {
+    // Docker returns HTTP 304 when the container is already stopped
+    if (e.statusCode === 304) {
+      return;
+    }
+    throw e;
+  }
 }
 
 module.exports = {
