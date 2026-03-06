@@ -6,7 +6,8 @@
   },
   {
     "key": "nextcloudTalk",
-    "img": "/assets/integrations/cover/nextcloud-talk.jpg"
+    "img": "/assets/integrations/cover/nextcloud-talk.jpg",
+    "local": true
   },
   {
     "key": "alexa",
@@ -26,7 +27,7 @@
     "key": "homekit",
     "img": "/assets/integrations/cover/homekit.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "local": true
   },
   {
     "key": "openai",
@@ -48,6 +49,8 @@
   },
   {
     "key": "mcp",
-    "img": "/assets/integrations/cover/mcp.jpg"
+    "img": "/assets/integrations/cover/mcp.jpg",
+    "gladysPlus": true,
+    "local": true
   }
 ]

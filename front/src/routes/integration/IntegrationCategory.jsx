@@ -68,18 +68,24 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => {
           <div class="text-muted">
             <Text id={`integration.${integration.key}.description`} />
           </div>
-          {(integration.gladysPlus || integration.cloud) && (
+          {(integration.gladysPlus || integration.cloud || integration.local) && (
             <div class="integration-tags mt-2">
-              {integration.gladysPlus && (
-                <span class="badge badge-info integration-tag">
-                  <i class="fe fe-plus mr-1" />
-                  <Text id="integration.tags.gladysPlus" />
+              {integration.local && (
+                <span class="badge badge-success integration-tag">
+                  <i class="fe fe-home mr-1" />
+                  <Text id="integration.tags.local" />
                 </span>
               )}
               {integration.cloud && (
                 <span class="badge badge-warning integration-tag">
                   <i class="fe fe-cloud mr-1" />
                   <Text id="integration.tags.cloud" />
+                </span>
+              )}
+              {integration.gladysPlus && (
+                <span class="badge badge-info integration-tag">
+                  <i class="fe fe-plus mr-1" />
+                  <Text id="integration.tags.gladysPlus" />
                 </span>
               )}
             </div>
