@@ -1,0 +1,92 @@
+{
+  "external_id": "tuya:bf2be3c32ea4d8f561ujmu",
+  "device_type": "smart-socket",
+  "properties": {
+    "properties": [
+      {
+        "code": "switch_1",
+        "dp_id": 1,
+        "value": false
+      },
+      {
+        "code": "add_ele",
+        "dp_id": 17,
+        "value": 1
+      },
+      {
+        "code": "cur_current",
+        "dp_id": 18,
+        "value": 0
+      },
+      {
+        "code": "cur_power",
+        "dp_id": 19,
+        "value": 0
+      },
+      {
+        "code": "cur_voltage",
+        "dp_id": 20,
+        "value": 2340
+      },
+      {
+        "code": "child_lock",
+        "dp_id": 41,
+        "value": false
+      }
+    ]
+  },
+  "params": [
+    { "name": "IP_ADDRESS", "value": "192.168.1.50" },
+    { "name": "LOCAL_KEY", "value": "local-key" },
+    { "name": "PROTOCOL_VERSION", "value": "3.5" },
+    { "name": "LOCAL_OVERRIDE", "value": true }
+  ],
+  "features": [
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 1
+    },
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+      "category": "child-lock",
+      "type": "binary",
+      "last_value": 1
+    },
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+      "category": "switch",
+      "type": "energy",
+      "scale": 3,
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+      "category": "switch",
+      "type": "current",
+      "scale": 0,
+      "last_value": 1
+    },
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+      "category": "switch",
+      "type": "power",
+      "scale": 1,
+      "last_value": 1
+    },
+    {
+      "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+      "category": "switch",
+      "type": "voltage",
+      "scale": 1,
+      "last_value": 1
+    }
+  ]
+}

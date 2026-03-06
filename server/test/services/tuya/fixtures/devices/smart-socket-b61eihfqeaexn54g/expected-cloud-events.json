@@ -1,0 +1,26 @@
+[
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+    "state": 0.001
+  },
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+    "state": 234
+  },
+  {
+    "device_feature_external_id": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+    "state": 0
+  }
+]

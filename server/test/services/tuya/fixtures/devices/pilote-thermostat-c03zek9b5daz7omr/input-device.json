@@ -1,0 +1,154 @@
+{
+  "id": "bfc3c1dcdd95241afal8mo",
+  "name": "Thermostat Bureau Psycho",
+  "product_name": "Pilote Thermostat",
+  "model": "RP5",
+  "product_id": "c03zek9b5daz7omr",
+  "local_key": "local-key",
+  "ip": "10.0.0.15",
+  "cloud_ip": "82.0.0.1",
+  "protocol_version": "3.5",
+  "local_override": true,
+  "online": true,
+  "specifications": {
+    "category": "cjkg",
+    "functions": [],
+    "status": []
+  },
+  "properties": {
+    "properties": [
+      { "code": "mode", "dp_id": 101, "type": "enum", "value": "Anti_forst" },
+      { "code": "child_lock", "dp_id": 102, "type": "bool", "value": false },
+      { "code": "week_program_1", "dp_id": 103, "type": "raw", "value": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" },
+      { "code": "week_program_2", "dp_id": 104, "type": "raw", "value": "VVVVVVVVVSIhEVVRElEVURURFVVVVVVV" },
+      { "code": "week_program_3", "dp_id": 105, "type": "raw", "value": "VVVVVVVVVSIhEVVRFVEVURURFVVVVVVV" },
+      { "code": "week_program_4", "dp_id": 106, "type": "raw", "value": "VVVVVVVVVSIhEVVRFVEVURURVVVVVVVV" },
+      { "code": "week_program_5", "dp_id": 107, "type": "raw", "value": "VVVVVVVVVSIhEVVRFVEVURURVVVVVVVV" },
+      { "code": "week_program_6", "dp_id": 108, "type": "raw", "value": "VVVVVVVVVSIhEVVRFVEVURVVVVVVVVVV" },
+      { "code": "week_program_7", "dp_id": 109, "type": "raw", "value": "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" },
+      { "code": "vacation_duration", "dp_id": 110, "type": "value", "value": 0 },
+      { "code": "boost_duration", "dp_id": 111, "type": "value", "value": 0 },
+      { "code": "electricity_statistics", "dp_id": 112, "type": "value", "value": 0 },
+      {
+        "code": "elec_statistics_day",
+        "dp_id": 113,
+        "type": "raw",
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAcAhAuAAAAAqBHAABCAEAAAAA5BZBXCkD4AAAABJ"
+      },
+      {
+        "code": "elec_statistics_month",
+        "dp_id": 114,
+        "type": "raw",
+        "value": "AAADpwjGB1sEqwAAAAAAAAAAAAAAAAAAAAA="
+      },
+      { "code": "elec_statistics_year", "dp_id": 115, "type": "raw", "value": "AAAMBg==" },
+      { "code": "temp_current", "dp_id": 116, "type": "value", "value": 152 },
+      { "code": "average_power", "dp_id": 117, "type": "value", "value": 20 },
+      { "code": "temp_correction", "dp_id": 118, "type": "value", "value": 0 },
+      { "code": "fault", "dp_id": 119, "type": "bitmap", "value": 0 },
+      { "code": "air_pressure_index", "dp_id": 120, "type": "raw", "value": "H4ppqtom8Ljr3qW5xnTAeqoAiTyiz2E9" },
+      { "code": "support_features", "dp_id": 121, "type": "value", "value": 31 },
+      { "code": "window_check", "dp_id": 122, "type": "bool", "value": true },
+      { "code": "window_state", "dp_id": 123, "type": "bool", "value": false },
+      { "code": "window_keep_time", "dp_id": 124, "type": "value", "value": 30 },
+      { "code": "temp_set", "dp_id": 125, "type": "value", "value": 210 },
+      { "code": "temp_unit_convert", "dp_id": 126, "type": "enum", "value": "c" },
+      { "code": "app_features", "dp_id": 127, "type": "value", "value": 2 },
+      { "code": "switch_diff", "dp_id": 128, "type": "value", "value": 10 },
+      { "code": "upper_temp", "dp_id": 129, "type": "value", "value": 350 },
+      { "code": "lower_temp", "dp_id": 130, "type": "value", "value": 50 },
+      { "code": "running_mode", "dp_id": 131, "type": "enum", "value": "Anti_forst" },
+      { "code": "night_led_config", "dp_id": 132, "type": "raw", "value": "BLAB4AE=" },
+      { "code": "ecowatt_url", "dp_id": 133, "type": "string", "value": "" }
+    ]
+  },
+  "thing_model": {
+    "modelId": "fjl7k0",
+    "services": [
+      {
+        "code": "",
+        "name": "Default service",
+        "properties": [
+          {
+            "abilityId": 101,
+            "accessMode": "rw",
+            "code": "mode",
+            "name": "Mode",
+            "typeSpec": {
+              "type": "enum",
+              "range": [
+                "Standby",
+                "Comfort",
+                "Comfort_1",
+                "Comfort_2",
+                "ECO",
+                "Anti_forst",
+                "Programming",
+                "Thermostat"
+              ]
+            }
+          },
+          {
+            "abilityId": 102,
+            "accessMode": "rw",
+            "code": "child_lock",
+            "name": "Child lock",
+            "typeSpec": { "type": "bool" }
+          },
+          {
+            "abilityId": 112,
+            "accessMode": "ro",
+            "code": "electricity_statistics",
+            "name": "Electricity statistics",
+            "typeSpec": { "type": "value", "max": 2000000000, "min": 0, "scale": 1, "step": 1, "unit": "kWh" }
+          },
+          {
+            "abilityId": 116,
+            "accessMode": "ro",
+            "code": "temp_current",
+            "name": "Current temperature",
+            "typeSpec": { "type": "value", "max": 9000, "min": -300, "scale": 1, "step": 1, "unit": "" }
+          },
+          {
+            "abilityId": 117,
+            "accessMode": "ro",
+            "code": "average_power",
+            "name": "Average power",
+            "typeSpec": { "type": "value", "max": 2000000000, "min": 0, "scale": 1, "step": 1, "unit": "W" }
+          },
+          {
+            "abilityId": 119,
+            "accessMode": "ro",
+            "code": "fault",
+            "name": "Fault",
+            "typeSpec": { "type": "bitmap", "label": ["e1", "e2"], "maxlen": 2 }
+          },
+          {
+            "abilityId": 123,
+            "accessMode": "ro",
+            "code": "window_state",
+            "name": "Window state",
+            "typeSpec": { "type": "bool" }
+          },
+          {
+            "abilityId": 125,
+            "accessMode": "rw",
+            "code": "temp_set",
+            "name": "Target temperature",
+            "typeSpec": { "type": "value", "max": 3000, "min": 50, "scale": 1, "step": 5, "unit": "" }
+          },
+          {
+            "abilityId": 131,
+            "accessMode": "ro",
+            "code": "running_mode",
+            "name": "Running mode",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["Standby", "Comfort", "Comfort_1", "Comfort_2", "ECO", "Anti_forst"]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

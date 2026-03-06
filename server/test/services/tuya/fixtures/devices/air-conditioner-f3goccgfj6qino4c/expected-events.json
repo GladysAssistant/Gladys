@@ -1,0 +1,30 @@
+[
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:Power",
+    "state": 1
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:horizontal",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:mode",
+    "state": 2
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:temp_current",
+    "state": 23
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:temp_set",
+    "state": 20
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:vertical",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf5638fc7cc3f25e32i45q:windspeed",
+    "state": 0
+  }
+]
