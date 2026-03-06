@@ -116,10 +116,12 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.gladysConnected).to.equal(false);
     expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
-    expect(zigbee2MqttManager.networkModeValid).to.equal(false);
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
-    expect(zigbee2MqttManager.dockerBased).to.equal(false);
+
+    // Host environment properties should be preserved
+    expect(zigbee2MqttManager.dockerBased).to.equal(true);
+    expect(zigbee2MqttManager.networkModeValid).to.equal(true);
 
     // Should emit status event
     assert.called(gladys.event.emit);

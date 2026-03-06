@@ -51,10 +51,8 @@ async function reset() {
   this.gladysConnected = false;
   this.zigbee2mqttConnected = false;
   this.z2mPermitJoin = false;
-  this.networkModeValid = false;
   this.coordinatorFirmware = null;
   this.z2mContainerError = null;
-  this.dockerBased = false;
 
   // 5. Emit status event
   this.emitStatusEvent();
