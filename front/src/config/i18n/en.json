@@ -1445,7 +1445,12 @@
         "copyFailed": "Fail to copy",
         "deleteLabel": "Delete feature",
         "showAdvancedSettings": "Show advanced settings",
-        "hideAdvancedSettings": "Hide advanced settings"
+        "hideAdvancedSettings": "Hide advanced settings",
+        "energyMonitoring": {
+          "title": "Energy Monitoring",
+          "description": "This feature can be used for energy monitoring. Click the button below to automatically create the consumption and cost tracking features.",
+          "createButton": "Create energy monitoring features"
+        }
       },
       "setup": {
         "title": "MQTT configuration",
@@ -1831,13 +1836,7 @@
       "circularReference": "circular reference",
       "selfReference": "self reference",
       "fixAutomatically": "Fix",
-      "fixing": "Fixing...",
-      "featureHint": {
-        "title": "Energy monitoring",
-        "hierarchy": "Place it in the 'Energy monitoring' hierarchy (My devices tab) to link cost features.",
-        "recalc": "Then rerun consumption/cost from the Settings tab.",
-        "goToIntegration": "Open Energy monitoring"
-      }
+      "fixing": "Fixing..."
     },
     "caldav": {
       "title": "CalDAV",
