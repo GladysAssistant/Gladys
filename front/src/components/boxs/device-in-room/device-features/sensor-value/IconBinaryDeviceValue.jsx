@@ -23,7 +23,7 @@ const IconBinaryDeviceValue = ({ deviceFeature }) => {
   const icon = get(ICON_MAP, `${category}.${lastValue}`);
 
   if (icon) {
-    return <i class={`fe fe-${icon}`} />;
+    return <i class={`icon-${icon}`} />;
   }
 
   return null;

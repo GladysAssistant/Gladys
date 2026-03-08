@@ -77,7 +77,7 @@ class SceneTagFilter extends Component {
         >
           <div>
             <li class="dropdown-item" onClick={this.unselectTags}>
-              <i class={cx('fe', 'fe-x-square', styles.iconUnselectAll)} />
+              <i class={cx('icon-square-x', styles.iconUnselectAll)} />
               <span class="custom-control">
                 <Text id="scene.unselectTags" />
               </span>

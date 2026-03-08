@@ -13,7 +13,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'sliders' })}`} />
+        <i class={`icon-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'sliders' })}`} />
       </td>
       <td>{props.rowName}</td>
 

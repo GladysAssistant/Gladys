@@ -209,7 +209,7 @@ class MatterDeviceBox extends Component {
                 {device.params && device.params.length > 0 && (
                   <div class="form-group">
                     <button onClick={this.toggleParams} class="btn btn-sm btn-outline-secondary mb-2" type="button">
-                      <i class={`fe fe-chevron-${showParams ? 'up' : 'down'} mr-2`} />
+                      <i class={`icon-chevron-${showParams ? 'up' : 'down'} mr-2`} />
                       <Text id="integration.matter.displayDeviceInfo" default="Display device informations" />
                     </button>
                     {showParams && (

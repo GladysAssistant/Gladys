@@ -59,7 +59,7 @@ class SceneCard extends Component {
               [style.disabledSceneRow]: !props.scene.active
             })}
           >
-            <i class={`fe fe-${props.scene.icon}`} />
+            <i class={`icon-${props.scene.icon}`} />
           </a>
           <a
             href={this.getSceneUrl()}
@@ -107,7 +107,7 @@ class SceneCard extends Component {
             <div class="card h-100 d-flex flex-column justify-content-between">
               <div class="card-body p-3 text-center h-100 d-flex flex-column">
                 <div class={style.scene_icon}>
-                  <i class={`fe fe-${props.scene.icon}`} />
+                  <i class={`icon-${props.scene.icon}`} />
                 </div>
                 <div class={style.disableSceneButton}>
                   <label class="custom-switch m-0">

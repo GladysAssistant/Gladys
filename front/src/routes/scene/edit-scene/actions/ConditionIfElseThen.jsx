@@ -128,7 +128,7 @@ class ConditionIfElseThen extends Component {
             onClick={this.toggleThenCollapse}
           >
             <h4>
-              <i class={`fe fe-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
+              <i class={`icon-chevron-${thenCollapsed ? 'right' : 'down'} mr-2`} />
               <Text id="editScene.actionsCard.conditionIfThenElse.then">Then...</Text>
               {thenCollapsed && (
                 <span class="badge badge-pill badge-secondary ml-2">
@@ -177,7 +177,7 @@ class ConditionIfElseThen extends Component {
             onClick={this.toggleElseCollapse}
           >
             <h4>
-              <i class={`fe fe-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
+              <i class={`icon-chevron-${elseCollapsed ? 'right' : 'down'} mr-2`} />
               <Text id="editScene.actionsCard.conditionIfThenElse.else">Else...</Text>
               {elseCollapsed && (
                 <span class="badge badge-pill badge-secondary ml-2">

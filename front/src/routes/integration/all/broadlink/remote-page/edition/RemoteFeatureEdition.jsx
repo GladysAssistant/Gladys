@@ -60,7 +60,7 @@ class RemoteFeatureEdition extends Component {
           <div class="col">
             <div class="input-icon">
               <span class="input-icon-addon">
-                <i class={`fe fe-${DeviceFeatureCategoriesIcon[category][type]}`} />
+                <i class={`icon-${DeviceFeatureCategoriesIcon[category][type]}`} />
               </span>
               <Localizer>
                 <input

@@ -19,7 +19,7 @@ class SceneRow extends Component {
     return (
       <tr>
         <td>
-          <i className={`fe fe-${props.icon}`} />
+          <i className={`icon-${props.icon}`} />
         </td>
         <td>{props.name}</td>
         <td className="text-right">

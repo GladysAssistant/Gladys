@@ -112,7 +112,7 @@ class MELCloudDeviceBox extends Component {
           <div class="card-header">
             <Localizer>
               <div title={<Text id={`integration.melcloud.status.${online ? 'online' : 'offline'}`} />}>
-                <i class={`fe fe-radio text-${online ? 'success' : 'danger'}`} />
+                <i class={`icon-radio text-${online ? 'success' : 'danger'}`} />
                 &nbsp;{device.name}
               </div>
             </Localizer>

@@ -22,9 +22,9 @@ const DeviceDisplay = ({
     <div class={cx('mb-4', { 'ms-4': level > 0 })}>
       <div class="d-flex align-items-center cursor-pointer mb-3" onClick={() => toggleDevice(devicePath)}>
         <i
-          class={cx('fe me-2', {
-            'fe-chevron-right': isCollapsed,
-            'fe-chevron-down': !isCollapsed
+          class={cx('me-2', {
+            'icon-chevron-right': isCollapsed,
+            'icon-chevron-down': !isCollapsed
           })}
         />
         <h6 class="mb-0">

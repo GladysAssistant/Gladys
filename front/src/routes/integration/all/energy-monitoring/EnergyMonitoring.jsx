@@ -928,7 +928,7 @@ class EnergyMonitoringPage extends Component {
               onClick={() => this.toggleContractGroupExpanded(groupName)}
             >
               <div class="d-flex align-items-center">
-                <i class={cx('fe mr-2', isExpanded ? 'fe-chevron-down' : 'fe-chevron-right')} />
+                <i class={cx('mr-2', isExpanded ? 'icon-chevron-down' : 'icon-chevron-right')} />
                 <strong>{groupName}</strong>
                 <span class="badge badge-secondary ml-2">{prices.length}</span>
               </div>

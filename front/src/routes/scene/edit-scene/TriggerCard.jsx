@@ -16,24 +16,24 @@ import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
 
 const TRIGGER_ICON = {
-  [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
-  [EVENTS.TIME.CHANGED]: 'fe-watch',
-  [EVENTS.TIME.SUNSET]: 'fe-sunset',
-  [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
-  [EVENTS.USER_PRESENCE.BACK_HOME]: 'fe-home',
-  [EVENTS.USER_PRESENCE.LEFT_HOME]: 'fe-home',
-  [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'fe-home',
-  [EVENTS.AREA.USER_ENTERED]: 'fe-compass',
-  [EVENTS.AREA.USER_LEFT]: 'fe-compass',
-  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'fe-calendar',
-  [EVENTS.ALARM.ARM]: 'fe-bell',
-  [EVENTS.ALARM.ARMING]: 'fe-clock',
-  [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
-  [EVENTS.ALARM.DISARM]: 'fe-bell-off',
-  [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
-  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
-  [EVENTS.SYSTEM.START]: 'fe-activity',
-  [EVENTS.MQTT.RECEIVED]: 'fe-hash'
+  [EVENTS.DEVICE.NEW_STATE]: 'icon-activity',
+  [EVENTS.TIME.CHANGED]: 'icon-watch',
+  [EVENTS.TIME.SUNSET]: 'icon-sunset',
+  [EVENTS.TIME.SUNRISE]: 'icon-sunrise',
+  [EVENTS.USER_PRESENCE.BACK_HOME]: 'icon-home',
+  [EVENTS.USER_PRESENCE.LEFT_HOME]: 'icon-home',
+  [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'icon-home',
+  [EVENTS.AREA.USER_ENTERED]: 'icon-compass',
+  [EVENTS.AREA.USER_LEFT]: 'icon-compass',
+  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'icon-calendar',
+  [EVENTS.ALARM.ARM]: 'icon-bell',
+  [EVENTS.ALARM.ARMING]: 'icon-clock',
+  [EVENTS.ALARM.PARTIAL_ARM]: 'icon-bell',
+  [EVENTS.ALARM.DISARM]: 'icon-bell-off',
+  [EVENTS.ALARM.PANIC]: 'icon-triangle-alert',
+  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'icon-triangle-alert',
+  [EVENTS.SYSTEM.START]: 'icon-activity',
+  [EVENTS.MQTT.RECEIVED]: 'icon-hash'
 };
 
 const ALARM_TRIGGERS = [
@@ -52,7 +52,7 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {TRIGGER_ICON[props.trigger.type] && <i class={`fe ${TRIGGER_ICON[props.trigger.type]}`} />}
+      {TRIGGER_ICON[props.trigger.type] && <i class={TRIGGER_ICON[props.trigger.type]} />}
       {props.trigger.type === null && <i class="icon-circle-plus" />}
       <div class="card-title">
         <i class={cx('mr-3', props.trigger.icon)} />
