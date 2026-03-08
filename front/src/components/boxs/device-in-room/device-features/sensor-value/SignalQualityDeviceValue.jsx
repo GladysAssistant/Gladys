@@ -17,7 +17,8 @@ const SignalQualityDeviceValue = ({ deviceFeature }) => {
     return <Text id="dashboard.boxes.devicesInRoom.noValue" />;
   }
 
-  const ratio = Math.round(((lastValue - min) * 5) / (max - min));
+  const range = max - min;
+  const ratio = range > 0 ? Math.round(((lastValue - min) * 5) / range) : 0;
   const iconName = SIGNAL_QUALITY_ICONS[ratio] || SIGNAL_QUALITY_ICONS.off;
 
   return (
