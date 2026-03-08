@@ -40,9 +40,6 @@ function createActions(store) {
           options.search = state.zigbee2mqttSearch;
         }
 
-        // const zigbee2mqttsReceived = await state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options);
-
-        // Appels parallèles : devices DB + discovered devices MQTT
         const [zigbee2mqttsReceived, discoveredDevices] = await Promise.all([
           state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options),
           state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false })
@@ -60,8 +57,8 @@ function createActions(store) {
           }
 
           const discovered = discoveredMap[device.external_id];
-          if (discovered && discovered.ieeeAddress) {
-            device.ieeeAddress = discovered.ieeeAddress;
+          if (discovered && discovered.ieee_address) {
+            device.ieee_address = discovered.ieee_address;
           }
         });
 

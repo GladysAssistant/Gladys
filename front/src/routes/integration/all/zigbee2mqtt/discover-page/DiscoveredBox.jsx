@@ -45,7 +45,7 @@ class DiscoveredBox extends Component {
   };
 
   render({ device = {}, deviceIndex, houses = [], z2mUrl }, { loading, saveError }) {
-    const { features = [], ieeeAddress = null } = device;
+    const { features = [], ieee_address = null } = device;
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const supportedDevice = features.findIndex(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
@@ -131,15 +131,15 @@ class DiscoveredBox extends Component {
                       </Localizer>
                     </div>
 
-                    {ieeeAddress && (
+                    {ieee_address && (
                       <div class="form-group">
                         <label class="form-label">
                           <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
                         </label>
-                        <input type="text" class="form-control" value={ieeeAddress} disabled />
+                        <input type="text" class="form-control" value={ieee_address} disabled />
                         {z2mUrl && (
                           <a
-                            href={`${z2mUrl}/#/device/0/${ieeeAddress}`}
+                            href={`${z2mUrl}/#/device/0/${ieee_address}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             class={`${style.z2mDeviceLink} mt-2 text-muted`}
