@@ -14,7 +14,7 @@ const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, s
 
     <div class="input-icon ml-2">
       <span class="input-icon-addon">
-        <i class="fe fe-search" />
+        <i class="icon-search" />
       </span>
       <input type="text" class="form-control" placeholder={searchPlaceHolder} onInput={search} value={searchValue} />
     </div>

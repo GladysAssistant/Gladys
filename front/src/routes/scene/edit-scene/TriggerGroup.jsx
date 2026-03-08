@@ -16,7 +16,7 @@ const TriggerGroup = ({ children, ...props }) => (
             <span class="d-none d-sm-inline-block">
               <Text id="editScene.addNewTriggerButton" />
             </span>{' '}
-            <i class="fe fe-plus" />
+            <i class="icon-plus" />
           </button>
         </div>
       </div>

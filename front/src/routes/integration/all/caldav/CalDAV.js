@@ -20,7 +20,7 @@ const CalDAV = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="icon-radio" />
                     </span>
                     <Text id="integration.caldav.accountTab" />
                   </Link>
@@ -31,7 +31,7 @@ const CalDAV = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-refresh-cw" />
+                      <i class="icon-refresh-cw" />
                     </span>
                     <Text id="integration.caldav.syncTab" />
                   </Link>
@@ -42,7 +42,7 @@ const CalDAV = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-share" />
+                      <i class="icon-share" />
                     </span>
                     <Text id="integration.caldav.shareTab" />
                   </Link>
@@ -54,7 +54,7 @@ const CalDAV = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.caldav.documentation" />
                   </DeviceConfigurationLink>

@@ -16,22 +16,22 @@ const RoomHumidityBox = ({ children, ...props }) => (
         props.humidity >= props.humidityMin &&
         props.humidity <= props.humidityMax && (
           <span class="stamp stamp-md bg-green mr-3">
-            <i class="fe fe-droplet" />
+            <i class="icon-droplet" />
           </span>
         )}
       {isNotNullOrUndefined(props.humidity) && props.humidity < props.humidityMin && (
         <span class="stamp stamp-md bg-yellow mr-3">
-          <i class="fe fe-droplet" />
+          <i class="icon-droplet" />
         </span>
       )}
       {isNotNullOrUndefined(props.humidity) && props.humidity > props.humidityMax && (
         <span class="stamp stamp-md bg-blue mr-3">
-          <i class="fe fe-droplet" />
+          <i class="icon-droplet" />
         </span>
       )}
       {!isNotNullOrUndefined(props.humidity) && (
         <span class="stamp stamp-md bg-warning mr-3">
-          <i class="fe fe-droplet" />
+          <i class="icon-droplet" />
         </span>
       )}
       <div>

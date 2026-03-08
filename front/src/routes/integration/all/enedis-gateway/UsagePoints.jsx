@@ -169,7 +169,7 @@ const EnedisUsagePoints = ({
       <div class="page-options d-flex">
         {usagePointsDevices && usagePointsDevices.length > 0 && (
           <button class="btn btn-primary" onClick={sync}>
-            <i class="fe fe-refresh-cw" />{' '}
+            <i class="icon-refresh-cw" />{' '}
             <span class="d-none d-sm-inline-block ml-2">
               <Text id="integration.enedis.usagePoints.refreshLocal" />
             </span>

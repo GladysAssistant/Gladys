@@ -36,10 +36,10 @@ class BinaryDeviceState extends Component {
         <div class="col-12 col-md-1">
           <div class="text-center">
             <i
-              class="fe fe-arrow-down d-block d-xs-none d-sm-none"
+              class="icon-arrow-down d-block d-xs-none d-sm-none"
               style={{ fontSize: '20px', marginBottom: '15px' }}
             />
-            <i class="fe fe-arrow-right d-none d-xs-block d-sm-block" style={{ fontSize: '20px', marginTop: '10px' }} />
+            <i class="icon-arrow-right d-none d-xs-block d-sm-block" style={{ fontSize: '20px', marginTop: '10px' }} />
           </div>
         </div>
         <div class="col-12 col-md-5">

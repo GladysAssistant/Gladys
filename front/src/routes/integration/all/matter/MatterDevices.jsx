@@ -349,7 +349,7 @@ class MatterDevices extends Component {
                 />
               </Localizer>
               <button onClick={this.init} class="btn btn-sm btn-outline-primary ml-2">
-                <i class="fe fe-refresh-cw" />
+                <i class="icon-refresh-cw" />
               </button>
             </div>
           </div>
@@ -396,7 +396,7 @@ class MatterDevices extends Component {
                                   <div class="tag tag-danger">
                                     <Text id="integration.matter.device.nodeDisconnected" />
                                     <span class="tag-addon">
-                                      <i class="fe fe-wifi-off" />
+                                      <i class="icon-wifi-off" />
                                     </span>
                                   </div>
                                 </div>

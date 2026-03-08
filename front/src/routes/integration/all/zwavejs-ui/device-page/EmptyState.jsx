@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.zwavejs-ui.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/zwavejs-ui/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.zwavejs-ui.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.zwavejs-ui.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

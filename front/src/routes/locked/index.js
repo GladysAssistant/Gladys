@@ -30,7 +30,7 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
       </Localizer>
       <div class="input-group-append">
         <button class={cx('btn btn-outline-secondary', style.lockedDeleteButton)} onClick={clearPreviousLetter}>
-          <i class="fe fe-delete" />
+          <i class="icon-delete" />
         </button>
       </div>
     </div>

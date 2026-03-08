@@ -85,7 +85,7 @@ class DiscoverTab extends Component {
             <button onClick={this.refreshDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
               {!discoveredDevices && <Text id="integration.netatmo.discover.scan" />}
               {discoveredDevices && <Text id="integration.netatmo.discover.refresh" />}
-              <i class="fe fe-radio" />
+              <i class="icon-radio" />
             </button>
           </div>
         </div>

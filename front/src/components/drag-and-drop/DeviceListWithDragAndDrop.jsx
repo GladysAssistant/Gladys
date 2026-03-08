@@ -53,7 +53,7 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
         ref={ref}
       >
         <div class="input-group-prepend" ref={drag}>
-          <span class="input-group-text fe fe-list" />
+          <span class="input-group-text icon-list" />
         </div>
         <input
           type="text"
@@ -68,7 +68,7 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
         />
         <div class={cx('input-group-append', style.deviceListRemoveButton)}>
           <button class="btn btn-outline-danger" type="button" onClick={removeThisDevice}>
-            <span class=" fe fe-x" />
+            <span class="icon-x" />
           </button>
         </div>
       </div>

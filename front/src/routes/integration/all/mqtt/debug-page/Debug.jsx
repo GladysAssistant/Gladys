@@ -68,7 +68,7 @@ class MqttNodePage extends Component {
                 <span class="mr-2">
                   <Text id="integration.mqtt.debug.activateDebugMode" />
                 </span>
-                <i class="fe fe-refresh-cw" />
+                <i class="icon-refresh-cw" />
               </button>
             </div>
           </div>

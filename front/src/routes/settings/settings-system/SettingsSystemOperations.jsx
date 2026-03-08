@@ -22,7 +22,7 @@ const SettingsSystemOperations = ({
           </h4>
           {systemInfos && systemInfos.new_release_available === false && (
             <button class={`btn btn-link ${style.textDecorationNone}`} onClick={checkForUpdates}>
-              <i class="fe fe-refresh-cw" />
+              <i class="icon-refresh-cw" />
             </button>
           )}
         </div>

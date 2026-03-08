@@ -103,7 +103,7 @@ const EditBoxColumns = ({ children, ...props }) => (
           })}
           onClick={props.toggleMobileReorder}
         >
-          <i class="fe fe-list mr-2" />
+          <i class="icon-list mr-2" />
           {!props.isMobileReordering && <Text id="dashboard.reorderDashboardButton" />}
           {props.isMobileReordering && <Text id="dashboard.stopReorderingDashboardButton" />}
         </button>
@@ -129,7 +129,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                       class={cx('btn p-0 ml-2', style.btnLinkDelete)}
                       onClick={() => props.deleteCurrentColumn(x)}
                     >
-                      <i class="fe fe-trash" />
+                      <i class="icon-trash" />
                     </button>
                   )}
                 </h3>
@@ -151,7 +151,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                               class={cx('btn btn-sm btn-outline-secondary px-4 py-0', style.btnAddNewBoxAtPosition)}
                               onClick={() => props.addBoxAtPosition(x, y)}
                             >
-                              <i class="fe fe-plus" />
+                              <i class="icon-plus" />
                             </button>
                           </div>
                         )}
@@ -172,7 +172,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                 {column.length === 0 && (
                   <div class="d-flex justify-content-center mb-4">
                     <button class="btn btn-primary" onClick={() => props.addBox(x)}>
-                      <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
+                      <Text id="dashboard.addBoxButton" /> <i class="icon-plus" />
                     </button>
                   </div>
                 )}
@@ -188,7 +188,7 @@ const EditBoxColumns = ({ children, ...props }) => (
                 onClick={() => props.addColumn(getBoxesLength(props))}
                 data-title={<Text id="dashboard.editDashboardAddColumnButton" />}
               >
-                <i class="fe fe-plus" />
+                <i class="icon-plus" />
                 <div class={cx('d-none', style.displayTextMobile)}>
                   <Text id="dashboard.editDashboardAddColumnButton" />
                 </div>

@@ -52,7 +52,7 @@ const DashboardListItem = ({ children, ...props }) => {
         backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     >
-      <i ref={drag} style={{ cursor: 'move' }} class="fe fe-list mr-2" /> {wrapEmojisJSX(props.name)}
+      <i ref={drag} style={{ cursor: 'move' }} class="icon-list mr-2" /> {wrapEmojisJSX(props.name)}
     </li>
   );
 };

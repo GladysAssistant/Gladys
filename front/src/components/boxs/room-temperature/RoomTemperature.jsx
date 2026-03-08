@@ -21,22 +21,22 @@ const RoomTemperatureBox = ({ children, ...props }) => (
         props.temperature >= props.temperatureMin &&
         props.temperature <= props.temperatureMax && (
           <span class="stamp stamp-md bg-green mr-3">
-            <i class="fe fe-thermometer" />
+            <i class="icon-thermometer" />
           </span>
         )}
       {isNotNullOrUndefined(props.temperature) && props.temperature < props.temperatureMin && (
         <span class="stamp stamp-md bg-blue mr-3">
-          <i class="fe fe-thermometer" />
+          <i class="icon-thermometer" />
         </span>
       )}
       {isNotNullOrUndefined(props.temperature) && props.temperature > props.temperatureMax && (
         <span class="stamp stamp-md bg-red mr-3">
-          <i class="fe fe-thermometer" />
+          <i class="icon-thermometer" />
         </span>
       )}
       {!isNotNullOrUndefined(props.temperature) && (
         <span class="stamp stamp-md bg-warning mr-3">
-          <i class="fe fe-thermometer" />
+          <i class="icon-thermometer" />
         </span>
       )}
 

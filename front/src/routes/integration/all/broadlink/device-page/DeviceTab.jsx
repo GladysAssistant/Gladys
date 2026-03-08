@@ -34,7 +34,7 @@ const DeviceTab = ({
         </Localizer>
         <Link href="/dashboard/integration/device/broadlink/edit">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.broadlink.device.newButton" /> <i class="fe fe-plus" />
+            <Text id="integration.broadlink.device.newButton" /> <i class="icon-plus" />
           </button>
         </Link>
       </div>

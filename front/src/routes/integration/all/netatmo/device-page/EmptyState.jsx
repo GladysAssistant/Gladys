@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.netatmo.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/netatmo/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.netatmo.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.netatmo.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

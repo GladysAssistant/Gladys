@@ -11,13 +11,13 @@ const EmptyState = () => (
       <div class="mt-5">
         <Link href="/dashboard/integration/device/nuki/mqtt">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.nuki.mqttDiscoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.nuki.mqttDiscoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
 
         <Link href="/dashboard/integration/device/nuki/http">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.nuki.httpDiscoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.nuki.httpDiscoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

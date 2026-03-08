@@ -43,10 +43,10 @@ const EditScenePage = ({ children, ...props }) => (
                     </div>
                     <div>
                       <button onClick={props.deleteScene} className="btn btn-outline-danger ml-2 mb-2">
-                        <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
+                        <Text id="editScene.deleteButton" /> <i class="icon-trash" />
                       </button>
                       <button onClick={props.cancelDeleteCurrentScene} className="btn btn-outline-secondary ml-2 mb-2">
-                        <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
+                        <Text id="editScene.cancelButton" /> <i class="icon-slash" />
                       </button>
                     </div>
                   </div>
@@ -58,7 +58,7 @@ const EditScenePage = ({ children, ...props }) => (
                       <span class="d-none d-md-inline-block">
                         <Text id="editScene.duplicateButton" />
                       </span>{' '}
-                      <i class="fe fe-copy" />
+                      <i class="icon-copy" />
                     </button>
                     <button
                       onClick={props.askDeleteCurrentScene}
@@ -67,7 +67,7 @@ const EditScenePage = ({ children, ...props }) => (
                       <span class="d-none d-md-inline-block">
                         <Text id="editScene.deleteButton" />
                       </span>{' '}
-                      <i class="fe fe-trash" />
+                      <i class="icon-trash" />
                     </button>
                   </div>
                 )}
@@ -83,10 +83,10 @@ const EditScenePage = ({ children, ...props }) => (
                     </div>
                     <div>
                       <button onClick={props.deleteScene} className="btn btn-outline-danger mx-1 mb-2">
-                        <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
+                        <Text id="editScene.deleteButton" /> <i class="icon-trash" />
                       </button>
                       <button onClick={props.cancelDeleteCurrentScene} className="btn btn-outline-secondary mx-1 mb-2">
-                        <Text id="editScene.cancelButton" /> <i class="fe fe-slash" />
+                        <Text id="editScene.cancelButton" /> <i class="icon-slash" />
                       </button>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ const EditScenePage = ({ children, ...props }) => (
             <div class={cx('row mb-4', style.arrowDown)}>
               <div class="col-lg-12">
                 <div class="text-center">
-                  <i class="fe fe-arrow-down" />
+                  <i class="icon-arrow-down" />
                 </div>
               </div>
             </div>
@@ -176,7 +176,7 @@ const EditScenePage = ({ children, ...props }) => (
                         class="btn btn-sm btn-outline-secondary"
                         disabled={props.saving}
                       >
-                        <i class="fe fe-plus-circle" />{' '}
+                        <i class="icon-circle-plus" />{' '}
                         <Text id="editScene.addActionGroupButton">Add action group</Text>
                       </button>
                     </div>
@@ -188,7 +188,7 @@ const EditScenePage = ({ children, ...props }) => (
                 <div class={cx('row mb-4', style.arrowDown)}>
                   <div class="col-lg-12">
                     <div class="text-center">
-                      <i class="fe fe-arrow-down" />
+                      <i class="icon-arrow-down" />
                     </div>
                   </div>
                 </div>

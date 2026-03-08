@@ -410,7 +410,7 @@ class EnergyConsumption extends Component {
             <div class="col-12">
               <div class="d-flex align-items-center">
                 <button type="button" class="btn btn-outline-secondary" onClick={this.navigatePrevious}>
-                  <i class="fe fe-chevron-left" />
+                  <i class="icon-chevron-left" />
                 </button>
 
                 <div class="flex-fill mx-3">
@@ -427,7 +427,7 @@ class EnergyConsumption extends Component {
                 </div>
 
                 <button type="button" class="btn btn-outline-secondary" onClick={this.navigateNext}>
-                  <i class="fe fe-chevron-right" />
+                  <i class="icon-chevron-right" />
                 </button>
               </div>
             </div>

@@ -32,7 +32,7 @@ const LANManagerDiscoverTab = ({
               <span class="d-none d-md-inline mr-2">
                 <Text id="integration.lanManager.discover.deviceUpdateButton" />
               </span>
-              <i class="fe fe-refresh-cw" />
+              <i class="icon-refresh-cw" />
             </button>
           )}
           <button
@@ -45,7 +45,7 @@ const LANManagerDiscoverTab = ({
             <span class="d-none d-md-inline mr-2">
               <Text id="integration.lanManager.discover.scanButton" />
             </span>
-            <i class="fe fe-radio" />
+            <i class="icon-radio" />
           </button>
         </div>
       </div>

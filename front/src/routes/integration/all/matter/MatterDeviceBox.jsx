@@ -122,7 +122,7 @@ class MatterDeviceBox extends Component {
                 <div class="tag tag-danger">
                   <Text id="integration.matter.device.nodeDisconnected" />
                   <span class="tag-addon">
-                    <i class="fe fe-wifi-off" />
+                    <i class="icon-wifi-off" />
                   </span>
                 </div>
               </div>

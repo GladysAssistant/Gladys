@@ -89,19 +89,19 @@ class Header extends Component {
                     })}
                   >
                     <a class="dropdown-item" href="/dashboard/profile">
-                      <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
+                      <i class="dropdown-icon icon-user" /> <Text id="header.profile" />
                     </a>
                     {props.user.role === USER_ROLE.ADMIN && (
                       <a class="dropdown-item" href="/dashboard/settings/house">
-                        <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
+                        <i class="dropdown-icon icon-settings" /> <Text id="header.settings" />
                       </a>
                     )}
                     <div class="dropdown-divider" />
                     <a class="dropdown-item" href={forumUrl} target="_blank" rel="noopener noreferrer">
-                      <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
+                      <i class="dropdown-icon icon-circle-help" /> <Text id="header.needHelp" />
                     </a>
                     <a class="dropdown-item" href="" onClick={props.logout}>
-                      <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
+                      <i class="dropdown-icon icon-log-out" /> <Text id="header.signOut" />
                     </a>
                   </div>
                 </div>
@@ -132,7 +132,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard'
                       })}
                     >
-                      <i class="fe fe-home" /> <Text id="header.home" />
+                      <i class="icon-home" /> <Text id="header.home" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -142,7 +142,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard/chat'
                       })}
                     >
-                      <i class="fe fe-message-square" /> <Text id="header.chat" />
+                      <i class="icon-message-square" /> <Text id="header.chat" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -150,7 +150,7 @@ class Header extends Component {
                       href="/dashboard/integration"
                       class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                     >
-                      <i class="fe fe-grid" /> <Text id="header.integrations" />
+                      <i class="icon-grid" /> <Text id="header.integrations" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -160,7 +160,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard/calendar'
                       })}
                     >
-                      <i class="fe fe-calendar" /> <Text id="header.calendar" />
+                      <i class="icon-calendar" /> <Text id="header.calendar" />
                     </Link>
                   </li>
                   <li class="nav-item">
@@ -171,7 +171,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard/maps'
                       })}
                     >
-                      <i class="fe fe-map" /> <Text id="header.maps" />
+                      <i class="icon-map" /> <Text id="header.maps" />
                     </Link>
                   </li>
                   {props.user.role === USER_ROLE.ADMIN && (
@@ -180,7 +180,7 @@ class Header extends Component {
                         href="/dashboard/scene"
                         class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
                       >
-                        <i class="fe fe-play" /> <Text id="header.scenes" />
+                        <i class="icon-play" /> <Text id="header.scenes" />
                       </Link>
                     </li>
                   )}

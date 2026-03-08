@@ -136,7 +136,7 @@ class AlarmComponent extends Component {
                           })}
                         >
                           <div class="pb-2">
-                            <i class={cx('fe fe-bell', style.alarmActionIcon)} />
+                            <i class={cx('icon-bell', style.alarmActionIcon)} />
                           </div>
                           <div>
                             <Text id="dashboard.boxes.alarm.armButton" />
@@ -153,7 +153,7 @@ class AlarmComponent extends Component {
                           })}
                         >
                           <div class="pb-2">
-                            <i class={cx('fe fe-home', style.alarmActionIcon)} />
+                            <i class={cx('icon-home', style.alarmActionIcon)} />
                           </div>
                           <div>
                             <Text id="dashboard.boxes.alarm.disarmButton" />
@@ -172,7 +172,7 @@ class AlarmComponent extends Component {
                           })}
                         >
                           <div class="pb-2">
-                            <i class={cx('fe fe-shield', style.alarmActionIcon)} />
+                            <i class={cx('icon-shield', style.alarmActionIcon)} />
                           </div>
                           <div>
                             <Text id="dashboard.boxes.alarm.partiallyArmedButton" />
@@ -191,7 +191,7 @@ class AlarmComponent extends Component {
                           })}
                         >
                           <div class="pb-2">
-                            <i class={cx('fe fe-alert-circle', style.alarmActionIcon)} />
+                            <i class={cx('icon-circle-alert', style.alarmActionIcon)} />
                           </div>
                           <div>
                             <Text id="dashboard.boxes.alarm.panicButton" />

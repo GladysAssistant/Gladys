@@ -10,7 +10,7 @@ const IntegrationMenu = ({ integrationCategories }) => {
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="fe fe-hash" />
+          <i class="icon-hash" />
         </span>
         <Text id="integration.root.menu.all" />
       </Link>
@@ -20,7 +20,7 @@ const IntegrationMenu = ({ integrationCategories }) => {
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="fe fe-star" />
+          <i class="icon-star" />
         </span>
         <Text id="integration.root.menu.favorites" />
       </Link>

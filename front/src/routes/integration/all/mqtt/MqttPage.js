@@ -20,7 +20,7 @@ const MqttPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="icon-radio" />
                     </span>
                     <Text id="integration.mqtt.deviceTab" />
                   </Link>
@@ -31,7 +31,7 @@ const MqttPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-code" />
+                      <i class="icon-code" />
                     </span>
                     <Text id="integration.mqtt.debugTab" />
                   </Link>
@@ -42,7 +42,7 @@ const MqttPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="icon-sliders-horizontal" />
                     </span>
                     <Text id="integration.mqtt.setupTab" />
                   </Link>
@@ -54,7 +54,7 @@ const MqttPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.mqtt.documentation" />
                   </DeviceConfigurationLink>
@@ -66,7 +66,7 @@ const MqttPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.mqtt.apiDocumentation" />
                   </DeviceConfigurationLink>

@@ -1,0 +1,535 @@
+import { Component } from 'preact';
+import { connect } from 'unistore/preact';
+import cx from 'classnames';
+import { Text } from 'preact-i18n';
+import DatePicker from 'react-datepicker';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
+import ApexChartComponent, { DEFAULT_COLORS } from '../chart/ApexChartComponent';
+import { formatHttpError } from '../../../utils/formatErrors';
+import dayjs from 'dayjs';
+
+import fr from 'date-fns/locale/fr';
+
+import 'react-datepicker/dist/react-datepicker.css';
+
+const PERIODS = {
+  YEAR: 'year',
+  MONTH: 'month',
+  DAY: 'day'
+};
+
+const DISPLAY_MODES = {
+  CURRENCY: 'currency',
+  KWH: 'kwh'
+};
+
+const PERIOD_LABELS = {
+  [PERIODS.YEAR]: 'dashboard.boxes.energyConsumption.year',
+  [PERIODS.MONTH]: 'dashboard.boxes.energyConsumption.month',
+  [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day'
+};
+
+const SUBSCRIPTION_COLOR = '#b8c2cc';
+
+class EnergyConsumption extends Component {
+  constructor(props) {
+    super(props);
+
+    const now = new Date();
+    this.state = {
+      loading: true,
+      error: null,
+      errorDetail: null,
+      series: [],
+      seriesColors: [],
+      emptySeries: true,
+      selectedPeriod: PERIODS.MONTH,
+      selectedDate: now,
+      displayMode: DISPLAY_MODES.CURRENCY,
+      currencyUnit: null
+    };
+  }
+
+  componentDidMount() {
+    this.refreshData();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.box.device_features !== this.props.box.device_features ||
+      prevProps.box.title !== this.props.box.title
+    ) {
+      this.refreshData();
+    }
+  }
+
+  refreshData = async () => {
+    if (!this.props.box.device_features || this.props.box.device_features.length === 0) {
+      await this.setState({
+        emptySeries: true,
+        loading: false
+      });
+      return;
+    }
+
+    await this.setState({ loading: true, error: null, errorDetail: null });
+
+    try {
+      const { startDate, endDate } = this.getDateRange();
+      const deviceFeatures = this.props.box.device_features;
+
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/energy_consumption`, {
+        device_features: deviceFeatures.join(','),
+        from: startDate.toISOString(),
+        to: endDate.toISOString(),
+        group_by: this.getGroupBy(),
+        display_mode: this.state.displayMode
+      });
+
+      let emptySeries = true;
+      let totalConsumption = 0;
+      const series = [];
+
+      // Collect all unique timestamps across all device features
+      const allTimestamps = new Set();
+      data.forEach(deviceData => {
+        deviceData.values.forEach(value => {
+          allTimestamps.add(new Date(value.created_at).getTime());
+        });
+      });
+
+      // Sort timestamps
+      const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
+
+      // Get the currency unit from the first device feature that has one
+      let currencyUnit = null;
+      data.forEach(deviceData => {
+        if (deviceData.deviceFeature.currency_unit && !currencyUnit) {
+          currencyUnit = deviceData.deviceFeature.currency_unit;
+        }
+      });
+
+      // Process data for stacked bar chart
+      // Each device feature becomes a separate series with aligned timestamps
+      // Track colors for each series (gray for subscription, widget colors for consumption)
+      const seriesColors = [];
+      let colorIndex = 0;
+      // Use widget configured colors if available, otherwise fall back to default colors
+      const widgetColors = this.props.box.colors || DEFAULT_COLORS;
+
+      data.forEach(deviceData => {
+        const isSubscription = deviceData.deviceFeature.is_subscription === true;
+
+        // Skip subscription data if show_subscription_prices is not enabled
+        if (isSubscription && !this.props.box.show_subscription_prices) {
+          return;
+        }
+
+        const deviceFeatureName = deviceData.deviceFeature.name
+          ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
+          : deviceData.device.name;
+
+        // Create a map of timestamp -> value for this device feature
+        const valueMap = new Map();
+        deviceData.values.forEach(value => {
+          emptySeries = false;
+          totalConsumption += parseFloat(value.sum_value);
+          const timestamp = new Date(value.created_at).getTime();
+          valueMap.set(timestamp, parseFloat(value.sum_value.toFixed(4)));
+        });
+
+        // Create series data with all timestamps, filling missing values with 0
+        const seriesData = sortedTimestamps.map(timestamp => ({
+          x: timestamp,
+          y: valueMap.get(timestamp) || 0
+        }));
+
+        series.push({
+          name: deviceFeatureName,
+          data: seriesData
+        });
+
+        // Assign gray color for subscription, otherwise use widget configured colors
+        if (isSubscription) {
+          seriesColors.push(SUBSCRIPTION_COLOR);
+        } else {
+          seriesColors.push(widgetColors[colorIndex % widgetColors.length]);
+          colorIndex++;
+        }
+      });
+
+      await this.setState({
+        series,
+        seriesColors,
+        loading: false,
+        emptySeries,
+        totalConsumption,
+        currencyUnit
+      });
+    } catch (e) {
+      console.error('Error fetching energy consumption data:', e);
+      const error = formatHttpError(e);
+      await this.setState({
+        error: error.message,
+        errorDetail: error.detail,
+        loading: false
+      });
+    }
+  };
+
+  getDateRange = () => {
+    const { selectedPeriod, selectedDate } = this.state;
+    let startDate, endDate;
+
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        startDate = new Date(selectedDate.getFullYear(), 0, 1, 0, 0, 0, 0);
+        endDate = new Date(selectedDate.getFullYear() + 1, 0, 1, 0, 0, 0, 0);
+        break;
+      case PERIODS.MONTH:
+        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
+        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
+        break;
+      case PERIODS.DAY:
+        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0, 0);
+        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1, 0, 0, 0, 0);
+        break;
+      default:
+        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
+        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
+    }
+
+    return { startDate, endDate };
+  };
+
+  getInterval = () => {
+    const { selectedPeriod } = this.state;
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        return 'monthly';
+      case PERIODS.MONTH:
+        return 'daily';
+      case PERIODS.DAY:
+        return 'hourly';
+      default:
+        return 'daily';
+    }
+  };
+
+  getGroupBy = () => {
+    const { selectedPeriod } = this.state;
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        return 'month';
+      case PERIODS.MONTH:
+        return 'day';
+      case PERIODS.DAY:
+        return 'hour';
+      default:
+        return 'day';
+    }
+  };
+
+  changePeriod = period => {
+    this.setState({ selectedPeriod: period }, () => {
+      this.refreshData();
+    });
+  };
+
+  navigatePrevious = () => {
+    const { selectedPeriod, selectedDate } = this.state;
+    let newDate = new Date(selectedDate);
+
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        newDate.setFullYear(selectedDate.getFullYear() - 1);
+        break;
+      case PERIODS.MONTH:
+        newDate.setMonth(selectedDate.getMonth() - 1);
+        break;
+      case PERIODS.DAY:
+        newDate.setDate(selectedDate.getDate() - 1);
+        break;
+    }
+
+    this.setState({ selectedDate: newDate }, this.refreshData);
+  };
+
+  navigateNext = () => {
+    const { selectedPeriod, selectedDate } = this.state;
+    let newDate = new Date(selectedDate);
+
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        newDate.setFullYear(selectedDate.getFullYear() + 1);
+        break;
+      case PERIODS.MONTH:
+        newDate.setMonth(selectedDate.getMonth() + 1);
+        break;
+      case PERIODS.DAY:
+        newDate.setDate(selectedDate.getDate() + 1);
+        break;
+    }
+
+    this.setState({ selectedDate: newDate }, this.refreshData);
+  };
+
+  onDateChange = date => {
+    this.setState({ selectedDate: date }, this.refreshData);
+  };
+
+  changeDisplayMode = mode => {
+    this.setState({ displayMode: mode }, this.refreshData);
+  };
+
+  getCurrencySymbol = () => {
+    const { currencyUnit } = this.state;
+    if (currencyUnit === 'dollar') {
+      return '$';
+    }
+    return '€';
+  };
+
+  yAxisFormatter = value => {
+    if (Number.isNaN(value)) {
+      return value;
+    }
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
+    if (value === 0) {
+      return `0${unit}`;
+    }
+    return `${value.toFixed(2)}${unit}`;
+  };
+
+  tooltipYFormatter = value => {
+    if (Number.isNaN(value)) {
+      return value;
+    }
+    const { displayMode } = this.state;
+    const unit = displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : ' kWh';
+    return `${value.toFixed(2)}${unit}`;
+  };
+
+  tooltipXFormatter = value => {
+    const { selectedPeriod } = this.state;
+    // Format date based on period - show date only, not datetime
+    if (selectedPeriod === PERIODS.DAY) {
+      // For day view, show hour only
+      return dayjs(value)
+        .locale(this.props.user.language)
+        .format('HH:mm');
+    } else if (selectedPeriod === PERIODS.MONTH) {
+      // For month view, show day
+      return dayjs(value)
+        .locale(this.props.user.language)
+        .format('DD MMM YYYY');
+    } else {
+      // For year view, show month
+      return dayjs(value)
+        .locale(this.props.user.language)
+        .format('MMM YYYY');
+    }
+  };
+
+  getDatePickerView = () => {
+    const { selectedPeriod } = this.state;
+
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        return 'year';
+      case PERIODS.MONTH:
+        return 'month';
+      case PERIODS.DAY:
+        return 'date';
+      default:
+        return 'month';
+    }
+  };
+
+  getDateFormat = () => {
+    const { selectedPeriod } = this.state;
+
+    switch (selectedPeriod) {
+      case PERIODS.YEAR:
+        return 'yyyy';
+      case PERIODS.MONTH:
+        return 'MMMM yyyy';
+      case PERIODS.DAY:
+        return 'dd/MM/yyyy';
+      default:
+        return 'MMMM yyyy';
+    }
+  };
+
+  render(props, state) {
+    const {
+      loading,
+      error,
+      errorDetail,
+      series,
+      seriesColors,
+      emptySeries,
+      selectedPeriod,
+      totalConsumption,
+      displayMode
+    } = state;
+    const localeSet = this.props.user.language === 'fr' ? fr : 'en';
+    return (
+      <div class="card">
+        {/* Widget Title */}
+        {props.box.name && (
+          <div class="card-header">
+            <h5 class="card-title">{props.box.name}</h5>
+          </div>
+        )}
+        <div class="card-body">
+          {/* Period Selection Buttons */}
+          <div class="row mb-3">
+            <div class="col-12">
+              <div class="d-flex justify-content-between">
+                {Object.values(PERIODS).map(period => (
+                  <button
+                    key={period}
+                    type="button"
+                    class={cx('btn flex-fill mx-1', {
+                      'btn-primary': selectedPeriod === period,
+                      'btn-outline-primary': selectedPeriod !== period
+                    })}
+                    onClick={() => this.changePeriod(period)}
+                  >
+                    <Text id={PERIOD_LABELS[period]} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div class="row mb-2">
+            <div class="col-12">
+              <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-outline-secondary" onClick={this.navigatePrevious}>
+                  <i class="fe fe-chevron-left" />
+                </button>
+
+                <div class="flex-fill mx-3">
+                  <DatePicker
+                    locale={localeSet}
+                    selected={this.state.selectedDate}
+                    onChange={this.onDateChange}
+                    dateFormat={this.getDateFormat()}
+                    showMonthYearPicker={selectedPeriod === PERIODS.MONTH}
+                    showYearPicker={selectedPeriod === PERIODS.YEAR}
+                    className="form-control text-center w-100"
+                    wrapperClassName={'w-100'}
+                  />
+                </div>
+
+                <button type="button" class="btn btn-outline-secondary" onClick={this.navigateNext}>
+                  <i class="fe fe-chevron-right" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Display Mode Toggle */}
+          <div class="row mb-3">
+            <div class="col-12 text-center">
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.currency" />
+              </button>
+              <button
+                type="button"
+                class={cx('btn btn-sm mx-1', {
+                  'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
+                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
+                })}
+                onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
+              >
+                <Text id="dashboard.boxes.energyConsumption.kwh" />
+              </button>
+            </div>
+          </div>
+
+          {/* Chart */}
+          <div class="row">
+            <div class="col-12">
+              <div class={loading ? 'dimmer active' : 'dimmer'}>
+                <div class="loader" />
+                <div class="dimmer-content">
+                  {error && (
+                    <div class="alert alert-danger" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.error" />
+                      {errorDetail && <div class="mt-2">{errorDetail}</div>}
+                    </div>
+                  )}
+
+                  {!error && emptySeries && (
+                    <div class="alert alert-info" role="alert">
+                      <Text id="dashboard.boxes.energyConsumption.noData" />
+                    </div>
+                  )}
+
+                  {!error && !emptySeries && (
+                    <>
+                      <div class="row mb-2">
+                        <div class="col-12">
+                          <div class="card border-0 mb-0">
+                            <div class="card-body text-center py-3">
+                              <div class="d-flex align-items-center justify-content-center">
+                                <div>
+                                  <h5 class="mb-1 text-muted small">
+                                    <Text
+                                      id={
+                                        displayMode === DISPLAY_MODES.CURRENCY
+                                          ? 'dashboard.boxes.energyConsumption.totalConsumptionCost'
+                                          : 'dashboard.boxes.energyConsumption.totalConsumptionKwh'
+                                      }
+                                    />
+                                  </h5>
+                                  <h3 class="mb-0 text-primary font-weight-bold">
+                                    {totalConsumption.toFixed(2)}{' '}
+                                    {displayMode === DISPLAY_MODES.CURRENCY ? this.getCurrencySymbol() : 'kWh'}
+                                  </h3>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <ApexChartComponent
+                        user={this.props.user}
+                        series={series}
+                        chart_type="bar"
+                        height={300}
+                        colors={seriesColors.length > 0 ? seriesColors : DEFAULT_COLORS}
+                        size="big"
+                        display_axes={true}
+                        hide_legend={true}
+                        y_axis_formatter={this.yAxisFormatter}
+                        tooltip_y_formatter={this.tooltipYFormatter}
+                        tooltip_x_formatter={this.tooltipXFormatter}
+                        dictionary={props.intl.dictionary}
+                        disable_zoom={true}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default connect('user,session,httpClient,houses,devices,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));

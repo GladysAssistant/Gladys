@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.sonos.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/sonos/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.sonos.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.sonos.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

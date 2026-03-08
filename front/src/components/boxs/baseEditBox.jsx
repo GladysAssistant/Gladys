@@ -47,7 +47,7 @@ const BaseEditBox = ({ children, ...props }) => {
         <div ref={drag} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
           <div class="d-flex bd-highlight justify-content-between">
             <div>
-              <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />
+              <i style={{ cursor: 'move' }} class="icon-list mr-4" />
             </div>
             <div class="flex-fill">
               <Text id={props.titleKey} />
@@ -70,16 +70,16 @@ const BaseEditBox = ({ children, ...props }) => {
     >
       <div class="card-header">
         <h3 class="card-title">
-          {props.isMobileReordering && <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />}
+          {props.isMobileReordering && <i style={{ cursor: 'move' }} class="icon-list mr-4" />}
           {props.titleKey && <Text id={props.titleKey} />}
         </h3>
         <div class="card-options">
           <a class="card-options-remove">
-            <i ref={drag} style={{ cursor: 'move' }} class="fe fe-move mr-2 d-none d-lg-inline" />
+            <i ref={drag} style={{ cursor: 'move' }} class="icon-move mr-2 d-none d-lg-inline" />
           </a>
           {!props.isMobileReordering && (
             <a onClick={removeBox} class="card-options-remove">
-              <i class="fe fe-x" />
+              <i class="icon-x" />
             </a>
           )}
         </div>

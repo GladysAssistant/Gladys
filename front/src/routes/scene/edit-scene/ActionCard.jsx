@@ -37,38 +37,38 @@ import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
 
 const ACTION_ICON = {
-  [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
-  [ACTIONS.LIGHT.BLINK]: 'fe fe-star',
-  [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
-  [ACTIONS.TIME.DELAY]: 'fe fe-clock',
-  [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
-  [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
-  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
-  [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
-  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
-  [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
-  [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
-  [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
-  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
-  [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
-  [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
-  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
-  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
-  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
-  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
-  [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
-  [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
-  [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
-  [ACTIONS.MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
-  [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
-  [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
+  [ACTIONS.LIGHT.TURN_ON]: 'icon-toggle-right',
+  [ACTIONS.LIGHT.TURN_OFF]: 'icon-toggle-left',
+  [ACTIONS.LIGHT.TOGGLE]: 'icon-shuffle',
+  [ACTIONS.LIGHT.BLINK]: 'icon-star',
+  [ACTIONS.SWITCH.TURN_ON]: 'icon-toggle-right',
+  [ACTIONS.SWITCH.TURN_OFF]: 'icon-toggle-left',
+  [ACTIONS.SWITCH.TOGGLE]: 'icon-shuffle',
+  [ACTIONS.TIME.DELAY]: 'icon-clock',
+  [ACTIONS.MESSAGE.SEND]: 'icon-message-square',
+  [ACTIONS.MESSAGE.SEND_CAMERA]: 'icon-message-square',
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: 'icon-shuffle',
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'icon-shuffle',
+  [ACTIONS.DEVICE.GET_VALUE]: 'icon-refresh-cw',
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'icon-home',
+  [ACTIONS.USER.SET_OUT_OF_HOME]: 'icon-home',
+  [ACTIONS.HTTP.REQUEST]: 'icon-link',
+  [ACTIONS.USER.CHECK_PRESENCE]: 'icon-home',
+  [ACTIONS.CONDITION.CHECK_TIME]: 'icon-watch',
+  [ACTIONS.SCENE.START]: 'icon-fast-forward',
+  [ACTIONS.HOUSE.IS_EMPTY]: 'icon-home',
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'icon-home',
+  [ACTIONS.DEVICE.SET_VALUE]: 'icon-radio',
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'icon-calendar',
+  [ACTIONS.ECOWATT.CONDITION]: 'icon-zap',
+  [ACTIONS.EDF_TEMPO.CONDITION]: 'icon-zap',
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'icon-bell',
+  [ACTIONS.ALARM.SET_ALARM_MODE]: 'icon-bell',
+  [ACTIONS.MQTT.SEND]: 'icon-message-square',
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'icon-speaker',
+  [ACTIONS.ZIGBEE2MQTT.SEND]: 'icon-message-square',
+  [ACTIONS.AI.ASK]: 'icon-cpu',
+  [ACTIONS.SMS.SEND]: 'icon-message-circle'
 };
 
 const ACTION_COMPONENTS = {
@@ -180,7 +180,7 @@ const ActionCard = ({ children, ...props }) => {
       >
         <div ref={drag} class="card-header">
           {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
-          {props.action.type === null && <i class="fe fe-plus-circle" />}
+          {props.action.type === null && <i class="icon-circle-plus" />}
           <div class="card-title">
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
             {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
@@ -191,10 +191,10 @@ const ActionCard = ({ children, ...props }) => {
           )}
           <div class="card-options">
             <a>
-              <i class="fe fe-move mr-4" />
+              <i class="icon-move mr-4" />
             </a>
             <a onClick={handleDelete} class="card-options-remove">
-              <i class="fe fe-x" />
+              <i class="icon-x" />
             </a>
           </div>
         </div>

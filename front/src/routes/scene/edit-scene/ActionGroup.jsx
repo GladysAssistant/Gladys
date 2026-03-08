@@ -56,12 +56,12 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
 
           <div class="card-options">
             <div class="mr-4 my-auto">
-              <i class="fe fe-move" />
+              <i class="icon-move" />
             </div>
 
             {!props.firstActionGroup && !props.lastActionGroup && (
               <button onClick={props.deleteThisActionGroup} class="btn btn-outline-danger">
-                <i class="fe fe-trash-2" />
+                <i class="icon-trash-2" />
               </button>
             )}
           </div>
@@ -110,7 +110,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
               {/* Add Action Button */}
               <div class="text-center mt-4">
                 <button onClick={props.addActionToColumn} class="btn btn-sm btn-outline-primary">
-                  <i class="fe fe-plus" /> <Text id="editScene.addActionButton">Add action</Text>
+                  <i class="icon-plus" /> <Text id="editScene.addActionButton">Add action</Text>
                 </button>
               </div>
             </div>

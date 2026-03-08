@@ -13,7 +13,7 @@ class DarkModeToggle extends Component {
 
     return (
       <div class="mode-toggle" onClick={this.toggleDarkMode} title={darkMode ? 'Light Mode' : 'Dark Mode'}>
-        {darkMode ? <i class="fe fe-sun" aria-hidden="true" /> : <i class="fe fe-moon" aria-hidden="true" />}
+        {darkMode ? <i class="icon-sun" aria-hidden="true" /> : <i class="icon-moon" aria-hidden="true" />}
       </div>
     );
   }

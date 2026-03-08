@@ -37,7 +37,7 @@ class PilotWireModeDeviceState extends Component {
       <Fragment>
         <div class="col-2 col-md-1">
           <div class="text-center" style={{ marginTop: '10px' }}>
-            <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+            <i class="icon-arrow-right" style={{ fontSize: '20px' }} />
           </div>
         </div>
         <div class="col-10 col-md-5">

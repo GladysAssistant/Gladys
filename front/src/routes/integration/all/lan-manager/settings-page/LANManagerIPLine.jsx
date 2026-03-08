@@ -45,7 +45,7 @@ class LANManagerIPLine extends Component {
                 )
               }
             >
-              <i class="fe fe-trash" />
+              <i class="icon-trash" />
             </button>
           </Localizer>
         </td>

@@ -31,7 +31,7 @@ class SceneRow extends Component {
             })}
             disabled={loading}
           >
-            <i class="fe fe-play" />
+            <i class="icon-play" />
             <Text id="scene.startButton" />
           </button>
         </td>

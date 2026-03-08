@@ -170,7 +170,7 @@ class SetupLocalOptions extends Component {
                 onClick={this.loadUsbPorts}
                 disabled={loadUsbPortsStatus === RequestStatus.Getting}
               >
-                <i class="fe fe-refresh-cw" />
+                <i class="icon-refresh-cw" />
               </button>
             </div>
           </div>
@@ -198,7 +198,7 @@ class SetupLocalOptions extends Component {
                 onClick={this.loadZigbeeAdapters}
                 disabled={loadZigbeeAdaptersStatus === RequestStatus.Getting}
               >
-                <i class="fe fe-refresh-cw" />
+                <i class="icon-refresh-cw" />
               </button>
             </div>
           </div>

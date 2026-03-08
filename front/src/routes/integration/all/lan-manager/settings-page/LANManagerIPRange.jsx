@@ -106,7 +106,7 @@ class LANManagerIPRange extends Component {
                   </td>
                   <td class="align-top">
                     <button class="btn btn-primary btn-sm" onClick={this.addMask} disabled={disabled || !valid}>
-                      <i class="fe fe-plus" />
+                      <i class="icon-plus" />
                     </button>
                   </td>
                   <td />

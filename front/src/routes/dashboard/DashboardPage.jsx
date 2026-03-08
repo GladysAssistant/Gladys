@@ -53,7 +53,7 @@ const DashboardPage = ({ children, ...props }) => (
                           <Text id="dashboard.toggleDefineTabletMode" />
                         )}
                       </span>{' '}
-                      <i class="fe fe-tablet" />
+                      <i class="icon-tablet" />
                     </button>
                   )}
                   {!props.dashboardNotConfigured &&
@@ -63,8 +63,8 @@ const DashboardPage = ({ children, ...props }) => (
                         <span>
                           {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
                           {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                          {props.fullScreen && <i class="fe fe-minimize-2" />}
+                          {!props.fullScreen && <i class="icon-maximize-2" />}
+                          {props.fullScreen && <i class="icon-minimize-2" />}
                         </span>
                       </button>
                     )}
@@ -73,7 +73,7 @@ const DashboardPage = ({ children, ...props }) => (
                       <span class={style.editDashboardText}>
                         <Text id="dashboard.editDashboardButton" />
                       </span>{' '}
-                      <i class="fe fe-edit" />
+                      <i class="icon-pencil" />
                     </button>
                   )}
                 </div>

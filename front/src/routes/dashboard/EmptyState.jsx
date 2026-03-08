@@ -12,7 +12,7 @@ const EmptyState = ({ children, ...props }) => (
     </p>
     {props.dashboardListEmpty && (
       <Link href="/dashboard/create/new" class="btn btn-success">
-        <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
+        <Text id="dashboard.newDashboardButton" /> <i class="icon-plus" />
       </Link>
     )}
   </div>

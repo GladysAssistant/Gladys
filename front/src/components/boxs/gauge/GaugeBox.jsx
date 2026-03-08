@@ -254,21 +254,21 @@ class GaugeBox extends Component {
         {error && (
           <div class="card-body">
             <div class="alert alert-danger">
-              <i class="fe fe-alert-triangle mr-2" /> <Text id="dashboard.boxes.gauge.errorLoadingDevice" />
+              <i class="icon-triangle-alert mr-2" /> <Text id="dashboard.boxes.gauge.errorLoadingDevice" />
             </div>
           </div>
         )}
         {noDeviceFeatureSelector && (
           <div class="card-body">
             <div class="alert alert-danger">
-              <i class="fe fe-alert-triangle mr-2" /> <Text id="dashboard.boxes.gauge.noDeviceFeatureSelector" />
+              <i class="icon-triangle-alert mr-2" /> <Text id="dashboard.boxes.gauge.noDeviceFeatureSelector" />
             </div>
           </div>
         )}
         {noDeviceFeatureLastValue && (
           <div class="card-body">
             <div class="alert alert-warning">
-              <i class="fe fe-alert-triangle mr-2" /> <Text id="dashboard.boxes.gauge.noDeviceFeatureLastValue" />
+              <i class="icon-triangle-alert mr-2" /> <Text id="dashboard.boxes.gauge.noDeviceFeatureLastValue" />
             </div>
           </div>
         )}

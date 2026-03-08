@@ -42,7 +42,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <i class="fe fe-zap" />
+        <i class="icon-zap" />
         <span class="m-1">
           <Text id="dashboard.boxTitle.edf-tempo" />
         </span>
@@ -53,7 +53,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
         <div class="loader" />
         {error && (
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.edfTempo.error" />
             </span>
@@ -71,7 +71,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
                       'd-flex align-items-center justify-content-center dark-mode-no-invert'
                     )}
                   >
-                    <i class="fe fe-sun mr-4" />
+                    <i class="icon-sun mr-4" />
                     <Text id="dashboard.boxes.edfTempo.peakHour" />
                   </div>
                 )}
@@ -83,7 +83,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
                       'd-flex align-items-center justify-content-center dark-mode-no-invert'
                     )}
                   >
-                    <i class="fe fe-moon mr-4" />
+                    <i class="icon-moon mr-4" />
                     <Text id="dashboard.boxes.edfTempo.offPeakHour" />
                   </div>
                 )}

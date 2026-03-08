@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.google-cast.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/google-cast/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.google-cast.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.google-cast.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

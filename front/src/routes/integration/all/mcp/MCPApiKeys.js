@@ -28,7 +28,7 @@ const MCPApiKey = ({ children, ...props }) => {
         )}
       </td>
       <td>
-        <i style={{ cursor: 'pointer' }} onClick={revokeMCPApiKey} class="fe fe-trash-2" />
+        <i style={{ cursor: 'pointer' }} onClick={revokeMCPApiKey} class="icon-trash-2" />
       </td>
     </tr>
   );

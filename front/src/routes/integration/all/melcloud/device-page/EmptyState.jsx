@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.melcloud.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/melcloud/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.melcloud.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.melcloud.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

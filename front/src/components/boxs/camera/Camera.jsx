@@ -289,7 +289,7 @@ class CameraBoxComponent extends Component {
             <h3 class="card-title">{props.box && props.box.name}</h3>
             <div class="card-options">
               <button class="btn btn-primary btn-sm" onClick={this.stopStreaming}>
-                <i class="fe fe-pause" />
+                <i class="icon-pause" />
               </button>
             </div>
           </div>
@@ -317,7 +317,7 @@ class CameraBoxComponent extends Component {
         {liveStartError && (
           <div>
             <p class="alert alert-danger">
-              <i class="fe fe-bell" />
+              <i class="icon-bell" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.liveStartError" />
               </span>
@@ -327,7 +327,7 @@ class CameraBoxComponent extends Component {
         {upgradeGladysPlusPlanRequired && (
           <div>
             <p class="alert alert-warning">
-              <i class="fe fe-bell" />
+              <i class="icon-bell" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.upgradeGladysPlusPlanError" />
               </span>
@@ -337,7 +337,7 @@ class CameraBoxComponent extends Component {
         {liveNotSupportedBrowser && (
           <div>
             <p class="alert alert-warning">
-              <i class="fe fe-compass" />
+              <i class="icon-compass" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.notNotSupportedBrowser" />
               </span>
@@ -347,7 +347,7 @@ class CameraBoxComponent extends Component {
         {liveTooManyRequestsError && (
           <div>
             <p class="alert alert-warning">
-              <i class="fe fe-alert-triangle" />
+              <i class="icon-triangle-alert" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.tooManyRequests" />
               </span>
@@ -358,7 +358,7 @@ class CameraBoxComponent extends Component {
           <h3 class="card-title">{props.box && props.box.name}</h3>
           <div class="card-options">
             <button class="btn btn-secondary btn-sm" onClick={this.startStreaming}>
-              <i class="fe fe-airplay" />
+              <i class="icon-airplay" />
             </button>
           </div>
         </div>

@@ -83,7 +83,7 @@ class SetupTab extends Component {
                 onClick={props.getBridges}
                 disabled={props.philipsHueGetBridgesStatus === RequestStatus.Getting}
               >
-                <i class="fe fe-radio" /> <Text id="integration.philipsHue.setup.scanButton" />
+                <i class="icon-radio" /> <Text id="integration.philipsHue.setup.scanButton" />
               </button>
             </div>
           </div>

@@ -115,7 +115,7 @@ class ConditionIfElseThen extends Component {
           </div>
           <div class="text-center mt-4">
             <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
-              <i class="fe fe-plus" />{' '}
+              <i class="icon-plus" />{' '}
               <Text id="editScene.actionsCard.conditionIfThenElse.addCondition">Add condition</Text>
             </button>
           </div>

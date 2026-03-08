@@ -22,7 +22,7 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.nextcloudTalk.documentation" />
                   </DeviceConfigurationLink>

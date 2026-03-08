@@ -27,11 +27,11 @@ const WelcomeStep = () => (
     <div class="col-lg-6 d-flex flex-row align-items-center">
       <div class="w-100">
         <Link class="btn btn-secondary btn-block mb-4 text-wrap" href="/signup/create-account-gladys-gateway">
-          <i class="fe fe-download-cloud mr-1" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
+          <i class="icon-download-cloud mr-1" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
         </Link>
 
         <Link class="btn btn-primary btn-block" href="/signup/create-account-local">
-          <i class="fe fe-mail mr-1" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
+          <i class="icon-mail mr-1" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
         </Link>
       </div>
     </div>

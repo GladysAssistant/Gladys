@@ -22,7 +22,7 @@ class PushDeviceComponent extends Component {
     return (
       <tr>
         <td>
-          <i class="fe fe-circle" />
+          <i class="icon-circle" />
         </td>
         <td>{props.rowName}</td>
         <td class="text-right">
@@ -33,7 +33,7 @@ class PushDeviceComponent extends Component {
               'btn-loading': loading
             })}
           >
-            <i class="fe fe-circle" /> <Text id="dashboard.boxes.devicesInRoom.pushButton" />
+            <i class="icon-circle" /> <Text id="dashboard.boxes.devicesInRoom.pushButton" />
           </button>
         </td>
       </tr>

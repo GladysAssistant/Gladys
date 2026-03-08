@@ -21,7 +21,7 @@ const HousePage = ({ children, ...props }) => (
           />
         </Localizer>
         <button onClick={props.addHouse} class="btn btn-outline-primary ml-2">
-          <Text id="housesSettings.newButton" /> <i class="fe fe-plus" />
+          <Text id="housesSettings.newButton" /> <i class="icon-plus" />
         </button>
       </div>
     </div>

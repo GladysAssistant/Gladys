@@ -53,7 +53,7 @@ const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       {TRIGGER_ICON[props.trigger.type] && <i class={`fe ${TRIGGER_ICON[props.trigger.type]}`} />}
-      {props.trigger.type === null && <i class="fe fe-plus-circle" />}
+      {props.trigger.type === null && <i class="icon-circle-plus" />}
       <div class="card-title">
         <i class={cx('mr-3', props.trigger.icon)} />
         <Text id={`editScene.triggers.${props.trigger.type}`} />
@@ -62,11 +62,11 @@ const TriggerCard = ({ children, ...props }) => (
       <div class="card-options">
         {false && (
           <a class="card-options-collapse">
-            <i class="fe fe-chevron-down" />
+            <i class="icon-chevron-down" />
           </a>
         )}
         <a onClick={deleteTriggerFromList(props.deleteTrigger, props.index)} class="card-options-remove">
-          <i class="fe fe-x" />
+          <i class="icon-x" />
         </a>
       </div>
     </div>

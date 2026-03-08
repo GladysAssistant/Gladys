@@ -20,7 +20,7 @@ const UserPage = ({ children, ...props }) => (
           />
         </Localizer>
         <Link href="/dashboard/settings/user/new" class="btn btn-outline-primary ml-2">
-          <Text id="usersSettings.newUserButton" /> <i class="fe fe-plus" />
+          <Text id="usersSettings.newUserButton" /> <i class="icon-plus" />
         </Link>
       </div>
     </div>

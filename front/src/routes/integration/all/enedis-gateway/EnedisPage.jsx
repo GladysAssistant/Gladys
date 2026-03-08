@@ -20,7 +20,7 @@ const EnedisPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-home" />
+                      <i class="icon-home" />
                     </span>
                     <Text id="integration.enedis.welcomeTab" />
                   </Link>
@@ -31,7 +31,7 @@ const EnedisPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-zap" />
+                      <i class="icon-zap" />
                     </span>
                     <Text id="integration.enedis.usagePointsTab" />
                   </Link>
@@ -43,7 +43,7 @@ const EnedisPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.enedis.documentation" />
                   </DeviceConfigurationLink>

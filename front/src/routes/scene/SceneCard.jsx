@@ -86,7 +86,7 @@ class SceneCard extends Component {
                 'btn-loading': saving
               })}
             >
-              <i class="fe fe-play" />
+              <i class="icon-play" />
             </button>
           </div>
         </div>
@@ -139,11 +139,11 @@ class SceneCard extends Component {
                 <div class="card-footer">
                   <div class="btn-list text-center">
                     <Link href={this.getSceneUrl()} class="btn btn-outline-primary btn-sm">
-                      <i class="fe fe-edit" />
+                      <i class="icon-pencil" />
                       <Text id="scene.editButton" />
                     </Link>
                     <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                      <i class="fe fe-play" />
+                      <i class="icon-play" />
                       <Text id="scene.startButton" />
                     </button>
                   </div>

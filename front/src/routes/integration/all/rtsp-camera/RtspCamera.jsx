@@ -27,7 +27,7 @@ const RtspCameraPage = ({ children, ...props }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.rtspCamera.documentation" />
                   </DeviceConfigurationLink>
@@ -55,7 +55,7 @@ const RtspCameraPage = ({ children, ...props }) => (
                       <span class="d-none d-lg-inline-block mr-2">
                         <Text id="scene.newButton" />
                       </span>
-                      <i class="fe fe-plus" />
+                      <i class="icon-plus" />
                     </button>
                   </div>
                 </div>

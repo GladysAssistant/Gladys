@@ -11,7 +11,7 @@ const EmptyState = ({ matterEnabled }) => (
           <Text id="integration.matter.discoverDeviceDescr" />
           <Link href="/dashboard/integration/device/matter/discover">
             <button class="btn btn-outline-primary ml-2">
-              <Text id="integration.matter.addTab" /> <i class="fe fe-plus-circle" />
+              <Text id="integration.matter.addTab" /> <i class="icon-circle-plus" />
             </button>
           </Link>
         </div>

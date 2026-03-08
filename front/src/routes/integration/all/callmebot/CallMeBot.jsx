@@ -20,7 +20,7 @@ const CallMeBotPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="icon-sliders-horizontal" />
                     </span>
                     <Text id="integration.callmebot.setupTab" />
                   </Link>
@@ -32,7 +32,7 @@ const CallMeBotPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.callmebot.documentation" />
                   </DeviceConfigurationLink>

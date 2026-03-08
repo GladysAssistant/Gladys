@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.tuya.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/tuya/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.tuya.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.tuya.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>

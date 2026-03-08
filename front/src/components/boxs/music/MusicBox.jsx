@@ -124,26 +124,26 @@ class MusicComponent extends Component {
             <div class="col">
               {previousFeature && (
                 <button class="btn btn-block btn-secondary" onClick={this.previous}>
-                  <i class="fe fe-skip-back" />
+                  <i class="icon-skip-back" />
                 </button>
               )}
             </div>
             <div class="col">
               {!isPlaying && (
                 <button class="btn btn-block btn-secondary" onClick={this.play}>
-                  <i class="fe fe-play" />
+                  <i class="icon-play" />
                 </button>
               )}
               {isPlaying && (
                 <button class="btn btn-block btn-secondary" onClick={this.pause}>
-                  <i class="fe fe-pause" />
+                  <i class="icon-pause" />
                 </button>
               )}
             </div>
             <div class="col">
               {nextFeature && (
                 <button class="btn btn-block btn-secondary" onClick={this.next}>
-                  <i class="fe fe-skip-forward" />
+                  <i class="icon-skip-forward" />
                 </button>
               )}
             </div>

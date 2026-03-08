@@ -655,7 +655,7 @@ class Chartbox extends Component {
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
-                  <i class="fe fe-alert-circle mr-2" />
+                  <i class="icon-circle-alert mr-2" />
                   <Text id="dashboard.boxes.chart.noChartType" />
                 </div>
                 <div class={style.smallTextEmptyState}>
@@ -666,7 +666,7 @@ class Chartbox extends Component {
             {error && (
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div>
-                  <i class="fe fe-alert-circle mr-2" />
+                  <i class="icon-circle-alert mr-2" />
                   {error}
                 </div>
                 {errorDetail && <div>{errorDetail}</div>}
@@ -678,7 +678,7 @@ class Chartbox extends Component {
                   <div class={cx('text-center', style.bigEmptyState)}>
                     <div />
                     <div>
-                      <i class="fe fe-alert-circle mr-2" />
+                      <i class="icon-circle-alert mr-2" />
                       <Text id="dashboard.boxes.chart.noValue" />
                     </div>
                     <div class={style.smallTextEmptyState}>

@@ -32,7 +32,7 @@ const ScenePage = ({ children, ...props }) => (
                 <span class="d-none d-lg-inline-block mr-2">
                   <Text id="scene.newButton" />
                 </span>
-                <i class="fe fe-plus" />
+                <i class="icon-plus" />
               </Link>
             </div>
           </div>

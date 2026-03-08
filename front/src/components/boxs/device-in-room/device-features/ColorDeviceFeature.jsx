@@ -75,7 +75,7 @@ class ColorDeviceType extends Component {
       <Fragment>
         <tr>
           <td>
-            <i class="fe fe-circle" />
+            <i class="icon-circle" />
           </td>
           <td>{rowName}</td>
           <td class="text-right">

@@ -20,7 +20,7 @@ const NukiPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-link" />
+                      <i class="icon-link" />
                     </span>
                     <Text id="integration.nuki.deviceTab" />
                   </Link>
@@ -31,7 +31,7 @@ const NukiPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="icon-radio" />
                     </span>
                     <Text id="integration.nuki.mqttDiscoverTab" />
                   </Link>
@@ -42,7 +42,7 @@ const NukiPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-globe" />
+                      <i class="icon-globe" />
                     </span>
                     <Text id="integration.nuki.httpDiscoverTab" />
                   </Link>
@@ -53,7 +53,7 @@ const NukiPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="icon-sliders-horizontal" />
                     </span>
                     <Text id="integration.nuki.setupTab" />
                   </Link>
@@ -65,7 +65,7 @@ const NukiPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.nuki.documentation" />
                   </DeviceConfigurationLink>

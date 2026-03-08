@@ -696,10 +696,10 @@ class EnergyMonitoringPage extends Component {
           <div class="page-options d-flex">
             <button class="btn btn-outline-secondary ml-2" onClick={this.startImportPrices}>
               <Text id="integration.energyMonitoring.importPrices" defaultMessage="Import" />{' '}
-              <i class="fe fe-download" />
+              <i class="icon-download" />
             </button>
             <button class="btn btn-outline-primary ml-2" onClick={this.startCreatePrice}>
-              <Text id="global.create" defaultMessage="Create" /> <i class="fe fe-plus" />
+              <Text id="global.create" defaultMessage="Create" /> <i class="icon-plus" />
             </button>
           </div>
         )}
@@ -941,7 +941,7 @@ class EnergyMonitoringPage extends Component {
                   }
                 }}
               >
-                <i class="fe fe-trash-2" />
+                <i class="icon-trash-2" />
               </button>
             </div>
           </div>
@@ -963,11 +963,11 @@ class EnergyMonitoringPage extends Component {
           <div class="text-muted small">
             {state.wizardEditingId ? (
               <span>
-                <i class="fe fe-edit mr-1" /> <Text id="global.edit" defaultMessage="Edit" />
+                <i class="icon-pencil mr-1" /> <Text id="global.edit" defaultMessage="Edit" />
               </span>
             ) : (
               <span>
-                <i class="fe fe-plus mr-1" /> <Text id="global.create" defaultMessage="Create" />
+                <i class="icon-plus mr-1" /> <Text id="global.create" defaultMessage="Create" />
               </span>
             )}
           </div>
@@ -1465,7 +1465,7 @@ class EnergyMonitoringPage extends Component {
                     </span>
                   ) : (
                     <span>
-                      <i class="fe fe-play mr-2" />
+                      <i class="icon-play mr-2" />
                       <Text
                         id="integration.energyMonitoring.calculateConsumptionFromIndexFromBeginning"
                         defaultMessage="Calculate consumption from index from beginning"
@@ -1498,7 +1498,7 @@ class EnergyMonitoringPage extends Component {
                     </span>
                   ) : (
                     <span>
-                      <i class="fe fe-play mr-2" />
+                      <i class="icon-play mr-2" />
                       <Text
                         id="integration.energyMonitoring.calculateCostFromBeginning"
                         defaultMessage="Calculate cost from beginning"
@@ -1568,7 +1568,7 @@ class EnergyMonitoringPage extends Component {
                         class="list-group-item list-group-item-action d-flex align-items-center"
                       >
                         <span class="icon mr-3">
-                          <i class="fe fe-grid" />
+                          <i class="icon-grid" />
                         </span>
                         <Text id="integration.energyMonitoring.myDevicesTab" />
                       </Link>
@@ -1579,7 +1579,7 @@ class EnergyMonitoringPage extends Component {
                         class="list-group-item list-group-item-action d-flex align-items-center"
                       >
                         <span class="icon mr-3">
-                          <i class="fe fe-dollar-sign" />
+                          <i class="icon-dollar-sign" />
                         </span>
                         <Text id="integration.energyMonitoring.energyPriceTab" />
                       </Link>
@@ -1590,7 +1590,7 @@ class EnergyMonitoringPage extends Component {
                         class="list-group-item list-group-item-action d-flex align-items-center"
                       >
                         <span class="icon mr-3">
-                          <i class="fe fe-settings" />
+                          <i class="icon-settings" />
                         </span>
                         <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
                       </Link>
@@ -1602,7 +1602,7 @@ class EnergyMonitoringPage extends Component {
                         linkClass="list-group-item list-group-item-action d-flex align-items-center"
                       >
                         <span class="icon mr-3">
-                          <i class="fe fe-book-open" />
+                          <i class="icon-book-open" />
                         </span>
                         <Text id="integration.energyMonitoring.documentation" />
                       </DeviceConfigurationLink>
@@ -1635,7 +1635,7 @@ class EnergyMonitoringPage extends Component {
                                     <div class="d-flex align-items-start justify-content-between">
                                       <div>
                                         <h4 class="alert-heading">
-                                          <i class="fe fe-alert-triangle mr-2" />
+                                          <i class="icon-triangle-alert mr-2" />
                                           <Text id="integration.energyMonitoring.circularDependencyDetected" />
                                         </h4>
                                         <p class="mb-2">
@@ -1686,7 +1686,7 @@ class EnergyMonitoringPage extends Component {
                                           </span>
                                         ) : (
                                           <span>
-                                            <i class="fe fe-tool mr-2" />
+                                            <i class="icon-wrench mr-2" />
                                             <Text id="integration.energyMonitoring.fixAutomatically" />
                                           </span>
                                         )}

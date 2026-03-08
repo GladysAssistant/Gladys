@@ -176,13 +176,13 @@ class SetupTab extends Component {
             </button>
             {saveStatus === RequestStatus.Success && (
               <span class="text-success ml-2">
-                <i class="fe fe-check" />
+                <i class="icon-check" />
                 <Text id="integration.callmebot.setup.saved" />
               </span>
             )}
             {saveStatus === RequestStatus.Error && (
               <span class="text-danger ml-2">
-                <i class="fe fe-alert-triangle" />
+                <i class="icon-triangle-alert" />
                 <Text id="integration.callmebot.setup.error" />
               </span>
             )}

@@ -20,7 +20,7 @@ const MatterPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-cpu" />
+                      <i class="icon-cpu" />
                     </span>
                     <Text id="integration.matter.deviceTab" />
                   </Link>
@@ -31,7 +31,7 @@ const MatterPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-plus-circle" />
+                      <i class="icon-circle-plus" />
                     </span>
                     <Text id="integration.matter.addTab" />
                   </Link>
@@ -42,7 +42,7 @@ const MatterPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-settings" />
+                      <i class="icon-settings" />
                     </span>
                     <Text id="integration.matter.settingsTab" />
                   </Link>
@@ -54,7 +54,7 @@ const MatterPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="icon-book-open" />
                     </span>
                     <Text id="integration.matter.documentation" />
                   </DeviceConfigurationLink>

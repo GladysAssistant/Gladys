@@ -67,7 +67,7 @@ class DiscoverTab extends Component {
           </h1>
           <div class="page-options d-flex">
             <button onClick={this.scan} class="btn btn-outline-primary ml-2" disabled={loading}>
-              <Text id="integration.zwavejs-ui.discover.scan" /> <i class="fe fe-radio" />
+              <Text id="integration.zwavejs-ui.discover.scan" /> <i class="icon-radio" />
             </button>
           </div>
         </div>

@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.airplay.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/airplay/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.airplay.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.airplay.discoverTab" /> <i class="icon-radio" />
           </button>
         </Link>
       </div>
