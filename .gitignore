@@ -26,4 +26,3 @@ size-plugin.json
 .tmp
 .DS_Store
 matter-controller-data
-*.backup
