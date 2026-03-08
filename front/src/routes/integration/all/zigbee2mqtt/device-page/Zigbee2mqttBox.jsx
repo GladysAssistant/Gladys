@@ -164,7 +164,7 @@ class Zigbee2mqttBox extends Component {
                       ))}
                   </select>
                 </div>
-                
+
                 {props.device.ieeeAddress && (
                   <div class="form-group">
                     <label class="form-label">
