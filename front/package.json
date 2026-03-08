@@ -26,7 +26,7 @@
   },
   "overrides": {
     "esm": "npm:esm-wallaby@3.2.35"
-  },
+  },cd
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",
     "compare-json": "^0.4.0",
