@@ -57,8 +57,8 @@ function createActions(store) {
           }
 
           const discovered = discoveredMap[device.external_id];
-          if (discovered && discovered.ieeeAddress) {
-            device.ieeeAddress = discovered.ieeeAddress;
+          if (discovered && discovered.ieee_address) {
+            device.ieee_address = discovered.ieee_address;
           }
         });
 
