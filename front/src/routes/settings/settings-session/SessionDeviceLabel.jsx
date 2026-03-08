@@ -7,7 +7,7 @@ const SessionDeviceLabel = ({ session }) => {
 
   if (!session.useragent) {
     label = <Text id="sessionsSettings.unknowDevice" />;
-    icon = 'alert-triangle';
+    icon = 'triangle-alert';
   } else {
     const useragent = uaParser.parse(session.useragent);
     label = `${useragent.browser} - ${useragent.platform} - ${useragent.os}`;

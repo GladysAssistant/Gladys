@@ -230,9 +230,9 @@ class DiscoverTab extends Component {
                       </Localizer>
                       <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
                         <i
-                          class={cx('fe', {
-                            'fe-eye': !showPassword,
-                            'fe-eye-off': showPassword
+                          class={cx({
+                            'icon-eye': !showPassword,
+                            'icon-eye-off': showPassword
                           })}
                         />
                       </span>

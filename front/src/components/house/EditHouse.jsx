@@ -119,9 +119,9 @@ const EditHouse = ({ children, ...props }) => (
             </Localizer>
             <span class="input-icon-addon cursor-pointer" onClick={props.toggleAlarmCodePassword}>
               <i
-                class={cx('fe', {
-                  'fe-eye': !props.showAlarmCode,
-                  'fe-eye-off': props.showAlarmCode
+                class={cx({
+                  'icon-eye': !props.showAlarmCode,
+                  'icon-eye-off': props.showAlarmCode
                 })}
               />
             </span>

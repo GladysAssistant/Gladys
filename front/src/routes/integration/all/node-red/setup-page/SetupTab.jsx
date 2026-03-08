@@ -247,9 +247,9 @@ class SetupTab extends Component {
                   </Localizer>
                   <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
                     <i
-                      class={cx('fe', {
-                        'fe-eye': !showPassword,
-                        'fe-eye-off': showPassword
+                      class={cx({
+                        'icon-eye': !showPassword,
+                        'icon-eye-off': showPassword
                       })}
                     />
                   </span>
@@ -344,9 +344,9 @@ class SetupTab extends Component {
                           <td className={style.tdCenter}>
                             <hr className={style.line} />
                             <i
-                              className={cx('fe', {
-                                'fe-check': nodeRedRunning,
-                                'fe-x': !nodeRedRunning,
+                              className={cx({
+                                'icon-check': nodeRedRunning,
+                                'icon-x': !nodeRedRunning,
                                 greenIcon: nodeRedRunning,
                                 redIcon: !nodeRedRunning
                               })}

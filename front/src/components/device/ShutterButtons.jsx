@@ -33,7 +33,7 @@ class ShutterButtons extends Component {
           )}
         </button>
         <button
-          class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
+          class={cx('btn btn-sm btn-secondary', 'icon-pause', {
             active: value === COVER_STATE.STOP
           })}
           onClick={this.stop}

@@ -26,9 +26,9 @@ class Settings extends Component {
           <div class="card-status bg-green" />
           <div class="card-header" onClick={this.openCloseCard}>
             <i
-              class={cx('fe', 'mr-2', {
-                'fe-chevron-right': !cardOpened,
-                'fe-chevron-down': cardOpened
+              class={cx('mr-2', {
+                'icon-chevron-right': !cardOpened,
+                'icon-chevron-down': cardOpened
               })}
             />
             <h4 class="text-center card-title ">

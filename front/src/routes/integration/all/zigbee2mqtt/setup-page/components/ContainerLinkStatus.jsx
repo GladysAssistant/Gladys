@@ -18,12 +18,12 @@ const ContainerLinkStatus = ({ linked, loading }) => {
     <div class="d-flex flex-column flex-sm-row flex-fill justify-content-center align-items-center">
       {line}
       <i
-        class={cx('fe', 'h3', 'my-0', 'mx-2', {
-          'fe-check': linked && !loading,
+        class={cx('h3', 'my-0', 'mx-2', {
+          'icon-check': linked && !loading,
           'text-success': linked && !loading,
-          'fe-x': !linked && !loading,
+          'icon-x': !linked && !loading,
           'text-danger': !linked && !loading,
-          'fe-refresh-cw': loading,
+          'icon-refresh-cw': loading,
           'text-info': loading
         })}
       />

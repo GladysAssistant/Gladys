@@ -15,7 +15,7 @@ const ICON_MAP = {
     0: 'unlock',
     1: 'lock',
     2: 'activity',
-    3: 'alert-triangle'
+    3: 'triangle-alert'
   }
 };
 const IconBinaryDeviceValue = ({ deviceFeature }) => {

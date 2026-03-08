@@ -255,9 +255,9 @@ class SetupTab extends Component {
                           <td className={style.tdCenter}>
                             <hr className={style.line} />
                             <i
-                              className={cx('fe', {
-                                'fe-check': matterbridgeRunning,
-                                'fe-x': !matterbridgeRunning,
+                              className={cx({
+                                'icon-check': matterbridgeRunning,
+                                'icon-x': !matterbridgeRunning,
                                 greenIcon: matterbridgeRunning,
                                 redIcon: !matterbridgeRunning
                               })}
