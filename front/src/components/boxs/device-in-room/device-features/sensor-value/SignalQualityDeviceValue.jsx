@@ -7,7 +7,7 @@ const SIGNAL_QUALITY_ICONS = {
   2: 'signal-low',
   3: 'signal-medium',
   4: 'signal-high',
-  5: 'signal',
+  5: 'signal'
 };
 
 const SignalQualityDeviceValue = ({ deviceFeature }) => {
