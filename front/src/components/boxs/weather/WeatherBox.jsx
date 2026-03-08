@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import cx from 'classnames';
 import dayjs from 'dayjs';
 
 import { WEATHER_UNITS } from '../../../../../server/utils/constants';
@@ -139,7 +138,7 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-              className={cx('fe', props.weatherIcon)}
+              class={props.weatherIcon}
               style={{
                 fontSize: '50px'
               }}
@@ -273,7 +272,7 @@ class WeatherBoxComponent extends Component {
                 {`${hour.datetime_beautiful}h`}
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
-                <i className={cx('fe', hour.weatherIcon)} style={{ fontSize: '20px' }} />
+                <i class={hour.weatherIcon} style={{ fontSize: '20px' }} />
               </p>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
                 <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
@@ -296,7 +295,7 @@ class WeatherBoxComponent extends Component {
                   .format('dddd')}
               </div>
               <div className="col-3">
-                <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
+                <i class={day.weatherIcon} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text
