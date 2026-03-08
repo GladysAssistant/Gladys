@@ -1,5 +1,14 @@
 import { Text } from 'preact-i18n';
-import SvgIcon from '../../../../icons/SvgIcon';
+
+const SIGNAL_QUALITY_ICONS = {
+  off: 'signal-zero',
+  0: 'signal-zero',
+  1: 'signal-zero',
+  2: 'signal-low',
+  3: 'signal-medium',
+  4: 'signal-high',
+  5: 'signal',
+};
 
 const SignalQualityDeviceValue = ({ deviceFeature }) => {
   const { last_value: lastValue, min, max } = deviceFeature;
@@ -9,9 +18,11 @@ const SignalQualityDeviceValue = ({ deviceFeature }) => {
   }
 
   const ratio = Math.round(((lastValue - min) * 5) / (max - min));
+  const iconName = SIGNAL_QUALITY_ICONS[ratio] || SIGNAL_QUALITY_ICONS.off;
+
   return (
     <div class="d-flex flex-row-reverse">
-      <SvgIcon icon={`tabler-antenna-bars-${ratio || 'off'}`} />
+      <i class={`icon-${iconName}`} />
     </div>
   );
 };

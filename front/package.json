@@ -26,7 +26,7 @@
   },
   "overrides": {
     "esm": "npm:esm-wallaby@3.2.35"
-  },cd
+  },
   "devDependencies": {
     "@relative-ci/agent": "^2.0.0",
     "compare-json": "^0.4.0",
@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^4.19.1",
-    "@gladysassistant/theme-optimized": "file:../../theme-optimized",
+    "@gladysassistant/theme-optimized": "^1.0.5",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",
     "apexcharts": "^3.41.1",
