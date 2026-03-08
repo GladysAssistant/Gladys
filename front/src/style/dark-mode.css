@@ -35,17 +35,20 @@ body.dark-mode {
 }
 
 /* Fix icons appearance */
-.dark-mode .fe {
+.dark-mode [class^="icon-"],
+.dark-mode [class*=" icon-"] {
   filter: invert(100%) hue-rotate(180deg); /* Ensure icons look good */
 }
 
 /** Should not invert icon on dashboard **/
-.dark-mode .dashboard .fe {
+.dark-mode .dashboard [class^="icon-"],
+.dark-mode .dashboard [class*=" icon-"] {
   filter: none;
 }
 
 /** Should not invert icon inside btn-outline-danger **/
-.dark-mode .btn-outline-danger .fe {
+.dark-mode .btn-outline-danger [class^="icon-"],
+.dark-mode .btn-outline-danger [class*=" icon-"] {
   filter: none;
 }
 
@@ -160,11 +163,12 @@ body.dark-mode {
 }
 
 /** EDF Tempo icon for example **/
-.dark-mode .dark-mode-no-invert .fe {
+.dark-mode .dark-mode-no-invert [class^="icon-"],
+.dark-mode .dark-mode-no-invert [class*=" icon-"] {
   filter: none;
 }
 
-.dark-mode .dark-mode-fe-none-filter {
+.dark-mode .dark-mode-icon-none-filter {
   filter: none;
 }
 

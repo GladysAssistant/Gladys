@@ -179,7 +179,7 @@ const ActionCard = ({ children, ...props }) => {
         })}
       >
         <div ref={drag} class="card-header">
-          {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-fe-none-filter')} />}
+          {props.action.type !== null && <i class={cx(ACTION_ICON[props.action.type], 'dark-mode-icon-none-filter')} />}
           {props.action.type === null && <i class="icon-circle-plus" />}
           <div class="card-title">
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
