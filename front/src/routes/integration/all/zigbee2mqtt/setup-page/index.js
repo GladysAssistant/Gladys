@@ -15,7 +15,8 @@ const VARIABLE_MAP = {
   Z2M_MQTT_MODE: 'mqttMode',
   Z2M_MQTT_URL: 'mqttUrl',
   GLADYS_MQTT_USERNAME: 'mqttUsername',
-  GLADYS_MQTT_PASSWORD: 'mqttPassword'
+  GLADYS_MQTT_PASSWORD: 'mqttPassword',
+  Z2M_FRONTEND_URL: 'z2mFrontendUrl'
 };
 
 class Zigbee2mqttSetupPage extends Component {
