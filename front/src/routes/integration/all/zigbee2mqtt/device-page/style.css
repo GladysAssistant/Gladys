@@ -20,3 +20,16 @@
 .z2mActionButtons > a button {
   width: 100%;
 }
+
+.z2mDeviceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.z2mDeviceLinkLogo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}

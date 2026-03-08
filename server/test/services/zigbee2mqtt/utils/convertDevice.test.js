@@ -65,7 +65,7 @@ describe('zigbee2mqtt convertDevice', () => {
   it('should return ikea E1743 device', () => {
     const zigbee2mqttDevice = {
       friendly_name: '0x5c0272fffxxxxx',
-      ieee_address: '0x5c0272fffeaxxxxx',
+      ieee_address: '0x5c0272fffxxxxx',
       status: 'successful',
       supported: true,
       definition: {
@@ -149,6 +149,7 @@ describe('zigbee2mqtt convertDevice', () => {
     expect(result).to.deep.equal({
       name: '0x5c0272fffxxxxx',
       model: 'E1743',
+      ieee_address: '0x5c0272fffxxxxx',
       external_id: 'zigbee2mqtt:0x5c0272fffxxxxx',
       features: [
         {
@@ -255,6 +256,7 @@ describe('zigbee2mqtt convertDevice', () => {
     expect(result).to.deep.equal({
       name: 'Lixee ZLinky TIC',
       model: 'ZLinky_TIC',
+      ieee_address: '0x00158d00045a8abc',
       external_id: 'zigbee2mqtt:Lixee ZLinky TIC',
       features: [
         {

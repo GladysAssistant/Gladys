@@ -23,6 +23,7 @@ class Zigbee2mqttIntegration extends Component {
     this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
     this.props.getDiscoveredDevices();
+    this.props.getZ2mUrl();
   }
 
   componentWillUnmount() {
@@ -47,7 +48,7 @@ class Zigbee2mqttIntegration extends Component {
 
 export default withIntlAsProp(
   connect(
-    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting',
+    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl',
     actions
   )(Zigbee2mqttIntegration)
 );

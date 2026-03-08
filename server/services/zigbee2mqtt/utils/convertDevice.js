@@ -9,7 +9,7 @@ const { mapDefinition } = require('./features/mapDefinition');
  * convertDevice({ friendly_name: 'name', definition: {} }, '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
  */
 function convertDevice(device, serviceId) {
-  const { friendly_name: name, definition = {} } = device;
+  const { friendly_name: name, definition = {}, ieee_address: ieeeAddress } = device;
   const { model } = definition;
   const features = mapDefinition(name, definition);
 
@@ -21,6 +21,10 @@ function convertDevice(device, serviceId) {
     should_poll: false,
     service_id: serviceId,
   };
+
+  if (ieeeAddress) {
+    gladysDevice.ieee_address = ieeeAddress;
+  }
 
   return gladysDevice;
 }

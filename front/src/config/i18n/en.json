@@ -879,6 +879,8 @@
         "mqtt": "MQTT",
         "status": "Status",
         "connectionUrl": "Zigbee2mqtt Interface URL: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "Zigbee2mqtt Interface URL",
+        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {
           "title": "Reset Integration",
           "description": "Use this option if you want to start from scratch with Zigbee2mqtt. This can be useful if your configuration is corrupted or if you want to change your Zigbee coordinator.",
@@ -908,6 +910,7 @@
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
       "ieeeAddressLabel": "IEEE Address",
+      "openInZ2mButton": "Open in Zigbee2mqtt",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% Zigbee2mqtt MQTT value",
       "featuresLabel": "Features",
