@@ -15,10 +15,10 @@ import {
 } from './commons/deviceHelpers';
 import {
   buildIssueTitle,
+  buildFollowUpIssueTitle,
   buildGithubSearchUrl,
-  checkGithubIssueExists,
+  checkGithubIssues,
   createGithubIssueData,
-  createGithubUrl,
   createEmptyGithubIssueUrl
 } from './commons/githubIssue';
 
@@ -158,7 +158,10 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: false
+      githubIssueOpened: false,
+      githubIssueLatestIssueNumber: null,
+      githubIssueTargetTitle: null,
+      githubIssueSkipDuplicateCheck: false
     });
   }
 
@@ -189,7 +192,10 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: null,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: null,
-        githubIssueOpened: false
+        githubIssueOpened: false,
+        githubIssueLatestIssueNumber: null,
+        githubIssueTargetTitle: null,
+        githubIssueSkipDuplicateCheck: false
       });
       return;
     }
@@ -226,7 +232,10 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: false
+      githubIssueOpened: false,
+      githubIssueLatestIssueNumber: null,
+      githubIssueTargetTitle: null,
+      githubIssueSkipDuplicateCheck: false
     });
   };
 
@@ -439,56 +448,63 @@ class TuyaDeviceBox extends Component {
     });
   };
 
-  handleCreateGithubIssue = async e => {
-    if (e && e.preventDefault) {
-      e.preventDefault();
-    }
+  startGithubIssueCreation = async ({ skipDuplicateCheck = false, followUp = false } = {}) => {
     const {
       githubIssueChecking,
       githubIssueExists,
       githubIssuePayload,
       githubIssuePayloadUrl,
       githubIssueOpened,
+      githubIssueLatestIssueNumber,
       device,
       localPollStatus,
       localPollError,
       localPollValidation,
       localPollDps
     } = this.state;
-    if (githubIssueChecking || githubIssueExists || githubIssuePayload || githubIssuePayloadUrl || githubIssueOpened) {
+    if (githubIssueChecking || githubIssuePayload || githubIssuePayloadUrl || githubIssueOpened) {
+      return;
+    }
+    if (!followUp && githubIssueExists) {
       return;
     }
     const persistedLocalPollDps = getLocalPollDpsFromParams(device);
     const effectiveLocalPollDps = localPollDps || persistedLocalPollDps;
-    const issueData = createGithubIssueData(
-      device,
-      localPollStatus,
-      localPollError,
-      localPollValidation,
-      effectiveLocalPollDps
-    );
-    const issueUrl = issueData.url;
-    const issueTitle = buildIssueTitle(device);
+    const baseIssueTitle = buildIssueTitle(device);
+
     const popup = window.open('about:blank', '_blank');
     if (popup) {
       popup.opener = null;
-      popup.document.title = 'GitHub';
-      popup.document.body.innerText = 'Searching for existing issues...';
-    }
-
-    this.setState({ githubIssueChecking: true });
-
-    let shouldOpenIssue = true;
-    try {
-      const exists = await checkGithubIssueExists(issueTitle);
-      if (exists) {
-        shouldOpenIssue = false;
-        this.setState({ githubIssueExists: true });
+      if (!skipDuplicateCheck) {
+        popup.document.title = 'GitHub';
+        popup.document.body.innerText = 'Searching for existing issues...';
       }
-    } catch (error) {
-      shouldOpenIssue = true;
-    } finally {
-      this.setState({ githubIssueChecking: false });
+    }
+    let latestIssueNumber = githubIssueLatestIssueNumber;
+    let shouldOpenIssue = true;
+    if (!skipDuplicateCheck) {
+      this.setState({ githubIssueChecking: true });
+      try {
+        const searchResult = await checkGithubIssues(baseIssueTitle);
+        latestIssueNumber = searchResult.latestIssueNumber;
+        if (searchResult.exists) {
+          shouldOpenIssue = false;
+          this.setState({
+            githubIssueExists: true,
+            githubIssueLatestIssueNumber: searchResult.latestIssueNumber,
+            githubIssuePayload: null,
+            githubIssuePayloadCopied: false,
+            githubIssuePayloadUrl: null,
+            githubIssueOpened: false,
+            githubIssueTargetTitle: null,
+            githubIssueSkipDuplicateCheck: false
+          });
+        }
+      } catch (error) {
+        shouldOpenIssue = true;
+      } finally {
+        this.setState({ githubIssueChecking: false });
+      }
     }
 
     const closePopup = () => {
@@ -503,10 +519,23 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: null,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: null,
-        githubIssueOpened: false
+        githubIssueOpened: false,
+        githubIssueTargetTitle: null,
+        githubIssueSkipDuplicateCheck: false
       });
       return;
     }
+
+    const targetIssueTitle = followUp ? buildFollowUpIssueTitle(baseIssueTitle, latestIssueNumber) : baseIssueTitle;
+    const issueData = createGithubIssueData(
+      device,
+      localPollStatus,
+      localPollError,
+      localPollValidation,
+      effectiveLocalPollDps,
+      { title: targetIssueTitle }
+    );
+    const issueUrl = issueData.url;
 
     if (issueData.truncated) {
       closePopup();
@@ -514,7 +543,10 @@ class TuyaDeviceBox extends Component {
         githubIssuePayload: issueData.body,
         githubIssuePayloadCopied: false,
         githubIssuePayloadUrl: issueData.url,
-        githubIssueOpened: false
+        githubIssueOpened: false,
+        githubIssueTargetTitle: targetIssueTitle,
+        githubIssueSkipDuplicateCheck: skipDuplicateCheck || followUp,
+        githubIssueLatestIssueNumber: latestIssueNumber
       });
       return;
     }
@@ -523,7 +555,10 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload: null,
       githubIssuePayloadCopied: false,
       githubIssuePayloadUrl: null,
-      githubIssueOpened: true
+      githubIssueOpened: true,
+      githubIssueTargetTitle: targetIssueTitle,
+      githubIssueSkipDuplicateCheck: skipDuplicateCheck || followUp,
+      githubIssueLatestIssueNumber: latestIssueNumber
     });
 
     if (popup) {
@@ -531,6 +566,20 @@ class TuyaDeviceBox extends Component {
       return;
     }
     window.open(issueUrl, '_blank');
+  };
+
+  handleCreateGithubIssue = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    await this.startGithubIssueCreation({ skipDuplicateCheck: false, followUp: false });
+  };
+
+  handleCreateGithubIssueAnyway = async e => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    await this.startGithubIssueCreation({ skipDuplicateCheck: true, followUp: true });
   };
 
   copyGithubIssuePayload = async e => {
@@ -569,25 +618,44 @@ class TuyaDeviceBox extends Component {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
-    const { githubIssuePayloadUrl, githubIssueChecking, githubIssueExists, githubIssueOpened, device } = this.state;
-    if (!githubIssuePayloadUrl || githubIssueChecking || githubIssueExists || githubIssueOpened || !device) {
+    const {
+      githubIssuePayloadUrl,
+      githubIssueChecking,
+      githubIssueOpened,
+      device,
+      githubIssueTargetTitle,
+      githubIssueSkipDuplicateCheck
+    } = this.state;
+    if (!githubIssuePayloadUrl || githubIssueChecking || githubIssueOpened || !device) {
       return;
     }
-    const issueTitle = buildIssueTitle(device);
+    const issueTitle = githubIssueTargetTitle || buildIssueTitle(device);
     const popup = window.open('about:blank', '_blank');
     if (popup) {
       popup.opener = null;
     }
+    if (githubIssueSkipDuplicateCheck) {
+      if (popup && !popup.closed) {
+        popup.location.href = createEmptyGithubIssueUrl(issueTitle);
+      } else {
+        window.open(createEmptyGithubIssueUrl(issueTitle), '_blank');
+      }
+      this.setState({ githubIssueOpened: true });
+      return;
+    }
     this.setState({ githubIssueChecking: true });
     let shouldOpenIssue = true;
     try {
-      const exists = await checkGithubIssueExists(issueTitle);
-      if (exists) {
+      const searchResult = await checkGithubIssues(issueTitle);
+      if (searchResult.exists) {
         shouldOpenIssue = false;
         if (popup && !popup.closed) {
           popup.close();
         }
-        this.setState({ githubIssueExists: true });
+        this.setState({
+          githubIssueExists: true,
+          githubIssueLatestIssueNumber: searchResult.latestIssueNumber
+        });
       }
     } catch (error) {
       shouldOpenIssue = true;
@@ -693,7 +761,8 @@ class TuyaDeviceBox extends Component {
       githubIssuePayload,
       githubIssuePayloadCopied,
       githubIssuePayloadUrl,
-      githubIssueOpened
+      githubIssueOpened,
+      githubIssueLatestIssueNumber
     }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -743,6 +812,11 @@ class TuyaDeviceBox extends Component {
         : 'integration.tuya.device.partialFeaturesCount';
     const disableGithubIssueButton =
       githubIssueChecking || githubIssueExists || githubIssueOpened || githubIssuePayloadUrl || githubIssuePayload;
+    const disableGithubIssueCreateAnywayButton = githubIssueChecking || githubIssueOpened || githubIssuePayload;
+    const shouldShowGithubIssuePayloadPanel = Boolean(githubIssuePayload || githubIssuePayloadCopied);
+    const shouldShowGithubIssuePayloadInsideExistingInfo = Boolean(
+      githubIssueExists && (githubIssuePayload || githubIssuePayloadCopied || githubIssuePayloadUrl)
+    );
 
     const renderGithubIssueButton = (labelId, extraClass = '') => (
       <a
@@ -750,17 +824,7 @@ class TuyaDeviceBox extends Component {
           [extraClass]: !!extraClass,
           disabled: disableGithubIssueButton
         })}
-        href={
-          disableGithubIssueButton
-            ? '#'
-            : createGithubUrl(
-                this.state.device,
-                localPollStatus,
-                localPollError,
-                localPollValidation,
-                effectiveLocalPollDps
-              )
-        }
+        href="#"
         onClick={this.handleCreateGithubIssue}
         aria-disabled={disableGithubIssueButton}
         tabIndex={disableGithubIssueButton ? -1 : undefined}
@@ -771,15 +835,75 @@ class TuyaDeviceBox extends Component {
       </a>
     );
 
+    const renderGithubIssueCreateAnywayButton = () => (
+      <button
+        onClick={this.handleCreateGithubIssueAnyway}
+        class="btn btn-outline-secondary mt-2"
+        disabled={disableGithubIssueCreateAnywayButton}
+      >
+        <Text id="integration.tuya.device.githubIssueCreateAnywayButton" />
+      </button>
+    );
+
+    const renderGithubIssuePayloadContent = () => (
+      <div>
+        <Text id="integration.tuya.device.githubIssuePayloadInfo" />
+        <textarea
+          class="form-control mt-2"
+          rows="6"
+          readOnly
+          value={githubIssuePayload || ''}
+          ref={el => {
+            this.githubIssueTextarea = el;
+          }}
+        />
+        <div class="d-flex align-items-center mt-2">
+          <button onClick={this.copyGithubIssuePayload} class="btn btn-outline-primary">
+            <Text id="integration.tuya.device.githubIssuePayloadCopyButton" />
+          </button>
+          <button
+            onClick={this.openEmptyGithubIssue}
+            class="btn btn-outline-secondary ml-auto"
+            disabled={!githubIssuePayloadUrl || githubIssueChecking || githubIssueOpened}
+          >
+            <Text id="integration.tuya.device.githubIssuePayloadOpenEmptyButton" />
+          </button>
+        </div>
+        {githubIssuePayloadCopied && (
+          <div class="text-success mt-2">
+            <Text id="integration.tuya.device.githubIssuePayloadCopied" />
+          </div>
+        )}
+      </div>
+    );
+
+    const renderGithubIssueExistingInfo = (withMargin = true) =>
+      githubIssueExists ? (
+        <div class={cx('alert alert-info', { 'mt-2': withMargin })}>
+          <MarkupText id="integration.tuya.device.githubIssueExistsInfo" fields={{ issuesUrl: githubIssuesUrl }} />
+          {shouldShowGithubIssuePayloadInsideExistingInfo ? (
+            <div class="mt-3">{renderGithubIssuePayloadContent()}</div>
+          ) : (
+            <>
+              <div class="text-muted mt-2">
+                <Text
+                  id="integration.tuya.device.githubIssueCreateAnywayInfo"
+                  fields={{ issueNumber: githubIssueLatestIssueNumber || '?' }}
+                />
+              </div>
+              <div>{renderGithubIssueCreateAnywayButton()}</div>
+            </>
+          )}
+        </div>
+      ) : null;
+
     const renderGithubIssueAction = () => (
       <div>
         <div class="d-flex flex-wrap">
           {renderGithubIssueButton('integration.tuya.device.createGithubIssue', 'ml-sm-auto')}
         </div>
         {githubIssueExists ? (
-          <div class="alert alert-info mt-2">
-            <MarkupText id="integration.tuya.device.githubIssueExistsInfo" fields={{ issuesUrl: githubIssuesUrl }} />
-          </div>
+          renderGithubIssueExistingInfo()
         ) : (
           <div class="text-muted mt-2">
             <Text id="integration.tuya.device.githubIssueInfo" />
@@ -800,42 +924,10 @@ class TuyaDeviceBox extends Component {
     );
 
     const renderGithubIssuePayloadInfo = () => {
-      if (!githubIssuePayload && !githubIssuePayloadCopied) {
+      if (!shouldShowGithubIssuePayloadPanel || githubIssueExists || shouldShowGithubIssuePayloadInsideExistingInfo) {
         return null;
       }
-      return (
-        <div class="alert alert-info mt-2">
-          <div>
-            <Text id="integration.tuya.device.githubIssuePayloadInfo" />
-            <textarea
-              class="form-control mt-2"
-              rows="6"
-              readOnly
-              value={githubIssuePayload || ''}
-              ref={el => {
-                this.githubIssueTextarea = el;
-              }}
-            />
-            <div class="d-flex align-items-center mt-2">
-              <button onClick={this.copyGithubIssuePayload} class="btn btn-outline-primary">
-                <Text id="integration.tuya.device.githubIssuePayloadCopyButton" />
-              </button>
-              <button
-                onClick={this.openEmptyGithubIssue}
-                class="btn btn-outline-secondary ml-auto"
-                disabled={!githubIssuePayloadUrl || githubIssueChecking || githubIssueExists || githubIssueOpened}
-              >
-                <Text id="integration.tuya.device.githubIssuePayloadOpenEmptyButton" />
-              </button>
-            </div>
-            {githubIssuePayloadCopied && (
-              <div class="text-success mt-2">
-                <Text id="integration.tuya.device.githubIssuePayloadCopied" />
-              </div>
-            )}
-          </div>
-        </div>
-      );
+      return <div class="alert alert-info mt-2">{renderGithubIssuePayloadContent()}</div>;
     };
 
     return (
@@ -1123,12 +1215,7 @@ class TuyaDeviceBox extends Component {
                 {hasPartialSupport && isDiscoverPage && (
                   <>
                     {githubIssueExists ? (
-                      <div class="alert alert-info mt-2">
-                        <MarkupText
-                          id="integration.tuya.device.githubIssueExistsInfo"
-                          fields={{ issuesUrl: githubIssuesUrl }}
-                        />
-                      </div>
+                      renderGithubIssueExistingInfo()
                     ) : (
                       <div class="text-muted mt-2">
                         <Text id="integration.tuya.device.githubIssueInfo" />

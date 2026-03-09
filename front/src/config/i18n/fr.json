@@ -1368,6 +1368,8 @@
         "githubIssuePayloadCopyButton": "Copier le contenu",
         "githubIssuePayloadOpenEmptyButton": "Créer l'issue vide",
         "githubIssueExistsInfo": "Une issue existe déjà pour ce périphérique. Un développeur s'en occupera prochainement. N'hésitez pas à demander sur le forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />Vous pouvez consulter les issues correspondantes sur GitHub ici : <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">liste des issues</a>.",
+        "githubIssueCreateAnywayInfo": "Si besoin, vous pouvez tout de même créer une issue de suivi basée sur la plus récente (#{{issueNumber}}). Avant d'en recréer une nouvelle, vérifiez qu'une autre issue similaire encore ouverte n'existe pas déjà. Si c'est le cas et que vous en êtes propriétaire, fermez-la ou mettez-la à jour si nécessaire avant de créer la nouvelle.",
+        "githubIssueCreateAnywayButton": "Créer une issue de suivi",
         "partialFeaturesCount": "({{count}} non implémentée(s))",
         "partialFeaturesCountDiscover": "({{count}} non implémentable(s))"
       },
