@@ -1238,6 +1238,8 @@
         "githubIssuePayloadCopyButton": "Inhalt kopieren",
         "githubIssuePayloadOpenEmptyButton": "Leeres Issue erstellen",
         "githubIssueExistsInfo": "Für dieses Gerät existiert bereits ein Issue. Ein Entwickler kümmert sich demnächst darum. Bei Fragen gerne im Forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />Die passenden GitHub-Issues findest du hier: <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">Issue-Liste</a>.",
+        "githubIssueCreateAnywayInfo": "Bei Bedarf kannst du trotzdem ein Folge-Issue auf Basis des neuesten (#{{issueNumber}}) erstellen. Prüfe vorher, ob bereits ein anderes ähnliches, noch offenes Issue existiert. Falls ja und es dir gehört, schließe es oder aktualisiere es bei Bedarf, bevor du ein neues erstellst.",
+        "githubIssueCreateAnywayButton": "Folge-Issue erstellen",
         "partialFeaturesCount": "({{count}} nicht unterstützt)",
         "partialFeaturesCountDiscover": "({{count}} noch nicht unterstützt)"
       },
