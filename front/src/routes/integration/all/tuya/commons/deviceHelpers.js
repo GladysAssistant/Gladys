@@ -6,6 +6,38 @@ const LOCAL_CODE_ALIASES = {
 export const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 
+export const resolveOnlineStatus = (device, recentMinutes = 5) => {
+  const features = Array.isArray(device && device.features) ? device.features : [];
+  let mostRecentFeatureTimestamp = null;
+
+  for (let i = 0; i < features.length; i += 1) {
+    const rawDate = features[i] && features[i].last_value_changed;
+    if (!rawDate) {
+      continue;
+    }
+    let parsedDate = new Date(rawDate);
+    if (Number.isNaN(parsedDate.getTime()) && typeof rawDate === 'string') {
+      parsedDate = new Date(rawDate.replace(' ', 'T').replace(' +', '+'));
+    }
+    if (Number.isNaN(parsedDate.getTime())) {
+      continue;
+    }
+    const timestamp = parsedDate.getTime();
+    if (mostRecentFeatureTimestamp === null || timestamp > mostRecentFeatureTimestamp) {
+      mostRecentFeatureTimestamp = timestamp;
+    }
+  }
+
+  if (mostRecentFeatureTimestamp !== null) {
+    const isReachableFromRecentFeatures = Date.now() - mostRecentFeatureTimestamp <= recentMinutes * 60 * 1000;
+    if (isReachableFromRecentFeatures) {
+      return true;
+    }
+  }
+
+  return normalizeBoolean(device && device.online);
+};
+
 const getIgnoredLocalDps = device => {
   const mapping = device && device.tuya_mapping ? device.tuya_mapping : null;
   const ignored = mapping && Array.isArray(mapping.ignored_local_dps) ? mapping.ignored_local_dps : [];
@@ -154,10 +186,19 @@ export const getLocalOverrideValue = device => {
   if (!device) {
     return undefined;
   }
-  if (device.local_override !== undefined && device.local_override !== null) {
-    return device.local_override;
+  const localOverrideParam = getParamValue(device, 'LOCAL_OVERRIDE');
+  if (localOverrideParam !== undefined && localOverrideParam !== null) {
+    return localOverrideParam;
   }
-  return getParamValue(device, 'LOCAL_OVERRIDE');
+  return device.local_override;
+};
+
+export const getTuyaDeviceId = device => {
+  if (!device || !device.external_id) {
+    return '';
+  }
+  const splitExternalId = String(device.external_id).split(':');
+  return splitExternalId[1] || device.external_id;
 };
 
 export const getLocalPollDpsFromParams = device => {

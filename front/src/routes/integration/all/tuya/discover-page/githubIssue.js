@@ -7,7 +7,7 @@ import {
   getProductIdentifier,
   getUnknownDpsKeys,
   getUnknownSpecificationCodes
-} from './deviceHelpers';
+} from '../commons/deviceHelpers';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
@@ -363,11 +363,6 @@ export const checkGithubIssues = async title => {
   return result;
 };
 
-export const checkGithubIssueExists = async title => {
-  const result = await checkGithubIssues(title);
-  return result.exists;
-};
-
 const buildIssuePayload = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
   if (!device) {
     return null;
@@ -640,8 +635,5 @@ export const createGithubIssueData = (
     title: issueTitle
   };
 };
-
-export const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps, options) =>
-  createGithubIssueData(device, localPollStatus, localPollError, localPollValidation, localPollDps, options).url;
 
 export const createEmptyGithubIssueUrl = title => `${GITHUB_BASE_URL}?title=${encodeURIComponent(title)}`;
