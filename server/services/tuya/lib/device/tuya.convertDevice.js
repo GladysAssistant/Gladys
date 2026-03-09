@@ -4,7 +4,7 @@ const { normalizeBoolean } = require('../utils/tuya.normalize');
 const { resolveCloudReadStrategy } = require('../utils/tuya.cloudStrategy');
 const { mergeTuyaReport } = require('../utils/tuya.report');
 const { convertFeature } = require('./tuya.convertFeature');
-const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
+const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps, DEVICE_TYPES } = require('../mappings');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -30,6 +30,7 @@ function convertDevice(tuyaDevice) {
     properties,
     thing_model: thingModel,
     specifications = {},
+    status: deviceStatus,
     category,
     tuya_report: tuyaReport,
   } = tuyaDevice;
@@ -41,6 +42,7 @@ function convertDevice(tuyaDevice) {
   logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
   const deviceType = getDeviceType({
     specifications,
+    status: deviceStatus,
     model,
     product_name: productName,
     product_id: productId,
@@ -101,6 +103,19 @@ function convertDevice(tuyaDevice) {
     const { code } = func;
     groups[code] = { ...func, readOnly: false };
   });
+  const topLevelStatus = Array.isArray(deviceStatus) ? deviceStatus : [];
+  topLevelStatus.forEach((entry) => {
+    const { code } = entry || {};
+    if (!code || groups[code]) {
+      return;
+    }
+    groups[code] = {
+      code,
+      name: code,
+      values: {},
+      readOnly: true,
+    };
+  });
   const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
   services.forEach((service) => {
     const thingProperties = Array.isArray(service && service.properties) ? service.properties : [];
@@ -139,10 +154,18 @@ function convertDevice(tuyaDevice) {
       ignoredCloudCodes,
     }),
   );
+  const filteredFeatures = features.filter((feature) => feature);
+  if (filteredFeatures.length === 0 && deviceType !== DEVICE_TYPES.UNKNOWN) {
+    logger.debug(
+      `[Tuya][convertDevice] inferred type=${deviceType} but no supported feature found (device=${id || 'unknown'} product_id=${
+        productId || 'unknown'
+      } spec_functions=${functions.length} spec_status=${status.length} list_status=${topLevelStatus.length} shadow_properties=${currentProperties.length} thing_services=${services.length})`,
+    );
+  }
 
   const device = {
     name,
-    features: features.filter((feature) => feature),
+    features: filteredFeatures,
     device_type: deviceType,
     external_id: externalId,
     selector: externalId,
