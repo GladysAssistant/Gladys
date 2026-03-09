@@ -277,15 +277,68 @@ class TuyaDeviceBox extends Component {
       localPollProtocol: null,
       localPollDps: null
     });
-    const params = Array.isArray(currentDevice.params) ? currentDevice.params : [];
+    const params = Array.isArray(currentDevice.params) ? [...currentDevice.params] : [];
     const getParam = name => {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
+    const setParam = (targetParams, name, value) => {
+      if (value === undefined || value === null || value === '') {
+        return;
+      }
+      const index = targetParams.findIndex(param => param.name === name);
+      if (index >= 0) {
+        targetParams[index] = { ...targetParams[index], value };
+      } else {
+        targetParams.push({ name, value });
+      }
+    };
+    const isValidIpAddress = ip =>
+      typeof ip === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ip);
     const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
     const selectedProtocol = getParam('PROTOCOL_VERSION') || currentDevice.protocol_version;
-    const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
+    const deviceId = currentDevice.external_id
+      ? currentDevice.external_id.split(':')[1] || currentDevice.external_id
+      : undefined;
+    const localKey = getParam('LOCAL_KEY') || currentDevice.local_key;
+    const localOverrideRaw =
+      getParam('LOCAL_OVERRIDE') !== undefined ? getParam('LOCAL_OVERRIDE') : currentDevice.local_override;
+    const localOverride = normalizeBoolean(localOverrideRaw);
+    let resolvedIp = getParam('IP_ADDRESS') || currentDevice.ip;
+    let scannedProtocolVersion = null;
+    let scannedDevice = null;
     try {
+      if (localOverride === true && localKey && deviceId && !isValidIpAddress(resolvedIp)) {
+        const localScanResponse = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', {
+          timeoutSeconds: 5
+        });
+        const localDevices =
+          localScanResponse && localScanResponse.local_devices && typeof localScanResponse.local_devices === 'object'
+            ? localScanResponse.local_devices
+            : {};
+        const localInfo = localDevices[deviceId];
+        if (!localInfo || !localInfo.ip) {
+          throw new Error('Local auto scan did not find this device IP');
+        }
+        resolvedIp = localInfo.ip;
+        scannedProtocolVersion = localInfo.version || null;
+        setParam(params, 'IP_ADDRESS', resolvedIp);
+        if (scannedProtocolVersion) {
+          setParam(params, 'PROTOCOL_VERSION', scannedProtocolVersion);
+        }
+        if (Array.isArray(localScanResponse && localScanResponse.devices)) {
+          scannedDevice =
+            localScanResponse.devices.find(device => device.external_id === `tuya:${deviceId}`) ||
+            localScanResponse.devices.find(device => device.external_id === currentDevice.external_id) ||
+            null;
+        }
+      }
+
+      const protocolList = selectedProtocol
+        ? [selectedProtocol]
+        : scannedProtocolVersion
+        ? [scannedProtocolVersion, ...tryProtocols.filter(protocol => protocol !== scannedProtocolVersion)]
+        : tryProtocols;
       let result = null;
       let usedProtocol = selectedProtocol;
       let latestDevice = null;
@@ -297,11 +350,9 @@ class TuyaDeviceBox extends Component {
             localPollProtocol: protocolVersion
           });
           const response = await this.props.httpClient.post('/api/v1/service/tuya/local-poll', {
-            deviceId: currentDevice.external_id
-              ? currentDevice.external_id.split(':')[1] || currentDevice.external_id
-              : undefined,
-            ip: getParam('IP_ADDRESS') || currentDevice.ip,
-            localKey: getParam('LOCAL_KEY') || currentDevice.local_key,
+            deviceId,
+            ip: resolvedIp,
+            localKey,
             protocolVersion,
             timeoutMs: 3000,
             fastScan: true
@@ -322,9 +373,17 @@ class TuyaDeviceBox extends Component {
           }
         }
       }
-      const baseDevice = latestDevice || currentDevice;
+      const baseDevice = latestDevice || scannedDevice || currentDevice;
       const baseParams = Array.isArray(baseDevice.params) ? [...baseDevice.params] : [];
       const newParams = baseParams;
+      if (resolvedIp) {
+        const ipIndex = newParams.findIndex(param => param.name === 'IP_ADDRESS');
+        if (ipIndex >= 0) {
+          newParams[ipIndex] = { ...newParams[ipIndex], value: resolvedIp };
+        } else {
+          newParams.push({ name: 'IP_ADDRESS', value: resolvedIp });
+        }
+      }
       if (usedProtocol) {
         const protocolIndex = newParams.findIndex(param => param.name === 'PROTOCOL_VERSION');
         if (protocolIndex >= 0) {
@@ -341,7 +400,7 @@ class TuyaDeviceBox extends Component {
         localPollStatus: RequestStatus.Success,
         localPollProtocol: null,
         localPollValidation: {
-          ip: getParam('IP_ADDRESS') || currentDevice.ip || '',
+          ip: resolvedIp || '',
           protocol: usedProtocol || '',
           localOverride: true
         },
@@ -658,9 +717,7 @@ class TuyaDeviceBox extends Component {
     const cloudIp = params.CLOUD_IP || device.cloud_ip || '';
     const showCloudIp = localOverride !== true;
     const displayIp = showCloudIp ? cloudIp : ipAddress;
-    const isValidIp =
-      typeof ipAddress === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
-    const canPollLocal = localOverride === true && isValidIp && localKey;
+    const canPollLocal = localOverride === true && !!localKey && !!deviceId;
     const hasLocalChanges = hasDeviceChanged(device, this.state.baselineDevice);
     const currentLocalConfig = getLocalConfig(device);
     const baselineLocalConfig = getLocalConfig(this.state.baselineDevice);
