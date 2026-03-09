@@ -234,10 +234,42 @@ const buildSuggestedManifest = issuePayload => {
 const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, localPollError, effectiveLocalPollDps) => {
   const unknownSpecificationCodes = getUnknownSpecificationCodes(device.specifications, device.features, device);
   const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features, device);
+  const listEntry = get(issuePayload, 'cloud.raw.device_list_entry.response_item') || {};
+  const listStatus = Array.isArray(listEntry.status) ? listEntry.status : [];
+  const assembledSpecifications = get(issuePayload, 'cloud.assembled.specifications') || {};
+  const assembledProperties = get(issuePayload, 'cloud.assembled.properties') || {};
+  const assembledThingModel = get(issuePayload, 'cloud.assembled.thing_model') || {};
+  const thingServices = Array.isArray(assembledThingModel.services) ? assembledThingModel.services : [];
+  const thingModelPropertyCount = thingServices.reduce((acc, service) => {
+    const serviceProperties = Array.isArray(service && service.properties) ? service.properties : [];
+    return acc + serviceProperties.length;
+  }, 0);
+  const cloudErrors = compactObject({
+    specification: get(issuePayload, 'cloud.raw.device_specification.error') || null,
+    details: get(issuePayload, 'cloud.raw.device_details.error') || null,
+    shadow_properties: get(issuePayload, 'cloud.raw.thing_shadow_properties.error') || null,
+    thing_model: get(issuePayload, 'cloud.raw.thing_model.error') || null
+  });
   return compactObject({
     selector: get(issuePayload, 'device.selector') || null,
     service_id: get(issuePayload, 'device.service_id') || null,
     device_type: get(issuePayload, 'device.device_type') || null,
+    feature_count: Array.isArray(get(issuePayload, 'device.features')) ? get(issuePayload, 'device.features').length : 0,
+    discovery_inputs: {
+      product_id: get(issuePayload, 'device.product_id') || null,
+      model: get(issuePayload, 'device.model') || null,
+      category_from_specification: assembledSpecifications.category || null,
+      category_from_list_entry: listEntry.category || null,
+      thing_model_id: assembledThingModel.modelId || null
+    },
+    cloud_source_counts: {
+      specification_functions: Array.isArray(assembledSpecifications.functions) ? assembledSpecifications.functions.length : 0,
+      specification_status: Array.isArray(assembledSpecifications.status) ? assembledSpecifications.status.length : 0,
+      list_status: listStatus.length,
+      shadow_properties: Array.isArray(assembledProperties.properties) ? assembledProperties.properties.length : 0,
+      thing_model_properties: thingModelPropertyCount
+    },
+    cloud_raw_errors: Object.keys(cloudErrors).length > 0 ? cloudErrors : undefined,
     protocol_version: get(issuePayload, 'device.protocol_version') || null,
     poll_frequency: get(issuePayload, 'device.poll_frequency') || null,
     should_poll: get(issuePayload, 'device.should_poll') || null,
