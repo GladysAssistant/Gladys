@@ -157,9 +157,12 @@ function convertDevice(tuyaDevice) {
   const filteredFeatures = features.filter((feature) => feature);
   if (filteredFeatures.length === 0 && deviceType !== DEVICE_TYPES.UNKNOWN) {
     logger.debug(
-      `[Tuya][convertDevice] inferred type=${deviceType} but no supported feature found (device=${id || 'unknown'} product_id=${
-        productId || 'unknown'
-      } spec_functions=${functions.length} spec_status=${status.length} list_status=${topLevelStatus.length} shadow_properties=${currentProperties.length} thing_services=${services.length})`,
+      `[Tuya][convertDevice] inferred type=${deviceType} but no supported feature found (device=${id ||
+        'unknown'} product_id=${productId || 'unknown'} spec_functions=${functions.length} spec_status=${
+        status.length
+      } list_status=${topLevelStatus.length} shadow_properties=${currentProperties.length} thing_services=${
+        services.length
+      })`,
     );
   }
 
