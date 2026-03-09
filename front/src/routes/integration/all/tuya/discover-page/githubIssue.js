@@ -7,7 +7,7 @@ import {
   getProductIdentifier,
   getUnknownDpsKeys,
   getUnknownSpecificationCodes
-} from './deviceHelpers';
+} from '../commons/deviceHelpers';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const GITHUB_SEARCH_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues?q=';
@@ -234,10 +234,46 @@ const buildSuggestedManifest = issuePayload => {
 const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, localPollError, effectiveLocalPollDps) => {
   const unknownSpecificationCodes = getUnknownSpecificationCodes(device.specifications, device.features, device);
   const unknownLocalDpsKeys = getUnknownDpsKeys(effectiveLocalPollDps, device.features, device);
+  const listEntry = get(issuePayload, 'cloud.raw.device_list_entry.response_item') || {};
+  const listStatus = Array.isArray(listEntry.status) ? listEntry.status : [];
+  const assembledSpecifications = get(issuePayload, 'cloud.assembled.specifications') || {};
+  const assembledProperties = get(issuePayload, 'cloud.assembled.properties') || {};
+  const assembledThingModel = get(issuePayload, 'cloud.assembled.thing_model') || {};
+  const thingServices = Array.isArray(assembledThingModel.services) ? assembledThingModel.services : [];
+  const thingModelPropertyCount = thingServices.reduce((acc, service) => {
+    const serviceProperties = Array.isArray(service && service.properties) ? service.properties : [];
+    return acc + serviceProperties.length;
+  }, 0);
+  const cloudErrors = compactObject({
+    specification: get(issuePayload, 'cloud.raw.device_specification.error') || null,
+    details: get(issuePayload, 'cloud.raw.device_details.error') || null,
+    shadow_properties: get(issuePayload, 'cloud.raw.thing_shadow_properties.error') || null,
+    thing_model: get(issuePayload, 'cloud.raw.thing_model.error') || null
+  });
   return compactObject({
     selector: get(issuePayload, 'device.selector') || null,
     service_id: get(issuePayload, 'device.service_id') || null,
     device_type: get(issuePayload, 'device.device_type') || null,
+    feature_count: Array.isArray(get(issuePayload, 'device.features'))
+      ? get(issuePayload, 'device.features').length
+      : 0,
+    discovery_inputs: {
+      product_id: get(issuePayload, 'device.product_id') || null,
+      model: get(issuePayload, 'device.model') || null,
+      category_from_specification: assembledSpecifications.category || null,
+      category_from_list_entry: listEntry.category || null,
+      thing_model_id: assembledThingModel.modelId || null
+    },
+    cloud_source_counts: {
+      specification_functions: Array.isArray(assembledSpecifications.functions)
+        ? assembledSpecifications.functions.length
+        : 0,
+      specification_status: Array.isArray(assembledSpecifications.status) ? assembledSpecifications.status.length : 0,
+      list_status: listStatus.length,
+      shadow_properties: Array.isArray(assembledProperties.properties) ? assembledProperties.properties.length : 0,
+      thing_model_properties: thingModelPropertyCount
+    },
+    cloud_raw_errors: Object.keys(cloudErrors).length > 0 ? cloudErrors : undefined,
     protocol_version: get(issuePayload, 'device.protocol_version') || null,
     poll_frequency: get(issuePayload, 'device.poll_frequency') || null,
     should_poll: get(issuePayload, 'device.should_poll') || null,
@@ -256,10 +292,24 @@ export const buildIssueTitle = device => {
   return `Tuya (${modeLabel}) [${productIdentifier}]: Add support for ${modelLabel}`;
 };
 
+export const buildFollowUpIssueTitle = (baseTitle, latestIssueNumber) => {
+  const normalizedBaseTitle = baseTitle || 'Tuya: Add support for unknown device';
+  const parsedIssueNumber = Number.parseInt(latestIssueNumber, 10);
+  if (Number.isInteger(parsedIssueNumber) && parsedIssueNumber > 0) {
+    return `${normalizedBaseTitle} (follow-up of #${parsedIssueNumber})`;
+  }
+  return `${normalizedBaseTitle} (follow-up)`;
+};
+
 const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "${title}"`;
 
 export const buildGithubSearchUrl = title =>
   `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
+
+const buildGithubSearchApiUrl = title => {
+  const query = buildGithubSearchQuery(title);
+  return `${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}&sort=created&order=desc&per_page=1`;
+};
 
 const setGithubIssueCache = (query, value) => {
   if (githubIssueCache.has(query)) {
@@ -274,21 +324,22 @@ const setGithubIssueCache = (query, value) => {
   githubIssueCache.set(query, value);
 };
 
-export const checkGithubIssueExists = async title => {
+export const checkGithubIssues = async title => {
   const query = buildGithubSearchQuery(title);
   const cached = githubIssueCache.get(query);
   if (cached && Date.now() - cached.timestamp < GITHUB_SEARCH_CACHE_TTL_MS) {
-    return cached.exists;
+    return cached.result;
   }
 
   let response;
+  const searchApiUrl = buildGithubSearchApiUrl(title);
   if (typeof AbortController === 'undefined') {
-    response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`);
+    response = await fetch(searchApiUrl);
   } else {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-      response = await fetch(`${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}`, {
+      response = await fetch(searchApiUrl, {
         signal: controller.signal
       });
     } finally {
@@ -299,9 +350,17 @@ export const checkGithubIssueExists = async title => {
     throw new Error('Github search failed');
   }
   const data = await response.json();
-  const exists = Boolean(data && typeof data.total_count === 'number' && data.total_count > 0);
-  setGithubIssueCache(query, { exists, timestamp: Date.now() });
-  return exists;
+  const totalCount = data && typeof data.total_count === 'number' ? data.total_count : 0;
+  const firstIssue = Array.isArray(data && data.items) && data.items.length > 0 ? data.items[0] : null;
+  const latestIssueNumber =
+    firstIssue && typeof firstIssue.number === 'number' && firstIssue.number > 0 ? firstIssue.number : null;
+  const result = {
+    exists: totalCount > 0,
+    totalCount,
+    latestIssueNumber
+  };
+  setGithubIssueCache(query, { result, timestamp: Date.now() });
+  return result;
 };
 
 const buildIssuePayload = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
@@ -367,6 +426,12 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
   );
 
   const sections = [
+    '## Requester Notes',
+    '',
+    'Please add a short description of your request below (context, expected behavior, observed behavior).',
+    '',
+    '',
+    '',
     '## Summary',
     '',
     'Unsupported or partially supported Tuya device report.',
@@ -548,21 +613,27 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
   return sections.join('\n');
 };
 
-export const createGithubIssueData = (device, localPollStatus, localPollError, localPollValidation, localPollDps) => {
-  const title = encodeURIComponent(buildIssueTitle(device));
+export const createGithubIssueData = (
+  device,
+  localPollStatus,
+  localPollError,
+  localPollValidation,
+  localPollDps,
+  options = {}
+) => {
+  const issueTitle = options.title || buildIssueTitle(device);
+  const title = encodeURIComponent(issueTitle);
   const body = buildIssueBody(device, localPollStatus, localPollError, localPollValidation, localPollDps);
   const urlWithBody = `${GITHUB_BASE_URL}?title=${title}&body=${encodeURIComponent(body)}`;
   if (urlWithBody.length <= MAX_GITHUB_URL_LENGTH) {
-    return { url: urlWithBody, body, truncated: false };
+    return { url: urlWithBody, body, truncated: false, title: issueTitle };
   }
   return {
     url: `${GITHUB_BASE_URL}?title=${title}`,
     body,
-    truncated: true
+    truncated: true,
+    title: issueTitle
   };
 };
-
-export const createGithubUrl = (device, localPollStatus, localPollError, localPollValidation, localPollDps) =>
-  createGithubIssueData(device, localPollStatus, localPollError, localPollValidation, localPollDps).url;
 
 export const createEmptyGithubIssueUrl = title => `${GITHUB_BASE_URL}?title=${encodeURIComponent(title)}`;
