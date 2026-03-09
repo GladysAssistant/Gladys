@@ -1133,6 +1133,8 @@
         "githubIssuePayloadCopyButton": "Copy content",
         "githubIssuePayloadOpenEmptyButton": "Create empty issue",
         "githubIssueExistsInfo": "An issue already exists for this device. A developer will take care of it soon. Feel free to ask on the forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />You can view related issues on GitHub here: <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">issues list</a>.",
+        "githubIssueCreateAnywayInfo": "If needed, you can still create a follow-up issue based on the latest one (#{{issueNumber}}). Before creating a new one, check whether another similar open issue already exists. If so, and you own it, close it or update it if needed before creating a new one.",
+        "githubIssueCreateAnywayButton": "Create follow-up issue",
         "partialFeaturesCount": "({{count}} not implemented)",
         "partialFeaturesCountDiscover": "({{count}} not yet supported)"
       },
