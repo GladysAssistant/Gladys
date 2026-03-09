@@ -497,4 +497,64 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
     expect(updated.features).to.have.length(1);
     expect(updated.features[0].external_id).to.equal('tuya:device1:switch_1');
   });
+
+  it('should rebuild a supported device from existing metadata after local poll', () => {
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: 'bbcg1hrkrj5rifsd',
+          params: [],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    expect(updated.device_type).to.equal('smart-meter');
+    expect(updated.features.length).to.be.greaterThan(0);
+    expect(updated.features.some((feature) => feature.external_id === 'tuya:device1:total_power')).to.equal(true);
+  });
+
+  it('should reuse PRODUCT_ID from params when top-level product_id is missing', () => {
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: undefined,
+          params: [{ name: DEVICE_PARAM_NAME.PRODUCT_ID, value: 'bbcg1hrkrj5rifsd' }],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    expect(updated.product_id).to.equal('bbcg1hrkrj5rifsd');
+    expect(updated.device_type).to.equal('smart-meter');
+    expect(updated.features.length).to.be.greaterThan(0);
+  });
 });

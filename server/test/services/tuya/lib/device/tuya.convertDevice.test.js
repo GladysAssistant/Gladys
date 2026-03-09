@@ -171,4 +171,22 @@ describe('tuya.convertDevice', () => {
     expect(switchFeature.name).to.equal('switch_1');
     expect(powerFeature.scale).to.equal(1);
   });
+
+  it('should build features from top-level cloud status when specifications are empty', () => {
+    const tuyaDevice = {
+      id: 'smart-meter-id',
+      name: 'Smart Meter',
+      model: 'Smart Meter',
+      product_id: 'bbcg1hrkrj5rifsd',
+      local_override: true,
+      specifications: {},
+      status: [{ code: 'total_power', value: 120 }, { code: 'forward_energy_total', value: 35 }],
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+
+    expect(device.device_type).to.equal(DEVICE_TYPES.SMART_METER);
+    expect(device.features.map((feature) => feature.external_id)).to.include('tuya:smart-meter-id:total_power');
+    expect(device.features.map((feature) => feature.external_id)).to.include('tuya:smart-meter-id:forward_energy_total');
+  });
 });

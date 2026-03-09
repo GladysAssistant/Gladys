@@ -8,6 +8,7 @@ const {
   DEVICE_TYPES,
   extractCodesFromSpecifications,
   extractCodesFromFeatures,
+  extractCodesFromStatusList,
   getCloudMapping,
   getLocalMapping,
   getFeatureMapping,
@@ -51,6 +52,14 @@ describe('Tuya mappings index', () => {
     expect(codes.size).to.equal(3);
   });
 
+  it('should extract codes from top-level status list', () => {
+    const empty = extractCodesFromStatusList(null);
+    expect(empty.size).to.equal(0);
+
+    const codes = extractCodesFromStatusList([{ code: 'TOTAL_POWER' }, {}, { code: ' forward_energy_total ' }]);
+    expect(Array.from(codes)).to.have.members(['total_power', 'forward_energy_total']);
+  });
+
   it('should build cloud and local mappings', () => {
     const cloud = getCloudMapping(DEVICE_TYPES.SMART_SOCKET);
     expect(cloud.switch).to.be.an('object');
@@ -84,12 +93,19 @@ describe('Tuya mappings index', () => {
   it('should detect device types', () => {
     expect(getDeviceType(null)).to.equal(DEVICE_TYPES.UNKNOWN);
 
-    const socketByCategory = getDeviceType({
+    const socketByCategoryAndCode = getDeviceType({
+      specifications: { category: 'cz', functions: [{ code: 'switch_1' }], status: [] },
+      model: '',
+      features: [],
+    });
+    expect(socketByCategoryAndCode).to.equal(DEVICE_TYPES.SMART_SOCKET);
+
+    const unknownByCategoryOnly = getDeviceType({
       specifications: { category: 'cz', functions: [], status: [] },
       model: '',
       features: [],
     });
-    expect(socketByCategory).to.equal(DEVICE_TYPES.SMART_SOCKET);
+    expect(unknownByCategoryOnly).to.equal(DEVICE_TYPES.UNKNOWN);
 
     const socketByCodesAndName = getDeviceType({
       specifications: {
@@ -138,6 +154,13 @@ describe('Tuya mappings index', () => {
       model: 'DIN Smart Meter',
     });
     expect(smartMeterByThingModel).to.equal(DEVICE_TYPES.SMART_METER);
+
+    const smartMeterByTopLevelStatus = getDeviceType({
+      specifications: {},
+      status: [{ code: 'total_power' }, { code: 'forward_energy_total' }],
+      model: 'DIN Smart Meter',
+    });
+    expect(smartMeterByTopLevelStatus).to.equal(DEVICE_TYPES.SMART_METER);
 
     const socketByMergedSources = getDeviceType({
       specifications: {
