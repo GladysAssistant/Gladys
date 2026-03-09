@@ -17,10 +17,12 @@ const { convertDevice } = require('./device/tuya.convertDevice');
  */
 async function localPoll(payload) {
   const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false, logDps = true } = payload || {};
+  const isProtocol34 = protocolVersion === '3.4';
   const isProtocol35 = protocolVersion === '3.5';
+  const isProtocol34Or35 = isProtocol34 || isProtocol35;
   const parsedTimeout = Number(timeoutMs);
   const sanitizedTimeout = Number.isFinite(parsedTimeout) ? Math.min(Math.max(parsedTimeout, 500), 30000) : 3000;
-  const effectiveTimeout = isProtocol35 && !fastScan ? Math.max(sanitizedTimeout, 5000) : sanitizedTimeout;
+  const effectiveTimeout = isProtocol34Or35 && !fastScan ? Math.max(sanitizedTimeout, 5000) : sanitizedTimeout;
   const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
 
   if (!deviceId || !ip || !localKey || !protocolVersion) {
@@ -96,8 +98,12 @@ async function localPoll(payload) {
   };
 
   try {
-    const attempts =
-      protocolVersion === '3.5' ? [{ schema: true }, { schema: true, dps: [1] }, {}] : [{ schema: true }];
+    let attempts = [{ schema: true }];
+    if (isProtocol35) {
+      attempts = [{ schema: true }, { schema: true, dps: [1] }, {}];
+    } else if (isProtocol34) {
+      attempts = [{ schema: true }, { schema: true }];
+    }
     const tryAttempt = async (index) => {
       try {
         return await runGet(attempts[index]);
