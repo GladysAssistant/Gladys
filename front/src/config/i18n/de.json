@@ -1872,8 +1872,10 @@
       "buttonSync": "Jetzt synchronisieren"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Steuere deine Bluetooth-Geräte und ermögliche die Erkennung deiner Anwesenheit.",
+      "title": "Bluetooth-Anwesenheit",
+      "description": "Anwesenheitserkennung über Bluetooth.",
+      "warningTitle": "Wichtige Einschränkungen",
+      "warningMessage": "Diese Integration erkennt die Anwesenheit von Bluetooth-Geräten wie Bluetooth-Schlüsselanhängern oder Beacons. Achtung: Das Tracking von Smartphones und Smartwatches funktioniert nicht, da Hersteller Anti-Tracking-Schutzmaßnahmen implementiert haben (MAC-Adressen-Rotation, etc.).",
       "deviceTab": "Meine Geräte",
       "discoverTab": "Geräte in der Nähe",
       "setupTab": "Anwesenheitsscanner",
