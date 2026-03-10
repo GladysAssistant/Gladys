@@ -69,6 +69,64 @@ describe('POST /api/v1/service/nuki/config', () => {
   });
 });
 
+describe('GET /api/v1/service/nuki/discover/http', () => {
+  beforeEach(() => {
+    nukiHandler = {
+      getDiscoveredDevices: fake.returns(discoveredDevices),
+      scan: fake.resolves(discoveredDevices),
+    };
+
+    controllers = NukiController(nukiHandler);
+  });
+
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('Get discovered HTTP devices', () => {
+    const req = {
+      params: {
+        protocol: 'http',
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    controllers['get /api/v1/service/nuki/discover/:protocol'].controller(req, res);
+    assert.calledOnce(nukiHandler.getDiscoveredDevices);
+    assert.notCalled(nukiHandler.scan);
+    assert.calledWith(res.json, discoveredDevices);
+  });
+});
+
+describe('POST /api/v1/service/nuki/discover/http', () => {
+  beforeEach(() => {
+    nukiHandler = new NukiHandlerMock({}, serviceId);
+    controllers = NukiController(nukiHandler);
+  });
+
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('Scan for HTTP devices', async () => {
+    const req = {
+      params: {
+        protocol: 'http',
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controllers['post /api/v1/service/nuki/discover/:protocol'].controller(req, res);
+    assert.notCalled(nukiHandler.getDiscoveredDevices);
+    assert.calledOnce(nukiHandler.scan);
+    assert.calledWith(res.json, { success: true });
+  });
+});
+
 describe('GET /api/v1/service/nuki/discover/mqtt', () => {
   beforeEach(() => {
     nukiHandler = {
@@ -110,7 +168,7 @@ describe('POST /api/v1/service/nuki/discover/mqtt', () => {
     sinon.reset();
   });
 
-  it('Look for MQTT devices', () => {
+  it('Scan for MQTT devices', async () => {
     const req = {
       params: {
         protocol: 'mqtt',
@@ -120,9 +178,33 @@ describe('POST /api/v1/service/nuki/discover/mqtt', () => {
       json: fake.returns(null),
     };
 
-    controllers['post /api/v1/service/nuki/discover/:protocol'].controller(req, res);
+    await controllers['post /api/v1/service/nuki/discover/:protocol'].controller(req, res);
     assert.notCalled(nukiHandler.getDiscoveredDevices);
     assert.calledOnce(nukiHandler.scan);
+    assert.calledWith(res.json, { success: true });
+  });
+});
+
+describe('GET /api/v1/service/nuki/connect', () => {
+  beforeEach(() => {
+    nukiHandler = new NukiHandlerMock({}, serviceId);
+    controllers = NukiController(nukiHandler);
+  });
+
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('Connect to Nuki Web service', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+    nukiHandler.getHandler = fake.returns({
+      connect: fake.resolves(null),
+    });
+    await controllers['get /api/v1/service/nuki/connect'].controller(req, res);
+    assert.calledWith(nukiHandler.getHandler, 'http');
     assert.calledWith(res.json, { success: true });
   });
 });

@@ -2,14 +2,9 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
-
-const mqttService = {
-  device: {
-    publish: fake.returns(true),
-  },
-};
 
 const gladys = {
   service: {
