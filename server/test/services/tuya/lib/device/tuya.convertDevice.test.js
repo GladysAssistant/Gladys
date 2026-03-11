@@ -1,9 +1,11 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 
 const { convertDevice } = require('../../../../../services/tuya/lib/device/tuya.convertDevice');
 const { DEVICE_PARAM_NAME } = require('../../../../../services/tuya/lib/utils/tuya.constants');
 const { DEVICE_TYPES } = require('../../../../../services/tuya/lib/mappings');
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../../utils/constants');
+const logger = require('../../../../../utils/logger');
 
 describe('tuya.convertDevice', () => {
   it('should map params and features with optional fields', () => {
@@ -239,5 +241,73 @@ describe('tuya.convertDevice', () => {
     expect(reverseTotalFeature.scale).to.equal(2);
     expect(reverseTotalFeature.category).to.equal('energy-sensor');
     expect(reverseTotalFeature.type).to.equal('export-index');
+  });
+
+  it('should ignore malformed groups and preserve merged values fallbacks', () => {
+    const tuyaDevice = {
+      id: 'smart-meter-id',
+      name: 'Smart Meter',
+      model: 'Smart Meter',
+      product_id: 'bbcg1hrkrj5rifsd',
+      local_override: true,
+      specifications: {
+        status: [
+          { code: 'voltage_a', values: '{"scale":1}' },
+          { code: 'voltage_a', values: '{invalid' },
+          { code: 'reverse_energy_total', values: '{invalid' },
+          { code: 'reverse_energy_total' },
+          { name: 'missing-status-code', values: '{"scale":2}' },
+        ],
+        functions: [{ name: 'missing-function-code', values: '{}' }],
+      },
+      thing_model: {
+        services: [
+          {
+            properties: [
+              { name: 'missing-property-code', accessMode: 'ro', typeSpec: { scale: 8 } },
+              { code: 'voltage_a', accessMode: 'ro', typeSpec: { scale: 2 } },
+            ],
+          },
+        ],
+      },
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+    const voltageFeature = device.features.find((feature) => feature.external_id === 'tuya:smart-meter-id:voltage_a');
+    const reverseTotalFeature = device.features.find(
+      (feature) => feature.external_id === 'tuya:smart-meter-id:reverse_energy_total',
+    );
+
+    expect(voltageFeature).to.not.equal(undefined);
+    expect(voltageFeature.scale).to.equal(1);
+    expect(reverseTotalFeature).to.not.equal(undefined);
+    expect(reverseTotalFeature.scale).to.equal(undefined);
+  });
+
+  it('should log inferred type when no supported feature is found', () => {
+    const debugStub = sinon.stub(logger, 'debug');
+    try {
+      const tuyaDevice = {
+        id: 'smart-meter-id',
+        name: 'Smart Meter',
+        model: 'Smart Meter',
+        product_id: 'bbcg1hrkrj5rifsd',
+        local_override: true,
+        specifications: {
+          status: [{ name: 'missing-status-code' }],
+          functions: [{ name: 'missing-function-code' }],
+        },
+        thing_model: {
+          services: [{ properties: [{ name: 'missing-property-code' }] }],
+        },
+      };
+
+      const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+      expect(device.device_type).to.equal(DEVICE_TYPES.SMART_METER);
+      expect(device.features).to.have.length(0);
+      expect(debugStub.calledWithMatch(sinon.match(/inferred type=smart-meter/))).to.equal(true);
+    } finally {
+      debugStub.restore();
+    }
   });
 });
