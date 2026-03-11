@@ -3883,6 +3883,7 @@
       "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
+      "export-index": "Index export",
       "index": "Index",
       "index-today": "Index aujourd'hui",
       "index-yesterday": "Index hier",

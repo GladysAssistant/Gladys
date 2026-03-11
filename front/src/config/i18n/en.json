@@ -3883,6 +3883,7 @@
       "binary": "Switch",
       "power": "Power",
       "energy": "Energy",
+      "export-index": "Export index",
       "index": "Index",
       "index-today": "Index today",
       "index-yesterday": "Index yesterday",

@@ -729,6 +729,7 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     POWER: 'power',
     ENERGY: 'energy',
+    EXPORT_INDEX: 'export-index',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',

@@ -195,4 +195,50 @@ describe('tuya.convertDevice', () => {
       'tuya:smart-meter-id:forward_energy_total',
     );
   });
+
+  it('should keep thing model scale metadata when top-level cloud status has same code', () => {
+    const tuyaDevice = {
+      id: 'smart-meter-id',
+      name: 'Smart Meter',
+      model: 'Smart Meter',
+      product_id: 'bbcg1hrkrj5rifsd',
+      local_override: true,
+      specifications: {},
+      status: [
+        { code: 'voltage_a', value: 2323 },
+        { code: 'reverse_energy_total', value: 43222 },
+      ],
+      thing_model: {
+        services: [
+          {
+            properties: [
+              {
+                code: 'voltage_a',
+                accessMode: 'ro',
+                typeSpec: { min: 0, max: 28000, scale: 1, step: 1, unit: 'V' },
+              },
+              {
+                code: 'reverse_energy_total',
+                accessMode: 'ro',
+                typeSpec: { min: 0, max: 99999999, scale: 2, step: 1, unit: 'KWH' },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+    const voltageFeature = device.features.find((feature) => feature.external_id === 'tuya:smart-meter-id:voltage_a');
+    const reverseTotalFeature = device.features.find(
+      (feature) => feature.external_id === 'tuya:smart-meter-id:reverse_energy_total',
+    );
+
+    expect(voltageFeature).to.not.equal(undefined);
+    expect(voltageFeature.scale).to.equal(1);
+    expect(reverseTotalFeature).to.not.equal(undefined);
+    expect(reverseTotalFeature.scale).to.equal(2);
+    expect(reverseTotalFeature.category).to.equal('energy-sensor');
+    expect(reverseTotalFeature.type).to.equal('export-index');
+  });
 });
