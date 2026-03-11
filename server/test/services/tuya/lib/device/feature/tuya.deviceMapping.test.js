@@ -150,11 +150,23 @@ describe('Tuya device mapping', () => {
         );
         expect(Number.isNaN(result)).to.equal(true);
       });
+      it('power uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER](
+          '1764',
+        );
+        expect(result).to.eq(176.4);
+      });
       it('power with scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER
         ]('706', { scale: 1 });
         expect(result).to.eq(70.6);
+      });
+      it('energy uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY](
+          '158068',
+        );
+        expect(result).to.eq(1580.68);
       });
       it('energy with scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
@@ -162,17 +174,35 @@ describe('Tuya device mapping', () => {
         ]('149241', { scale: 2 });
         expect(result).to.eq(1492.41);
       });
+      it('export index uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
+          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX
+        ]('48401');
+        expect(result).to.eq(484.01);
+      });
       it('export index with scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX
         ]('43222', { scale: 2 });
         expect(result).to.eq(432.22);
       });
+      it('voltage uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE](
+          '2365',
+        );
+        expect(result).to.eq(236.5);
+      });
       it('voltage with scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE
         ]('2301', { scale: 1 });
         expect(result).to.eq(230.1);
+      });
+      it('current uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT](
+          '1105',
+        );
+        expect(result).to.eq(1105);
       });
       it('current without scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
