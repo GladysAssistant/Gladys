@@ -26,6 +26,13 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
       </div>
     </div>
     <div class="card-body">
+      <div class="alert alert-warning">
+        <h4 class="alert-heading">
+          <i class="fe fe-alert-triangle mr-2" />
+          <Text id="integration.bluetooth.warningTitle" />
+        </h4>
+        <Text id="integration.bluetooth.warningMessage" />
+      </div>
       <div
         class={cx('dimmer', {
           active: getBluetoothDevicesStatus === RequestStatus.Getting,
