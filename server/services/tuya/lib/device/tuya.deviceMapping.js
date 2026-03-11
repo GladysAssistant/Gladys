@@ -123,15 +123,13 @@ const readValues = {
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
     },
+    [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX]: (valueFromDevice, deviceFeature) => {
+      return scaleValue(valueFromDevice, deviceFeature, 0);
+    },
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
     },
     [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT]: (valueFromDevice, deviceFeature) => {
-      return scaleValue(valueFromDevice, deviceFeature, 0);
-    },
-  },
-  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: {
-    [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX]: (valueFromDevice, deviceFeature) => {
       return scaleValue(valueFromDevice, deviceFeature, 0);
     },
   },

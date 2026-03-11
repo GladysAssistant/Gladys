@@ -162,6 +162,12 @@ describe('Tuya device mapping', () => {
         ]('149241', { scale: 2 });
         expect(result).to.eq(1492.41);
       });
+      it('export index with scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
+          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX
+        ]('43222', { scale: 2 });
+        expect(result).to.eq(432.22);
+      });
       it('voltage with scale', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE
@@ -173,12 +179,6 @@ describe('Tuya device mapping', () => {
           DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT
         ]('123', { scale: 0 });
         expect(result).to.eq(123);
-      });
-      it('production index with scale', () => {
-        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR][
-          DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX
-        ]('43222', { scale: 2 });
-        expect(result).to.eq(432.22);
       });
     });
     describe('curtain state', () => {

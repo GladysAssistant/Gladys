@@ -7,6 +7,47 @@ const { convertFeature } = require('./tuya.convertFeature');
 const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps, DEVICE_TYPES } = require('../mappings');
 const logger = require('../../../../utils/logger');
 
+const parseFeatureValues = (values) => {
+  if (!values || typeof values !== 'object') {
+    if (typeof values === 'string') {
+      try {
+        const parsed = JSON.parse(values);
+        return parsed && typeof parsed === 'object' ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+  return values;
+};
+
+const mergeFeatureValues = (currentValues, nextValues) => {
+  const currentParsed = parseFeatureValues(currentValues);
+  const nextParsed = parseFeatureValues(nextValues);
+
+  if (currentParsed && nextParsed) {
+    // Keep existing keys first, enrich missing metadata from the new source.
+    return {
+      ...nextParsed,
+      ...currentParsed,
+    };
+  }
+  if (currentParsed) {
+    return currentParsed;
+  }
+  if (nextParsed) {
+    return nextParsed;
+  }
+  if (currentValues !== undefined && currentValues !== null) {
+    return currentValues;
+  }
+  if (nextValues !== undefined && nextValues !== null) {
+    return nextValues;
+  }
+  return {};
+};
+
 /**
  * @description Transform Tuya device to Gladys device.
  * @param {object} tuyaDevice - Tuya device.
@@ -93,15 +134,54 @@ function convertDevice(tuyaDevice) {
   logger.debug('Tuya convert device specifications');
   logger.debug(JSON.stringify(safeDeviceLog));
 
-  // Groups cloud specification entries first, then thing model properties, then current property shadow codes.
+  // Build features from specifications first, enrich metadata from thing model, then fallback to status/properties.
   const groups = {};
   status.forEach((stat) => {
-    const { code } = stat;
-    groups[code] = { ...stat, readOnly: true };
+    const { code } = stat || {};
+    if (!code) {
+      return;
+    }
+    const existingGroup = groups[code] || {};
+    groups[code] = {
+      ...existingGroup,
+      ...stat,
+      values: mergeFeatureValues(existingGroup.values, stat && stat.values),
+      readOnly: true,
+    };
   });
   functions.forEach((func) => {
-    const { code } = func;
-    groups[code] = { ...func, readOnly: false };
+    const { code } = func || {};
+    if (!code) {
+      return;
+    }
+    const existingGroup = groups[code] || {};
+    groups[code] = {
+      ...existingGroup,
+      ...func,
+      values: mergeFeatureValues(existingGroup.values, func && func.values),
+      readOnly: false,
+    };
+  });
+  const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
+  services.forEach((service) => {
+    const thingProperties = Array.isArray(service && service.properties) ? service.properties : [];
+    thingProperties.forEach((property) => {
+      const { code } = property || {};
+      if (!code) {
+        return;
+      }
+      const existingGroup = groups[code] || {};
+      groups[code] = {
+        ...existingGroup,
+        code,
+        name: existingGroup.name || property.name,
+        values: mergeFeatureValues(existingGroup.values, property.typeSpec || {}),
+        readOnly:
+          existingGroup.readOnly !== undefined && existingGroup.readOnly !== null
+            ? existingGroup.readOnly
+            : property.accessMode !== 'rw',
+      };
+    });
   });
   const topLevelStatus = Array.isArray(deviceStatus) ? deviceStatus : [];
   topLevelStatus.forEach((entry) => {
@@ -115,22 +195,6 @@ function convertDevice(tuyaDevice) {
       values: {},
       readOnly: true,
     };
-  });
-  const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
-  services.forEach((service) => {
-    const thingProperties = Array.isArray(service && service.properties) ? service.properties : [];
-    thingProperties.forEach((property) => {
-      const { code } = property || {};
-      if (!code || groups[code]) {
-        return;
-      }
-      groups[code] = {
-        code,
-        name: property.name,
-        values: property.typeSpec || {},
-        readOnly: property.accessMode !== 'rw',
-      };
-    });
   });
   const currentProperties = Array.isArray(properties && properties.properties) ? properties.properties : [];
   currentProperties.forEach((property) => {

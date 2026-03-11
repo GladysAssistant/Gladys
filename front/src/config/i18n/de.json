@@ -3883,6 +3883,7 @@
       "binary": "Schalter",
       "power": "Leistung",
       "energy": "Energie",
+      "export-index": "Einspeiseindex",
       "index": "Index",
       "index-today": "Index heute",
       "index-yesterday": "Index gestern",
