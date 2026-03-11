@@ -2,6 +2,7 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiHTTPHandler = require('../../../../../services/nuki/lib/http');
 
@@ -12,6 +13,9 @@ const fakeNukiWebApi = {
 const gladys = {
   event: {
     emit: fake.returns(true),
+  },
+  service: {
+    getService: fake.returns(mqttService),
   },
 };
 

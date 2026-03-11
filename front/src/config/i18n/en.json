@@ -1912,8 +1912,10 @@
       "buttonSync": "Sync now"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Control your Bluetooth devices and detect your presence.",
+      "title": "Bluetooth Presence",
+      "description": "Presence detection via Bluetooth.",
+      "warningTitle": "Important limitations",
+      "warningMessage": "This integration detects the presence of Bluetooth devices such as Bluetooth keychains or beacons. Warning: tracking phones and smartwatches does not work, as manufacturers have implemented anti-tracking protections (MAC address rotation, etc.).",
       "deviceTab": "Devices",
       "discoverTab": "Bluetooth discover",
       "setupTab": "Presence scanner",
@@ -1959,7 +1961,7 @@
         "title": "Presence scanner",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "errorLabel": "An error occurred while loading configuration.",
-        "presenceScannerDescription": "The presence scanner feature is doing a bluetooth scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
+        "presenceScannerDescription": "The presence scanner does a Bluetooth scan at a defined interval. When a device is detected, it will be flagged as \"seen\" in Gladys. In scenes, you can create a trigger on this state change.",
         "presenceScannerStatusLabel": "Enable or disable presence scanner",
         "presenceScannerFrequencyLabel": "Scanner interval",
         "presenceScannerFrequencyUnit": "minutes",
@@ -2150,7 +2152,8 @@
         "pairingCodeHelp": "Enter the 11- or 21-digit pairing code provided by your Matter device",
         "addButton": "Add to Gladys",
         "loading": "Connecting to device, this may take a few minutes.",
-        "error": "Impossible to add this Matter device to Gladys, are you sure this device is on the same network as Gladys? Is Gladys launched with network=host?"
+        "error": "Unable to add this Matter device to Gladys. Please check that:<br/>- The device is on the same network as Gladys<br/>- Gladys is running with network=host<br/>- If you are using a Thread Border Router, you must use a pairing code provided by the router's app (see warning above)",
+        "borderRouterWarning": "<b>Warning:</b> If you are using a Thread Border Router (Apple TV, IKEA Dirigera, Aqara) and your Thread devices are connected to this router, you must use a pairing code provided by the router's app, not the code printed on the device."
       },
       "settings": {
         "title": "Matter Settings",
