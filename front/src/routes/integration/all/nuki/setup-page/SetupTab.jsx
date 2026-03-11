@@ -71,6 +71,9 @@ class SetupTab extends Component {
 
       setTimeout(() => this.setState({ nukiConnectionStatus: undefined }), 3000);
     } catch (e) {
+      await this.props.httpClient.post('/api/v1/service/nuki/config', {
+        apiKey: ''
+      });
       this.setState({
         nukiConnectionStatus: RequestStatus.Error,
         apiKeyChanges: false
