@@ -2112,7 +2112,8 @@
         "pairingCodeHelp": "Enter the 11- or 21-digit pairing code provided by your Matter device",
         "addButton": "Add to Gladys",
         "loading": "Connecting to device, this may take a few minutes.",
-        "error": "Impossible to add this Matter device to Gladys, are you sure this device is on the same network as Gladys? Is Gladys launched with network=host?"
+        "error": "Unable to add this Matter device to Gladys. Please check that:<br/>- The device is on the same network as Gladys<br/>- Gladys is running with network=host<br/>- If you are using a Thread Border Router, you must use a pairing code provided by the router's app (see warning above)",
+        "borderRouterWarning": "<b>Warning:</b> If you are using a Thread Border Router (Apple TV, IKEA Dirigera, Aqara) and your Thread devices are connected to this router, you must use a pairing code provided by the router's app, not the code printed on the device."
       },
       "settings": {
         "title": "Matter Settings",
