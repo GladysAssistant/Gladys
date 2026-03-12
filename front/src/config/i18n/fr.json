@@ -701,8 +701,10 @@
       "buttonSync": "Synchroniser"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Contrôler vos appareils Bluetooth.",
+      "title": "Présence Bluetooth",
+      "description": "Détection de présence via Bluetooth.",
+      "warningTitle": "Limitations importantes",
+      "warningMessage": "Cette intégration permet de détecter la présence d'appareils Bluetooth tels que des porte-clés Bluetooth ou des balises (beacons). Attention : le suivi de téléphones et montres connectées ne fonctionne pas, car les constructeurs ont mis en place des protections anti-tracking (rotation des adresses MAC, etc.).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Bluetooth",
       "setupTab": "Scanner de présence",
@@ -748,7 +750,7 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
@@ -2188,7 +2190,8 @@
         "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
         "addButton": "Ajouter à Gladys",
         "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
-        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys. Vérifiez que :<br/>- L'appareil est bien sur le même réseau que Gladys<br/>- Gladys est bien lancé en network=host<br/>- Si vous utilisez un Thread Border Router, vous devez utiliser un code d'appairage fourni par l'application du routeur (voir avertissement ci-dessus)",
+        "borderRouterWarning": "<b>Attention :</b> Si vous utilisez un Thread Border Router (Apple TV, IKEA Dirigera, Aqara) et que vos appareils Thread sont connectés à ce routeur, vous devez utiliser un code d'appairage fourni par l'application du routeur, et non pas le code imprimé sur l'appareil."
       },
       "settings": {
         "title": "Paramètres Matter",
