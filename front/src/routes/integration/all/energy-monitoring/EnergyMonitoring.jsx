@@ -785,18 +785,23 @@ class EnergyMonitoringPage extends Component {
       if (!rootTypes || !rootTypes.includes(feature.type)) {
         return;
       }
-      const consumptionChildren = (childrenByParent.get(feature.id) || []).filter(child => consumptionTypes.has(child.type));
+      const consumptionChildren = (childrenByParent.get(feature.id) || []).filter(child =>
+        consumptionTypes.has(child.type)
+      );
       if (consumptionChildren.length === 0) return;
 
       const consumptionSelectors = new Set();
       const costSelectors = new Set();
 
       consumptionChildren.forEach(consumptionChild => {
-        const consumptionSelector = consumptionChild.selector || consumptionChild.external_id || String(consumptionChild.id);
+        const consumptionSelector =
+          consumptionChild.selector || consumptionChild.external_id || String(consumptionChild.id);
         if (consumptionSelector) {
           consumptionSelectors.add(consumptionSelector);
         }
-        const costChildren = (childrenByParent.get(consumptionChild.id) || []).filter(child => costTypes.has(child.type));
+        const costChildren = (childrenByParent.get(consumptionChild.id) || []).filter(child =>
+          costTypes.has(child.type)
+        );
         costChildren.forEach(costChild => {
           const costSelector = costChild.selector || costChild.external_id || String(costChild.id);
           if (costSelector) {

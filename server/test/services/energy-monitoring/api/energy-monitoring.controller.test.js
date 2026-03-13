@@ -105,7 +105,11 @@ describe('EnergyMonitoringController', () => {
     it('should reject non-array feature selectors', async () => {
       req.body = { feature_selectors: 'feature-1' };
 
-      await controller['post /api/v1/service/energy-monitoring/calculate-cost-from-beginning'].controller(req, res, next);
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-from-beginning'].controller(
+        req,
+        res,
+        next,
+      );
 
       assert.notCalled(energyMonitoringHandler.calculateCostFromBeginning);
       assert.notCalled(res.json);
