@@ -1120,7 +1120,7 @@
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
-        "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
+        "description": "Devices added to your Tuya Cloud Account will be automatically discovered.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
         "scan": "Scan"
@@ -4023,6 +4023,11 @@
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
+    },
+    "number": {
+      "shortCategoryName": "Number",
+      "decimal": "Number (decimal)",
+      "integer": "Number (integer)"
     }
   },
   "errorPage": {

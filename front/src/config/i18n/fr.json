@@ -4023,6 +4023,11 @@
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
+    },
+    "number": {
+      "shortCategoryName": "Number",
+      "decimal": "Number (decimal)",
+      "integer": "Number (integer)"
     }
   },
   "errorPage": {

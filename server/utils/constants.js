@@ -590,6 +590,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
   INPUT: 'input',
+  NUMBER: 'number',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -609,6 +610,7 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
     BINARY: 'binary',
     PUSH: 'push',
+    ENUM: 'enum',
     UNKNOWN: 'unknown',
   },
   TEMPERATURE_SENSOR: {
@@ -1411,6 +1413,7 @@ const DASHBOARD_BOX_TYPE = {
   SCENE: 'scene',
   MUSIC: 'music',
   GAUGE: 'gauge',
+  THERMOSTAT: 'thermostat',
   ENERGY_CONSUMPTION: 'energy-consumption',
 };
 
