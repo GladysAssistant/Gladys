@@ -2625,6 +2625,13 @@
       "warning": {
         "houseWithoutCoordinate": "Dein Zuhause hat keine Koordinaten. Dieser Auslöser funktioniert nicht ohne Koordinaten. Bitte gehe zu Einstellungen -> Zuhause und klicke auf die Karte, um die Koordinaten des Zuhauses festzulegen."
       },
+      "sunriseSunsetTrigger": {
+        "offsetLabel": "Wann",
+        "atExactTime": "Zur genauen Uhrzeit",
+        "before": "Vor",
+        "after": "Nach",
+        "minutes": "Minuten"
+      },
       "userPresence": {
         "backAtHomeDescription": "Dies wird ausgelöst, wenn der ausgewählte Benutzer wieder im ausgewählten Zuhause ist.",
         "leftHomeDescription": "Dies wird ausgelöst, wenn der ausgewählte Benutzer das ausgewählte Zuhause verlässt.",

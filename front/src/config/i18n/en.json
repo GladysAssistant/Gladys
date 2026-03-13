@@ -2625,6 +2625,13 @@
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
       },
+      "sunriseSunsetTrigger": {
+        "offsetLabel": "When",
+        "atExactTime": "At exact time",
+        "before": "Before",
+        "after": "After",
+        "minutes": "minutes"
+      },
       "userPresence": {
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
         "leftHomeDescription": "This will trigger when the selected user is leaving the selected home.",

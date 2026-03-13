@@ -31,58 +31,71 @@ async function dailyUpdate() {
         .tz(this.timezone)
         .toDate();
       const times = this.sunCalc.getTimes(todayAt12InMyTimeZone, house.latitude, house.longitude);
-      // Sunrise time
-      const sunriseHour = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('hour');
-      const sunriseMinute = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('minute');
-      const sunriseTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunriseHour)
-        .minute(sunriseMinute)
-        .toDate();
-      // Sunset time
-      const sunsetHour = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('hour');
-      const sunsetMinute = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('minute');
-      const sunsetTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunsetHour)
-        .minute(sunsetMinute)
-        .toDate();
-      logger.info(`Sunrise today is at ${sunriseHour}:${sunriseMinute} today, in your timezone = ${this.timezone}`);
-      logger.info(`Sunset today is at ${sunsetHour}:${sunsetMinute} today, in your timezone = ${this.timezone}`);
-      const sunriseJob = this.scheduler.scheduleJob(sunriseTime, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNRISE,
-          house,
-        }),
+      // Sunrise and Sunset base times
+      const sunriseBase = dayjs(times.sunrise).tz(this.timezone);
+      const sunsetBase = dayjs(times.sunset).tz(this.timezone);
+      logger.info(
+        `Sunrise today is at ${sunriseBase.get('hour')}:${sunriseBase.get('minute')} today, in your timezone = ${
+          this.timezone
+        }`,
       );
-      if (sunriseJob) {
-        logger.info(`Sunrise is scheduled, ${dayjs(sunriseTime).fromNow()}.`);
-        this.jobs.push(sunriseJob);
-      } else {
-        logger.info(`The sun rose this morning. Not scheduling for today.`);
-      }
-
-      const sunsetJob = this.scheduler.scheduleJob(sunsetTime, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNSET,
-          house,
-        }),
+      logger.info(
+        `Sunset today is at ${sunsetBase.get('hour')}:${sunsetBase.get('minute')} today, in your timezone = ${
+          this.timezone
+        }`,
       );
 
-      if (sunsetJob) {
-        logger.info(`Sunset is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
-        this.jobs.push(sunsetJob);
-      } else {
-        logger.info(`The sun has already set. Not scheduling for today.`);
-      }
+      // Collect all distinct offsets for this house from active scene triggers
+      const sunriseOffsets = new Set([0]);
+      const sunsetOffsets = new Set([0]);
+      Object.values(this.scenes).forEach((scene) => {
+        if (!scene.active || !scene.triggers) {
+          return;
+        }
+        scene.triggers.forEach((trigger) => {
+          const offset = trigger.offset || 0;
+          if (trigger.type === EVENTS.TIME.SUNRISE && trigger.house === house.selector) {
+            sunriseOffsets.add(offset);
+          } else if (trigger.type === EVENTS.TIME.SUNSET && trigger.house === house.selector) {
+            sunsetOffsets.add(offset);
+          }
+        });
+      });
+
+      // Schedule one job per distinct (house, type, offset) combination
+      sunriseOffsets.forEach((offset) => {
+        const sunriseTime = sunriseBase.add(offset, 'minute').toDate();
+        const sunriseJob = this.scheduler.scheduleJob(sunriseTime, () =>
+          this.event.emit(EVENTS.TRIGGERS.CHECK, {
+            type: EVENTS.TIME.SUNRISE,
+            house,
+            offset,
+          }),
+        );
+        if (sunriseJob) {
+          logger.info(`Sunrise (offset ${offset}min) is scheduled, ${dayjs(sunriseTime).fromNow()}.`);
+          this.jobs.push(sunriseJob);
+        } else {
+          logger.info(`Sunrise (offset ${offset}min): time is in the past, not scheduling for today.`);
+        }
+      });
+
+      sunsetOffsets.forEach((offset) => {
+        const sunsetTime = sunsetBase.add(offset, 'minute').toDate();
+        const sunsetJob = this.scheduler.scheduleJob(sunsetTime, () =>
+          this.event.emit(EVENTS.TRIGGERS.CHECK, {
+            type: EVENTS.TIME.SUNSET,
+            house,
+            offset,
+          }),
+        );
+        if (sunsetJob) {
+          logger.info(`Sunset (offset ${offset}min) is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
+          this.jobs.push(sunsetJob);
+        } else {
+          logger.info(`Sunset (offset ${offset}min): time is in the past, not scheduling for today.`);
+        }
+      });
     }
   });
 }
