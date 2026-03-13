@@ -23,6 +23,23 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.SECONDS,
       },
+      types: {
+        composite: {
+          category: DEVICE_FEATURE_CATEGORIES.DURATION,
+          type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
+          unit: DEVICE_FEATURE_UNITS.SECONDS,
+        },
+      },
+    },
+    strobe_duty_cycle: {
+      types: {
+        composite: {
+          category: DEVICE_FEATURE_CATEGORIES.SIREN,
+          type: DEVICE_FEATURE_TYPES.SIREN.STROBE_DUTY_CYCLE,
+          min: 0,
+          max: 10,
+        },
+      },
     },
     battery: {
       feature: {

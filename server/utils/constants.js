@@ -113,6 +113,17 @@ const SIREN_LMH_VOLUME = {
   LOW: 0,
   MEDIUM: 1,
   HIGH: 2,
+  VERY_HIGH: 3,
+};
+
+const SIREN_MODE = {
+  STOP: 0,
+  BURGLAR: 1,
+  FIRE: 2,
+  EMERGENCY: 3,
+  POLICE_PANIC: 4,
+  FIRE_PANIC: 5,
+  EMERGENCY_PANIC: 6,
 };
 
 const AC_MODE = {
@@ -520,6 +531,7 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
+  AC_CONNECTED: 'ac-connected',
   CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
@@ -611,6 +623,9 @@ const DEVICE_FEATURE_TYPES = {
     PUSH: 'push',
     UNKNOWN: 'unknown',
   },
+  AC_CONNECTED: {
+    BINARY: 'binary',
+  },
   TEMPERATURE_SENSOR: {
     MIN: 'min',
     MAX: 'max',
@@ -638,6 +653,11 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
+    MODE: 'mode',
+    LEVEL: 'level',
+    STROBE: 'strobe',
+    STROBE_LEVEL: 'strobe_level',
+    STROBE_DUTY_CYCLE: 'strobe_duty_cycle',
   },
   CHILD_LOCK: {
     BINARY: 'binary',
@@ -1545,6 +1565,7 @@ module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
+module.exports.SIREN_MODE = SIREN_MODE;
 module.exports.AC_MODE = AC_MODE;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;

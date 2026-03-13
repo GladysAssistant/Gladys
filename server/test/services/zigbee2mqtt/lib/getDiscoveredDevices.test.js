@@ -45,6 +45,10 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       .onSecondCall()
       .returns(expectedDevicesPayload[1])
       .onThirdCall()
+      .returns(false)
+      .onCall(3)
+      .returns(false)
+      .onCall(4)
       .returns(false);
 
     discoveredDevices
@@ -93,6 +97,10 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       .onSecondCall()
       .returns(expectedDevicesPayload[1])
       .onThirdCall()
+      .returns(false)
+      .onCall(3)
+      .returns(false)
+      .onCall(4)
       .returns(false);
 
     discoveredDevices

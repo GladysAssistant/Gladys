@@ -3359,6 +3359,27 @@
           "low": "Low",
           "medium": "Medium",
           "high": "High"
+        },
+        "mode": {
+          "stop": "Stop",
+          "burglar": "Burglar",
+          "fire": "Fire",
+          "emergency": "Emergency",
+          "police_panic": "Police panic",
+          "fire_panic": "Fire panic",
+          "emergency_panic": "Emergency panic"
+        },
+        "level": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "very_high": "Very high"
+        },
+        "strobe_level": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "very_high": "Very high"
         }
       }
     }
@@ -3566,6 +3587,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "AC Connected",
+      "binary": "AC Connected (yes/no)"
+    },
     "light": {
       "shortCategoryName": "Light",
       "binary": "Light On/Off",
@@ -3671,7 +3696,12 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody"
+      "melody": "Melody",
+      "mode": "Warning mode",
+      "level": "Sound level",
+      "strobe": "Strobe light",
+      "strobe_level": "Strobe intensity",
+      "strobe_duty_cycle": "Strobe duty cycle"
     },
     "cube": {
       "shortCategoryName": "Cube",

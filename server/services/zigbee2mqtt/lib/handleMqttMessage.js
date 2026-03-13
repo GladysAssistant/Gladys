@@ -111,6 +111,27 @@ async function handleMqttMessage(topic, message) {
           Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
             // Find the feature regarding the field name
             const value = incomingFeatures[zigbeeFeatureField];
+
+            // Handle composite object values (e.g. {"warning": {"mode": "burglar", "level": "high"}})
+            if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+              Object.keys(value).forEach((subField) => {
+                const subValue = value[subField];
+                const subFeature = convertFeature(device.features, subField, subValue);
+                if (subFeature) {
+                  try {
+                    const newState = {
+                      device_feature_external_id: `${subFeature.external_id}`,
+                      state: this.readValue(deviceName, subField, subValue),
+                    };
+                    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+                  } catch (e) {
+                    logger.error(`Failed to convert value for device ${deviceName}:`, e);
+                  }
+                }
+              });
+              return;
+            }
+
             const feature = convertFeature(device.features, zigbeeFeatureField, value);
             if (feature) {
               try {

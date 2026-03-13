@@ -3359,6 +3359,27 @@
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
+        },
+        "mode": {
+          "stop": "Stop",
+          "burglar": "Intrusion",
+          "fire": "Incendie",
+          "emergency": "Urgence",
+          "police_panic": "Panique police",
+          "fire_panic": "Panique incendie",
+          "emergency_panic": "Panique urgence"
+        },
+        "level": {
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Fort",
+          "very_high": "Très fort"
+        },
+        "strobe_level": {
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Fort",
+          "very_high": "Très fort"
         }
       }
     }
@@ -3566,6 +3587,10 @@
     }
   },
   "deviceFeatureCategory": {
+    "ac-connected": {
+      "shortCategoryName": "Secteur Connecté",
+      "binary": "Secteur Connecté (Oui/Non)"
+    },
     "light": {
       "shortCategoryName": "Lumière",
       "binary": "Eclairage On/Off",
@@ -3671,7 +3696,12 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "mode": "Mode d'alerte",
+      "level": "Niveau sonore",
+      "strobe": "Flash stroboscopique",
+      "strobe_level": "Intensité du flash",
+      "strobe_duty_cycle": "Cycle du flash"
     },
     "cube": {
       "shortCategoryName": "Cube",

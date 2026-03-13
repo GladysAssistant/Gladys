@@ -60,4 +60,19 @@ describe('zigbee2mqtt readValue', () => {
     const result = zigbee2MqttService.device.readValue('0x00158d00045b2740', 'alarm', false);
     assert.deepEqual(result, 0);
   });
+
+  it('should return warning mode burglar as 1', () => {
+    const result = zigbee2MqttService.device.readValue('0x00158d00045b2741', 'mode', 'burglar');
+    assert.deepEqual(result, 1);
+  });
+
+  it('should return warning level high as 2', () => {
+    const result = zigbee2MqttService.device.readValue('0x00158d00045b2741', 'level', 'high');
+    assert.deepEqual(result, 2);
+  });
+
+  it('should return warning strobe true as 1', () => {
+    const result = zigbee2MqttService.device.readValue('0x00158d00045b2741', 'strobe', true);
+    assert.deepEqual(result, 1);
+  });
 });

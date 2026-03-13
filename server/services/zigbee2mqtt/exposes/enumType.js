@@ -4,6 +4,7 @@ const {
   BUTTON_STATUS,
   COVER_STATE,
   SIREN_LMH_VOLUME,
+  SIREN_MODE,
   PILOT_WIRE_MODE,
   LIQUID_STATE,
 } = require('../../../utils/constants');
@@ -136,6 +137,24 @@ addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
+addMapping('mode', SIREN_MODE.STOP, 'stop');
+addMapping('mode', SIREN_MODE.BURGLAR, 'burglar');
+addMapping('mode', SIREN_MODE.FIRE, 'fire');
+addMapping('mode', SIREN_MODE.EMERGENCY, 'emergency');
+addMapping('mode', SIREN_MODE.POLICE_PANIC, 'police_panic');
+addMapping('mode', SIREN_MODE.FIRE_PANIC, 'fire_panic');
+addMapping('mode', SIREN_MODE.EMERGENCY_PANIC, 'emergency_panic');
+
+addMapping('level', SIREN_LMH_VOLUME.LOW, 'low');
+addMapping('level', SIREN_LMH_VOLUME.MEDIUM, 'medium');
+addMapping('level', SIREN_LMH_VOLUME.HIGH, 'high');
+addMapping('level', SIREN_LMH_VOLUME.VERY_HIGH, 'very_high');
+
+addMapping('strobe_level', SIREN_LMH_VOLUME.LOW, 'low');
+addMapping('strobe_level', SIREN_LMH_VOLUME.MEDIUM, 'medium');
+addMapping('strobe_level', SIREN_LMH_VOLUME.HIGH, 'high');
+addMapping('strobe_level', SIREN_LMH_VOLUME.VERY_HIGH, 'very_high');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -192,6 +211,36 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIREN,
         type: DEVICE_FEATURE_TYPES.SIREN.MELODY,
+      },
+    },
+    mode: {
+      types: {
+        composite: {
+          category: DEVICE_FEATURE_CATEGORIES.SIREN,
+          type: DEVICE_FEATURE_TYPES.SIREN.MODE,
+          min: 0,
+          max: 6,
+        },
+      },
+    },
+    level: {
+      types: {
+        composite: {
+          category: DEVICE_FEATURE_CATEGORIES.SIREN,
+          type: DEVICE_FEATURE_TYPES.SIREN.LEVEL,
+          min: 0,
+          max: 3,
+        },
+      },
+    },
+    strobe_level: {
+      types: {
+        composite: {
+          category: DEVICE_FEATURE_CATEGORIES.SIREN,
+          type: DEVICE_FEATURE_TYPES.SIREN.STROBE_LEVEL,
+          min: 0,
+          max: 3,
+        },
       },
     },
     pilot_wire_mode: {

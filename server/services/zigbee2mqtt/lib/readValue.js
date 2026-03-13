@@ -11,11 +11,12 @@ const exposesMap = require('../exposes');
  */
 function readValue(deviceName, property, value) {
   // Looks mapping from exposes
-  const expose = this.findMatchingExpose(deviceName, property);
-  if (!expose) {
+  const result = this.findMatchingExpose(deviceName, property);
+  if (!result) {
     throw new Error(`Zigbee2mqqt expose not found on device "${deviceName}" with property "${property}".`);
   }
 
+  const { expose } = result;
   const matchingValue = exposesMap[expose.type].readValue(expose, value);
 
   if (matchingValue === undefined) {

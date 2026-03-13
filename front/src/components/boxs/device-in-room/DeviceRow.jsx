@@ -14,6 +14,8 @@ import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
+import SirenModeDeviceFeature from './device-features/SirenModeDeviceFeature';
+import SirenLevelDeviceFeature from './device-features/SirenLevelDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
@@ -34,6 +36,11 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: PilotWireModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.LOCK.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.MODE]: SirenModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.LEVEL]: SirenLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.STROBE_LEVEL]: SirenLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.STROBE]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SIREN.STROBE_DUTY_CYCLE]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.MELODY]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.DURATION.DECIMAL]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: PushDeviceFeature,

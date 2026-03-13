@@ -268,5 +268,98 @@
     ],
     "should_poll": false,
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+  },
+  {
+    "name": "0x00158d00045b2741",
+    "model": "TS0216",
+    "external_id": "zigbee2mqtt:0x00158d00045b2741",
+    "features": [
+      {
+        "name": "Mode",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 7,
+        "category": "siren",
+        "type": "mode",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:siren:mode:mode",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-siren-mode-mode"
+      },
+      {
+        "name": "Level",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 4,
+        "category": "siren",
+        "type": "level",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:siren:level:level",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-siren-level-level"
+      },
+      {
+        "name": "Strobe",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 1,
+        "category": "siren",
+        "type": "strobe",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:siren:strobe:strobe",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-siren-strobe-strobe"
+      },
+      {
+        "name": "Strobe level",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 4,
+        "category": "siren",
+        "type": "strobe_level",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:siren:strobe_level:strobe_level",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-siren-strobe-level-strobe-level"
+      },
+      {
+        "name": "Strobe duty cycle",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 10,
+        "category": "siren",
+        "type": "strobe_duty_cycle",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:siren:strobe_duty_cycle:strobe_duty_cycle",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-siren-strobe-duty-cycle-strobe-duty-cycle"
+      },
+      {
+        "name": "Duration",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 600,
+        "category": "duration",
+        "type": "decimal",
+        "unit": "seconds",
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:duration:decimal:duration",
+        "selector": "zigbee2mqtt-0x00158d00045b2741-duration-decimal-duration"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00045b2741:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00045b2741-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
   }
 ]

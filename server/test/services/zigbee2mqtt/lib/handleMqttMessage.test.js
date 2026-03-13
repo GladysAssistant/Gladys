@@ -79,6 +79,10 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       .onSecondCall()
       .returns(expectedDevicesPayload[1])
       .onThirdCall()
+      .returns(null)
+      .onCall(3)
+      .returns(null)
+      .onCall(4)
       .returns(null);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
@@ -258,6 +262,45 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86}`);
     // ASSERT
     assert.notCalled(gladys.event.emit);
+    expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
+  });
+
+  it('should get good topic with composite object value (warning)', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:mode:mode',
+          type: 'mode',
+        },
+        {
+          external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:level:level',
+          type: 'level',
+        },
+      ],
+    });
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbeeDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2mqttManager.discoveredDevices[device.friendly_name] = device;
+      });
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage(
+      'zigbee2mqtt/0x00158d00045b2741',
+      `{"warning": {"mode": "burglar", "level": "high"}}`,
+    );
+    // ASSERT
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWithExactly(gladys.event.emit.firstCall, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:mode:mode',
+      state: 1,
+    });
+    assert.calledWithExactly(gladys.event.emit.secondCall, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00045b2741:siren:level:level',
+      state: 2,
+    });
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });
 
