@@ -211,8 +211,16 @@ class EnergyMonitoringPage extends Component {
     const consumptionSet = new Set();
     const costSet = new Set();
     (this.state.selectedFeaturesForRecalc || []).forEach(opt => {
-      if (opt && opt.consumptionSelector) consumptionSet.add(opt.consumptionSelector);
-      if (opt && opt.costSelector) costSet.add(opt.costSelector);
+      const consumptionSelectors = Array.isArray(opt && opt.consumptionSelectors)
+        ? opt.consumptionSelectors
+        : [opt && opt.consumptionSelector];
+      const costSelectors = Array.isArray(opt && opt.costSelectors) ? opt.costSelectors : [opt && opt.costSelector];
+      consumptionSelectors.forEach(selector => {
+        if (selector) consumptionSet.add(selector);
+      });
+      costSelectors.forEach(selector => {
+        if (selector) costSet.add(selector);
+      });
     });
     return { consumptionSelectors: Array.from(consumptionSet), costSelectors: Array.from(costSet) };
   };
@@ -777,14 +785,33 @@ class EnergyMonitoringPage extends Component {
       if (!rootTypes || !rootTypes.includes(feature.type)) {
         return;
       }
-      const consumptionChildren = childrenByParent.get(feature.id) || [];
-      const consumptionFeature = consumptionChildren.find(child => consumptionTypes.has(child.type));
-      if (!consumptionFeature) return;
-      const costChildren = childrenByParent.get(consumptionFeature.id) || [];
-      const costFeature = costChildren.find(child => costTypes.has(child.type));
-      if (!costFeature) return;
+      const consumptionChildren = (childrenByParent.get(feature.id) || []).filter(child => consumptionTypes.has(child.type));
+      if (consumptionChildren.length === 0) return;
 
-      candidates.push({ root: feature, consumption: consumptionFeature, cost: costFeature });
+      const consumptionSelectors = new Set();
+      const costSelectors = new Set();
+
+      consumptionChildren.forEach(consumptionChild => {
+        const consumptionSelector = consumptionChild.selector || consumptionChild.external_id || String(consumptionChild.id);
+        if (consumptionSelector) {
+          consumptionSelectors.add(consumptionSelector);
+        }
+        const costChildren = (childrenByParent.get(consumptionChild.id) || []).filter(child => costTypes.has(child.type));
+        costChildren.forEach(costChild => {
+          const costSelector = costChild.selector || costChild.external_id || String(costChild.id);
+          if (costSelector) {
+            costSelectors.add(costSelector);
+          }
+        });
+      });
+
+      if (consumptionSelectors.size === 0 || costSelectors.size === 0) return;
+
+      candidates.push({
+        root: feature,
+        consumptionSelectors: Array.from(consumptionSelectors),
+        costSelectors: Array.from(costSelectors)
+      });
     });
 
     return candidates.sort((a, b) => {
@@ -805,8 +832,8 @@ class EnergyMonitoringPage extends Component {
       })
       .map(entry => {
         const root = entry.root;
-        const consumption = entry.consumption;
-        const cost = entry.cost;
+        const consumptionSelectors = entry.consumptionSelectors || [];
+        const costSelectors = entry.costSelectors || [];
         const value = root.selector || root.external_id || String(root.id);
         const deviceName = (root.__device && root.__device.name) || '';
         const featureName = root.name || root.type || value;
@@ -815,8 +842,11 @@ class EnergyMonitoringPage extends Component {
           value,
           label,
           rootSelector: root.selector || root.external_id || String(root.id),
-          consumptionSelector: consumption.selector || consumption.external_id || String(consumption.id),
-          costSelector: cost.selector || cost.external_id || String(cost.id)
+          consumptionSelectors,
+          costSelectors,
+          // Keep legacy single-selector fields for backward compatibility with existing state shape.
+          consumptionSelector: consumptionSelectors[0],
+          costSelector: costSelectors[0]
         };
       });
   }
