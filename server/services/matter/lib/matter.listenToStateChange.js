@@ -1,5 +1,7 @@
 const {
   OnOff,
+  BooleanState,
+  Switch,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
@@ -19,7 +21,7 @@ const {
 
 const logger = require('../../../utils/logger');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
-const { EVENTS, STATE } = require('../../../utils/constants');
+const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 
 /**
  * @description Listen to state changes of a device.
@@ -44,6 +46,61 @@ async function listenToStateChange(nodeId, devicePath, device) {
         state: value ? STATE.ON : STATE.OFF,
       });
     });
+  }
+
+  const booleanState = device.clusterClients.get(BooleanState.Complete.id);
+  if (booleanState && !this.stateChangeListeners.has(booleanState)) {
+    logger.debug(`Matter: Adding state change listener for BooleanState cluster ${booleanState.name}`);
+    this.stateChangeListeners.add(booleanState);
+    booleanState.addStateValueAttributeListener((value) => {
+      logger.debug(`Matter: BooleanState attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${BooleanState.Complete.id}`,
+        state: value ? STATE.ON : STATE.OFF,
+      });
+    });
+  }
+
+  const switchCluster = device.clusterClients.get(Switch.Complete.id);
+  if (switchCluster && !this.stateChangeListeners.has(switchCluster)) {
+    logger.debug(`Matter: Adding state change listener for Switch cluster ${switchCluster.name}`);
+    this.stateChangeListeners.add(switchCluster);
+
+    if (switchCluster.addInitialPressEventListener) {
+      switchCluster.addInitialPressEventListener(() => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Switch.Complete.id}:click`,
+          state: BUTTON_STATUS.INITIAL_PRESS,
+        });
+      });
+    }
+
+    if (switchCluster.addShortReleaseEventListener) {
+      switchCluster.addShortReleaseEventListener(() => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Switch.Complete.id}:click`,
+          state: BUTTON_STATUS.SHORT_RELEASE,
+        });
+      });
+    }
+
+    if (switchCluster.addLongPressEventListener) {
+      switchCluster.addLongPressEventListener(() => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Switch.Complete.id}:click`,
+          state: BUTTON_STATUS.LONG_PRESS,
+        });
+      });
+    }
+
+    if (switchCluster.addLongReleaseEventListener) {
+      switchCluster.addLongReleaseEventListener(() => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${Switch.Complete.id}:click`,
+          state: BUTTON_STATUS.LONG_RELEASE,
+        });
+      });
+    }
   }
 
   const occupancy = device.clusterClients.get(OccupancySensing.Complete.id);

@@ -1,5 +1,7 @@
 const {
   OnOff,
+  BooleanState,
+  Switch,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
@@ -114,6 +116,29 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 1,
+        });
+      } else if (clusterIndex === BooleanState.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === Switch.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Click)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-click`, true),
+          category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+          type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:click`,
+          min: 0,
+          max: 84,
         });
       } else if (clusterIndex === OccupancySensing.Complete.id) {
         gladysDevice.features.push({
