@@ -279,6 +279,52 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexRange', () => {
     expect(setParamStub.firstCall.args[2]).to.equal('2025-06-16T20:00:00.000Z');
   });
 
+  it('should restore last processed value on window error even when restore is not required by range context', async () => {
+    clock = sinon.useFakeTimers(new Date('2025-06-17T01:00:00Z').getTime());
+    const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
+    energyMonitoring.queue = { push: (fn) => fn() };
+    const indexId = 'idx1';
+    const setParamStub = fake.resolves(null);
+    gladys.device.get = fake.resolves([
+      {
+        id: 'dev-1',
+        params: [{ name: 'ENERGY_INDEX_LAST_PROCESSED', value: '2025-06-16T20:00:00.000Z' }],
+        features: [
+          { id: indexId, category: 'energy-sensor', type: 'index' },
+          {
+            id: 'cons',
+            selector: 'cons',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+            energy_parent_id: indexId,
+          },
+        ],
+      },
+    ]);
+    gladys.device.getOldestStateFromDeviceFeatures = fake.resolves([
+      { oldest_created_at: new Date('2025-06-16T22:00:00Z') },
+    ]);
+    gladys.device.destroyStatesBetween = fake.resolves(null);
+    gladys.device.destroyStatesFrom = fake.resolves(null);
+    gladys.device.destroyParam = fake.resolves(null);
+    gladys.device.setParam = setParamStub;
+
+    let callCount = 0;
+    energyMonitoring.calculateConsumptionFromIndex = async () => {
+      callCount += 1;
+      if (callCount === 1) {
+        throw new Error('fail-window');
+      }
+      return null;
+    };
+
+    await energyMonitoring.calculateConsumptionFromIndexRange('2025-06-17', [], null, 'job-error-restore');
+
+    expect(setParamStub.calledOnce).to.equal(true);
+    expect(setParamStub.firstCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+    expect(setParamStub.firstCall.args[2]).to.equal('2025-06-16T20:00:00.000Z');
+  });
+
   it('should continue processing on window error and update progress in catch', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'service-id');
     energyMonitoring.queue = { push: (fn) => fn() };
