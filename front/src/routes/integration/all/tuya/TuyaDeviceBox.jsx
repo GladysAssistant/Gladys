@@ -179,10 +179,23 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
+      const localConfig = getLocalConfig(this.state.device);
+      const baselineFeatures = this.state.baselineDevice && this.state.baselineDevice.features;
+      const currentFeatures = this.state.device && this.state.device.features;
+      const shouldFallbackToBaselineFeatures =
+        !!this.state.device.created_at &&
+        localConfig.localOverride === true &&
+        Array.isArray(baselineFeatures) &&
+        baselineFeatures.length > 0 &&
+        (!Array.isArray(currentFeatures) || currentFeatures.length === 0);
+
       const payload = {
         ...this.state.device,
-        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+        poll_frequency: localConfig.localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
       };
+      if (shouldFallbackToBaselineFeatures) {
+        payload.features = baselineFeatures;
+      }
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
