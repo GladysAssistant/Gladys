@@ -130,6 +130,8 @@ const PILOT_WIRE_MODE = {
   COMFORT_1: 3,
   COMFORT_2: 4,
   COMFORT: 5,
+  PROGRAMMING: 6,
+  THERMOSTAT: 7,
 };
 
 const MUSIC_PLAYBACK_STATE = {
@@ -1364,6 +1366,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+    ERROR: 'tuya.error',
   },
   NETATMO: {
     STATUS: 'netatmo.status',

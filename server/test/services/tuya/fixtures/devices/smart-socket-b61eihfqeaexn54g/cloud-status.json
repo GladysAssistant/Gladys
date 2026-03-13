@@ -1,0 +1,10 @@
+{
+  "result": [
+    { "code": "switch_1", "value": false },
+    { "code": "child_lock", "value": false },
+    { "code": "add_ele", "value": 1 },
+    { "code": "cur_current", "value": 0 },
+    { "code": "cur_power", "value": 0 },
+    { "code": "cur_voltage", "value": 2340 }
+  ]
+}
