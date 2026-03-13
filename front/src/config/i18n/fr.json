@@ -619,7 +619,7 @@
       "calculateCostFromBeginningError": "Une erreur est survenue lors du lancement du calcul du coût.",
       "calculateConsumptionAndCostFromBeginning": "Calculer la consommation et le coût depuis le début",
       "calculateConsumptionAndCostOnPeriod": "Calculer la consommation et le coût sur la période",
-      "calculateSelectedFeaturesDescription": "Sélectionnez une ou plusieurs fonctionnalités énergie pour recalculer leur consommation et leur coût depuis le début.",
+      "calculateSelectedFeaturesDescription": "Sélectionnez une ou plusieurs fonctionnalités énergie pour recalculer leur consommation et leur coût.",
       "selectFeatures": "Sélectionner des fonctionnalités",
       "selectFeaturesPlaceholder": "Sélectionner une/des fonctionnalité(s) ou laisser vide",
       "noFeaturesAvailable": "Aucune fonctionnalité éligible trouvée.",
