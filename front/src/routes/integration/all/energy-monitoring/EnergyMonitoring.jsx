@@ -3,9 +3,11 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
 import cx from 'classnames';
+import Select from 'react-select';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import ImportPricesPage from './ImportPrices';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { DeviceListWithDragAndDrop } from '../../../../components/drag-and-drop/DeviceListWithDragAndDrop';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -39,6 +41,27 @@ const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
 ];
 
+const ENERGY_INDEX_FEATURE_TYPES_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: [
+    DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+    DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX
+  ],
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: [DEVICE_FEATURE_TYPES.SWITCH.ENERGY],
+  [DEVICE_FEATURE_CATEGORIES.TELEINFORMATION]: [
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EAST,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF01,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF02,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF03,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF04,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF05,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF06,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF07,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF08,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF09,
+    DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
+  ]
+};
+
 class EnergyMonitoringPage extends Component {
   state = {
     devices: [],
@@ -50,11 +73,23 @@ class EnergyMonitoringPage extends Component {
     priceError: null,
     // Settings state
     calculatingFromBeginning: false,
-    calculatingConsumptionFromBeginning: false,
+    calculatingCostFromBeginning: false,
     settingsSuccess: null,
     settingsError: null,
-    consumptionSettingsSuccess: null,
-    consumptionSettingsError: null,
+    costSettingsSuccess: null,
+    costSettingsError: null,
+    calculatingSelectedFromBeginning: false,
+    calculatingSelectedCostFromBeginning: false,
+    selectionSettingsSuccess: null,
+    selectionSettingsError: null,
+    selectionCostSettingsSuccess: null,
+    selectionCostSettingsError: null,
+    selectedFeaturesForRecalc: [],
+    showConfirmRecalculateAll: false,
+    showConfirmCostAll: false,
+    recalculateStartDate: '',
+    recalculateEndDate: '',
+    recalculateDateError: null,
     // UI state for collapsible price items
     expandedPriceIds: new Set(),
     // UI state for collapsible contract groups (collapsed by default)
@@ -132,38 +167,307 @@ class EnergyMonitoringPage extends Component {
     return arr.map(this.slotIndexToLabel).join(',');
   };
 
-  calculateFromBeginning = async () => {
+  calculateConsumptionAndCostFromBeginning = async () => {
+    await this.runConsumptionAndCostCalculations();
+  };
+
+  addSelectedFeature = option => {
+    if (!option) return;
+    this.setState(prev => {
+      const exists = (prev.selectedFeaturesForRecalc || []).some(o => o.value === option.value);
+
+      if (exists) return null;
+      return {
+        selectedFeaturesForRecalc: [...(prev.selectedFeaturesForRecalc || []), option],
+        showConfirmRecalculateAll: false,
+        showConfirmCostAll: false
+      };
+    });
+  };
+
+  removeSelectedFeature = index => {
+    this.setState(prev => {
+      const next = [...(prev.selectedFeaturesForRecalc || [])];
+      next.splice(index, 1);
+      return {
+        selectedFeaturesForRecalc: next,
+        showConfirmRecalculateAll: false,
+        showConfirmCostAll: false
+      };
+    });
+  };
+
+  moveSelectedFeature = (from, to) => {
+    if (from === to) return;
+    this.setState(prev => {
+      const list = [...(prev.selectedFeaturesForRecalc || [])];
+      const item = list.splice(from, 1)[0];
+      list.splice(to, 0, item);
+      return { selectedFeaturesForRecalc: list };
+    });
+  };
+
+  getSelectedRecalculationSelectors = () => {
+    const consumptionSet = new Set();
+    const costSet = new Set();
+    (this.state.selectedFeaturesForRecalc || []).forEach(opt => {
+      if (opt && opt.consumptionSelector) consumptionSet.add(opt.consumptionSelector);
+      if (opt && opt.costSelector) costSet.add(opt.costSelector);
+    });
+    return { consumptionSelectors: Array.from(consumptionSet), costSelectors: Array.from(costSet) };
+  };
+
+  calculateCostFromBeginning = async () => {
+    await this.runCostCalculations();
+  };
+
+  handleRecalculateStartDateChange = e => {
+    const nextStartDate = e.target.value;
+    this.setState(prev => {
+      const hasInvalidRange = nextStartDate && prev.recalculateEndDate && nextStartDate > prev.recalculateEndDate;
+      return {
+        recalculateStartDate: nextStartDate,
+        showConfirmRecalculateAll: false,
+        showConfirmCostAll: false,
+        recalculateDateError: hasInvalidRange ? 'invalidStartAfterEnd' : null
+      };
+    });
+  };
+
+  handleRecalculateEndDateChange = e => {
+    const nextEndDate = e.target.value;
+    this.setState(prev => {
+      const hasInvalidRange = nextEndDate && prev.recalculateStartDate && nextEndDate < prev.recalculateStartDate;
+      return {
+        recalculateEndDate: nextEndDate,
+        showConfirmRecalculateAll: false,
+        showConfirmCostAll: false,
+        recalculateDateError: hasInvalidRange ? 'invalidEndBeforeStart' : null
+      };
+    });
+  };
+
+  clearRecalculateStartDate = () => {
+    this.setState({
+      recalculateStartDate: '',
+      showConfirmRecalculateAll: false,
+      showConfirmCostAll: false,
+      recalculateDateError: null
+    });
+  };
+
+  clearRecalculateEndDate = () => {
+    this.setState({
+      recalculateEndDate: '',
+      showConfirmRecalculateAll: false,
+      showConfirmCostAll: false,
+      recalculateDateError: null
+    });
+  };
+
+  hasRecalculatePeriod = () => {
+    return Boolean(this.state.recalculateStartDate || this.state.recalculateEndDate);
+  };
+
+  getRecalculateDatePayload = () => {
+    const payload = {};
+    if (this.state.recalculateStartDate) payload.start_date = this.state.recalculateStartDate;
+    if (this.state.recalculateEndDate) payload.end_date = this.state.recalculateEndDate;
+    return payload;
+  };
+
+  renderRecalculatePeriod = () => {
+    const { recalculateStartDate, recalculateEndDate } = this.state;
+    if (recalculateStartDate && recalculateEndDate) {
+      return (
+        <Text
+          id="integration.energyMonitoring.periodFromTo"
+          defaultMessage="Period: from {{startDate}} to {{endDate}}."
+          fields={{ startDate: recalculateStartDate, endDate: recalculateEndDate }}
+        />
+      );
+    }
+    if (recalculateStartDate) {
+      return (
+        <Text
+          id="integration.energyMonitoring.periodFrom"
+          defaultMessage="Period: from {{startDate}}."
+          fields={{ startDate: recalculateStartDate }}
+        />
+      );
+    }
+    if (recalculateEndDate) {
+      return (
+        <Text
+          id="integration.energyMonitoring.periodUntil"
+          defaultMessage="Period: until {{endDate}}."
+          fields={{ endDate: recalculateEndDate }}
+        />
+      );
+    }
+    return <Text id="integration.energyMonitoring.periodAllTime" defaultMessage="Period: full history." />;
+  };
+
+  calculateConsumptionAndCostForSelection = async () => {
+    const { consumptionSelectors, costSelectors } = this.getSelectedRecalculationSelectors();
+    if (consumptionSelectors.length === 0 && costSelectors.length === 0) {
+      this.setState({
+        showConfirmRecalculateAll: true,
+        showConfirmCostAll: false,
+        selectionSettingsError: null,
+        selectionSettingsSuccess: null,
+        selectionCostSettingsError: null,
+        selectionCostSettingsSuccess: null
+      });
+      return;
+    }
+    await this.runConsumptionAndCostCalculations({
+      consumptionSelectors,
+      costSelectors,
+      fromSelection: true
+    });
+  };
+
+  confirmConsumptionAndCostForAll = async () => {
+    this.setState({ showConfirmRecalculateAll: false });
+    await this.runConsumptionAndCostCalculations();
+  };
+
+  cancelConfirmConsumptionAndCostForAll = () => {
+    this.setState({ showConfirmRecalculateAll: false });
+  };
+
+  calculateCostForSelection = async () => {
+    const { costSelectors } = this.getSelectedRecalculationSelectors();
+    if (costSelectors.length === 0) {
+      this.setState({
+        showConfirmCostAll: true,
+        showConfirmRecalculateAll: false,
+        selectionSettingsError: null,
+        selectionSettingsSuccess: null,
+        selectionCostSettingsError: null,
+        selectionCostSettingsSuccess: null
+      });
+      return;
+    }
+    await this.runCostCalculations({
+      costSelectors,
+      fromSelection: true
+    });
+  };
+
+  confirmCostForAll = async () => {
+    this.setState({ showConfirmCostAll: false });
+    await this.runCostCalculations();
+  };
+
+  cancelConfirmCostForAll = () => {
+    this.setState({ showConfirmCostAll: false });
+  };
+
+  runCostCalculations = async ({ costSelectors = [], fromSelection = false } = {}) => {
     try {
-      this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
-      await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {});
-      this.setState({ settingsSuccess: 'ok' });
-      // Redirect to jobs page
+      const hasPeriod = this.hasRecalculatePeriod();
+      const url = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-cost-range'
+        : '/api/v1/service/energy-monitoring/calculate-cost-from-beginning';
+      this.setState({
+        calculatingCostFromBeginning: !fromSelection,
+        calculatingSelectedCostFromBeginning: fromSelection,
+        costSettingsError: null,
+        costSettingsSuccess: null,
+        settingsError: null,
+        settingsSuccess: null,
+        selectionSettingsError: null,
+        selectionSettingsSuccess: null,
+        selectionCostSettingsError: null,
+        selectionCostSettingsSuccess: null
+      });
+      const costResponse = await this.props.httpClient.post(url, {
+        feature_selectors: costSelectors,
+        ...this.getRecalculateDatePayload()
+      });
+      if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
+        throw new Error('job_not_created');
+      }
+      if (fromSelection) {
+        this.setState({ selectionCostSettingsSuccess: 'ok' });
+      } else {
+        this.setState({ costSettingsSuccess: 'ok' });
+      }
       route('/dashboard/settings/jobs');
     } catch (e) {
-      this.setState({ settingsError: e });
+      if (fromSelection) {
+        this.setState({ selectionCostSettingsError: e });
+      } else {
+        this.setState({ costSettingsError: e });
+      }
     } finally {
-      this.setState({ calculatingFromBeginning: false });
+      if (fromSelection) {
+        this.setState({ calculatingSelectedCostFromBeginning: false });
+      } else {
+        this.setState({ calculatingCostFromBeginning: false });
+      }
     }
   };
 
-  calculateConsumptionFromIndexFromBeginning = async () => {
+  runConsumptionAndCostCalculations = async ({
+    consumptionSelectors = [],
+    costSelectors = [],
+    fromSelection = false
+  } = {}) => {
     try {
+      const hasPeriod = this.hasRecalculatePeriod();
+      const consumptionUrl = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-consumption-from-index-range'
+        : '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning';
+      const costUrl = hasPeriod
+        ? '/api/v1/service/energy-monitoring/calculate-cost-range'
+        : '/api/v1/service/energy-monitoring/calculate-cost-from-beginning';
       this.setState({
-        calculatingConsumptionFromBeginning: true,
-        consumptionSettingsError: null,
-        consumptionSettingsSuccess: null
+        calculatingFromBeginning: !fromSelection,
+        calculatingSelectedFromBeginning: fromSelection,
+        settingsError: null,
+        settingsSuccess: null,
+        costSettingsError: null,
+        costSettingsSuccess: null,
+        selectionSettingsError: null,
+        selectionSettingsSuccess: null,
+        selectionCostSettingsError: null,
+        selectionCostSettingsSuccess: null
       });
-      await this.props.httpClient.post(
-        '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
-        {}
-      );
-      this.setState({ consumptionSettingsSuccess: 'ok' });
-      // Redirect to jobs page
+      const consumptionResponse = await this.props.httpClient.post(consumptionUrl, {
+        feature_selectors: consumptionSelectors,
+        ...this.getRecalculateDatePayload()
+      });
+      if (!consumptionResponse || consumptionResponse.success !== true || !consumptionResponse.job_id) {
+        throw new Error('job_not_created');
+      }
+      const costResponse = await this.props.httpClient.post(costUrl, {
+        feature_selectors: costSelectors,
+        ...this.getRecalculateDatePayload()
+      });
+      if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
+        throw new Error('job_not_created');
+      }
+      if (fromSelection) {
+        this.setState({ selectionSettingsSuccess: 'ok' });
+      } else {
+        this.setState({ settingsSuccess: 'ok' });
+      }
       route('/dashboard/settings/jobs');
     } catch (e) {
-      this.setState({ consumptionSettingsError: e });
+      if (fromSelection) {
+        this.setState({ selectionSettingsError: e });
+      } else {
+        this.setState({ settingsError: e });
+      }
     } finally {
-      this.setState({ calculatingConsumptionFromBeginning: false });
+      if (fromSelection) {
+        this.setState({ calculatingSelectedFromBeginning: false });
+      } else {
+        this.setState({ calculatingFromBeginning: false });
+      }
     }
   };
 
@@ -440,6 +744,81 @@ class EnergyMonitoringPage extends Component {
         });
     });
     return flat;
+  }
+
+  getRecalculationCandidates() {
+    const all = this.getAllFeatures();
+    const byId = new Map();
+    const childrenByParent = new Map();
+
+    all.forEach(feature => {
+      byId.set(feature.id, feature);
+      const parentId = feature.energy_parent_id;
+      if (parentId) {
+        if (!childrenByParent.has(parentId)) childrenByParent.set(parentId, []);
+        childrenByParent.get(parentId).push(feature);
+      }
+    });
+
+    const consumptionTypes = new Set([
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION
+    ]);
+    const costTypes = new Set([
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST
+    ]);
+
+    const candidates = [];
+
+    all.forEach(feature => {
+      if (!feature) return;
+      const rootTypes = ENERGY_INDEX_FEATURE_TYPES_BY_CATEGORY[feature.category];
+      if (!rootTypes || !rootTypes.includes(feature.type)) {
+        return;
+      }
+      const consumptionChildren = childrenByParent.get(feature.id) || [];
+      const consumptionFeature = consumptionChildren.find(child => consumptionTypes.has(child.type));
+      if (!consumptionFeature) return;
+      const costChildren = childrenByParent.get(consumptionFeature.id) || [];
+      const costFeature = costChildren.find(child => costTypes.has(child.type));
+      if (!costFeature) return;
+
+      candidates.push({ root: feature, consumption: consumptionFeature, cost: costFeature });
+    });
+
+    return candidates.sort((a, b) => {
+      const deviceNameA = (a.root.__device && a.root.__device.name) || '';
+      const deviceNameB = (b.root.__device && b.root.__device.name) || '';
+      const nameA = `${deviceNameA} ${a.root.name || ''}`.trim().toLowerCase();
+      const nameB = `${deviceNameB} ${b.root.name || ''}`.trim().toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
+  getRecalculationOptions(features = this.getRecalculationCandidates()) {
+    const selected = new Set((this.state.selectedFeaturesForRecalc || []).map(opt => opt && opt.value).filter(Boolean));
+    return features
+      .filter(entry => {
+        const value = (entry.root && (entry.root.selector || entry.root.external_id || String(entry.root.id))) || '';
+        return value && !selected.has(value);
+      })
+      .map(entry => {
+        const root = entry.root;
+        const consumption = entry.consumption;
+        const cost = entry.cost;
+        const value = root.selector || root.external_id || String(root.id);
+        const deviceName = (root.__device && root.__device.name) || '';
+        const featureName = root.name || root.type || value;
+        const label = deviceName ? `${deviceName} - ${featureName}` : featureName;
+        return {
+          value,
+          label,
+          rootSelector: root.selector || root.external_id || String(root.id),
+          consumptionSelector: consumption.selector || consumption.external_id || String(consumption.id),
+          costSelector: cost.selector || cost.external_id || String(cost.id)
+        };
+      });
   }
 
   detectCircularDependencies() {
@@ -1401,117 +1780,386 @@ class EnergyMonitoringPage extends Component {
       </div>
     );
 
-    const renderSettings = () => (
-      <div>
-        <div class="card">
-          <div class="card-header">
-            <h1 class="card-title">
-              <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
-            </h1>
-          </div>
-          <div class="card-body">
-            {state.settingsError && (
-              <div class="alert alert-danger" role="alert">
-                <Text
-                  id="integration.energyMonitoring.calculateFromBeginningError"
-                  defaultMessage="An error occurred while starting the calculation."
-                />
-              </div>
-            )}
-            {state.settingsSuccess && (
-              <div class="alert alert-success" role="alert">
-                <Text
-                  id="integration.energyMonitoring.calculateFromBeginningStarted"
-                  defaultMessage="Calculation started. You can follow progress in Jobs."
-                />
-              </div>
-            )}
-            {state.consumptionSettingsError && (
-              <div class="alert alert-danger" role="alert">
-                <Text
-                  id="integration.energyMonitoring.calculateConsumptionFromBeginningError"
-                  defaultMessage="An error occurred while starting the consumption calculation."
-                />
-              </div>
-            )}
-            {state.consumptionSettingsSuccess && (
-              <div class="alert alert-success" role="alert">
-                <Text
-                  id="integration.energyMonitoring.calculateConsumptionFromBeginningStarted"
-                  defaultMessage="Consumption calculation started. You can follow progress in Jobs."
-                />
-              </div>
-            )}
-            <div class="mb-4">
-              <p class="text-muted">
-                <Text
-                  id="integration.energyMonitoring.calculateConsumptionFromIndexDescription"
-                  defaultMessage="This will calculate the energy consumption (in kWh) from your energy meter index readings. Use this if you have index data and want to compute the actual consumption between readings."
-                />
-              </p>
-              <p>
-                <button
-                  class="btn btn-primary"
-                  disabled={state.calculatingConsumptionFromBeginning}
-                  onClick={this.calculateConsumptionFromIndexFromBeginning}
-                >
-                  {state.calculatingConsumptionFromBeginning ? (
-                    <span>
-                      <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                      <Text
-                        id="integration.energyMonitoring.calculatingConsumptionFromBeginning"
-                        defaultMessage="Starting consumption calculation..."
-                      />
-                    </span>
-                  ) : (
-                    <span>
-                      <i class="fe fe-play mr-2" />
-                      <Text
-                        id="integration.energyMonitoring.calculateConsumptionFromIndexFromBeginning"
-                        defaultMessage="Calculate consumption from index from beginning"
-                      />
-                    </span>
-                  )}
-                </button>
-              </p>
+    const renderSettings = () => {
+      const recalcFeatures = this.getRecalculationCandidates();
+      const hasPeriod = this.hasRecalculatePeriod();
+      const hasSelection = (state.selectedFeaturesForRecalc || []).length > 0;
+
+      return (
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h1 class="card-title">
+                <Text id="integration.energyMonitoring.settings" defaultMessage="Settings" />
+              </h1>
             </div>
-            <div class="mb-4">
-              <p class="text-muted">
-                <Text
-                  id="integration.energyMonitoring.calculateCostFromBeginningDescription"
-                  defaultMessage="This will calculate the cost of your energy consumption based on your consumption data and electricity prices. Use this after you have consumption data and configured your electricity prices."
-                />
-              </p>
-              <p>
-                <button
-                  class="btn btn-primary"
-                  disabled={state.calculatingFromBeginning}
-                  onClick={this.calculateFromBeginning}
-                >
-                  {state.calculatingFromBeginning ? (
-                    <span>
-                      <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+            <div class="card-body">
+              {state.settingsError && (
+                <div class="alert alert-danger" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateFromBeginningError"
+                    defaultMessage="An error occurred while starting the calculation."
+                  />
+                </div>
+              )}
+              {state.settingsSuccess && (
+                <div class="alert alert-success" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateFromBeginningStarted"
+                    defaultMessage="Calculation started. You can follow progress in Jobs."
+                  />
+                </div>
+              )}
+              {state.costSettingsError && (
+                <div class="alert alert-danger" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateCostFromBeginningError"
+                    defaultMessage="An error occurred while starting the cost calculation."
+                  />
+                </div>
+              )}
+              {state.costSettingsSuccess && (
+                <div class="alert alert-success" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateCostFromBeginningStarted"
+                    defaultMessage="Cost calculation started. You can follow progress in Jobs."
+                  />
+                </div>
+              )}
+              {state.selectionSettingsError && (
+                <div class="alert alert-danger" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateSelectedFeaturesFromBeginningError"
+                    defaultMessage="An error occurred while starting the calculation for selected features."
+                  />
+                </div>
+              )}
+              {state.selectionSettingsSuccess && (
+                <div class="alert alert-success" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateSelectedFeaturesFromBeginningStarted"
+                    defaultMessage="Calculation for selected features started. You can follow progress in Jobs."
+                  />
+                </div>
+              )}
+              {state.selectionCostSettingsError && (
+                <div class="alert alert-danger" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateSelectedFeaturesCostFromBeginningError"
+                    defaultMessage="An error occurred while starting the cost calculation for selected features."
+                  />
+                </div>
+              )}
+              {state.selectionCostSettingsSuccess && (
+                <div class="alert alert-success" role="alert">
+                  <Text
+                    id="integration.energyMonitoring.calculateSelectedFeaturesCostFromBeginningStarted"
+                    defaultMessage="Cost calculation for selected features started. You can follow progress in Jobs."
+                  />
+                </div>
+              )}
+              <div class="mb-4">
+                <p class="text-muted">
+                  <Text
+                    id="integration.energyMonitoring.recalculateSelectionDescription"
+                    defaultMessage="Select one or more energy features to recalculate their consumption and/or cost."
+                  />
+                </p>
+                <p class="text-muted">
+                  <Text
+                    id="integration.energyMonitoring.recalculateAllFallbackDescription"
+                    defaultMessage="If no feature is selected, we will recalculate all energy features after confirmation."
+                  />
+                </p>
+              </div>
+              <div class="mb-4">
+                <div class="form-group">
+                  <label>
+                    <Text id="integration.energyMonitoring.selectFeatures" defaultMessage="Select features" />
+                  </label>
+                  <Select
+                    onChange={this.addSelectedFeature}
+                    value={null}
+                    options={this.getRecalculationOptions(recalcFeatures)}
+                    isClearable
+                    isDisabled={state.calculatingSelectedFromBeginning || recalcFeatures.length === 0}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    placeholder={
+                      this.props.intl.dictionary.integration.energyMonitoring.selectFeaturesPlaceholder || 'Select...'
+                    }
+                    noOptionsMessage={() =>
+                      this.props.intl.dictionary.integration.energyMonitoring.noFeaturesAvailable ||
+                      'No eligible features found.'
+                    }
+                  />
+                </div>
+                <div class="form-group">
+                  <DeviceListWithDragAndDrop
+                    selectedDeviceFeaturesOptions={state.selectedFeaturesForRecalc}
+                    moveDevice={this.moveSelectedFeature}
+                    removeDevice={this.removeSelectedFeature}
+                    updateDeviceFeatureName={() => {}}
+                    isTouchDevice={false}
+                    allowRename={false}
+                  />
+                  <hr class="my-3" />
+                  <p class="text-muted">
+                    <Text
+                      id="integration.energyMonitoring.recalculatePeriodDescription"
+                      defaultMessage="Choose a date range to limit the recalculation. Leave empty to use the full history."
+                    />
+                  </p>
+                  <div class="form-row">
+                    <div class="form-group col-12 col-md-6">
+                      <label>
+                        <Text id="integration.energyMonitoring.recalculateStartDateLabel" defaultMessage="From" />
+                      </label>
+                      <div class="input-group">
+                        <input
+                          type="date"
+                          class="form-control"
+                          value={state.recalculateStartDate}
+                          onChange={this.handleRecalculateStartDateChange}
+                          max={state.recalculateEndDate || undefined}
+                        />
+                        {state.recalculateStartDate && (
+                          <div class="input-group-append">
+                            <button
+                              type="button"
+                              class="btn btn-outline-secondary"
+                              onClick={this.clearRecalculateStartDate}
+                              aria-label={
+                                this.props.intl.dictionary.integration.energyMonitoring.clearDate || 'Clear date'
+                              }
+                            >
+                              <i class="fe fe-x" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div class="form-group col-12 col-md-6">
+                      <label>
+                        <Text id="integration.energyMonitoring.recalculateEndDateLabel" defaultMessage="To" />
+                      </label>
+                      <div class="input-group">
+                        <input
+                          type="date"
+                          class="form-control"
+                          value={state.recalculateEndDate}
+                          onChange={this.handleRecalculateEndDateChange}
+                          min={state.recalculateStartDate || undefined}
+                        />
+                        {state.recalculateEndDate && (
+                          <div class="input-group-append">
+                            <button
+                              type="button"
+                              class="btn btn-outline-secondary"
+                              onClick={this.clearRecalculateEndDate}
+                              aria-label={
+                                this.props.intl.dictionary.integration.energyMonitoring.clearDate || 'Clear date'
+                              }
+                            >
+                              <i class="fe fe-x" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {state.recalculateDateError && (
+                    <div class="alert alert-warning py-2">
                       <Text
-                        id="integration.energyMonitoring.calculatingFromBeginning"
-                        defaultMessage="Starting calculation..."
+                        id={
+                          state.recalculateDateError === 'invalidStartAfterEnd'
+                            ? 'integration.energyMonitoring.recalculateDateStartAfterEndError'
+                            : 'integration.energyMonitoring.recalculateDateEndBeforeStartError'
+                        }
+                        defaultMessage="The start date must be before the end date."
                       />
-                    </span>
-                  ) : (
-                    <span>
-                      <i class="fe fe-play mr-2" />
-                      <Text
-                        id="integration.energyMonitoring.calculateCostFromBeginning"
-                        defaultMessage="Calculate cost from beginning"
-                      />
-                    </span>
+                    </div>
                   )}
-                </button>
-              </p>
+                  <p class="text-muted mb-0">{this.renderRecalculatePeriod()}</p>
+                </div>
+                {state.showConfirmRecalculateAll && (
+                  <div class="alert alert-warning d-flex flex-column mb-3">
+                    <Text
+                      id={
+                        hasPeriod
+                          ? 'integration.energyMonitoring.recalculateAllConfirmDescriptionPeriod'
+                          : 'integration.energyMonitoring.recalculateAllConfirmDescription'
+                      }
+                      defaultMessage="No feature is selected. This will recalculate all energy features."
+                    />
+                    <div class="small text-muted mt-1">{this.renderRecalculatePeriod()}</div>
+                    <div class="mt-2">
+                      <button
+                        class="btn btn-danger"
+                        onClick={this.confirmConsumptionAndCostForAll}
+                        disabled={
+                          state.calculatingFromBeginning ||
+                          state.calculatingSelectedFromBeginning ||
+                          state.calculatingCostFromBeginning ||
+                          state.calculatingSelectedCostFromBeginning
+                        }
+                      >
+                        <Text
+                          id="integration.energyMonitoring.recalculateAllConfirmButton"
+                          defaultMessage="Confirm full recalculation"
+                        />
+                      </button>
+                      <button
+                        class="btn ml-2"
+                        onClick={this.cancelConfirmConsumptionAndCostForAll}
+                        disabled={
+                          state.calculatingFromBeginning ||
+                          state.calculatingSelectedFromBeginning ||
+                          state.calculatingCostFromBeginning ||
+                          state.calculatingSelectedCostFromBeginning
+                        }
+                      >
+                        <Text id="integration.energyMonitoring.recalculateAllCancelButton" defaultMessage="Cancel" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {state.showConfirmCostAll && (
+                  <div class="alert alert-warning d-flex flex-column mb-3">
+                    <Text
+                      id={
+                        hasPeriod
+                          ? 'integration.energyMonitoring.recalculateAllCostConfirmDescriptionPeriod'
+                          : 'integration.energyMonitoring.recalculateAllCostConfirmDescription'
+                      }
+                      defaultMessage="No feature is selected. This will recalculate the cost for all energy features."
+                    />
+                    <div class="small text-muted mt-1">{this.renderRecalculatePeriod()}</div>
+                    <div class="mt-2">
+                      <button
+                        class="btn btn-danger"
+                        onClick={this.confirmCostForAll}
+                        disabled={
+                          state.calculatingFromBeginning ||
+                          state.calculatingSelectedFromBeginning ||
+                          state.calculatingCostFromBeginning ||
+                          state.calculatingSelectedCostFromBeginning
+                        }
+                      >
+                        <Text
+                          id="integration.energyMonitoring.recalculateAllCostConfirmButton"
+                          defaultMessage="Confirm full cost recalculation"
+                        />
+                      </button>
+                      <button
+                        class="btn ml-2"
+                        onClick={this.cancelConfirmCostForAll}
+                        disabled={
+                          state.calculatingFromBeginning ||
+                          state.calculatingSelectedFromBeginning ||
+                          state.calculatingCostFromBeginning ||
+                          state.calculatingSelectedCostFromBeginning
+                        }
+                      >
+                        <Text id="integration.energyMonitoring.recalculateAllCancelButton" defaultMessage="Cancel" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!state.showConfirmRecalculateAll && !state.showConfirmCostAll && (
+                  <div class="d-flex flex-wrap">
+                    <button
+                      class="btn btn-primary mr-2 mb-2"
+                      disabled={
+                        state.calculatingFromBeginning ||
+                        state.calculatingSelectedFromBeginning ||
+                        state.calculatingCostFromBeginning ||
+                        state.calculatingSelectedCostFromBeginning ||
+                        state.recalculateDateError ||
+                        recalcFeatures.length === 0
+                      }
+                      onClick={this.calculateConsumptionAndCostForSelection}
+                    >
+                      {state.calculatingFromBeginning || state.calculatingSelectedFromBeginning ? (
+                        <span>
+                          <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                          <Text
+                            id={
+                              (state.selectedFeaturesForRecalc || []).length > 0
+                                ? 'integration.energyMonitoring.calculatingSelectedFeaturesFromBeginning'
+                                : 'integration.energyMonitoring.calculatingFromBeginning'
+                            }
+                            defaultMessage="Starting calculation..."
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          <i class="fe fe-play mr-2" />
+                          <Text
+                            id={
+                              hasSelection
+                                ? hasPeriod
+                                  ? 'integration.energyMonitoring.calculateSelectedFeaturesOnPeriod'
+                                  : 'integration.energyMonitoring.calculateSelectedFeaturesFromBeginning'
+                                : hasPeriod
+                                ? 'integration.energyMonitoring.calculateConsumptionAndCostOnPeriod'
+                                : 'integration.energyMonitoring.calculateConsumptionAndCostFromBeginning'
+                            }
+                            defaultMessage="Calculate consumption and cost from beginning"
+                          />
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      class="btn btn-outline-primary mb-2"
+                      disabled={
+                        state.calculatingCostFromBeginning ||
+                        state.calculatingSelectedCostFromBeginning ||
+                        state.calculatingFromBeginning ||
+                        state.calculatingSelectedFromBeginning ||
+                        state.recalculateDateError ||
+                        recalcFeatures.length === 0
+                      }
+                      onClick={this.calculateCostForSelection}
+                    >
+                      {state.calculatingCostFromBeginning || state.calculatingSelectedCostFromBeginning ? (
+                        <span>
+                          <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
+                          <Text
+                            id={
+                              (state.selectedFeaturesForRecalc || []).length > 0
+                                ? 'integration.energyMonitoring.calculatingSelectedFeaturesCostFromBeginning'
+                                : 'integration.energyMonitoring.calculatingCostFromBeginning'
+                            }
+                            defaultMessage="Starting cost calculation..."
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          <i class="fe fe-play mr-2" />
+                          <Text
+                            id={
+                              hasSelection
+                                ? hasPeriod
+                                  ? 'integration.energyMonitoring.calculateSelectedFeaturesCostOnPeriod'
+                                  : 'integration.energyMonitoring.calculateSelectedFeaturesCostFromBeginning'
+                                : hasPeriod
+                                ? 'integration.energyMonitoring.calculateCostOnPeriod'
+                                : 'integration.energyMonitoring.calculateCostFromBeginning'
+                            }
+                            defaultMessage="Calculate cost from beginning"
+                          />
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    };
 
     const renderPrices = () => {
       const priceGroups = groupPricesByName(state.prices);
