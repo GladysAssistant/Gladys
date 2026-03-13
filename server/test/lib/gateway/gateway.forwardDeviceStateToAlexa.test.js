@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const get = require('get-value');
 
 const { fake, assert } = sinon;
 
@@ -127,7 +126,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
         header: {
           namespace: 'Alexa',
           name: 'ChangeReport',
-          messageId: get(calledParam, 'event.header.messageId'),
+          messageId: calledParam?.event?.header?.messageId,
           payloadVersion: '3',
         },
         endpoint: { endpointId: 'my-device' },
@@ -139,7 +138,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
                 namespace: 'Alexa.PowerController',
                 name: 'powerState',
                 value: 'OFF',
-                timeOfSample: get(calledParam, 'event.payload.change.properties.0.timeOfSample'),
+                timeOfSample: calledParam?.event?.payload?.change?.properties?.[0]?.timeOfSample,
                 uncertaintyInMilliseconds: 0,
               },
             ],
@@ -152,7 +151,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
             namespace: 'Alexa.PowerController',
             name: 'powerState',
             value: 'OFF',
-            timeOfSample: get(calledParam, 'context.properties.0.timeOfSample'),
+            timeOfSample: calledParam?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],
@@ -208,7 +207,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
         header: {
           namespace: 'Alexa',
           name: 'ChangeReport',
-          messageId: get(calledParam, 'event.header.messageId'),
+          messageId: calledParam?.event?.header?.messageId,
           payloadVersion: '3',
         },
         endpoint: { endpointId: 'my-device' },
@@ -220,7 +219,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
                 namespace: 'Alexa.BrightnessController',
                 name: 'brightness',
                 value: 50,
-                timeOfSample: get(calledParam, 'event.payload.change.properties.0.timeOfSample'),
+                timeOfSample: calledParam?.event?.payload?.change?.properties?.[0]?.timeOfSample,
                 uncertaintyInMilliseconds: 0,
               },
             ],
@@ -233,7 +232,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
             namespace: 'Alexa.BrightnessController',
             name: 'brightness',
             value: 50,
-            timeOfSample: get(calledParam, 'context.properties.0.timeOfSample'),
+            timeOfSample: calledParam?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],
@@ -430,7 +429,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
         header: {
           namespace: 'Alexa',
           name: 'ChangeReport',
-          messageId: get(calledParam, 'event.header.messageId'),
+          messageId: calledParam?.event?.header?.messageId,
           payloadVersion: '3',
         },
         endpoint: { endpointId: 'my-device' },
@@ -442,7 +441,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
                 namespace: 'Alexa.PowerController',
                 name: 'powerState',
                 value: 'OFF',
-                timeOfSample: get(calledParam, 'event.payload.change.properties.0.timeOfSample'),
+                timeOfSample: calledParam?.event?.payload?.change?.properties?.[0]?.timeOfSample,
                 uncertaintyInMilliseconds: 0,
               },
             ],
@@ -455,7 +454,7 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
             namespace: 'Alexa.PowerController',
             name: 'powerState',
             value: 'OFF',
-            timeOfSample: get(calledParam, 'context.properties.0.timeOfSample'),
+            timeOfSample: calledParam?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],

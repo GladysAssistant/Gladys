@@ -5,7 +5,7 @@ import { connect } from 'unistore/preact';
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import { USER_ROLE } from '../../../../server/utils/constants';
-import debounce from 'debounce';
+import debounce from '../../utils/debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
@@ -21,7 +21,7 @@ class Integration extends Component {
       searchKeyword: '',
       orderDir: 'asc'
     };
-    this.getIntegrationsDebounced = debounce(this.getIntegrations, 300);
+    this.getIntegrationsDebounced = debounce(this.getIntegrations.bind(this), 300);
   }
 
   componentWillMount() {

@@ -1,5 +1,5 @@
 import update from 'immutability-helper';
-import debounce from 'debounce';
+import debounce from '../../../../utils/debounce';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
 

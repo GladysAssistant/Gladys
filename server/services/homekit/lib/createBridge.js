@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const { EVENTS } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const { mappings } = require('./deviceMappings');
@@ -15,7 +15,7 @@ async function createBridge() {
   let pincode = await this.gladys.variable.getValue('HOMEKIT_PIN_CODE', this.serviceId);
 
   if (!bridgeUuid) {
-    bridgeUuid = uuid.v4();
+    bridgeUuid = randomUUID();
     await this.gladys.variable.setValue('HOMEKIT_GLADYS_UUID', bridgeUuid, this.serviceId);
   }
 

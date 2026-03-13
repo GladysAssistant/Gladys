@@ -1,4 +1,3 @@
-const get = require('get-value');
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
@@ -31,7 +30,7 @@ async function handleGoogleHomeMessage(data, rawMessage, cb) {
       );
       this.googleHomeConnected = true;
     }
-    const firstOrderIntent = get(body, 'inputs.0.intent');
+    const firstOrderIntent = body?.inputs?.[0]?.intent;
     let response;
     if (firstOrderIntent === 'action.devices.SYNC') {
       response = await service.googleActionsHandler.onSync(body);
