@@ -592,7 +592,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     calcStub.restore();
   });
 
-  it('should skip consumption features without selector and still process valid ones', async () => {
+  it('should skip consumption features without selector and still process valid ones for mixed device with missing selector', async () => {
     const mixedDevice = {
       id: 'device-with-mixed-consumption',
       name: 'Mixed Consumption Device',
