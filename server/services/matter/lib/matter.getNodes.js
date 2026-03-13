@@ -5,7 +5,8 @@ const convertDevice = (device) => {
   const clusterClients = [];
 
   // Each cluster client is a feature of the device
-  device.clusterClients.forEach((clusterClient, clusterIndex) => {
+  const allClusterClients = device.getAllClusterClients();
+  allClusterClients.forEach((clusterClient) => {
     clusterClients.push({
       id: clusterClient.id.toString(),
       name: clusterClient.name,
@@ -16,7 +17,8 @@ const convertDevice = (device) => {
   });
 
   // Convert child endpoints (child devices)
-  const childEndpoints = device.childEndpoints.map((childDeviceEndpoint) => {
+  const childEndpointsList = device.getChildEndpoints();
+  const childEndpoints = childEndpointsList.map((childDeviceEndpoint) => {
     return convertDevice(childDeviceEndpoint);
   });
 
@@ -37,8 +39,8 @@ const convertDevice = (device) => {
 async function getNodes() {
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
   const filteredNodeDetails = nodeDetails.filter((nodeDetail) => {
-    if (!nodeDetail.deviceData) {
-      logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data`);
+    if (!nodeDetail.deviceData || !nodeDetail.deviceData.basicInformation) {
+      logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data or basic information`);
       return false;
     }
     return true;
