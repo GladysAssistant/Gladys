@@ -1790,7 +1790,7 @@
       "calculateCostFromBeginningError": "An error occurred while starting the cost calculation.",
       "calculateConsumptionAndCostFromBeginning": "Calculate consumption and cost from the beginning",
       "calculateConsumptionAndCostOnPeriod": "Calculate consumption and cost for the period",
-      "calculateSelectedFeaturesDescription": "Select one or more energy features to recalculate their consumption and cost from the beginning.",
+      "calculateSelectedFeaturesDescription": "Select one or more energy features to recalculate their consumption and cost.",
       "selectFeatures": "Select features",
       "selectFeaturesPlaceholder": "Select feature(s) or leave empty",
       "noFeaturesAvailable": "No eligible features found.",
