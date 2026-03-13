@@ -1,0 +1,14 @@
+{
+  "result": {
+    "properties": [
+      { "code": "Power", "value": true },
+      { "code": "temp_set", "value": 200 },
+      { "code": "temp_current", "value": 230 },
+      { "code": "mode", "value": "heat" },
+      { "code": "windspeed", "value": "auto" },
+      { "code": "unit", "value": "c" },
+      { "code": "horizontal", "value": "off" },
+      { "code": "vertical", "value": "off" }
+    ]
+  }
+}
