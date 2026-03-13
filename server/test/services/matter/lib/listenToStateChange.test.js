@@ -1,5 +1,7 @@
 const {
   OnOff,
+  BooleanState,
+  Switch,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
@@ -21,7 +23,7 @@ const sinon = require('sinon');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE } = require('../../../../utils/constants');
+const { EVENTS, STATE, BUTTON_STATUS } = require('../../../../utils/constants');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -93,6 +95,61 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:child_endpoint:2:6',
       state: STATE.OFF,
+    });
+  });
+  it('should listen to state change (BooleanState = true)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(BooleanState.Complete.id, {
+      addStateValueAttributeListener: (callback) => {
+        callback(true);
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:69',
+      state: STATE.ON,
+    });
+  });
+  it('should listen to switch events', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(Switch.Complete.id, {
+      addInitialPressEventListener: (callback) => {
+        callback();
+      },
+      addShortReleaseEventListener: (callback) => {
+        callback();
+      },
+      addLongPressEventListener: (callback) => {
+        callback();
+      },
+      addLongReleaseEventListener: (callback) => {
+        callback();
+      },
+    });
+    const device = {
+      number: 1,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:59:click',
+      state: BUTTON_STATUS.INITIAL_PRESS,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:59:click',
+      state: BUTTON_STATUS.SHORT_RELEASE,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:59:click',
+      state: BUTTON_STATUS.LONG_PRESS,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:59:click',
+      state: BUTTON_STATUS.LONG_RELEASE,
     });
   });
   it('should listen to state change (Occupancy = true)', async () => {
