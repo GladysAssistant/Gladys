@@ -446,6 +446,62 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       oldestStub.restore();
       getStub.restore();
     });
+
+    it('should restore previous last processed timestamp on full-history recalculation when a window fails', async () => {
+      const customDevice = {
+        id: 'custom-device',
+        name: 'Custom Energy Device',
+        params: [{ name: 'ENERGY_INDEX_LAST_PROCESSED', value: '2023-10-03T08:30:00.000Z' }],
+        features: [
+          {
+            id: '11111111-1111-1111-1111-111111111111',
+            selector: 'custom-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: '33333333-3333-3333-3333-333333333333',
+            selector: 'valid-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: '11111111-1111-1111-1111-111111111111',
+          },
+        ],
+      };
+
+      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+
+      const getStub = stub(gladys.device, 'get').returns([customDevice]);
+      const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
+        { oldest_created_at: new Date('2023-10-03T10:00:00.000Z') },
+      ]);
+      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
+      const destroyParamStub = stub(gladys.device, 'destroyParam').resolves();
+      const setParamStub = stub(gladys.device, 'setParam').resolves();
+
+      let callCount = 0;
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(async () => {
+        callCount += 1;
+        if (callCount === 1) {
+          throw new Error('Simulated window failure');
+        }
+        return null;
+      });
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-restore-on-failure');
+
+      expect(setParamStub.called).to.equal(true);
+      expect(setParamStub.firstCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamStub.firstCall.args[2]).to.equal('2023-10-03T08:30:00.000Z');
+
+      calcStub.restore();
+      setParamStub.restore();
+      destroyParamStub.restore();
+      destroyFromStub.restore();
+      oldestStub.restore();
+      getStub.restore();
+    });
   });
 
   it('should continue processing windows even when some fail', async () => {

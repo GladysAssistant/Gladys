@@ -83,16 +83,15 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
       }
     });
 
-    const shouldRestoreLastProcessed = selectorSet.size > 0;
+    const shouldRestoreLastProcessedByContext = selectorSet.size > 0;
     const originalLastProcessedByDeviceId = new Map();
-    if (shouldRestoreLastProcessed) {
-      devicesWithBothFeatures.forEach(({ device }) => {
-        const lastProcessedParam = device.params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
-        if (lastProcessedParam && lastProcessedParam.value) {
-          originalLastProcessedByDeviceId.set(device.id, lastProcessedParam.value);
-        }
-      });
-    }
+    devicesWithBothFeatures.forEach(({ device }) => {
+      const params = Array.isArray(device.params) ? device.params : [];
+      const lastProcessedParam = params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
+      if (lastProcessedParam && lastProcessedParam.value) {
+        originalLastProcessedByDeviceId.set(device.id, lastProcessedParam.value);
+      }
+    });
 
     logger.info(
       `Found ${devicesWithBothFeatures.length} devices with both INDEX and THIRTY_MINUTES_CONSUMPTION features`,
@@ -210,6 +209,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
         }
       });
     } finally {
+      const shouldRestoreLastProcessed = shouldRestoreLastProcessedByContext || failedWindows > 0;
       if (shouldRestoreLastProcessed) {
         await Promise.each(devicesWithBothFeatures, async ({ device }) => {
           const originalValue = originalLastProcessedByDeviceId.get(device.id);
