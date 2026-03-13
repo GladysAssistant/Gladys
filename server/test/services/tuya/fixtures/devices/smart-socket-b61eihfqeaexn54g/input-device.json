@@ -1,0 +1,104 @@
+{
+  "id": "bf2be3c32ea4d8f561ujmu",
+  "name": "Chauffage cabinet",
+  "product_name": "LSC Power Plug FR incl. Power meter",
+  "product_id": "b61eihfqeaexn54g",
+  "local_key": "local-key",
+  "ip": "192.168.1.50",
+  "cloud_ip": "91.0.0.1",
+  "protocol_version": "3.5",
+  "local_override": true,
+  "online": true,
+  "specifications": {
+    "category": "cz",
+    "functions": [
+      {
+        "code": "switch_1",
+        "name": "Switch 1",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "child_lock",
+        "name": "Child Lock",
+        "type": "Boolean",
+        "values": "{}"
+      }
+    ],
+    "status": [
+      {
+        "code": "switch_1",
+        "name": "Switch 1",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "add_ele",
+        "name": "Electricity",
+        "type": "Integer",
+        "values": "{\"min\":0,\"max\":50000,\"scale\":3,\"step\":100}"
+      },
+      {
+        "code": "cur_current",
+        "name": "Current",
+        "type": "Integer",
+        "values": "{\"unit\":\"mA\",\"min\":0,\"max\":30000,\"scale\":0,\"step\":1}"
+      },
+      {
+        "code": "cur_power",
+        "name": "Power",
+        "type": "Integer",
+        "values": "{\"unit\":\"W\",\"min\":0,\"max\":80000,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "cur_voltage",
+        "name": "Voltage",
+        "type": "Integer",
+        "values": "{\"unit\":\"V\",\"min\":0,\"max\":5000,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "child_lock",
+        "name": "Child Lock",
+        "type": "Boolean",
+        "values": "{}"
+      }
+    ]
+  },
+  "properties": {
+    "properties": [
+      {
+        "code": "switch_1",
+        "dp_id": 1,
+        "value": false
+      },
+      {
+        "code": "add_ele",
+        "dp_id": 17,
+        "value": 1
+      },
+      {
+        "code": "cur_current",
+        "dp_id": 18,
+        "value": 0
+      },
+      {
+        "code": "cur_power",
+        "dp_id": 19,
+        "value": 0
+      },
+      {
+        "code": "cur_voltage",
+        "dp_id": 20,
+        "value": 2340
+      },
+      {
+        "code": "child_lock",
+        "dp_id": 41,
+        "value": false
+      }
+    ]
+  },
+  "thing_model": {
+    "services": []
+  }
+}
