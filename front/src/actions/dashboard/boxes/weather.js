@@ -38,7 +38,7 @@ function createActions(store) {
         });
         weather.days.shift();
         weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.weatherIcon = translateWeatherToFeIcon(day.weather);
           day.datetime_beautiful = dayjs(day.datetime).format('dddd');
         });
 
