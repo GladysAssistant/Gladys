@@ -160,6 +160,7 @@
     "img": "/assets/integrations/cover/energy-monitoring.jpg",
     "invertInDarkMode": true,
     "local": true,
-    "cloud": true
+    "cloud": true,
+    "gladysPlus": true
   }
 ]
