@@ -143,7 +143,13 @@ const AccountTab = ({ children, ...props }) => (
           {props.caldavLog && (
             <div class="alert alert-secondary">
               <div class="d-flex justify-content-between align-items-center">
-                <strong onClick={props.toggleCaldavLog}>
+                <button
+                  type="button"
+                  class="btn btn-link p-0 text-start"
+                  onClick={props.toggleCaldavLog}
+                  aria-expanded={!props.caldavLogVisibility}
+                  aria-controls="caldav-log-content"
+                >
                   <i
                     class={cx('fe me-2', {
                       'fe-chevron-right': props.caldavLogVisibility,
@@ -151,10 +157,11 @@ const AccountTab = ({ children, ...props }) => (
                     })}
                   />
                   Log
-                </strong>
+                </button>
               </div>
               {!props.caldavLogVisibility && (
-                <pre class="mb-0 mt-2" style="white-space: pre-wrap; word-break: break-all;">
+                <pre id="caldav-log-content" class="mb-0 mt-2" style="white-space: pre-wrap; word-break: break-all;">
+                  {' '}
                   {props.caldavLog}
                 </pre>
               )}
