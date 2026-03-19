@@ -127,7 +127,9 @@ describe('CalDAV config', () => {
       })
       .returns('request1');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
+    await expect(configEnv.config(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
   });
 
   it('should failed to get CALDAV_HOME_URL', async () => {
@@ -161,6 +163,8 @@ describe('CalDAV config', () => {
       })
       .returns('request2');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_HOME_URL');
+    await expect(configEnv.config(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_HOME_URL');
   });
 });

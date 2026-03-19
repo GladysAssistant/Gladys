@@ -302,7 +302,9 @@ describe('CalDAV sync', () => {
 
     sync.requestCalendars.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_CALENDARS');
+    await expect(sync.syncUserCalendars(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CALENDARS');
   });
 
   it('should failed fetch changes', async () => {
@@ -354,7 +356,9 @@ describe('CalDAV sync', () => {
 
     sync.requestChanges.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_CHANGES');
+    await expect(sync.syncUserCalendars(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CHANGES');
   });
 
   it('should failed get events data', async () => {
@@ -421,6 +425,8 @@ describe('CalDAV sync', () => {
 
     sync.requestEventsData.rejects();
 
-    await expect(sync.syncUserCalendars(userId)).to.be.rejectedWith(Error, 'CALDAV_FAILED_REQUEST_EVENTS');
+    await expect(sync.syncUserCalendars(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_EVENTS');
   });
 });
