@@ -27,7 +27,7 @@ class AccountPage extends Component {
 
 export default withIntlAsProp(
   connect(
-    'user,caldavHost,caldavUrl,caldavCheckSSL,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
+    'user,caldavHost,caldavUrl,caldavCheckSSL,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus,caldavLog,caldavLogVisibility',
     actions
   )(AccountPage)
 );

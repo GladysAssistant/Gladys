@@ -140,6 +140,26 @@ const AccountTab = ({ children, ...props }) => (
               <Text id="integration.caldav.synchronizationSuccess" />
             </p>
           )}
+          {props.caldavLog && (
+            <div class="alert alert-secondary">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong onClick={props.toggleCaldavLog}>
+                  <i
+                    class={cx('fe me-2', {
+                      'fe-chevron-right': props.caldavLogVisibility,
+                      'fe-chevron-down': !props.caldavLogVisibility
+                    })}
+                  />
+                  Log
+                </strong>
+              </div>
+              {!props.caldavLogVisibility && (
+                <pre class="mb-0 mt-2" style="white-space: pre-wrap; word-break: break-all;">
+                  {props.caldavLog}
+                </pre>
+              )}
+            </div>
+          )}
           <div class="form-group">
             <div className={style.successMessage}>
               <Text id={`integration.caldav.synchronizationInfo`} />
