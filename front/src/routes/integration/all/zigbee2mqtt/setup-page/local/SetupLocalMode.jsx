@@ -41,7 +41,7 @@ class SetupLocalMode extends Component {
     }
   }
 
-  render({ configuration, httpClient, disabled }, { editionMode }) {
+  render({ configuration, httpClient, disabled, zigbee2mqttStatus }, { editionMode }) {
     if (editionMode) {
       return (
         <SetupLocalOptions
@@ -50,12 +50,18 @@ class SetupLocalMode extends Component {
           configuration={configuration}
           saveConfiguration={this.saveConfiguration}
           resetConfiguration={this.resetConfiguration}
+          zigbee2mqttStatus={zigbee2mqttStatus}
         />
       );
     }
 
     return (
-      <SetupLocalSummary disabled={disabled} configuration={configuration} enableEditionMode={this.enableEditionMode} />
+      <SetupLocalSummary
+        disabled={disabled}
+        configuration={configuration}
+        enableEditionMode={this.enableEditionMode}
+        zigbee2mqttStatus={zigbee2mqttStatus}
+      />
     );
   }
 }

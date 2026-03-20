@@ -88,7 +88,7 @@
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.6",
     "dockerode": "^3.3.4",
-    "duckdb": "^1.4.3",
+    "duckdb": "^1.4.4",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "form-data": "^2.3.3",

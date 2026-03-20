@@ -61,6 +61,7 @@ describe('Tasmota - MQTT - create device with COUNTER features', () => {
     assert.notCalled(gladys.event.emit);
     assert.notCalled(gladys.stateManager.get);
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '11');
+    assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '5');
   });
 
   it('decode STATUS11 message', () => {
@@ -90,8 +91,8 @@ describe('Tasmota - MQTT - create device with COUNTER features', () => {
     assert.calledWith(mqttService.device.publish, 'cmnd/tasmota-device-topic/STATUS', '8');
   });
 
-  it('decode STATUS8 message', () => {
-    tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
+  it('decode STATUS8 message', async () => {
+    await tasmotaHandler.handleMessage('stat/tasmota-device-topic/STATUS8', JSON.stringify(messages.STATUS8));
 
     const expectedDevice = {
       name: 'Tasmota',

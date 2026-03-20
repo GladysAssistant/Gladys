@@ -69,12 +69,12 @@ function status(networkAddress, username, password) {
     this.subStatus(networkAddress, username, password, 11);
   };
 
-  const authErrorCallback = () => {
+  const authErrorCallback = async () => {
     device.needAuthentication = true;
 
     this.discoveredDevices[networkAddress] = device;
 
-    this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
+    await this.tasmotaHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE);
   };
 
   const errorCallback = () => {

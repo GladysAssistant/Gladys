@@ -512,6 +512,7 @@
       "noIntegrations": "Aucune intégration trouvée",
       "menu": {
         "all": "Toutes les intégrations",
+        "favorites": "Favoris",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -700,8 +701,10 @@
       "buttonSync": "Synchroniser"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Contrôler vos appareils Bluetooth.",
+      "title": "Présence Bluetooth",
+      "description": "Détection de présence via Bluetooth.",
+      "warningTitle": "Limitations importantes",
+      "warningMessage": "Cette intégration permet de détecter la présence d'appareils Bluetooth tels que des porte-clés Bluetooth ou des balises (beacons). Attention : le suivi de téléphones et montres connectées ne fonctionne pas, car les constructeurs ont mis en place des protections anti-tracking (rotation des adresses MAC, etc.).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Bluetooth",
       "setupTab": "Scanner de présence",
@@ -747,7 +750,7 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
@@ -990,6 +993,8 @@
         "mqtt": "Topic MQTT",
         "http": "Adresse HTTP"
       },
+      "ipLabel": "Adresse IP",
+      "openWebUiButton": "Ouvrir l'interface",
       "saveButton": "Sauvegarder",
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
@@ -1059,6 +1064,10 @@
               "dongleName": "Dongle",
               "unknownDongle": "Non défini",
               "tcpPort": "Port TCP"
+            },
+            "containerErrors": {
+              "EZSP_PROTOCOL_VERSION": "Attention : Le firmware de votre coordinateur Ember est obsolète. La version 7.4.x ou supérieure est requise. Vous pouvez suivre ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a> pour le mettre à jour. Dans le cas contraire, sélectionner le dongle (legacy ezsp) dans la configuration.",
+              "unknownErrorPrefix": "Erreur du conteneur Zigbee2MQTT : "
             }
           },
           "remote": {
@@ -1101,7 +1110,16 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "reset": {
+          "title": "Réinitialiser l'intégration",
+          "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Zigbee2mqtt. Cela peut être utile si votre configuration est corrompue ou si vous souhaitez changer de coordinateur Zigbee.",
+          "button": "Réinitialiser",
+          "confirmMessage": "Attention, réinitialiser l'intégration supprimera tous les fichiers liés à Zigbee2mqtt sur le disque et tous les paramètres enregistrés. Tous les appareils Zigbee actuellement appairés à Zigbee2mqtt devront être ré-appairés.",
+          "confirmButton": "Oui, tout réinitialiser",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        }
       },
       "device": {
         "title": "Appareils Zigbee",
@@ -1163,6 +1181,36 @@
         "usernameLabel": "Nom d'utilisateur",
         "passwordLabel": "Mot de passe",
         "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+      }
+    },
+    "matterbridge": {
+      "title": "Matterbridge",
+      "description": "Contrôlez dans Gladys vos appareils Matterbridge.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Matterbridge",
+      "status": {
+        "notInstalled": "Le serveur Matterbridge n'a pas pu être installé.",
+        "notRunning": "Le serveur Matterbridge n'a pas démarré.",
+        "running": "Matterbridge démarré avec succès.",
+        "notEnabled": "Matterbridge n'est pas activé.",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Matterbridge depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personnalisée, pour installer Matterbridge depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
+      },
+      "setup": {
+        "title": "Configuration du service Matterbridge",
+        "description": "Ce service utilise un conteneur Docker. Activez Matterbridge pour déployer ce conteneur.\nPour en savoir plus, rendez-vous sur la page de documentation Matterbridge.",
+        "error": "Une erreur s'est produite au démarrage du service Matterbridge.",
+        "enableMatterbridge": "Activer",
+        "disableMatterbridge": "Désactiver",
+        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Matterbridge ?",
+        "confirmDisableCancelButton": "Annuler",
+        "activationMatterbridge": "Activation...",
+        "serviceStatus": "Etat du service Matterbridge",
+        "containersStatus": "Conteneurs liés à Matterbridge",
+        "status": "Statut",
+        "matterbridge": "Matterbridge",
+        "gladys": "Gladys",
+        "urlLabel": "Url de l'interface Matterbridge : <a href=\"{{matterbridgeUrl}}\" target=\"_blank\">{{matterbridgeUrl}}</a> (Pas accessible depuis Gladys Plus)"
       }
     },
     "googleHome": {
@@ -2095,7 +2143,8 @@
         "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
         "addButton": "Ajouter à Gladys",
         "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
-        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys. Vérifiez que :<br/>- L'appareil est bien sur le même réseau que Gladys<br/>- Gladys est bien lancé en network=host<br/>- Si vous utilisez un Thread Border Router, vous devez utiliser un code d'appairage fourni par l'application du routeur (voir avertissement ci-dessus)",
+        "borderRouterWarning": "<b>Attention :</b> Si vous utilisez un Thread Border Router (Apple TV, IKEA Dirigera, Aqara) et que vos appareils Thread sont connectés à ce routeur, vous devez utiliser un code d'appairage fourni par l'application du routeur, et non pas le code imprimé sur l'appareil."
       },
       "settings": {
         "title": "Paramètres Matter",
@@ -3789,6 +3838,8 @@
       "power": "Puissance",
       "energy": "Energie",
       "index": "Index",
+      "index-today": "Index aujourd'hui",
+      "index-yesterday": "Index hier",
       "daily-consumption": "Consommation journalière",
       "daily-consumption-cost": "Coût journalier",
       "thirty-minutes-consumption": "Consommation 30 minutes",

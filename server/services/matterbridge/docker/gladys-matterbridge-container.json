@@ -1,0 +1,38 @@
+{
+  "name": "gladys-matterbridge",
+  "Image": "luligu/matterbridge:latest",
+  "HostConfig": {
+    "Binds": [
+      "/var/lib/gladysassistant/matterbridge/Matterbridge:/root/Matterbridge",
+      "/var/lib/gladysassistant/matterbridge/.matterbridge:/root/.matterbridge",
+      "/var/lib/gladysassistant/matterbridge/.mattercert:/root/.mattercert"
+    ],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
+    "PortBindings": {
+      "8283/tcp": [
+        {
+          "HostPort": "8283"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

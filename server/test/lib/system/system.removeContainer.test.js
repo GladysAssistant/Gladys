@@ -60,12 +60,40 @@ describe('system.removeContainer', () => {
   it('should removeContainer command with success', async () => {
     const result = await system.removeContainer('my-container');
 
-    expect(result).to.be.eq(true);
+    expect(result).to.be.eq(undefined);
 
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);
     assert.notCalled(event.emit);
 
     assert.calledOnce(system.dockerode.getContainer);
+  });
+
+  it('should resolve when container does not exist (HTTP 404)', async () => {
+    const error = new Error('no such container');
+    error.statusCode = 404;
+    system.dockerode.getContainer = fake.returns({
+      remove: fake.rejects(error),
+    });
+
+    await system.removeContainer('my-container');
+
+    assert.calledOnce(system.dockerode.getContainer);
+  });
+
+  it('should throw on other Docker errors', async () => {
+    const error = new Error('internal server error');
+    error.statusCode = 500;
+    system.dockerode.getContainer = fake.returns({
+      remove: fake.rejects(error),
+    });
+
+    try {
+      await system.removeContainer('my-container');
+      assert.fail('should have failed');
+    } catch (e) {
+      expect(e.statusCode).to.be.eq(500);
+      expect(e.message).to.be.eq('internal server error');
+    }
   });
 });

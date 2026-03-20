@@ -5,3 +5,18 @@
 .zigbee2mqttListBody {
   min-height: 200px
 }
+
+.z2mActionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.z2mActionButtons > a {
+  display: flex; 
+  flex: 1 1 100%;
+}
+
+.z2mActionButtons > a button {
+  width: 100%;
+}

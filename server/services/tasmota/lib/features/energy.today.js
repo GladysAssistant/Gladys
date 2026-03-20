@@ -11,7 +11,7 @@ module.exports = {
   generateFeature: () => {
     return {
       category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_TODAY,
       name: 'Energy today',
       read_only: true,
       has_feedback: false,
