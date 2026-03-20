@@ -135,7 +135,7 @@ const handleDevice = async (
  * await handleNode(nodeDetail);
  */
 async function handleNode(nodeDetail) {
-  const nodeId = nodeDetail.nodeId;
+  const { nodeId } = nodeDetail;
   logger.debug(`Matter: Handling node ${nodeId}`);
   if (!nodeDetail.deviceData) {
     logger.warn(`Matter: Node ${nodeId} has no device data`);
@@ -180,13 +180,13 @@ async function handleNode(nodeDetail) {
   node.events.stateChanged.on(async (nodeState) => {
     if (nodeState === NodeStates.Connected) {
       logger.info(`Matter: Node ${nodeId} connected, refreshing device states from cache`);
-      for (const { device: d, path } of deviceInfos) {
+      await Promise.each(deviceInfos, async ({ device: d, path }) => {
         try {
           await boundListenToStateChange(nodeId, path, d);
         } catch (e) {
           logger.warn(`Matter: Error refreshing state for node ${nodeId}, path ${path}: ${e.message}`);
         }
-      }
+      });
     }
   });
 }
