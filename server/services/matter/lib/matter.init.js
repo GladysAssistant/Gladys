@@ -51,7 +51,11 @@ async function init() {
 
   await this.commissioningController.start();
   logger.info('Matter controller started');
-  await this.refreshDevices();
+  // Refresh devices in background to avoid blocking Gladys startup
+  // Node connections can take a long time if devices are offline
+  this.refreshDevicesPromise = this.refreshDevices().catch((e) => {
+    logger.warn(`Matter: Error during background device refresh: ${e.message}`);
+  });
   // Schedule reccurent job if not already scheduled
   if (!this.backupScheduledJob) {
     this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 4 * * *', () => this.backupController());

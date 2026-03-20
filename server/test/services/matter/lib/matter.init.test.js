@@ -389,6 +389,8 @@ describe('Matter.init', () => {
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
+    // refreshDevices runs in background, wait for it to complete
+    await matterHandler.refreshDevicesPromise;
     expect(matterHandler.devices).to.have.lengthOf(2);
     // Device selector should be a slug of the name with 4 random characters at the end
     expect(matterHandler.devices[0].selector).to.satisfy(
