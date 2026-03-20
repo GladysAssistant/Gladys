@@ -549,6 +549,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   HEATER: 'heater',
+  HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
@@ -922,6 +923,9 @@ const DEVICE_FEATURE_TYPES = {
     ODOMETER: 'odometer', // Total distance traveled in km or miles (integer - sensor)
     TIRE_PRESSURE: 'tire-pressure', // Tire pressure in bar (decimal - sensor)
     WINDOW_OPENED: 'window-opened', // Window open state (binary - sensor)
+  },
+  FILTER_MONITORING: {
+    FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
   },
 };
 
