@@ -816,7 +816,9 @@ describe('Matter.listenToStateChange', () => {
       getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
-    assert.calledOnce(clusterClients.get(WindowCovering.Complete.id).addCurrentPositionLiftPercent100thsAttributeListener);
+    assert.calledOnce(
+      clusterClients.get(WindowCovering.Complete.id).addCurrentPositionLiftPercent100thsAttributeListener,
+    );
   });
 
   // Test cached read error for LevelControl
@@ -906,6 +908,8 @@ describe('Matter.listenToStateChange', () => {
       getClusterClientById: (id) => clusterClients.get(id),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
-    assert.calledOnce(clusterClients.get(ElectricalEnergyMeasurement.Complete.id).addCumulativeEnergyImportedAttributeListener);
+    assert.calledOnce(
+      clusterClients.get(ElectricalEnergyMeasurement.Complete.id).addCumulativeEnergyImportedAttributeListener,
+    );
   });
 });

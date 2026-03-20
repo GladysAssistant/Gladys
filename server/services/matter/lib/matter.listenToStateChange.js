@@ -200,7 +200,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
       try {
         const currentHue = await colorControl.attributes.currentHue.get(false);
         const currentSaturation = await colorControl.attributes.currentSaturation.get(false);
-        if (currentHue === undefined || currentHue === null || currentSaturation === undefined || currentSaturation === null) {
+        if (
+          currentHue === undefined ||
+          currentHue === null ||
+          currentSaturation === undefined ||
+          currentSaturation === null
+        ) {
           return;
         }
         logger.debug(`Matter: Emitting color state hue=${currentHue} sat=${currentSaturation}`);
@@ -221,8 +226,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: Adding state change listener for ColorControl cluster ${colorControl.name}`);
       this.stateChangeListeners.add(colorControl);
       if (colorControl.supportedFeatures.hueSaturation) {
-        colorControl.addCurrentHueAttributeListener(() => { emitColorState(); });
-        colorControl.addCurrentSaturationAttributeListener(() => { emitColorState(); });
+        colorControl.addCurrentHueAttributeListener(() => {
+          emitColorState();
+        });
+        colorControl.addCurrentSaturationAttributeListener(() => {
+          emitColorState();
+        });
       }
     }
   }
