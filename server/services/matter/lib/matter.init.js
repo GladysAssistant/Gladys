@@ -45,9 +45,8 @@ async function init() {
       environment,
       id: 'matter-controller-data',
     },
-    autoConnect: true,
+    autoConnect: false,
     adminFabricLabel: 'Gladys Assistant',
-    storage: storageService,
   });
 
   await this.commissioningController.start();

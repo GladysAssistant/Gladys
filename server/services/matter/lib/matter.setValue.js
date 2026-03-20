@@ -80,7 +80,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
   if (!node.isConnected) {
     logger.warn(`Matter: Node ${nodeId} is not connected, connecting...`);
     node.connect();
-    await node.events.initialized;
+    await node.events.initializedFromRemote;
     logger.info(`Matter: Node ${nodeId} connected.`);
   }
 
