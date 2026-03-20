@@ -33,33 +33,57 @@ const handleDevice = async (
   // We get all attributes for this child endpoint
   if (bridgedDeviceBasicInformationClusterClient) {
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'vendorName')) {
-      const vendorName = await bridgedDeviceBasicInformationClusterClient.attributes.vendorName.get();
-      childInformations.vendorName = vendorName;
+      try {
+        const vendorName = await bridgedDeviceBasicInformationClusterClient.attributes.vendorName.get();
+        childInformations.vendorName = vendorName;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged vendorName for node ${nodeId}: ${e.message}`);
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'nodeLabel')) {
-      const nodeLabel = await bridgedDeviceBasicInformationClusterClient.attributes.nodeLabel.get();
-      childInformations.nodeLabel = nodeLabel;
+      try {
+        const nodeLabel = await bridgedDeviceBasicInformationClusterClient.attributes.nodeLabel.get();
+        childInformations.nodeLabel = nodeLabel;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged nodeLabel for node ${nodeId}: ${e.message}`);
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'productLabel')) {
-      const productLabel = await bridgedDeviceBasicInformationClusterClient.attributes.productLabel.get();
-      childInformations.productLabel = productLabel;
+      try {
+        const productLabel = await bridgedDeviceBasicInformationClusterClient.attributes.productLabel.get();
+        childInformations.productLabel = productLabel;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged productLabel for node ${nodeId}: ${e.message}`);
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'productName')) {
-      const productName = await bridgedDeviceBasicInformationClusterClient.attributes.productName.get();
-      childInformations.productName = productName;
+      try {
+        const productName = await bridgedDeviceBasicInformationClusterClient.attributes.productName.get();
+        childInformations.productName = productName;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged productName for node ${nodeId}: ${e.message}`);
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'uniqueId')) {
-      const uniqueId = await bridgedDeviceBasicInformationClusterClient.attributes.uniqueId.get();
-      childInformations.uniqueId = uniqueId;
+      try {
+        const uniqueId = await bridgedDeviceBasicInformationClusterClient.attributes.uniqueId.get();
+        childInformations.uniqueId = uniqueId;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged uniqueId for node ${nodeId}: ${e.message}`);
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(bridgedDeviceBasicInformationClusterClient.attributes, 'serialNumber')) {
-      const serialNumber = await bridgedDeviceBasicInformationClusterClient.attributes.serialNumber.get();
-      childInformations.serialNumber = serialNumber;
+      try {
+        const serialNumber = await bridgedDeviceBasicInformationClusterClient.attributes.serialNumber.get();
+        childInformations.serialNumber = serialNumber;
+      } catch (e) {
+        logger.warn(`Matter: Unable to read bridged serialNumber for node ${nodeId}: ${e.message}`);
+      }
     }
   }
 
