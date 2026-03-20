@@ -156,7 +156,7 @@ const AccountTab = ({ children, ...props }) => (
                       'fe-chevron-down': !props.caldavLogVisibility
                     })}
                   />
-                  Log
+                  <Text id="integration.caldav.logTitle" />
                 </button>
               </div>
               {!props.caldavLogVisibility && (

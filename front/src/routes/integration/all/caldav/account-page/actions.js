@@ -146,7 +146,7 @@ const actions = store => ({
     } catch (e) {
       let responseMessage = get(e, 'response.data.message');
       let log;
-      if (typeof responseMessage === 'object') {
+      if (responseMessage && typeof responseMessage === 'object') {
         log = responseMessage.log;
         responseMessage = responseMessage.message;
       }
@@ -217,7 +217,7 @@ const actions = store => ({
     } catch (e) {
       let responseMessage = get(e, 'response.data.message');
       let log;
-      if (typeof responseMessage === 'object') {
+      if (responseMessage && typeof responseMessage === 'object') {
         log = responseMessage.log;
         responseMessage = responseMessage.message;
       }

@@ -37,7 +37,7 @@ async function syncUserCalendars(userId) {
     davCalendars = await this.requestCalendars(xhr, CALDAV_HOME_URL);
   } catch (e) {
     logger.error(e);
-    throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CALENDARS', log: e.message });
+    throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CALENDARS', log: e.stack });
   }
 
   logger.info(`CalDAV : Found ${davCalendars.length} calendars.`);
@@ -76,7 +76,7 @@ async function syncUserCalendars(userId) {
         eventsToUpdate = await this.requestChanges(xhr, calendarToUpdate);
       } catch (e) {
         logger.error(e);
-        throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CHANGES', log: e.message });
+        throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_CHANGES', log: e.stack });
       }
 
       await Promise.map(
@@ -110,7 +110,7 @@ async function syncUserCalendars(userId) {
         jsonEvents = await this.requestEventsData(xhr, calendarToUpdate.external_id, eventsToUpdate, CALDAV_HOST);
       } catch (e) {
         logger.error(e);
-        throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_EVENTS', log: e.message });
+        throw new NotFoundError({ message: 'CALDAV_FAILED_REQUEST_EVENTS', log: e.stack });
       }
 
       await Promise.map(
