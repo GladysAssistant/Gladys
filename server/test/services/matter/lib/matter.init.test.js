@@ -53,7 +53,9 @@ describe('Matter.init', () => {
       name: 'OnOff',
       endpointId: 1,
       attributes: {
-        onOff: {},
+        onOff: {
+          get: fake.resolves(true),
+        },
       },
       commands: {},
       addOnOffAttributeListener: fake.returns(null),
@@ -65,7 +67,9 @@ describe('Matter.init', () => {
       name: 'OccupancySensing',
       endpointId: 1,
       attributes: {
-        occupancy: {},
+        occupancy: {
+          get: fake.resolves({ occupied: true }),
+        },
       },
       commands: {},
       addOccupancyAttributeListener: fake.returns(null),
@@ -77,7 +81,9 @@ describe('Matter.init', () => {
       name: 'IlluminanceMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(10000),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -89,7 +95,9 @@ describe('Matter.init', () => {
       name: 'TemperatureMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(2500),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -101,7 +109,9 @@ describe('Matter.init', () => {
       name: 'WindowCovering',
       endpointId: 1,
       attributes: {
-        currentPositionLiftPercent100ths: {},
+        currentPositionLiftPercent100ths: {
+          get: fake.resolves(5000),
+        },
       },
       commands: {},
       addCurrentPositionLiftPercent100thsAttributeListener: fake.returns(null),
@@ -112,7 +122,14 @@ describe('Matter.init', () => {
       id: 768,
       name: 'ColorControl',
       endpointId: 1,
-      attributes: {},
+      attributes: {
+        currentHue: {
+          get: fake.resolves(128),
+        },
+        currentSaturation: {
+          get: fake.resolves(128),
+        },
+      },
       commands: {},
       supportedFeatures: {
         hueSaturation: true,
@@ -128,11 +145,16 @@ describe('Matter.init', () => {
       id: 8,
       name: 'LevelControl',
       endpointId: 1,
-      attributes: {},
+      attributes: {
+        currentLevel: {
+          get: fake.resolves(50),
+        },
+      },
       commands: {},
       supportedFeatures: {
         lighting: true,
       },
+      addCurrentLevelAttributeListener: fake.returns(null),
       getMinLevelAttribute: fake.resolves(0),
       getMaxLevelAttribute: fake.resolves(100),
     });
@@ -143,7 +165,9 @@ describe('Matter.init', () => {
       name: 'RelativeHumidityMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(5000),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -155,8 +179,12 @@ describe('Matter.init', () => {
       name: 'Thermostat',
       endpointId: 1,
       attributes: {
-        occupiedHeatingSetpoint: {},
-        occupiedCoolingSetpoint: {},
+        occupiedHeatingSetpoint: {
+          get: fake.resolves(2100),
+        },
+        occupiedCoolingSetpoint: {
+          get: fake.resolves(2500),
+        },
       },
       supportedFeatures: {
         heating: true,
@@ -173,7 +201,9 @@ describe('Matter.init', () => {
       name: 'Pm25ConcentrationMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(25),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -188,7 +218,9 @@ describe('Matter.init', () => {
       name: 'Pm10ConcentrationMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(50),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -203,7 +235,9 @@ describe('Matter.init', () => {
       name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement',
       endpointId: 1,
       attributes: {
-        levelValue: {},
+        levelValue: {
+          get: fake.resolves(3),
+        },
       },
       commands: {},
       addLevelValueAttributeListener: fake.returns(null),
@@ -215,7 +249,9 @@ describe('Matter.init', () => {
       name: 'FormaldehydeConcentrationMeasurement',
       endpointId: 1,
       attributes: {
-        measuredValue: {},
+        measuredValue: {
+          get: fake.resolves(10),
+        },
       },
       commands: {},
       addMeasuredValueAttributeListener: fake.returns(null),
@@ -230,9 +266,15 @@ describe('Matter.init', () => {
       name: 'ElectricalPowerMeasurement',
       endpointId: 1,
       attributes: {
-        activePower: {},
-        voltage: {},
-        activeCurrent: {},
+        activePower: {
+          get: fake.resolves(1500000),
+        },
+        voltage: {
+          get: fake.resolves(230000),
+        },
+        activeCurrent: {
+          get: fake.resolves(6500),
+        },
       },
       commands: {},
       addActivePowerAttributeListener: fake.returns(null),
@@ -248,7 +290,9 @@ describe('Matter.init', () => {
       name: 'ElectricalEnergyMeasurement',
       endpointId: 1,
       attributes: {
-        cumulativeEnergyImported: {},
+        cumulativeEnergyImported: {
+          get: fake.resolves({ energy: 5000000000 }),
+        },
       },
       commands: {},
       supportedFeatures: {
@@ -276,6 +320,15 @@ describe('Matter.init', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: false,
+        initialized: false,
+        connect: fake.returns(null),
+        events: {
+          initialized: Promise.resolve(),
+          stateChanged: {
+            on: fake.returns(null),
+          },
+        },
         getDevices: fake.returns([
           {
             id: 'device-1',

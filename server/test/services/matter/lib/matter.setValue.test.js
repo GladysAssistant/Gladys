@@ -44,7 +44,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -83,7 +83,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -123,7 +123,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -173,7 +173,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -212,7 +212,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -259,7 +259,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -313,7 +313,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -360,7 +360,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -398,7 +398,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -442,7 +442,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -469,7 +469,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -501,7 +501,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },
@@ -533,7 +533,7 @@ describe('Matter.setValue', () => {
       isConnected: false,
       connect: fake.resolves(null),
       events: {
-        initialized: new Promise((resolve) => {
+        initializedFromRemote: new Promise((resolve) => {
           resolve();
         }),
       },

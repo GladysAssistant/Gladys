@@ -29,6 +29,11 @@ describe('Matter.pairDevice', () => {
       id: 6,
       name: 'OnOff',
       endpointId: 1,
+      attributes: {
+        onOff: {
+          get: fake.resolves(true),
+        },
+      },
       addOnOffAttributeListener: fake.returns(null),
     });
     matterHandler.commissioningController = {
@@ -45,6 +50,15 @@ describe('Matter.pairDevice', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: false,
+        initialized: false,
+        connect: fake.returns(null),
+        events: {
+          initialized: Promise.resolve(),
+          stateChanged: {
+            on: fake.returns(null),
+          },
+        },
         getDevices: fake.returns([
           {
             id: 'device-1',
@@ -77,6 +91,11 @@ describe('Matter.pairDevice', () => {
       id: 6,
       name: 'OnOff',
       endpointId: 1,
+      attributes: {
+        onOff: {
+          get: fake.resolves(true),
+        },
+      },
       addOnOffAttributeListener: fake.returns(null),
     });
     const bridgeClusterClients = new Map();
@@ -118,6 +137,15 @@ describe('Matter.pairDevice', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: false,
+        initialized: false,
+        connect: fake.returns(null),
+        events: {
+          initialized: Promise.resolve(),
+          stateChanged: {
+            on: fake.returns(null),
+          },
+        },
         getDevices: fake.returns([
           {
             id: 'device-1',
@@ -176,5 +204,155 @@ describe('Matter.pairDevice', () => {
     await assert.isRejected(promise, 'Commissioning failed');
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+  it('should handle bridged device attribute read errors gracefully', async () => {
+    const pairingCode = '1450-134-1614';
+    const clusterClients = new Map();
+    clusterClients.set(6, {
+      id: 6,
+      name: 'OnOff',
+      endpointId: 1,
+      attributes: {
+        onOff: {
+          get: fake.resolves(true),
+        },
+      },
+      addOnOffAttributeListener: fake.returns(null),
+    });
+    const bridgeClusterClients = new Map();
+    // All bridged attributes throw errors
+    bridgeClusterClients.set(BridgedDeviceBasicInformation.Complete.id, {
+      attributes: {
+        vendorName: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+        productName: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+        productLabel: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+        nodeLabel: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+        uniqueId: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+        serialNumber: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+      },
+    });
+    matterHandler.commissioningController = {
+      commissionNode: fake.resolves(12345n),
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 12345n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Test Vendor',
+              productName: 'Test Product',
+            },
+          },
+        },
+      ]),
+      getNode: fake.resolves({
+        isConnected: true,
+        initialized: true,
+        connect: fake.returns(null),
+        events: {
+          initialized: Promise.resolve(),
+          stateChanged: {
+            on: fake.returns(null),
+          },
+        },
+        getDevices: fake.returns([
+          {
+            id: 'device-1',
+            name: 'Test Device',
+            number: 1,
+            getClusterClientById: (id) => bridgeClusterClients.get(id),
+            getAllClusterClients: () => Array.from(bridgeClusterClients.values()),
+            getChildEndpoints: () => [
+              {
+                id: 'child-endpoint-1',
+                name: 'Child Endpoint',
+                number: 2,
+                getClusterClientById: (id) => clusterClients.get(id),
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
+              },
+            ],
+          },
+        ]),
+      }),
+    };
+    // Should not throw despite attribute read errors
+    await matterHandler.pairDevice(pairingCode);
+    expect(matterHandler.devices).to.have.lengthOf(1);
+  });
+  it('should handle node already connected and initialized', async () => {
+    const pairingCode = '1450-134-1614';
+    const clusterClients = new Map();
+    clusterClients.set(6, {
+      id: 6,
+      name: 'OnOff',
+      endpointId: 1,
+      attributes: {
+        onOff: {
+          get: fake.resolves(true),
+        },
+      },
+      addOnOffAttributeListener: fake.returns(null),
+    });
+    const connectFake = fake.returns(null);
+    matterHandler.commissioningController = {
+      commissionNode: fake.resolves(12345n),
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 12345n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Test Vendor',
+              productName: 'Test Product',
+            },
+          },
+        },
+      ]),
+      getNode: fake.resolves({
+        isConnected: true, // Already connected
+        initialized: true, // Already initialized
+        connect: connectFake,
+        events: {
+          initialized: Promise.resolve(),
+          stateChanged: {
+            on: fake.returns(null),
+          },
+        },
+        getDevices: fake.returns([
+          {
+            id: 'device-1',
+            name: 'Test Device',
+            number: 1,
+            getClusterClientById: () => undefined,
+            getAllClusterClients: () => [],
+            getChildEndpoints: () => [
+              {
+                id: 'child-endpoint-1',
+                name: 'Child Endpoint',
+                number: 2,
+                getClusterClientById: (id) => clusterClients.get(id),
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getChildEndpoints: () => [],
+              },
+            ],
+          },
+        ]),
+      }),
+    };
+    await matterHandler.pairDevice(pairingCode);
+    // connect() should NOT be called since isConnected is true
+    sinon.assert.notCalled(connectFake);
+    expect(matterHandler.devices).to.have.lengthOf(1);
   });
 });
