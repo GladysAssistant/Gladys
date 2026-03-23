@@ -901,10 +901,8 @@ describe('Matter.init', () => {
     const error = new Error('Test error');
     matterHandler.refreshDevices = fake.rejects(error);
     await matterHandler.init();
-    // Wait for background promise to complete
+    // Wait for background promise to complete - error should be caught and logged, not thrown
     await matterHandler.refreshDevicesPromise;
-    // The error should be caught and logged, not thrown
-    expect(matterHandler.refreshDevicesPromise).to.be.fulfilled;
   });
 
   it('should return PPM for 0', () => {
