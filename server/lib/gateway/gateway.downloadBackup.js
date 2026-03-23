@@ -42,9 +42,17 @@ async function downloadBackup(fileUrl) {
     logger.debug(`Download backup progress, ${progressEvent.loaded} / ${progressEvent.total}`);
   });
   // decrypt backup
-  await exec(
-    `openssl enc -aes-256-cbc -pass pass:${encryptKey} -d -in ${encryptedBackupFilePath} -out ${compressedBackupFilePath}`,
-  );
+  await execFile('openssl', [
+    'enc',
+    '-aes-256-cbc',
+    '-pass',
+    `pass:${encryptKey}`,
+    '-d',
+    '-in',
+    encryptedBackupFilePath,
+    '-out',
+    compressedBackupFilePath,
+  ]);
 
   try {
     logger.info(`Trying to restore the backup new style (DuckDB)`);
