@@ -161,11 +161,9 @@ async function setValue(gladysDevice, gladysFeature, value) {
     await colorControl.moveToHueAndSaturation({
       hue: matterHue,
       saturation: matterSaturation,
-      transitionTime: null,
-      optionsMask: {
-        executeIfOff: true,
-      },
-      optionsOverride: {},
+      transitionTime: 0,
+      optionsMask: 1, // bitmap: bit 0 = executeIfOff
+      optionsOverride: 1, // bitmap: bit 0 = executeIfOff
     });
     // If the user changes the color, we needs to turn on the light
     await onOff.on();
