@@ -1616,8 +1616,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connexion à un serveur MQTT, en local ou en distant.",
+      "title": "Appareils virtuels MQTT",
+      "description": "Créez des appareils virtuels contrôlables via MQTT.",
+      "virtualDevicesExplanation": "Cette intégration permet de créer des appareils virtuels, qui sont contrôlables via MQTT, via HTTP, dans les scènes et sur le tableau de bord. Pour utiliser des appareils Zigbee, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>. Pour utiliser des appareils Z-Wave, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>. Pour utiliser des appareils MQTT Nuki, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/nuki\">Nuki</a>.",
       "deviceTab": "Appareils",
       "debugTab": "Debug MQTT",
       "setupTab": "Configuration",

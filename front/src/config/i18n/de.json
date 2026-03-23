@@ -1484,8 +1484,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Verbinde dich mit einem lokalen oder entfernten MQTT-Server.",
+      "title": "Virtuelle MQTT-Geräte",
+      "description": "Erstellen Sie virtuelle Geräte, die über MQTT steuerbar sind.",
+      "virtualDevicesExplanation": "Diese Integration ermöglicht es Ihnen, virtuelle Geräte zu erstellen, die über MQTT, HTTP, in Szenen und auf dem Dashboard steuerbar sind. Um Zigbee-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>-Integration. Um Z-Wave-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>-Integration. Um Nuki-MQTT-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/nuki\">Nuki</a>-Integration.",
       "deviceTab": "Meine Geräte",
       "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
