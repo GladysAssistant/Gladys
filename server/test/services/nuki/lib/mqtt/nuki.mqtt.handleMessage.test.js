@@ -141,4 +141,27 @@ describe('Nuki - MQTT - Handle message', () => {
     assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);
   });
+
+  it('should handle malformed Nuki discovery message (contains "Nuki" but invalid JSON)', () => {
+    // This message contains "Nuki" so it passes the filter, but is not valid JSON
+    nukiHandler.handleMessage('homeassistant/lock/nuki_test/config', 'invalid json with "Nuki" in it');
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
+
+  it('should handle Nuki message with missing required fields', () => {
+    // Valid JSON with "Nuki" but missing dev.ids field
+    const invalidNukiMessage = JSON.stringify({
+      name: 'Test',
+      dev: {
+        mf: 'Nuki',
+        name: 'Test Lock',
+      },
+    });
+    nukiHandler.handleMessage('homeassistant/lock/nuki_test/config', invalidNukiMessage);
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
 });
