@@ -1379,8 +1379,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connect to a local or remote MQTT server",
+      "title": "MQTT Virtual Devices",
+      "description": "Create virtual devices controllable via MQTT.",
+      "virtualDevicesExplanation": "This integration allows you to create virtual devices, which are controllable via MQTT, HTTP, in scenes and on the dashboard. To use Zigbee devices, please use the <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a> integration. To use Z-Wave devices, please use the <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a> integration. To use Nuki MQTT devices, please use the <a href=\"/dashboard/integration/device/nuki\">Nuki</a> integration.",
       "deviceTab": "Devices",
       "debugTab": "MQTT Debug",
       "setupTab": "Setup",
