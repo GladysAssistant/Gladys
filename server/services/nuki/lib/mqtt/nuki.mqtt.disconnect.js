@@ -8,6 +8,13 @@ const { DISCOVERY_TOPIC } = require('../utils/nuki.constants');
  */
 async function disconnect() {
   logger.debug(`Call MQTT disconnect`);
+
+  // Clear scan timeout if active
+  if (this.scanTimeout) {
+    clearTimeout(this.scanTimeout);
+    this.scanTimeout = null;
+  }
+
   // Unsubscribe to Nuki topics
   this.mqttService.device.unsubscribe(DISCOVERY_TOPIC);
   // Unsubscribe devices topics
