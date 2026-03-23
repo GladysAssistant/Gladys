@@ -45,9 +45,10 @@ async function init() {
       environment,
       id: 'matter-controller-data',
     },
-    autoConnect: true,
+    // Set autoConnect to undefined to fix matter-js bug (https://github.com/matter-js/matter.js/pull/3436)
+    // Once the fix is live in matter-js, we can switch back to true
+    autoConnect: undefined,
     adminFabricLabel: 'Gladys Assistant',
-    storage: storageService,
   });
 
   await this.commissioningController.start();
