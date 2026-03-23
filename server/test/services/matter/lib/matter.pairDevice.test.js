@@ -24,10 +24,10 @@ describe('Matter.pairDevice', () => {
 
   it('should pair a device', async () => {
     const pairingCode = '1450-134-1614';
-    const clusterClients = new Map();
-    clusterClients.set(6, {
+    const clusterClient = {
+      id: 6,
       addOnOffAttributeListener: fake.returns(null),
-    });
+    };
     matterHandler.commissioningController = {
       commissionNode: fake.resolves(12345n),
       getCommissionedNodesDetails: fake.returns([
@@ -47,13 +47,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients: new Map(),
-            childEndpoints: [
+            getAllClusterClients: () => [],
+            getClusterClientById: () => null,
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => [clusterClient],
+                getClusterClientById: () => null,
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -66,12 +69,12 @@ describe('Matter.pairDevice', () => {
   });
   it('should pair a bridge device', async () => {
     const pairingCode = '1450-134-1614';
-    const clusterClients = new Map();
-    clusterClients.set(6, {
+    const clusterClient = {
+      id: 6,
       addOnOffAttributeListener: fake.returns(null),
-    });
-    const bridgeClusterClients = new Map();
-    bridgeClusterClients.set(BridgedDeviceBasicInformation.Complete.id, {
+    };
+    const bridgeClusterClient = {
+      id: BridgedDeviceBasicInformation.Complete.id,
       attributes: {
         vendorName: {
           get: fake.resolves('Test Vendor'),
@@ -92,7 +95,7 @@ describe('Matter.pairDevice', () => {
           get: fake.resolves('serialNumber'),
         },
       },
-    });
+    };
     matterHandler.commissioningController = {
       commissionNode: fake.resolves(12345n),
       getCommissionedNodesDetails: fake.returns([
@@ -114,13 +117,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients: bridgeClusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => [bridgeClusterClient],
+            getClusterClientById: (id) => (id === bridgeClusterClient.id ? bridgeClusterClient : null),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => [clusterClient],
+                getClusterClientById: () => null,
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -128,13 +134,16 @@ describe('Matter.pairDevice', () => {
             id: 'device-2',
             name: 'Test Device 2',
             number: 2,
-            clusterClients: bridgeClusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => [bridgeClusterClient],
+            getClusterClientById: (id) => (id === bridgeClusterClient.id ? bridgeClusterClient : null),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-2',
                 name: 'Child Endpoint 2',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => [clusterClient],
+                getClusterClientById: () => null,
+                getChildEndpoints: () => [],
               },
             ],
           },

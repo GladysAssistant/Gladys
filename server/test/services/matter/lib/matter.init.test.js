@@ -294,13 +294,16 @@ describe('Matter.init', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },

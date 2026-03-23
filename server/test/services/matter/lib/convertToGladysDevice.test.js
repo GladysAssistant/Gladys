@@ -13,17 +13,17 @@ describe('Matter.convertToGladysDevice', () => {
   };
 
   it('should create a read-only binary feature for BooleanState cluster', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(BooleanState.Complete.id, {
+    const clusterClient = {
       id: BooleanState.Complete.id,
       name: 'BooleanState',
       endpointId: 1,
-    });
+    };
 
     const device = {
       name: 'Test Device',
       number: 1,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
@@ -43,17 +43,17 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should create a button click feature for Switch cluster', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Switch.Complete.id, {
+    const clusterClient = {
       id: Switch.Complete.id,
       name: 'Switch',
       endpointId: 2,
-    });
+    };
 
     const device = {
       name: 'Test Device',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:2');
