@@ -15,11 +15,13 @@ const logger = require('../../utils/logger');
 async function newStateEvent(event) {
   const deviceFeature = this.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
   if (deviceFeature === null) {
-    throw new NotFoundError(`DeviceFeature ${event.device_feature_external_id} not found`);
+    logger.info(`DeviceFeature "${event.device_feature_external_id}" not found (or not added to Gladys), skipping state update.`);
+    return;
   }
   const device = this.stateManager.get('deviceById', deviceFeature.device_id);
   if (device === null) {
-    throw new NotFoundError(`Device ${deviceFeature.device_id} not found`);
+    logger.info(`Device "${deviceFeature.device_id}" not found, skipping state update.`);
+    return;
   }
   try {
     // If there is a "text" property in the even, we save as string
