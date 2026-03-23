@@ -8,7 +8,6 @@ const { expect } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 const job = new Job(event);
