@@ -3,7 +3,7 @@ const fse = require('fs-extra');
 const fs = require('fs');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
-const { exec } = require('../../utils/childProcess');
+const { exec, execFile } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const RESTORE_FOLDER = 'restore';
@@ -48,7 +48,16 @@ async function downloadBackup(fileUrl) {
 
   try {
     logger.info(`Trying to restore the backup new style (DuckDB)`);
-    await exec(`tar -xzvf ${compressedBackupFilePath} -C ${restoreFolderPath}`);
+    // List archive contents and check for path traversal attempts
+    const tarList = await execFile('tar', ['-tzvf', compressedBackupFilePath]);
+    const hasPathTraversal = tarList.split('\n').some((line) => {
+      // Check for symlinks (lines starting with 'l'), absolute paths, or '..' sequences
+      return line.startsWith('l') || /\s\.\.\//.test(line) || /\s\//.test(line);
+    });
+    if (hasPathTraversal) {
+      throw new Error('BACKUP_CONTAINS_UNSAFE_PATHS');
+    }
+    await execFile('tar', ['-xzvf', compressedBackupFilePath, '-C', restoreFolderPath]);
     logger.info("Extracting worked. It's a DuckDB export.");
     const itemsInFolder = await fse.readdir(restoreFolderPath);
     sqliteBackupFilePath = path.join(
@@ -60,6 +69,10 @@ async function downloadBackup(fileUrl) {
       itemsInFolder.find((i) => i.endsWith('_parquet_folder')),
     );
   } catch (e) {
+    // Re-throw security errors - don't fall back to old strategy
+    if (e.message === 'BACKUP_CONTAINS_UNSAFE_PATHS') {
+      throw e;
+    }
     logger.info(`Extracting failed using new strategy (Error: ${e})`);
     logger.info(`Restoring using old backup strategy (SQLite only)`);
     sqliteBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.db`);

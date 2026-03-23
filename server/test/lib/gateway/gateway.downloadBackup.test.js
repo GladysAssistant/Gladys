@@ -94,4 +94,15 @@ describe('gateway.downloadBackup', () => {
       },
     });
   });
+
+  it('should reject backup containing symlinks (path traversal protection)', async () => {
+    const maliciousBackupFilePath = path.join(__dirname, 'malicious-backup-with-symlink.tar.gz.enc');
+    try {
+      await gateway.downloadBackup(maliciousBackupFilePath);
+      assert.fail('Should have thrown BACKUP_CONTAINS_UNSAFE_PATHS');
+    } catch (e) {
+      expect(e.message).to.equal('BACKUP_CONTAINS_UNSAFE_PATHS');
+    }
+    assert.notCalled(event.emit);
+  });
 });
