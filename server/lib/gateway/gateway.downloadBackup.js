@@ -48,13 +48,18 @@ async function downloadBackup(fileUrl) {
 
   try {
     logger.info(`Trying to restore the backup new style (DuckDB)`);
-    // List archive contents and check for path traversal attempts
+    // Check archive for path traversal attempts and symlinks
+    const tarEntries = await execFile('tar', ['-tzf', compressedBackupFilePath]);
+    const hasUnsafePath = tarEntries
+      .split('\n')
+      .filter(Boolean)
+      .some((entry) => {
+        const normalized = path.posix.normalize(entry);
+        return path.posix.isAbsolute(entry) || normalized === '..' || normalized.startsWith('../');
+      });
     const tarList = await execFile('tar', ['-tzvf', compressedBackupFilePath]);
-    const hasPathTraversal = tarList.split('\n').some((line) => {
-      // Check for symlinks (lines starting with 'l'), absolute paths, or '..' sequences
-      return line.startsWith('l') || /\s\.\.\//.test(line) || /\s\//.test(line);
-    });
-    if (hasPathTraversal) {
+    const hasSymlink = tarList.split('\n').some((line) => line.startsWith('l'));
+    if (hasUnsafePath || hasSymlink) {
       throw new Error('BACKUP_CONTAINS_UNSAFE_PATHS');
     }
     await execFile('tar', ['-xzvf', compressedBackupFilePath, '-C', restoreFolderPath]);
