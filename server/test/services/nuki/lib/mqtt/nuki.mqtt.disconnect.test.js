@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { fake } = sinon;
@@ -34,5 +35,25 @@ describe('Nuki - MQTT - disconnect', () => {
     nukiHandler.mqttService.device.unsubscribe.firstCall.calledWith('homeassistant/#');
     // nukiHandler.mqttService.device.unsubscribe.secondCall.calledWith('nuki/4242/#');
     // nukiHandler.mqttService.device.unsubscribe.thirdCall.calledWith('nuki/4343/#');
+  });
+
+  it('should clear scan timeout on disconnect', async () => {
+    // Simulate an active scan timeout
+    const fakeTimeout = setTimeout(() => {}, 10000);
+    nukiHandler.scanTimeout = fakeTimeout;
+
+    await nukiHandler.disconnect();
+
+    expect(nukiHandler.scanTimeout).to.equal(null);
+  });
+
+  it('should handle disconnect when no scan timeout is active', async () => {
+    // Ensure scanTimeout is null
+    nukiHandler.scanTimeout = null;
+
+    // Should not throw
+    await nukiHandler.disconnect();
+
+    expect(nukiHandler.scanTimeout).to.equal(null);
   });
 });

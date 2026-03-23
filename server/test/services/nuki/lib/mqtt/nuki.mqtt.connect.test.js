@@ -33,7 +33,7 @@ describe('nuki.mqtt.connect command', () => {
     sinon.reset();
   });
 
-  it('should connect to search mqtt topic and subscribe to specific device mqtt topic', async () => {
+  it('should subscribe to existing device topics only (not discovery topic)', async () => {
     await nukiHandler.connect();
     assert.calledWith(gladys.service.getService, 'mqtt');
     // Only subscribes to device topics, not discovery topic (homeassistant/#)
