@@ -158,9 +158,11 @@ const AccountTab = ({ children, ...props }) => (
                   />
                   <Text id="integration.caldav.logTitle" />
                 </button>
-                <button type="button" class="btn p-0" onClick={() => navigator.clipboard.writeText(props.caldavLog)}>
-                  <i class="fe fe-copy me-1" />
-                </button>
+                {window.isSecureContext && (
+                  <button type="button" class="btn p-0" onClick={() => navigator.clipboard.writeText(props.caldavLog)}>
+                    <i class="fe fe-copy me-1" />
+                  </button>
+                )}
               </div>
               {!props.caldavLogVisibility && (
                 <pre id="caldav-log-content" class="mb-0 mt-2" style="white-space: pre-wrap; word-break: break-all;">
