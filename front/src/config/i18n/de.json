@@ -1868,6 +1868,7 @@
       "synchronizationNeeded": "Starte die Synchronisierung, um verfügbare Kalender aufzulisten.",
       "calendarChoiceSuccess": "Deine Auswahl wurde gesichert.",
       "calendarChoiceError": "Das Sichern ist fehlgeschlagen.",
+      "logTitle": "Protokoll",
       "buttonSave": "Sichern",
       "buttonCleanUp": "Aufräumen",
       "buttonSync": "Jetzt synchronisieren"

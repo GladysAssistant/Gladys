@@ -1868,6 +1868,7 @@
       "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
       "calendarChoiceSuccess": "Your choices have been saved.",
       "calendarChoiceError": "An error occurred while saving.",
+      "logTitle": "Log",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"

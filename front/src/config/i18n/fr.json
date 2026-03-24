@@ -696,6 +696,7 @@
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
       "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
+      "logTitle": "Journal",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
