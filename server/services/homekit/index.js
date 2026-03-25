@@ -33,6 +33,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping HomeKit service');
+    await homeKitHandler.stopBridge();
   }
 
   return Object.freeze({
