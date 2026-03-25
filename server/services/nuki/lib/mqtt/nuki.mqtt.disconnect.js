@@ -18,7 +18,7 @@ async function disconnect() {
   // Unsubscribe to Nuki topics
   this.mqttService.device.unsubscribe(DISCOVERY_TOPIC);
   // Unsubscribe devices topics
-  const devices = await this.nukiHandler.gladys.device.get({ service_id: this.nukiHandler.serviceId });
+  const devices = await this.nukiHandler.gladys.device.get({ service: 'nuki' });
   devices.forEach((device) => {
     const topic = `nuki/${device.external_id.split(':')[1]}/#`;
     this.mqttService.device.unsubscribe(topic);

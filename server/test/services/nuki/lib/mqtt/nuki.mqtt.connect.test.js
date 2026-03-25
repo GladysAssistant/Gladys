@@ -36,6 +36,9 @@ describe('nuki.mqtt.connect command', () => {
   it('should subscribe to existing device topics only (not discovery topic)', async () => {
     await nukiHandler.connect();
     assert.calledWith(gladys.service.getService, 'mqtt');
+    // Verify device.get is called with correct service filter
+    assert.calledOnce(gladys.device.get);
+    assert.calledWith(gladys.device.get, { service: 'nuki' });
     // Only subscribes to device topics, not discovery topic (homeassistant/#)
     // Discovery topic is only subscribed during scan()
     assert.callCount(mqttService.device.subscribe, 1);
