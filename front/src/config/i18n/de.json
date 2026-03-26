@@ -1387,7 +1387,7 @@
       "saveButton": "Speichern",
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
-      "alphaWarning": "Diese Integration unterstützt eine begrenzte Anzahl von Z-Wave-Geräten. Wenn Sie nicht unterstützte Geräte haben, zögern Sie nicht, diese einzureichen, damit sie hinzugefügt werden können!",
+      "alphaWarning": "Wenn Sie nicht unterstützte Geräte haben, reichen Sie diese bitte im Forum ein, damit wir Unterstützung dafür hinzufügen können!",
       "device": {
         "title": "Z-Wave JS UI Geräte in Gladys",
         "editButton": "Bearbeiten",

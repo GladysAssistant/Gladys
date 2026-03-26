@@ -1520,7 +1520,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
+      "alphaWarning": "Si vous avez des appareils Z-Wave non gérés, n'hésitez pas à nous les soumettre sur le forum pour qu'ils soient ajoutés !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
