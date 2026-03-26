@@ -2713,6 +2713,7 @@
     "day": "Tag",
     "selectorText": "Der Selektor ist der eindeutige Identifikator deines Benutzers. Er kann in der API verwendet werden.",
     "emailText": "Deine E-Mail-Adresse wird ausschließlich für den Login verwendet. Sie wird nur lokal gesichert.",
+    "emailTextOtherUser": "Die E-Mail-Adresse wird ausschließlich für den Login verwendet. Sie wird nur lokal gesichert.",
     "profilePictureLabel": "Profilbild",
     "chooseFileLabel": "Datei auswählen",
     "emailLabel": "E-Mail-Adresse",
