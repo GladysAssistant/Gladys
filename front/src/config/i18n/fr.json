@@ -2716,6 +2716,7 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local.",
+    "emailTextOtherUser": "L'email sert juste d'identifiant, il n'est enregistré qu'en local.",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
