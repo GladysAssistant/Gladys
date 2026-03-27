@@ -4,6 +4,29 @@ const { writeValues, readValues } = require('../../../../../../services/tuya/lib
 
 describe('Tuya device mapping', () => {
   describe('write value', () => {
+    it('Thermostat set manual', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.ENUM]('Manual', {
+        value: 'Auto|Manual',
+      });
+      expect(result).to.eq(1);
+    });
+    it('Thermostat set Auto', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.ENUM]('Auto', {
+        value: 'Auto|Manual',
+      });
+      expect(result).to.eq(0);
+    });
+
+    it('Thermostat set setPoint', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.INTEGER](50, {
+        value: '{ "scale": 1, "step": 10, "min": 200, "max": 900 }',
+      });
+      expect(result).to.eq('500');
+    });
+    it('Thermostat status text', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.TEXT][DEVICE_FEATURE_TYPES.SENSOR.TEXT]('Hello Tuya');
+      expect(result).to.eq('Hello Tuya');
+    });
     it('light binary', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY](1);
       expect(result).to.eq(true);
@@ -51,6 +74,29 @@ describe('Tuya device mapping', () => {
   });
 
   describe('read value', () => {
+    it('Thermostat read mode', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.ENUM]('Manual', {
+        value: 'Auto|Manual',
+      });
+      expect(result).to.eq(1);
+    });
+    it('Thermostat read mode', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.ENUM]('Auto', {
+        value: 'Auto|Manual',
+      });
+      expect(result).to.eq(0);
+    });
+
+    it('Thermostat set setPoint', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.NUMBER][DEVICE_FEATURE_TYPES.SENSOR.INTEGER](500, {
+        value: '{ "scale": 1, "step": 10, "min": 200, "max": 900 }',
+      });
+      expect(result).to.eq('50');
+    });
+    it('Thermostat status text', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.TEXT][DEVICE_FEATURE_TYPES.SENSOR.TEXT]('Hello Tuya');
+      expect(result).to.eq('Hello Tuya');
+    });
     it('light binary', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY](true);
       expect(result).to.eq(1);

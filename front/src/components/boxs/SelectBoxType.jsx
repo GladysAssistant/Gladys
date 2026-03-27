@@ -26,7 +26,7 @@ class SelectBoxType extends Component {
             </option>
             {DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => (
               <option value={dashboardBoxType}>
-                <Text id={`dashboard.boxTitle.${dashboardBoxType}`} />
+                <Text id={`dashboard.boxTitle.${dashboardBoxType}`}>{dashboardBoxType}</Text>
               </option>
             ))}
           </select>

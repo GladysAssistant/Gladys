@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext, client } = require('../tuya.mock.test');
+const { TuyaContext, client } = require('../tuya.mock');
 
 const { assert, fake } = sinon;
 
@@ -19,7 +19,11 @@ const gladys = {
   event: {
     emit: fake.returns(null),
   },
+  variable: {
+    getValue: fake.returns('abc'),
+  },
 };
+
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
 describe('TuyaHandler.connect', () => {
@@ -56,6 +60,7 @@ describe('TuyaHandler.connect', () => {
       await tuyaHandler.connect({
         baseUrl: 'apiUrl',
         secretKey: 'secretKey',
+        fakeClient: client,
       });
       assert.fail();
     } catch (e) {
@@ -73,6 +78,7 @@ describe('TuyaHandler.connect', () => {
       await tuyaHandler.connect({
         baseUrl: 'apiUrl',
         accessKey: 'accessKey',
+        fakeClient: client,
       });
       assert.fail();
     } catch (e) {
@@ -90,6 +96,7 @@ describe('TuyaHandler.connect', () => {
       baseUrl: 'apiUrl',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      fakeClient: client,
     });
 
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
@@ -114,6 +121,7 @@ describe('TuyaHandler.connect', () => {
       baseUrl: 'apiUrl',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      fakeClient: client,
     });
 
     expect(tuyaHandler.status).to.eq(STATUS.ERROR);
