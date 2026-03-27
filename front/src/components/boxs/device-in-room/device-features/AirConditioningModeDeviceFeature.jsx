@@ -1,29 +1,26 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
-import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { AC_MODE } from '../../../../../../server/utils/constants';
 
-const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
+const MODE_OPTIONS = [
+  { value: AC_MODE.AUTO, i18nKey: 'auto' },
+  { value: AC_MODE.COOLING, i18nKey: 'cooling' },
+  { value: AC_MODE.HEATING, i18nKey: 'heating' },
+  { value: AC_MODE.DRYING, i18nKey: 'drying' },
+  { value: AC_MODE.FAN, i18nKey: 'fan' }
+];
+
+const AirConditioningModeDeviceFeature = props => {
   const { deviceFeature } = props;
-  const { category, type, last_value: lastValue } = deviceFeature;
+  const { category, type } = deviceFeature;
+  const rawValue = deviceFeature.last_value;
+  const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
 
-  function updateValue(value) {
-    props.updateValueWithDebounce(deviceFeature, value);
-  }
-
-  function auto() {
-    updateValue(AC_MODE.AUTO);
-  }
-
-  function cooling() {
-    updateValue(AC_MODE.COOLING);
-  }
-
-  function heating() {
-    updateValue(AC_MODE.HEATING);
-  }
+  const updateValue = e => {
+    props.updateValueWithDebounce(deviceFeature, Number(e.currentTarget.value));
+  };
 
   return (
     <tr>
@@ -33,32 +30,15 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
       <td>{props.rowName}</td>
 
       <td class="py-0">
-        <div class="d-flex justify-content-end">
-          <div class="btn-group" role="group">
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === AC_MODE.AUTO
-              })}
-              onClick={auto}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.auto`} plural={AC_MODE.HEATING} />
-            </button>
-            <button
-              class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === AC_MODE.COOLING
-              })}
-              onClick={cooling}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.cooling`} plural={AC_MODE.HEATING} />
-            </button>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === AC_MODE.HEATING
-              })}
-              onClick={heating}
-            >
-              <Text id={`deviceFeatureAction.category.${category}.${type}.heating`} plural={AC_MODE.HEATING} />
-            </button>
+        <div class="justify-content-end">
+          <div class="form-group mb-0">
+            <select value={lastValue} onChange={updateValue} class="form-control form-control-sm">
+              {MODE_OPTIONS.map(option => (
+                <option value={option.value} key={option.value}>
+                  <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </td>

@@ -18,13 +18,14 @@ describe('TuyaHandler.loadDevices', () => {
 
   beforeEach(() => {
     sinon.reset();
+    gladys.variable.getValue = fake.resolves('APP_ACCOUNT_UID');
     tuyaHandler.connector = {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: { list: [{ id: 1 }], total: 2, has_more: true, last_row_key: 'next' } })
+        .resolves({ result: { list: [{ id: 1 }], has_more: true } })
         .onSecondCall()
-        .resolves({ result: { list: [{ id: 2 }], total: 2, has_more: false } }),
+        .resolves({ result: { list: [{ id: 2 }], has_more: false } }),
     };
   });
 
@@ -33,20 +34,152 @@ describe('TuyaHandler.loadDevices', () => {
   });
 
   it('should loop on pages', async () => {
-    const devices = await tuyaHandler.loadDevices();
+    const devices = await tuyaHandler.loadDevices(1, 1);
 
     expect(devices).to.deep.eq([{ id: 1 }, { id: 2 }]);
 
     assert.callCount(tuyaHandler.connector.request, 2);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_3}/devices`,
-      query: { last_row_key: null, source_id: 'APP_ACCOUNT_UID', source_type: 'tuyaUser' },
+      path: `${API.PUBLIC_VERSION_1_0}/users/APP_ACCOUNT_UID/devices`,
+      query: { page_no: 1, page_size: 1 },
     });
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION_1_3}/devices`,
-      query: { last_row_key: 'next', source_id: 'APP_ACCOUNT_UID', source_type: 'tuyaUser' },
+      path: `${API.PUBLIC_VERSION_1_0}/users/APP_ACCOUNT_UID/devices`,
+      query: { page_no: 2, page_size: 1 },
     });
+  });
+
+  it('should loop on pages with array result', async () => {
+    tuyaHandler.connector.request = sinon
+      .stub()
+      .onFirstCall()
+      .resolves({ result: [{ id: 1 }] })
+      .onSecondCall()
+      .resolves({ result: [] });
+
+    const devices = await tuyaHandler.loadDevices(1, 1);
+
+    expect(devices).to.deep.eq([{ id: 1 }]);
+    assert.callCount(tuyaHandler.connector.request, 2);
+  });
+
+  it('should throw on invalid pageNo', async () => {
+    try {
+      await tuyaHandler.loadDevices(0, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('pageNo must be a positive integer');
+    }
+  });
+
+  it('should throw on invalid pageSize', async () => {
+    try {
+      await tuyaHandler.loadDevices(1, 0);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('pageSize must be a positive integer');
+    }
+  });
+
+  it('should throw on api error response', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      msg: 'Tuya error',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya error');
+    }
+  });
+
+  it('should use error message field when msg is missing', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      message: 'Tuya message error',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya message error');
+    }
+  });
+
+  it('should use error code field when msg and message are missing', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+      code: 'TUYA_ERR_CODE',
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('TUYA_ERR_CODE');
+    }
+  });
+
+  it('should fallback to default api error message when error payload is empty', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      success: false,
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya API error');
+    }
+  });
+
+  it('should throw on empty api response', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves(null);
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya API returned no response');
+    }
+  });
+
+  it('should throw when app account uid is missing', async () => {
+    gladys.variable.getValue = sinon.fake.resolves(null);
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya APP_ACCOUNT_UID is missing');
+    }
+  });
+
+  it('should throw when pagination does not advance', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      result: { list: [], has_more: true },
+    });
+
+    try {
+      await tuyaHandler.loadDevices(1, 1);
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Tuya API pagination did not advance (has_more=true with empty page)');
+    }
+  });
+
+  it('should handle malformed result.list payloads as empty pages', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      result: { list: { id: 1 }, has_more: false },
+    });
+
+    const devices = await tuyaHandler.loadDevices(1, 1);
+
+    expect(devices).to.deep.eq([]);
   });
 });

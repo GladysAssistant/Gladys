@@ -1,0 +1,10 @@
+{
+  "mode": 101,
+  "child_lock": 102,
+  "electricity_statistics": 112,
+  "temp_current": 116,
+  "average_power": 117,
+  "window_state": 123,
+  "temp_set": 125,
+  "running_mode": 131
+}

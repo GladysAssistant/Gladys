@@ -1,0 +1,42 @@
+{
+  "id": "socket-device-id",
+  "name": "Kitchen Plug",
+  "product_name": "Mini Plug",
+  "product_id": "cya3zxfd38g4qp8d",
+  "product_key": "socket-key",
+  "local_key": "local-key",
+  "ip": "10.0.0.10",
+  "cloud_ip": "1.2.3.4",
+  "protocol_version": "3.3",
+  "local_override": true,
+  "online": true,
+  "specifications": {
+    "category": "cz",
+    "functions": [
+      {
+        "code": "switch_1",
+        "name": "Switch 1",
+        "type": "Boolean"
+      }
+    ],
+    "status": [
+      {
+        "code": "cur_power",
+        "name": "Current Power",
+        "type": "Integer",
+        "values": {
+          "min": 0,
+          "max": 99999,
+          "scale": 1,
+          "unit": "W"
+        }
+      }
+    ]
+  },
+  "properties": {
+    "properties": []
+  },
+  "thing_model": {
+    "services": []
+  }
+}

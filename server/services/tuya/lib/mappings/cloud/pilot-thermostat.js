@@ -1,0 +1,77 @@
+const {
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../../../utils/constants');
+
+module.exports = {
+  ignoredCodes: [
+    'week_program_1',
+    'week_program_2',
+    'week_program_3',
+    'week_program_4',
+    'week_program_5',
+    'week_program_6',
+    'week_program_7',
+    'vacation_duration',
+    'boost_duration',
+    'elec_statistics_day',
+    'elec_statistics_month',
+    'elec_statistics_year',
+    'temp_correction',
+    'air_pressure_index',
+    'support_features',
+    'window_check',
+    'window_keep_time',
+    'temp_unit_convert',
+    'app_features',
+    'switch_diff',
+    'upper_temp',
+    'lower_temp',
+    'night_led_config',
+    'ecowatt_url',
+  ],
+  mode: {
+    category: DEVICE_FEATURE_CATEGORIES.HEATER,
+    type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+    has_feedback: true,
+  },
+  running_mode: {
+    category: DEVICE_FEATURE_CATEGORIES.HEATER,
+    type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+  },
+  child_lock: {
+    category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
+    type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+    has_feedback: true,
+  },
+  electricity_statistics: {
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_TODAY,
+    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    scale: 1,
+  },
+  temp_current: {
+    category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    unit: DEVICE_FEATURE_UNITS.CELSIUS,
+    scale: 1,
+  },
+  average_power: {
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+    unit: DEVICE_FEATURE_UNITS.WATT,
+    scale: 1,
+  },
+  window_state: {
+    category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+  },
+  temp_set: {
+    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+    unit: DEVICE_FEATURE_UNITS.CELSIUS,
+    scale: 1,
+    has_feedback: true,
+  },
+};
