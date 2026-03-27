@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
-import debounce from 'debounce';
+import debounce from '../../utils/debounce';
 import update from 'immutability-helper';
 import ScenePage from './ScenePage';
 

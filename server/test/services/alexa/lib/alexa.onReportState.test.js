@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-const get = require('get-value');
 
 const { fake } = sinon;
 const AlexaHandler = require('../../../../services/alexa/lib');
@@ -54,7 +53,7 @@ describe('alexa.onReportState', () => {
           namespace: 'Alexa',
           name: 'StateReport',
           payloadVersion: '3',
-          messageId: get(result, 'event.header.messageId'),
+          messageId: result?.event?.header?.messageId,
           correlationToken:
             'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JAAIAAAAAAADgCDHXLLn3nx8SmjtElD2w8CfsniSH6KxFhbRSgD/sELuMpZTr4Jl/E3Nip62gpI2QqFNm/TrQ/Pi+XSFtf/4AVCDxe4bV2FAXSVu61AsuUlhbdqdvjUoaHOuqSLW8F3Qj9z3HWhfvTCMEbbhw4XVDWOsyXb9nknvswimA+R4ftNdBx5POWZGxWtbvU+yeBStTV+QwSSZaHWjzQdi/LAo1KW35MkmLikny7Y7J097LTTL1Tof6IkLsi9/gxOtUUFvnD4yIkWeHTT110Ch6R4kDuonNtOiHsTmMMRtsY5kRWoIL9VMfX6QHWjamhvd+XJp4sXkLMBdtJ3aTzfsUNrQIdrcPTox9qTNjShunTlbAYkq1TSUXaylEGHvcwHrbo7ZoUlBvidqnJGUNRJPxOHHyfCm5VqFzuFI8AG1W/dj1W4Di0AAND/mwzjZKUTRsiX4uEaRw8/Na4Qj/GBMuT18hUoGpe7t/UYw5JFw+MXm0kn/5jKe9r62xil3TN8BK9ODQDP9zq08+iiT0CBtEX5F4Drrowb57IwcW7nt/hkCeeyR59B/Z6nPsSq0NQ+rd1w4a1iHIyaTU6acQsKwmaX1OeTvtT2p7U/HhqfhVMSqA7ybGhQDF4FPPzIbh+o+D1S+AX9m9nVSSJNwoevikdZimCbk1l1HmUrhz78GO+j0yFg==',
         },
@@ -67,7 +66,7 @@ describe('alexa.onReportState', () => {
             namespace: 'Alexa.PowerController',
             name: 'powerState',
             value: 'ON',
-            timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+            timeOfSample: result?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],
@@ -122,7 +121,7 @@ describe('alexa.onReportState', () => {
           namespace: 'Alexa',
           name: 'StateReport',
           payloadVersion: '3',
-          messageId: get(result, 'event.header.messageId'),
+          messageId: result?.event?.header?.messageId,
           correlationToken:
             'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JAAIAAAAAAADgCDHXLLn3nx8SmjtElD2w8CfsniSH6KxFhbRSgD/sELuMpZTr4Jl/E3Nip62gpI2QqFNm/TrQ/Pi+XSFtf/4AVCDxe4bV2FAXSVu61AsuUlhbdqdvjUoaHOuqSLW8F3Qj9z3HWhfvTCMEbbhw4XVDWOsyXb9nknvswimA+R4ftNdBx5POWZGxWtbvU+yeBStTV+QwSSZaHWjzQdi/LAo1KW35MkmLikny7Y7J097LTTL1Tof6IkLsi9/gxOtUUFvnD4yIkWeHTT110Ch6R4kDuonNtOiHsTmMMRtsY5kRWoIL9VMfX6QHWjamhvd+XJp4sXkLMBdtJ3aTzfsUNrQIdrcPTox9qTNjShunTlbAYkq1TSUXaylEGHvcwHrbo7ZoUlBvidqnJGUNRJPxOHHyfCm5VqFzuFI8AG1W/dj1W4Di0AAND/mwzjZKUTRsiX4uEaRw8/Na4Qj/GBMuT18hUoGpe7t/UYw5JFw+MXm0kn/5jKe9r62xil3TN8BK9ODQDP9zq08+iiT0CBtEX5F4Drrowb57IwcW7nt/hkCeeyR59B/Z6nPsSq0NQ+rd1w4a1iHIyaTU6acQsKwmaX1OeTvtT2p7U/HhqfhVMSqA7ybGhQDF4FPPzIbh+o+D1S+AX9m9nVSSJNwoevikdZimCbk1l1HmUrhz78GO+j0yFg==',
         },
@@ -135,7 +134,7 @@ describe('alexa.onReportState', () => {
             namespace: 'Alexa.BrightnessController',
             name: 'brightness',
             value: 50,
-            timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+            timeOfSample: result?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],
@@ -188,7 +187,7 @@ describe('alexa.onReportState', () => {
           namespace: 'Alexa',
           name: 'StateReport',
           payloadVersion: '3',
-          messageId: get(result, 'event.header.messageId'),
+          messageId: result?.event?.header?.messageId,
           correlationToken:
             'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JAAIAAAAAAADgCDHXLLn3nx8SmjtElD2w8CfsniSH6KxFhbRSgD/sELuMpZTr4Jl/E3Nip62gpI2QqFNm/TrQ/Pi+XSFtf/4AVCDxe4bV2FAXSVu61AsuUlhbdqdvjUoaHOuqSLW8F3Qj9z3HWhfvTCMEbbhw4XVDWOsyXb9nknvswimA+R4ftNdBx5POWZGxWtbvU+yeBStTV+QwSSZaHWjzQdi/LAo1KW35MkmLikny7Y7J097LTTL1Tof6IkLsi9/gxOtUUFvnD4yIkWeHTT110Ch6R4kDuonNtOiHsTmMMRtsY5kRWoIL9VMfX6QHWjamhvd+XJp4sXkLMBdtJ3aTzfsUNrQIdrcPTox9qTNjShunTlbAYkq1TSUXaylEGHvcwHrbo7ZoUlBvidqnJGUNRJPxOHHyfCm5VqFzuFI8AG1W/dj1W4Di0AAND/mwzjZKUTRsiX4uEaRw8/Na4Qj/GBMuT18hUoGpe7t/UYw5JFw+MXm0kn/5jKe9r62xil3TN8BK9ODQDP9zq08+iiT0CBtEX5F4Drrowb57IwcW7nt/hkCeeyR59B/Z6nPsSq0NQ+rd1w4a1iHIyaTU6acQsKwmaX1OeTvtT2p7U/HhqfhVMSqA7ybGhQDF4FPPzIbh+o+D1S+AX9m9nVSSJNwoevikdZimCbk1l1HmUrhz78GO+j0yFg==',
         },
@@ -205,7 +204,7 @@ describe('alexa.onReportState', () => {
               saturation: 1,
               brightness: 1,
             },
-            timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+            timeOfSample: result?.context?.properties?.[0]?.timeOfSample,
             uncertaintyInMilliseconds: 0,
           },
         ],

@@ -2,7 +2,7 @@ import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
-import debounce from 'debounce';
+import debounce from '../../../utils/debounce';
 import { connect } from 'unistore/preact';
 
 class SettingsSystemBatteryLevelWarning extends Component {

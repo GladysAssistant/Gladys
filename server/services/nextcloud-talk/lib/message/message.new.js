@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 
@@ -24,7 +24,7 @@ async function newMessage(msg) {
     language: user.language,
     created_at: new Date(msg.timestamp * 1000).toISOString(),
     text: msg.message,
-    id: uuid.v4(),
+    id: randomUUID(),
   };
   this.gladys.event.emit(EVENTS.MESSAGE.NEW, message);
   return null;

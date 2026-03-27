@@ -10,7 +10,7 @@ import {
   DEVICE_FEATURE_TYPES
 } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
-import debounce from 'debounce';
+import debounce from '../../../utils/debounce';
 
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {

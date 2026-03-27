@@ -1,7 +1,7 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import uuid from 'uuid';
-import debounce from 'debounce';
+import debounce from '../../../../../utils/debounce';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
 

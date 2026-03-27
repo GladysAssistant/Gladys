@@ -2,7 +2,7 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import debounce from 'debounce';
+import debounce from '../../../../utils/debounce';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
@@ -71,7 +71,7 @@ class MatterDevices extends Component {
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
       nodesIsConnected: new Map()
     };
-    this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
+    this.debouncedGetMatterDevices = debounce(this.getMatterDevices.bind(this), 200);
   }
 
   init = async () => {
