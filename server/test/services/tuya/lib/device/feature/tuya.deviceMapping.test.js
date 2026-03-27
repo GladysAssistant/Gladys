@@ -55,6 +55,10 @@ describe('Tuya device mapping', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY](true);
       expect(result).to.eq(1);
     });
+    it('light binary string', () => {
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BINARY]('true');
+      expect(result).to.eq(1);
+    });
     it('light brightness', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS](50);
       expect(result).to.eq(50);
@@ -74,21 +78,61 @@ describe('Tuya device mapping', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
         expect(result).to.eq(1);
       });
+      it('switch number', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](1);
+        expect(result).to.eq(1);
+      });
+      it('switch string false', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('false');
+        expect(result).to.eq(0);
+      });
+      it('switch string on', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('ON');
+        expect(result).to.eq(1);
+      });
       it('energy', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30');
         expect(result).to.eq(0.3);
+      });
+      it('energy with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30', {
+          scale: 1,
+        });
+        expect(result).to.eq(3);
       });
       it('current', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('20');
         expect(result).to.eq(20);
       });
+      it('current with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('205', {
+          scale: 1,
+        });
+        expect(result).to.eq(20.5);
+      });
       it('power', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('2245');
         expect(result).to.eq(224.5);
       });
+      it('power with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('2245', {
+          scale: 2,
+        });
+        expect(result).to.eq(22.45);
+      });
       it('voltage', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]('120');
         expect(result).to.eq(12.0);
+      });
+      it('voltage with explicit scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]('2352', {
+          scale: 1,
+        });
+        expect(result).to.eq(235.2);
+      });
+      it('switch power invalid value returns NaN', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('not-a-number');
+        expect(Number.isNaN(result)).to.equal(true);
       });
     });
     describe('curtain state', () => {
