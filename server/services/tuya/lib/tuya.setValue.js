@@ -1,7 +1,13 @@
+const TuyAPI = require('tuyapi');
+const TuyAPINewGen = require('@demirdeniz/tuyapi-newgen');
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/tuya.deviceMapping');
+const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
+const { normalizeBoolean } = require('./utils/tuya.normalize');
+const { getParamValue } = require('./utils/tuya.deviceParams');
+const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 
 /**
  * @description Send the new device value over device protocol.
@@ -21,9 +27,70 @@ async function setValue(device, deviceFeature, value) {
   if (!topic || topic.length === 0) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
+  if (!command || command.trim().length === 0) {
+    throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no command`);
+  }
 
-  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value);
+  const writeCategory = writeValues[deviceFeature.category];
+  const writeFn = writeCategory ? writeCategory[deviceFeature.type] : null;
+  const transformedValue = writeFn ? writeFn(value) : value;
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
+
+  const params = device.params || [];
+  const ipAddress = getParamValue(params, DEVICE_PARAM_NAME.IP_ADDRESS);
+  const localKey = getParamValue(params, DEVICE_PARAM_NAME.LOCAL_KEY);
+  const protocolVersionRaw = getParamValue(params, DEVICE_PARAM_NAME.PROTOCOL_VERSION);
+  const protocolVersion =
+    protocolVersionRaw !== null && protocolVersionRaw !== undefined ? String(protocolVersionRaw).trim() : undefined;
+  const localOverride = normalizeBoolean(getParamValue(params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE));
+
+  const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
+
+  const localDps = getLocalDpsFromCode(command, device);
+
+  if (hasLocalConfig && localDps !== null) {
+    const isProtocol35 = protocolVersion === '3.5';
+    const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+    const tuyaOptions = {
+      id: topic,
+      key: localKey,
+      ip: ipAddress,
+      version: protocolVersion,
+      issueGetOnConnect: false,
+      issueRefreshOnConnect: false,
+      issueRefreshOnPing: false,
+    };
+    if (isProtocol35) {
+      tuyaOptions.keepAlive = false;
+    }
+    const runLocalSet = async () => {
+      const tuyaLocal = new TuyaLocalApi(tuyaOptions);
+      let connected = false;
+      try {
+        await tuyaLocal.connect();
+        connected = true;
+        await tuyaLocal.set({ dps: localDps, set: transformedValue });
+        logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
+        return true;
+      } catch (e) {
+        logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+        return false;
+      } finally {
+        if (connected) {
+          try {
+            await tuyaLocal.disconnect();
+          } catch (disconnectError) {
+            logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
+          }
+        }
+      }
+    };
+
+    const localSuccess = await runLocalSet();
+    if (localSuccess) {
+      return;
+    }
+  }
 
   const response = await this.connector.request({
     method: 'POST',
