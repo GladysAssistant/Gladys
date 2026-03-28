@@ -505,6 +505,11 @@
     "createDashboardButton": "Créer"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
@@ -1171,7 +1176,8 @@
         "enableLabel": "Activation du service Node-RED",
         "enableNodeRed": "Activer",
         "disableNodeRed": "Désactiver",
-        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
+        "confirmDisableWarning": "Attention : La désactivation de Node-RED supprimera définitivement toutes vos données Node-RED, y compris tous vos flows et configurations. Cette action est irréversible.",
+        "confirmDisableLabel": "Êtes-vous sûr de vouloir désactiver Node-RED ?",
         "confirmDisableCancelButton": "Annuler",
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-RED",
@@ -1524,7 +1530,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
+      "alphaWarning": "Si vous avez des appareils Z-Wave non gérés, n'hésitez pas à nous les soumettre sur le forum pour qu'ils soient ajoutés !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -2714,6 +2720,7 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local.",
+    "emailTextOtherUser": "L'email sert juste d'identifiant, il n'est enregistré qu'en local.",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",

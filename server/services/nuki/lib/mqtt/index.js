@@ -19,6 +19,10 @@ const NukiMQTTHandler = function NukiMQTTHandler(nukiHandler) {
   this.mqttService = this.nukiHandler.gladys.service.getService('mqtt');
   // Found devices
   this.discoveredDevices = {};
+  // Scan timeout handle
+  this.scanTimeout = null;
+  // Discovery window duration in ms (can be overridden in tests)
+  this.scanTimeoutMs = 60 * 1000; // 1 minute
 };
 
 // Commons

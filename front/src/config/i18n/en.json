@@ -505,6 +505,11 @@
     "createDashboardButton": "Create"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
@@ -933,7 +938,8 @@
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
-        "confirmDisableLabel": "Are you sur you to disable Node-RED ?",
+        "confirmDisableWarning": "Warning: Disabling Node-RED will permanently delete all your Node-RED data, including all your flows and configurations. This action cannot be undone.",
+        "confirmDisableLabel": "Are you sure you want to disable Node-RED?",
         "confirmDisableCancelButton": "Cancel",
         "activationNodeRed": "Activating...",
         "serviceStatus": "Node-RED Service Status",
@@ -1286,7 +1292,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration handles a limited number of Z-Wave devices. If you have unsupported devices, don't hesitate to submit them so they can be added!",
+      "alphaWarning": "If you have unsupported devices, please submit them on the forum so we can add support for them!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
@@ -2711,6 +2717,7 @@
     "day": "Day",
     "selectorText": "The selector is the unique identifier of your user. It can be used in the API.",
     "emailText": "Your email is just an identifier for login, it's only saved locally",
+    "emailTextOtherUser": "The email is just an identifier for login, it's only saved locally",
     "profilePictureLabel": "Profile Picture",
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",
