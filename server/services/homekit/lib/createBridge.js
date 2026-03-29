@@ -13,7 +13,8 @@ async function createBridge() {
   let bridgeUuid = await this.gladys.variable.getValue('HOMEKIT_GLADYS_UUID', this.serviceId);
   let username = await this.gladys.variable.getValue('HOMEKIT_USERNAME', this.serviceId);
   let pincode = await this.gladys.variable.getValue('HOMEKIT_PIN_CODE', this.serviceId);
-  const mdnsAdvertiser = await this.gladys.variable.getValue('HOMEKIT_MDNS_ADVERTISER', this.serviceId) || this.hap.MDNSAdvertiser.CIAO;
+  const mdnsAdvertiser =
+    (await this.gladys.variable.getValue('HOMEKIT_MDNS_ADVERTISER', this.serviceId)) || this.hap.MDNSAdvertiser.BONJOUR;
 
   if (!bridgeUuid) {
     bridgeUuid = uuid.v4();

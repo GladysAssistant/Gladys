@@ -7,11 +7,13 @@ const actions = store => ({
       homekitGetSettingsStatus: RequestStatus.Getting
     });
     try {
-      let homekitMdnsAdvertiser = 'ciao';
+      let homekitMdnsAdvertiser = 'bonjour-hap';
 
       const { value: setupURI } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_SETUP_URI');
       try {
-        ({ value: homekitMdnsAdvertiser } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER'));
+        ({ value: homekitMdnsAdvertiser } = await state.httpClient.get(
+          '/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER'
+        ));
       } catch (e) {
         // Variable not set yet
       }
