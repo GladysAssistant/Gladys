@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const { stub } = require('sinon');
 const { stopBridge } = require('../../../../services/homekit/lib/stopBridge');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
 describe('Stop bridge', () => {
   it('should stop a bridge', async () => {

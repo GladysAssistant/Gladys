@@ -13,8 +13,12 @@ async function createBridge() {
   let bridgeUuid = await this.gladys.variable.getValue('HOMEKIT_GLADYS_UUID', this.serviceId);
   let username = await this.gladys.variable.getValue('HOMEKIT_USERNAME', this.serviceId);
   let pincode = await this.gladys.variable.getValue('HOMEKIT_PIN_CODE', this.serviceId);
-  const mdnsAdvertiser =
-    (await this.gladys.variable.getValue('HOMEKIT_MDNS_ADVERTISER', this.serviceId)) || this.hap.MDNSAdvertiser.BONJOUR;
+  const configuredMdnsAdvertiser = await this.gladys.variable.getValue('HOMEKIT_MDNS_ADVERTISER', this.serviceId);
+
+  const allowedMdnsAdvertisers = new Set(Object.values(this.hap.MDNSAdvertiser));
+  const mdnsAdvertiser = allowedMdnsAdvertisers.has(configuredMdnsAdvertiser)
+    ? configuredMdnsAdvertiser
+    : this.hap.MDNSAdvertiser.BONJOUR;
 
   if (!bridgeUuid) {
     bridgeUuid = uuid.v4();
@@ -39,12 +43,8 @@ async function createBridge() {
     .map((device) => this.buildAccessory(device))
     .filter((accessory) => accessory !== null);
 
-  if (this.notifyCb) {
-    this.gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, this.notifyCb);
-  }
-
   if (this.bridge) {
-    await this.bridge.unpublish();
+    await this.stopBridge();
   }
 
   this.notifyCb = eventFunctionWrapper(this.notifyChange.bind(this, accessories));
