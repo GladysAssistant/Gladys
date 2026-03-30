@@ -3467,7 +3467,9 @@
           "81": "Hold Minus",
           "82": "Release Plus (Aqara W100)",
           "83": "Release Center (Aqara W100)",
-          "84": "Release Minus (Aqara W100)"
+          "84": "Release Minus (Aqara W100)",
+          "85": "On double",
+          "86": "Off double"
         }
       },
       "heater": {
