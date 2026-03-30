@@ -4,6 +4,9 @@ const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 
+const matchSunEvent = (self, sceneSelector, event, trigger) =>
+  event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // we check that we are talking about the same device feature
@@ -81,10 +84,8 @@ const triggersFunc = {
     return false;
   },
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
-  [EVENTS.TIME.SUNRISE]: (self, sceneSelector, event, trigger) =>
-    event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0),
-  [EVENTS.TIME.SUNSET]: (self, sceneSelector, event, trigger) =>
-    event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0),
+  [EVENTS.TIME.SUNRISE]: matchSunEvent,
+  [EVENTS.TIME.SUNSET]: matchSunEvent,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>
     event.house === trigger.house && event.user === trigger.user,
   [EVENTS.USER_PRESENCE.LEFT_HOME]: (self, sceneSelector, event, trigger) =>

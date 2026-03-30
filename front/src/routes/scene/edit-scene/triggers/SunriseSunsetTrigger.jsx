@@ -29,9 +29,7 @@ class SunriseSunsetTrigger extends Component {
 
   onOffsetDirectionChange = e => {
     const direction = e.target.value;
-    const currentMinutes = this.state.offsetMinutesInput
-      ? Math.abs(parseInt(this.state.offsetMinutesInput, 10)) || 30
-      : 30;
+    const currentMinutes = parseInt(this.state.offsetMinutesInput, 10) || 30;
     if (direction === 'exact') {
       this.props.updateTriggerProperty(this.props.index, 'offset', 0);
     } else if (direction === 'before') {

@@ -6,6 +6,22 @@ const { EVENTS } = require('../../utils/constants');
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
+/**
+ * @description Has sunrise or sunset trigger.
+ * @param {object} scene - Scene object.
+ * @returns {boolean} Return true if the scene has a sunrise or sunset trigger.
+ * @example
+ * hasSunriseSunsetTrigger({
+ *  selector: 'test'
+ * });
+ */
+function hasSunriseSunsetTrigger(scene) {
+  if (!scene.triggers) {
+    return false;
+  }
+  return scene.triggers.some((trigger) => trigger.type === EVENTS.TIME.SUNRISE || trigger.type === EVENTS.TIME.SUNSET);
+}
+
 const nodeScheduleDaysOfWeek = {
   sunday: 0,
   monday: 1,
@@ -29,6 +45,8 @@ function addScene(sceneRaw) {
   // deep clone the scene so that we don't modify the same object which will be returned to the client
   const scene = cloneDeep(sceneRaw);
   // first, if the scene actually exist, we cancel all triggers
+  const previousScene = this.scenes[scene.selector];
+  const hadSunriseSunset = previousScene && hasSunriseSunsetTrigger(previousScene);
   this.cancelTriggers(scene.selector);
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled
   // only if the scene is active
@@ -123,9 +141,13 @@ function addScene(sceneRaw) {
 
   this.scenes[scene.selector] = scene;
   this.brain.addNamedEntity('scene', scene.selector, scene.name);
+  if (hasSunriseSunsetTrigger(scene) || hadSunriseSunset) {
+    this.dailyUpdate();
+  }
   return scene;
 }
 
 module.exports = {
   addScene,
+  hasSunriseSunsetTrigger,
 };

@@ -131,7 +131,8 @@ describe('SceneManager.dailyUpdate', () => {
         },
       ],
     });
-    await sceneManager.dailyUpdate();
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
     // offset=0 sunrise + offset=30 sunrise + offset=0 sunset = 3 jobs
     expect(sceneManager.jobs).to.have.lengthOf(3);
 
@@ -161,7 +162,8 @@ describe('SceneManager.dailyUpdate', () => {
         },
       ],
     });
-    await sceneManager.dailyUpdate();
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
     // offset=0 sunrise + offset=0 sunset + offset=-15 sunset = 3 jobs
     expect(sceneManager.jobs).to.have.lengthOf(3);
 
@@ -184,7 +186,8 @@ describe('SceneManager.dailyUpdate', () => {
       actions: [],
       triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
     });
-    await sceneManager.dailyUpdate();
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
     // Inactive scene offsets must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
     expect(sceneManager.jobs).to.have.lengthOf(2);
   });
@@ -202,6 +205,48 @@ describe('SceneManager.dailyUpdate', () => {
     expect(sceneManager.jobs).to.have.lengthOf(2);
   });
 
+  it('should ignore a non-numeric offset (string)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-bad-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 'abc' }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // invalid offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should ignore an offset exceeding 24h (offset > 1440)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-huge-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 1500 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // out-of-day offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should ignore a large negative offset exceeding 24h (offset < -1440)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    sceneManager.addScene({
+      selector: 'scene-huge-neg-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNSET, house: 'house-1', offset: -1500 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // out-of-day offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
   it('should deduplicate offsets when multiple scenes share the same offset', async () => {
     brain.addNamedEntity = fake.returns(null);
     sceneManager.addScene({
@@ -210,13 +255,16 @@ describe('SceneManager.dailyUpdate', () => {
       actions: [],
       triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
     });
+    // flush first addScene auto-triggered dailyUpdate
+    await Promise.resolve();
     sceneManager.addScene({
       selector: 'scene-b',
       active: true,
       actions: [],
       triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
     });
-    await sceneManager.dailyUpdate();
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
     // offset=0 sunrise + offset=30 sunrise (deduplicated) + offset=0 sunset = 3 jobs
     expect(sceneManager.jobs).to.have.lengthOf(3);
   });

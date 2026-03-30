@@ -206,6 +206,7 @@ describe('SceneManager.addScene', () => {
     }
   });
   it('should add a scene with a scheduled trigger, sunrise', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -219,8 +220,10 @@ describe('SceneManager.addScene', () => {
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    assert.calledOnce(sceneManager.dailyUpdate);
   });
   it('should add a scene with a scheduled trigger, sunset', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -235,6 +238,58 @@ describe('SceneManager.addScene', () => {
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    assert.calledOnce(sceneManager.dailyUpdate);
+  });
+  it('should NOT call dailyUpdate when adding a scene without sunrise/sunset triggers', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
+    sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'every-day',
+          time: '12:00',
+        },
+      ],
+      actions: [],
+    });
+    assert.notCalled(sceneManager.dailyUpdate);
+  });
+  it('should call dailyUpdate when previous scene had sunrise trigger but new one does not', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
+    const scene = sceneManager.addScene({
+      selector: 'my-scene',
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house',
+        },
+      ],
+      actions: [],
+    });
+    assert.calledOnce(sceneManager.dailyUpdate);
+    sceneManager.dailyUpdate.resetHistory();
+    // Update the scene to remove the sunrise trigger
+    sceneManager.addScene({
+      selector: scene.selector,
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.CHANGED,
+          scheduler_type: 'every-day',
+          time: '08:00',
+        },
+      ],
+      actions: [],
+    });
+    assert.calledOnce(sceneManager.dailyUpdate);
   });
   it('should add a scene with a message received trigger', async () => {
     const scene = sceneManager.addScene({
