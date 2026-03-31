@@ -257,6 +257,25 @@ describe('SceneManager.addScene', () => {
     });
     assert.notCalled(sceneManager.dailyUpdate);
   });
+  it('should NOT call dailyUpdate when skipDailyUpdate option is true, even with a sunrise trigger', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
+    sceneManager.addScene(
+      {
+        name: 'a-test-scene',
+        icon: 'bell',
+        active: true,
+        triggers: [
+          {
+            type: EVENTS.TIME.SUNRISE,
+            house: 'house',
+          },
+        ],
+        actions: [],
+      },
+      { skipDailyUpdate: true },
+    );
+    assert.notCalled(sceneManager.dailyUpdate);
+  });
   it('should call dailyUpdate when previous scene had sunrise trigger but new one does not', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
     const scene = sceneManager.addScene({

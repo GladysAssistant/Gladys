@@ -35,13 +35,15 @@ const nodeScheduleDaysOfWeek = {
 /**
  * @description Add a scene to the scene manager.
  * @param {object} sceneRaw - Scene object from DB.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.skipDailyUpdate=false] - Skip dailyUpdate call (e.g. During init).
  * @returns {object} Return the scene.
  * @example
  * addScene({
  *  selector: 'test'
  * });
  */
-function addScene(sceneRaw) {
+function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
   // deep clone the scene so that we don't modify the same object which will be returned to the client
   const scene = cloneDeep(sceneRaw);
   // first, if the scene actually exist, we cancel all triggers
@@ -141,7 +143,7 @@ function addScene(sceneRaw) {
 
   this.scenes[scene.selector] = scene;
   this.brain.addNamedEntity('scene', scene.selector, scene.name);
-  if (hasSunriseSunsetTrigger(scene) || hadSunriseSunset) {
+  if (!skipDailyUpdate && (hasSunriseSunsetTrigger(scene) || hadSunriseSunset)) {
     this.dailyUpdate();
   }
   return scene;
