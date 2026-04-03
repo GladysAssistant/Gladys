@@ -1075,7 +1075,11 @@
       "reloadButton": "Reload",
       "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
       "resetButton": "Reset",
-      "resetError": "An error appears while resetting bridge."
+      "resetError": "An error appears while resetting bridge.",
+      "mdns": "If you encounter connection problems between your Home app and the Gladys HomeKit bridge, it is possible that your local network is having difficulty finding the HomeKit bridge. You can try changing the mDNS advertiser used among the available options.",
+      "saveMDNSButton": "Save",
+      "saveMDNSSuccess": "mDNS advertiser saved successfully. The HomeKit service will restart automatically, please wait a few seconds before adding it to your Home app.",
+      "saveMDNSError": "An error occurred while saving the mDNS advertiser."
     },
     "owntracks": {
       "title": "OwnTracks",

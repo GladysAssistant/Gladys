@@ -1313,7 +1313,11 @@
       "reloadButton": "Relancer",
       "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
       "resetButton": "Réinitialiser",
-      "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
+      "resetError": "Une erreur est survenue pendant la réinitialisation du pont",
+      "mdns": "Si vous rencontrez des problèmes de connexion entre votre application Maison et le pont Gladys HomeKit, il est possible que votre réseau local ait des difficultés à trouver le pont HomeKit. Vous pouvez essayer de modifier l'annonceur mDNS utilisé parmi les options disponibles.",
+      "saveMDNSButton": "Enregistrer",
+      "saveMDNSSuccess": "L'annonceur mDNS a été enregistré avec succès. Le redémarrage du service HomeKit est automatique, attendez quelques secondes avant de l'ajouter à votre application Maison.",
+      "saveMDNSError": "Une erreur est survenue lors de l'enregistrement de l'annonceur mDNS."
     },
     "owntracks": {
       "title": "OwnTracks",
