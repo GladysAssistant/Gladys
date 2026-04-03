@@ -3468,8 +3468,8 @@
           "82": "Relâchement Plus",
           "83": "Relâchement Centre",
           "84": "Relâchement Moins",
-          "85": "On double",
-          "86": "Off double"
+          "85": "On clic double",
+          "86": "Off clic double"
         }
       },
       "heater": {
