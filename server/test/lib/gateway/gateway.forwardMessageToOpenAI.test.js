@@ -8,8 +8,11 @@ const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 
 const event = new EventEmitter();
 
+const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
+
 const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
+  '../../utils/resizeImage': { resizeImage: resizeImageMock },
 });
 
 const getConfig = require('../../../utils/getConfig');
@@ -273,5 +276,46 @@ describe('gateway.forwardMessageToOpenAI', () => {
     gateway.gladysGatewayClient.openAIAsk = fake.rejects(new Error());
     await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     assert.calledWith(messageManager.replyByIntent, message, 'openai.request.fail', context);
+  });
+  it('should resize image before sending to OpenAI', async () => {
+    const imageBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk';
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'INFO',
+      answer: 'I can see a person in the image.',
+      room: null,
+    });
+    resizeImageMock.resetHistory();
+    const classification = await gateway.forwardMessageToOpenAI({
+      message,
+      image: imageBase64,
+      previousQuestions,
+      context,
+    });
+    assert.calledOnce(resizeImageMock);
+    assert.calledWith(resizeImageMock, imageBase64);
+    assert.calledWith(gateway.gladysGatewayClient.openAIAsk, {
+      question: 'Turn on the light in the living room',
+      image: 'data:image/jpeg;base64,resized-image-data',
+      previous_questions: [],
+    });
+    expect(classification).to.deep.equal({
+      answer: 'I can see a person in the image.',
+      intent: 'info.get-info',
+    });
+  });
+  it('should not call resizeImage when no image is provided', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'INFO',
+      answer: 'Hello!',
+      room: null,
+    });
+    resizeImageMock.resetHistory();
+    await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    assert.notCalled(resizeImageMock);
+    assert.calledWith(gateway.gladysGatewayClient.openAIAsk, {
+      question: 'Turn on the light in the living room',
+      image: undefined,
+      previous_questions: [],
+    });
   });
 });

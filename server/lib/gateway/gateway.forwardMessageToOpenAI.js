@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const { Error429 } = require('../../utils/httpErrors');
+const { resizeImage } = require('../../utils/resizeImage');
 
 const intentTranslation = {
   SHOW_CAMERA: 'camera.get-image',
@@ -31,9 +32,12 @@ const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY', 'NO_
  */
 async function forwardMessageToOpenAI({ message, image, previousQuestions, context }) {
   try {
+    // Resize image to reduce API costs (640x480 is sufficient for security camera AI analysis)
+    const resizedImage = image ? await resizeImage(image) : undefined;
+
     const response = await this.openAIAsk({
       question: message.text,
-      image,
+      image: resizedImage,
       previous_questions: previousQuestions,
     });
 
