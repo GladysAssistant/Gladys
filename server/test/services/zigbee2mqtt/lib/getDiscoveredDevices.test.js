@@ -272,4 +272,73 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(devices).to.have.lengthOf(1);
     expect(devices[0].updatable).to.equal(true);
   });
+
+  it('should not mark device as updatable when only energy params differ (ENERGY_INDEX_LAST_PROCESSED)', async () => {
+    // PREPARE
+    // This test reproduces the real bug: existing device has ENERGY_INDEX_LAST_PROCESSED param
+    // added by Gladys energy monitoring, but new device from Zigbee2mqtt has no params.
+    // This was causing deviceChanged = true due to params length mismatch.
+    const existingDeviceWithEnergyParams = {
+      id: 'existing-device-id',
+      external_id: 'zigbee2mqtt:my_device',
+      room_id: 'room_id',
+      name: 'Existing Device',
+      features: [
+        {
+          id: 'feature-1',
+          external_id: 'zigbee2mqtt:my_device:switch:energy:energy',
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+        {
+          id: 'consumption-feature-id',
+          external_id: 'zigbee2mqtt:my_device:switch:energy:energy_consumption',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: 'feature-1',
+        },
+        {
+          id: 'cost-feature-id',
+          external_id: 'zigbee2mqtt:my_device:switch:energy:energy_cost',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+          energy_parent_id: 'consumption-feature-id',
+        },
+      ],
+      params: [
+        {
+          id: 'param-1',
+          device_id: 'existing-device-id',
+          name: 'ENERGY_INDEX_LAST_PROCESSED',
+          value: '2026-04-03T16:27:51.853Z',
+        },
+      ],
+    };
+
+    gladys.stateManager.get.returns(existingDeviceWithEnergyParams);
+
+    // Zigbee2mqtt device has no params (they are added by Gladys energy monitoring)
+    zigbee2MqttService.device.discoveredDevices = {
+      my_device: {
+        friendly_name: 'my_device',
+        supported: true,
+        definition: {
+          model: 'Test Model',
+          exposes: [{ type: 'numeric', name: 'energy', property: 'energy', unit: 'kWh', access: 1 }],
+        },
+      },
+    };
+
+    // EXECUTE
+    const devices = zigbee2MqttService.device.getDiscoveredDevices();
+
+    // ASSERT
+    expect(devices).to.have.lengthOf(1);
+    // THIS WAS THE BUG: updatable was true because params.length differed (1 vs 0)
+    expect(devices[0].updatable).to.equal(false, 'Device should NOT be marked as updatable');
+    // Verify that params are preserved
+    expect(devices[0].params).to.have.lengthOf(1);
+    expect(devices[0].params[0].name).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+  });
 });

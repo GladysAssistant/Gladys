@@ -50,6 +50,19 @@ function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId)
           }
         });
       }
+      // Also copy existing params (like ENERGY_INDEX_LAST_PROCESSED) to the new device
+      // These params are added by Gladys energy monitoring, not from Zigbee2mqtt
+      if (existingDevice && existingDevice.params && existingDevice.params.length > 0) {
+        if (!d.params) {
+          d.params = [];
+        }
+        existingDevice.params.forEach((existingParam) => {
+          const alreadyExists = d.params.some((p) => p.name === existingParam.name);
+          if (!alreadyExists) {
+            d.params.push(existingParam);
+          }
+        });
+      }      
       // Merge with existing device.
       return mergeDevices(d, existingDevice);
     })
