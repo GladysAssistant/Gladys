@@ -43,9 +43,21 @@ function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId)
             (existingFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION ||
               existingFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST);
           if (isEnergyConsumptionOrCost) {
-            const alreadyExists = d.features.some((f) => f.external_id === existingFeature.external_id);
-            if (!alreadyExists) {
-              d.features.push(existingFeature);
+            // Only preserve this child feature if its parent meter still exists in the new device
+            const parentStillExists = existingFeature.energy_parent_id
+              ? d.features.some((f) => f.id === existingFeature.energy_parent_id) ||
+                existingDevice.features.some(
+                  (f) =>
+                    f.id === existingFeature.energy_parent_id &&
+                    d.features.some((nf) => nf.external_id === f.external_id),
+                )
+              : false;
+            if (parentStillExists) {
+              const alreadyExists = d.features.some((f) => f.external_id === existingFeature.external_id);
+              if (!alreadyExists) {
+                // Clone the feature to avoid mutating the cached object
+                d.features.push({ ...existingFeature });
+              }
             }
           }
         });
@@ -62,7 +74,7 @@ function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId)
             d.params.push(existingParam);
           }
         });
-      }      
+      }
       // Merge with existing device.
       return mergeDevices(d, existingDevice);
     })
