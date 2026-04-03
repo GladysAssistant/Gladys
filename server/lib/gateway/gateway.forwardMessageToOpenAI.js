@@ -42,23 +42,24 @@ async function forwardMessageToOpenAI({ message, image, previousQuestions, conte
     });
 
     const classification = {};
+    classification.entities = [];
 
     // add room entity
     if (response.room) {
       const roomId = this.brain.getEntityIdByName('room', response.room);
-      classification.entities = [{ entity: 'room', option: roomId, sourceText: response.room }];
+      classification.entities.push({ entity: 'room', option: roomId, sourceText: response.room });
     }
 
     // add scene entity
     if (response.scene) {
       const sceneSelector = this.brain.getEntityIdByName('scene', response.scene);
-      classification.entities = [{ entity: 'scene', option: sceneSelector, sourceText: response.scene }];
+      classification.entities.push({ entity: 'scene', option: sceneSelector, sourceText: response.scene });
     }
 
     // add device entity
     if (response.device) {
       const deviceSelector = this.brain.getEntityIdByName('device', response.device);
-      classification.entities = [{ entity: 'device', option: deviceSelector, sourceText: response.device }];
+      classification.entities.push({ entity: 'device', option: deviceSelector, sourceText: response.device });
     }
 
     classification.intent = intentTranslation[response.type];

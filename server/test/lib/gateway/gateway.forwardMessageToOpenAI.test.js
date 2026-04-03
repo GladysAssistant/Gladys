@@ -12,7 +12,9 @@ const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data
 
 const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
-  '../../utils/resizeImage': { resizeImage: resizeImageMock },
+  './gateway.forwardMessageToOpenAI': proxyquire('../../../lib/gateway/gateway.forwardMessageToOpenAI', {
+    '../../utils/resizeImage': { resizeImage: resizeImageMock },
+  }),
 });
 
 const getConfig = require('../../../utils/getConfig');
@@ -188,6 +190,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     });
     const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     expect(classification).to.deep.equal({
+      entities: [],
       answer: 'Jules Verne is a famous writer.',
       intent: 'info.get-info',
     });
@@ -219,6 +222,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     });
     const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
     expect(classification).to.deep.equal({
+      entities: [],
       intent: undefined,
       answer: '',
     });
@@ -299,6 +303,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
       previous_questions: [],
     });
     expect(classification).to.deep.equal({
+      entities: [],
       answer: 'I can see a person in the image.',
       intent: 'info.get-info',
     });
