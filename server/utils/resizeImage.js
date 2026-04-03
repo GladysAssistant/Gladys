@@ -20,18 +20,9 @@ async function resizeImage(base64Image, options = {}) {
 
   // Extract base64 data (remove data URI prefix if present)
   let base64Data = base64Image;
-  let mimeType = 'image/jpeg';
 
   if (base64Image.includes(',')) {
-    const parts = base64Image.split(',');
-    const header = parts[0];
-    base64Data = parts[1];
-
-    // Extract mime type from header (e.g., "data:image/png;base64")
-    const mimeMatch = header.match(/data:([^;]+)/);
-    if (mimeMatch) {
-      [, mimeType] = mimeMatch;
-    }
+    [, base64Data] = base64Image.split(',');
   }
 
   // Convert base64 to buffer

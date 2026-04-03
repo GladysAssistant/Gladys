@@ -15,7 +15,8 @@ const createSharpMock = (outputBuffer) => {
 
 describe('resizeImage', () => {
   it('should resize image with data URI prefix', async () => {
-    const inputBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const inputBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     const outputBuffer = Buffer.from('resized-image-data');
     const sharpMock = createSharpMock(outputBuffer);
 
@@ -28,13 +29,18 @@ describe('resizeImage', () => {
     expect(result).to.equal(`data:image/jpeg;base64,${outputBuffer.toString('base64')}`);
     expect(sharpMock.calledOnce).to.equal(true);
     expect(sharpMock.instance.resize.calledOnce).to.equal(true);
-    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([640, 480, { fit: 'inside', withoutEnlargement: true }]);
+    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([
+      640,
+      480,
+      { fit: 'inside', withoutEnlargement: true },
+    ]);
     expect(sharpMock.instance.jpeg.calledOnce).to.equal(true);
     expect(sharpMock.instance.jpeg.firstCall.args).to.deep.equal([{ quality: 80 }]);
   });
 
   it('should resize image without data URI prefix', async () => {
-    const inputBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const inputBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     const outputBuffer = Buffer.from('resized-image-data');
     const sharpMock = createSharpMock(outputBuffer);
 
@@ -49,7 +55,8 @@ describe('resizeImage', () => {
   });
 
   it('should use custom dimensions and quality', async () => {
-    const inputBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const inputBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     const outputBuffer = Buffer.from('resized-image-data');
     const sharpMock = createSharpMock(outputBuffer);
 
@@ -63,7 +70,11 @@ describe('resizeImage', () => {
       quality: 90,
     });
 
-    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([800, 600, { fit: 'inside', withoutEnlargement: true }]);
+    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([
+      800,
+      600,
+      { fit: 'inside', withoutEnlargement: true },
+    ]);
     expect(sharpMock.instance.jpeg.firstCall.args).to.deep.equal([{ quality: 90 }]);
   });
 
@@ -91,7 +102,8 @@ describe('resizeImage', () => {
   });
 
   it('should handle malformed data URI header (no mime type match)', async () => {
-    const inputBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const inputBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     const outputBuffer = Buffer.from('resized-image-data');
     const sharpMock = createSharpMock(outputBuffer);
 
