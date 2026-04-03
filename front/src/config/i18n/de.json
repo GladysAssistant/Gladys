@@ -3471,7 +3471,9 @@
           "81": "Halten Minus",
           "82": "Loslassen Plus",
           "83": "Loslassen Mitte",
-          "84": "Loslassen Minus"
+          "84": "Loslassen Minus",
+          "85": "Doppelt Ein",
+          "86": "Doppelt Aus"
         }
       },
       "heater": {
