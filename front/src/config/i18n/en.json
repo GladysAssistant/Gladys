@@ -505,6 +505,11 @@
     "createDashboardButton": "Create"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
@@ -933,7 +938,8 @@
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
-        "confirmDisableLabel": "Are you sur you to disable Node-RED ?",
+        "confirmDisableWarning": "Warning: Disabling Node-RED will permanently delete all your Node-RED data, including all your flows and configurations. This action cannot be undone.",
+        "confirmDisableLabel": "Are you sure you want to disable Node-RED?",
         "confirmDisableCancelButton": "Cancel",
         "activationNodeRed": "Activating...",
         "serviceStatus": "Node-RED Service Status",
@@ -1069,7 +1075,11 @@
       "reloadButton": "Reload",
       "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
       "resetButton": "Reset",
-      "resetError": "An error appears while resetting bridge."
+      "resetError": "An error appears while resetting bridge.",
+      "mdns": "If you encounter connection problems between your Home app and the Gladys HomeKit bridge, it is possible that your local network is having difficulty finding the HomeKit bridge. You can try changing the mDNS advertiser used among the available options.",
+      "saveMDNSButton": "Save",
+      "saveMDNSSuccess": "mDNS advertiser saved successfully. The HomeKit service will restart automatically, please wait a few seconds before adding it to your Home app.",
+      "saveMDNSError": "An error occurred while saving the mDNS advertiser."
     },
     "owntracks": {
       "title": "OwnTracks",
@@ -1329,7 +1339,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration handles a limited number of Z-Wave devices. If you have unsupported devices, don't hesitate to submit them so they can be added!",
+      "alphaWarning": "If you have unsupported devices, please submit them on the forum so we can add support for them!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
@@ -1426,8 +1436,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connect to a local or remote MQTT server",
+      "title": "MQTT Virtual Devices",
+      "description": "Create virtual devices controllable via MQTT.",
+      "virtualDevicesExplanation": "This integration allows you to create virtual devices, which are controllable via MQTT, HTTP, in scenes and on the dashboard. To use Zigbee devices, please use the <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a> integration. To use Z-Wave devices, please use the <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a> integration. To use Nuki MQTT devices, please use the <a href=\"/dashboard/integration/device/nuki\">Nuki</a> integration.",
       "deviceTab": "Devices",
       "debugTab": "MQTT Debug",
       "setupTab": "Setup",
@@ -1914,6 +1925,7 @@
       "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
       "calendarChoiceSuccess": "Your choices have been saved.",
       "calendarChoiceError": "An error occurred while saving.",
+      "logTitle": "Log",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
@@ -2752,6 +2764,7 @@
     "day": "Day",
     "selectorText": "The selector is the unique identifier of your user. It can be used in the API.",
     "emailText": "Your email is just an identifier for login, it's only saved locally",
+    "emailTextOtherUser": "The email is just an identifier for login, it's only saved locally",
     "profilePictureLabel": "Profile Picture",
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",
@@ -3505,6 +3518,8 @@
           "82": "Release Plus (Aqara W100)",
           "83": "Release Center (Aqara W100)",
           "84": "Release Minus (Aqara W100)",
+          "85": "On double",
+          "86": "Off double",
           "unknown": "{{value}} (unknown value)"
         }
       },
@@ -3983,6 +3998,10 @@
     "uv-sensor": {
       "shortCategoryName": "UV Sensor",
       "integer": "UV Index"
+    },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "HEPA filter monitoring",
+      "filter-life-remaining": "Filter life remaining"
     },
     "duration": {
       "shortCategoryName": "Duration",

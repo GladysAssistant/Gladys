@@ -158,7 +158,7 @@ describe('addEnergyFeatures', () => {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
           energy_parent_id: 'index-feature-id',
-          external_id: 'device:energy-consumption',
+          external_id: 'device:energy-index_consumption',
           name: 'Existing Consumption',
           selector: 'device-energy-consumption',
         },
@@ -177,7 +177,13 @@ describe('addEnergyFeatures', () => {
     expect(consumptionFeatures).to.have.lengthOf(1);
     expect(consumptionFeatures[0].id).to.equal('existing-consumption-id');
 
-    // Check cost feature links to existing consumption
+    // Check consumption feature id was not changed
+    const consumptionFeature = result.features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    );
+    expect(consumptionFeature.id).to.equal('existing-consumption-id');
+
+    // Check cost feature links to existing consumption id
     const costFeature = result.features.find(
       (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
     );
@@ -202,7 +208,7 @@ describe('addEnergyFeatures', () => {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
           energy_parent_id: 'index-feature-id',
-          external_id: 'device:energy-consumption',
+          external_id: 'device:energy-index_consumption',
           name: 'Consumption',
           selector: 'device-energy-consumption',
         },
@@ -211,7 +217,7 @@ describe('addEnergyFeatures', () => {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
           energy_parent_id: 'consumption-id',
-          external_id: 'device:energy-cost',
+          external_id: 'device:energy-index_cost',
           name: 'Existing Cost',
           selector: 'device-energy-cost',
         },
@@ -223,12 +229,21 @@ describe('addEnergyFeatures', () => {
     // Should have 3 features: index + consumption + existing cost (no new features added)
     expect(result.features).to.have.lengthOf(3);
 
-    // Check that cost feature was not duplicated
+    // Check that consumption feature id was not changed
+    const consumptionFeature = result.features.find(
+      (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    );
+    expect(consumptionFeature.id).to.equal('consumption-id');
+
+    // Check that cost feature was not duplicated and id was not changed
     const costFeatures = result.features.filter(
       (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
     );
     expect(costFeatures).to.have.lengthOf(1);
     expect(costFeatures[0].id).to.equal('existing-cost-id');
+
+    // Check that cost feature still links to the existing consumption id
+    expect(costFeatures[0].energy_parent_id).to.equal('consumption-id');
   });
 
   it('should handle multiple index features', () => {

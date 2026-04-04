@@ -505,6 +505,11 @@
     "createDashboardButton": "Hinzufügen"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Lokal"
+    },
     "root": {
       "title": "Integrationen",
       "subtitle": "{{length}} von {{total}} Integrationen",
@@ -1038,7 +1043,8 @@
         "enableLabel": "Node-RED-Aktivierung",
         "enableNodeRed": "Aktivieren",
         "disableNodeRed": "Deaktivieren",
-        "confirmDisableLabel": "Bist du sicher, dass du Node-RED deaktivieren möchten?",
+        "confirmDisableWarning": "Achtung: Das Deaktivieren von Node-RED löscht dauerhaft alle deine Node-RED-Daten, einschließlich aller Flows und Konfigurationen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirmDisableLabel": "Bist du sicher, dass du Node-RED deaktivieren möchtest?",
         "confirmDisableCancelButton": "Abbrechen",
         "activationNodeRed": "Aktivieren …",
         "serviceStatus": "Status des Node-RED-Dienstes",
@@ -1174,7 +1180,11 @@
       "reloadButton": "Neu laden",
       "reset": "Wenn es Probleme mit der Verbindung zwischen deiner Home-App und der HomeKit-Gladys-Bridge gibt, kannst du versuchen, sie durch Klicken auf die untige Schaltfläche zurückzusetzen. <b>WARNUNG</b>: Du musst dann die Gladys-Bridge aus deiner Home-Anwendung auf deinem Apple-Gerät entfernen und erneut hinzufügen.",
       "resetButton": "Zurücksetzen",
-      "resetError": "Es ist ein Fehler beim Zurücksetzen der Bridge aufgetreten."
+      "resetError": "Es ist ein Fehler beim Zurücksetzen der Bridge aufgetreten.",
+      "mdns": "Wenn es Probleme mit der Verbindung zwischen deiner Home-App und der Gladys HomeKit-Bridge gibt, ist es möglich, dass dein lokales Netzwerk Schwierigkeiten hat, die HomeKit-Bridge zu finden. Du kannst versuchen, den verwendeten mDNS-Advertiser unter den verfügbaren Optionen zu ändern.",
+      "saveMDNSButton": "Speichern",
+      "saveMDNSSuccess": "mDNS-Advertiser erfolgreich gespeichert. Der HomeKit-Dienst wird automatisch neu gestartet, bitte warte einige Sekunden, bevor du ihn zu deiner Home-App hinzufügst.",
+      "saveMDNSError": "Beim Speichern des mDNS-Advertisers ist ein Fehler aufgetreten."
     },
     "owntracks": {
       "title": "OwnTracks",
@@ -1434,7 +1444,7 @@
       "saveButton": "Speichern",
       "alreadyCreatedButton": "Bereits erstellt",
       "deleteButton": "Löschen",
-      "alphaWarning": "Diese Integration unterstützt eine begrenzte Anzahl von Z-Wave-Geräten. Wenn Sie nicht unterstützte Geräte haben, zögern Sie nicht, diese einzureichen, damit sie hinzugefügt werden können!",
+      "alphaWarning": "Wenn Sie nicht unterstützte Geräte haben, reichen Sie diese bitte im Forum ein, damit wir Unterstützung dafür hinzufügen können!",
       "device": {
         "title": "Z-Wave JS UI Geräte in Gladys",
         "editButton": "Bearbeiten",
@@ -1531,8 +1541,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Verbinde dich mit einem lokalen oder entfernten MQTT-Server.",
+      "title": "Virtuelle MQTT-Geräte",
+      "description": "Erstellen Sie virtuelle Geräte, die über MQTT steuerbar sind.",
+      "virtualDevicesExplanation": "Diese Integration ermöglicht es Ihnen, virtuelle Geräte zu erstellen, die über MQTT, HTTP, in Szenen und auf dem Dashboard steuerbar sind. Um Zigbee-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>-Integration. Um Z-Wave-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>-Integration. Um Nuki-MQTT-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/nuki\">Nuki</a>-Integration.",
       "deviceTab": "Meine Geräte",
       "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
@@ -1914,6 +1925,7 @@
       "synchronizationNeeded": "Starte die Synchronisierung, um verfügbare Kalender aufzulisten.",
       "calendarChoiceSuccess": "Deine Auswahl wurde gesichert.",
       "calendarChoiceError": "Das Sichern ist fehlgeschlagen.",
+      "logTitle": "Protokoll",
       "buttonSave": "Sichern",
       "buttonCleanUp": "Aufräumen",
       "buttonSync": "Jetzt synchronisieren"
@@ -2752,6 +2764,7 @@
     "day": "Tag",
     "selectorText": "Der Selektor ist der eindeutige Identifikator deines Benutzers. Er kann in der API verwendet werden.",
     "emailText": "Deine E-Mail-Adresse wird ausschließlich für den Login verwendet. Sie wird nur lokal gesichert.",
+    "emailTextOtherUser": "Die E-Mail-Adresse wird ausschließlich für den Login verwendet. Sie wird nur lokal gesichert.",
     "profilePictureLabel": "Profilbild",
     "chooseFileLabel": "Datei auswählen",
     "emailLabel": "E-Mail-Adresse",
@@ -3505,6 +3518,8 @@
           "82": "Loslassen Plus",
           "83": "Loslassen Mitte",
           "84": "Loslassen Minus",
+          "85": "Doppelt Ein",
+          "86": "Doppelt Aus",
           "unknown": "{{value}} (unbekannter Wert)"
         }
       },
@@ -3983,6 +3998,10 @@
     "uv-sensor": {
       "shortCategoryName": "UV-Sensor",
       "integer": "UV-Index"
+    },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "HEPA-Filterüberwachung",
+      "filter-life-remaining": "Verbleibende Filterlebensdauer"
     },
     "duration": {
       "shortCategoryName": "Dauer",

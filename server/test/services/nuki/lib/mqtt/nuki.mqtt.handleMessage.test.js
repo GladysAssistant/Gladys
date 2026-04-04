@@ -85,4 +85,83 @@ describe('Nuki - MQTT - Handle message', () => {
     assert.notCalled(mqttService.device.publish);
     assert.calledOnce(gladys.event.emit);
   });
+
+  it('should ignore non-Nuki homeassistant discovery messages (Zigbee2MQTT)', () => {
+    const zigbee2mqttMessage = JSON.stringify({
+      availability: [{ topic: 'zigbee2mqtt/bridge/state' }],
+      device: {
+        identifiers: ['zigbee2mqtt_0x00158d0001234567'],
+        manufacturer: 'Xiaomi',
+        model: 'Aqara temperature sensor',
+        name: 'Temperature Sensor',
+      },
+      name: 'Temperature',
+      state_topic: 'zigbee2mqtt/Temperature Sensor',
+      unique_id: '0x00158d0001234567_temperature_zigbee2mqtt',
+    });
+    nukiHandler.handleMessage('homeassistant/sensor/0x00158d0001234567/temperature/config', zigbee2mqttMessage);
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
+
+  it('should ignore non-Nuki homeassistant discovery messages (Tasmota)', () => {
+    const tasmotaMessage = JSON.stringify({
+      name: 'Tasmota Switch',
+      stat_t: 'tele/tasmota_switch/STATE',
+      avty_t: 'tele/tasmota_switch/LWT',
+      pl_avail: 'Online',
+      pl_not_avail: 'Offline',
+      cmd_t: 'cmnd/tasmota_switch/POWER',
+      val_tpl: '{{value_json.POWER}}',
+      pl_off: 'OFF',
+      pl_on: 'ON',
+      uniq_id: 'tasmota_switch_RL_1',
+      dev: {
+        ids: ['tasmota_switch'],
+        name: 'Tasmota Switch',
+        mdl: 'Sonoff Basic',
+        mf: 'Tasmota',
+      },
+    });
+    nukiHandler.handleMessage('homeassistant/switch/tasmota_switch/config', tasmotaMessage);
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
+
+  it('should ignore empty homeassistant messages', () => {
+    nukiHandler.handleMessage('homeassistant/sensor/test/config', '');
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should ignore malformed homeassistant messages', () => {
+    nukiHandler.handleMessage('homeassistant/sensor/test/config', 'not valid json');
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should handle malformed Nuki discovery message (contains "Nuki" but invalid JSON)', () => {
+    // This message contains "Nuki" so it passes the filter, but is not valid JSON
+    nukiHandler.handleMessage('homeassistant/lock/nuki_test/config', 'invalid json with "Nuki" in it');
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
+
+  it('should handle Nuki message with missing required fields', () => {
+    // Valid JSON with "Nuki" but missing dev.ids field
+    const invalidNukiMessage = JSON.stringify({
+      name: 'Test',
+      dev: {
+        mf: 'Nuki',
+        name: 'Test Lock',
+      },
+    });
+    nukiHandler.handleMessage('homeassistant/lock/nuki_test/config', invalidNukiMessage);
+    assert.notCalled(mqttService.device.publish);
+    assert.notCalled(gladys.event.emit);
+    expect(nukiHandler.discoveredDevices).to.deep.equal({});
+  });
 });
