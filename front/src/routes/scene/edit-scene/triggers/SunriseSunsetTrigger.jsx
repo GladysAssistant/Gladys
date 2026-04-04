@@ -27,10 +27,36 @@ class SunriseSunsetTrigger extends Component {
     this.props.updateTriggerProperty(this.props.index, 'house', houseSelector);
   };
 
+  onOffsetDirectionChange = e => {
+    const direction = e.target.value;
+    const currentMinutes = Math.min(parseInt(this.state.offsetMinutesInput, 10) || 30, 1440);
+    if (direction === 'exact') {
+      this.props.updateTriggerProperty(this.props.index, 'offset', 0);
+    } else if (direction === 'before') {
+      this.props.updateTriggerProperty(this.props.index, 'offset', -currentMinutes);
+    } else {
+      this.props.updateTriggerProperty(this.props.index, 'offset', currentMinutes);
+    }
+  };
+
+  onOffsetMinutesChange = e => {
+    const raw = e.target.value;
+    this.setState({ offsetMinutesInput: raw });
+    const minutes = parseInt(raw, 10);
+    if (!minutes || minutes <= 0 || minutes > 1440) {
+      return;
+    }
+    const currentOffset = this.props.trigger.offset || 0;
+    const newOffset = currentOffset < 0 ? -minutes : minutes;
+    this.props.updateTriggerProperty(this.props.index, 'offset', newOffset);
+  };
+
   constructor(props) {
     super(props);
+    const initialMinutes = Math.abs(props.trigger.offset || 0);
     this.state = {
-      houses: []
+      houses: [],
+      offsetMinutesInput: initialMinutes > 0 ? String(initialMinutes) : '30'
     };
   }
 
@@ -38,7 +64,9 @@ class SunriseSunsetTrigger extends Component {
     this.getHouses();
   }
 
-  render({}, { houses }) {
+  render({}, { houses, offsetMinutesInput }) {
+    const offset = this.props.trigger.offset || 0;
+    const offsetDirection = offset === 0 ? 'exact' : offset > 0 ? 'after' : 'before';
     return (
       <div>
         <div class="row">
@@ -46,6 +74,43 @@ class SunriseSunsetTrigger extends Component {
             <SelectSunriseSunset houses={houses} house={this.props.trigger.house} onHouseChange={this.onHouseChange} />
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="editScene.triggersCard.sunriseSunsetTrigger.offsetLabel" />
+              </label>
+              <select onChange={this.onOffsetDirectionChange} class="form-control">
+                <option value="exact" selected={offsetDirection === 'exact'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.atExactTime" />
+                </option>
+                <option value="before" selected={offsetDirection === 'before'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.before" />
+                </option>
+                <option value="after" selected={offsetDirection === 'after'}>
+                  <Text id="editScene.triggersCard.sunriseSunsetTrigger.after" />
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        {offsetDirection !== 'exact' && (
+          <div class="row align-items-center">
+            <div class="col-6">
+              <input
+                type="number"
+                class="form-control"
+                min="1"
+                max="1440"
+                value={offsetMinutesInput}
+                onInput={this.onOffsetMinutesChange}
+              />
+            </div>
+            <div class="col-6">
+              <Text id="editScene.triggersCard.sunriseSunsetTrigger.minutes" />
+            </div>
+          </div>
+        )}
       </div>
     );
   }

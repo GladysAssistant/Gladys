@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { hasSunriseSunsetTrigger } = require('./scene.addScene');
 
 /**
  * @description Destroy a scene.
@@ -35,10 +36,15 @@ async function destroy(selector) {
   });
 
   await existingScene.destroy();
+  // check if scene had sunrise/sunset triggers before deleting from RAM
+  const hadSunriseSunset = this.scenes[selector] && hasSunriseSunsetTrigger(this.scenes[selector]);
   // we cancel triggers linked to the scene
   this.cancelTriggers(selector);
   // then we delete the scene in RAM
   delete this.scenes[selector];
+  if (hadSunriseSunset) {
+    await this.dailyUpdate();
+  }
 }
 
 module.exports = {

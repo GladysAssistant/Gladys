@@ -59,7 +59,7 @@ describe('scene.triggers.deviceNewState', () => {
   });
 
   it('should execute scene', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -96,7 +96,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene, scene not active', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: false,
       actions: [
@@ -133,7 +133,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene, condition not verified', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -170,7 +170,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene, device feature is not the same', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -207,7 +207,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene, threshold already passed', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -246,7 +246,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should execute scene, threshold passed for the first time', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -285,7 +285,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should start timer to check later for state and not follow current scene', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -330,7 +330,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should start timer to check now and condition should still be valid on second call', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -372,7 +372,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should start timer to check now and re-send new value still validating the condition', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -420,7 +420,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should start timer to check now and condition should not be valid on second call', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -468,7 +468,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should execute scene with string value equality (text device feature like Shelly Button)', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -506,7 +506,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene with string value equality when value does not match', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -544,7 +544,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should execute scene with string value inequality', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -582,7 +582,7 @@ describe('scene.triggers.deviceNewState', () => {
     });
   });
   it('should not execute scene with string value inequality when value matches', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [

@@ -54,7 +54,7 @@ describe('Scene.triggers.mqttReceived', () => {
   });
 
   it('should execute scene with message received trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -91,7 +91,7 @@ describe('Scene.triggers.mqttReceived', () => {
   });
 
   it('should execute scene with message received trigger with undefined message (match any)', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -128,7 +128,7 @@ describe('Scene.triggers.mqttReceived', () => {
   });
 
   it('should execute scene with message received trigger whit message', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [

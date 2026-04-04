@@ -31,58 +31,56 @@ async function dailyUpdate() {
         .tz(this.timezone)
         .toDate();
       const times = this.sunCalc.getTimes(todayAt12InMyTimeZone, house.latitude, house.longitude);
-      // Sunrise time
-      const sunriseHour = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('hour');
-      const sunriseMinute = dayjs(times.sunrise)
-        .tz(this.timezone)
-        .get('minute');
-      const sunriseTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunriseHour)
-        .minute(sunriseMinute)
-        .toDate();
-      // Sunset time
-      const sunsetHour = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('hour');
-      const sunsetMinute = dayjs(times.sunset)
-        .tz(this.timezone)
-        .get('minute');
-      const sunsetTime = dayjs()
-        .tz(this.timezone)
-        .hour(sunsetHour)
-        .minute(sunsetMinute)
-        .toDate();
-      logger.info(`Sunrise today is at ${sunriseHour}:${sunriseMinute} today, in your timezone = ${this.timezone}`);
-      logger.info(`Sunset today is at ${sunsetHour}:${sunsetMinute} today, in your timezone = ${this.timezone}`);
-      const sunriseJob = this.scheduler.scheduleJob(sunriseTime, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNRISE,
-          house,
-        }),
+      // Sunrise and Sunset base times
+      const sunriseBase = dayjs(times.sunrise).tz(this.timezone);
+      const sunsetBase = dayjs(times.sunset).tz(this.timezone);
+      logger.info(
+        `Sunrise today is at ${sunriseBase.get('hour')}:${sunriseBase.get('minute')}, in your timezone = ${
+          this.timezone
+        }`,
       );
-      if (sunriseJob) {
-        logger.info(`Sunrise is scheduled, ${dayjs(sunriseTime).fromNow()}.`);
-        this.jobs.push(sunriseJob);
-      } else {
-        logger.info(`The sun rose this morning. Not scheduling for today.`);
-      }
-
-      const sunsetJob = this.scheduler.scheduleJob(sunsetTime, () =>
-        this.event.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.TIME.SUNSET,
-          house,
-        }),
+      logger.info(
+        `Sunset today is at ${sunsetBase.get('hour')}:${sunsetBase.get('minute')}, in your timezone = ${this.timezone}`,
       );
 
-      if (sunsetJob) {
-        logger.info(`Sunset is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
-        this.jobs.push(sunsetJob);
-      } else {
-        logger.info(`The sun has already set. Not scheduling for today.`);
-      }
+      // Collect all distinct offsets for this house from active scene triggers
+      const sunriseOffsets = new Set([0]);
+      const sunsetOffsets = new Set([0]);
+      Object.values(this.scenes).forEach((scene) => {
+        if (!scene.active || !scene.triggers) {
+          return;
+        }
+        scene.triggers.forEach((trigger) => {
+          const offset = Number(trigger.offset) || 0;
+          if (!Number.isInteger(offset) || Math.abs(offset) > 24 * 60) {
+            return;
+          }
+          if (trigger.type === EVENTS.TIME.SUNRISE && trigger.house === house.selector) {
+            sunriseOffsets.add(offset);
+          } else if (trigger.type === EVENTS.TIME.SUNSET && trigger.house === house.selector) {
+            sunsetOffsets.add(offset);
+          }
+        });
+      });
+
+      // Schedule one job per distinct (house, type, offset) combination
+      const scheduleForOffsets = (offsets, baseTime, eventType, label) => {
+        offsets.forEach((offset) => {
+          const time = baseTime.add(offset, 'minute').toDate();
+          const job = this.scheduler.scheduleJob(time, () =>
+            this.event.emit(EVENTS.TRIGGERS.CHECK, { type: eventType, house, offset }),
+          );
+          if (job) {
+            logger.info(`${label} (offset ${offset}min) is scheduled, ${dayjs(time).fromNow()}.`);
+            this.jobs.push(job);
+          } else {
+            logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling for today.`);
+          }
+        });
+      };
+
+      scheduleForOffsets(sunriseOffsets, sunriseBase, EVENTS.TIME.SUNRISE, 'Sunrise');
+      scheduleForOffsets(sunsetOffsets, sunsetBase, EVENTS.TIME.SUNSET, 'Sunset');
     }
   });
 }
