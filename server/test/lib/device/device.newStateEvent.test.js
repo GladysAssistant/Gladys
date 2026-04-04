@@ -8,7 +8,6 @@ const { expect } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -184,16 +183,12 @@ describe('Device.newStateEvent', () => {
   it('should not save state missing device feature', async () => {
     const stateManager = new StateManager(event);
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);
-    try {
-      await device.newStateEvent({
-        device_feature_external_id: 'hue:binary:1',
-        state: 12,
-        created_at: '2019-02-12 07:49:07.556 +00:00',
-      });
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(NotFoundError);
-    }
+    // Should not throw, just log and return early
+    await device.newStateEvent({
+      device_feature_external_id: 'hue:binary:1',
+      state: 12,
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+    });
     const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'hue:binary:1');
     // eslint-disable-next-line no-unused-expressions
     expect(newDeviceFeature).to.be.null;
@@ -209,16 +204,12 @@ describe('Device.newStateEvent', () => {
     };
     stateManager.setState('deviceFeatureByExternalId', 'hue:binary:1', currentDeviceFeature);
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);
-    try {
-      await device.newStateEvent({
-        device_feature_external_id: 'hue:binary:1',
-        state: 12,
-        created_at: '2019-02-12 07:49:07.556 +00:00',
-      });
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(NotFoundError);
-    }
+    // Should not throw, just log and return early
+    await device.newStateEvent({
+      device_feature_external_id: 'hue:binary:1',
+      state: 12,
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+    });
     const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'hue:binary:1');
     expect(newDeviceFeature).not.to.have.property('last_value');
     expect(newDeviceFeature).not.to.have.property('last_value_changed');

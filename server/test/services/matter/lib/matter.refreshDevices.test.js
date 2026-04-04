@@ -53,13 +53,16 @@ describe('Matter.refreshDevices', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -75,5 +78,55 @@ describe('Matter.refreshDevices', () => {
     await matterHandler.refreshDevices();
     expect(matterHandler.devices).to.have.lengthOf(2);
     expect(matterHandler.nodesMap.size).to.equal(1);
+  });
+
+  it('should continue with other devices when one node fails', async () => {
+    let callCount = 0;
+    // First node throws an error, second node succeeds
+    matterHandler.commissioningController = {
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 11111n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Unreachable Vendor',
+              productName: 'Unreachable Product',
+            },
+          },
+        },
+        {
+          nodeId: 22222n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Reachable Vendor',
+              productName: 'Reachable Product',
+            },
+          },
+        },
+      ]),
+      getNode: sinon.stub().callsFake(async () => {
+        callCount += 1;
+        if (callCount === 1) {
+          throw new Error('Node is not reachable right now');
+        }
+        return {
+          getDevices: fake.returns([
+            {
+              id: 'device-2',
+              name: 'Reachable Device',
+              number: 1,
+              getAllClusterClients: () => Array.from(clusterClients.values()),
+              getClusterClientById: (id) => clusterClients.get(id),
+              getChildEndpoints: () => [],
+            },
+          ]),
+        };
+      }),
+    };
+
+    await matterHandler.refreshDevices();
+    // Should have 1 device from the second node (first node failed)
+    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.devices[0].name).to.include('Reachable');
   });
 });

@@ -45,14 +45,19 @@ async function init() {
       environment,
       id: 'matter-controller-data',
     },
-    autoConnect: true,
+    // Set autoConnect to undefined to fix matter-js bug (https://github.com/matter-js/matter.js/pull/3436)
+    // Once the fix is live in matter-js, we can switch back to true
+    autoConnect: undefined,
     adminFabricLabel: 'Gladys Assistant',
-    storage: storageService,
   });
 
   await this.commissioningController.start();
   logger.info('Matter controller started');
-  await this.refreshDevices();
+  // Refresh devices in the background to avoid blocking Gladys startup
+  // Store the promise so it can be awaited in tests
+  this.refreshDevicesPromise = this.refreshDevices().catch((err) => {
+    logger.error('Matter: Error refreshing devices in background:', err);
+  });
   // Schedule reccurent job if not already scheduled
   if (!this.backupScheduledJob) {
     this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 4 * * *', () => this.backupController());
