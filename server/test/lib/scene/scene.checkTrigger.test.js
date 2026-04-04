@@ -58,7 +58,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene', async () => {
-    const addedScene = sceneManager.addScene({
+    const addedScene = await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -94,7 +94,7 @@ describe('scene.checkTrigger', () => {
     });
   });
   it('should execute scene with empty house trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -129,7 +129,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with no longer empty house trigger', async () => {
-    const addedScene = sceneManager.addScene({
+    const addedScene = await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -164,7 +164,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with user back home trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -201,7 +201,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with user left home trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -238,7 +238,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with user entered area trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -275,7 +275,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with user left area trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -312,7 +312,7 @@ describe('scene.checkTrigger', () => {
   });
 
   it('should execute scene with system start trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -344,7 +344,7 @@ describe('scene.checkTrigger', () => {
     });
   });
   it('should not execute scene, event not matching', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -390,7 +390,7 @@ describe('scene.checkTrigger', () => {
     }).to.throw(Error, 'Trigger type "one-unknown-event" has no checker function.');
   });
   it('should execute scene, event & key matching', async () => {
-    const addedScene = sceneManager.addScene({
+    const addedScene = await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -429,7 +429,7 @@ describe('scene.checkTrigger', () => {
     });
   });
   it('should not execute scene, key not matching', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [

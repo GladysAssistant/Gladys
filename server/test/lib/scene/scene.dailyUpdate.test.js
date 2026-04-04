@@ -119,7 +119,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should schedule extra job for sunrise when a scene has offset=30', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-offset',
       active: true,
       actions: [],
@@ -150,7 +150,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should schedule extra job for sunset when a scene has negative offset=-15', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-offset-neg',
       active: true,
       actions: [],
@@ -180,7 +180,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should not add extra jobs for an inactive scene with a sunrise trigger', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-inactive',
       active: false,
       actions: [],
@@ -194,7 +194,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should not add extra jobs for a scene with no triggers', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-no-triggers',
       active: true,
       actions: [],
@@ -207,7 +207,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should ignore a non-numeric offset (string)', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-bad-offset',
       active: true,
       actions: [],
@@ -221,7 +221,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should ignore an offset exceeding 24h (offset > 1440)', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-huge-offset',
       active: true,
       actions: [],
@@ -235,7 +235,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should ignore a large negative offset exceeding 24h (offset < -1440)', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-huge-neg-offset',
       active: true,
       actions: [],
@@ -249,7 +249,7 @@ describe('SceneManager.dailyUpdate', () => {
 
   it('should deduplicate offsets when multiple scenes share the same offset', async () => {
     brain.addNamedEntity = fake.returns(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-a',
       active: true,
       actions: [],
@@ -257,7 +257,7 @@ describe('SceneManager.dailyUpdate', () => {
     });
     // flush first addScene auto-triggered dailyUpdate
     await Promise.resolve();
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'scene-b',
       active: true,
       actions: [],

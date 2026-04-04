@@ -54,7 +54,7 @@ describe('Scene.triggers.sunriseSunset', () => {
   });
 
   it('should execute scene with sunrise trigger', async () => {
-    const addedScene = sceneManager.addScene({
+    const addedScene = await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -91,7 +91,7 @@ describe('Scene.triggers.sunriseSunset', () => {
   });
 
   it('should execute scene with sunset trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -128,7 +128,7 @@ describe('Scene.triggers.sunriseSunset', () => {
   });
 
   it('should not execute scene, sunrise trigger with offset=30 when event has offset=0', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -167,7 +167,7 @@ describe('Scene.triggers.sunriseSunset', () => {
   });
 
   it('should execute scene, sunrise trigger with offset=30 when event has offset=30', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -206,7 +206,7 @@ describe('Scene.triggers.sunriseSunset', () => {
   });
 
   it('should not execute scene, sunset trigger with offset=-15 when event has offset=0', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [

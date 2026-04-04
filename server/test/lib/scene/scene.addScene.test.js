@@ -46,7 +46,7 @@ describe('SceneManager.addScene', () => {
 
   it('should NOT add a scene with an invalid trigger', async () => {
     try {
-      sceneManager.addScene({
+      await sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
         active: true,
@@ -66,7 +66,7 @@ describe('SceneManager.addScene', () => {
     }
   });
   it('should add a scene with a scheduled trigger, every-month', async () => {
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -89,7 +89,7 @@ describe('SceneManager.addScene', () => {
     assert.calledOnceWithExactly(event.emit, EVENTS.TRIGGERS.CHECK, trigger);
   });
   it('should add a scene with a scheduled trigger, every-week', async () => {
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -106,7 +106,7 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, every-day', async () => {
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -125,7 +125,7 @@ describe('SceneManager.addScene', () => {
     const in30Minutes = new Date(new Date().getTime() + 30 * 60 * 1000);
     const date = in30Minutes.toISOString().slice(0, 10);
     const time = in30Minutes.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -147,7 +147,7 @@ describe('SceneManager.addScene', () => {
       longitude: 50,
     });
 
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -165,7 +165,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should throw an error, interval is too big', async () => {
     try {
-      sceneManager.addScene({
+      await sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
         active: true,
@@ -186,7 +186,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should return error, interval not supported', async () => {
     try {
-      sceneManager.addScene({
+      await sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
         active: true,
@@ -207,7 +207,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should add a scene with a scheduled trigger, sunrise', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -224,7 +224,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should add a scene with a scheduled trigger, sunset', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -242,7 +242,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should NOT call dailyUpdate when adding a scene without sunrise/sunset triggers', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
-    sceneManager.addScene({
+    await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,
@@ -259,7 +259,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should NOT call dailyUpdate when skipDailyUpdate option is true, even with a sunrise trigger', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
-    sceneManager.addScene(
+    await sceneManager.addScene(
       {
         name: 'a-test-scene',
         icon: 'bell',
@@ -278,7 +278,7 @@ describe('SceneManager.addScene', () => {
   });
   it('should call dailyUpdate when previous scene had sunrise trigger but new one does not', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       selector: 'my-scene',
       name: 'a-test-scene',
       icon: 'bell',
@@ -294,7 +294,7 @@ describe('SceneManager.addScene', () => {
     assert.calledOnce(sceneManager.dailyUpdate);
     sceneManager.dailyUpdate.resetHistory();
     // Update the scene to remove the sunrise trigger
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: scene.selector,
       name: 'a-test-scene',
       icon: 'bell',
@@ -311,7 +311,7 @@ describe('SceneManager.addScene', () => {
     assert.calledOnce(sceneManager.dailyUpdate);
   });
   it('should add a scene with a message received trigger', async () => {
-    const scene = sceneManager.addScene({
+    const scene = await sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
       active: true,

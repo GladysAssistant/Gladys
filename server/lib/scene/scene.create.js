@@ -32,7 +32,7 @@ async function create(scene) {
 
   const plainScene = createdScene.get({ plain: true });
   // add scene to live store
-  this.addScene(plainScene);
+  await this.addScene(plainScene);
   // return created scene
   return plainScene;
 }

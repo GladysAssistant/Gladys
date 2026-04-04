@@ -3,7 +3,6 @@ const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
-const logger = require('../../utils/logger');
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
@@ -44,7 +43,7 @@ const nodeScheduleDaysOfWeek = {
  *  selector: 'test'
  * });
  */
-function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
+async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
   // deep clone the scene so that we don't modify the same object which will be returned to the client
   const scene = cloneDeep(sceneRaw);
   // first, if the scene actually exist, we cancel all triggers
@@ -145,7 +144,7 @@ function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
   this.scenes[scene.selector] = scene;
   this.brain.addNamedEntity('scene', scene.selector, scene.name);
   if (!skipDailyUpdate && (hasSunriseSunsetTrigger(scene) || hadSunriseSunset)) {
-    this.dailyUpdate().catch((e) => logger.error(e));
+    await this.dailyUpdate();
   }
   return scene;
 }
