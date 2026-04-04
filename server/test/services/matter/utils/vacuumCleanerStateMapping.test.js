@@ -70,9 +70,33 @@ describe('Matter.vacuumCleanerStateMapping', () => {
       );
     });
 
+    it('should convert Gladys RUNNING to Matter RUNNING', () => {
+      expect(convertGladysOperationalStateToMatter(VACUUM_CLEANER_STATE.RUNNING)).to.equal(
+        MATTER_RVC_OPERATIONAL_STATE.RUNNING,
+      );
+    });
+
+    it('should convert Gladys PAUSED to Matter PAUSED', () => {
+      expect(convertGladysOperationalStateToMatter(VACUUM_CLEANER_STATE.PAUSED)).to.equal(
+        MATTER_RVC_OPERATIONAL_STATE.PAUSED,
+      );
+    });
+
+    it('should convert Gladys ERROR to Matter ERROR', () => {
+      expect(convertGladysOperationalStateToMatter(VACUUM_CLEANER_STATE.ERROR)).to.equal(
+        MATTER_RVC_OPERATIONAL_STATE.ERROR,
+      );
+    });
+
     it('should convert Gladys RETURNING_TO_DOCK (4) to Matter SEEKING_CHARGER (64)', () => {
       expect(convertGladysOperationalStateToMatter(VACUUM_CLEANER_STATE.RETURNING_TO_DOCK)).to.equal(
         MATTER_RVC_OPERATIONAL_STATE.SEEKING_CHARGER,
+      );
+    });
+
+    it('should convert Gladys CHARGING (5) to Matter CHARGING (65)', () => {
+      expect(convertGladysOperationalStateToMatter(VACUUM_CLEANER_STATE.CHARGING)).to.equal(
+        MATTER_RVC_OPERATIONAL_STATE.CHARGING,
       );
     });
 
@@ -166,10 +190,28 @@ describe('Matter.vacuumCleanerStateMapping', () => {
       expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO)).to.equal(MATTER_RVC_CLEAN_MODE.AUTO);
     });
 
+    it('should convert Gladys QUICK to Matter QUICK', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUICK)).to.equal(MATTER_RVC_CLEAN_MODE.QUICK);
+    });
+
+    it('should convert Gladys QUIET to Matter QUIET', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUIET)).to.equal(MATTER_RVC_CLEAN_MODE.QUIET);
+    });
+
+    it('should convert Gladys LOW_NOISE to Matter LOW_NOISE', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE)).to.equal(
+        MATTER_RVC_CLEAN_MODE.LOW_NOISE,
+      );
+    });
+
     it('should convert Gladys DEEP_CLEAN (4) to Matter DEEP_CLEAN (16384)', () => {
       expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN)).to.equal(
         MATTER_RVC_CLEAN_MODE.DEEP_CLEAN,
       );
+    });
+
+    it('should convert Gladys VACUUM (5) to Matter VACUUM (16385)', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM)).to.equal(MATTER_RVC_CLEAN_MODE.VACUUM);
     });
 
     it('should convert Gladys MOP (6) to Matter MOP (16386)', () => {
