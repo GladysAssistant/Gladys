@@ -33,11 +33,16 @@ describe('nuki.mqtt.connect command', () => {
     sinon.reset();
   });
 
-  it('should connect to search mqtt topic and subscribe to specific device mqtt topic', async () => {
+  it('should subscribe to existing device topics only (not discovery topic)', async () => {
     await nukiHandler.connect();
     assert.calledWith(gladys.service.getService, 'mqtt');
-    assert.callCount(mqttService.device.subscribe, 2);
-    mqttService.device.subscribe.firstCall.calledWith('stat/+/+', nukiHandler.handleMessage.bind(nukiHandler));
+    // Verify device.get is called with correct service filter
+    assert.calledOnce(gladys.device.get);
+    assert.calledWith(gladys.device.get, { service: 'nuki' });
+    // Only subscribes to device topics, not discovery topic (homeassistant/#)
+    // Discovery topic is only subscribed during scan()
+    assert.callCount(mqttService.device.subscribe, 1);
+    assert.calledWith(mqttService.device.subscribe, 'nuki/398172F4/#', sinon.match.func);
     assert.calledOnce(nukiHandler.subscribeDeviceTopic);
   });
 });

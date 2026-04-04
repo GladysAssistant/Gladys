@@ -1,4 +1,5 @@
 const { createBridge } = require('./createBridge');
+const { stopBridge } = require('./stopBridge');
 const { resetBridge } = require('./resetBridge');
 const { buildAccessory } = require('./buildAccessory');
 const { buildService } = require('./buildService');
@@ -27,6 +28,7 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
 HomeKitHandler.prototype.newPinCode = newPinCode;
 HomeKitHandler.prototype.newUsername = newUsername;
 HomeKitHandler.prototype.createBridge = createBridge;
+HomeKitHandler.prototype.stopBridge = stopBridge;
 HomeKitHandler.prototype.resetBridge = resetBridge;
 HomeKitHandler.prototype.buildAccessory = buildAccessory;
 HomeKitHandler.prototype.buildService = buildService;

@@ -1,6 +1,7 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { fake } = sinon;
+const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');
 const { mqttService } = require('../../mocks/mqtt.mock.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
@@ -29,10 +30,33 @@ describe('Nuki - MQTT - disconnect', () => {
     sinon.reset();
   });
 
-  it('should disconnect with unsubscription of all devices topics', () => {
-    nukiHandler.disconnect();
+  it('should disconnect with unsubscription of all devices topics', async () => {
+    await nukiHandler.disconnect();
+    // Verify device.get is called with correct service filter
+    assert.calledOnce(gladys.device.get);
+    assert.calledWith(gladys.device.get, { service: 'nuki' });
     nukiHandler.mqttService.device.unsubscribe.firstCall.calledWith('homeassistant/#');
     // nukiHandler.mqttService.device.unsubscribe.secondCall.calledWith('nuki/4242/#');
     // nukiHandler.mqttService.device.unsubscribe.thirdCall.calledWith('nuki/4343/#');
+  });
+
+  it('should clear scan timeout on disconnect', async () => {
+    // Simulate an active scan timeout
+    const fakeTimeout = setTimeout(() => {}, 10000);
+    nukiHandler.scanTimeout = fakeTimeout;
+
+    await nukiHandler.disconnect();
+
+    expect(nukiHandler.scanTimeout).to.equal(null);
+  });
+
+  it('should handle disconnect when no scan timeout is active', async () => {
+    // Ensure scanTimeout is null
+    nukiHandler.scanTimeout = null;
+
+    // Should not throw
+    await nukiHandler.disconnect();
+
+    expect(nukiHandler.scanTimeout).to.equal(null);
   });
 });

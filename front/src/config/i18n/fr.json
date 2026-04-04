@@ -505,6 +505,11 @@
     "createDashboardButton": "Créer"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
@@ -736,6 +741,7 @@
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
       "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
+      "logTitle": "Journal",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
@@ -1210,7 +1216,8 @@
         "enableLabel": "Activation du service Node-RED",
         "enableNodeRed": "Activer",
         "disableNodeRed": "Désactiver",
-        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
+        "confirmDisableWarning": "Attention : La désactivation de Node-RED supprimera définitivement toutes vos données Node-RED, y compris tous vos flows et configurations. Cette action est irréversible.",
+        "confirmDisableLabel": "Êtes-vous sûr de vouloir désactiver Node-RED ?",
         "confirmDisableCancelButton": "Annuler",
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-RED",
@@ -1346,7 +1353,11 @@
       "reloadButton": "Relancer",
       "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
       "resetButton": "Réinitialiser",
-      "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
+      "resetError": "Une erreur est survenue pendant la réinitialisation du pont",
+      "mdns": "Si vous rencontrez des problèmes de connexion entre votre application Maison et le pont Gladys HomeKit, il est possible que votre réseau local ait des difficultés à trouver le pont HomeKit. Vous pouvez essayer de modifier l'annonceur mDNS utilisé parmi les options disponibles.",
+      "saveMDNSButton": "Enregistrer",
+      "saveMDNSSuccess": "L'annonceur mDNS a été enregistré avec succès. Le redémarrage du service HomeKit est automatique, attendez quelques secondes avant de l'ajouter à votre application Maison.",
+      "saveMDNSError": "Une erreur est survenue lors de l'enregistrement de l'annonceur mDNS."
     },
     "owntracks": {
       "title": "OwnTracks",
@@ -1559,7 +1570,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
+      "alphaWarning": "Si vous avez des appareils Z-Wave non gérés, n'hésitez pas à nous les soumettre sur le forum pour qu'ils soient ajoutés !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1656,8 +1667,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connexion à un serveur MQTT, en local ou en distant.",
+      "title": "Appareils virtuels MQTT",
+      "description": "Créez des appareils virtuels contrôlables via MQTT.",
+      "virtualDevicesExplanation": "Cette intégration permet de créer des appareils virtuels, qui sont contrôlables via MQTT, via HTTP, dans les scènes et sur le tableau de bord. Pour utiliser des appareils Zigbee, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>. Pour utiliser des appareils Z-Wave, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>. Pour utiliser des appareils MQTT Nuki, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/nuki\">Nuki</a>.",
       "deviceTab": "Appareils",
       "debugTab": "Debug MQTT",
       "setupTab": "Configuration",
@@ -2748,6 +2760,7 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local.",
+    "emailTextOtherUser": "L'email sert juste d'identifiant, il n'est enregistré qu'en local.",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
@@ -3500,7 +3513,9 @@
           "81": "Maintien Moins",
           "82": "Relâchement Plus",
           "83": "Relâchement Centre",
-          "84": "Relâchement Moins"
+          "84": "Relâchement Moins",
+          "85": "On clic double",
+          "86": "Off clic double"
         }
       },
       "heater": {
@@ -3978,6 +3993,10 @@
     "uv-sensor": {
       "shortCategoryName": "Capteur d'UV",
       "integer": "Indice UV"
+    },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "Surveillance filtre HEPA",
+      "filter-life-remaining": "Durée de vie restante du filtre"
     },
     "duration": {
       "shortCategoryName": "Durée",
