@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-// eslint-disable-next-line import/no-unresolved
+
 const {
   BooleanState,
   Switch,
@@ -7,6 +7,7 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const { convertToGladysDevice } = require('../../../../services/matter/utils/convertToGladysDevice');
