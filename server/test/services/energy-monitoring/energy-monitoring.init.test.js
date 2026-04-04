@@ -77,7 +77,7 @@ describe('EnergyMonitoring.init', () => {
     expect(rule).to.have.property('tz', 'Europe/Paris');
     expect(typeof dailyJobCall.args[1]).to.equal('function');
 
-     // Verify 24h job uses RecurrenceRule with timezone
+    // Verify 24h job uses RecurrenceRule with timezone
     const lastDailyJobCall = mockScheduler.scheduleJob.getCall(2);
     const rule2 = lastDailyJobCall.args[0];
     expect(rule2).to.have.property('recurs', true);

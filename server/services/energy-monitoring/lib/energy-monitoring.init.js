@@ -36,7 +36,7 @@ async function init() {
     rule.hour = 11;
     rule.minute = 10;
     rule.tz = systemTimezone;
-    // Scheduling consumption and cost calculation every day at 9AM
+    // Scheduling consumption and cost calculation every day at 11:10
     this.calculateConsumptionAndCostEvery24HoursJob = this.gladys.scheduler.scheduleJob(rule, async () => {
       const yesterdayDate = dayjs
         .tz(dayjs(), systemTimezone)
@@ -49,13 +49,13 @@ async function init() {
     });
   }
 
-  // Re-calculate yesterday at 11 AM (useful for enedis)
+  // Re-calculate yesterday at 16:10 (useful for late enedis data)
   if (!this.calculateConsumptionAndCostEvery24HoursLastJob) {
     const rule = new schedule.RecurrenceRule();
     rule.hour = 16;
     rule.minute = 10;
     rule.tz = systemTimezone;
-    // Scheduling consumption and cost calculation every day at 9AM
+    // Scheduling consumption and cost calculation every day at 16:10
     this.calculateConsumptionAndCostEvery24HoursLastJob = this.gladys.scheduler.scheduleJob(rule, async () => {
       const yesterdayDate = dayjs
         .tz(dayjs(), systemTimezone)
