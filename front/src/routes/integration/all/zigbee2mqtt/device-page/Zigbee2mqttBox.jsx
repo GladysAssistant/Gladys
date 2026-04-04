@@ -10,7 +10,6 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
-import style from './style.css';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
