@@ -116,7 +116,10 @@ const triggersSchema = Joi.array().items(
     threshold_only: Joi.boolean(),
     topic: Joi.string(),
     message: Joi.string().allow(''),
-    offset: Joi.number().integer(),
+    offset: Joi.number()
+      .integer()
+      .min(-1440)
+      .max(1440),
   }),
 );
 

@@ -3,6 +3,7 @@ const uuid = require('uuid');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
@@ -144,7 +145,7 @@ function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
   this.scenes[scene.selector] = scene;
   this.brain.addNamedEntity('scene', scene.selector, scene.name);
   if (!skipDailyUpdate && (hasSunriseSunsetTrigger(scene) || hadSunriseSunset)) {
-    this.dailyUpdate();
+    this.dailyUpdate().catch((e) => logger.error(e));
   }
   return scene;
 }

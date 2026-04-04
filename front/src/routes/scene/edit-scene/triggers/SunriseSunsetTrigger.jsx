@@ -29,7 +29,7 @@ class SunriseSunsetTrigger extends Component {
 
   onOffsetDirectionChange = e => {
     const direction = e.target.value;
-    const currentMinutes = parseInt(this.state.offsetMinutesInput, 10) || 30;
+    const currentMinutes = Math.min(parseInt(this.state.offsetMinutesInput, 10) || 30, 1440);
     if (direction === 'exact') {
       this.props.updateTriggerProperty(this.props.index, 'offset', 0);
     } else if (direction === 'before') {
@@ -43,7 +43,7 @@ class SunriseSunsetTrigger extends Component {
     const raw = e.target.value;
     this.setState({ offsetMinutesInput: raw });
     const minutes = parseInt(raw, 10);
-    if (!minutes || minutes <= 0) {
+    if (!minutes || minutes <= 0 || minutes > 1440) {
       return;
     }
     const currentOffset = this.props.trigger.offset || 0;
@@ -101,6 +101,7 @@ class SunriseSunsetTrigger extends Component {
                 type="number"
                 class="form-control"
                 min="1"
+                max="1440"
                 value={offsetMinutesInput}
                 onInput={this.onOffsetMinutesChange}
               />
