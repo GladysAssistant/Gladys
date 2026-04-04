@@ -3374,6 +3374,13 @@
           "medium": "Mittel",
           "high": "Hoch"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Leerlauf",
+          "cleaning": "Reinigen",
+          "mapping": "Kartieren"
+        }
       }
     }
   },
