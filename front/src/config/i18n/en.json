@@ -1132,7 +1132,7 @@
         "localKeyLabel": "Local Key",
         "protocolVersionLabel": "Protocol Version",
         "protocol35OptionUnsupported": "3.5 (Not supported)",
-        "protocol35Unsupported": "Tuya protocol 3.5 is not supported locally yet. Please use cloud mode or protocol 3.1/3.3/3.4.",
+        "protocolVersionRequired": "Protocol 3.5 is not yet supported but will be available soon.",
         "ipAddressLabel": "IP Address",
         "ipModeLocal": "Local",
         "ipModeCloud": "Cloud",

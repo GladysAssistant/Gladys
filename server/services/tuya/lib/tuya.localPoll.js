@@ -107,12 +107,7 @@ async function localPoll(payload) {
       logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
-    try {
-      tuyaLocal.removeListener('error', onError);
-      await tuyaLocal.disconnect();
-    } catch (err) {
-      // ignore
-    }
+    tuyaLocal.removeListener('error', onError);
     throw e;
   }
 }

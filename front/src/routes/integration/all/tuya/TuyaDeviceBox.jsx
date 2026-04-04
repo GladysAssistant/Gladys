@@ -211,6 +211,9 @@ class TuyaDeviceBox extends Component {
 
   updateProtocol = e => {
     const protocolVersion = e.target.value;
+    if (protocolVersion === '3.5') {
+      return;
+    }
     const params = Array.isArray(this.state.device.params) ? [...this.state.device.params] : [];
     const existingIndex = params.findIndex(param => param.name === 'PROTOCOL_VERSION');
     if (existingIndex >= 0) {
@@ -607,9 +610,9 @@ class TuyaDeviceBox extends Component {
                       <Text id="integration.tuya.device.protocol35OptionUnsupported" />
                     </option>
                   </select>
-                  {!showCloudIp && !protocolVersion && (
-                    <div class="text-danger mt-2">
-                      <Text id="integration.tuya.device.protocol35Unsupported" />
+                  {!showCloudIp && (!protocolVersion || protocolVersion === '3.5') && (
+                    <div class="text-warning mt-2">
+                      <Text id="integration.tuya.device.protocolVersionRequired" />
                     </div>
                   )}
                 </div>

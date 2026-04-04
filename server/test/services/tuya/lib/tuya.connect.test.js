@@ -200,21 +200,22 @@ describe('TuyaHandler.connect', () => {
     expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
   });
 
-  it('should map missing app account uid error', async () => {
-    client.init.resolves();
+  it('should reject missing app account uid before connecting', async () => {
     tuyaHandler.autoReconnectAllowed = true;
 
-    await tuyaHandler.connect({
-      baseUrl: 'apiUrl',
-      accessKey: 'accessKey',
-      secretKey: 'secretKey',
-      appAccountId: '',
-    });
+    try {
+      await tuyaHandler.connect({
+        baseUrl: 'apiUrl',
+        accessKey: 'accessKey',
+        secretKey: 'secretKey',
+        appAccountId: '',
+      });
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.eq('Tuya is not configured.');
+    }
 
-    expect(tuyaHandler.status).to.eq(STATUS.ERROR);
-    expect(tuyaHandler.lastError).to.eq('integration.tuya.setup.errorInvalidAppAccountUid');
-    expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
-    assert.notCalled(tuyaHandler.connector.request);
+    expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
   });
 
   it('should map invalid app account uid from api response', async () => {

@@ -152,32 +152,12 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false
     });
     try {
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
-        value: tuyaEndpoint
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
-        value: tuyaAccessKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SECRET_KEY', {
-        value: tuyaSecretKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_ACCOUNT_UID', {
-        value: tuyaAppAccountId
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_USERNAME', {
-        value: tuyaAppUsername
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_LAST_CONNECTED_CONFIG_HASH', {
-        value: ''
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
-        value: 'false'
+      await this.props.httpClient.post('/api/v1/service/tuya/configuration', {
+        endpoint: tuyaEndpoint,
+        accessKey: tuyaAccessKey,
+        secretKey: tuyaSecretKey,
+        appAccountId: tuyaAppAccountId,
+        appUsername: tuyaAppUsername
       });
 
       const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId);
@@ -565,7 +545,7 @@ class SetupTab extends Component {
                       type="button"
                       class="btn btn-outline-danger"
                       onClick={this.disconnectFromCloud}
-                      disabled={!state.tuyaConfigured || state.tuyaDisconnecting || state.tuyaConnecting}
+                      disabled={state.tuyaDisconnecting || state.tuyaConnecting}
                     >
                       <Text id="integration.tuya.setup.disconnectLabel" />
                     </button>

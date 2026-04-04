@@ -1237,7 +1237,7 @@
         "localKeyLabel": "Lokaler Schlüssel",
         "protocolVersionLabel": "Protokollversion",
         "protocol35OptionUnsupported": "3.5 (Nicht unterstützt)",
-        "protocol35Unsupported": "Das Tuya-Protokoll 3.5 wird lokal noch nicht unterstützt. Bitte nutze den Cloud-Modus oder 3.1/3.3/3.4.",
+        "protocolVersionRequired": "Protokoll 3.5 wird noch nicht unterstützt, aber bald verfügbar sein.",
         "ipAddressLabel": "IP-Adresse",
         "ipModeLocal": "Lokal",
         "ipModeCloud": "Cloud",
