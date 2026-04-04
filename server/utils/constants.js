@@ -158,6 +158,22 @@ const LEVEL_MATTER_STATE = {
   CRITICAL: 4,
 };
 
+const VACUUM_CLEANER_STATE = {
+  STOPPED: 0,
+  RUNNING: 1,
+  PAUSED: 2,
+  ERROR: 3,
+  RETURNING_TO_DOCK: 4,
+  CHARGING: 5,
+  DOCKED: 6,
+};
+
+const VACUUM_CLEANER_MODE = {
+  IDLE: 0,
+  CLEANING: 1,
+  MAPPING: 2,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -591,6 +607,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
 };
@@ -928,6 +945,12 @@ const DEVICE_FEATURE_TYPES = {
   },
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
+  },
+  VACUUM_CLEANER: {
+    STATE: 'state', // Operational state of the vacuum (integer - sensor)
+    RUN_MODE: 'run-mode', // Run mode of the vacuum (integer - command)
+    CLEAN_MODE: 'clean-mode', // Clean mode of the vacuum (integer - command)
+    DOCK: 'dock', // Send vacuum to dock (binary - command)
   },
 };
 
@@ -1553,6 +1576,8 @@ module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
+module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
+module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;

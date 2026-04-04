@@ -18,6 +18,10 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -414,6 +418,66 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 100,
         });
+      } else if (clusterIndex === RvcOperationalState.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-state`, true),
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: 0,
+          max: 255,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Dock)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-dock`, true),
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+          read_only: false,
+          has_feedback: false,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:dock`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === RvcRunMode.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 255,
+        });
+      } else if (clusterIndex === RvcCleanMode.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 255,
+        });
+      } else if (clusterIndex === PowerSource.Complete.id) {
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Battery)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-battery`, true),
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+            type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
+            read_only: true,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:battery`,
+            min: 0,
+            max: 100,
+          });
+        }
       }
     });
   }
