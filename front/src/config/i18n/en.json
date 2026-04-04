@@ -3434,6 +3434,7 @@
     "category": {
       "button": {
         "click": {
+          "unknown": "{{value}} (unknown value)",
           "1": "Simple click",
           "2": "Double click",
           "3": "Long click press",
@@ -3519,8 +3520,7 @@
           "83": "Release Center (Aqara W100)",
           "84": "Release Minus (Aqara W100)",
           "85": "On double",
-          "86": "Off double",
-          "unknown": "{{value}} (unknown value)"
+          "86": "Off double"
         }
       },
       "heater": {
