@@ -147,7 +147,7 @@ describe('Matter.convertToGladysDevice', () => {
       has_feedback: true,
       external_id: 'matter:12345:2:84',
       min: 0,
-      max: 255,
+      max: 2,
     });
   });
 
@@ -177,7 +177,7 @@ describe('Matter.convertToGladysDevice', () => {
       has_feedback: true,
       external_id: 'matter:12345:2:85',
       min: 0,
-      max: 255,
+      max: 6,
     });
   });
 

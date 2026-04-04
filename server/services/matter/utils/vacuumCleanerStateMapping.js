@@ -1,4 +1,5 @@
-const { VACUUM_CLEANER_STATE, VACUUM_CLEANER_MODE } = require('../../../utils/constants');
+const { VACUUM_CLEANER_STATE, VACUUM_CLEANER_MODE, VACUUM_CLEANER_CLEAN_MODE } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
 
 /**
  * Matter RvcOperationalState values (from Matter specification).
@@ -21,6 +22,21 @@ const MATTER_RVC_RUN_MODE = {
   IDLE: 0,
   CLEANING: 1,
   MAPPING: 2,
+};
+
+/**
+ * Matter RvcCleanMode values (from Matter specification).
+ * Standard modes are 0-3, manufacturer-specific modes start at 16384.
+ */
+const MATTER_RVC_CLEAN_MODE = {
+  AUTO: 0,
+  QUICK: 1,
+  QUIET: 2,
+  LOW_NOISE: 3,
+  // Manufacturer-specific modes (16384+)
+  DEEP_CLEAN: 16384,
+  VACUUM: 16385,
+  MOP: 16386,
 };
 
 /**
@@ -119,11 +135,72 @@ function convertGladysRunModeToMatter(gladysMode) {
   }
 }
 
+/**
+ * @description Convert Matter RvcCleanMode to Gladys vacuum cleaner clean mode.
+ * @param {number} matterMode - The Matter RvcCleanMode value.
+ * @returns {number|null} The Gladys vacuum cleaner clean mode, or null if unknown.
+ * @example
+ * const gladysMode = convertMatterCleanModeToGladys(0); // Returns VACUUM_CLEANER_CLEAN_MODE.AUTO (0)
+ */
+function convertMatterCleanModeToGladys(matterMode) {
+  switch (matterMode) {
+    case MATTER_RVC_CLEAN_MODE.AUTO:
+      return VACUUM_CLEANER_CLEAN_MODE.AUTO;
+    case MATTER_RVC_CLEAN_MODE.QUICK:
+      return VACUUM_CLEANER_CLEAN_MODE.QUICK;
+    case MATTER_RVC_CLEAN_MODE.QUIET:
+      return VACUUM_CLEANER_CLEAN_MODE.QUIET;
+    case MATTER_RVC_CLEAN_MODE.LOW_NOISE:
+      return VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE;
+    case MATTER_RVC_CLEAN_MODE.DEEP_CLEAN:
+      return VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN;
+    case MATTER_RVC_CLEAN_MODE.VACUUM:
+      return VACUUM_CLEANER_CLEAN_MODE.VACUUM;
+    case MATTER_RVC_CLEAN_MODE.MOP:
+      return VACUUM_CLEANER_CLEAN_MODE.MOP;
+    default:
+      logger.debug(`Matter: Unknown RvcCleanMode value ${matterMode}, returning as-is`);
+      return matterMode;
+  }
+}
+
+/**
+ * @description Convert Gladys vacuum cleaner clean mode to Matter RvcCleanMode.
+ * @param {number} gladysMode - The Gladys vacuum cleaner clean mode.
+ * @returns {number} The Matter RvcCleanMode value.
+ * @example
+ * const matterMode = convertGladysCleanModeToMatter(4); // Returns MATTER_RVC_CLEAN_MODE.DEEP_CLEAN (16384)
+ */
+function convertGladysCleanModeToMatter(gladysMode) {
+  switch (gladysMode) {
+    case VACUUM_CLEANER_CLEAN_MODE.AUTO:
+      return MATTER_RVC_CLEAN_MODE.AUTO;
+    case VACUUM_CLEANER_CLEAN_MODE.QUICK:
+      return MATTER_RVC_CLEAN_MODE.QUICK;
+    case VACUUM_CLEANER_CLEAN_MODE.QUIET:
+      return MATTER_RVC_CLEAN_MODE.QUIET;
+    case VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE:
+      return MATTER_RVC_CLEAN_MODE.LOW_NOISE;
+    case VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN:
+      return MATTER_RVC_CLEAN_MODE.DEEP_CLEAN;
+    case VACUUM_CLEANER_CLEAN_MODE.VACUUM:
+      return MATTER_RVC_CLEAN_MODE.VACUUM;
+    case VACUUM_CLEANER_CLEAN_MODE.MOP:
+      return MATTER_RVC_CLEAN_MODE.MOP;
+    default:
+      logger.debug(`Matter: Unknown Gladys clean mode value ${gladysMode}, returning as-is`);
+      return gladysMode;
+  }
+}
+
 module.exports = {
   MATTER_RVC_OPERATIONAL_STATE,
   MATTER_RVC_RUN_MODE,
+  MATTER_RVC_CLEAN_MODE,
   convertMatterOperationalStateToGladys,
   convertGladysOperationalStateToMatter,
   convertMatterRunModeToGladys,
   convertGladysRunModeToMatter,
+  convertMatterCleanModeToGladys,
+  convertGladysCleanModeToMatter,
 };

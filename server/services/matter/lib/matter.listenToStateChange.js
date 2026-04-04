@@ -30,6 +30,7 @@ const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
   convertMatterOperationalStateToGladys,
   convertMatterRunModeToGladys,
+  convertMatterCleanModeToGladys,
 } = require('../utils/vacuumCleanerStateMapping');
 
 /**
@@ -453,11 +454,11 @@ async function listenToStateChange(nodeId, devicePath, device) {
   if (rvcCleanMode && !this.stateChangeListeners.has(rvcCleanMode)) {
     logger.debug(`Matter: Adding state change listener for RvcCleanMode cluster ${rvcCleanMode.name}`);
     this.stateChangeListeners.add(rvcCleanMode);
-    // Subscribe to RvcCleanMode attribute changes (clean mode uses same mapping as run mode)
+    // Subscribe to RvcCleanMode attribute changes
     rvcCleanMode.addCurrentModeAttributeListener((value) => {
       logger.debug(`Matter: RvcCleanMode currentMode attribute changed to ${value}`);
-      // Convert Matter mode to Gladys standard mode
-      const gladysMode = convertMatterRunModeToGladys(value);
+      // Convert Matter clean mode to Gladys standard clean mode
+      const gladysMode = convertMatterCleanModeToGladys(value);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${RvcCleanMode.Complete.id}`,
         state: gladysMode,

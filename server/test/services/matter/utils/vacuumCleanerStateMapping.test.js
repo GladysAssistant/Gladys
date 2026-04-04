@@ -3,13 +3,16 @@ const { expect } = require('chai');
 const {
   MATTER_RVC_OPERATIONAL_STATE,
   MATTER_RVC_RUN_MODE,
+  MATTER_RVC_CLEAN_MODE,
   convertMatterOperationalStateToGladys,
   convertGladysOperationalStateToMatter,
   convertMatterRunModeToGladys,
   convertGladysRunModeToMatter,
+  convertMatterCleanModeToGladys,
+  convertGladysCleanModeToMatter,
 } = require('../../../../services/matter/utils/vacuumCleanerStateMapping');
 
-const { VACUUM_CLEANER_STATE, VACUUM_CLEANER_MODE } = require('../../../../utils/constants');
+const { VACUUM_CLEANER_STATE, VACUUM_CLEANER_MODE, VACUUM_CLEANER_CLEAN_MODE } = require('../../../../utils/constants');
 
 describe('Matter.vacuumCleanerStateMapping', () => {
   describe('convertMatterOperationalStateToGladys', () => {
@@ -117,6 +120,64 @@ describe('Matter.vacuumCleanerStateMapping', () => {
 
     it('should return unknown values as-is', () => {
       expect(convertGladysRunModeToMatter(99)).to.equal(99);
+    });
+  });
+
+  describe('convertMatterCleanModeToGladys', () => {
+    it('should convert Matter AUTO to Gladys AUTO', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.AUTO)).to.equal(VACUUM_CLEANER_CLEAN_MODE.AUTO);
+    });
+
+    it('should convert Matter QUICK to Gladys QUICK', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.QUICK)).to.equal(VACUUM_CLEANER_CLEAN_MODE.QUICK);
+    });
+
+    it('should convert Matter QUIET to Gladys QUIET', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.QUIET)).to.equal(VACUUM_CLEANER_CLEAN_MODE.QUIET);
+    });
+
+    it('should convert Matter LOW_NOISE to Gladys LOW_NOISE', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.LOW_NOISE)).to.equal(
+        VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE,
+      );
+    });
+
+    it('should convert Matter DEEP_CLEAN (16384) to Gladys DEEP_CLEAN (4)', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.DEEP_CLEAN)).to.equal(
+        VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+      );
+    });
+
+    it('should convert Matter VACUUM (16385) to Gladys VACUUM (5)', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.VACUUM)).to.equal(VACUUM_CLEANER_CLEAN_MODE.VACUUM);
+    });
+
+    it('should convert Matter MOP (16386) to Gladys MOP (6)', () => {
+      expect(convertMatterCleanModeToGladys(MATTER_RVC_CLEAN_MODE.MOP)).to.equal(VACUUM_CLEANER_CLEAN_MODE.MOP);
+    });
+
+    it('should return unknown values as-is', () => {
+      expect(convertMatterCleanModeToGladys(99)).to.equal(99);
+    });
+  });
+
+  describe('convertGladysCleanModeToMatter', () => {
+    it('should convert Gladys AUTO to Matter AUTO', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO)).to.equal(MATTER_RVC_CLEAN_MODE.AUTO);
+    });
+
+    it('should convert Gladys DEEP_CLEAN (4) to Matter DEEP_CLEAN (16384)', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN)).to.equal(
+        MATTER_RVC_CLEAN_MODE.DEEP_CLEAN,
+      );
+    });
+
+    it('should convert Gladys MOP (6) to Matter MOP (16386)', () => {
+      expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.MOP)).to.equal(MATTER_RVC_CLEAN_MODE.MOP);
+    });
+
+    it('should return unknown values as-is', () => {
+      expect(convertGladysCleanModeToMatter(99)).to.equal(99);
     });
   });
 });

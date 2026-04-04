@@ -461,7 +461,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           has_feedback: true,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
-          max: 2,
+          max: 6,
         });
       } else if (clusterIndex === PowerSource.Complete.id) {
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {

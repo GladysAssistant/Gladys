@@ -3380,6 +3380,15 @@
           "idle": "Repos",
           "cleaning": "Nettoyer",
           "mapping": "Cartographier"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Rapide",
+          "quiet": "Silencieux",
+          "low-noise": "Faible bruit",
+          "deep-clean": "Nettoyage profond",
+          "vacuum": "Aspiration",
+          "mop": "Serpillère"
         }
       }
     }

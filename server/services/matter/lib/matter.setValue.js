@@ -12,7 +12,7 @@ const {
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
-const { convertGladysRunModeToMatter } = require('../utils/vacuumCleanerStateMapping');
+const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -233,8 +233,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!rvcCleanMode) {
       throw new Error('Device does not support RvcCleanMode cluster');
     }
-    // Convert Gladys standard mode to Matter mode (uses same mapping as run mode)
-    const matterMode = convertGladysRunModeToMatter(value);
+    // Convert Gladys standard clean mode to Matter clean mode
+    const matterMode = convertGladysCleanModeToMatter(value);
     await rvcCleanMode.changeToMode({ newMode: matterMode });
   }
 }

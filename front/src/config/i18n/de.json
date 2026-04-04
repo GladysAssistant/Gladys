@@ -3380,6 +3380,15 @@
           "idle": "Leerlauf",
           "cleaning": "Reinigen",
           "mapping": "Kartieren"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Schnell",
+          "quiet": "Leise",
+          "low-noise": "Geräuscharm",
+          "deep-clean": "Tiefenreinigung",
+          "vacuum": "Saugen",
+          "mop": "Wischen"
         }
       }
     }

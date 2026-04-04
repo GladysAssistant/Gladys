@@ -3380,6 +3380,15 @@
           "idle": "Idle",
           "cleaning": "Clean",
           "mapping": "Map"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Quick",
+          "quiet": "Quiet",
+          "low-noise": "Low Noise",
+          "deep-clean": "Deep Clean",
+          "vacuum": "Vacuum",
+          "mop": "Mop"
         }
       }
     }

@@ -572,7 +572,7 @@ describe('Matter.listenToStateChange', () => {
     const clusterClients = new Map();
     clusterClients.set(RvcCleanMode.Complete.id, {
       addCurrentModeAttributeListener: (callback) => {
-        callback(2); // Deep clean mode
+        callback(16384); // Matter DEEP_CLEAN (16384) should be converted to Gladys DEEP_CLEAN (4)
       },
     });
     const device = {
@@ -582,7 +582,7 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '2', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:2:85',
-      state: 2,
+      state: 4, // Gladys standard DEEP_CLEAN mode
     });
   });
   it('should listen to state change (PowerSource battery)', async () => {

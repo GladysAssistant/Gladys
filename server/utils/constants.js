@@ -174,6 +174,16 @@ const VACUUM_CLEANER_MODE = {
   MAPPING: 2,
 };
 
+const VACUUM_CLEANER_CLEAN_MODE = {
+  AUTO: 0,
+  QUICK: 1,
+  QUIET: 2,
+  LOW_NOISE: 3,
+  DEEP_CLEAN: 4,
+  VACUUM: 5,
+  MOP: 6,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -1578,6 +1588,7 @@ module.exports.AC_MODE = AC_MODE;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
+module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
