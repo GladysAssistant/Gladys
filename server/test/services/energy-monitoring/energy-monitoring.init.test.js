@@ -281,5 +281,38 @@ describe('EnergyMonitoring.init', () => {
         clock.restore();
       }
     });
+    it('should execute calculateCostFromYesterday with yesterday at midnight when 16:10 daily job runs', async () => {
+      // Use sinon fake timers to mock a specific time
+      const clock = useFakeTimers(new Date('2023-10-15T09:00:00.000Z'));
+
+      try {
+        await energyMonitoring.init();
+
+        // Get the 16:10 daily job function (third call)
+        const dailyJobFunction = mockScheduler.scheduleJob.getCall(2).args[1];
+
+        // Execute the daily job
+        await dailyJobFunction();
+
+        // Verify calculateCostFromYesterday was called
+        assert.calledOnce(calculateCostFromYesterday);
+
+        const callArgs = calculateCostFromYesterday.getCall(0).args;
+        const yesterdayDate = callArgs[0];
+
+        // Should be yesterday at midnight in Europe/Paris timezone
+        expect(yesterdayDate).to.be.instanceOf(Date);
+        // October 14, 2023 at midnight in Europe/Paris (CEST = UTC+2)
+        // So midnight Paris = 22:00 UTC on Oct 13
+        expect(yesterdayDate.getUTCFullYear()).to.equal(2023);
+        expect(yesterdayDate.getUTCMonth()).to.equal(9); // October (0-indexed)
+        expect(yesterdayDate.getUTCDate()).to.equal(13);
+        expect(yesterdayDate.getUTCHours()).to.equal(22); // Midnight Paris = 22:00 UTC (CEST)
+        expect(yesterdayDate.getUTCMinutes()).to.equal(0);
+        expect(yesterdayDate.getUTCSeconds()).to.equal(0);
+      } finally {
+        clock.restore();
+      }
+    });
   });
 });
