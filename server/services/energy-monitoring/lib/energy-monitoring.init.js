@@ -49,6 +49,25 @@ async function init() {
     });
   }
 
+  // Re-calculate yesterday at 11 AM (useful for enedis)
+  if (!this.calculateConsumptionAndCostEvery24HoursLastJob) {
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 16;
+    rule.minute = 10;
+    rule.tz = systemTimezone;
+    // Scheduling consumption and cost calculation every day at 9AM
+    this.calculateConsumptionAndCostEvery24HoursLastJob = this.gladys.scheduler.scheduleJob(rule, async () => {
+      const yesterdayDate = dayjs
+        .tz(dayjs(), systemTimezone)
+        .subtract(1, 'day')
+        .startOf('day')
+        .toDate();
+
+      // Add to queue
+      await this.calculateCostFromYesterday(yesterdayDate);
+    });
+  }
+
   return null;
 }
 
