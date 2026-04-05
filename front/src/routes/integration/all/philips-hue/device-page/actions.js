@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import { BRIDGE_MODEL } from '../../../../../../../server/services/philips-hue/lib/utils/consts';
 import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
-import debounce from '../../../../../utils/debounce';
+import debounce from 'debounce';
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);

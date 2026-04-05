@@ -1,7 +1,7 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
-import debounce from '../../../../../utils/debounce';
+import debounce from 'debounce';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
