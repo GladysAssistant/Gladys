@@ -61,7 +61,7 @@ describe('EnergyMonitoring.init', () => {
     await energyMonitoring.init();
 
     // Verify both jobs are scheduled (30 min job + 24h job)
-    assert.calledTwice(mockScheduler.scheduleJob);
+    assert.calledThrice(mockScheduler.scheduleJob);
 
     // Verify combined job (at 00:00 and 00:30)
     const jobCall = mockScheduler.scheduleJob.getCall(0);
@@ -77,6 +77,15 @@ describe('EnergyMonitoring.init', () => {
     expect(rule).to.have.property('tz', 'Europe/Paris');
     expect(typeof dailyJobCall.args[1]).to.equal('function');
 
+    // Verify 24h job uses RecurrenceRule with timezone
+    const lastDailyJobCall = mockScheduler.scheduleJob.getCall(2);
+    const rule2 = lastDailyJobCall.args[0];
+    expect(rule2).to.have.property('recurs', true);
+    expect(rule2).to.have.property('hour', 16);
+    expect(rule2).to.have.property('minute', 10);
+    expect(rule2).to.have.property('tz', 'Europe/Paris');
+    expect(typeof lastDailyJobCall.args[1]).to.equal('function');
+
     // Verify job IDs are stored
     expect(energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob).to.equal('mock-job-id');
     expect(energyMonitoring.calculateConsumptionAndCostEvery24HoursJob).to.equal('mock-job-id');
@@ -86,6 +95,7 @@ describe('EnergyMonitoring.init', () => {
     // Set existing job IDs
     energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob = 'existing-job';
     energyMonitoring.calculateConsumptionAndCostEvery24HoursJob = 'existing-daily-job';
+    energyMonitoring.calculateConsumptionAndCostEvery24HoursLastJob = 'existing-last-daily-job';
 
     await energyMonitoring.init();
 
@@ -95,6 +105,7 @@ describe('EnergyMonitoring.init', () => {
     // Verify existing job IDs are preserved
     expect(energyMonitoring.calculateConsumptionAndCostEvery30MinutesJob).to.equal('existing-job');
     expect(energyMonitoring.calculateConsumptionAndCostEvery24HoursJob).to.equal('existing-daily-job');
+    expect(energyMonitoring.calculateConsumptionAndCostEvery24HoursLastJob).to.equal('existing-last-daily-job');
   });
 
   it('should schedule job if not already scheduled', async () => {
@@ -104,8 +115,8 @@ describe('EnergyMonitoring.init', () => {
 
     await energyMonitoring.init();
 
-    // Verify both jobs are scheduled
-    assert.calledTwice(mockScheduler.scheduleJob);
+    // Verify all jobs are scheduled
+    assert.calledThrice(mockScheduler.scheduleJob);
 
     const jobCall = mockScheduler.scheduleJob.getCall(0);
     expect(jobCall.args[0]).to.equal('0 0,30 * * * *');
@@ -246,6 +257,39 @@ describe('EnergyMonitoring.init', () => {
 
         // Get the daily job function (second call)
         const dailyJobFunction = mockScheduler.scheduleJob.getCall(1).args[1];
+
+        // Execute the daily job
+        await dailyJobFunction();
+
+        // Verify calculateCostFromYesterday was called
+        assert.calledOnce(calculateCostFromYesterday);
+
+        const callArgs = calculateCostFromYesterday.getCall(0).args;
+        const yesterdayDate = callArgs[0];
+
+        // Should be yesterday at midnight in Europe/Paris timezone
+        expect(yesterdayDate).to.be.instanceOf(Date);
+        // October 14, 2023 at midnight in Europe/Paris (CEST = UTC+2)
+        // So midnight Paris = 22:00 UTC on Oct 13
+        expect(yesterdayDate.getUTCFullYear()).to.equal(2023);
+        expect(yesterdayDate.getUTCMonth()).to.equal(9); // October (0-indexed)
+        expect(yesterdayDate.getUTCDate()).to.equal(13);
+        expect(yesterdayDate.getUTCHours()).to.equal(22); // Midnight Paris = 22:00 UTC (CEST)
+        expect(yesterdayDate.getUTCMinutes()).to.equal(0);
+        expect(yesterdayDate.getUTCSeconds()).to.equal(0);
+      } finally {
+        clock.restore();
+      }
+    });
+    it('should execute calculateCostFromYesterday with yesterday at midnight when 16:10 daily job runs', async () => {
+      // Use sinon fake timers to mock a specific time
+      const clock = useFakeTimers(new Date('2023-10-15T09:00:00.000Z'));
+
+      try {
+        await energyMonitoring.init();
+
+        // Get the 16:10 daily job function (third call)
+        const dailyJobFunction = mockScheduler.scheduleJob.getCall(2).args[1];
 
         // Execute the daily job
         await dailyJobFunction();
