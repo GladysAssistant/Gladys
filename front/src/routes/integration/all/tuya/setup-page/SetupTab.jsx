@@ -411,7 +411,9 @@ class SetupTab extends Component {
                 <Text id="integration.tuya.localModeLimitInfo" />
               </div>
               <div>
-                <strong><Text id="integration.tuya.setup.cloudTitle" /></strong>
+                <strong>
+                  <Text id="integration.tuya.setup.cloudTitle" />
+                </strong>
                 <br />
                 <MarkupText id="integration.tuya.setup.description" />
                 <MarkupText id="integration.tuya.setup.descriptionCreateAccount" />
@@ -423,12 +425,16 @@ class SetupTab extends Component {
                 <MarkupText id="integration.tuya.setup.descriptionCloudLimit" />
                 <MarkupText id="integration.tuya.setup.descriptionControllable" />
                 <br />
-                <strong><Text id="integration.tuya.setup.localTitle" /></strong>
+                <strong>
+                  <Text id="integration.tuya.setup.localTitle" />
+                </strong>
                 <br />
                 <MarkupText id="integration.tuya.setup.descriptionLocalMode" />
                 <MarkupText id="integration.tuya.setup.descriptionLocalKeepsApp" />
                 <MarkupText id="integration.tuya.setup.descriptionCameraLimit" />
               </div>
+
+              <hr class="mt-4 mb-4" />
 
               <form>
                 <div class="form-group">

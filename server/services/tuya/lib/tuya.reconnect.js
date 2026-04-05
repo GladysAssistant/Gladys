@@ -20,6 +20,8 @@ function createReconnectManager(tuyaHandler) {
   /**
    * @description Attempt to reconnect to Tuya if configured and not manually disconnected.
    * @returns {Promise<boolean>} Returns true if reconnect should be retried, false otherwise.
+   * @example
+   * await tryReconnect();
    */
   async function tryReconnect() {
     try {
@@ -49,6 +51,8 @@ function createReconnectManager(tuyaHandler) {
 
   /**
    * @description Clear pending quick reconnect timers and reset state.
+   * @example
+   * clearQuickReconnects();
    */
   function clearQuickReconnects() {
     if (quickReconnectTimeouts.length > 0) {
@@ -61,6 +65,8 @@ function createReconnectManager(tuyaHandler) {
   /**
    * @description Schedule quick reconnect attempts when disconnected.
    * @returns {Promise<void>} Resolves once the current attempt is finished.
+   * @example
+   * await scheduleQuickReconnects();
    */
   function scheduleQuickReconnects() {
     if (quickReconnectInProgress) {
@@ -99,6 +105,8 @@ function createReconnectManager(tuyaHandler) {
 
   /**
    * @description Start the reconnect manager (quick reconnects + periodic interval).
+   * @example
+   * reconnectManager.start();
    */
   function start() {
     if (tuyaHandler.status !== STATUS.CONNECTED && tuyaHandler.autoReconnectAllowed) {
@@ -111,6 +119,8 @@ function createReconnectManager(tuyaHandler) {
 
   /**
    * @description Stop the reconnect manager and clear all timers.
+   * @example
+   * reconnectManager.stop();
    */
   function stop() {
     if (reconnectInterval) {
