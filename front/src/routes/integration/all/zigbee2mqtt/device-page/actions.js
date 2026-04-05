@@ -4,11 +4,28 @@ import uuid from 'uuid';
 import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
+import config from '../../../../../config';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
   const actions = {
+    async getZ2mUrl(state) {
+      try {
+        const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
+        if (configuration.Z2M_MQTT_MODE === 'local') {
+          if (configuration.z2mTcpPort && state.session.gatewayClient === undefined) {
+            const url = new URL(config.localApiUrl);
+            const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort}`;
+            store.setState({ z2mUrl });
+          }
+        } else if (configuration.Z2M_MQTT_MODE === 'external' && configuration.Z2M_FRONTEND_URL) {
+          store.setState({ z2mUrl: configuration.Z2M_FRONTEND_URL });
+        }
+      } catch (e) {
+        // z2mUrl stays undefined, link won't be shown
+      }
+    },
     async getZigbee2mqttDevices(state, take, skip) {
       store.setState({
         getZigbee2mqttStatus: RequestStatus.Getting
@@ -23,11 +40,25 @@ function createActions(store) {
           options.search = state.zigbee2mqttSearch;
         }
 
-        const zigbee2mqttsReceived = await state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options);
+        const [zigbee2mqttsReceived, discoveredDevices] = await Promise.all([
+          state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options),
+          state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false })
+        ]);
+
+        const discoveredMap = {};
+        discoveredDevices.forEach(d => {
+          discoveredMap[d.external_id] = d;
+        });
+
         zigbee2mqttsReceived.forEach(device => {
           const model = device.params.find(p => p.name === 'model');
           if (model) {
             device.model = model.value;
+          }
+
+          const discovered = discoveredMap[device.external_id];
+          if (discovered && discovered.ieee_address) {
+            device.ieee_address = discovered.ieee_address;
           }
         });
 

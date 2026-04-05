@@ -47,11 +47,13 @@
         }
       ]
     },
-    "friendly_name": "CCT5015 device"
+    "friendly_name": "CCT5015 device",
+    "ieee_address": "0x00124b0024329b96"
   },
   "gladysDevice": {
     "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
     "external_id": "zigbee2mqtt:CCT5015 device",
+    "ieee_address": "0x00124b0024329b96",
     "features": [
       {
         "external_id": "zigbee2mqtt:CCT5015 device:shutter:state:state",
