@@ -18,53 +18,79 @@ async function setValue(device, deviceFeature, value, options) {
   }
 
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
-    const client = new this.Airtunes();
-    const airplayDevice = client.add(ipAddress, {
-      volume: options?.volume || 70,
-    });
+    const MAX_NOTIFICATION_DURATION_MS = 5 * 60 * 1000; // 5 minutes max
     let decodeProcess;
+    let killTimer;
 
-    client.on('buffer', (event) => {
-      if (event === 'end') {
-        logger.debug('Playback ended, waiting for AirTunes devices');
-        setTimeout(() => {
-          client.stopAll(() => {
-            if (decodeProcess) {
-              decodeProcess.kill();
+    const cleanup = () => {
+      clearTimeout(killTimer);
+      if (decodeProcess) {
+        decodeProcess.kill();
+        decodeProcess = null;
+      }
+    };
+
+    const sender = this.airplaySender(
+      {
+        host: ipAddress,
+        airplay2: true,
+        volume: options?.volume ?? 70,
+      },
+      async (event) => {
+        if (event.event === 'device' && event.message === 'ready') {
+          decodeProcess = this.childProcess.spawn('ffmpeg', [
+            '-re',
+            '-i',
+            value,
+            '-acodec',
+            'pcm_s16le',
+            '-f',
+            's16le', // PCM 16bits, little-endian
+            '-ar',
+            '44100', // Sampling rate
+            '-ac',
+            2, // Stereo
+            'pipe:1', // Output on stdout
+          ]);
+
+          killTimer = setTimeout(() => {
+            logger.warn('ffmpeg exceeded max notification duration, killing process');
+            cleanup();
+            sender.stop();
+          }, MAX_NOTIFICATION_DURATION_MS);
+
+          decodeProcess.on('error', (err) => {
+            logger.error('Failed to start ffmpeg');
+            logger.error(err);
+            cleanup();
+            sender.stop();
+          });
+
+          decodeProcess.stdout.on('data', (chunk) => sender.sendPcm(chunk));
+          decodeProcess.stdout.on('end', () => {
+            clearTimeout(killTimer);
+            setTimeout(() => {
+              sender.stop();
+            }, 7000);
+          });
+
+          // detect if ffmpeg was not spawned correctly
+          decodeProcess.stderr.setEncoding('utf8');
+          decodeProcess.stderr.on('data', (data) => {
+            if (/^execvp\(\)/.test(data)) {
+              logger.error('Failed to start ffmpeg');
+              logger.error(`stderr: ${data}`);
+              cleanup();
+              sender.stop();
             }
           });
-        }, 5000);
-      }
-    });
+        }
 
-    airplayDevice.on('status', async (status) => {
-      if (status === 'ready') {
-        decodeProcess = this.childProcess.spawn('ffmpeg', [
-          '-i',
-          value,
-          '-acodec',
-          'pcm_s16le',
-          '-f',
-          's16le', // PCM 16bits, little-endian
-          '-ar',
-          '44100', // Sampling rate
-          '-ac',
-          2, // Stereo
-          'pipe:1', // Output on stdout
-        ]);
-        decodeProcess.stdout.pipe(client);
-
-        // detect if ffmpeg was not spawned correctly
-        decodeProcess.stderr.setEncoding('utf8');
-        decodeProcess.stderr.on('data', (data) => {
-          if (/^execvp\(\)/.test(data)) {
-            logger.error('Failed to start ffmpeg');
-            logger.error(`stderr: ${data}`);
-            client.stopAll(() => {});
-          }
-        });
-      }
-    });
+        if (event.event === 'buffer' && event.message === 'end') {
+          cleanup();
+        }
+      },
+    );
   }
 }
 
