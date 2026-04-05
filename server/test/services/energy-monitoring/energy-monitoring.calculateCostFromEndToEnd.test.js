@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon');
+
+const { fake } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const fs = require('fs');
@@ -26,6 +28,26 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const EnergyPrice = require('../../../lib/energy-price');
+
+const clearDuckDb = async () => {
+  const tables = [
+    't_device_feature_state',
+    't_device_feature_state_aggregate',
+    't_energy_price',
+    't_device_feature',
+    't_device_param',
+    't_device',
+  ];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const table of tables) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await db.duckDbWriteConnectionAllAsync(`DELETE FROM ${table}`);
+    } catch (e) {
+      // ignore if table not present
+    }
+  }
+};
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -275,7 +297,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
     await Promise.all(createPromises);
   }; */
   beforeEach(async () => {
-    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await clearDuckDb();
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
     device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
@@ -290,6 +312,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
     // We create a new electrical meter device
@@ -328,6 +351,9 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
         },
       ],
     });
+  });
+  afterEach(async () => {
+    await clearDuckDb();
   });
   it('should calculate cost from a specific date for a edf-tempo contract', async () => {
     await importAllTempoPricesFromCsv(electricalMeterDevice.id, energyPrice);
