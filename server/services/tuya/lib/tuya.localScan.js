@@ -13,13 +13,13 @@ const {
 const DEFAULT_PORTS = [6666, 6667, 7000];
 /**
  * @description Scan local network for Tuya devices (UDP broadcast).
- * @param {number|object} input - Scan duration in seconds or options.
+ * @param {object} options - Scan options.
+ * @param {number} [options.timeoutSeconds=10] - Scan duration in seconds.
  * @returns {Promise<object>} Map of deviceId -> { ip, version, productKey }.
  * @example
  * await localScan({ timeoutSeconds: 10 });
  */
-async function localScan(input = 10) {
-  const options = typeof input === 'object' ? input || {} : { timeoutSeconds: input };
+async function localScan(options = {}) {
   const timeoutSeconds = options.timeoutSeconds || 10;
   const devices = {};
   const portErrors = {};

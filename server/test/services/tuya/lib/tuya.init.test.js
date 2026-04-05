@@ -80,7 +80,7 @@ describe('TuyaHandler.init', () => {
     });
   });
 
-  it('should exit early when not configured', async () => {
+  it('should throw ServiceNotConfiguredError when not configured', async () => {
     gladys.variable.getValue
       .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
       .returns(null)
@@ -93,7 +93,12 @@ describe('TuyaHandler.init', () => {
       .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
       .returns(null);
 
-    await tuyaHandler.init();
+    try {
+      await tuyaHandler.init();
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.eq('Tuya is not configured.');
+    }
 
     expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     expect(tuyaHandler.autoReconnectAllowed).to.equal(false);

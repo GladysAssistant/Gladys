@@ -6,136 +6,122 @@ const QUICK_RECONNECT_DELAY_MS = 1000 * 3;
 const RECONNECT_INTERVAL_MS = 1000 * 60 * 30;
 
 /**
- * @description Create a reconnect manager for the Tuya handler.
- * @param {object} tuyaHandler - TuyaHandler instance.
- * @returns {object} Reconnect manager with start, stop methods.
+ * @description Attempt to reconnect to Tuya if configured and not manually disconnected.
+ * @returns {Promise<boolean>} Returns true if reconnect should be retried, false otherwise.
  * @example
- * const reconnect = createReconnectManager(tuyaHandler);
+ * await this.tryReconnect();
  */
-function createReconnectManager(tuyaHandler) {
-  let reconnectInterval = null;
-  let quickReconnectTimeouts = [];
-  let quickReconnectInProgress = false;
-
-  /**
-   * @description Attempt to reconnect to Tuya if configured and not manually disconnected.
-   * @returns {Promise<boolean>} Returns true if reconnect should be retried, false otherwise.
-   * @example
-   * await tryReconnect();
-   */
-  async function tryReconnect() {
-    try {
-      if (!tuyaHandler.autoReconnectAllowed) {
-        return false;
-      }
-      const status = await tuyaHandler.getStatus();
-      if (!status.configured || status.manual_disconnect) {
-        return false;
-      }
-      if (
-        tuyaHandler.status === STATUS.CONNECTED ||
-        tuyaHandler.status === STATUS.CONNECTING ||
-        tuyaHandler.status === STATUS.DISCOVERING_DEVICES
-      ) {
-        return false;
-      }
-      logger.info('Tuya is disconnected, attempting auto-reconnect...');
-      const configuration = await tuyaHandler.getConfiguration();
-      await tuyaHandler.connect(configuration);
-      return tuyaHandler.status !== STATUS.CONNECTED;
-    } catch (e) {
-      logger.warn('Auto-reconnect to Tuya failed:', e.message || e);
-      return true;
+async function tryReconnect() {
+  try {
+    if (!this.autoReconnectAllowed) {
+      return false;
     }
+    const status = await this.getStatus();
+    if (!status.configured || status.manual_disconnect) {
+      return false;
+    }
+    if (
+      this.status === STATUS.CONNECTED ||
+      this.status === STATUS.CONNECTING ||
+      this.status === STATUS.DISCOVERING_DEVICES
+    ) {
+      return false;
+    }
+    logger.info('Tuya is disconnected, attempting auto-reconnect...');
+    const configuration = await this.getConfiguration();
+    await this.connect(configuration);
+    return this.status !== STATUS.CONNECTED;
+  } catch (e) {
+    logger.warn('Auto-reconnect to Tuya failed:', e.message || e);
+    return true;
   }
+}
 
-  /**
-   * @description Clear pending quick reconnect timers and reset state.
-   * @example
-   * clearQuickReconnects();
-   */
-  function clearQuickReconnects() {
-    if (quickReconnectTimeouts.length > 0) {
-      quickReconnectTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-      quickReconnectTimeouts = [];
-    }
-    quickReconnectInProgress = false;
+/**
+ * @description Schedule quick reconnect attempts when disconnected.
+ * @returns {Promise<void>} Resolves once the current attempt is finished.
+ * @example
+ * await this.scheduleQuickReconnects();
+ */
+function scheduleQuickReconnects() {
+  if (this.quickReconnectInProgress) {
+    return Promise.resolve();
   }
+  this.quickReconnectInProgress = true;
+  let attempts = 0;
 
-  /**
-   * @description Schedule quick reconnect attempts when disconnected.
-   * @returns {Promise<void>} Resolves once the current attempt is finished.
-   * @example
-   * await scheduleQuickReconnects();
-   */
-  function scheduleQuickReconnects() {
-    if (quickReconnectInProgress) {
-      return Promise.resolve();
+  const runAttempt = async () => {
+    attempts += 1;
+    const shouldRetry = await this.tryReconnect();
+    const isConnecting =
+      this.status === STATUS.CONNECTED ||
+      this.status === STATUS.CONNECTING ||
+      this.status === STATUS.DISCOVERING_DEVICES;
+
+    if (!shouldRetry || isConnecting) {
+      this.clearQuickReconnects();
+      return;
     }
-    quickReconnectInProgress = true;
-    let attempts = 0;
 
-    const runAttempt = async () => {
-      attempts += 1;
-      const shouldRetry = await tryReconnect();
-      const isConnecting =
-        tuyaHandler.status === STATUS.CONNECTED ||
-        tuyaHandler.status === STATUS.CONNECTING ||
-        tuyaHandler.status === STATUS.DISCOVERING_DEVICES;
-
-      if (!shouldRetry || isConnecting) {
-        clearQuickReconnects();
-        return;
+    if (attempts < QUICK_RECONNECT_ATTEMPTS) {
+      const timeoutId = setTimeout(runAttempt, QUICK_RECONNECT_DELAY_MS);
+      if (timeoutId && typeof timeoutId.unref === 'function') {
+        timeoutId.unref();
       }
-
-      if (attempts < QUICK_RECONNECT_ATTEMPTS) {
-        const timeoutId = setTimeout(runAttempt, QUICK_RECONNECT_DELAY_MS);
-        if (timeoutId && typeof timeoutId.unref === 'function') {
-          timeoutId.unref();
-        }
-        quickReconnectTimeouts.push(timeoutId);
-        return;
-      }
-
-      quickReconnectInProgress = false;
-    };
-
-    return runAttempt();
-  }
-
-  /**
-   * @description Start the reconnect manager (quick reconnects + periodic interval).
-   * @example
-   * reconnectManager.start();
-   */
-  function start() {
-    if (tuyaHandler.status !== STATUS.CONNECTED && tuyaHandler.autoReconnectAllowed) {
-      scheduleQuickReconnects();
+      this.quickReconnectTimeouts.push(timeoutId);
+      return;
     }
-    if (!reconnectInterval) {
-      reconnectInterval = setInterval(scheduleQuickReconnects, RECONNECT_INTERVAL_MS);
-    }
-  }
 
-  /**
-   * @description Stop the reconnect manager and clear all timers.
-   * @example
-   * reconnectManager.stop();
-   */
-  function stop() {
-    if (reconnectInterval) {
-      clearInterval(reconnectInterval);
-      reconnectInterval = null;
-    }
-    clearQuickReconnects();
-  }
-
-  return {
-    start,
-    stop,
+    this.quickReconnectInProgress = false;
   };
+
+  return runAttempt();
+}
+
+/**
+ * @description Clear pending quick reconnect timers and reset state.
+ * @example
+ * this.clearQuickReconnects();
+ */
+function clearQuickReconnects() {
+  if (this.quickReconnectTimeouts && this.quickReconnectTimeouts.length > 0) {
+    this.quickReconnectTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+    this.quickReconnectTimeouts = [];
+  }
+  this.quickReconnectInProgress = false;
+}
+
+/**
+ * @description Start the reconnect manager (quick reconnects + periodic interval).
+ * @example
+ * this.startReconnect();
+ */
+function startReconnect() {
+  if (this.status !== STATUS.CONNECTED && this.autoReconnectAllowed) {
+    this.scheduleQuickReconnects();
+  }
+  if (!this.reconnectInterval) {
+    this.reconnectInterval = setInterval(() => this.scheduleQuickReconnects(), RECONNECT_INTERVAL_MS);
+  }
+}
+
+/**
+ * @description Stop the reconnect manager and clear all timers.
+ * @example
+ * this.stopReconnect();
+ */
+function stopReconnect() {
+  if (this.reconnectInterval) {
+    clearInterval(this.reconnectInterval);
+    this.reconnectInterval = null;
+  }
+  this.clearQuickReconnects();
 }
 
 module.exports = {
-  createReconnectManager,
+  tryReconnect,
+  scheduleQuickReconnects,
+  clearQuickReconnects,
+  startReconnect,
+  stopReconnect,
 };

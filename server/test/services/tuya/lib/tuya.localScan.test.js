@@ -52,7 +52,7 @@ describe('TuyaHandler.localScan', () => {
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan(1);
+    const promise = localScan({ timeoutSeconds: 1 });
 
     // Trigger message on all sockets
     sockets.forEach((socket) => {
@@ -118,7 +118,7 @@ describe('TuyaHandler.localScan', () => {
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan(1);
+    const promise = localScan({ timeoutSeconds: 1 });
 
     sockets.forEach((socket) => {
       if (socket.handlers.message) {
@@ -190,7 +190,7 @@ describe('TuyaHandler.localScan', () => {
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan(1);
+    const promise = localScan({ timeoutSeconds: 1 });
     await clock.tickAsync(1100);
     const result = await promise;
     clock.restore();
@@ -237,7 +237,7 @@ describe('TuyaHandler.localScan', () => {
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan(1);
+    const promise = localScan({ timeoutSeconds: 1 });
     await clock.tickAsync(1100);
     await promise;
     clock.restore();

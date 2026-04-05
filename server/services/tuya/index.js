@@ -3,11 +3,9 @@ const tuyaController = require('./api/tuya.controller');
 
 const TuyaHandler = require('./lib');
 const { STATUS } = require('./lib/utils/tuya.constants');
-const { createReconnectManager } = require('./lib/tuya.reconnect');
 
 module.exports = function TuyaService(gladys, serviceId) {
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
-  const reconnectManager = createReconnectManager(tuyaHandler);
 
   /**
    * @public
@@ -21,7 +19,7 @@ module.exports = function TuyaService(gladys, serviceId) {
     if (tuyaHandler.status === STATUS.CONNECTED) {
       await tuyaHandler.loadDevices();
     }
-    reconnectManager.start();
+    tuyaHandler.startReconnect();
   }
 
   /**
@@ -32,7 +30,7 @@ module.exports = function TuyaService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping Tuya service');
-    reconnectManager.stop();
+    tuyaHandler.stopReconnect();
     await tuyaHandler.disconnect();
   }
 

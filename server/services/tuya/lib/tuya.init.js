@@ -1,6 +1,7 @@
 const { GLADYS_VARIABLES, STATUS } = require('./utils/tuya.constants');
 const { buildConfigHash } = require('./utils/tuya.config');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
@@ -15,7 +16,7 @@ async function init() {
   if (!baseUrl || !accessKey || !secretKey || !appAccountId) {
     this.status = STATUS.NOT_INITIALIZED;
     this.autoReconnectAllowed = false;
-    return;
+    throw new ServiceNotConfiguredError('Tuya is not configured.');
   }
 
   const lastConnectedHash = await this.gladys.variable.getValue(
