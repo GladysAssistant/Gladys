@@ -314,7 +314,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Motion detected",
-        "pushButton": "Push"
+        "pushButton": "Push",
+        "vacuumDock": "Return to Dock"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
@@ -3373,6 +3374,22 @@
           "medium": "Medium",
           "high": "High"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Idle",
+          "cleaning": "Clean",
+          "mapping": "Map"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Quick",
+          "quiet": "Quiet",
+          "low-noise": "Low Noise",
+          "deep-clean": "Deep Clean",
+          "vacuum": "Vacuum",
+          "mop": "Mop"
+        }
       }
     }
   },
@@ -3576,6 +3593,18 @@
           "2": "Medium",
           "3": "High",
           "4": "Critical"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Stopped",
+          "1": "Running",
+          "2": "Paused",
+          "3": "Error",
+          "4": "Returning to Dock",
+          "5": "Charging",
+          "6": "Docked"
         }
       }
     }
@@ -4042,6 +4071,13 @@
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Vacuum Cleaner",
+      "state": "Operational State",
+      "run-mode": "Run Mode",
+      "clean-mode": "Clean Mode",
+      "dock": "Return to Dock"
     }
   },
   "errorPage": {

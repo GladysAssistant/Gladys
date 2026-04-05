@@ -17,6 +17,10 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -527,6 +531,74 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:113',
+      state: 75,
+    });
+  });
+  it('should listen to state change (RvcOperationalState)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(RvcOperationalState.Complete.id, {
+      addOperationalStateAttributeListener: (callback) => {
+        callback(66); // Matter DOCKED state (66) should be converted to Gladys DOCKED state (6)
+      },
+    });
+    const device = {
+      number: 2,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '1:child_endpoint:2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:child_endpoint:2:97:state',
+      state: 6, // Gladys standard DOCKED state
+    });
+  });
+  it('should listen to state change (RvcRunMode)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(RvcRunMode.Complete.id, {
+      addCurrentModeAttributeListener: (callback) => {
+        callback(1); // Cleaning mode
+      },
+    });
+    const device = {
+      number: 2,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:84',
+      state: 1,
+    });
+  });
+  it('should listen to state change (RvcCleanMode)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(RvcCleanMode.Complete.id, {
+      addCurrentModeAttributeListener: (callback) => {
+        callback(16384); // Matter DEEP_CLEAN (16384) should be converted to Gladys DEEP_CLEAN (4)
+      },
+    });
+    const device = {
+      number: 2,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:85',
+      state: 4, // Gladys standard DEEP_CLEAN mode
+    });
+  });
+  it('should listen to state change (PowerSource battery)', async () => {
+    const clusterClients = new Map();
+    clusterClients.set(PowerSource.Complete.id, {
+      addBatPercentRemainingAttributeListener: (callback) => {
+        callback(150); // 150 half-percent = 75%
+      },
+    });
+    const device = {
+      number: 2,
+      clusterClients,
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:47:battery',
       state: 75,
     });
   });

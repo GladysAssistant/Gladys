@@ -1,8 +1,18 @@
-// eslint-disable-next-line import/no-unresolved
-const { OnOff, WindowCovering, LevelControl, ColorControl, Thermostat } = require('@matter/main/clusters');
+const {
+  OnOff,
+  WindowCovering,
+  LevelControl,
+  ColorControl,
+  Thermostat,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
+const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -184,6 +194,48 @@ async function setValue(gladysDevice, gladysFeature, value) {
   ) {
     const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
     await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
+  }
+
+  // Handle vacuum cleaner dock command
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK
+  ) {
+    const rvcOperationalState = targetDevice.clusterClients.get(RvcOperationalState.Complete.id);
+    if (!rvcOperationalState) {
+      throw new Error('Device does not support RvcOperationalState cluster');
+    }
+    if (value === 1) {
+      await rvcOperationalState.goHome();
+    }
+  }
+
+  // Handle vacuum cleaner run mode
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE
+  ) {
+    const rvcRunMode = targetDevice.clusterClients.get(RvcRunMode.Complete.id);
+    if (!rvcRunMode) {
+      throw new Error('Device does not support RvcRunMode cluster');
+    }
+    // Convert Gladys standard mode to Matter mode
+    const matterMode = convertGladysRunModeToMatter(value);
+    await rvcRunMode.changeToMode({ newMode: matterMode });
+  }
+
+  // Handle vacuum cleaner clean mode
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE
+  ) {
+    const rvcCleanMode = targetDevice.clusterClients.get(RvcCleanMode.Complete.id);
+    if (!rvcCleanMode) {
+      throw new Error('Device does not support RvcCleanMode cluster');
+    }
+    // Convert Gladys standard clean mode to Matter clean mode
+    const matterMode = convertGladysCleanModeToMatter(value);
+    await rvcCleanMode.changeToMode({ newMode: matterMode });
   }
 }
 

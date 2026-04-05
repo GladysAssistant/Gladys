@@ -550,4 +550,223 @@ describe('Matter.setValue', () => {
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device not found for path 1:child_endpoint:2');
   });
+  it('should send vacuum cleaner to dock', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1:child_endpoint:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const rvcOperationalStateCluster = {
+      goHome: fake.resolves(null),
+    };
+    clusterClients.set(97, rvcOperationalStateCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          childEndpoints: [
+            {
+              number: 2,
+              clusterClients,
+            },
+          ],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(rvcOperationalStateCluster.goHome);
+  });
+  it('should not call goHome when dock value is 0', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1:child_endpoint:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 0;
+
+    const clusterClients = new Map();
+
+    const rvcOperationalStateCluster = {
+      goHome: fake.resolves(null),
+    };
+    clusterClients.set(97, rvcOperationalStateCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          childEndpoints: [
+            {
+              number: 2,
+              clusterClients,
+            },
+          ],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.notCalled(rvcOperationalStateCluster.goHome);
+  });
+  it('should change vacuum cleaner run mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const rvcRunModeCluster = {
+      changeToMode: fake.resolves(null),
+    };
+    clusterClients.set(84, rvcRunModeCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnceWithExactly(rvcRunModeCluster.changeToMode, { newMode: 1 });
+  });
+  it('should change vacuum cleaner clean mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+    };
+
+    const value = 2;
+
+    const clusterClients = new Map();
+
+    const rvcCleanModeCluster = {
+      changeToMode: fake.resolves(null),
+    };
+    clusterClients.set(85, rvcCleanModeCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          clusterClients,
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnceWithExactly(rvcCleanModeCluster.changeToMode, { newMode: 2 });
+  });
+  it('should throw error when RvcOperationalState cluster is not available for dock', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          clusterClients,
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcOperationalState cluster');
+  });
+  it('should throw error when RvcRunMode cluster is not available', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          clusterClients,
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcRunMode cluster');
+  });
+  it('should throw error when RvcCleanMode cluster is not available', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          clusterClients,
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcCleanMode cluster');
+  });
 });

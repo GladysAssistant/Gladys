@@ -314,7 +314,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
-        "pushButton": "Appuyer"
+        "pushButton": "Appuyer",
+        "vacuumDock": "Retour à la base"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
@@ -3373,6 +3374,22 @@
           "medium": "Moyen",
           "high": "Fort"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Repos",
+          "cleaning": "Nettoyer",
+          "mapping": "Cartographier"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Rapide",
+          "quiet": "Silencieux",
+          "low-noise": "Faible bruit",
+          "deep-clean": "Nettoyage profond",
+          "vacuum": "Aspiration",
+          "mop": "Serpillère"
+        }
       }
     }
   },
@@ -3576,6 +3593,18 @@
           "2": "Moyen",
           "3": "Élevé",
           "4": "Critique"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Arrêté",
+          "1": "En cours",
+          "2": "En pause",
+          "3": "Erreur",
+          "4": "Retour à la base",
+          "5": "En charge",
+          "6": "Sur la base"
         }
       }
     }
@@ -4042,6 +4071,13 @@
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Aspirateur Robot",
+      "state": "État opérationnel",
+      "run-mode": "Mode de fonctionnement",
+      "clean-mode": "Mode de nettoyage",
+      "dock": "Retour à la base"
     }
   },
   "errorPage": {
