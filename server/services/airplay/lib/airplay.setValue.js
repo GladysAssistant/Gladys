@@ -18,7 +18,17 @@ async function setValue(device, deviceFeature, value, options) {
   }
 
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
+    const MAX_NOTIFICATION_DURATION_MS = 5 * 60 * 1000; // 5 minutes max
     let decodeProcess;
+    let killTimer;
+
+    const cleanup = () => {
+      clearTimeout(killTimer);
+      if (decodeProcess) {
+        decodeProcess.kill();
+        decodeProcess = null;
+      }
+    };
 
     const sender = this.airplaySender(
       {
@@ -43,14 +53,22 @@ async function setValue(device, deviceFeature, value, options) {
             'pipe:1', // Output on stdout
           ]);
 
+          killTimer = setTimeout(() => {
+            logger.warn('ffmpeg exceeded max notification duration, killing process');
+            cleanup();
+            sender.stop();
+          }, MAX_NOTIFICATION_DURATION_MS);
+
           decodeProcess.on('error', (err) => {
             logger.error('Failed to start ffmpeg');
             logger.error(err);
+            cleanup();
             sender.stop();
           });
 
           decodeProcess.stdout.on('data', (chunk) => sender.sendPcm(chunk));
           decodeProcess.stdout.on('end', () => {
+            clearTimeout(killTimer);
             setTimeout(() => {
               sender.stop();
             }, 7000);
@@ -62,15 +80,14 @@ async function setValue(device, deviceFeature, value, options) {
             if (/^execvp\(\)/.test(data)) {
               logger.error('Failed to start ffmpeg');
               logger.error(`stderr: ${data}`);
+              cleanup();
               sender.stop();
             }
           });
         }
 
         if (event.event === 'buffer' && event.message === 'end') {
-          if (decodeProcess) {
-            decodeProcess.kill();
-          }
+          cleanup();
         }
       },
     );
