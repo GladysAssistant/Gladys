@@ -212,6 +212,36 @@ describe('AirplayHandler.setValue', () => {
     });
     sinon.assert.calledOnce(stopSender);
   });
+  it('should kill ffmpeg and stop sender when max duration is exceeded', async () => {
+    const killStub = sinon.stub();
+
+    const childProcessWithNeverEndingStream = {
+      spawn: () => ({
+        kill: killStub,
+        stdout: { on: () => {} },
+        stderr: { on: () => {}, setEncoding: () => {} },
+        on: () => {},
+      }),
+    };
+
+    const airplayHandlerWithTimeout = new AirplayHandler(
+      gladys,
+      airplaySender,
+      bonjourLib,
+      childProcessWithNeverEndingStream,
+      serviceId,
+    );
+    airplayHandlerWithTimeout.scanTimeout = 1;
+    const devices = await airplayHandlerWithTimeout.scan();
+    const device = devices[0];
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout'] });
+    await airplayHandlerWithTimeout.setValue(device, device.features[0], 'http://play-url.com');
+    await new Promise((resolve) => setImmediate(resolve));
+    clock.tick(5 * 60 * 1000);
+    sinon.assert.calledOnce(killStub);
+    sinon.assert.calledOnce(stopSender);
+    clock.restore();
+  });
   it('should return device not found', async () => {
     airplayHandler.scanTimeout = 1;
     const device = {
