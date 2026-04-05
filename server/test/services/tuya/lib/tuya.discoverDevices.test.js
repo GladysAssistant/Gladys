@@ -18,6 +18,9 @@ const gladys = {
   variable: {
     getValue: fake.resolves('APP_ACCOUNT_UID'),
   },
+  device: {
+    get: fake.resolves([]),
+  },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -26,13 +29,28 @@ describe('TuyaHandler.discoverDevices', () => {
 
   beforeEach(() => {
     sinon.reset();
+    gladys.event.emit = fake.resolves(null);
+    gladys.stateManager.get = fake.returns(null);
+    gladys.variable.getValue = fake.resolves('APP_ACCOUNT_UID');
+    gladys.device.get = fake.resolves([]);
     tuyaHandler.status = STATUS.CONNECTED;
     tuyaHandler.connector = {
       request: sinon
         .stub()
-        .onFirstCall()
-        .resolves({ result: { list: [{ name: 'name', id: 'uuid', product_name: 'model' }] } })
-        .onSecondCall()
+        .onCall(0)
+        .resolves({
+          result: [
+            {
+              name: 'name',
+              id: 'uuid',
+              product_name: 'model',
+              local_key: 'localKey',
+              ip: '1.1.1.1',
+              online: true,
+            },
+          ],
+        })
+        .onCall(1)
         .resolves({
           result: {
             details: 'details',
@@ -50,6 +68,26 @@ describe('TuyaHandler.discoverDevices', () => {
                 type: 'Integer',
               },
             ],
+            category: 'cz',
+          },
+        })
+        .onCall(2)
+        .resolves({
+          result: {
+            local_key: 'localKey',
+            ip: '1.1.1.1',
+          },
+        })
+        .onCall(3)
+        .resolves({
+          result: {
+            properties: [{ code: 'switch_1', value: true }],
+          },
+        })
+        .onCall(4)
+        .resolves({
+          result: {
+            model: '{"services":[]}',
           },
         }),
     };
@@ -111,7 +149,7 @@ describe('TuyaHandler.discoverDevices', () => {
             min: 0,
             name: 'cur_power',
             read_only: true,
-            selector: 'tuya:uuid:cur_power',
+            selector: 'tuya-uuid-cur-power',
             type: 'power',
             unit: 'watt',
           },
@@ -121,18 +159,63 @@ describe('TuyaHandler.discoverDevices', () => {
             has_feedback: false,
             max: 1,
             min: 0,
-            name: 'name',
+            name: 'switch_1',
             read_only: false,
-            selector: 'tuya:uuid:switch_1',
+            selector: 'tuya-uuid-switch-1',
             type: 'binary',
           },
         ],
         model: 'model',
         name: 'name',
         poll_frequency: 30000,
-        selector: 'tuya:uuid',
+        params: [
+          {
+            name: 'DEVICE_ID',
+            value: 'uuid',
+          },
+          {
+            name: 'LOCAL_KEY',
+            value: 'localKey',
+          },
+          {
+            name: 'CLOUD_IP',
+            value: '1.1.1.1',
+          },
+          {
+            name: 'LOCAL_OVERRIDE',
+            value: false,
+          },
+        ],
+        properties: {
+          properties: [{ code: 'switch_1', value: true }],
+        },
+        product_id: undefined,
+        product_key: undefined,
+        specifications: {
+          details: 'details',
+          category: 'cz',
+          functions: [
+            {
+              code: 'switch_1',
+              name: 'name',
+              type: 'Boolean',
+            },
+          ],
+          status: [
+            {
+              code: 'cur_power',
+              name: 'cur_power',
+              type: 'Integer',
+            },
+          ],
+        },
+        selector: 'tuya-uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: true,
+        thing_model: {
+          services: [],
+        },
+        online: true,
       },
     ]);
 
@@ -146,6 +229,47 @@ describe('TuyaHandler.discoverDevices', () => {
       payload: { status: STATUS.CONNECTED },
     });
 
-    assert.calledTwice(tuyaHandler.connector.request);
+    assert.callCount(tuyaHandler.connector.request, 5);
+  });
+
+  it('should keep local params from existing devices', async () => {
+    gladys.stateManager.get = fake.returns({
+      external_id: 'tuya:uuid',
+      params: [
+        { name: 'IP_ADDRESS', value: '2.2.2.2' },
+        { name: 'PROTOCOL_VERSION', value: '3.3' },
+        { name: 'LOCAL_OVERRIDE', value: true },
+      ],
+      features: [{ external_id: 'tuya:uuid:cur_power' }, { external_id: 'tuya:uuid:switch_1' }],
+    });
+
+    const devices = await tuyaHandler.discoverDevices();
+    const { params } = devices[0];
+    const getParam = (name) => params.find((param) => param.name === name);
+
+    expect(getParam('IP_ADDRESS').value).to.equal('2.2.2.2');
+    expect(getParam('PROTOCOL_VERSION').value).to.equal('3.3');
+    expect(getParam('LOCAL_OVERRIDE').value).to.equal(true);
+  });
+
+  it('should append existing devices not returned by discovery', async () => {
+    gladys.device.get = fake.resolves([
+      { external_id: 'tuya:existing', name: 'Existing device', params: [] },
+      { name: 'missing external id' },
+    ]);
+
+    const devices = await tuyaHandler.discoverDevices();
+    const existing = devices.find((device) => device.external_id === 'tuya:existing');
+
+    expect(existing).to.not.equal(undefined);
+    expect(existing.updatable).to.equal(false);
+  });
+
+  it('should continue when loading existing devices fails', async () => {
+    gladys.device.get = fake.rejects(new Error('failure'));
+
+    const devices = await tuyaHandler.discoverDevices();
+    expect(devices).to.be.an('array');
+    expect(devices.length).to.be.greaterThan(0);
   });
 });

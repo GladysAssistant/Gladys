@@ -16,7 +16,10 @@ module.exports = function TuyaService(gladys, serviceId) {
   async function start() {
     logger.info('Starting Tuya service', serviceId);
     await tuyaHandler.init();
-    await tuyaHandler.loadDevices();
+    if (tuyaHandler.status === STATUS.CONNECTED) {
+      await tuyaHandler.loadDevices();
+    }
+    tuyaHandler.startReconnect();
   }
 
   /**
@@ -27,6 +30,7 @@ module.exports = function TuyaService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping Tuya service');
+    tuyaHandler.stopReconnect();
     await tuyaHandler.disconnect();
   }
 

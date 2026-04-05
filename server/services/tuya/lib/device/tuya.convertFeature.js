@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { addSelector } = require('../../../../utils/addSelector');
 const { mappings } = require('./tuya.deviceMapping');
 
 /**
@@ -28,7 +29,7 @@ function convertFeature(tuyaFunctions, externalId) {
   }
 
   const feature = {
-    name,
+    name: code || name,
     external_id: `${externalId}:${code}`,
     selector: `${externalId}:${code}`,
     read_only: readOnly,
@@ -44,6 +45,7 @@ function convertFeature(tuyaFunctions, externalId) {
     feature.max = valuesObject.max;
   }
 
+  addSelector(feature);
   return feature;
 }
 
