@@ -1,4 +1,5 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
 const { convertFeature } = require('./tuya.convertFeature');
@@ -103,6 +104,7 @@ function convertDevice(tuyaDevice) {
   if (online !== undefined) {
     device.online = online;
   }
+  addSelector(device);
   return device;
 }
 
