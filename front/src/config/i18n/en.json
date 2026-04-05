@@ -1163,7 +1163,7 @@
       },
       "setup": {
         "title": "Tuya configuration",
-        "cloudTitle": "<strong>Cloud</strong><br />",
+        "cloudTitle": "Cloud",
         "description": "You can connect Gladys to your Tuya cloud account to control the related devices. Documentation is available in the left menu or <a href=\"https://gladysassistant.com/en/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
         "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Sign up</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Log in</a>).",
         "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account (console: <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
@@ -1173,7 +1173,7 @@
         "descriptionTrial": "Tuya Cloud projects have a <strong>trial period</strong>: make sure to <strong>renew</strong> or <strong>extend</strong> it regularly to avoid service interruptions.",
         "descriptionCloudLimit": "Note: the Tuya Cloud trial allows up to <strong>10 controllable devices</strong>. Additional devices may stay <strong>read-only</strong> until you upgrade.",
         "descriptionControllable": "Some devices are <strong>read-only</strong> by default. In Tuya IoT Platform, open <strong>Device Permission</strong> and click <strong>Change</strong> to make them controllable.",
-        "localTitle": "<br /><strong>Local</strong><br />",
+        "localTitle": "Local",
         "descriptionLocalMode": "Local mode can be used after the cloud setup: provide the local IP and protocol version on each device to poll locally. If devices are on the same network as the Gladys machine, the IP discovery and protocol version are detected automatically. This lets you avoid renewing the cloud trial, but the cloud is still needed when you add a new device from the Tuya app.",
         "descriptionLocalKeepsApp": "<strong>Local control</strong> does not disable control from the Tuya/Smart Life app.",
         "descriptionCameraLimit": "<strong>Cameras</strong>: video streaming is not supported in Gladys yet.",

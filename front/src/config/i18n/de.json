@@ -1268,7 +1268,7 @@
       },
       "setup": {
         "title": "Tuya-Konfiguration",
-        "cloudTitle": "<strong>Cloud</strong><br />",
+        "cloudTitle": "Cloud",
         "description": "Du kannst Gladys mit deinem Tuya-Cloud-Account verbinden, um die zugehörigen Geräte zu steuern. Die Dokumentation findest du im linken Menü oder <a href=\"https://gladysassistant.com/de/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">hier</a>.",
         "descriptionCreateAccount": "Du musst einen Account bei <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> erstellen (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Registrieren</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Anmelden</a>).",
         "descriptionCreateProject": "Danach musst du ein \"Cloud-Projekt\" in deinem Tuya-Account erstellen (Konsole: <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
@@ -1278,7 +1278,7 @@
         "descriptionTrial": "Tuya-Cloud-Projekte haben eine <strong>Testphase</strong>: denke daran, sie regelmäßig zu <strong>verlängern</strong>, um Unterbrechungen zu vermeiden.",
         "descriptionCloudLimit": "Hinweis: Die Tuya-Cloud-Testversion erlaubt bis zu <strong>10 steuerbare Geräte</strong>. Weitere Geräte können <strong>schreibgeschützt</strong> bleiben, bis du ein Upgrade durchführst.",
         "descriptionControllable": "Einige Geräte sind standardmäßig <strong>schreibgeschützt</strong>. Öffne in der Tuya IoT Platform <strong>Device Permission</strong> und klicke auf <strong>Change</strong>, um sie steuerbar zu machen.",
-        "localTitle": "<br /><strong>Lokal</strong><br />",
+        "localTitle": "Lokal",
         "descriptionLocalMode": "Der lokale Modus kann nach der Cloud-Konfiguration genutzt werden: Trage lokale IP und Protokollversion pro Gerät ein, um lokal abzufragen. Wenn die Geräte im selben Netzwerk wie der Gladys-Host sind, werden IP-Erkennung und Protokollversion automatisch erkannt. So kannst du die Cloud-Verlängerung umgehen, aber für das Hinzufügen neuer Geräte in der Tuya-App bleibt die Cloud nötig.",
         "descriptionLocalKeepsApp": "<strong>Lokale Steuerung</strong> deaktiviert die Steuerung über die Tuya/Smart-Life-App nicht.",
         "descriptionCameraLimit": "<strong>Kameras</strong>: Video-Streaming wird in Gladys derzeit nicht unterstützt.",
