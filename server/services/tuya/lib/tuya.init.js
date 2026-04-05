@@ -10,11 +10,19 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  */
 async function init() {
   const configuration = await this.getConfiguration();
+  const { baseUrl, accessKey, secretKey, appAccountId } = configuration || {};
+
+  if (!baseUrl || !accessKey || !secretKey || !appAccountId) {
+    this.status = STATUS.NOT_INITIALIZED;
+    this.autoReconnectAllowed = false;
+    return;
+  }
+
   const lastConnectedHash = await this.gladys.variable.getValue(
     GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH,
     this.serviceId,
   );
-  const currentHash = configuration ? buildConfigHash(configuration) : null;
+  const currentHash = buildConfigHash(configuration);
   const hasMatchingConfig = Boolean(lastConnectedHash && currentHash && lastConnectedHash === currentHash);
   const manualDisconnect = await this.gladys.variable.getValue(GLADYS_VARIABLES.MANUAL_DISCONNECT, this.serviceId);
   const manualDisconnectEnabled = normalizeBoolean(manualDisconnect);

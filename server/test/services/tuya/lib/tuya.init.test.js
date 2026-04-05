@@ -80,6 +80,27 @@ describe('TuyaHandler.init', () => {
     });
   });
 
+  it('should exit early when not configured', async () => {
+    gladys.variable.getValue
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns(null);
+
+    await tuyaHandler.init();
+
+    expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
+    expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
+    assert.notCalled(client.init);
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should not connect when manual disconnect is enabled', async () => {
     gladys.variable.getValue
       .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
