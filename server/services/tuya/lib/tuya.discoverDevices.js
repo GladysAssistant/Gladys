@@ -9,7 +9,7 @@ const { applyExistingLocalParams, normalizeExistingDevice } = require('./utils/t
 
 /**
  * @description Discover Tuya cloud devices.
- * @returns {Promise} List of discovered devices;.
+ * @returns {Promise<Array>} List of discovered devices.
  * @example
  * await discoverDevices();
  */
