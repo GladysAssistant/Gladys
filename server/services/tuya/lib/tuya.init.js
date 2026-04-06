@@ -41,6 +41,12 @@ async function init() {
   this.autoReconnectAllowed = hasMatchingConfig;
 
   await this.connect(configuration);
+
+  if (this.status === STATUS.CONNECTED) {
+    await this.loadDevices();
+  }
+
+  this.startReconnect();
 }
 
 module.exports = {

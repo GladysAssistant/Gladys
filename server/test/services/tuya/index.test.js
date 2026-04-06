@@ -8,11 +8,15 @@ const { assert, fake } = sinon;
 const TuyaHandler = require('../../../services/tuya/lib');
 
 const TuyaHandlerMock = sinon.stub();
-TuyaHandlerMock.prototype.init = fake(function init() {
+TuyaHandlerMock.prototype.init = fake(async function init() {
   this.status = STATUS.CONNECTED;
+  await this.loadDevices();
+  this.startReconnect();
 });
 TuyaHandlerMock.prototype.loadDevices = fake.returns(null);
-TuyaHandlerMock.prototype.disconnect = fake.returns(null);
+TuyaHandlerMock.prototype.disconnect = fake(function disconnect() {
+  this.stopReconnect();
+});
 TuyaHandlerMock.prototype.startReconnect = TuyaHandler.prototype.startReconnect;
 TuyaHandlerMock.prototype.stopReconnect = TuyaHandler.prototype.stopReconnect;
 TuyaHandlerMock.prototype.tryReconnect = TuyaHandler.prototype.tryReconnect;
@@ -144,6 +148,7 @@ describe('TuyaService', () => {
     tuyaService.device.init = fake(function init() {
       this.status = STATUS.ERROR;
       this.autoReconnectAllowed = true;
+      this.startReconnect();
     });
     tuyaService.device.getStatus = fake.resolves({ configured: false, manual_disconnect: false });
 
@@ -184,6 +189,7 @@ describe('TuyaService', () => {
       tuyaService.device.init = fake(function init() {
         this.status = STATUS.CONNECTED;
         this.autoReconnectAllowed = true;
+        this.startReconnect();
       });
       tuyaService.device.getStatus = fake.resolves({ configured: true, manual_disconnect: false });
       tuyaService.device.getConfiguration = fake.resolves({ config: 'ok' });
