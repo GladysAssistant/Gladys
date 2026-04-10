@@ -219,8 +219,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!rvcRunMode) {
       throw new Error('Device does not support RvcRunMode cluster');
     }
-    // Convert Gladys standard mode to Matter mode
-    const matterMode = convertGladysRunModeToMatter(value);
+    // Convert Gladys standard mode to Matter mode (ensure value is a number)
+    const matterMode = convertGladysRunModeToMatter(Number(value));
     await rvcRunMode.changeToMode({ newMode: matterMode });
   }
 
@@ -233,8 +233,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!rvcCleanMode) {
       throw new Error('Device does not support RvcCleanMode cluster');
     }
-    // Convert Gladys standard clean mode to Matter clean mode
-    const matterMode = convertGladysCleanModeToMatter(value);
+    // Convert Gladys standard clean mode to Matter clean mode (ensure value is a number)
+    const matterMode = convertGladysCleanModeToMatter(Number(value));
     await rvcCleanMode.changeToMode({ newMode: matterMode });
   }
 }
