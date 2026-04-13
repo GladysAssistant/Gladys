@@ -55,7 +55,8 @@ describe('Matter.reset', () => {
     assert.calledOnce(matterHandler.stop);
     assert.calledOnceWithExactly(gladys.variable.destroy, 'MATTER_BACKUP', 'service-1');
     assert.calledOnceWithExactly(gladys.variable.setValue, 'MATTER_ENABLED', 'false', 'service-1');
-    assert.calledOnceWithExactly(fseRemoveFake, path.join('/var/lib/gladys', 'matter'));
+    assert.calledOnce(fseRemoveFake);
+    assert.calledWith(fseRemoveFake, path.join(path.dirname(gladys.config.storage), 'matter'));
 
     // Verify in-memory state is reset
     sinon.assert.match(matterHandler.commissioningController, null);
