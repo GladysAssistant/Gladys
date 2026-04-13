@@ -524,18 +524,10 @@ class MatterSettingsPage extends Component {
                           <Text id="integration.matter.settings.reset.confirmMessage" />
                         </div>
                         <div>
-                          <button
-                            class="btn btn-danger"
-                            onClick={this.confirmReset}
-                            disabled={resetting}
-                          >
+                          <button class="btn btn-danger" onClick={this.confirmReset} disabled={resetting}>
                             <Text id="integration.matter.settings.reset.confirmButton" />
                           </button>
-                          <button
-                            class="btn ml-2"
-                            onClick={this.cancelReset}
-                            disabled={resetting}
-                          >
+                          <button class="btn ml-2" onClick={this.cancelReset} disabled={resetting}>
                             <Text id="integration.matter.settings.reset.cancelButton" />
                           </button>
                         </div>
