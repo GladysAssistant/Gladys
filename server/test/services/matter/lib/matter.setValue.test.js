@@ -587,7 +587,7 @@ describe('Matter.setValue', () => {
     await matterHandler.setValue(gladysDevice, gladysFeature, value);
     assert.calledOnce(rvcOperationalStateCluster.goHome);
   });
-  it('should not call goHome when dock value is 0', async () => {
+  it('should throw error when dock value is not 1', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1:child_endpoint:2',
     };
@@ -621,7 +621,8 @@ describe('Matter.setValue', () => {
       ]),
     });
 
-    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Unsupported dock command value: 0. Only value 1 (go home) is supported.');
     assert.notCalled(rvcOperationalStateCluster.goHome);
   });
   it('should change vacuum cleaner run mode', async () => {

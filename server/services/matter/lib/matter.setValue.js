@@ -207,6 +207,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     }
     if (value === 1) {
       await rvcOperationalState.goHome();
+    } else {
+      throw new Error(`Unsupported dock command value: ${value}. Only value 1 (go home) is supported.`);
     }
   }
 
