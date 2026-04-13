@@ -44,7 +44,6 @@ describe('Matter.reset', () => {
   afterEach(async () => {
     await fse.remove(testMatterPath);
     process.env.MATTER_FOLDER_PATH = previousMatterPath;
-    sinon.restore();
   });
 
   it('should reset matter integration', async () => {
