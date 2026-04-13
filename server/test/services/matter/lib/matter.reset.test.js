@@ -1,6 +1,7 @@
 const sinon = require('sinon');
 const path = require('path');
-const proxyquire = require('proxyquire').noCallThru();
+const fse = require('fs-extra');
+const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
@@ -9,8 +10,18 @@ const MatterHandler = require('../../../../services/matter/lib');
 describe('Matter.reset', () => {
   let matterHandler;
   let gladys;
+  let previousMatterPath;
+  let testMatterPath;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    previousMatterPath = process.env.MATTER_FOLDER_PATH;
+    testMatterPath = '/tmp/gladys-matter-reset-test';
+    process.env.MATTER_FOLDER_PATH = testMatterPath;
+
+    // Create test directory with some files
+    await fse.ensureDir(testMatterPath);
+    await fse.writeFile(path.join(testMatterPath, 'test-file'), 'test content');
+
     gladys = {
       job: {
         wrapper: fake.returns(null),
@@ -30,19 +41,13 @@ describe('Matter.reset', () => {
     matterHandler.stop = fake.resolves(null);
   });
 
-  afterEach(() => {
-    sinon.reset();
+  afterEach(async () => {
+    await fse.remove(testMatterPath);
+    process.env.MATTER_FOLDER_PATH = previousMatterPath;
+    sinon.restore();
   });
 
   it('should reset matter integration', async () => {
-    const fseRemoveFake = fake.resolves(null);
-
-    const { reset } = proxyquire('../../../../services/matter/lib/matter.reset', {
-      'fs-extra': {
-        remove: fseRemoveFake,
-      },
-    });
-
     matterHandler.commissioningController = {
       close: fake.resolves(null),
     };
@@ -50,42 +55,24 @@ describe('Matter.reset', () => {
     matterHandler.nodesMap = new Map([['node1', {}]]);
     matterHandler.stateChangeListeners = new Set(['listener1']);
 
-    await reset.call(matterHandler);
+    // Verify directory exists before reset
+    const existsBefore = await fse.pathExists(testMatterPath);
+    expect(existsBefore).to.equal(true);
+
+    await matterHandler.reset();
 
     assert.calledOnce(matterHandler.stop);
     assert.calledOnceWithExactly(gladys.variable.destroy, 'MATTER_BACKUP', 'service-1');
     assert.calledOnceWithExactly(gladys.variable.setValue, 'MATTER_ENABLED', 'false', 'service-1');
-    assert.calledOnce(fseRemoveFake);
-    assert.calledWith(fseRemoveFake, path.join(path.dirname(gladys.config.storage), 'matter'));
+
+    // Verify directory was deleted
+    const existsAfter = await fse.pathExists(testMatterPath);
+    expect(existsAfter).to.equal(false);
 
     // Verify in-memory state is reset
-    sinon.assert.match(matterHandler.commissioningController, null);
-    sinon.assert.match(matterHandler.devices, []);
-    sinon.assert.match(matterHandler.nodesMap.size, 0);
-    sinon.assert.match(matterHandler.stateChangeListeners.size, 0);
-  });
-
-  it('should reset matter integration with custom MATTER_FOLDER_PATH', async () => {
-    const originalEnv = process.env.MATTER_FOLDER_PATH;
-    process.env.MATTER_FOLDER_PATH = '/custom/matter/path';
-
-    const fseRemoveFake = fake.resolves(null);
-
-    const { reset } = proxyquire('../../../../services/matter/lib/matter.reset', {
-      'fs-extra': {
-        remove: fseRemoveFake,
-      },
-    });
-
-    await reset.call(matterHandler);
-
-    assert.calledOnceWithExactly(fseRemoveFake, '/custom/matter/path');
-
-    // Restore original env
-    if (originalEnv === undefined) {
-      delete process.env.MATTER_FOLDER_PATH;
-    } else {
-      process.env.MATTER_FOLDER_PATH = originalEnv;
-    }
+    expect(matterHandler.commissioningController).to.equal(null);
+    expect(matterHandler.devices).to.deep.equal([]);
+    expect(matterHandler.nodesMap.size).to.equal(0);
+    expect(matterHandler.stateChangeListeners.size).to.equal(0);
   });
 });
