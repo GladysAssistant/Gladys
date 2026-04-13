@@ -2133,7 +2133,16 @@
         "disabledWarningSettings": "Matter ist nicht aktiviert, bitte klicke auf den Button unten, um es zu aktivieren.",
         "enableButton": "Matter aktivieren",
         "disableButton": "Matter deaktivieren",
-        "downloadNodesJson": "Knoten-JSON herunterladen"
+        "downloadNodesJson": "Knoten-JSON herunterladen",
+        "reset": {
+          "title": "Integration zurücksetzen",
+          "description": "Verwende diese Option, wenn du mit Matter von vorne beginnen möchtest. Dadurch werden alle Controller-Daten, Backups und der Matter-Ordner gelöscht.",
+          "button": "Zurücksetzen",
+          "confirmMessage": "Achtung, das Zurücksetzen der Integration löscht alle Matter-Controller-Daten, Backups und den Matter-Ordner. Alle derzeit gekoppelten Matter-Geräte müssen erneut gekoppelt werden.",
+          "confirmButton": "Ja, alles zurücksetzen",
+          "cancelButton": "Abbrechen",
+          "error": "Beim Zurücksetzen der Integration ist ein Fehler aufgetreten."
+        }
       },
       "device": {
         "title": "Matter-Geräte",
