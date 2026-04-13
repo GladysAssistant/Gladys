@@ -222,4 +222,135 @@ describe('Matter.vacuumCleanerStateMapping', () => {
       expect(convertGladysCleanModeToMatter(99)).to.equal(99);
     });
   });
+
+  describe('dynamic supportedModes mapping', () => {
+    // Simulates Matterbridge Roborock plugin supportedModes where Idle=1, Cleaning=2
+    const roborockRunModeSupportedModes = {
+      supportedModes: [
+        { mode: 1, label: 'Idle', modeTags: [{ value: 16384 }] }, // ModeTag 16384 = Idle
+        { mode: 2, label: 'Cleaning', modeTags: [{ value: 16385 }] }, // ModeTag 16385 = Cleaning
+      ],
+      clusterType: 'RvcRunMode',
+    };
+
+    const roborockCleanModeSupportedModes = {
+      supportedModes: [{ mode: 1, label: 'Vacuum', modeTags: [{ value: 16385 }] }], // ModeTag 16385 = Vacuum
+      clusterType: 'RvcCleanMode',
+    };
+
+    describe('convertMatterRunModeToGladys with supportedModes', () => {
+      it('should convert Matter mode 1 to Gladys IDLE using supportedModes', () => {
+        expect(convertMatterRunModeToGladys(1, roborockRunModeSupportedModes)).to.equal(VACUUM_CLEANER_MODE.IDLE);
+      });
+
+      it('should convert Matter mode 2 to Gladys CLEANING using supportedModes', () => {
+        expect(convertMatterRunModeToGladys(2, roborockRunModeSupportedModes)).to.equal(VACUUM_CLEANER_MODE.CLEANING);
+      });
+
+      it('should fallback to static mapping when supportedModes is null', () => {
+        expect(convertMatterRunModeToGladys(0, null)).to.equal(VACUUM_CLEANER_MODE.IDLE);
+      });
+    });
+
+    describe('convertGladysRunModeToMatter with supportedModes', () => {
+      it('should convert Gladys IDLE to Matter mode 1 using supportedModes', () => {
+        expect(convertGladysRunModeToMatter(VACUUM_CLEANER_MODE.IDLE, roborockRunModeSupportedModes)).to.equal(1);
+      });
+
+      it('should convert Gladys CLEANING to Matter mode 2 using supportedModes', () => {
+        expect(convertGladysRunModeToMatter(VACUUM_CLEANER_MODE.CLEANING, roborockRunModeSupportedModes)).to.equal(2);
+      });
+
+      it('should fallback to static mapping when supportedModes is null', () => {
+        expect(convertGladysRunModeToMatter(VACUUM_CLEANER_MODE.IDLE, null)).to.equal(MATTER_RVC_RUN_MODE.IDLE);
+      });
+    });
+
+    describe('convertMatterCleanModeToGladys with supportedModes', () => {
+      it('should convert Matter mode 1 to Gladys VACUUM using supportedModes', () => {
+        expect(convertMatterCleanModeToGladys(1, roborockCleanModeSupportedModes)).to.equal(
+          VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+        );
+      });
+
+      it('should fallback to static mapping when supportedModes is null', () => {
+        expect(convertMatterCleanModeToGladys(0, null)).to.equal(VACUUM_CLEANER_CLEAN_MODE.AUTO);
+      });
+    });
+
+    describe('convertGladysCleanModeToMatter with supportedModes', () => {
+      it('should convert Gladys VACUUM to Matter mode 1 using supportedModes', () => {
+        expect(
+          convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, roborockCleanModeSupportedModes),
+        ).to.equal(1);
+      });
+
+      it('should fallback to static mapping when supportedModes is null', () => {
+        expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO, null)).to.equal(
+          MATTER_RVC_CLEAN_MODE.AUTO,
+        );
+      });
+    });
+
+    describe('fallback when mode not found in supportedModes', () => {
+      // supportedModes that doesn't contain all modes
+      const incompleteSupportedModes = {
+        supportedModes: [{ mode: 1, label: 'Idle', modeTags: [{ value: 16384 }] }],
+        clusterType: 'RvcRunMode',
+      };
+
+      const incompleteCleanModeSupportedModes = {
+        supportedModes: [{ mode: 1, label: 'Vacuum', modeTags: [{ value: 16385 }] }],
+        clusterType: 'RvcCleanMode',
+      };
+
+      it('should fallback when Matter mode not found in supportedModes (RvcRunMode)', () => {
+        // Mode 99 is not in supportedModes, should fallback to static mapping
+        expect(convertMatterRunModeToGladys(99, incompleteSupportedModes)).to.equal(99);
+      });
+
+      it('should fallback when Gladys mode not found in supportedModes (RvcRunMode)', () => {
+        // MAPPING mode tag is not in supportedModes, should fallback to static mapping
+        expect(convertGladysRunModeToMatter(VACUUM_CLEANER_MODE.MAPPING, incompleteSupportedModes)).to.equal(
+          MATTER_RVC_RUN_MODE.MAPPING,
+        );
+      });
+
+      it('should fallback when Matter mode not found in supportedModes (RvcCleanMode)', () => {
+        // Mode 99 is not in supportedModes, should fallback to static mapping
+        expect(convertMatterCleanModeToGladys(99, incompleteCleanModeSupportedModes)).to.equal(99);
+      });
+
+      it('should fallback when Gladys mode not found in supportedModes (RvcCleanMode)', () => {
+        // MOP mode tag is not in supportedModes, should fallback to static mapping
+        expect(
+          convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.MOP, incompleteCleanModeSupportedModes),
+        ).to.equal(MATTER_RVC_CLEAN_MODE.MOP);
+      });
+    });
+
+    describe('edge cases with invalid supportedModes data', () => {
+      it('should fallback when supportedModes is not an array (RvcRunMode)', () => {
+        const invalidData = { supportedModes: 'not-an-array', clusterType: 'RvcRunMode' };
+        expect(convertMatterRunModeToGladys(0, invalidData)).to.equal(VACUUM_CLEANER_MODE.IDLE);
+      });
+
+      it('should fallback when supportedModes is not an array (RvcCleanMode)', () => {
+        const invalidData = { supportedModes: 'not-an-array', clusterType: 'RvcCleanMode' };
+        expect(convertMatterCleanModeToGladys(0, invalidData)).to.equal(VACUUM_CLEANER_CLEAN_MODE.AUTO);
+      });
+
+      it('should fallback when supportedModes is not an array for Gladys to Matter (RvcRunMode)', () => {
+        const invalidData = { supportedModes: 'not-an-array', clusterType: 'RvcRunMode' };
+        expect(convertGladysRunModeToMatter(VACUUM_CLEANER_MODE.IDLE, invalidData)).to.equal(MATTER_RVC_RUN_MODE.IDLE);
+      });
+
+      it('should fallback when supportedModes is not an array for Gladys to Matter (RvcCleanMode)', () => {
+        const invalidData = { supportedModes: 'not-an-array', clusterType: 'RvcCleanMode' };
+        expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO, invalidData)).to.equal(
+          MATTER_RVC_CLEAN_MODE.AUTO,
+        );
+      });
+    });
+  });
 });

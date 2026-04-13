@@ -219,8 +219,12 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!rvcRunMode) {
       throw new Error('Device does not support RvcRunMode cluster');
     }
+    // Get supportedModes for dynamic conversion
+    const runModeExternalId = gladysFeature.external_id;
+    const supportedModesData = this.supportedModesMap.get(runModeExternalId);
     // Convert Gladys standard mode to Matter mode (ensure value is a number)
-    const matterMode = convertGladysRunModeToMatter(Number(value));
+    const matterMode = convertGladysRunModeToMatter(Number(value), supportedModesData);
+    logger.debug(`Matter: Setting RvcRunMode to ${matterMode} (Gladys value: ${value})`);
     await rvcRunMode.changeToMode({ newMode: matterMode });
   }
 
@@ -233,8 +237,12 @@ async function setValue(gladysDevice, gladysFeature, value) {
     if (!rvcCleanMode) {
       throw new Error('Device does not support RvcCleanMode cluster');
     }
+    // Get supportedModes for dynamic conversion
+    const cleanModeExternalId = gladysFeature.external_id;
+    const supportedModesData = this.supportedModesMap.get(cleanModeExternalId);
     // Convert Gladys standard clean mode to Matter clean mode (ensure value is a number)
-    const matterMode = convertGladysCleanModeToMatter(Number(value));
+    const matterMode = convertGladysCleanModeToMatter(Number(value), supportedModesData);
+    logger.debug(`Matter: Setting RvcCleanMode to ${matterMode} (Gladys value: ${value})`);
     await rvcCleanMode.changeToMode({ newMode: matterMode });
   }
 }

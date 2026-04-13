@@ -40,6 +40,71 @@ const MATTER_RVC_CLEAN_MODE = {
 };
 
 /**
+ * Matter RvcRunMode ModeTag values (from Matter specification).
+ * These are used in the modeTags array of supportedModes to identify mode types.
+ */
+const MATTER_RVC_RUN_MODE_TAG = {
+  IDLE: 16384, // 0x4000
+  CLEANING: 16385, // 0x4001
+  MAPPING: 16386, // 0x4002
+};
+
+/**
+ * Matter RvcCleanMode ModeTag values (from Matter specification).
+ * These are used in the modeTags array of supportedModes to identify mode types.
+ */
+const MATTER_RVC_CLEAN_MODE_TAG = {
+  DEEP_CLEAN: 16384, // 0x4000
+  VACUUM: 16385, // 0x4001
+  MOP: 16386, // 0x4002
+};
+
+/**
+ * @description Find the Matter mode value for a given Gladys mode using supportedModes.
+ * @param {Array} supportedModes - The supportedModes array from the cluster.
+ * @param {number} targetModeTag - The ModeTag to search for.
+ * @returns {number|null} The Matter mode value, or null if not found.
+ */
+function findMatterModeByTag(supportedModes, targetModeTag) {
+  if (!supportedModes || !Array.isArray(supportedModes)) {
+    return null;
+  }
+  for (const mode of supportedModes) {
+    if (mode.modeTags && Array.isArray(mode.modeTags)) {
+      for (const tag of mode.modeTags) {
+        if (tag.value === targetModeTag) {
+          return mode.mode;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * @description Find the Gladys mode for a given Matter mode value using supportedModes.
+ * @param {Array} supportedModes - The supportedModes array from the cluster.
+ * @param {number} matterModeValue - The Matter mode value to convert.
+ * @param {object} modeTagMapping - Mapping of ModeTag values to Gladys mode values.
+ * @returns {number|null} The Gladys mode value, or null if not found.
+ */
+function findGladysModeByMatterValue(supportedModes, matterModeValue, modeTagMapping) {
+  if (!supportedModes || !Array.isArray(supportedModes)) {
+    return null;
+  }
+  for (const mode of supportedModes) {
+    if (mode.mode === matterModeValue && mode.modeTags && Array.isArray(mode.modeTags)) {
+      for (const tag of mode.modeTags) {
+        if (modeTagMapping[tag.value] !== undefined) {
+          return modeTagMapping[tag.value];
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
  * @description Convert Matter RvcOperationalState to Gladys vacuum cleaner state.
  * @param {number} matterState - The Matter RvcOperationalState value.
  * @returns {number} The Gladys vacuum cleaner state.
@@ -96,13 +161,38 @@ function convertGladysOperationalStateToMatter(gladysState) {
 }
 
 /**
+ * Mapping of RvcRunMode ModeTag values to Gladys VACUUM_CLEANER_MODE values.
+ */
+const RVC_RUN_MODE_TAG_TO_GLADYS = {
+  [MATTER_RVC_RUN_MODE_TAG.IDLE]: VACUUM_CLEANER_MODE.IDLE,
+  [MATTER_RVC_RUN_MODE_TAG.CLEANING]: VACUUM_CLEANER_MODE.CLEANING,
+  [MATTER_RVC_RUN_MODE_TAG.MAPPING]: VACUUM_CLEANER_MODE.MAPPING,
+};
+
+/**
  * @description Convert Matter RvcRunMode to Gladys vacuum cleaner mode.
+ * Uses dynamic supportedModes if available, otherwise falls back to static mapping.
  * @param {number} matterMode - The Matter RvcRunMode value.
+ * @param {object} supportedModesData - Optional object containing supportedModes array.
  * @returns {number} The Gladys vacuum cleaner mode.
  * @example
  * const gladysMode = convertMatterRunModeToGladys(1); // Returns VACUUM_CLEANER_MODE.CLEANING (1)
  */
-function convertMatterRunModeToGladys(matterMode) {
+function convertMatterRunModeToGladys(matterMode, supportedModesData = null) {
+  // Try dynamic mapping using supportedModes
+  if (supportedModesData && supportedModesData.supportedModes) {
+    const gladysMode = findGladysModeByMatterValue(
+      supportedModesData.supportedModes,
+      matterMode,
+      RVC_RUN_MODE_TAG_TO_GLADYS,
+    );
+    if (gladysMode !== null) {
+      return gladysMode;
+    }
+    logger.debug(`Matter: No ModeTag mapping found for RvcRunMode value ${matterMode}, using fallback`);
+  }
+
+  // Fallback to static mapping (Matter spec default values)
   switch (matterMode) {
     case MATTER_RVC_RUN_MODE.IDLE:
       return VACUUM_CLEANER_MODE.IDLE;
@@ -116,13 +206,38 @@ function convertMatterRunModeToGladys(matterMode) {
 }
 
 /**
+ * Mapping of Gladys VACUUM_CLEANER_MODE values to RvcRunMode ModeTag values.
+ */
+const GLADYS_TO_RVC_RUN_MODE_TAG = {
+  [VACUUM_CLEANER_MODE.IDLE]: MATTER_RVC_RUN_MODE_TAG.IDLE,
+  [VACUUM_CLEANER_MODE.CLEANING]: MATTER_RVC_RUN_MODE_TAG.CLEANING,
+  [VACUUM_CLEANER_MODE.MAPPING]: MATTER_RVC_RUN_MODE_TAG.MAPPING,
+};
+
+/**
  * @description Convert Gladys vacuum cleaner mode to Matter RvcRunMode.
+ * Uses dynamic supportedModes if available, otherwise falls back to static mapping.
  * @param {number} gladysMode - The Gladys vacuum cleaner mode.
+ * @param {object} supportedModesData - Optional object containing supportedModes array.
  * @returns {number} The Matter RvcRunMode value.
  * @example
  * const matterMode = convertGladysRunModeToMatter(1); // Returns MATTER_RVC_RUN_MODE.CLEANING (1)
  */
-function convertGladysRunModeToMatter(gladysMode) {
+function convertGladysRunModeToMatter(gladysMode, supportedModesData = null) {
+  // Try dynamic mapping using supportedModes
+  if (supportedModesData && supportedModesData.supportedModes) {
+    const targetModeTag = GLADYS_TO_RVC_RUN_MODE_TAG[gladysMode];
+    if (targetModeTag !== undefined) {
+      const matterMode = findMatterModeByTag(supportedModesData.supportedModes, targetModeTag);
+      if (matterMode !== null) {
+        logger.debug(`Matter: Converted Gladys mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`);
+        return matterMode;
+      }
+    }
+    logger.debug(`Matter: No supportedModes mapping found for Gladys mode ${gladysMode}, using fallback`);
+  }
+
+  // Fallback to static mapping (Matter spec default values)
   switch (gladysMode) {
     case VACUUM_CLEANER_MODE.IDLE:
       return MATTER_RVC_RUN_MODE.IDLE;
@@ -136,13 +251,47 @@ function convertGladysRunModeToMatter(gladysMode) {
 }
 
 /**
+ * Mapping of RvcCleanMode ModeTag values to Gladys VACUUM_CLEANER_CLEAN_MODE values.
+ */
+const RVC_CLEAN_MODE_TAG_TO_GLADYS = {
+  [MATTER_RVC_CLEAN_MODE_TAG.DEEP_CLEAN]: VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+  [MATTER_RVC_CLEAN_MODE_TAG.VACUUM]: VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+  [MATTER_RVC_CLEAN_MODE_TAG.MOP]: VACUUM_CLEANER_CLEAN_MODE.MOP,
+};
+
+/**
+ * Mapping of Gladys VACUUM_CLEANER_CLEAN_MODE values to RvcCleanMode ModeTag values.
+ */
+const GLADYS_TO_RVC_CLEAN_MODE_TAG = {
+  [VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN]: MATTER_RVC_CLEAN_MODE_TAG.DEEP_CLEAN,
+  [VACUUM_CLEANER_CLEAN_MODE.VACUUM]: MATTER_RVC_CLEAN_MODE_TAG.VACUUM,
+  [VACUUM_CLEANER_CLEAN_MODE.MOP]: MATTER_RVC_CLEAN_MODE_TAG.MOP,
+};
+
+/**
  * @description Convert Matter RvcCleanMode to Gladys vacuum cleaner clean mode.
+ * Uses dynamic supportedModes if available, otherwise falls back to static mapping.
  * @param {number} matterMode - The Matter RvcCleanMode value.
+ * @param {object} supportedModesData - Optional object containing supportedModes array.
  * @returns {number|null} The Gladys vacuum cleaner clean mode, or null if unknown.
  * @example
  * const gladysMode = convertMatterCleanModeToGladys(0); // Returns VACUUM_CLEANER_CLEAN_MODE.AUTO (0)
  */
-function convertMatterCleanModeToGladys(matterMode) {
+function convertMatterCleanModeToGladys(matterMode, supportedModesData = null) {
+  // Try dynamic mapping using supportedModes
+  if (supportedModesData && supportedModesData.supportedModes) {
+    const gladysMode = findGladysModeByMatterValue(
+      supportedModesData.supportedModes,
+      matterMode,
+      RVC_CLEAN_MODE_TAG_TO_GLADYS,
+    );
+    if (gladysMode !== null) {
+      return gladysMode;
+    }
+    logger.debug(`Matter: No ModeTag mapping found for RvcCleanMode value ${matterMode}, using fallback`);
+  }
+
+  // Fallback to static mapping (Matter spec default values)
   switch (matterMode) {
     case MATTER_RVC_CLEAN_MODE.AUTO:
       return VACUUM_CLEANER_CLEAN_MODE.AUTO;
@@ -166,12 +315,30 @@ function convertMatterCleanModeToGladys(matterMode) {
 
 /**
  * @description Convert Gladys vacuum cleaner clean mode to Matter RvcCleanMode.
+ * Uses dynamic supportedModes if available, otherwise falls back to static mapping.
  * @param {number} gladysMode - The Gladys vacuum cleaner clean mode.
+ * @param {object} supportedModesData - Optional object containing supportedModes array.
  * @returns {number} The Matter RvcCleanMode value.
  * @example
  * const matterMode = convertGladysCleanModeToMatter(4); // Returns MATTER_RVC_CLEAN_MODE.DEEP_CLEAN (16384)
  */
-function convertGladysCleanModeToMatter(gladysMode) {
+function convertGladysCleanModeToMatter(gladysMode, supportedModesData = null) {
+  // Try dynamic mapping using supportedModes
+  if (supportedModesData && supportedModesData.supportedModes) {
+    const targetModeTag = GLADYS_TO_RVC_CLEAN_MODE_TAG[gladysMode];
+    if (targetModeTag !== undefined) {
+      const matterMode = findMatterModeByTag(supportedModesData.supportedModes, targetModeTag);
+      if (matterMode !== null) {
+        logger.debug(
+          `Matter: Converted Gladys clean mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`,
+        );
+        return matterMode;
+      }
+    }
+    logger.debug(`Matter: No supportedModes mapping found for Gladys clean mode ${gladysMode}, using fallback`);
+  }
+
+  // Fallback to static mapping (Matter spec default values)
   switch (gladysMode) {
     case VACUUM_CLEANER_CLEAN_MODE.AUTO:
       return MATTER_RVC_CLEAN_MODE.AUTO;

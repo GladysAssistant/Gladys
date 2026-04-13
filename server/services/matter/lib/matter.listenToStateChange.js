@@ -438,13 +438,26 @@ async function listenToStateChange(nodeId, devicePath, device) {
   if (rvcRunMode && !this.stateChangeListeners.has(rvcRunMode)) {
     logger.debug(`Matter: Adding state change listener for RvcRunMode cluster ${rvcRunMode.name}`);
     this.stateChangeListeners.add(rvcRunMode);
+
+    // Read and store supportedModes for this cluster
+    const externalId = `matter:${nodeId}:${devicePath}:${RvcRunMode.Complete.id}`;
+    try {
+      if (rvcRunMode.attributes && rvcRunMode.attributes.supportedModes) {
+        const supportedModes = await rvcRunMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcRunMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(externalId, { supportedModes, clusterType: 'RvcRunMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcRunMode supportedModes: ${err.message}`);
+    }
+
     // Subscribe to RvcRunMode attribute changes
     rvcRunMode.addCurrentModeAttributeListener((value) => {
       logger.debug(`Matter: RvcRunMode currentMode attribute changed to ${value}`);
-      // Convert Matter mode to Gladys standard mode
-      const gladysMode = convertMatterRunModeToGladys(value);
+      // Convert Matter mode to Gladys standard mode using stored supportedModes or fallback
+      const gladysMode = convertMatterRunModeToGladys(value, this.supportedModesMap.get(externalId));
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${RvcRunMode.Complete.id}`,
+        device_feature_external_id: externalId,
         state: gladysMode,
       });
     });
@@ -454,13 +467,26 @@ async function listenToStateChange(nodeId, devicePath, device) {
   if (rvcCleanMode && !this.stateChangeListeners.has(rvcCleanMode)) {
     logger.debug(`Matter: Adding state change listener for RvcCleanMode cluster ${rvcCleanMode.name}`);
     this.stateChangeListeners.add(rvcCleanMode);
+
+    // Read and store supportedModes for this cluster
+    const cleanModeExternalId = `matter:${nodeId}:${devicePath}:${RvcCleanMode.Complete.id}`;
+    try {
+      if (rvcCleanMode.attributes && rvcCleanMode.attributes.supportedModes) {
+        const supportedModes = await rvcCleanMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcCleanMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(cleanModeExternalId, { supportedModes, clusterType: 'RvcCleanMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcCleanMode supportedModes: ${err.message}`);
+    }
+
     // Subscribe to RvcCleanMode attribute changes
     rvcCleanMode.addCurrentModeAttributeListener((value) => {
       logger.debug(`Matter: RvcCleanMode currentMode attribute changed to ${value}`);
-      // Convert Matter clean mode to Gladys standard clean mode
-      const gladysMode = convertMatterCleanModeToGladys(value);
+      // Convert Matter clean mode to Gladys standard clean mode using stored supportedModes or fallback
+      const gladysMode = convertMatterCleanModeToGladys(value, this.supportedModesMap.get(cleanModeExternalId));
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${RvcCleanMode.Complete.id}`,
+        device_feature_external_id: cleanModeExternalId,
         state: gladysMode,
       });
     });
