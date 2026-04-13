@@ -64,21 +64,17 @@ const MATTER_RVC_CLEAN_MODE_TAG = {
  * @param {Array} supportedModes - The supportedModes array from the cluster.
  * @param {number} targetModeTag - The ModeTag to search for.
  * @returns {number|null} The Matter mode value, or null if not found.
+ * @example
+ * const matterMode = findMatterModeByTag(supportedModes, 16384); // Returns mode value for Idle tag
  */
 function findMatterModeByTag(supportedModes, targetModeTag) {
   if (!supportedModes || !Array.isArray(supportedModes)) {
     return null;
   }
-  for (const mode of supportedModes) {
-    if (mode.modeTags && Array.isArray(mode.modeTags)) {
-      for (const tag of mode.modeTags) {
-        if (tag.value === targetModeTag) {
-          return mode.mode;
-        }
-      }
-    }
-  }
-  return null;
+  const foundMode = supportedModes.find(
+    (mode) => mode.modeTags && Array.isArray(mode.modeTags) && mode.modeTags.some((tag) => tag.value === targetModeTag),
+  );
+  return foundMode ? foundMode.mode : null;
 }
 
 /**
@@ -87,21 +83,21 @@ function findMatterModeByTag(supportedModes, targetModeTag) {
  * @param {number} matterModeValue - The Matter mode value to convert.
  * @param {object} modeTagMapping - Mapping of ModeTag values to Gladys mode values.
  * @returns {number|null} The Gladys mode value, or null if not found.
+ * @example
+ * const gladysMode = findGladysModeByMatterValue(supportedModes, 1, tagMapping); // Returns Gladys mode
  */
 function findGladysModeByMatterValue(supportedModes, matterModeValue, modeTagMapping) {
   if (!supportedModes || !Array.isArray(supportedModes)) {
     return null;
   }
-  for (const mode of supportedModes) {
-    if (mode.mode === matterModeValue && mode.modeTags && Array.isArray(mode.modeTags)) {
-      for (const tag of mode.modeTags) {
-        if (modeTagMapping[tag.value] !== undefined) {
-          return modeTagMapping[tag.value];
-        }
-      }
-    }
+  const matchingMode = supportedModes.find(
+    (mode) => mode.mode === matterModeValue && mode.modeTags && Array.isArray(mode.modeTags),
+  );
+  if (!matchingMode) {
+    return null;
   }
-  return null;
+  const matchingTag = matchingMode.modeTags.find((tag) => modeTagMapping[tag.value] !== undefined);
+  return matchingTag ? modeTagMapping[matchingTag.value] : null;
 }
 
 /**
