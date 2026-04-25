@@ -417,6 +417,7 @@ const ACTIONS = {
   },
   CALENDAR: {
     IS_EVENT_RUNNING: 'calendar.is-event-running',
+    GET_RUNNING_EVENT: 'calendar.get-running-event',
   },
   DEVICE: {
     SET_VALUE: 'device.set-value',

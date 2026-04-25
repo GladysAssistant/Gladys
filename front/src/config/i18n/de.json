@@ -2402,6 +2402,12 @@
         "stopScene": "Szene stoppen",
         "continueScene": "Szene fortsetzen"
       },
+      "calendarGetRunningEvent": {
+        "description": "Diese Aktion ruft das aktuell laufende Kalenderereignis ab und speichert es in Variablen, die im weiteren Verlauf der Szene verwendet werden können. Wenn kein Ereignis gefunden wird, werden die Variablen nicht aktualisiert.",
+        "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
+        "nameLabel": "Wenn der Name",
+        "namePlaceholder": "Gib einen Namen ein"
+      },
       "ecowattCondition": {
         "description": "Diese Bedingung ermöglicht es dir, den Status des französischen Stromnetzes zu überprüfen",
         "knowMore": "Mehr erfahren",
@@ -2460,7 +2466,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Bedingung für Kalenderereignisse"
+        "is-event-running": "Bedingung für Kalenderereignisse",
+        "get-running-event": "Aktuelles Kalenderereignis abrufen"
       },
       "device": {
         "get-value": "Gerätewert abrufen",

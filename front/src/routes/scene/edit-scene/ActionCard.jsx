@@ -24,6 +24,7 @@ import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
+import CalendarGetRunningEvent from './actions/CalendarGetRunningEvent';
 import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
 import CheckAlarmMode from './actions/CheckAlarmMode';
@@ -60,6 +61,7 @@ const ACTION_ICON = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
+  [ACTIONS.CALENDAR.GET_RUNNING_EVENT]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
   [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
@@ -95,6 +97,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.DEVICE.SET_VALUE]: DeviceSetValue,
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: CalendarIsEventRunning,
+  [ACTIONS.CALENDAR.GET_RUNNING_EVENT]: CalendarGetRunningEvent,
   [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
   [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
@@ -160,6 +163,7 @@ const ActionCard = ({ children, ...props }) => {
         'col-lg-6':
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
+          props.action.type === ACTIONS.CALENDAR.GET_RUNNING_EVENT ||
           props.action.type === ACTIONS.MQTT.SEND ||
           props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK ||
@@ -168,6 +172,7 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
+          props.action.type !== ACTIONS.CALENDAR.GET_RUNNING_EVENT &&
           props.action.type !== ACTIONS.SMS.SEND
       })}
     >
