@@ -2307,6 +2307,9 @@
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
+      "deviceCheckValue": {
+        "description": "La scène continuera uniquement si l'état actuel de l'appareil sélectionné vérifie la condition."
+      },
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
@@ -2464,7 +2467,8 @@
       },
       "device": {
         "get-value": "Récupérer le dernier état",
-        "set-value": "Contrôler un appareil"
+        "set-value": "Contrôler un appareil",
+        "check-value": "Condition sur état d'appareil"
       },
       "message": {
         "send": "Envoyer un message",

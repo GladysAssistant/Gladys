@@ -2307,6 +2307,9 @@
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
       },
+      "deviceCheckValue": {
+        "description": "The scene will continue only if the current state of the selected device matches the condition."
+      },
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
@@ -2464,7 +2467,8 @@
       },
       "device": {
         "get-value": "Get device value",
-        "set-value": "Set device value"
+        "set-value": "Set device value",
+        "check-value": "Condition on device state"
       },
       "message": {
         "send": "Send Message",

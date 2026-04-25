@@ -11,6 +11,7 @@ import { ACTIONS } from '../../../../../server/utils/constants';
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 import DelayActionParams from './actions/DelayActionParams';
 import DeviceGetValueParams from './actions/DeviceGetValueParams';
+import DeviceCheckValueParams from './actions/DeviceCheckValueParams';
 import DeviceSetValue from './actions/DeviceSetValue';
 import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
@@ -50,6 +51,7 @@ const ACTION_ICON = {
   [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
+  [ACTIONS.DEVICE.CHECK_VALUE]: 'fe fe-check-circle',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
   [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
@@ -85,6 +87,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MESSAGE.SEND_CAMERA]: SendMessageCameraParams,
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: OnlyContinueIfParams,
   [ACTIONS.DEVICE.GET_VALUE]: DeviceGetValueParams,
+  [ACTIONS.DEVICE.CHECK_VALUE]: DeviceCheckValueParams,
   [ACTIONS.USER.SET_SEEN_AT_HOME]: UserPresence,
   [ACTIONS.USER.CHECK_PRESENCE]: CheckUserPresence,
   [ACTIONS.USER.SET_OUT_OF_HOME]: UserPresence,
@@ -163,12 +166,14 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.MQTT.SEND ||
           props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK ||
-          props.action.type === ACTIONS.SMS.SEND,
+          props.action.type === ACTIONS.SMS.SEND ||
+          props.action.type === ACTIONS.DEVICE.CHECK_VALUE,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
-          props.action.type !== ACTIONS.SMS.SEND
+          props.action.type !== ACTIONS.SMS.SEND &&
+          props.action.type !== ACTIONS.DEVICE.CHECK_VALUE
       })}
     >
       <div
