@@ -86,7 +86,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
                 </Localizer>
               ) : (
                 props.comment && (
-                  <div class="alert alert-secondary mb-3 cursor-pointer" onClick={props.onStartEditingComment}>
+                  <div class="alert alert-secondary mb-3 cursor-pointer">
                     {props.comment}
                   </div>
                 )
