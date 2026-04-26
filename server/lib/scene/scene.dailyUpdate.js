@@ -34,14 +34,8 @@ async function dailyUpdate() {
       // Sunrise and Sunset base times
       const sunriseBase = dayjs(times.sunrise).tz(this.timezone);
       const sunsetBase = dayjs(times.sunset).tz(this.timezone);
-      logger.info(
-        `Sunrise today is at ${sunriseBase.get('hour')}:${sunriseBase.get('minute')}, in your timezone = ${
-          this.timezone
-        }`,
-      );
-      logger.info(
-        `Sunset today is at ${sunsetBase.get('hour')}:${sunsetBase.get('minute')}, in your timezone = ${this.timezone}`,
-      );
+      logger.info(`Sunrise today is at ${sunriseBase.format('HH:mm')}, in your timezone = ${this.timezone}`);
+      logger.info(`Sunset today is at ${sunsetBase.format('HH:mm')}, in your timezone = ${this.timezone}`);
 
       // Collect all distinct offsets for this house from active scene triggers
       const sunriseOffsets = new Set([0]);
@@ -71,7 +65,11 @@ async function dailyUpdate() {
             this.event.emit(EVENTS.TRIGGERS.CHECK, { type: eventType, house, offset }),
           );
           if (job) {
-            logger.info(`${label} (offset ${offset}min) is scheduled, ${dayjs(time).fromNow()}.`);
+            logger.info(
+              `${label} (offset ${offset}min) is scheduled at ${dayjs(time)
+                .tz(this.timezone)
+                .format('HH:mm')}, ${dayjs(time).fromNow()}.`,
+            );
             this.jobs.push(job);
           } else {
             logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling for today.`);
