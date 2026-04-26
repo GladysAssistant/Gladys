@@ -176,6 +176,10 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      actionsComments: {
+        allowNull: true,
+        type: DataTypes.JSON,
+      },
       last_executed: {
         type: DataTypes.DATE,
       },

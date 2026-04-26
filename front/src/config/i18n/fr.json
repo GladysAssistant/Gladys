@@ -2229,6 +2229,7 @@
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
     "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
     "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
+    "actionsCommentPlaceholder": "Ajouter un commentaire pour ce bloc...",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {

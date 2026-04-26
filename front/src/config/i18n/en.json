@@ -2229,6 +2229,7 @@
     "noActionsYet": "No actions added yet. Click on the + button to add an action to this scene.",
     "triggersDescription": "Every trigger is independent. When any of those triggers are triggered, the scene will run.",
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
+    "actionsCommentPlaceholder": "Add a comment for this block...",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
