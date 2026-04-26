@@ -61,7 +61,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
 
             {props.updateComment !== undefined && (
               <button type="button" class="btn btn-outline-info" onClick={props.onStartEditingComment}>
-                <i class="fe fe-info" />
+                <i class="fe fe-info"  tooltip={<Text id="editScene.actionsCommentTooltip" />} />
               </button>
             )}
 
