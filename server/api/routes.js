@@ -581,6 +581,16 @@ function getRoutes(gladys) {
       admin: true,
       controller: systemController.vacuum,
     },
+    'get /api/v1/system/backup/local': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.localBackup,
+    },
+    'post /api/v1/system/backup/local/restore': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.localBackupRestore,
+    },
     // user
     'post /api/v1/user': {
       authenticated: true,

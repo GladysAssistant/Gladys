@@ -25,6 +25,8 @@ const { getNetworkMode } = require('./system.getNetworkMode');
 const { vacuum } = require('./system.vacuum');
 const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
 const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
+const { createLocalBackup } = require('./system.localBackup');
+const { restoreLocalBackup } = require('./system.restoreLocalBackup');
 
 const { shutdown } = require('./system.shutdown');
 
@@ -74,5 +76,7 @@ System.prototype.getNetworkMode = getNetworkMode;
 System.prototype.vacuum = vacuum;
 System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;
+System.prototype.createLocalBackup = createLocalBackup;
+System.prototype.restoreLocalBackup = restoreLocalBackup;
 
 module.exports = System;
