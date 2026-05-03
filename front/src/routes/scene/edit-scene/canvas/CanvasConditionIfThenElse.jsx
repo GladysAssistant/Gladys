@@ -79,13 +79,13 @@ const CanvasConditionIfThenElse = ({
     updateActionProperty(path, 'if', next);
   };
 
-  // Each condition sub-component receives its own updateActionProperty adapter.
-  // It ignores the path argument and updates conditions[index] directly.
-  const makeConditionUpdater = (index, currentConditions) => (_subPath, property, value) => {
-    const next = currentConditions.map((c, i) =>
-      i === index ? { ...c, [property]: value } : c
-    );
-    updateActionProperty(path, 'if', next);
+  // Delegate directly to the parent updateActionProperty with the nested path so
+  // NodeConfigPanel's setNestedValue handles the update against current node state.
+  // This avoids a stale-closure bug when a sub-component calls updateActionProperty
+  // multiple times in the same event (e.g. house + house_label): each call gets the
+  // latest node state via the functional setNodes updater.
+  const makeConditionUpdater = index => (_subPath, property, value) => {
+    updateActionProperty(`${path}.if.${index}`, property, value);
   };
 
   return (
@@ -111,12 +111,12 @@ const CanvasConditionIfThenElse = ({
           <div
             key={index}
             class="mb-2"
-            style={{ border: '1px solid #fcd34d', borderRadius: '6px', overflow: 'hidden' }}
+            style={{ border: '1px solid #fcd34d', borderRadius: '6px' }}
           >
             {/* ── Condition header ─────────────────────────────── */}
             <div
               class="d-flex align-items-center justify-content-between"
-              style={{ padding: '6px 10px', background: '#fef3c7', cursor: 'pointer' }}
+              style={{ padding: '6px 10px', background: '#fef3c7', cursor: 'pointer', borderRadius: '5px 5px 0 0' }}
               onClick={() => setExpandedIndex(isExpanded ? null : index)}
             >
               <div
@@ -194,11 +194,12 @@ const CanvasConditionIfThenElse = ({
                   <CondComponent
                     action={condition}
                     path={`${path}.if.${index}`}
-                    updateActionProperty={makeConditionUpdater(index, conditions)}
+                    updateActionProperty={makeConditionUpdater(index)}
                     variables={variables || {}}
                     triggersVariables={triggersVariables || []}
                     actionsGroupsBefore={actionsGroupsBefore || []}
                     allActions={allActions || []}
+                    setVariables={() => {}}
                     deleteAction={() => {}}
                     deleteActionGroup={() => {}}
                     addAction={() => {}}

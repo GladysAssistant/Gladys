@@ -71,6 +71,12 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    // Display-only labels stored by frontend components (not used by backend execution)
+    house_label: Joi.string().allow(null),
+    user_label: Joi.string().allow(null),
+    scene_label: Joi.string().allow(null),
+    device_feature_label: Joi.string().allow(null),
+    calendars_label: Joi.string().allow(null),
   })
   .id('action');
 
@@ -116,6 +122,11 @@ const triggersSchema = Joi.array().items(
     threshold_only: Joi.boolean(),
     topic: Joi.string(),
     message: Joi.string().allow(''),
+    // Display-only labels stored by frontend components
+    house_label: Joi.string().allow(null),
+    user_label: Joi.string().allow(null),
+    area_label: Joi.string().allow(null),
+    calendars_label: Joi.string().allow(null),
   }),
 );
 
