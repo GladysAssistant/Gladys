@@ -18,7 +18,7 @@ const TriggerNode = ({ data, selected }) => {
           ))}
         </div>
       )}
-      <Handle type="source" position={Position.Bottom} class={style.handle} />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 };

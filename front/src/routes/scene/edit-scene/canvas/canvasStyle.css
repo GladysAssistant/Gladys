@@ -225,9 +225,6 @@
   transform: translate(-50%, -100%) !important;
 }
 
-.handle {
-  /* kept for backwards-compat — real sizing done via :global above */
-}
 
 /* ─── Single "Oui" handle label (non-branching condition nodes) ─── */
 .conditionHandleLabelYes {

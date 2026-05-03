@@ -203,6 +203,7 @@ const SceneCanvas = ({
 
   const onSelectionChange = useCallback(({ nodes: sel }) => {
     if (sel.length > 1) setSelectedNodeId(null);
+    else if (sel.length === 1) setSelectedNodeId(sel[0].id);
   }, []);
 
   const onDeleteNode = useCallback(

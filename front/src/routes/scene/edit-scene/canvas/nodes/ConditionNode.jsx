@@ -8,7 +8,7 @@ const ConditionNode = ({ data, selected }) => {
   return (
     <div class={`${style.node} ${style.conditionNode} ${selected ? style.nodeSelected : ''}`}>
       {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
-      <Handle type="target" position={Position.Top} id="input" class={style.handle} />
+      <Handle type="target" position={Position.Top} id="input" />
       <div class={style.nodeHeader}>
         <i class={`fe ${data.icon} ${style.nodeHeaderIcon}`} />
         <span class={style.nodeHeaderLabel}>{data.label}</span>
@@ -27,7 +27,6 @@ const ConditionNode = ({ data, selected }) => {
             position={Position.Bottom}
             id="then"
             style={{ left: '20%' }}
-            class={style.handle}
           />
           <span class={style.conditionHandleLabelThen}>Oui</span>
 
@@ -36,7 +35,6 @@ const ConditionNode = ({ data, selected }) => {
             position={Position.Bottom}
             id="after"
             style={{ left: '50%' }}
-            class={style.handle}
           />
           <span class={style.conditionHandleLabelAfter}>Suite</span>
 
@@ -45,7 +43,6 @@ const ConditionNode = ({ data, selected }) => {
             position={Position.Bottom}
             id="else"
             style={{ left: '80%' }}
-            class={style.handle}
           />
           <span class={style.conditionHandleLabelElse}>Non</span>
         </>
@@ -54,7 +51,6 @@ const ConditionNode = ({ data, selected }) => {
           <Handle
             type="source"
             position={Position.Bottom}
-            class={style.handle}
             style={{ background: '#10b981' }}
           />
           <span class={style.conditionHandleLabelYes}>Oui</span>

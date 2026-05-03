@@ -7,7 +7,7 @@ const ActionNode = ({ data, selected }) => {
   return (
     <div class={`${style.node} ${style.actionNode} ${selected ? style.nodeSelected : ''}`}>
       {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
-      <Handle type="target" position={Position.Top} id="input" class={style.handle} />
+      <Handle type="target" position={Position.Top} id="input" />
       <div class={style.nodeHeader}>
         <i class={`fe ${data.icon} ${style.nodeHeaderIcon}`} />
         <span class={style.nodeHeaderLabel}>{data.label}</span>
@@ -19,7 +19,7 @@ const ActionNode = ({ data, selected }) => {
           ))}
         </div>
       )}
-      <Handle type="source" position={Position.Bottom} class={style.handle} />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 };
