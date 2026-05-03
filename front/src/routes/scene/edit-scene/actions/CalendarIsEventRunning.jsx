@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../../utils/consts';
@@ -39,6 +39,8 @@ class CheckTime extends Component {
   updateCalendars = selectedCalendarsOptions => {
     const calendars = selectedCalendarsOptions.map(o => o.value);
     this.props.updateActionProperty(this.props.path, 'calendars', calendars);
+    const names = selectedCalendarsOptions.map(o => o.label).join(', ');
+    this.props.updateActionProperty(this.props.path, 'calendars_label', names || null);
   };
   handleComparator = e => {
     if (e.target.value) {

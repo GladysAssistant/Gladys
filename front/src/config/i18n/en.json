@@ -2694,6 +2694,15 @@
         "messagePlaceholder": "Enter the expected message",
         "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
       }
+    },
+    "canvas": {
+      "addBlock": "Add a block",
+      "autoLayout": "Auto-layout",
+      "applyGraph": "Apply graph",
+      "nodeType": "Type",
+      "deleteNode": "Delete",
+      "canvasViewTitle": "Graph view",
+      "listViewTitle": "List view"
     }
   },
   "profile": {

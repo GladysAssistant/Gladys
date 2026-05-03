@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 
 import actions from '../../../../actions/scene';
 
@@ -9,8 +9,10 @@ class StartSceneParams extends Component {
   handleChange = selectedOption => {
     if (selectedOption) {
       this.props.updateActionProperty(this.props.path, 'scene', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'scene_label', selectedOption.label);
     } else {
       this.props.updateActionProperty(this.props.path, 'scene', null);
+      this.props.updateActionProperty(this.props.path, 'scene_label', null);
     }
   };
 

@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
 class UserPresenceTrigger extends Component {
@@ -37,15 +37,19 @@ class UserPresenceTrigger extends Component {
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'user', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'user_label', selectedOption.label);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'user', null);
+      this.props.updateTriggerProperty(this.props.index, 'user_label', null);
     }
   };
   handleAreaChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'area', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'area_label', selectedOption.label);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'area', null);
+      this.props.updateTriggerProperty(this.props.index, 'area_label', null);
     }
   };
   refreshSelectedOptions = nextProps => {

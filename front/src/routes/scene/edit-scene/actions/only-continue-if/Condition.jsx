@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../../SceneSelect';
 import update from 'immutability-helper';
 
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';

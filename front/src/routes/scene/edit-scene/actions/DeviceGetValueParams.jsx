@@ -12,9 +12,12 @@ class DeviceGetValue extends Component {
   onDeviceFeatureChange = (deviceFeature, device) => {
     if (deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
+      const label = device ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}` : (deviceFeature.name || deviceFeature.selector);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
       this.setVariables(device, deviceFeature);
     } else {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', null);
       this.setVariables();
     }
     this.setState({ deviceFeature, device });

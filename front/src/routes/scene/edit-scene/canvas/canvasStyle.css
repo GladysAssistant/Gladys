@@ -1,0 +1,524 @@
+/* ─── Outer shell: provides the sizing + positioning context ──────── */
+.sceneCanvasOuter {
+  position: relative;
+  width: 100%;
+  height: 72vh;
+  min-height: 500px;
+}
+
+/* ─── Global grabbing cursor while dragging a block ─────────────────  */
+.isDragging,
+.isDragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* ─── Ghost element that follows the cursor during drag ─────────────  */
+.dragGhost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+/* ─── Canvas wrapper: fills the outer shell, clips ReactFlow ─────── */
+.canvasWrapper {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+/* ─── Panel button ───────────────────────────────────────────────── */
+.panelBtn {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* ─── Base node ──────────────────────────────────────────────────── */
+.node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: 260px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  transition: box-shadow 0.15s, border-color 0.15s;
+  cursor: default;
+  font-size: 13px;
+}
+
+.node:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Selection glow — colour matches the node type border, no override needed */
+.triggerNode.nodeSelected   { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.50); }
+.actionNode.nodeSelected    { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.50); }
+.conditionNode.nodeSelected { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.50); }
+
+/* ─── Badge affiché sur les nœuds sélectionnés ───────────────────── */
+.selectedBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 9px;
+  border: 2px solid #fff;
+  z-index: 10;
+  pointer-events: none;
+  /* default (action node) */
+  background: #3b82f6;
+}
+.triggerNode   .selectedBadge { background: #10b981; }
+.conditionNode .selectedBadge { background: #f59e0b; }
+
+/* ─── Trigger node (green) ───────────────────────────────────────── */
+.triggerNode {
+  border-color: #10b981;
+}
+.triggerNode .nodeHeader {
+  background: #10b981;
+}
+
+/* ─── Action node (blue) ─────────────────────────────────────────── */
+.actionNode {
+  border-color: #3b82f6;
+}
+.actionNode .nodeHeader {
+  background: #3b82f6;
+}
+
+/* ─── Condition node (orange) ────────────────────────────────────── */
+.conditionNode {
+  border-color: #f59e0b;
+}
+.conditionNode .nodeHeader {
+  background: #f59e0b;
+}
+
+/* ─── Node header ────────────────────────────────────────────────── */
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 5px 5px 0 0;
+}
+
+.nodeHeaderIcon {
+  color: #fff;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.nodeHeaderLabel {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Node body ──────────────────────────────────────────────────── */
+.nodeBody {
+  padding: 8px 10px;
+}
+
+.nodeTitle {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 13px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.nodeSummary {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 400;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.nodeSummary2 {
+  display: block;
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 400;
+  line-height: 1.4;
+  word-break: break-word;
+  margin-top: 2px;
+}
+
+/* ─── Condition handle labels (three-handle layout for IF_THEN_ELSE) ── */
+.conditionHandleLabelThen,
+.conditionHandleLabelElse,
+.conditionHandleLabelAfter {
+  position: absolute;
+  bottom: -30px;
+  font-size: 10px;
+  font-weight: 700;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.conditionHandleLabelThen {
+  left: calc(20% - 10px);
+  color: #065f46;
+}
+
+.conditionHandleLabelElse {
+  left: calc(80% - 10px);
+  color: #991b1b;
+}
+
+.conditionHandleLabelAfter {
+  left: calc(50% - 14px);
+  color: #64748b;
+}
+
+/* ─── React Flow handle override ─────────────────────────────────── */
+/* Target the real DOM class so CSS module scoping doesn't interfere */
+:global(.react-flow__handle) {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  border: 2px solid #fff !important;
+  background: #94a3b8 !important;
+}
+
+/* Push handles fully outside the node box.
+   React Flow default: translate(-50%, 50%) centres the handle on the edge.
+   With translate(-50%, 100%) the top edge of the handle aligns with the node
+   border → handle is entirely outside for bottom handles, and vice-versa for top. */
+:global(.react-flow__handle-bottom) {
+  transform: translate(-50%, 100%) !important;
+}
+:global(.react-flow__handle-top) {
+  transform: translate(-50%, -100%) !important;
+}
+
+.handle {
+  /* kept for backwards-compat — real sizing done via :global above */
+}
+
+/* ─── Single "Oui" handle label (non-branching condition nodes) ─── */
+.conditionHandleLabelYes {
+  position: absolute;
+  bottom: -30px;
+  left: calc(50% - 10px);
+  font-size: 10px;
+  font-weight: 700;
+  pointer-events: none;
+  white-space: nowrap;
+  color: #065f46;
+}
+
+/* ─── Node selector panel ────────────────────────────────────────── */
+.selectorPanel {
+  position: absolute;
+  top: 52px;
+  left: 12px;
+  z-index: 10;
+  width: 280px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(72vh - 70px);
+  overflow: hidden;
+}
+
+.selectorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.selectorTitle {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.selectorClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.selectorClose:hover { background: #f1f5f9; }
+
+.selectorSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.selectorSearchIcon {
+  color: #94a3b8;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.selectorSearchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #0f172a;
+  background: transparent;
+}
+
+.selectorTabs {
+  display: flex;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.selectorTab {
+  flex: 1;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+.selectorTab:hover { color: #0f172a; }
+.selectorTabActive { color: #3b82f6; border-bottom-color: #3b82f6; }
+
+.selectorList {
+  overflow-y: auto;
+  flex: 1;
+  padding: 6px;
+}
+
+.selectorEntry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: grab;
+  font-size: 13px;
+  color: #1e293b;
+  transition: background 0.1s, border-color 0.1s;
+  user-select: none;
+}
+.selectorEntry:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.selectorEntryDragHandle {
+  color: #cbd5e1;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.selectorEntryIcon {
+  color: #64748b;
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+.selectorEntryLabel {
+  flex: 1;
+  font-weight: 500;
+}
+
+.selectorEntryGroup {
+  font-size: 10px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ─── Node config panel (right sidebar) ──────────────────────────── */
+/* Positioned relative to .sceneCanvasOuter (outside canvasWrapper),
+   so React Select dropdowns are never clipped by overflow: hidden. */
+.configPanel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  width: 380px;
+  background: #fff;
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  /* No overflow: hidden — lets dropdowns extend freely outside the panel */
+}
+
+.configPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+.configPanelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.configPanelHeaderIcon {
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.configPanelHeaderText {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.configPanelTypeLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+}
+
+.configPanelTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.configPanelClose {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.configPanelClose:hover { background: rgba(255, 255, 255, 0.35); }
+
+.configPanelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  /* Ensure child components (cards, selects, etc.) fit the panel width */
+}
+
+/* React Select menus rendered via menuPortalTarget={document.body} need a high z-index */
+:global(.react-select__menu-portal) {
+  z-index: 9999 !important;
+}
+
+/* Hide the group bounding-box that React Flow draws around all selected nodes
+   after a drag-selection — our badge + border already handle this visually.
+   The drag rectangle itself (.react-flow__selection) is kept for visual feedback. */
+:global(.react-flow__nodesselection-rect) {
+  display: none !important;
+}
+:global(.react-flow__node.selected),
+:global(.react-flow__node:focus) {
+  outline: none !important;
+}
+
+/* ─── Selected edge effect ───────────────────────────────────────── */
+:global(.react-flow__edge.selected .react-flow__edge-path),
+:global(.react-flow__edge:focus .react-flow__edge-path),
+:global(.react-flow__edge:focus-visible .react-flow__edge-path) {
+  filter: drop-shadow(0 0 5px currentColor);
+  animation: edgeMarch 1.8s linear infinite;
+  stroke-dasharray: 10 5;
+}
+
+@keyframes edgeMarch {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -45; }
+}
+
+/* Override Bootstrap card styles inside the config panel */
+.configPanelBody .card {
+  margin-bottom: 0;
+}
+
+/* Force all Bootstrap grid columns to full width — the panel is ~380px,
+   far below Bootstrap's md/lg breakpoints, so columns must be stacked. */
+.configPanelBody [class*="col-lg-"],
+.configPanelBody [class*="col-md-"],
+.configPanelBody [class*="col-sm-"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+.configPanelFooter {
+  padding: 12px 16px;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+/* Hide then/else branches inside canvas config panel — they are separate graph paths */
+.configPanelBody :global(.then-container),
+.configPanelBody :global(.else-container) {
+  display: none !important;
+}

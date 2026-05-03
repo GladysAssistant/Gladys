@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 
 class BlinkLight extends Component {
   getOptions = async () => {

@@ -1114,13 +1114,41 @@ class EditScene extends Component {
     return [...new Set(types)];
   };
 
+  switchToCanvasView = () => this.setState({ canvasView: true });
+  switchToListView = () => this.setState({ canvasView: false });
+
+  saveSceneFromCanvas = async updatedScene => {
+    this.setState({ saving: true, error: false, errorMessage: null });
+    try {
+      // Ensure the trailing empty action group is present (required by the list view)
+      const actions = updatedScene.actions || [];
+      if (actions.length === 0 || actions[actions.length - 1].length > 0) {
+        actions.push([]);
+      }
+      const sceneToSave = { ...updatedScene, actions };
+      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
+      const variables = initializeSceneVariables(sceneToSave.actions);
+      const triggersVariables = (sceneToSave.triggers || []).map(() => []);
+      this.setState({ scene: sceneToSave, variables, triggersVariables });
+    } catch (e) {
+      console.error(e);
+      let errorMessage = null;
+      if (e.response && e.response.data) {
+        errorMessage = e.response.data.message || null;
+      }
+      this.setState({ error: true, errorMessage });
+    }
+    this.setState({ saving: false });
+  };
+
   constructor(props) {
     super(props);
     this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
-      triggersVariables: []
+      triggersVariables: [],
+      canvasView: false,
     };
   }
 
@@ -1139,7 +1167,7 @@ class EditScene extends Component {
     document.removeEventListener('click', this.closeEdition, true);
   }
 
-  render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene }) {
+  render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene, canvasView }) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     return (
       scene && (
@@ -1179,6 +1207,10 @@ class EditScene extends Component {
               askDeleteScene={askDeleteScene}
               askDeleteCurrentScene={this.askDeleteCurrentScene}
               cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
+              canvasView={canvasView}
+              switchToCanvasView={this.switchToCanvasView}
+              switchToListView={this.switchToListView}
+              saveSceneFromCanvas={this.saveSceneFromCanvas}
             />
           </DndProvider>
         </div>

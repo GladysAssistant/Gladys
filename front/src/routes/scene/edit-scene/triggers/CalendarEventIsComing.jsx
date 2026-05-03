@@ -5,7 +5,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../utils/consts';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './style.css';
@@ -39,6 +39,8 @@ class CalendarEventIsComing extends Component {
   updateCalendars = selectedCalendarsOptions => {
     const calendars = selectedCalendarsOptions.map(o => o.value);
     this.props.updateTriggerProperty(this.props.index, 'calendars', calendars);
+    const names = selectedCalendarsOptions.map(o => o.label).join(', ');
+    this.props.updateTriggerProperty(this.props.index, 'calendars_label', names || null);
   };
   handleComparator = e => {
     if (e.target.value) {

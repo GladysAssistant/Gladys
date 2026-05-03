@@ -25,7 +25,10 @@ class HouseEmptyOrNot extends Component {
   };
 
   onHouseChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'house', e.target.value);
+    const selector = e.target.value;
+    this.props.updateTriggerProperty(this.props.index, 'house', selector);
+    const house = this.state.houses.find(h => h.selector === selector);
+    this.props.updateTriggerProperty(this.props.index, 'house_label', house ? house.name : null);
   };
 
   constructor(props) {

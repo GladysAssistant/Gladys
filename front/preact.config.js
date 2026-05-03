@@ -31,5 +31,9 @@ export default {
     config.resolve.alias.react = 'preact/compat';
     config.resolve.alias['react-dom/test-utils'] = 'preact/test-utils';
     config.resolve.alias['react-dom'] = 'preact/compat';
+
+    // reactflow ships only ESM which preact-cli can't transpile — use the pre-bundled UMD build instead
+    // The $ suffix makes this an exact match so reactflow/dist/style.css still resolves correctly
+    config.resolve.alias['reactflow$'] = 'reactflow/dist/umd/index.js';
   }
 };
