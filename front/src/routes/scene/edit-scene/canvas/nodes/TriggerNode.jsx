@@ -2,6 +2,8 @@ import { Handle, Position } from 'reactflow';
 import { getTriggerSummary } from '../sceneToGraph';
 import style from '../canvasStyle.css';
 
+// Nœud déclencheur (vert) — représente un événement Gladys déclenchant la scène.
+// N'a qu'une sortie (en bas) ; pas d'entrée car rien ne précède un déclencheur.
 const TriggerNode = ({ data, selected }) => {
   const summary = getTriggerSummary(data.trigger);
   return (

@@ -1,14 +1,30 @@
+/**
+ * sceneToGraph.js — conversion d'une scène Gladys vers un graphe React Flow.
+ *
+ * Responsabilités :
+ *  - Définir les constantes de mise en page automatique (espacement, origine)
+ *  - Fournir les tables de libellés/icônes pour déclencheurs et actions
+ *  - Calculer les résumés affichés dans les nœuds (getTriggerSummary, getActionSummary)
+ *  - Exposer les prédicats isConditionAction / isIfThenElse utilisés partout
+ *  - Construire le tableau de nœuds + arêtes depuis la structure JSON de la scène
+ *    (sceneToGraph), en plaçant les branches then/else décalées horizontalement
+ */
 import { ACTIONS, EVENTS } from '../../../../../../server/utils/constants';
 
+// Identifiants de type de nœud React Flow — doivent correspondre aux clés de
+// l'objet nodeTypes passé à <ReactFlow nodeTypes={...}> dans SceneCanvas.
 export const NODE_TYPES = {
   TRIGGER: 'triggerNode',
   ACTION: 'actionNode',
   CONDITION: 'conditionNode',
 };
 
+// Espacement utilisé par le layout automatique (sceneToGraph).
+// H_SPACING : distance horizontale entre nœuds d'un même groupe.
+// V_SPACING : distance verticale entre groupes d'actions successifs.
 const H_SPACING = 280;
 const V_SPACING = 160;
-const START_X = 60;
+const START_X = 60;  // coin supérieur gauche de la première ligne de déclencheurs
 const START_Y = 60;
 
 const TRIGGER_LABELS = {
@@ -125,13 +141,19 @@ const ACTION_ICONS = {
   [ACTIONS.SMS.SEND]: 'fe-message-circle',
 };
 
+// Tronque une chaîne à max caractères pour les résumés affichés dans les nœuds.
+// Retourne null si la chaîne est vide/undefined pour simplifier les tests conditionnels.
 const truncate = (str, max = 38) =>
   str && str.length > max ? str.substring(0, max) + '…' : str || null;
 
+// Retourne le libellé français du déclencheur, ou son type brut en fallback.
 export function getTriggerLabel(trigger) {
   return TRIGGER_LABELS[trigger.type] || trigger.type || 'Déclencheur';
 }
 
+// Retourne une chaîne (ou un tableau de deux chaînes) résumant la configuration
+// du déclencheur pour l'afficher en sous-titre dans le nœud. Retourne null si
+// aucune information significative n'est disponible.
 export function getTriggerSummary(trigger) {
   if (!trigger) return null;
   switch (trigger.type) {
@@ -194,14 +216,19 @@ export function getTriggerSummary(trigger) {
   }
 }
 
+// Retourne le nom de classe Feather Icons du déclencheur (préfixe "fe-").
 export function getTriggerIcon(trigger) {
   return TRIGGER_ICONS[trigger.type] || 'fe-zap';
 }
 
+// Retourne le libellé français de l'action, ou son type brut en fallback.
 export function getActionLabel(action) {
   return ACTION_LABELS[action.type] || action.type || 'Action';
 }
 
+// Retourne un résumé lisible de la configuration d'une action : chaîne simple ou
+// tableau [ligne1, ligne2] affiché en sous-titre dans le nœud (nodeSummary / nodeSummary2).
+// Retourne null si l'action n'a pas encore de paramètres renseignés.
 export function getActionSummary(action) {
   if (!action) return null;
   switch (action.type) {
@@ -303,10 +330,13 @@ export function getActionSummary(action) {
   }
 }
 
+// Retourne le nom de classe Feather Icons de l'action (préfixe "fe-").
 export function getActionIcon(action) {
   return ACTION_ICONS[action.type] || 'fe-settings';
 }
 
+// Actions qui produisent un nœud de type CONDITION (orange) plutôt qu'ACTION (bleu).
+// Séparé de isIfThenElse car tous les nœuds condition n'ont pas de branches then/else.
 const CONDITION_ACTION_SET = new Set([
   ACTIONS.CONDITION.IF_THEN_ELSE,
   ACTIONS.CONDITION.ONLY_CONTINUE_IF,
@@ -315,15 +345,20 @@ const CONDITION_ACTION_SET = new Set([
   ACTIONS.HOUSE.IS_NOT_EMPTY,
 ]);
 
+// Vrai si l'action doit être rendue comme un nœud condition (ConditionNode).
 export function isConditionAction(action) {
   return action != null && CONDITION_ACTION_SET.has(action.type);
 }
 
+// Vrai uniquement pour IF_THEN_ELSE : ce nœud expose trois sorties (then/after/else)
+// au lieu d'une seule, et ses branches sont développées latéralement dans le graphe.
 export function isIfThenElse(action) {
   return action != null && action.type === ACTIONS.CONDITION.IF_THEN_ELSE;
 }
 
-// ── Edge style helpers ──────────────────────────────────────────────
+// ── Helpers de construction d'arêtes ────────────────────────────────
+// outerEdge : arête du flux principal (grise par défaut, verte pour les conditions simples).
+// branchEdge : arête de branche then (verte #10b981) ou else (rouge #ef4444).
 const outerEdge = (id, source, target, sourceHandle, color = '#94a3b8') => ({
   id,
   source,
@@ -335,6 +370,7 @@ const outerEdge = (id, source, target, sourceHandle, color = '#94a3b8') => ({
   style: { stroke: color, strokeWidth: 2 },
 });
 
+// branchEdge : arête colorée depuis un handle nommé (then → vert, else → rouge).
 const branchEdge = (id, source, sourceHandle, target, color) => ({
   id,
   source,
@@ -346,7 +382,9 @@ const branchEdge = (id, source, sourceHandle, target, color) => ({
   style: { stroke: color, strokeWidth: 2 },
 });
 
-// ── Create an action node (shared between main flow and branches) ───
+// Construit un objet nœud React Flow pour une action, qu'elle soit dans le flux
+// principal ou dans une branche then/else. extraData est fusionné dans node.data
+// (ex : groupIndex, actionIndex, isBranch).
 function makeActionNode(id, action, position, extraData) {
   return {
     id,
@@ -361,6 +399,17 @@ function makeActionNode(id, action, position, extraData) {
   };
 }
 
+/**
+ * Convertit une scène Gladys en graphe React Flow { nodes, edges }.
+ *
+ * Mise en page automatique :
+ *  - Ligne 0 (y=START_Y)       : déclencheurs, côte à côte espacés de H_SPACING.
+ *  - Lignes suivantes           : groupes d'actions, centrés sur le même axe X.
+ *  - Branches then/else         : développées latéralement (gauche / droite) sous
+ *    leur nœud IF_THEN_ELSE, avec autant de rangées qu'il y a d'étapes.
+ * Chaque nœud action reçoit node.data.path = "groupIdx.actionIdx" pour que
+ * NodeConfigPanel puisse retrouver son chemin dans la structure JSON de la scène.
+ */
 export function sceneToGraph(scene) {
   const nodes = [];
   const edges = [];
@@ -383,10 +432,10 @@ export function sceneToGraph(scene) {
     });
   });
 
-  // Pre-compute the Y position of each action group.
-  // Groups that contain an IF_THEN_ELSE reserve extra rows so branch nodes
-  // sit between the condition and its successor — never at the same Y as
-  // any other main-flow group.
+  // Pré-calcul de la coordonnée Y de chaque groupe d'actions.
+  // Un groupe contenant un IF_THEN_ELSE réserve autant de rangées que le nombre
+  // maximal d'étapes dans ses branches, afin que les nœuds de branche ne se
+  // superposent jamais aux nœuds du flux principal.
   const groupY = [];
   {
     let y = START_Y + V_SPACING;
@@ -403,23 +452,25 @@ export function sceneToGraph(scene) {
     });
   }
 
-  // Horizontal centre shared by all main-flow groups and their branches.
-  // Derived from the trigger row so a single trigger stays above the first node,
-  // and multiple triggers spread symmetrically around the same axis.
+  // Axe horizontal partagé par tous les groupes du flux principal et leurs branches.
+  // Calculé depuis la ligne des déclencheurs : un seul déclencheur reste centré
+  // au-dessus du premier nœud ; plusieurs se répartissent symétriquement.
   const flowCenterX = triggers.length > 0
     ? START_X + (triggers.length - 1) * H_SPACING / 2
     : START_X;
 
+  // IDs des nœuds de la rangée précédente (déclencheurs au départ) — utilisés
+  // pour tracer les arêtes vers la rangée courante.
   let prevIds = triggers.map((_, idx) => `trigger-${idx}`);
-  // Map nodeId → action to determine correct source handle for sequential edges
+  // Table nodeId → action pour retrouver si une source est IF_THEN_ELSE (handle 'after')
+  // ou une condition simple (arête verte) au moment de créer les arêtes séquentielles.
   const actionById = {};
 
   actionsGroups.forEach((actionGroup, groupIdx) => {
     const currentIds = [];
     const rowY = groupY[groupIdx];
-    // Centre this group below its predecessors.  A group with N nodes spreads
-    // N/2 slots left and right of flowCenterX so every group shares the same
-    // vertical axis regardless of width.
+    // Origine X du groupe : centré sur flowCenterX quelle que soit la largeur du groupe,
+    // de sorte que tous les groupes du flux principal partagent le même axe vertical.
     const groupStartX = flowCenterX - (actionGroup.length - 1) * H_SPACING / 2;
 
     actionGroup.forEach((action, actionIdx) => {
@@ -435,30 +486,27 @@ export function sceneToGraph(scene) {
         })
       );
 
-      // ── Branch nodes for Si/Alors/Sinon ────────────────────────
+      // ── Nœuds de branche pour Si/Alors/Sinon ───────────────────
       if (isIfThenElse(action)) {
-        // Because groupY already reserves one row per branch step between this
-        // condition and the next main-flow group, branch nodes never share a Y
-        // with any main-flow node — simple symmetric X formulas are safe.
+        // groupY a déjà réservé une rangée par étape de branche entre ce nœud et
+        // le groupe suivant du flux principal : les nœuds de branche ne partagent
+        // jamais un Y avec des nœuds du flux principal.
 
-        // "Oui" / then branch — all sequential steps, to the LEFT of condX.
-        // thenCenterX is the horizontal centre of step 0 (anchored left of START_X
-        // so no then-node shares X with any sibling in the same action group).
-        // Every step k is centred at that same X: centerX + H_SPACING*(aIdx - (count-1)/2).
-        // For step 0 this is algebraically identical to the old START_X-(count-aIdx)*H_SPACING
-        // formula; for step 1+ it centres the nodes below their parents instead of
-        // piling them against the leftmost column.
+        // Branche "Oui" (then) — placée à GAUCHE de condX.
+        // thenCenterX = centre idéal de l'étape 0. Le nœud le plus à droite de
+        // l'étape 0 doit rester à gauche de (groupStartX - H_SPACING) pour ne pas
+        // empiéter sur la colonne "Suite".
         const thenGroups = action.then || [];
         const thenCount0 = thenGroups.length > 0 ? thenGroups[0].length : 1;
-        // thenCenterX: ideal centre for the then-branch (step-0 rightmost node sits at groupStartX - H_SPACING).
-        // For wider steps the centre shifts left so no node crosses groupStartX - H_SPACING (suite boundary).
+        // Centre idéal pour la branche then (le nœud rightmost de step-0 s'arrête à groupStartX - H_SPACING).
+        // Pour les étapes plus larges, le centre glisse à gauche pour que rien ne dépasse cette frontière.
         const thenCenterX = groupStartX - H_SPACING * (thenCount0 + 1) / 2;
         const thenMaxX = groupStartX - H_SPACING;
         let prevThenIds = null;
         thenGroups.forEach((thenGroup, stepIdx) => {
           const stepY = rowY + V_SPACING * (1 + stepIdx);
           const count = thenGroup.length;
-          // Clamp centre so the rightmost node never crosses the suite boundary
+          // Clampé pour que le nœud le plus à droite ne franchisse pas la frontière "Suite"
           const stepCenterX = Math.min(thenCenterX, thenMaxX - (count - 1) * H_SPACING / 2);
           const stepIds = [];
           thenGroup.forEach((thenAction, aIdx) => {
@@ -481,20 +529,19 @@ export function sceneToGraph(scene) {
           prevThenIds = stepIds;
         });
 
-        // "Non" / else branch — all sequential steps, to the RIGHT of all siblings.
-        // elseCenterX mirrors the logic above: step 0 starts after the rightmost
-        // sibling, and every subsequent step is centred below step 0.
+        // Branche "Non" (else) — placée à DROITE de tous les nœuds frères du groupe.
+        // elseStartX = premier X disponible à droite du nœud condition et de ses frères.
         const elseStartX = Math.max(condX + H_SPACING, groupStartX + actionGroup.length * H_SPACING);
         const elseGroups = action.else || [];
         const elseCount0 = elseGroups.length > 0 ? elseGroups[0].length : 1;
-        // elseCenterX: ideal centre for the else-branch (step-0 leftmost node sits at elseStartX).
-        // For wider steps the centre shifts right so no node crosses elseStartX (suite boundary).
+        // Centre idéal pour la branche else (le nœud leftmost de step-0 commence à elseStartX).
+        // Pour les étapes plus larges, le centre glisse à droite pour que rien ne dépasse à gauche.
         const elseCenterX = elseStartX + H_SPACING * (elseCount0 - 1) / 2;
         let prevElseIds = null;
         elseGroups.forEach((elseGroup, stepIdx) => {
           const stepY = rowY + V_SPACING * (1 + stepIdx);
           const count = elseGroup.length;
-          // Clamp centre so the leftmost node never crosses the suite boundary
+          // Clampé pour que le nœud le plus à gauche ne franchisse pas la frontière "Suite"
           const stepCenterX = Math.max(elseCenterX, elseStartX + (count - 1) * H_SPACING / 2);
           const stepIds = [];
           elseGroup.forEach((elseAction, aIdx) => {
@@ -521,8 +568,10 @@ export function sceneToGraph(scene) {
       currentIds.push(id);
     });
 
-    // Outer sequential edges — IF_THEN_ELSE nodes use the 'after' handle;
-    // non-branching condition nodes emit a green edge.
+    // Arêtes séquentielles entre groupes :
+    //  - IF_THEN_ELSE → sort par le handle 'after' (continuation après les branches)
+    //  - condition simple (CheckTime, OnlyContinueIf…) → arête verte
+    //  - action ordinaire → arête grise
     prevIds.forEach(sourceId => {
       const srcAction = actionById[sourceId];
       const sh = isIfThenElse(srcAction) ? 'after' : undefined;

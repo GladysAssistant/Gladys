@@ -96,8 +96,18 @@ const PANEL_HEADER_COLOR = {
   [NODE_TYPES.CONDITION]: '#f59e0b',
 };
 
-// Navigate into a nested action object to apply (property, value) at a sub-path.
-// pathParts is e.g. ['if', '0'] to target action.if[0][property].
+/**
+ * Descend récursivement dans un objet action imbriqué pour appliquer (property, value)
+ * au niveau désigné par pathParts.
+ *
+ * Exemples d'appel :
+ *  setNestedValue(action, ['if', '0'], 'house', 'my-house-selector')
+ *    → action.if[0].house = 'my-house-selector'
+ *  setNestedValue(action, [], 'text', 'hello')
+ *    → action.text = 'hello'  (mise à jour directe, pas de descente)
+ *
+ * Retourne toujours un nouvel objet (immutabilité React).
+ */
 const setNestedValue = (obj, pathParts, property, value) => {
   if (pathParts.length === 0) {
     return { ...obj, [property]: value };
@@ -135,10 +145,21 @@ const NodeConfigPanel = ({
 }) => {
   const isTrigger = selectedNode.type === NODE_TYPES.TRIGGER;
   const headerColor = PANEL_HEADER_COLOR[selectedNode.type] || '#64748b';
-  // Use the node's actual path (set by sceneToGraph), not a hardcoded constant.
+  // Chemin de l'action dans la structure JSON de la scène (ex : "1.2" = groupe 1, action 2).
+  // Renseigné par sceneToGraph dans node.data.path ; fallback "0.0" pour les nœuds créés
+  // manuellement (drag-and-drop) avant leur première reconversion via graphToScene.
   const nodePath = selectedNode.data.path || '0.0';
 
-  // ── Action property update — supports nested paths like "1.2.if.0"
+  // Met à jour une propriété de l'action du nœud sélectionné, en gérant les chemins
+  // imbriqués (ex : "1.2.if.0" pour une condition à l'intérieur d'un IF_THEN_ELSE).
+  //
+  // callPath commence par nodePath (ex "1.2") ; si callPath est plus long, la partie
+  // restante après le préfixe est le chemin de descente dans l'objet action.
+  // Exemple : callPath="1.2.if.0", nodePath="1.2" → subPath="if.0"
+  //           → setNestedValue(action, ['if','0'], property, value)
+  //
+  // Utilise le form fonctionnel de setNodes pour que chaque appel consécutif dans
+  // le même événement voit l'état résultant du précédent (pas de stale closure).
   const updateActionProperty = useCallback(
     (callPath, property, value) => {
       setNodes(nds =>
@@ -147,13 +168,14 @@ const NodeConfigPanel = ({
           let newAction;
           const prefix = nodePath + '.';
           if (callPath.startsWith(prefix)) {
-            // Nested update e.g. callPath = "1.2.if.0" → subPath = "if.0"
+            // Mise à jour imbriquée : on descend dans l'objet action
             const subPath = callPath.slice(prefix.length);
             newAction = setNestedValue(n.data.action, subPath.split('.'), property, value);
           } else {
-            // Top-level update (callPath === nodePath or unrecognised)
+            // Mise à jour directe au niveau racine de l'action
             newAction = { ...n.data.action, [property]: value };
           }
+          // Recalcule le type du nœud au cas où l'action change de catégorie
           const newNodeType = isConditionAction(newAction) ? NODE_TYPES.CONDITION : NODE_TYPES.ACTION;
           return {
             ...n,
@@ -171,7 +193,8 @@ const NodeConfigPanel = ({
     [selectedNode.id, nodePath, setNodes]
   );
 
-  // ── Trigger property update
+  // Met à jour une propriété du déclencheur du nœud sélectionné et recalcule
+  // son libellé et son icône. index est l'indice du déclencheur dans scene.triggers.
   const updateTriggerProperty = useCallback(
     (index, property, value) => {
       setNodes(nds =>
@@ -193,17 +216,24 @@ const NodeConfigPanel = ({
     [selectedNode.id, setNodes]
   );
 
+  // Wrappers défensifs : certains composants appelants testent toujours setVariables
+  // avant de l'utiliser, mais d'autres (CalendarIsEventRunning) l'appellent sans garde.
+  // On les rend optionnels ici plutôt que de modifier tous les composants existants.
   const handleSetVariables = useCallback(
     (path, vars) => { if (setVariables) setVariables(path, vars); },
     [setVariables]
   );
 
+  // Même protection pour setVariablesTrigger (déclencheurs).
   const handleSetVariablesTrigger = useCallback(
     (idx, vars) => { if (setVariablesTrigger) setVariablesTrigger(idx, vars); },
     [setVariablesTrigger]
   );
 
-  // ── Render action config
+  // Monte le composant de configuration correspondant au type d'action.
+  // Les props no-op (deleteAction, moveCard…) satisfont les propTypes des composants
+  // existants sans déclencher de comportement — dans le canvas, la gestion des actions
+  // passe exclusivement par les nœuds React Flow.
   const renderActionConfig = () => {
     const { action } = selectedNode.data;
     const ActionComponent = ACTION_COMPONENTS[action.type];
@@ -231,7 +261,8 @@ const NodeConfigPanel = ({
     );
   };
 
-  // ── Render trigger config
+  // Monte le composant de configuration correspondant au type de déclencheur.
+  // Utilise commonProps pour ne pas répéter les props partagés entre tous les composants.
   const renderTriggerConfig = () => {
     const { trigger } = selectedNode.data;
     const idx = selectedNode.data.triggerIndex || 0;

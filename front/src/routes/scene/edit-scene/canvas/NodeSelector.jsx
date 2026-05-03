@@ -65,6 +65,13 @@ const TABS = [
   { id: 'condition', label: 'Conditions', color: '#f59e0b' },
 ];
 
+/**
+ * Panneau de sélection des blocs (déclencheurs, actions, conditions).
+ * Supporte deux modes d'ajout :
+ *  - Clic simple → onAddNode (centré sur le canvas)
+ *  - Glisser-déposer → onSelectorPointerDown démarre le ghost, SceneCanvas
+ *    crée le nœud à la position de relâchement via createNode()
+ */
 const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose }) => {
   const [activeTab, setActiveTab] = useState('trigger');
   const [search, setSearch] = useState('');
@@ -74,7 +81,11 @@ const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose 
       ? entries.filter(e => e.label.toLowerCase().includes(search.toLowerCase()))
       : entries;
 
+  // Construit le bouton d'entrée de la palette pour un déclencheur ou une action.
+  // Gère les deux modes : clic simple (onAddNode) et glisser-déposer (onSelectorPointerDown).
   const renderEntry = (entry, nodeType) => {
+    // nodeData est transmis à onSelectorPointerDown et sert de template pour
+    // créer le nœud : triggerType OU actionType selon la catégorie.
     const nodeData =
       nodeType === NODE_TYPES.TRIGGER
         ? { nodeType, triggerType: entry.type, label: entry.label, icon: entry.icon }
@@ -85,13 +96,14 @@ const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose 
         key={entry.type}
         class={style.selectorEntry}
         onPointerDown={e => {
-          // Only left button
+          // Seulement le bouton gauche — évite de déclencher le drag sur clic droit
           if (e.button !== 0 && e.buttons !== 1) return;
-          e.preventDefault();
+          e.preventDefault(); // empêche le focus/sélection de texte pendant le drag
           onSelectorPointerDown(nodeData, e.clientX, e.clientY);
         }}
         onClick={() => {
-          // Suppress click if the user performed a real drag (moved > 4px)
+          // Le gestionnaire pointerUp de SceneCanvas a déjà créé le nœud si l'utilisateur
+          // a vraiment glissé (> 4px). On supprime le click pour ne pas ajouter deux nœuds.
           if (getDragMoved && getDragMoved()) return;
           onAddNode(
             nodeType === NODE_TYPES.TRIGGER

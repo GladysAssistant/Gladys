@@ -51,6 +51,8 @@ const defaultEdgeOptions = {
   style: { stroke: '#94a3b8', strokeWidth: 2 },
 };
 
+// Lit les positions de nœuds sauvegardées en localStorage pour une scène donnée.
+// Retourne un objet vide si la clé est absente ou si le JSON est invalide.
 function loadSavedPositions(key) {
   if (!key) return {};
   try {
@@ -97,13 +99,14 @@ const SceneCanvas = ({
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId) || null;
 
-  // ── Copy / paste (Ctrl+C / Ctrl+V) + save (Ctrl+S) ──────────────────
+  // ── Copier / coller (Ctrl+C / Ctrl+V) + sauvegarder (Ctrl+S) ────────
   const clipboardRef = useRef(null);
-  // Keep stable refs so the keydown listener never goes stale
+  // Refs stables pour éviter la stale closure dans le listener keydown enregistré une
+  // seule fois au montage : les valeurs courantes sont toujours accessibles via .current.
   const selectedNodeIdRef = useRef(selectedNodeId);
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
-  const handleApplyRef = useRef(null);
+  const handleApplyRef = useRef(null); // mis à jour à chaque render (voir plus bas)
   useEffect(() => { selectedNodeIdRef.current = selectedNodeId; }, [selectedNodeId]);
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
   useEffect(() => { edgesRef.current = edges; }, [edges]);
@@ -151,7 +154,9 @@ const SceneCanvas = ({
   }, [setNodes]);
   // ─────────────────────────────────────────────────────────────────────
 
-  // ── Persist node positions to localStorage (debounced 600ms) ─────────
+  // ── Persistance des positions dans localStorage (debounce 600ms) ─────
+  // Clé par scène (selector) : les positions survivent aux rechargements de page.
+  // Le debounce évite une écriture localStorage à chaque pixel de déplacement.
   const saveTimerRef = useRef(null);
   useEffect(() => {
     if (!positionsKey) return;
@@ -167,6 +172,11 @@ const SceneCanvas = ({
   }, [nodes, positionsKey]);
   // ─────────────────────────────────────────────────────────────────────
 
+  // Coloration des arêtes lors d'une connexion manuelle (drag depuis un handle) :
+  //  - handle 'then' → verte  (#10b981)
+  //  - handle 'else' → rouge  (#ef4444)
+  //  - condition simple (OnlyContinueIf, CheckTime…) → verte
+  //  - action ordinaire → grise (défaut)
   const onConnect = useCallback(
     params => {
       let handleOverride = {};
@@ -175,7 +185,7 @@ const SceneCanvas = ({
       } else if (params.sourceHandle === 'else') {
         handleOverride = { style: { stroke: '#ef4444', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' } };
       } else {
-        // Non-branching condition node (e.g. "Continuer si") → green edge
+        // Condition non-branchante (ex : "Continuer si") → arête verte
         const sourceNode = nodes.find(n => n.id === params.source);
         if (sourceNode && sourceNode.type === NODE_TYPES.CONDITION && !isIfThenElse(sourceNode.data.action)) {
           handleOverride = { style: { stroke: '#10b981', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' } };
@@ -186,26 +196,33 @@ const SceneCanvas = ({
     [setEdges, nodes]
   );
 
+  // Ctrl/Meta/Shift + clic : désélectionne (ferme le panneau de config).
+  // Clic simple : sélectionne le nœud et force la désélection de tous les autres
+  // pour éviter qu'une multi-sélection antérieure ne reste active.
   const onNodeClick = useCallback((e, node) => {
     if (e.ctrlKey || e.metaKey || e.shiftKey) {
       setSelectedNodeId(null);
     } else {
       setSelectedNodeId(node.id);
-      // Deselect all other nodes so multi-selection doesn't persist
       setNodes(nds => nds.map(n => (n.id === node.id ? n : { ...n, selected: false })));
     }
     setSelectorOpen(false);
   }, [setNodes]);
 
+  // Clic sur le fond du canvas : ferme le panneau de configuration.
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
   }, []);
 
+  // Callback React Flow déclenché quand la sélection change (drag-select, Ctrl+clic…).
+  // Si plusieurs nœuds sont sélectionnés, on n'en désigne aucun comme "actif" pour
+  // ne pas ouvrir le panneau sur un nœud arbitraire.
   const onSelectionChange = useCallback(({ nodes: sel }) => {
     if (sel.length > 1) setSelectedNodeId(null);
     else if (sel.length === 1) setSelectedNodeId(sel[0].id);
   }, []);
 
+  // Supprime un nœud et toutes les arêtes qui lui sont connectées (source ou cible).
   const onDeleteNode = useCallback(
     nodeId => {
       setNodes(nds => nds.filter(n => n.id !== nodeId));
@@ -215,6 +232,9 @@ const SceneCanvas = ({
     [setNodes, setEdges]
   );
 
+  // Crée un nouveau nœud React Flow à la position donnée.
+  // Pour les déclencheurs, le type React Flow est toujours TRIGGER.
+  // Pour les actions, isConditionAction détermine si le type doit être CONDITION ou ACTION.
   const createNode = useCallback(
     ({ nodeType, actionType, triggerType }, position) => {
       const id = `new-${uuidv4()}`;
@@ -245,6 +265,9 @@ const SceneCanvas = ({
     [setNodes]
   );
 
+  // Ajoute un nœud via un clic simple dans la palette (sans drag).
+  // Positionné au centre visible du canvas, légèrement décalé selon le nombre
+  // de nœuds existants pour éviter les superpositions.
   const onAddNode = useCallback(
     ({ type: nodeType, actionType, triggerType }) => {
       const center = reactFlowInstance
@@ -256,7 +279,10 @@ const SceneCanvas = ({
     [nodes, reactFlowInstance, createNode]
   );
 
-  // ── Auto-layout: re-compute positions from current scene state ────────
+  // ── Réorganisation automatique ────────────────────────────────────────
+  // Reconvertit le graphe courant en scène (graphToScene), puis recalcule les
+  // positions depuis zéro via sceneToGraph. Les positions sauvegardées en
+  // localStorage sont effacées pour éviter qu'elles ne surchargent le nouveau layout.
   const handleAutoLayout = useCallback(() => {
     const currentScene = graphToScene(nodes, edges, scene);
     const freshGraph = sceneToGraph(currentScene);
@@ -268,10 +294,15 @@ const SceneCanvas = ({
   }, [nodes, edges, scene, setNodes, setEdges, positionsKey]);
   // ─────────────────────────────────────────────────────────────────────
 
-  // ── Custom pointer drag ──────────────────────────────────────────────
+  // ── Drag personnalisé depuis la palette NodeSelector ─────────────────
+  // React Flow intercepte les événements pointeur sur le canvas ; on utilise
+  // document-level pointermove/pointerup pour le ghost et la création du nœud,
+  // indépendamment de React Flow.
   const dragStartPos = useRef(null);
-  const hasMoved = useRef(false);
+  const hasMoved = useRef(false); // vrai si le curseur a bougé de plus de 4px
 
+  // Déclenché par NodeSelector au pointerdown : initialise l'état du drag,
+  // active le ghost et mémorise la position de départ pour détecter le mouvement.
   const onSelectorPointerDown = useCallback((nodeData, clientX, clientY) => {
     dragStartPos.current = { x: clientX, y: clientY };
     hasMoved.current = false;
@@ -279,7 +310,8 @@ const SceneCanvas = ({
     setGhostPos({ x: clientX, y: clientY });
   }, []);
 
-  // Exposed so NodeSelector can suppress onClick when a real drag occurred
+  // Getter stable exposé à NodeSelector pour qu'il sache si un vrai drag a eu lieu
+  // et puisse ignorer le onClick suivant (évite la double création de nœud).
   const getDragMoved = useCallback(() => hasMoved.current, []);
 
   useEffect(() => {
@@ -329,12 +361,16 @@ const SceneCanvas = ({
   }, [draggingNode, reactFlowInstance, createNode]);
   // ────────────────────────────────────────────────────────────────────
 
+  // Convertit le graphe courant en scène Gladys et déclenche la sauvegarde API.
+  // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
+  // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
   const handleApply = useCallback(() => {
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
     saveScene(updatedScene);
   }, [scene, saveScene]);
 
-  // Keep the ref fresh so the stable keydown listener can call the latest version
+  // Mise à jour du ref à chaque render : le listener keydown (enregistré une seule fois)
+  // appelle toujours la version la plus récente de handleApply via ce ref.
   handleApplyRef.current = handleApply;
 
   const miniMapNodeColor = node => {

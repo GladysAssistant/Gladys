@@ -1,21 +1,28 @@
+/**
+ * graphToScene.js — conversion inverse : graphe React Flow → scène Gladys.
+ *
+ * Algorithme en cinq étapes :
+ *  1. Identifier les nœuds de branche (cibles d'arêtes 'then'/'else' issues de
+ *     nœuds condition), puis étendre transitivement pour inclure leurs successeurs.
+ *  2. Séparer les nœuds du flux principal (ni déclencheurs, ni branche).
+ *  3. Attribuer un niveau de profondeur à chaque nœud via un parcours DFS
+ *     "chemin le plus long" depuis les déclencheurs (gère les convergences).
+ *  4. Pour chaque nœud IF_THEN_ELSE, reconstruire action.then et action.else
+ *     depuis les connexions du graphe (BFS par distance depuis step-0).
+ *  5. Regrouper les nœuds du flux principal par niveau (actions parallèles),
+ *     trier par position X pour retrouver l'ordre gauche→droite.
+ */
 import { NODE_TYPES, isIfThenElse } from './sceneToGraph';
 
-/**
- * Converts a React Flow graph (nodes + edges) back to the Gladys scene format.
- *
- * Algorithm:
- * 1. Identify branch nodes: targets of 'then'/'else' sourceHandle edges from condition nodes
- * 2. Build the main flow using only non-branch nodes
- * 3. Assign depth levels via longest-path DFS from trigger nodes
- * 4. Rebuild condition.then / condition.else from graph connections
- * 5. Group main nodes by level (parallel groups), sort by X position
- */
+// originalScene est utilisé comme base pour préserver les champs non-graph de la scène
+// (name, icon, selector, triggers…) — seuls triggers et actions sont reconstruits.
 export function graphToScene(nodes, edges, originalScene) {
   const triggerNodes = nodes
     .filter(n => n.type === NODE_TYPES.TRIGGER)
     .sort((a, b) => a.position.x - b.position.x);
 
-  // Build adjacency maps preserving sourceHandle
+  // Tables d'adjacence construites depuis les arêtes.
+  // outgoing conserve le sourceHandle pour distinguer then/else/after des arêtes normales.
   const outgoing = {}; // nodeId -> [{ target, sourceHandle }]
   const incoming = {}; // nodeId -> [sourceId]
   nodes.forEach(n => {
@@ -31,9 +38,10 @@ export function graphToScene(nodes, edges, originalScene) {
     }
   });
 
-  // Identify branch node IDs: targets of 'then' / 'else' edges from condition nodes
-  const thenTargets = {}; // conditionNodeId -> [targetId, ...]
-  const elseTargets = {}; // conditionNodeId -> [targetId, ...]
+  // Identification des nœuds de branche : cibles directes des arêtes 'then'/'else'
+  // issues des nœuds condition IF_THEN_ELSE.
+  const thenTargets = {}; // conditionNodeId -> [targetId, ...]  (étape 0 de la branche "Oui")
+  const elseTargets = {}; // conditionNodeId -> [targetId, ...]  (étape 0 de la branche "Non")
   const branchNodeIds = new Set();
 
   nodes.filter(n => n.type === NODE_TYPES.CONDITION).forEach(condNode => {
@@ -50,7 +58,9 @@ export function graphToScene(nodes, edges, originalScene) {
     });
   });
 
-  // Expand branchNodeIds to include all transitive (multi-step) branch nodes
+  // Extension transitive : les successeurs (step 1, step 2…) d'un nœud de branche
+  // sont aussi des nœuds de branche. On suit uniquement les arêtes sans sourceHandle
+  // (arêtes séquentielles normales, pas les sorties then/else).
   {
     let frontier = [...branchNodeIds];
     const visited = new Set(branchNodeIds);
@@ -69,21 +79,26 @@ export function graphToScene(nodes, edges, originalScene) {
     }
   }
 
-  // Main flow nodes: exclude triggers and branch nodes
+  // Nœuds du flux principal : tout sauf les déclencheurs et les nœuds de branche.
   const mainActionNodes = nodes.filter(
     n => n.type !== NODE_TYPES.TRIGGER && !branchNodeIds.has(n.id)
   );
 
-  // Assign depth levels via longest-path DFS from trigger outputs (main flow only)
+  // Attribution des niveaux par DFS "chemin le plus long" depuis les déclencheurs.
+  // On utilise le chemin le plus long (et non le plus court) pour que deux chemins
+  // qui convergent vers un même nœud placent ce nœud après les deux branches.
   const levels = {};
 
+  // DFS récursif : propage le niveau maximal depuis nodeId vers ses successeurs du flux principal.
   function propagate(nodeId, depth) {
+    // Met à jour seulement si on trouve un chemin plus long — garantit la convergence.
     if (levels[nodeId] === undefined || levels[nodeId] < depth) {
       levels[nodeId] = depth;
       (outgoing[nodeId] || []).forEach(({ target, sourceHandle }) => {
         if (
           !triggerNodes.find(t => t.id === target) &&
           !branchNodeIds.has(target) &&
+          // Ne pas traverser les sorties then/else (ce sont des branches, pas le flux principal)
           sourceHandle !== 'then' &&
           sourceHandle !== 'else'
         ) {
@@ -101,7 +116,8 @@ export function graphToScene(nodes, edges, originalScene) {
     });
   });
 
-  // Disconnected main action nodes go at the end
+  // Les nœuds du flux principal non connectés (aucun chemin depuis un déclencheur)
+  // sont placés à la fin pour ne pas les perdre lors de la reconversion.
   const maxExistingLevel =
     Object.values(levels).length > 0 ? Math.max(...Object.values(levels)) : -1;
   mainActionNodes.forEach((n, idx) => {
@@ -110,8 +126,11 @@ export function graphToScene(nodes, edges, originalScene) {
     }
   });
 
-  // Build branch action array [[step0actions], [step1actions], ...] from step-0 node IDs.
-  // Uses BFS distance to determine step order, X position to sort within a step.
+  // Reconstruit le tableau de groupes d'actions d'une branche (then ou else) à partir
+  // des IDs des nœuds de l'étape 0 (cibles directes du handle then/else).
+  // Utilise un BFS par distance pour ordonner les étapes ; à distance égale,
+  // les nœuds sont triés par position X (gauche → droite = ordre dans le groupe).
+  // Retourne [[actions step 0], [actions step 1], ...].
   const buildBranchGroup = step0Ids => {
     if (!step0Ids || step0Ids.length === 0) return [[]];
     const stepOf = {};
@@ -143,7 +162,8 @@ export function graphToScene(nodes, edges, originalScene) {
     return result;
   };
 
-  // Build action groups sorted by level, then by X position within each level
+  // Construction des groupes d'actions triés par niveau puis par position X.
+  // Chaque niveau correspond à un groupe d'actions parallèles dans la scène Gladys.
   const maxLevel =
     mainActionNodes.length > 0
       ? Math.max(...mainActionNodes.map(n => levels[n.id] || 0))
@@ -158,7 +178,7 @@ export function graphToScene(nodes, edges, originalScene) {
     if (nodesAtLevel.length > 0) {
       const actions = nodesAtLevel.map(n => {
         const action = { ...n.data.action };
-        // Only IF_THEN_ELSE has then/else branches in the graph
+        // Seul IF_THEN_ELSE possède des branches then/else dans le graphe.
         if (n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data.action)) {
           action.then = buildBranchGroup(thenTargets[n.id] || []);
           action.else = buildBranchGroup(elseTargets[n.id] || []);

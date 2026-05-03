@@ -2,6 +2,10 @@ import { Handle, Position } from 'reactflow';
 import { isIfThenElse, getActionSummary } from '../sceneToGraph';
 import style from '../canvasStyle.css';
 
+// Nœud de condition (orange).
+// Deux variantes selon le type d'action :
+//  - IF_THEN_ELSE (branching=true) : trois sorties — "Oui" (then, 20%), "Suite" (after, 50%), "Non" (else, 80%)
+//  - Condition simple (OnlyContinueIf, CheckTime…) : une seule sortie verte "Oui"
 const ConditionNode = ({ data, selected }) => {
   const branching = isIfThenElse(data.action);
   const summary = getActionSummary(data.action);
@@ -22,6 +26,7 @@ const ConditionNode = ({ data, selected }) => {
       )}
       {branching ? (
         <>
+          {/* then (20%) — arête verte dans graphToScene/SceneCanvas */}
           <Handle
             type="source"
             position={Position.Bottom}
@@ -30,6 +35,7 @@ const ConditionNode = ({ data, selected }) => {
           />
           <span class={style.conditionHandleLabelThen}>Oui</span>
 
+          {/* after (50%) — continuation du flux principal après la condition */}
           <Handle
             type="source"
             position={Position.Bottom}
@@ -38,6 +44,7 @@ const ConditionNode = ({ data, selected }) => {
           />
           <span class={style.conditionHandleLabelAfter}>Suite</span>
 
+          {/* else (80%) — arête rouge dans graphToScene/SceneCanvas */}
           <Handle
             type="source"
             position={Position.Bottom}

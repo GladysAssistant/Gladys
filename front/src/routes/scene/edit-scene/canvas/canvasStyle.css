@@ -204,8 +204,10 @@
   color: #64748b;
 }
 
-/* ─── React Flow handle override ─────────────────────────────────── */
-/* Target the real DOM class so CSS module scoping doesn't interfere */
+/* ─── Surcharge des handles React Flow ───────────────────────────── */
+/* :global() est nécessaire car CSS Modules préfixe les sélecteurs locaux ;
+   les classes internes de React Flow (.react-flow__*) doivent être ciblées
+   sans préfixe pour que les règles s'appliquent. */
 :global(.react-flow__handle) {
   width: 16px !important;
   height: 16px !important;
@@ -378,9 +380,11 @@
   flex-shrink: 0;
 }
 
-/* ─── Node config panel (right sidebar) ──────────────────────────── */
-/* Positioned relative to .sceneCanvasOuter (outside canvasWrapper),
-   so React Select dropdowns are never clipped by overflow: hidden. */
+/* ─── Panneau de configuration du nœud sélectionné (barre latérale droite) ── */
+/* Positionné par rapport à .sceneCanvasOuter (à l'extérieur de .canvasWrapper),
+   ce qui lui permet de dépasser la zone React Flow sans être rogné par son
+   overflow:hidden. Les menus déroulants (React Select) peuvent ainsi s'afficher
+   librement vers le haut ou le bas. */
 .configPanel {
   position: absolute;
   top: 0;
@@ -463,7 +467,9 @@
   /* Ensure child components (cards, selects, etc.) fit the panel width */
 }
 
-/* React Select menus rendered via menuPortalTarget={document.body} need a high z-index */
+/* Les menus React Select rendus via menuPortalTarget={document.body} sont insérés
+   directement dans le body et doivent avoir un z-index supérieur à tout le reste
+   (ReactFlow, panneau config z-index:20, ghost z-index:9999). */
 :global(.react-select__menu-portal) {
   z-index: 9999 !important;
 }
@@ -498,8 +504,9 @@
   margin-bottom: 0;
 }
 
-/* Force all Bootstrap grid columns to full width — the panel is ~380px,
-   far below Bootstrap's md/lg breakpoints, so columns must be stacked. */
+/* Force toutes les colonnes Bootstrap à pleine largeur — le panneau fait ~380px,
+   bien en dessous des breakpoints md/lg de Bootstrap, donc les colonnes doivent
+   être empilées verticalement pour ne pas déborder ou se compresser. */
 .configPanelBody [class*="col-lg-"],
 .configPanelBody [class*="col-md-"],
 .configPanelBody [class*="col-sm-"] {
@@ -514,7 +521,9 @@
   flex-shrink: 0;
 }
 
-/* Hide then/else branches inside canvas config panel — they are separate graph paths */
+/* Masque les blocs then/else du composant IfThenElse original dans le panneau canvas :
+   dans le canvas, les branches sont représentées par des arêtes et nœuds séparés
+   dans le graphe React Flow, et non par des sous-listes imbriquées dans le panneau. */
 .configPanelBody :global(.then-container),
 .configPanelBody :global(.else-container) {
   display: none !important;

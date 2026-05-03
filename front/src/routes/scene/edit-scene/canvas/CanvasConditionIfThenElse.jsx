@@ -60,10 +60,14 @@ const CanvasConditionIfThenElse = ({
     }
   }, []);
 
+  // Ajoute une nouvelle condition vide (type non encore choisi) à la liste.
   const addCondition = () => {
     updateActionProperty(path, 'if', [...conditions, { type: null }]);
   };
 
+  // Supprime la condition à l'index donné et corrige l'index d'expansion :
+  // - si c'était la condition expandée → on ferme
+  // - si une condition avant elle était expandée → on décale l'index de -1
   const deleteCondition = index => {
     const next = conditions.filter((_, i) => i !== index);
     updateActionProperty(path, 'if', next);
@@ -74,16 +78,20 @@ const CanvasConditionIfThenElse = ({
     });
   };
 
+  // Remplace le type d'une condition (sélection dans le <select>) en réinitialisant
+  // tous ses autres champs pour repartir d'un état vierge cohérent avec le nouveau type.
   const setConditionType = (index, type) => {
     const next = conditions.map((c, i) => (i === index ? { type } : c));
     updateActionProperty(path, 'if', next);
   };
 
-  // Delegate directly to the parent updateActionProperty with the nested path so
-  // NodeConfigPanel's setNestedValue handles the update against current node state.
-  // This avoids a stale-closure bug when a sub-component calls updateActionProperty
-  // multiple times in the same event (e.g. house + house_label): each call gets the
-  // latest node state via the functional setNodes updater.
+  // Délègue directement au updateActionProperty parent en passant le chemin imbriqué,
+  // afin que setNestedValue dans NodeConfigPanel applique la mise à jour sur l'état
+  // courant du nœud. Cela évite un bug de closure périmée (stale closure) lorsqu'un
+  // sous-composant appelle updateActionProperty plusieurs fois dans le même événement
+  // (ex : HouseEmptyOrNotCondition appelle updateActionProperty d'abord pour `house`
+  // puis pour `house_label`) : grâce au updater fonctionnel de setNodes, chaque appel
+  // voit l'état résultant du précédent plutôt qu'un snapshot initial figé.
   const makeConditionUpdater = index => (_subPath, property, value) => {
     updateActionProperty(`${path}.if.${index}`, property, value);
   };
@@ -108,12 +116,16 @@ const CanvasConditionIfThenElse = ({
         const isExpanded = expandedIndex === index;
 
         return (
+          // Pas de overflow:hidden : évite le clipping des time pickers et des menus
+          // déroulants (React Select) qui se positionnent en dehors du flux normal.
           <div
             key={index}
             class="mb-2"
             style={{ border: '1px solid #fcd34d', borderRadius: '6px' }}
           >
             {/* ── Condition header ─────────────────────────────── */}
+            {/* borderRadius uniquement sur les coins supérieurs : le parent n'ayant
+                plus overflow:hidden, le body qui suit arrondit lui-même ses coins. */}
             <div
               class="d-flex align-items-center justify-content-between"
               style={{ padding: '6px 10px', background: '#fef3c7', cursor: 'pointer', borderRadius: '5px 5px 0 0' }}
@@ -189,7 +201,11 @@ const CanvasConditionIfThenElse = ({
                   </div>
                 )}
 
-                {/* Dedicated condition component */}
+                {/* Composant dédié à la condition sélectionnée */}
+                {/* setVariables est requis par CalendarIsEventRunning.componentDidMount →
+                    initVariables() → removeVariables() → this.props.setVariables().
+                    Sans ce prop (undefined), un TypeError casse silencieusement le composant
+                    et rend la croix de suppression de la condition inopérante. */}
                 {CondComponent && (
                   <CondComponent
                     action={condition}
