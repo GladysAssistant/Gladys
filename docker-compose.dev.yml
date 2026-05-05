@@ -1,0 +1,27 @@
+version: '3.8'
+
+# Compose pour tester la branche localement depuis les sources.
+# Usage : docker compose -f docker-compose.dev.yml up --build
+#
+# L'interface sera accessible sur http://localhost:8080
+# Les données sont persistées dans le volume Docker "gladys-dev-data".
+
+services:
+  gladys-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: gladys-dev
+    restart: unless-stopped
+    ports:
+      - "8080:1443"
+    environment:
+      NODE_ENV: production
+      SERVER_PORT: 1443
+      TZ: Europe/Paris
+      SQLITE_FILE_PATH: /data/gladys-dev.db
+    volumes:
+      - gladys-dev-data:/data
+
+volumes:
+  gladys-dev-data:
