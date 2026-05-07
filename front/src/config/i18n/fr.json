@@ -2476,7 +2476,8 @@
       "device": {
         "get-value": "Récupérer le dernier état",
         "set-value": "Contrôler un appareil",
-        "check-value": "Condition sur état d'appareil"
+        "check-value": "Condition sur état d'appareil",
+        "check-multi-value": "Condition sur états multiples"
       },
       "message": {
         "send": "Envoyer un message",

@@ -2231,6 +2231,16 @@
     "actionsDescription": "Alle Aktionen in diesem Block werden parallel ausgeführt. Um eine Abfolge von Aktionen zu erstellen, füge Aktionen zum næchsten Block hinzu.",
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
+    "actionsCommentPlaceholder": "Kommentar zu diesem Block hinzufügen...",
+    "canvas": {
+      "addBlock": "Block hinzufügen",
+      "autoLayout": "Neu anordnen",
+      "applyGraph": "Graph anwenden",
+      "nodeType": "Typ",
+      "deleteNode": "Löschen",
+      "canvasViewTitle": "Grafische Ansicht",
+      "listViewTitle": "Listenansicht"
+    },
     "actionsCard": {
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
@@ -2306,6 +2316,12 @@
       "deviceGetValue": {
         "description": "Dies wird den letzten Wert des ausgewählten Geräts abrufen, damit du ihn später in der Szene verwenden kannst.",
         "deviceLabel": "Gerät auswählen"
+      },
+      "deviceCheckValue": {
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle Status des ausgewählten Geräts die Bedingung erfüllt."
+      },
+      "deviceCheckMultiValue": {
+        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle Status des Geräts einem der ausgewählten Werte entspricht."
       },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
@@ -2471,7 +2487,9 @@
       },
       "device": {
         "get-value": "Gerätewert abrufen",
-        "set-value": "Gerätewert setzen"
+        "set-value": "Gerätewert setzen",
+        "check-value": "Bedingung auf Gerätestatus",
+        "check-multi-value": "Bedingung auf mehrere Gerätezustände"
       },
       "message": {
         "send": "Nachricht senden",
@@ -2558,7 +2576,8 @@
     },
     "triggers": {
       "device": {
-        "new-state": "Änderung von Gerätestatus"
+        "new-state": "Änderung von Gerätestatus",
+        "multi-state": "Mehrfache Gerätestatus-Änderung"
       },
       "time": {
         "changed": "Zeitabhängiger Auslöser",
@@ -2609,6 +2628,10 @@
         "deviceSeen": "Wenn das Gerät erkannt wird",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
         "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:"
+      },
+      "multiState": {
+        "valuesLabel": "Auslösende Werte",
+        "addValue": "Wert hinzufügen"
       },
       "scheduledTrigger": {
         "typeLabel": "Typ",
@@ -2670,6 +2693,10 @@
         "startsWith": "beginnt mit",
         "endsWith": "endet mit",
         "hasAnyName": "einen beliebigen Namen hat",
+        "regex": "entspricht dem regulären Ausdruck",
+        "regexPlaceholder": "z.B. meeting.*(room|office)",
+        "regexValid": "Gültiger regulärer Ausdruck",
+        "regexInvalid": "Ungültiger regulärer Ausdruck",
         "namePlaceholder": "Zu vergleichender Name",
         "durationName": "Und das Ereignis ist",
         "startingIn": "Beginnt in",

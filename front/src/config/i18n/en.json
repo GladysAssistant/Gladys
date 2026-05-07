@@ -2476,7 +2476,8 @@
       "device": {
         "get-value": "Get device value",
         "set-value": "Set device value",
-        "check-value": "Condition on device state"
+        "check-value": "Condition on device state",
+        "check-multi-value": "Condition on multiple device states"
       },
       "message": {
         "send": "Send Message",

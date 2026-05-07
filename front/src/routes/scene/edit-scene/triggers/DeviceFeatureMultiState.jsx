@@ -55,15 +55,20 @@ const MULTI_COMPONENTS = { Option: CheckboxOption, ValueContainer: SummaryValueC
 // Déclencheur "Changement d'état multiple" : se déclenche si la valeur de l'appareil
 // correspond à l'une des valeurs sélectionnées (opérateur "=").
 class DeviceFeatureMultiState extends Component {
-  onDeviceFeatureChange = deviceFeature => {
+  onDeviceFeatureChange = (deviceFeature, device) => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
+      const label = device
+        ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
+        : (deviceFeature.name || deviceFeature.selector);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature_label', label);
       if (deviceFeature.selector !== this.props.trigger.device_feature) {
         this.props.updateTriggerProperty(this.props.index, 'values', []);
       }
     } else {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature_label', null);
     }
   };
 

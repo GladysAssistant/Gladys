@@ -316,6 +316,20 @@ const actionsFunc = {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
     }
   },
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: async (self, action) => {
+    const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
+    if (!deviceFeature) {
+      throw new AbortScene('DEVICE_FEATURE_NOT_FOUND');
+    }
+    const values = Array.isArray(action.values) ? action.values : [];
+    const conditionVerified = values.some((v) => compare('=', deviceFeature.last_value, v));
+    if (!conditionVerified) {
+      logger.debug(
+        `Device check-multi condition not verified. Feature: "${action.device_feature}", last_value: "${deviceFeature.last_value}", values: [${values.join(', ')}]`,
+      );
+      throw new AbortScene('CONDITION_NOT_VERIFIED');
+    }
+  },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {

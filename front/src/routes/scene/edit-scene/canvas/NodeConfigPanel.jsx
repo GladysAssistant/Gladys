@@ -7,6 +7,8 @@ import style from './canvasStyle.css';
 import ChooseActionTypeParams from '../actions/ChooseActionTypeCard';
 import DelayActionParams from '../actions/DelayActionParams';
 import DeviceGetValueParams from '../actions/DeviceGetValueParams';
+import DeviceCheckValueParams from '../actions/DeviceCheckValueParams';
+import DeviceCheckMultiValueParams from '../actions/DeviceCheckMultiValueParams';
 import DeviceSetValue from '../actions/DeviceSetValue';
 import SendMessageParams from '../actions/SendMessageParams';
 import OnlyContinueIfParams from '../actions/only-continue-if/OnlyContinueIfParams';
@@ -44,6 +46,7 @@ import CalendarEventIsComing from '../triggers/CalendarEventIsComing';
 import AlarmModeTrigger from '../triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from '../triggers/MQTTReceivedTrigger';
 import GladysStartTrigger from '../triggers/GladysStartTrigger';
+import DeviceFeatureMultiState from '../triggers/DeviceFeatureMultiState';
 
 const ACTION_COMPONENTS = {
   [null]: ChooseActionTypeParams,
@@ -59,6 +62,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MESSAGE.SEND_CAMERA]: SendMessageCameraParams,
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: OnlyContinueIfParams,
   [ACTIONS.DEVICE.GET_VALUE]: DeviceGetValueParams,
+  [ACTIONS.DEVICE.CHECK_VALUE]: DeviceCheckValueParams,
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: DeviceCheckMultiValueParams,
   [ACTIONS.USER.SET_SEEN_AT_HOME]: UserPresence,
   [ACTIONS.USER.CHECK_PRESENCE]: CheckUserPresence,
   [ACTIONS.USER.SET_OUT_OF_HOME]: UserPresence,
@@ -279,6 +284,7 @@ const NodeConfigPanel = ({
       return <ChooseTriggerType key={selectedNode.id} updateTriggerProperty={updateTriggerProperty} index={idx} />;
     }
     if (trigger.type === EVENTS.DEVICE.NEW_STATE) return <DeviceFeatureState {...commonProps} />;
+    if (trigger.type === EVENTS.DEVICE.MULTI_STATE) return <DeviceFeatureMultiState {...commonProps} />;
     if (trigger.type === EVENTS.TIME.CHANGED) return <ScheduledTrigger {...commonProps} />;
     if (trigger.type === EVENTS.TIME.SUNRISE || trigger.type === EVENTS.TIME.SUNSET) {
       return <SunriseSunsetTrigger {...commonProps} />;

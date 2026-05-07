@@ -5,6 +5,7 @@ import style from './canvasStyle.css';
 
 const TRIGGER_ENTRIES = [
   { type: EVENTS.DEVICE.NEW_STATE, label: 'État d\'appareil', icon: 'fe-activity' },
+  { type: EVENTS.DEVICE.MULTI_STATE, label: 'États multiples d\'appareil', icon: 'fe-layers' },
   { type: EVENTS.TIME.CHANGED, label: 'Heure planifiée', icon: 'fe-watch' },
   { type: EVENTS.TIME.SUNRISE, label: 'Lever du soleil', icon: 'fe-sunrise' },
   { type: EVENTS.TIME.SUNSET, label: 'Coucher du soleil', icon: 'fe-sunset' },
@@ -54,6 +55,8 @@ const ACTION_ENTRIES = [
 const CONDITION_ENTRIES = [
   { type: ACTIONS.CONDITION.IF_THEN_ELSE, label: 'Si / Alors / Sinon', icon: 'fe-git-branch' },
   { type: ACTIONS.CONDITION.ONLY_CONTINUE_IF, label: 'Continuer si', icon: 'fe-filter' },
+  { type: ACTIONS.DEVICE.CHECK_VALUE, label: 'Condition sur état', icon: 'fe-check-circle' },
+  { type: ACTIONS.DEVICE.CHECK_MULTI_VALUE, label: 'Condition sur états multiples', icon: 'fe-check-circle' },
   { type: ACTIONS.CONDITION.CHECK_TIME, label: 'Vérifier l\'heure', icon: 'fe-watch' },
   { type: ACTIONS.HOUSE.IS_EMPTY, label: 'Vérifier maison vide', icon: 'fe-home' },
   { type: ACTIONS.HOUSE.IS_NOT_EMPTY, label: 'Vérifier maison occupée', icon: 'fe-home' },

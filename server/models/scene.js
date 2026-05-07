@@ -76,6 +76,8 @@ const actionSchema = Joi.object()
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     thenComments: Joi.array().items(Joi.string().allow(null, '')),
     elseComments: Joi.array().items(Joi.string().allow(null, '')),
+    // Champ de l'action "device.check-multi-value" : liste de valeurs acceptées
+    values: Joi.array().items(Joi.alternatives().try(Joi.number(), Joi.string())),
     // Libellés d'affichage mémorisés par les composants frontend (ex: nom de la maison,
     // de l'utilisateur…). Non utilisés par le moteur d'exécution backend — Joi doit
     // néanmoins les accepter pour ne pas rejeter la sauvegarde de la scène.
@@ -96,7 +98,6 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
-    device_feature_label: Joi.string(),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),

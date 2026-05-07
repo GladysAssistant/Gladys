@@ -29,6 +29,7 @@ const START_Y = 60;
 
 const TRIGGER_LABELS = {
   [EVENTS.DEVICE.NEW_STATE]: 'État d\'appareil',
+  [EVENTS.DEVICE.MULTI_STATE]: 'États multiples d\'appareil',
   [EVENTS.TIME.CHANGED]: 'Heure planifiée',
   [EVENTS.TIME.SUNSET]: 'Coucher du soleil',
   [EVENTS.TIME.SUNRISE]: 'Lever du soleil',
@@ -51,6 +52,7 @@ const TRIGGER_LABELS = {
 
 const TRIGGER_ICONS = {
   [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
+  [EVENTS.DEVICE.MULTI_STATE]: 'fe-layers',
   [EVENTS.TIME.CHANGED]: 'fe-watch',
   [EVENTS.TIME.SUNSET]: 'fe-sunset',
   [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
@@ -88,6 +90,8 @@ const ACTION_LABELS = {
   [ACTIONS.CONDITION.CHECK_TIME]: 'Vérifier l\'heure',
   [ACTIONS.DEVICE.SET_VALUE]: 'Modifier appareil',
   [ACTIONS.DEVICE.GET_VALUE]: 'Lire état appareil',
+  [ACTIONS.DEVICE.CHECK_VALUE]: 'Condition sur état',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'Condition sur états multiples',
   [ACTIONS.HTTP.REQUEST]: 'Requête HTTP',
   [ACTIONS.MQTT.SEND]: 'Envoyer MQTT',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'Envoyer Zigbee2MQTT',
@@ -123,6 +127,8 @@ const ACTION_ICONS = {
   [ACTIONS.CONDITION.CHECK_TIME]: 'fe-watch',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe-sliders',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe-refresh-cw',
+  [ACTIONS.DEVICE.CHECK_VALUE]: 'fe-check-circle',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'fe-check-circle',
   [ACTIONS.HTTP.REQUEST]: 'fe-link',
   [ACTIONS.MQTT.SEND]: 'fe-send',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe-zap',
@@ -185,6 +191,13 @@ export function getTriggerSummary(trigger) {
       return trigger.topic || null;
     case EVENTS.DEVICE.NEW_STATE:
       return trigger.device_feature_label || trigger.device_feature || null;
+    case EVENTS.DEVICE.MULTI_STATE: {
+      const featureLabel = trigger.device_feature_label || trigger.device_feature || null;
+      const count = Array.isArray(trigger.values) ? trigger.values.length : 0;
+      const countLabel = `${count} valeur${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
+      if (featureLabel) return [featureLabel, countLabel];
+      return countLabel;
+    }
     case EVENTS.USER_PRESENCE.BACK_HOME:
     case EVENTS.USER_PRESENCE.LEFT_HOME: {
       const user = trigger.user_label || trigger.user || null;
@@ -286,6 +299,19 @@ export function getActionSummary(action) {
     }
     case ACTIONS.DEVICE.GET_VALUE:
       return action.device_feature_label || action.device_feature || null;
+    case ACTIONS.DEVICE.CHECK_VALUE: {
+      const name = action.device_feature_label || action.device_feature;
+      if (!name) return null;
+      if (action.value != null) return [name, `${action.operator || '='} ${action.value}`];
+      return name;
+    }
+    case ACTIONS.DEVICE.CHECK_MULTI_VALUE: {
+      const name = action.device_feature_label || action.device_feature;
+      if (!name) return null;
+      const count = Array.isArray(action.values) ? action.values.length : 0;
+      const countLabel = `${count} valeur${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
+      return [name, countLabel];
+    }
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;
       if (!name) return null;
@@ -343,6 +369,8 @@ const CONDITION_ACTION_SET = new Set([
   ACTIONS.CONDITION.CHECK_TIME,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
+  ACTIONS.DEVICE.CHECK_VALUE,
+  ACTIONS.DEVICE.CHECK_MULTI_VALUE,
 ]);
 
 // Vrai si l'action doit être rendue comme un nœud condition (ConditionNode).
