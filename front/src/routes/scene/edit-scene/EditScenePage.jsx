@@ -164,6 +164,8 @@ const EditScenePage = ({ children, ...props }) => (
                   variables={props.variables}
                   triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
+                  comment={(props.scene.actionsComments || [])[index] || ''}
+                  updateComment={comment => props.updateActionGroupComment(index, comment)}
                 />
               </div>
 

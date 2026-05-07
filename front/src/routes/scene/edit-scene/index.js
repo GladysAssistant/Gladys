@@ -254,6 +254,18 @@ class EditScene extends Component {
     await this.setState(newState);
   };
 
+  updateActionGroupComment = (index, comment) => {
+    this.setState(prevState => {
+      const newComments = [...(prevState.scene.actionsComments || [])];
+      newComments[index] = comment || null;
+      return update(prevState, {
+        scene: {
+          actionsComments: { $set: newComments }
+        }
+      });
+    });
+  };
+
   addActionGroupAfter = async index => {
     // Update variable paths for all actions after the inserted group
     await this.setState(prevState => {
@@ -366,9 +378,16 @@ class EditScene extends Component {
         processActions(prevState.scene.actions);
       });
 
+      const currentComments = prevState.scene.actionsComments || [];
+      const newComments = [
+        ...currentComments.slice(0, index + 1),
+        null,
+        ...currentComments.slice(index + 1)
+      ];
+
       return {
         variables: newVariables,
-        scene: newScene
+        scene: { ...newScene, actionsComments: newComments }
       };
     });
   };
@@ -428,16 +447,20 @@ class EditScene extends Component {
 
       // If it's a root level deletion (e.g., "1")
       if (pathSegments.length === 1) {
-        return update(prevState, {
+        const groupIndex = parseInt(pathSegments[0], 10);
+        const newComments = [...(prevState.scene.actionsComments || [])];
+        newComments.splice(groupIndex, 1);
+        const newState = update(prevState, {
           scene: {
             actions: {
-              $splice: [[parseInt(pathSegments[0], 10), 1]]
+              $splice: [[groupIndex, 1]]
             }
           },
           variables: {
             $set: newVariables
           }
         });
+        return { ...newState, scene: { ...newState.scene, actionsComments: newComments } };
       }
 
       // Build the nested update object
@@ -1023,10 +1046,20 @@ class EditScene extends Component {
         }
       });
 
+      // Reorder actionsComments for root-level group moves
+      let newComments = newState.scene.actionsComments || [];
+      if (sourcePath.split('.').length === 1) {
+        newComments = [...newComments];
+        const sourceComment = newComments[source.index] || null;
+        newComments.splice(source.index, 1);
+        newComments.splice(dest.index, 0, sourceComment);
+      }
+
       // Set the new state
       await this.setState({
         ...newState,
-        variables: newVariables
+        variables: newVariables,
+        scene: { ...newState.scene, actionsComments: newComments }
       });
 
       await this.addEmptyActionGroupIfNeeded();
@@ -1176,6 +1209,7 @@ class EditScene extends Component {
               setTags={this.setTags}
               updateSceneIcon={this.updateSceneIcon}
               addActionGroupAfter={this.addActionGroupAfter}
+              updateActionGroupComment={this.updateActionGroupComment}
               askDeleteScene={askDeleteScene}
               askDeleteCurrentScene={this.askDeleteCurrentScene}
               cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
