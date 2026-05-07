@@ -1,0 +1,107 @@
+name: Build & push all-functions image → ghcr.io
+
+on:
+  push:
+    branches:
+      - all_functions
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-front:
+    name: Compiler le frontend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 💽 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: front/package-lock.json
+
+      - name: 📦 Installer les dépendances front
+        working-directory: ./front
+        run: npm ci
+
+      - name: 🏗️ Compiler le front
+        working-directory: ./front
+        run: npm run build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+
+      - name: ↗️ Uploader l'artifact (build frontend)
+        uses: actions/upload-artifact@v4
+        with:
+          name: front-build
+          path: front/build
+          retention-days: 1
+
+  docker:
+    name: Build & push image Docker
+    needs: build-front
+    runs-on: ubuntu-22.04
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: ↙️ Télécharger l'artifact frontend
+        uses: actions/download-artifact@v4
+        with:
+          name: front-build
+          path: static
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Connexion à GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Métadonnées Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/gladys
+          tags: |
+            type=raw,value=all-functions
+            type=sha,prefix=all-functions-,format=short
+
+      - name: 🐳 Build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile.buildx
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📋 Résumé
+        run: |
+          echo "## Image publiée sur ghcr.io 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tags :" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Commande de test :" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker run -d -p 8080:1443 \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -e NODE_ENV=production \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -e SERVER_PORT=1443 \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -e SQLITE_FILE_PATH=/data/gladys-dev.db \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -v gladys-all-functions-data:/data \\" >> $GITHUB_STEP_SUMMARY
+          echo "  ghcr.io/${{ github.repository_owner }}/gladys:all-functions" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
