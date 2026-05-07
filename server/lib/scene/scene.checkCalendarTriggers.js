@@ -100,12 +100,25 @@ async function checkCalendarTriggers() {
           [Op.endsWith]: trigger.calendar_event_name,
         };
         break;
+      case 'regex':
+        // Pas de filtre SQL — on filtre en JS après la requête pour supporter les regex complexes
+        break;
     }
     // we search in the database if we find events that match our request
     const eventsMatching = await db.CalendarEvent.findAll(queryParams);
     // foreach event matching
     await Promise.each(eventsMatching, (eventMatching) => {
       const eventRaw = eventMatching.get({ plain: true });
+
+      // Filtrage regex post-requête (la syntaxe regex n'est pas supportée nativement par SQLite)
+      if (trigger.calendar_event_name_comparator === 'regex') {
+        try {
+          if (!new RegExp(trigger.calendar_event_name, 'i').test(eventRaw.name)) return;
+        } catch (e) {
+          return; // expression invalide — on ignore cet événement
+        }
+      }
+
       idsOfEventsMatching.push(eventRaw.id);
 
       const eventFormatted = {

@@ -62,7 +62,17 @@ class CalendarEventIsComing extends Component {
     }
   };
   handleNameChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'calendar_event_name', e.target.value);
+    const value = e.target.value;
+    this.props.updateTriggerProperty(this.props.index, 'calendar_event_name', value);
+    // Validation live de l'expression régulière
+    if (this.props.trigger.calendar_event_name_comparator === 'regex') {
+      try {
+        new RegExp(value);
+        this.setState({ regexError: null });
+      } catch (err) {
+        this.setState({ regexError: err.message });
+      }
+    }
   };
   handleDurationChange = e => {
     const value = e.target.value;
@@ -158,7 +168,7 @@ class CalendarEventIsComing extends Component {
     this.refreshSelectedOptions(nextProps.trigger);
   }
 
-  render({ trigger }, { calendarsOptions, selectedCalendarsOptions }) {
+  render({ trigger }, { calendarsOptions, selectedCalendarsOptions, regexError }) {
     return (
       <div>
         <div class="row">
@@ -212,6 +222,9 @@ class CalendarEventIsComing extends Component {
                 <option value="has-any-name">
                   <Text id="editScene.triggersCard.calendarEventIsComing.hasAnyName" />
                 </option>
+                <option value="regex">
+                  <Text id="editScene.triggersCard.calendarEventIsComing.regex" />
+                </option>
               </select>
             </div>
           </div>
@@ -220,12 +233,32 @@ class CalendarEventIsComing extends Component {
               <Localizer>
                 <input
                   type="text"
-                  class={cx('form-control', style.calendarEventIsComingMarginInputMargin)}
+                  class={cx(
+                    'form-control',
+                    style.calendarEventIsComingMarginInputMargin,
+                    trigger.calendar_event_name_comparator === 'regex' && regexError ? 'is-invalid' : '',
+                    trigger.calendar_event_name_comparator === 'regex' && !regexError && trigger.calendar_event_name ? 'is-valid' : '',
+                  )}
                   onChange={this.handleNameChange}
                   value={trigger.calendar_event_name}
-                  placeholder={<Text id="editScene.triggersCard.calendarEventIsComing.namePlaceholder" />}
+                  placeholder={
+                    trigger.calendar_event_name_comparator === 'regex'
+                      ? <Text id="editScene.triggersCard.calendarEventIsComing.regexPlaceholder" />
+                      : <Text id="editScene.triggersCard.calendarEventIsComing.namePlaceholder" />
+                  }
                 />
               </Localizer>
+              {trigger.calendar_event_name_comparator === 'regex' && regexError && (
+                <div class="invalid-feedback">
+                  <Text id="editScene.triggersCard.calendarEventIsComing.regexInvalid" />
+                  <small class="d-block text-muted">{regexError}</small>
+                </div>
+              )}
+              {trigger.calendar_event_name_comparator === 'regex' && !regexError && trigger.calendar_event_name && (
+                <div class="valid-feedback">
+                  <Text id="editScene.triggersCard.calendarEventIsComing.regexValid" />
+                </div>
+              )}
             </div>
           )}
         </div>

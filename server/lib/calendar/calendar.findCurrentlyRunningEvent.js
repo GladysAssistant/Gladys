@@ -66,9 +66,22 @@ async function findCurrentlyRunningEvent(calendars, calendarEventNameComparator,
         [Op.endsWith]: calendarEventName,
       };
       break;
+    case 'regex':
+      // Pas de filtre SQL — on filtre en JS après la requête
+      break;
   }
   // we search in the database if we find events that match our request
-  const eventsMatching = await db.CalendarEvent.findAll(queryParams);
+  let eventsMatching = await db.CalendarEvent.findAll(queryParams);
+
+  // Filtrage regex post-requête
+  if (calendarEventNameComparator === 'regex') {
+    try {
+      const re = new RegExp(calendarEventName, 'i');
+      eventsMatching = eventsMatching.filter(e => re.test(e.get({ plain: true }).name));
+    } catch (err) {
+      eventsMatching = [];
+    }
+  }
 
   return eventsMatching.map((event) => event.get({ plain: true }));
 }
