@@ -117,14 +117,37 @@ export function graphToScene(nodes, edges, originalScene) {
   });
 
   // Les nœuds du flux principal non connectés (aucun chemin depuis un déclencheur)
-  // sont placés à la fin pour ne pas les perdre lors de la reconversion.
+  // sont ordonnés par leur topologie interne (connexions entre eux uniquement) :
+  //  - sans fil entre eux → même niveau → actions parallèles
+  //  - A → B (fil entre orphelins) → niveaux distincts → actions séquentielles
   const maxExistingLevel =
     Object.values(levels).length > 0 ? Math.max(...Object.values(levels)) : -1;
-  mainActionNodes.forEach((n, idx) => {
-    if (levels[n.id] === undefined) {
-      levels[n.id] = maxExistingLevel + 1 + idx;
+  {
+    const orphanSet = new Set(
+      mainActionNodes.filter(n => levels[n.id] === undefined).map(n => n.id)
+    );
+    if (orphanSet.size > 0) {
+      const orphanLevels = {};
+      // DFS longest-path dans le sous-graphe des orphelins.
+      const orphanPropagate = (nodeId, depth) => {
+        if (orphanLevels[nodeId] === undefined || orphanLevels[nodeId] < depth) {
+          orphanLevels[nodeId] = depth;
+          (outgoing[nodeId] || []).forEach(({ target, sourceHandle }) => {
+            if (orphanSet.has(target) && sourceHandle !== 'then' && sourceHandle !== 'else') {
+              orphanPropagate(target, depth + 1);
+            }
+          });
+        }
+      };
+      // Sources : orphelins sans parent orphelin → départ à la profondeur 0.
+      orphanSet.forEach(id => {
+        const hasOrphanParent = (incoming[id] || []).some(src => orphanSet.has(src));
+        if (!hasOrphanParent) orphanPropagate(id, 0);
+      });
+      const base = maxExistingLevel + 1;
+      orphanSet.forEach(id => { levels[id] = base + (orphanLevels[id] || 0); });
     }
-  });
+  }
 
   // Reconstruit le tableau de groupes d'actions d'une branche (then ou else) à partir
   // des IDs des nœuds de l'étape 0 (cibles directes du handle then/else).
