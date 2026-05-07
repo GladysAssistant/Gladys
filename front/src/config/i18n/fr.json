@@ -2551,7 +2551,8 @@
     },
     "triggers": {
       "device": {
-        "new-state": "Changement d'état de l'appareil"
+        "new-state": "Changement d'état de l'appareil",
+        "multi-state": "Changement d'état multiple de l'appareil"
       },
       "time": {
         "changed": "Déclenchement programmé",
@@ -2602,6 +2603,10 @@
         "deviceSeen": "Si l'appareil est détecté",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
+      },
+      "multiState": {
+        "valuesLabel": "Valeurs déclenchantes",
+        "addValue": "Ajouter une valeur"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
