@@ -227,6 +227,7 @@ const EVENTS = {
     ADD_FEATURE: 'device.add-feature',
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
+    MULTI_STATE: 'device.multi-state',
     PURGE_STATES: 'device.purge-states',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
     PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',

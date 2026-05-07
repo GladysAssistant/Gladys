@@ -80,6 +80,53 @@ const triggersFunc = {
 
     return false;
   },
+  [EVENTS.DEVICE.MULTI_STATE]: (self, sceneSelector, event, trigger) => {
+    if (event.device_feature !== trigger.device_feature) {
+      return false;
+    }
+    const values = trigger.values || [];
+    const op = trigger.operator || '=';
+    const matches = values.some(v => compare(op, event.last_value, v));
+
+    const triggerDurationKey = `device.multi-state.${sceneSelector}.${trigger.device_feature}:${JSON.stringify(values)}`;
+
+    // Annule le timer si la condition n'est plus valide
+    if (!matches && self.checkTriggersDurationTimer.get(triggerDurationKey)) {
+      clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
+      self.checkTriggersDurationTimer.delete(triggerDurationKey);
+    }
+
+    if (trigger.for_duration === undefined) {
+      return matches;
+    }
+
+    // Vérification après expiration du timer
+    if (event.for_duration_finished && triggerDurationKey === event.trigger_duration_key) {
+      clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
+      self.checkTriggersDurationTimer.delete(triggerDurationKey);
+      return matches;
+    }
+
+    if (matches) {
+      if (self.checkTriggersDurationTimer.get(triggerDurationKey)) {
+        return false;
+      }
+      const timeoutId = setTimeout(() => {
+        const lastValue = self.stateManager.get('deviceFeature', trigger.device_feature).last_value;
+        self.event.emit(EVENTS.TRIGGERS.CHECK, {
+          ...cloneDeep(event),
+          previous_value: event.last_value,
+          last_value: lastValue,
+          for_duration_finished: true,
+          trigger_duration_key: triggerDurationKey,
+        });
+      }, trigger.for_duration);
+      self.checkTriggersDurationTimer.set(triggerDurationKey, timeoutId);
+      return false;
+    }
+
+    return false;
+  },
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
   [EVENTS.TIME.SUNRISE]: (self, sceneSelector, event, trigger) => event.house.selector === trigger.house,
   [EVENTS.TIME.SUNSET]: (self, sceneSelector, event, trigger) => event.house.selector === trigger.house,

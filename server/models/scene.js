@@ -119,6 +119,8 @@ const triggersSchema = Joi.array().items(
     threshold_only: Joi.boolean(),
     topic: Joi.string(),
     message: Joi.string().allow(''),
+    // Champ du déclencheur "device.multi-state" : liste de valeurs à surveiller
+    values: Joi.array().items(Joi.alternatives().try(Joi.number(), Joi.string())),
   }),
 );
 

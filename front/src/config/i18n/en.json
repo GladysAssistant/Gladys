@@ -2563,7 +2563,8 @@
     },
     "triggers": {
       "device": {
-        "new-state": "Device state change"
+        "new-state": "Device state change",
+        "multi-state": "Multiple device state change"
       },
       "time": {
         "changed": "Scheduled trigger",
@@ -2614,6 +2615,10 @@
         "deviceSeen": "If the device is detected",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
+      },
+      "multiState": {
+        "valuesLabel": "Triggering values",
+        "addValue": "Add a value"
       },
       "scheduledTrigger": {
         "typeLabel": "Type",

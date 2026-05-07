@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatureState from './triggers/DeviceFeatureState';
+import DeviceFeatureMultiState from './triggers/DeviceFeatureMultiState';
 import ScheduledTrigger from './triggers/ScheduledTrigger';
 import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
 import SunriseSunsetTrigger from './triggers/SunriseSunsetTrigger';
@@ -17,6 +18,7 @@ import GladysStartTrigger from './triggers/GladysStartTrigger';
 
 const TRIGGER_ICON = {
   [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
+  [EVENTS.DEVICE.MULTI_STATE]: 'fe-activity',
   [EVENTS.TIME.CHANGED]: 'fe-watch',
   [EVENTS.TIME.SUNSET]: 'fe-sunset',
   [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
@@ -76,6 +78,13 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.DEVICE.NEW_STATE && (
         <DeviceFeatureState
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.DEVICE.MULTI_STATE && (
+        <DeviceFeatureMultiState
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
