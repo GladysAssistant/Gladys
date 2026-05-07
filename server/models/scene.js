@@ -73,6 +73,14 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    // Libellés d'affichage mémorisés par les composants frontend (ex: nom de la maison,
+    // de l'utilisateur…). Non utilisés par le moteur d'exécution backend — Joi doit
+    // néanmoins les accepter pour ne pas rejeter la sauvegarde de la scène.
+    house_label: Joi.string().allow(null),
+    user_label: Joi.string().allow(null),
+    scene_label: Joi.string().allow(null),
+    device_feature_label: Joi.string().allow(null),
+    calendars_label: Joi.string().allow(null),
   })
   .id('action');
 
@@ -119,6 +127,13 @@ const triggersSchema = Joi.array().items(
     threshold_only: Joi.boolean(),
     topic: Joi.string(),
     message: Joi.string().allow(''),
+    // Libellés d'affichage mémorisés par les composants frontend — même raison que
+    // dans actionSchema : Joi doit les tolérer pour permettre la sauvegarde.
+    house_label: Joi.string().allow(null),
+    user_label: Joi.string().allow(null),
+    area_label: Joi.string().allow(null),
+    device_feature_label: Joi.string().allow(null),
+    calendars_label: Joi.string().allow(null),
     // Champ du déclencheur "device.multi-state" : liste de valeurs à surveiller
     values: Joi.array().items(Joi.alternatives().try(Joi.number(), Joi.string())),
   }),

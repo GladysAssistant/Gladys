@@ -7,6 +7,7 @@ import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
 import EditActions from './EditActions';
+import SceneCanvas from './canvas/SceneCanvas';
 import { Text } from 'preact-i18n';
 
 const EditScenePage = ({ children, ...props }) => (
@@ -53,7 +54,24 @@ const EditScenePage = ({ children, ...props }) => (
                 )}
 
                 {!props.askDeleteScene && (
-                  <div class="text-right">
+                  <div class="text-right d-flex flex-wrap justify-content-end align-items-center" style={{ gap: '6px' }}>
+                    {/* View toggle */}
+                    <div class="btn-group mb-0 mb-sm-2 mb-lg-0" role="group">
+                      <button
+                        onClick={props.switchToListView}
+                        className={`btn btn-sm ${!props.canvasView ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                        title="Vue liste"
+                      >
+                        <i class="fe fe-list" />
+                      </button>
+                      <button
+                        onClick={props.switchToCanvasView}
+                        className={`btn btn-sm ${props.canvasView ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                        title="Vue graphique"
+                      >
+                        <i class="fe fe-share-2" />
+                      </button>
+                    </div>
                     <button onClick={props.duplicateScene} className="btn btn-outline-primary mb-0 mb-sm-2 mb-lg-0">
                       <span class="d-none d-md-inline-block">
                         <Text id="editScene.duplicateButton" />
@@ -62,7 +80,7 @@ const EditScenePage = ({ children, ...props }) => (
                     </button>
                     <button
                       onClick={props.askDeleteCurrentScene}
-                      className="btn btn-outline-danger ml-2 mb-0 mb-sm-2 mb-lg-0"
+                      className="btn btn-outline-danger mb-0 mb-sm-2 mb-lg-0"
                     >
                       <span class="d-none d-md-inline-block">
                         <Text id="editScene.deleteButton" />
@@ -117,27 +135,46 @@ const EditScenePage = ({ children, ...props }) => (
               />
             </div>
 
-            <div class="row">
-              <TriggerGroup
-                triggers={props.scene.triggers}
-                addTrigger={props.addTrigger}
-                deleteTrigger={props.deleteTrigger}
-                updateTriggerProperty={props.updateTriggerProperty}
-                saving={props.saving}
-                variables={props.variables}
-                setVariablesTrigger={props.setVariablesTrigger}
-              />
-            </div>
-            <div class={cx('row mb-4', style.arrowDown)}>
-              <div class="col-lg-12">
-                <div class="text-center">
-                  <i class="fe fe-arrow-down" />
+            {/* ── Canvas view ─────────────────────────────────── */}
+            {props.canvasView ? (
+              <div class="row">
+                <div class="col-12">
+                  <SceneCanvas
+                    scene={props.scene}
+                    saveScene={props.saveSceneFromCanvas}
+                    saving={props.saving}
+                    variables={props.variables}
+                    triggersVariables={props.triggersVariables}
+                    setVariables={props.setVariables}
+                    setVariablesTrigger={props.setVariablesTrigger}
+                  />
                 </div>
               </div>
-            </div>
+            ) : (
+              <div>
+                <div class="row">
+                  <TriggerGroup
+                    triggers={props.scene.triggers}
+                    addTrigger={props.addTrigger}
+                    deleteTrigger={props.deleteTrigger}
+                    updateTriggerProperty={props.updateTriggerProperty}
+                    saving={props.saving}
+                    variables={props.variables}
+                    setVariablesTrigger={props.setVariablesTrigger}
+                  />
+                </div>
+                <div class={cx('row mb-4', style.arrowDown)}>
+                  <div class="col-lg-12">
+                    <div class="text-center">
+                      <i class="fe fe-arrow-down" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {props.scene.actions.map((parallelActions, index) => (
+          {!props.canvasView && props.scene.actions.map((parallelActions, index) => (
             <div>
               <div class="row">
                 <ActionGroup
@@ -197,7 +234,7 @@ const EditScenePage = ({ children, ...props }) => (
               )}
             </div>
           ))}
-          <EditActions {...props} />
+          {!props.canvasView && <EditActions {...props} />}
         </div>
         <AutoScrollMobile position="bottom" box_type={props.actionsGroupTypes} />
       </div>

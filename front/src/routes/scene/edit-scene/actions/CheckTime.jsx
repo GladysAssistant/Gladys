@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { Component } from 'preact';
 import DatePicker from 'react-datepicker';
 import { connect } from 'unistore/preact';

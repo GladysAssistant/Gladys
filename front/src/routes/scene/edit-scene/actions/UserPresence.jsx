@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -36,15 +36,19 @@ class UserSeenAtHome extends Component {
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'user_label', selectedOption.label);
     } else {
       this.props.updateActionProperty(this.props.path, 'user', null);
+      this.props.updateActionProperty(this.props.path, 'user_label', null);
     }
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
+      this.props.updateActionProperty(this.props.path, 'house_label', selectedOption.label);
     } else {
       this.props.updateActionProperty(this.props.path, 'house', null);
+      this.props.updateActionProperty(this.props.path, 'house_label', null);
     }
   };
   refreshSelectedOptions = nextProps => {

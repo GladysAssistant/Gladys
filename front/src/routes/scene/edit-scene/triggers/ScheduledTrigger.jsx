@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { format } from 'date-fns';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 
 import fr from 'date-fns/locale/fr';
 

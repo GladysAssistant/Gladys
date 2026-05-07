@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
 class UserPresenceTrigger extends Component {
@@ -38,15 +38,19 @@ class UserPresenceTrigger extends Component {
   handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'user', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'user_label', selectedOption.label);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'user', null);
+      this.props.updateTriggerProperty(this.props.index, 'user_label', null);
     }
   };
   handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'house', selectedOption.value);
+      this.props.updateTriggerProperty(this.props.index, 'house_label', selectedOption.label);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'house', null);
+      this.props.updateTriggerProperty(this.props.index, 'house_label', null);
     }
   };
   refreshSelectedOptions = nextProps => {

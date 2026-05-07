@@ -2715,6 +2715,15 @@
         "messagePlaceholder": "Entrez le message attendu",
         "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       }
+    },
+    "canvas": {
+      "addBlock": "Ajouter un bloc",
+      "autoLayout": "Réorganiser",
+      "applyGraph": "Appliquer le graphe",
+      "nodeType": "Type",
+      "deleteNode": "Supprimer",
+      "canvasViewTitle": "Vue graphique",
+      "listViewTitle": "Vue liste"
     }
   },
   "profile": {

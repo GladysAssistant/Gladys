@@ -15,15 +15,18 @@ import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
 
 class TurnOnLight extends Component {
-  onDeviceFeatureChange = deviceFeature => {
+  onDeviceFeatureChange = (deviceFeature, device) => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
+      const label = device ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}` : (deviceFeature.name || deviceFeature.selector);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature_label', label);
       if (deviceFeature.selector !== this.props.trigger.device_feature) {
         this.props.updateTriggerProperty(this.props.index, 'value', null);
       }
     } else {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
+      this.props.updateTriggerProperty(this.props.index, 'device_feature_label', null);
     }
   };
 

@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import Select from 'react-select';
+import Select from '../SceneSelect';
 import { Text, withText } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';

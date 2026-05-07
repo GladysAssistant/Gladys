@@ -30,8 +30,11 @@ class DeviceSetValue extends Component {
     const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
     if (deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
+      const label = device ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}` : (deviceFeature.name || deviceFeature.selector);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
     } else {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', null);
     }
     if (deviceFeatureChanged) {
       if (deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
