@@ -500,6 +500,37 @@ const actionsFunc = {
       );
     }
   },
+  [ACTIONS.CALENDAR.GET_RUNNING_EVENT]: async (self, action, scope, path) => {
+    const events = await self.calendar.findCurrentlyRunningEvent(
+      action.calendars,
+      action.calendar_event_name_comparator,
+      action.calendar_event_name,
+    );
+    if (events.length > 0) {
+      const eventRaw = events[0];
+      const eventFormatted = {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        description: eventRaw.description,
+        start: dayjs(eventRaw.start)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+        end: dayjs(eventRaw.end)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+      };
+      set(
+        scope,
+        path,
+        {
+          calendarEvent: eventFormatted,
+        },
+        { merge: true },
+      );
+    }
+  },
   [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
     try {
       const data = await self.gateway.getEcowattSignals();

@@ -2402,6 +2402,12 @@
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
       },
+      "calendarGetRunningEvent": {
+        "description": "La scène récupèrera l'évènement de calendrier en cours, vous pourrez l'utiliser plus tard dans celle-ci.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "nameLabel": "Si le nom",
+        "namePlaceholder": "Entrez un nom"
+      },
       "ecowattCondition": {
         "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
         "knowMore": "En savoir plus",
@@ -2460,7 +2466,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Condition sur un évènement d'un calendrier"
+        "is-event-running": "Condition sur un évènement d'un calendrier",
+        "get-running-event": "Récupérer l'évènement du calendrier en cours"
       },
       "device": {
         "get-value": "Récupérer le dernier état",

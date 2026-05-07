@@ -2402,6 +2402,12 @@
         "stopScene": "Stop the scene",
         "continueScene": "Continue the scene"
       },
+      "calendarGetRunningEvent": {
+        "description": "This action retrieves the currently running calendar event and stores it in variables available in the rest of the scene. If no event is found, the variables will not be updated.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "namePlaceholder": "Enter a name"
+      },
       "ecowattCondition": {
         "description": "This conditions lets you check the status of the french electricity network",
         "knowMore": "Read more",
@@ -2460,7 +2466,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Condition on calendar events"
+        "is-event-running": "Condition on calendar events",
+        "get-running-event": "Get current calendar event"
       },
       "device": {
         "get-value": "Get device value",
