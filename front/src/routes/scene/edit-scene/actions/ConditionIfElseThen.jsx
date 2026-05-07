@@ -164,6 +164,12 @@ class ConditionIfElseThen extends Component {
                   scene={props.scene}
                   firstActionGroup={index === 0}
                   lastActionGroup={index === props.action.then.length - 1}
+                  comment={(props.action.thenComments || [])[index] || ''}
+                  updateComment={comment => {
+                    const newComments = [...(props.action.thenComments || [])];
+                    newComments[index] = comment || null;
+                    props.updateActionProperty(props.path, 'thenComments', newComments);
+                  }}
                 />
               ))}
             </div>
@@ -213,6 +219,12 @@ class ConditionIfElseThen extends Component {
                   scene={props.scene}
                   firstActionGroup={index === 0}
                   lastActionGroup={index === props.action.else.length - 1}
+                  comment={(props.action.elseComments || [])[index] || ''}
+                  updateComment={comment => {
+                    const newComments = [...(props.action.elseComments || [])];
+                    newComments[index] = comment || null;
+                    props.updateActionProperty(props.path, 'elseComments', newComments);
+                  }}
                 />
               ))}
             </div>

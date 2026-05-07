@@ -10,6 +10,7 @@ const actionSchema = Joi.object()
       .required(),
     device_feature: Joi.string(),
     device_features: Joi.array().items(Joi.string()),
+    device_feature_label: Joi.string().allow(null),
     device: Joi.string(),
     devices: Joi.array().items(Joi.string()),
     user: Joi.string(),
@@ -73,13 +74,14 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    thenComments: Joi.array().items(Joi.string().allow(null, '')),
+    elseComments: Joi.array().items(Joi.string().allow(null, '')),
     // Libellés d'affichage mémorisés par les composants frontend (ex: nom de la maison,
     // de l'utilisateur…). Non utilisés par le moteur d'exécution backend — Joi doit
     // néanmoins les accepter pour ne pas rejeter la sauvegarde de la scène.
     house_label: Joi.string().allow(null),
     user_label: Joi.string().allow(null),
     scene_label: Joi.string().allow(null),
-    device_feature_label: Joi.string().allow(null),
     calendars_label: Joi.string().allow(null),
   })
   .id('action');
@@ -94,6 +96,7 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
+    device_feature_label: Joi.string(),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),

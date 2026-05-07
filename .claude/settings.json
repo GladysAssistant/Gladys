@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Bash(rtk grep *)",
+      "Bash(rtk read *)",
+      "Bash(rtk git *)",
       "Bash(npm run *)"
     ]
   }
