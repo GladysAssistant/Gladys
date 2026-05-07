@@ -3,7 +3,7 @@ name: Build & push all-functions image → ghcr.io
 on:
   push:
     branches:
-      - all_functions
+      - all_changes
   workflow_dispatch:
 
 permissions:
