@@ -129,6 +129,7 @@ const triggersSchema = Joi.array().items(
     house_label: Joi.string().allow(null),
     user_label: Joi.string().allow(null),
     area_label: Joi.string().allow(null),
+    device_feature_label: Joi.string().allow(null),
     calendars_label: Joi.string().allow(null),
   }),
 );

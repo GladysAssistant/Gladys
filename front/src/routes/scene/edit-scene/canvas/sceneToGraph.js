@@ -512,7 +512,10 @@ export function sceneToGraph(scene) {
           thenGroup.forEach((thenAction, aIdx) => {
             const thenId = `${id}-then-${stepIdx}-${aIdx}`;
             const thenX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
-            nodes.push(makeActionNode(thenId, thenAction, { x: thenX, y: stepY }, { isBranch: true }));
+            nodes.push(makeActionNode(thenId, thenAction, { x: thenX, y: stepY }, {
+              isBranch: true,
+              path: `${groupIdx}.${actionIdx}.then.${stepIdx}.${aIdx}`,
+            }));
             stepIds.push(thenId);
           });
           if (stepIdx === 0) {
@@ -547,7 +550,10 @@ export function sceneToGraph(scene) {
           elseGroup.forEach((elseAction, aIdx) => {
             const elseId = `${id}-else-${stepIdx}-${aIdx}`;
             const elseX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
-            nodes.push(makeActionNode(elseId, elseAction, { x: elseX, y: stepY }, { isBranch: true }));
+            nodes.push(makeActionNode(elseId, elseAction, { x: elseX, y: stepY }, {
+              isBranch: true,
+              path: `${groupIdx}.${actionIdx}.else.${stepIdx}.${aIdx}`,
+            }));
             stepIds.push(elseId);
           });
           if (stepIdx === 0) {

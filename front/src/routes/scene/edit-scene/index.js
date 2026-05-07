@@ -1117,7 +1117,7 @@ class EditScene extends Component {
   switchToCanvasView = () => this.setState({ canvasView: true });
   switchToListView = () => this.setState({ canvasView: false });
 
-  saveSceneFromCanvas = async updatedScene => {
+  saveSceneFromCanvas = async (updatedScene, debugMode = false) => {
     this.setState({ saving: true, error: false, errorMessage: null });
     try {
       // Ensure the trailing empty action group is present (required by the list view)
@@ -1126,6 +1126,9 @@ class EditScene extends Component {
         actions.push([]);
       }
       const sceneToSave = { ...updatedScene, actions };
+      if (debugMode) {
+        console.log('Canvas save payload:', JSON.stringify(sceneToSave, null, 2));
+      }
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
       const variables = initializeSceneVariables(sceneToSave.actions);
       const triggersVariables = (sceneToSave.triggers || []).map(() => []);
@@ -1134,7 +1137,16 @@ class EditScene extends Component {
       console.error(e);
       let errorMessage = null;
       if (e.response && e.response.data) {
-        errorMessage = e.response.data.message || null;
+        const { properties, message } = e.response.data;
+        if (typeof properties === 'string' && properties.length > 0) {
+          // Erreur de validation Joi : properties contient le message d'erreur directement
+          errorMessage = properties;
+        } else if (Array.isArray(properties) && properties.length > 0) {
+          // Erreur de validation Sequelize : properties est un tableau d'objets {message}
+          errorMessage = properties.map(p => p.message || String(p)).join('\n');
+        } else if (message) {
+          errorMessage = message;
+        }
       }
       this.setState({ error: true, errorMessage });
     }

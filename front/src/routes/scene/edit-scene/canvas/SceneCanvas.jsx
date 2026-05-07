@@ -91,6 +91,8 @@ const SceneCanvas = ({
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  // Mode debug : affiche le payload de sauvegarde dans la console
+  const [debugMode, setDebugMode] = useState(false);
 
   // Custom drag state
   const [draggingNode, setDraggingNode] = useState(null); // {nodeType, triggerType, actionType, label, icon}
@@ -366,8 +368,8 @@ const SceneCanvas = ({
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
   const handleApply = useCallback(() => {
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
-    saveScene(updatedScene);
-  }, [scene, saveScene]);
+    saveScene(updatedScene, debugMode);
+  }, [scene, saveScene, debugMode]);
 
   // Mise à jour du ref à chaque render : le listener keydown (enregistré une seule fois)
   // appelle toujours la version la plus récente de handleApply via ce ref.
@@ -410,6 +412,14 @@ const SceneCanvas = ({
               >
                 <i class="fe fe-plus mr-1" />
                 <Text id="editScene.canvas.addBlock">Ajouter un bloc</Text>
+              </button>
+              <button
+                class={`btn btn-sm ${debugMode ? 'btn-warning' : 'btn-outline-secondary'} ${style.panelBtn}`}
+                onClick={() => setDebugMode(d => !d)}
+                title={debugMode ? 'Debug activé — cliquer pour désactiver' : 'Activer le mode debug (log payload sauvegarde)'}
+              >
+                <i class="fe fe-terminal mr-1" />
+                Debug
               </button>
               <button
                 class={`btn btn-sm btn-outline-secondary ${style.panelBtn}`}

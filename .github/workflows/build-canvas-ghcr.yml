@@ -5,7 +5,7 @@ name: Build & push canvas image → ghcr.io
 on:
   push:
     branches:
-      - feat/canvas_style
+      - feat/last_version
   workflow_dispatch:
 
 # Le GITHUB_TOKEN doit pouvoir écrire des packages (images ghcr.io)
