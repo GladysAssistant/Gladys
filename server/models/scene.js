@@ -9,6 +9,7 @@ const actionSchema = Joi.object()
       .valid(...ACTION_LIST)
       .required(),
     device_feature: Joi.string(),
+    device_feature_label: Joi.string(),
     device_features: Joi.array().items(Joi.string()),
     device: Joi.string(),
     devices: Joi.array().items(Joi.string()),
@@ -71,6 +72,8 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    thenComments: Joi.array().items(Joi.string().allow(null, '')),
+    elseComments: Joi.array().items(Joi.string().allow(null, '')),
   })
   .id('action');
 
@@ -84,6 +87,7 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
+    device_feature_label: Joi.string(),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
