@@ -300,17 +300,19 @@ export function getActionSummary(action) {
     case ACTIONS.DEVICE.GET_VALUE:
       return action.device_feature_label || action.device_feature || null;
     case ACTIONS.DEVICE.CHECK_VALUE: {
-      const name = action.device_feature_label || action.device_feature;
+      const name = action.device_feature_label || action.device_feature || null;
       if (!name) return null;
-      if (action.value != null) return [name, `${action.operator || '='} ${action.value}`];
-      return name;
+      const OP = { '=': '=', '!=': '≠', '>': '>', '>=': '≥', '<': '<', '<=': '≤' };
+      const op = OP[action.operator] || action.operator || null;
+      const cond = op && action.value != null ? `${op} ${action.value}` : null;
+      return cond ? [name, cond] : name;
     }
     case ACTIONS.DEVICE.CHECK_MULTI_VALUE: {
-      const name = action.device_feature_label || action.device_feature;
+      const name = action.device_feature_label || action.device_feature || null;
       if (!name) return null;
-      const count = Array.isArray(action.values) ? action.values.length : 0;
-      const countLabel = `${count} valeur${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
-      return [name, countLabel];
+      const n = Array.isArray(action.values) ? action.values.length : 0;
+      const count = n > 0 ? `${n} valeur${n > 1 ? 's' : ''}` : null;
+      return count ? [name, count] : name;
     }
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;

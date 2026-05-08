@@ -12,16 +12,21 @@ import LevelSensorDeviceState from '../triggers/device-states/LevelSensorDeviceS
 import LevelMatterSensorDeviceState from '../triggers/device-states/LevelMatterSensorDeviceState';
 
 class DeviceCheckValueParams extends Component {
-  onDeviceFeatureChange = deviceFeature => {
+  onDeviceFeatureChange = (deviceFeature, device) => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
+      const label = device
+        ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
+        : (deviceFeature.name || deviceFeature.selector);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
       if (deviceFeature.selector !== this.props.action.device_feature) {
         this.props.updateActionProperty(this.props.path, 'value', undefined);
         this.props.updateActionProperty(this.props.path, 'operator', undefined);
       }
     } else {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature_label', null);
     }
   };
 
