@@ -152,32 +152,12 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false
     });
     try {
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
-        value: tuyaEndpoint
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
-        value: tuyaAccessKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SECRET_KEY', {
-        value: tuyaSecretKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_ACCOUNT_UID', {
-        value: tuyaAppAccountId
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_USERNAME', {
-        value: tuyaAppUsername
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_LAST_CONNECTED_CONFIG_HASH', {
-        value: ''
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
-        value: 'false'
+      await this.props.httpClient.post('/api/v1/service/tuya/configuration', {
+        endpoint: tuyaEndpoint,
+        accessKey: tuyaAccessKey,
+        secretKey: tuyaSecretKey,
+        appAccountId: tuyaAppAccountId,
+        appUsername: tuyaAppUsername
       });
 
       const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId);
@@ -244,28 +224,28 @@ class SetupTab extends Component {
       return;
     }
     if (status === 'error') {
-      this.setState(previousState => ({
+      this.setState({
         tuyaConnectionStatus: RequestStatus.Error,
         tuyaConnecting: false,
         tuyaConnected: false,
-        tuyaDisconnected: previousState.tuyaConfigured && !manualDisconnect,
+        tuyaDisconnected: this.state.tuyaConfigured && !manualDisconnect,
         tuyaManuallyDisconnected: false,
         tuyaManualDisconnectJustDone: false,
         tuyaJustSavedMissing: false,
-        tuyaConnectionError: error || previousState.tuyaConnectionError
-      }));
+        tuyaConnectionError: error || this.state.tuyaConnectionError
+      });
       return;
     }
     if (status === 'not_initialized') {
-      this.setState(previousState => ({
+      this.setState({
         tuyaConnectionStatus: null,
         tuyaConnecting: false,
         tuyaConnected: false,
         tuyaDisconnected: !manualDisconnect,
         tuyaManuallyDisconnected: !!manualDisconnect,
-        tuyaManualDisconnectJustDone: manualDisconnect ? previousState.tuyaManualDisconnectJustDone : false,
+        tuyaManualDisconnectJustDone: manualDisconnect ? this.state.tuyaManualDisconnectJustDone : false,
         tuyaJustSavedMissing: false
-      }));
+      });
     }
   };
 
@@ -306,9 +286,9 @@ class SetupTab extends Component {
   };
 
   toggleClientSecret = () => {
-    this.setState(previousState => ({
-      showClientSecret: !previousState.showClientSecret
-    }));
+    this.setState({
+      showClientSecret: !this.state.showClientSecret
+    });
   };
 
   disconnectFromCloud = async () => {
@@ -516,7 +496,7 @@ class SetupTab extends Component {
                         placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder" />}
                         value={state.tuyaSecretKey}
                         className="form-control"
-                        autoComplete="off"
+                        autocomplete="off"
                         onInput={this.updateConfiguration}
                       />
                     </Localizer>
@@ -574,7 +554,7 @@ class SetupTab extends Component {
                       type="button"
                       class="btn btn-outline-danger"
                       onClick={this.disconnectFromCloud}
-                      disabled={!state.tuyaConfigured || state.tuyaDisconnecting || state.tuyaConnecting}
+                      disabled={state.tuyaDisconnecting || state.tuyaConnecting}
                     >
                       <Text id="integration.tuya.setup.disconnectLabel" />
                     </button>
