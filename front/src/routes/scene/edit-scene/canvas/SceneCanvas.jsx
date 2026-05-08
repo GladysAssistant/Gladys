@@ -26,6 +26,7 @@ import {
   getTriggerIcon,
   isConditionAction,
   isIfThenElse,
+  isCalendarCondition,
 } from './sceneToGraph';
 import { graphToScene } from './graphToScene';
 import NodeSelector from './NodeSelector';
@@ -174,9 +175,35 @@ const SceneCanvas = ({
   }, [nodes, positionsKey]);
   // ─────────────────────────────────────────────────────────────────────
 
+  // Synchronise la couleur des arêtes issues d'un nœud CALENDAR.IS_EVENT_RUNNING
+  // quand stop_scene_if_event_found change dans le panneau de configuration.
+  // Les arêtes sont un état séparé (useEdgesState) et ne se mettent pas à jour
+  // automatiquement quand setNodes est appelé.
+  useEffect(() => {
+    setEdges(eds => {
+      let changed = false;
+      const newEds = eds.map(e => {
+        const sourceNode = nodes.find(n => n.id === e.source);
+        if (!sourceNode || !isCalendarCondition(sourceNode.data && sourceNode.data.action)) return e;
+        const targetColor = sourceNode.data.action.stop_scene_if_event_found === true
+          ? '#ef4444'
+          : '#10b981';
+        if (e.style && e.style.stroke === targetColor) return e;
+        changed = true;
+        return {
+          ...e,
+          style: { ...e.style, stroke: targetColor, strokeWidth: 2 },
+          markerEnd: { type: MarkerType.ArrowClosed, color: targetColor },
+        };
+      });
+      return changed ? newEds : eds;
+    });
+  }, [nodes]);
+
   // Coloration des arêtes lors d'une connexion manuelle (drag depuis un handle) :
   //  - handle 'then' → verte  (#10b981)
   //  - handle 'else' → rouge  (#ef4444)
+  //  - CALENDAR.IS_EVENT_RUNNING → verte ou rouge selon stop_scene_if_event_found
   //  - condition simple (OnlyContinueIf, CheckTime…) → verte
   //  - action ordinaire → grise (défaut)
   const onConnect = useCallback(
@@ -187,10 +214,13 @@ const SceneCanvas = ({
       } else if (params.sourceHandle === 'else') {
         handleOverride = { style: { stroke: '#ef4444', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' } };
       } else {
-        // Condition non-branchante (ex : "Continuer si") → arête verte
         const sourceNode = nodes.find(n => n.id === params.source);
         if (sourceNode && sourceNode.type === NODE_TYPES.CONDITION && !isIfThenElse(sourceNode.data.action)) {
-          handleOverride = { style: { stroke: '#10b981', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' } };
+          let condColor = '#10b981';
+          if (isCalendarCondition(sourceNode.data.action)) {
+            condColor = sourceNode.data.action.stop_scene_if_event_found === true ? '#ef4444' : '#10b981';
+          }
+          handleOverride = { style: { stroke: condColor, strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: condColor } };
         }
       }
       setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds));
