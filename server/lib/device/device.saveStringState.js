@@ -57,6 +57,13 @@ async function saveStringState(device, deviceFeature, newValue) {
     last_value: newValue,
     last_value_changed: now,
   });
+  this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+    type: EVENTS.DEVICE.MULTI_STATE,
+    device_feature: deviceFeature.selector,
+    previous_value: previousDeviceFeatureValue,
+    last_value: newValue,
+    last_value_changed: now,
+  });
 }
 
 module.exports = {
