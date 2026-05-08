@@ -60,6 +60,16 @@ module.exports = function TuyaController(tuyaManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/tuya/configuration Save Tuya configuration.
+   * @apiName saveConfiguration
+   * @apiGroup Tuya
+   */
+  async function saveConfiguration(req, res) {
+    const configuration = await tuyaManager.saveConfiguration(req.body);
+    res.json(configuration);
+  }
+
+  /**
    * @api {post} /api/v1/service/tuya/disconnect Disconnect Tuya cloud.
    * @apiName disconnect
    * @apiGroup Tuya
@@ -85,6 +95,10 @@ module.exports = function TuyaController(tuyaManager) {
     'get /api/v1/service/tuya/status': {
       authenticated: true,
       controller: asyncMiddleware(status),
+    },
+    'post /api/v1/service/tuya/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(saveConfiguration),
     },
     'post /api/v1/service/tuya/disconnect': {
       authenticated: true,

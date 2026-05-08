@@ -8,6 +8,9 @@ const gladys = {
   event: {
     emit: fake.returns(null),
   },
+  service: {
+    getService: fake.returns(true),
+  },
 };
 const serviceId = 'service-uuid-random';
 

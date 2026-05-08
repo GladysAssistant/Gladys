@@ -5,12 +5,21 @@ const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 
 const { assert, fake } = sinon;
 
+const TuyaHandler = require('../../../services/tuya/lib');
+
 const TuyaHandlerMock = sinon.stub();
 TuyaHandlerMock.prototype.init = fake(function init() {
   this.status = STATUS.CONNECTED;
 });
 TuyaHandlerMock.prototype.loadDevices = fake.returns(null);
-TuyaHandlerMock.prototype.disconnect = fake.returns(null);
+TuyaHandlerMock.prototype.disconnect = fake(function disconnect() {
+  this.stopReconnect();
+});
+TuyaHandlerMock.prototype.startReconnect = TuyaHandler.prototype.startReconnect;
+TuyaHandlerMock.prototype.stopReconnect = TuyaHandler.prototype.stopReconnect;
+TuyaHandlerMock.prototype.tryReconnect = TuyaHandler.prototype.tryReconnect;
+TuyaHandlerMock.prototype.scheduleQuickReconnects = TuyaHandler.prototype.scheduleQuickReconnects;
+TuyaHandlerMock.prototype.clearQuickReconnects = TuyaHandler.prototype.clearQuickReconnects;
 
 const TuyaService = proxyquire('../../../services/tuya/index', { './lib': TuyaHandlerMock });
 

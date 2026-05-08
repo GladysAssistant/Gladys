@@ -117,7 +117,7 @@ describe('TuyaHandler.poll', () => {
       }),
     };
 
-    gladys.stateManager.get.withArgs('deviceFeature', 'tuya:device:switch_1').returns({
+    gladys.stateManager.get.withArgs('deviceFeature', 'tuya-device-switch-1').returns({
       last_value: 1,
     });
 
@@ -126,7 +126,7 @@ describe('TuyaHandler.poll', () => {
       features: [
         {
           external_id: 'tuya:device:switch_1',
-          selector: 'tuya:device:switch_1',
+          selector: 'tuya-device-switch-1',
           category: 'switch',
           type: 'binary',
           last_value: 0,

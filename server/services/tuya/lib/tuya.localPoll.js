@@ -160,9 +160,7 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
   upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
   if (localKey) {
-    if (localKey) {
-      upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
-    }
+    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
   }
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);

@@ -31,6 +31,8 @@ describe('TuyaHandler.init', () => {
   beforeEach(() => {
     sinon.reset();
     tuyaHandler.status = 'UNKNOWN';
+    tuyaHandler.loadDevices = sinon.stub().resolves([]);
+    tuyaHandler.startReconnect = sinon.stub();
   });
 
   afterEach(() => {

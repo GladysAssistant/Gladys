@@ -17,35 +17,35 @@ describe('Build service', () => {
     gladys: {
       device: {},
       event: {},
+      stateManager: {
+        get: stub(),
+      },
     },
   };
 
   it('should build light service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
-          name: 'Luminosité',
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-          last_value: 50,
-        },
-        {
-          id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
-          name: 'Couleur',
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-          last_value: 3500000,
-        },
-        {
-          id: '77f26d98-49a5-4338-97c8-ab51fb5d2164',
-          name: 'Température',
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-          last_value: 255,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'lampe-brightness').returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: 'Luminosité',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      last_value: 50,
     });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'lampe-color').returns({
+      id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
+      name: 'Couleur',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+      last_value: 3500000,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'lampe-temperature').returns({
+      id: '77f26d98-49a5-4338-97c8-ab51fb5d2164',
+      name: 'Température',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+      last_value: 255,
+    });
+
     homekitHandler.gladys.event.emit = stub();
     const on = stub();
     const getCharacteristic = stub()
@@ -200,14 +200,10 @@ describe('Build service', () => {
   });
 
   it('should build switch service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          name: 'onoff',
-          device_feature: 'lampe-onoff',
-          last_value: 1,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      name: 'onoff',
+      device_feature: 'lampe-onoff',
+      last_value: 1,
     });
     homekitHandler.gladys.event.emit = stub();
     const on = stub();
@@ -267,33 +263,29 @@ describe('Build service', () => {
   });
 
   it('should build current temperature service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '26df6983-5127-4122-874a-b6ed0590badc',
-          name: 'Température Celsius',
-          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-          unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          last_value: 15,
-        },
-        {
-          id: '91ee488c-068b-4328-8563-e1e15678c5a1',
-          name: 'Température Kelvin',
-          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-          unit: DEVICE_FEATURE_UNITS.KELVIN,
-          last_value: 293.15,
-        },
-        {
-          id: '110eb9f0-a84d-40df-b0c6-05791fb2ec15',
-          name: 'Température Fahrenheit',
-          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-          unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
-          last_value: 77,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-celsius').returns({
+      id: '26df6983-5127-4122-874a-b6ed0590badc',
+      name: 'Température Celsius',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+      last_value: 15,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-kelvin').returns({
+      id: '91ee488c-068b-4328-8563-e1e15678c5a1',
+      name: 'Température Kelvin',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.KELVIN,
+      last_value: 293.15,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-fahrenheit').returns({
+      id: '110eb9f0-a84d-40df-b0c6-05791fb2ec15',
+      name: 'Température Fahrenheit',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+      last_value: 77,
     });
     const on = stub();
     const getCharacteristic = stub().returns({
@@ -319,6 +311,7 @@ describe('Build service', () => {
       {
         id: '26df6983-5127-4122-874a-b6ed0590badc',
         name: 'Température Celsius',
+        selector: 'temp-celsius',
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -326,6 +319,7 @@ describe('Build service', () => {
       {
         id: '91ee488c-068b-4328-8563-e1e15678c5a1',
         name: 'Température Kelvin',
+        selector: 'temp-kelvin',
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KELVIN,
@@ -333,6 +327,7 @@ describe('Build service', () => {
       {
         id: '110eb9f0-a84d-40df-b0c6-05791fb2ec15',
         name: 'Température Fahrenheit',
+        selector: 'temp-fahrenheit',
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
@@ -354,16 +349,12 @@ describe('Build service', () => {
   });
 
   it('should build motion sensor service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
-          name: 'Motion Detection',
-          category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-          type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-          last_value: 0,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: 'Motion Detection',
+      category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      last_value: 0,
     });
     const on = stub();
     const getCharacteristic = stub().returns({
@@ -413,16 +404,12 @@ describe('Build service', () => {
   });
 
   it('should build contact sensor service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
-          name: "Porte d'entrée",
-          category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-          type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-          last_value: 0,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: "Porte d'entrée",
+      category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      last_value: 0,
     });
     const on = stub();
     const getCharacteristic = stub().returns({
@@ -465,23 +452,19 @@ describe('Build service', () => {
   });
 
   it('should build shutter/curtain service', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
-          name: 'Shutter State',
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-          last_value: 0,
-        },
-        {
-          id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
-          name: 'Shutter position',
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-          last_value: 80,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'shutter-state').returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: 'Shutter State',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+      last_value: 0,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'shutter-position').returns({
+      id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
+      name: 'Shutter position',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      last_value: 80,
     });
     homekitHandler.gladys.event.emit = stub();
     const on = stub();
@@ -577,17 +560,13 @@ describe('Build service', () => {
   });
 
   it('should build shutter/curtain service without real position', async () => {
-    homekitHandler.gladys.device.getBySelector = stub().resolves({
-      features: [
-        {
-          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
-          name: 'Shutter State',
-          selector: 'shutter-state',
-          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-          type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-          last_value: 0,
-        },
-      ],
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: 'Shutter State',
+      selector: 'shutter-state',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+      last_value: 0,
     });
     homekitHandler.gladys.event.emit = stub();
     const on = stub();

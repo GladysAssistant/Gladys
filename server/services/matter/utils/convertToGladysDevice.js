@@ -1,5 +1,7 @@
 const {
   OnOff,
+  BooleanState,
+  Switch,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
@@ -15,6 +17,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -62,7 +65,7 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
  * @param {string} devicePath - The path of the device.
  * @example
  * const gladysDevice = await convertToGladysDevice(serviceId, nodeId, node, device);
- * @returns {Promise<object>} The Gladys device.
+ * @returns {Promise<any>} The Gladys device.
  */
 async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceDataBasicInformation, devicePath) {
   const gladysDevice = {
@@ -114,6 +117,29 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 1,
+        });
+      } else if (clusterIndex === BooleanState.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === Switch.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Click)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-click`, true),
+          category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+          type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:click`,
+          min: 0,
+          max: 84,
         });
       } else if (clusterIndex === OccupancySensing.Complete.id) {
         gladysDevice.features.push({
@@ -376,6 +402,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 1000000,
           });
         }
+      } else if (clusterIndex === HepaFilterMonitoring.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
+          type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
       }
     });
   }

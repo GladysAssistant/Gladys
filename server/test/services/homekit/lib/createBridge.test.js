@@ -39,6 +39,7 @@ describe('Create bridge', () => {
           publish,
           setupURI: stub().returns(),
         }),
+        MDNSAdvertiser: { BONJOUR: 'bonjour-hap' },
       },
     };
 
@@ -52,6 +53,7 @@ describe('Create bridge', () => {
       pincode: '123-45-678',
       port: '47129',
       category: 'BRIDGE',
+      advertiser: 'bonjour-hap',
     });
   });
 });

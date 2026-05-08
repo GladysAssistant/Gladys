@@ -5,6 +5,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -255,6 +256,18 @@ describe('Matter.init', () => {
         cumulativeEnergy: true,
       },
       addCumulativeEnergyImportedAttributeListener: fake.returns(null),
+    });
+
+    // HEPA Filter Monitoring
+    clusterClients.set(HepaFilterMonitoring.Complete.id, {
+      id: HepaFilterMonitoring.Complete.id,
+      name: 'HepaFilterMonitoring',
+      endpointId: 1,
+      attributes: {
+        condition: {},
+      },
+      commands: {},
+      addConditionAttributeListener: fake.returns(null),
     });
 
     // Mock commissioning controller
@@ -574,6 +587,18 @@ describe('Matter.init', () => {
             type: 'index',
             unit: 'kilowatt-hour',
           },
+          {
+            category: 'hepa-filter-monitoring',
+            external_id: 'matter:12345:1:113',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'HepaFilterMonitoring - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[19].selector,
+            type: 'filter-life-remaining',
+            unit: 'percent',
+          },
         ],
         params: [],
       },
@@ -806,6 +831,18 @@ describe('Matter.init', () => {
             selector: matterHandler.devices[1].features[18].selector,
             type: 'index',
             unit: 'kilowatt-hour',
+          },
+          {
+            category: 'hepa-filter-monitoring',
+            external_id: 'matter:12345:1:child_endpoint:2:113',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'HepaFilterMonitoring - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[19].selector,
+            type: 'filter-life-remaining',
+            unit: 'percent',
           },
         ],
         params: [],

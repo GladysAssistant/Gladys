@@ -328,11 +328,9 @@ describe('Matter.setValue', () => {
     assert.calledWith(clusterClient.moveToHueAndSaturation, {
       hue: 100,
       saturation: 41,
-      transitionTime: null,
-      optionsMask: {
-        executeIfOff: true,
-      },
-      optionsOverride: {},
+      transitionTime: 0,
+      optionsMask: 1,
+      optionsOverride: 1,
     });
     assert.calledOnce(onOff.on);
   });

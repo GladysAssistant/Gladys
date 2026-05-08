@@ -20,8 +20,17 @@ function handleMessage(topic, message) {
 
   let device;
   if (main === 'homeassistant') {
+    // Only process Nuki devices from Home Assistant discovery
+    if (!message || !message.includes('"Nuki"')) {
+      return;
+    }
     logger.debug(topic, deviceType);
-    device = this.convertToDevice(message);
+    try {
+      device = this.convertToDevice(message);
+    } catch (e) {
+      logger.debug(`MQTT : Unable to parse Nuki discovery message: ${e.message}`);
+      return;
+    }
     this.discoveredDevices[device.external_id] = device;
     this.nukiHandler.notifyNewDevice(device, WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_MQTT_DEVICE);
   } else if (main === 'nuki') {
