@@ -35,6 +35,8 @@ async function localPoll(payload) {
     issueRefreshOnPing: false,
   };
   if (isProtocol35) {
+    // Protocol 3.5 has a heavier handshake than 3.1/3.3/3.4: enforce a 5s socket
+    // floor and disable keepAlive so the socket closes promptly after the poll.
     tuyaOptions.keepAlive = false;
     tuyaOptions.socketTimeout = Math.max(effectiveTimeout, 5000);
   }
@@ -94,6 +96,9 @@ async function localPoll(payload) {
   };
 
   try {
+    // Protocol 3.5 sometimes rejects a bare `schema:true` get on first contact.
+    // Fall back to probing DPS 1 (the standard switch DPS for Tuya devices) and
+    // finally an empty get as last resort. Other protocols only need the schema.
     const attempts =
       protocolVersion === '3.5' ? [{ schema: true }, { schema: true, dps: [1] }, {}] : [{ schema: true }];
     const tryAttempt = async (index) => {
@@ -120,12 +125,7 @@ async function localPoll(payload) {
       logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
-    try {
-      tuyaLocal.removeListener('error', onError);
-      await tuyaLocal.disconnect();
-    } catch (err) {
-      // ignore
-    }
+    tuyaLocal.removeListener('error', onError);
     throw e;
   }
 }
@@ -159,9 +159,7 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   device.params = Array.isArray(device.params) ? [...device.params] : [];
   upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
   upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
-  if (localKey) {
-    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
-  }
+  upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
