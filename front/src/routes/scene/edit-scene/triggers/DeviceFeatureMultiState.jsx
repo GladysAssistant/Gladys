@@ -136,6 +136,13 @@ class DeviceFeatureMultiState extends Component {
     return (
       <div>
         <div class="row">
+          <div class="col-12">
+            <p class="text-muted">
+              <Text id="editScene.triggersCard.multiState.description" />
+            </p>
+          </div>
+        </div>
+        <div class="row">
           {/* Sélecteur d'appareil */}
           <div class="col-12 col-md-6">
             <div class="form-group">

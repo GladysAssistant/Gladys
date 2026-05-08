@@ -2591,6 +2591,7 @@
     },
     "triggersCard": {
       "newState": {
+        "description": "The scene continues if the device is at the specified state.",
         "equal": "equal",
         "superior": "superior",
         "superiorOrEqual": "superior or equal",
@@ -2605,6 +2606,7 @@
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
       },
       "multiState": {
+        "description": "The scene continues if the device is at the specified state or one of the specified states.",
         "valuesLabel": "Triggering values",
         "addValue": "Add a value"
       },

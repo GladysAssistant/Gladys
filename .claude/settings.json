@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(rtk grep *)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(rtk find *)",
+      "Bash(rtk git *)",
+      "Bash(rtk ls *)"
     ]
   }
 }

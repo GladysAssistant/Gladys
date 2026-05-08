@@ -2590,6 +2590,7 @@
     },
     "triggersCard": {
       "newState": {
+        "description": "Die Szene wird fortgesetzt, wenn das Gerät den angegebenen Zustand hat.",
         "equal": "gleich",
         "superior": "größer",
         "superiorOrEqual": "größer oder gleich",
@@ -2602,6 +2603,11 @@
         "deviceSeen": "Wenn das Gerät erkannt wird",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
         "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:"
+      },
+      "multiState": {
+        "description": "Die Szene wird fortgesetzt, wenn das Gerät den angegebenen Zustand oder einen der angegebenen Zustände hat.",
+        "valuesLabel": "Auslösende Werte",
+        "addValue": "Einen Wert hinzufügen"
       },
       "scheduledTrigger": {
         "typeLabel": "Typ",

@@ -2591,6 +2591,7 @@
     },
     "triggersCard": {
       "newState": {
+        "description": "La scène continue si l'appareil est à l'état indiqué.",
         "equal": "égal",
         "superior": "supérieur",
         "superiorOrEqual": "supérieur ou égal",
@@ -2605,6 +2606,7 @@
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
       "multiState": {
+        "description": "La scène continue si l'appareil est à l'état ou à l'un des états indiqués.",
         "valuesLabel": "Valeurs déclenchantes",
         "addValue": "Ajouter une valeur"
       },
