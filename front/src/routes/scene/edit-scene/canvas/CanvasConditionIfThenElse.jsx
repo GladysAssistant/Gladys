@@ -8,6 +8,8 @@ import CheckAlarmMode from '../actions/CheckAlarmMode';
 import CalendarIsEventRunning from '../actions/CalendarIsEventRunning';
 import EcowattCondition from '../actions/EcowattCondition';
 import HouseEmptyOrNotCondition from '../actions/HouseEmptyOrNotCondition';
+import DeviceCheckValueParams from '../actions/DeviceCheckValueParams';
+import DeviceCheckMultiValueParams from '../actions/DeviceCheckMultiValueParams';
 
 const CONDITION_LABELS = {
   [ACTIONS.CONDITION.CHECK_TIME]: "Vérifier l'heure",
@@ -18,6 +20,8 @@ const CONDITION_LABELS = {
   [ACTIONS.ECOWATT.CONDITION]: 'Condition Ecowatt',
   [ACTIONS.HOUSE.IS_EMPTY]: 'Maison vide',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'Maison occupée',
+  [ACTIONS.DEVICE.CHECK_VALUE]: 'Condition sur état',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'Condition sur états multiples',
 };
 
 const CONDITION_ICONS = {
@@ -29,6 +33,8 @@ const CONDITION_ICONS = {
   [ACTIONS.ECOWATT.CONDITION]: 'fe-zap',
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe-home',
+  [ACTIONS.DEVICE.CHECK_VALUE]: 'fe-check-circle',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'fe-check-circle',
 };
 
 const CONDITION_COMPONENTS = {
@@ -40,6 +46,8 @@ const CONDITION_COMPONENTS = {
   [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
   [ACTIONS.HOUSE.IS_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
+  [ACTIONS.DEVICE.CHECK_VALUE]: DeviceCheckValueParams,
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: DeviceCheckMultiValueParams,
 };
 
 const CanvasConditionIfThenElse = ({
