@@ -20,6 +20,8 @@ class DeviceCheckValueParams extends Component {
         ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
         : (deviceFeature.name || deviceFeature.selector);
       this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
+      this.props.updateActionProperty(this.props.path, 'device_feature_category', deviceFeature.category);
+      this.props.updateActionProperty(this.props.path, 'device_feature_type', deviceFeature.type);
       if (deviceFeature.selector !== this.props.action.device_feature) {
         this.props.updateActionProperty(this.props.path, 'value', undefined);
         this.props.updateActionProperty(this.props.path, 'operator', undefined);
@@ -27,6 +29,8 @@ class DeviceCheckValueParams extends Component {
     } else {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
       this.props.updateActionProperty(this.props.path, 'device_feature_label', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature_category', null);
+      this.props.updateActionProperty(this.props.path, 'device_feature_type', null);
     }
   };
 

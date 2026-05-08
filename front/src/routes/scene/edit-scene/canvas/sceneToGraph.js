@@ -315,7 +315,13 @@ export function getActionSummary(action) {
       if (!name) return null;
       const OP = { '=': '=', '!=': '≠', '>': '>', '>=': '≥', '<': '<', '<=': '≤' };
       const op = OP[action.operator] || action.operator || null;
-      const cond = op && action.value != null ? `${op} ${action.value}` : null;
+      let valueDisplay = action.value != null ? String(action.value) : null;
+      const isBinary =
+        action.device_feature_type === 'binary' || action.device_feature_category === 'presence-sensor';
+      if (isBinary && action.value != null) {
+        valueDisplay = action.value === 1 ? 'On' : 'Off';
+      }
+      const cond = op && valueDisplay != null ? `${op} ${valueDisplay}` : null;
       return cond ? [name, cond] : name;
     }
     case ACTIONS.DEVICE.CHECK_MULTI_VALUE: {
