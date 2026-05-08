@@ -232,10 +232,21 @@ export function getActionLabel(action) {
 export function getActionSummary(action) {
   if (!action) return null;
   switch (action.type) {
-    case ACTIONS.TIME.DELAY:
-      if (action.value != null) return `${action.value} ${action.unit || 'sec'}`;
+    case ACTIONS.TIME.DELAY: {
       if (action.evaluate_value) return truncate(action.evaluate_value);
+      if (action.value != null) {
+        const UNIT_FR = {
+          millisecond: 'ms',
+          second: 'seconde',
+          minute: 'minute',
+          hour: 'heure',
+        };
+        const unitFr = UNIT_FR[action.unit] || action.unit || 's';
+        const plural = action.value > 1 && unitFr !== 'ms' ? 's' : '';
+        return `${action.value} ${unitFr}${plural}`;
+      }
       return null;
+    }
     case ACTIONS.MESSAGE.SEND:
     case ACTIONS.AI.ASK: {
       const text = truncate(action.text);
