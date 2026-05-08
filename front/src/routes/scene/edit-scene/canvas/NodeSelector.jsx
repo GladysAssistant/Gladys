@@ -47,7 +47,6 @@ const ACTION_ENTRIES = [
   { type: ACTIONS.USER.CHECK_PRESENCE, label: 'Vérifier présence', icon: 'fe-user-check', group: 'Présence' },
   { type: ACTIONS.ALARM.SET_ALARM_MODE, label: 'Définir mode alarme', icon: 'fe-bell', group: 'Alarme' },
   { type: ACTIONS.ALARM.CHECK_ALARM_MODE, label: 'Vérifier mode alarme', icon: 'fe-bell', group: 'Alarme' },
-  { type: ACTIONS.CALENDAR.IS_EVENT_RUNNING, label: 'Événement en cours', icon: 'fe-calendar', group: 'Calendrier' },
   { type: ACTIONS.ECOWATT.CONDITION, label: 'Condition Ecowatt', icon: 'fe-zap', group: 'Énergie' },
   { type: ACTIONS.EDF_TEMPO.CONDITION, label: 'Condition EDF Tempo', icon: 'fe-zap', group: 'Énergie' },
 ];
@@ -58,6 +57,7 @@ const CONDITION_ENTRIES = [
   { type: ACTIONS.DEVICE.CHECK_VALUE, label: 'Condition sur état', icon: 'fe-check-circle' },
   { type: ACTIONS.DEVICE.CHECK_MULTI_VALUE, label: 'Condition sur états multiples', icon: 'fe-check-circle' },
   { type: ACTIONS.CONDITION.CHECK_TIME, label: 'Vérifier l\'heure', icon: 'fe-watch' },
+  { type: ACTIONS.CALENDAR.IS_EVENT_RUNNING, label: 'Condition sur un événement du calendrier', icon: 'fe-calendar' },
   { type: ACTIONS.HOUSE.IS_EMPTY, label: 'Vérifier maison vide', icon: 'fe-home' },
   { type: ACTIONS.HOUSE.IS_NOT_EMPTY, label: 'Vérifier maison occupée', icon: 'fe-home' },
 ];

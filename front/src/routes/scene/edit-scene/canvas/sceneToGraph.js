@@ -103,7 +103,7 @@ const ACTION_LABELS = {
   [ACTIONS.AI.ASK]: 'Demander à l\'IA',
   [ACTIONS.ALARM.SET_ALARM_MODE]: 'Définir mode alarme',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'Vérifier mode alarme',
-  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'Événement en cours',
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'Condition sur un événement du calendrier',
   [ACTIONS.ECOWATT.CONDITION]: 'Condition Ecowatt',
   [ACTIONS.EDF_TEMPO.CONDITION]: 'Condition EDF Tempo',
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'Notification sonore',
@@ -331,13 +331,29 @@ export function getActionSummary(action) {
     case ACTIONS.HOUSE.IS_NOT_EMPTY:
       return action.house_label || action.house || null;
     case ACTIONS.CALENDAR.IS_EVENT_RUNNING: {
-      const evName = action.calendar_event_name ? truncate(action.calendar_event_name) : null;
+      const COMPARATOR_FR = {
+        'is-exactly': 'est exactement',
+        'contains': 'contient',
+        'starts-with': 'commence par',
+        'ends-with': 'se termine par',
+        'has-any-name': 'n\'importe quel nom',
+      };
       const cals = action.calendars_label
         || (action.calendars && action.calendars.length > 0
           ? `${action.calendars.length} calendrier${action.calendars.length > 1 ? 's' : ''}`
           : null);
-      if (evName && cals) return [evName, cals];
-      return evName || cals || null;
+      const line1 = cals ? `Calendrier ${truncate(cals, 28)}` : null;
+      const comparatorFr = COMPARATOR_FR[action.calendar_event_name_comparator] || null;
+      let line2 = null;
+      if (action.calendar_event_name_comparator === 'has-any-name') {
+        line2 = comparatorFr;
+      } else if (comparatorFr && action.calendar_event_name) {
+        line2 = `${comparatorFr} ${truncate(action.calendar_event_name, 20)}`;
+      } else if (comparatorFr) {
+        line2 = comparatorFr;
+      }
+      if (line1 && line2) return [line1, line2];
+      return line1 || line2 || null;
     }
     case ACTIONS.LIGHT.TURN_ON:
     case ACTIONS.LIGHT.TURN_OFF:
@@ -369,6 +385,7 @@ const CONDITION_ACTION_SET = new Set([
   ACTIONS.CONDITION.CHECK_TIME,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
+  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
   ACTIONS.DEVICE.CHECK_VALUE,
   ACTIONS.DEVICE.CHECK_MULTI_VALUE,
 ]);
@@ -382,6 +399,12 @@ export function isConditionAction(action) {
 // au lieu d'une seule, et ses branches sont développées latéralement dans le graphe.
 export function isIfThenElse(action) {
   return action != null && action.type === ACTIONS.CONDITION.IF_THEN_ELSE;
+}
+
+// Vrai pour CALENDAR.IS_EVENT_RUNNING : la sortie et la couleur de l'arête dépendent
+// de stop_scene_if_event_found (true → "Non"/rouge, false → "Oui"/vert).
+export function isCalendarCondition(action) {
+  return action != null && action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING;
 }
 
 // ── Helpers de construction d'arêtes ────────────────────────────────
@@ -609,8 +632,13 @@ export function sceneToGraph(scene) {
     prevIds.forEach(sourceId => {
       const srcAction = actionById[sourceId];
       const sh = isIfThenElse(srcAction) ? 'after' : undefined;
-      const color =
-        isConditionAction(srcAction) && !isIfThenElse(srcAction) ? '#10b981' : '#94a3b8';
+      const color = isIfThenElse(srcAction)
+        ? '#94a3b8'
+        : isCalendarCondition(srcAction)
+          ? (srcAction.stop_scene_if_event_found === true ? '#ef4444' : '#10b981')
+          : isConditionAction(srcAction)
+            ? '#10b981'
+            : '#94a3b8';
       currentIds.forEach(targetId => {
         edges.push(outerEdge(`e-${sourceId}-${targetId}`, sourceId, targetId, sh, color));
       });
