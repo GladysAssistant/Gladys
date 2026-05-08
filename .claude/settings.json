@@ -4,7 +4,9 @@
       "Bash(rtk grep *)",
       "Bash(rtk read *)",
       "Bash(rtk git *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(rtk grep *)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
