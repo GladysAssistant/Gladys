@@ -88,6 +88,13 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
+          <div class="col-12">
+            <p class="text-muted">
+              <Text id="editScene.triggersCard.newState.description" />
+            </p>
+          </div>
+        </div>
+        <div class="row">
           <div class="col-12 col-md-6">
             <div class="form-group">
               <SelectDeviceFeature
