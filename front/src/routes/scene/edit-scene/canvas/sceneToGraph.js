@@ -343,7 +343,8 @@ export function getActionSummary(action) {
         valueDisplay = action.value === 1 ? 'On' : 'Off';
       } else if (isCover && action.value != null) {
         const COVER = { 1: 'Ouvert', 0: 'Stop', '-1': 'Fermé' };
-        valueDisplay = COVER[String(action.value)] ?? String(action.value);
+        const coverVal = COVER[String(action.value)];
+        valueDisplay = coverVal !== undefined ? coverVal : String(action.value);
       } else if (isButton && action.value != null) {
         const BTN = {
           1: 'Clic', 2: 'Double clic', 3: 'Appui long↓', 4: 'Appui long↑',
@@ -351,7 +352,8 @@ export function getActionSummary(action) {
           18: 'Triple', 19: 'Quadruple', 20: 'Relâché', 21: 'Multiple',
           22: 'Secoué', 23: 'Lancé', 24: 'Réveil'
         };
-        valueDisplay = BTN[action.value] ?? String(action.value);
+        const btnVal = BTN[action.value];
+        valueDisplay = btnVal !== undefined ? btnVal : String(action.value);
       }
       const cond = op && valueDisplay != null ? `${op} ${valueDisplay}` : null;
       return cond ? [name, cond] : name;
@@ -381,7 +383,8 @@ export function getActionSummary(action) {
           valueDisplay = action.value === 1 ? 'On' : 'Off';
         } else if (isCover) {
           const COVER = { 1: 'Ouvert', 0: 'Stop', '-1': 'Fermé' };
-          valueDisplay = COVER[String(action.value)] ?? String(action.value);
+          const coverVal = COVER[String(action.value)];
+          valueDisplay = coverVal !== undefined ? coverVal : String(action.value);
         } else {
           valueDisplay = String(action.value);
         }
