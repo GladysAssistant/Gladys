@@ -260,11 +260,12 @@ export function getActionSummary(action) {
     case ACTIONS.TIME.DELAY: {
       if (action.evaluate_value) return truncate(action.evaluate_value);
       if (action.value != null) {
+        // Unités stockées au pluriel anglais (secondes, minutes, hours, milliseconds)
         const UNIT_FR = {
-          millisecond: 'ms',
-          second: 'seconde',
-          minute: 'minute',
-          hour: 'heure',
+          milliseconds: 'ms',
+          seconds: 'seconde',
+          minutes: 'minute',
+          hours: 'heure',
         };
         const unitFr = UNIT_FR[action.unit] || action.unit || 's';
         const plural = action.value > 1 && unitFr !== 'ms' ? 's' : '';
@@ -284,6 +285,7 @@ export function getActionSummary(action) {
       return dest ? `→ ${dest}` : null;
     }
     case ACTIONS.SMS.SEND:
+      return truncate(action.text, 60);
     case ACTIONS.MUSIC.PLAY_NOTIFICATION:
       return truncate(action.text);
     case ACTIONS.HTTP.REQUEST:
@@ -334,8 +336,22 @@ export function getActionSummary(action) {
       let valueDisplay = action.value != null ? String(action.value) : null;
       const isBinary =
         action.device_feature_type === 'binary' || action.device_feature_category === 'presence-sensor';
+      const isCover =
+        action.device_feature_category === 'shutter' || action.device_feature_category === 'curtain';
+      const isButton = action.device_feature_category === 'button';
       if (isBinary && action.value != null) {
         valueDisplay = action.value === 1 ? 'On' : 'Off';
+      } else if (isCover && action.value != null) {
+        const COVER = { 1: 'Ouvert', 0: 'Stop', '-1': 'Fermé' };
+        valueDisplay = COVER[String(action.value)] ?? String(action.value);
+      } else if (isButton && action.value != null) {
+        const BTN = {
+          1: 'Clic', 2: 'Double clic', 3: 'Appui long↓', 4: 'Appui long↑',
+          5: 'Maintien', 6: 'Appui long', 7: 'Activé', 8: 'Désactivé',
+          18: 'Triple', 19: 'Quadruple', 20: 'Relâché', 21: 'Multiple',
+          22: 'Secoué', 23: 'Lancé', 24: 'Réveil'
+        };
+        valueDisplay = BTN[action.value] ?? String(action.value);
       }
       const cond = op && valueDisplay != null ? `${op} ${valueDisplay}` : null;
       return cond ? [name, cond] : name;
@@ -358,7 +374,17 @@ export function getActionSummary(action) {
       }
       if (action.value != null) {
         const isBinary = action.device_feature_type === 'binary';
-        const valueDisplay = isBinary ? (action.value === 1 ? 'On' : 'Off') : String(action.value);
+        const isCover =
+          action.device_feature_category === 'shutter' || action.device_feature_category === 'curtain';
+        let valueDisplay;
+        if (isBinary) {
+          valueDisplay = action.value === 1 ? 'On' : 'Off';
+        } else if (isCover) {
+          const COVER = { 1: 'Ouvert', 0: 'Stop', '-1': 'Fermé' };
+          valueDisplay = COVER[String(action.value)] ?? String(action.value);
+        } else {
+          valueDisplay = String(action.value);
+        }
         return [name, `= ${valueDisplay}`];
       }
       return name;
