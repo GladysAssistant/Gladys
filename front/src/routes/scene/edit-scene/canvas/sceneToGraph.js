@@ -23,9 +23,13 @@ export const NODE_TYPES = {
 // H_SPACING : distance horizontale entre nœuds d'un même groupe.
 // V_SPACING : distance verticale entre groupes d'actions successifs.
 const H_SPACING = 280;
-const V_SPACING = 160;
-const START_X = 60;  // coin supérieur gauche de la première ligne de déclencheurs
+const V_SPACING = 200;
+const START_X = 60;
 const START_Y = 60;
+// Largeur fixe de tous les nœuds — doit correspondre au CSS .node { width }
+// Utilisée pour convertir un X "centre" en X "coin supérieur gauche" (format React Flow).
+const NODE_WIDTH = 240;
+const HALF_W = NODE_WIDTH / 2;
 
 const TRIGGER_LABELS = {
   [EVENTS.DEVICE.NEW_STATE]: 'État d\'appareil',
@@ -334,8 +338,12 @@ export function getActionSummary(action) {
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;
       if (!name) return null;
-      if (action.value != null) return [name, `= ${action.value}`];
       if (action.evaluate_value) return [name, `= ${truncate(action.evaluate_value, 25)}`];
+      if (action.value != null) {
+        const isBinary = action.device_feature_type === 'binary';
+        const valueDisplay = isBinary ? (action.value === 1 ? 'On' : 'Off') : String(action.value);
+        return [name, `= ${valueDisplay}`];
+      }
       return name;
     }
     case ACTIONS.USER.SET_SEEN_AT_HOME:
@@ -492,7 +500,7 @@ export function sceneToGraph(scene) {
     nodes.push({
       id: `trigger-${idx}`,
       type: NODE_TYPES.TRIGGER,
-      position: { x: START_X + idx * H_SPACING, y: START_Y },
+      position: { x: START_X + idx * H_SPACING - HALF_W, y: START_Y },
       data: {
         trigger,
         triggerIndex: idx,
@@ -549,7 +557,7 @@ export function sceneToGraph(scene) {
       actionById[id] = action;
 
       nodes.push(
-        makeActionNode(id, action, { x: condX, y: rowY }, {
+        makeActionNode(id, action, { x: condX - HALF_W, y: rowY }, {
           groupIndex: groupIdx,
           actionIndex: actionIdx,
           path: `${groupIdx}.${actionIdx}`,
@@ -582,7 +590,7 @@ export function sceneToGraph(scene) {
           thenGroup.forEach((thenAction, aIdx) => {
             const thenId = `${id}-then-${stepIdx}-${aIdx}`;
             const thenX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
-            nodes.push(makeActionNode(thenId, thenAction, { x: thenX, y: stepY }, {
+            nodes.push(makeActionNode(thenId, thenAction, { x: thenX - HALF_W, y: stepY }, {
               isBranch: true,
               path: `${groupIdx}.${actionIdx}.then.${stepIdx}.${aIdx}`,
             }));
@@ -620,7 +628,7 @@ export function sceneToGraph(scene) {
           elseGroup.forEach((elseAction, aIdx) => {
             const elseId = `${id}-else-${stepIdx}-${aIdx}`;
             const elseX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
-            nodes.push(makeActionNode(elseId, elseAction, { x: elseX, y: stepY }, {
+            nodes.push(makeActionNode(elseId, elseAction, { x: elseX - HALF_W, y: stepY }, {
               isBranch: true,
               path: `${groupIdx}.${actionIdx}.else.${stepIdx}.${aIdx}`,
             }));
