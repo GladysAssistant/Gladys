@@ -216,14 +216,14 @@
   background: #94a3b8 !important;
 }
 
-/* Handles centrés sur le bord du nœud (comportement React Flow par défaut).
-   translate(-50%, 50%) : centrage horizontal + centrage vertical sur le bord bas.
-   Cela assure que les arêtes s'ancrent visuellement au bord du nœud sans décalage. */
+/* Centrage horizontal uniquement — le positionnement vertical est géré
+   par les props style inline dans chaque composant Handle (JSX),
+   car React Flow lit ces valeurs synchroniquement lors du rendu. */
 :global(.react-flow__handle-bottom) {
-  transform: translate(-50%, 50%) !important;
+  transform: translate(-50%, 0) !important;
 }
 :global(.react-flow__handle-top) {
-  transform: translate(-50%, -50%) !important;
+  transform: translate(-50%, 0) !important;
 }
 
 

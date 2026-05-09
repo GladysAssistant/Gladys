@@ -347,10 +347,18 @@ export function getActionSummary(action) {
         valueDisplay = coverVal !== undefined ? coverVal : String(action.value);
       } else if (isButton && action.value != null) {
         const BTN = {
-          1: 'Clic', 2: 'Double clic', 3: 'Appui long↓', 4: 'Appui long↑',
-          5: 'Maintien', 6: 'Appui long', 7: 'Activé', 8: 'Désactivé',
-          18: 'Triple', 19: 'Quadruple', 20: 'Relâché', 21: 'Multiple',
-          22: 'Secoué', 23: 'Lancé', 24: 'Réveil'
+          1: 'Clic simple', 2: 'Clic double', 3: 'Pression clic long', 4: 'Relâche clic long',
+          5: 'Clic maintenu', 6: 'Clic long', 7: 'On', 8: 'Off',
+          9: 'Réduire luminosité', 10: 'Augmenter luminosité', 11: 'Stopper luminosité',
+          12: 'Flèche gauche clic', 13: 'Flèche droite clic',
+          14: 'Flèche gauche maintenue', 15: 'Flèche droite maintenue',
+          16: 'Flèche gauche relâchée', 17: 'Flèche droite relâchée',
+          18: 'Clic triple', 19: 'Clic quadruple', 20: 'Clic relâché',
+          21: 'Plein de clics', 22: 'Cube secoué', 23: 'Cube lancé', 24: 'Cube réveillé',
+          25: 'Cube tombe', 26: 'Cube tapé', 27: 'Cube slide',
+          28: 'Cube flip 180°', 29: 'Cube flip 90°', 30: 'Cube rotation gauche', 31: 'Cube rotation droite',
+          47: 'Pression unique', 48: 'Pression longue', 49: 'Relâchement court', 50: 'Relâchement long',
+          51: 'Pression double', 60: 'Pressé'
         };
         const btnVal = BTN[action.value];
         valueDisplay = btnVal !== undefined ? btnVal : String(action.value);

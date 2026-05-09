@@ -19,7 +19,7 @@ const ConditionNode = ({ data, selected }) => {
   return (
     <div class={`${style.node} ${style.conditionNode} ${selected ? style.nodeSelected : ''}`}>
       {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
-      <Handle type="target" position={Position.Top} id="input" />
+      <Handle type="target" position={Position.Top} id="input" style={{ top: -16 }} />
       <div class={style.nodeHeader}>
         <i class={`fe ${data.icon} ${style.nodeHeaderIcon}`} />
         <span class={style.nodeHeaderLabel}>{data.label}</span>
@@ -38,7 +38,7 @@ const ConditionNode = ({ data, selected }) => {
             type="source"
             position={Position.Bottom}
             id="then"
-            style={{ left: '20%' }}
+            style={{ left: '20%', bottom: -16 }}
           />
           <span class={style.conditionHandleLabelThen}>Oui</span>
 
@@ -47,7 +47,7 @@ const ConditionNode = ({ data, selected }) => {
             type="source"
             position={Position.Bottom}
             id="after"
-            style={{ left: '50%' }}
+            style={{ left: '50%', bottom: -16 }}
           />
           <span class={style.conditionHandleLabelAfter}>Suite</span>
 
@@ -56,7 +56,7 @@ const ConditionNode = ({ data, selected }) => {
             type="source"
             position={Position.Bottom}
             id="else"
-            style={{ left: '80%' }}
+            style={{ left: '80%', bottom: -16 }}
           />
           <span class={style.conditionHandleLabelElse}>Non</span>
         </>
@@ -65,7 +65,7 @@ const ConditionNode = ({ data, selected }) => {
           <Handle
             type="source"
             position={Position.Bottom}
-            style={{ background: calendarHandleColor }}
+            style={{ background: calendarHandleColor, bottom: -16 }}
           />
           <span
             class={style.conditionHandleLabelYes}
@@ -79,7 +79,7 @@ const ConditionNode = ({ data, selected }) => {
           <Handle
             type="source"
             position={Position.Bottom}
-            style={{ background: '#10b981' }}
+            style={{ background: '#10b981', bottom: -16 }}
           />
           <span class={style.conditionHandleLabelYes}>Oui</span>
         </>
