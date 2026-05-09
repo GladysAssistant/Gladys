@@ -23,12 +23,16 @@ export const NODE_TYPES = {
 // H_SPACING : distance horizontale entre nœuds d'un même groupe.
 // V_SPACING : distance verticale entre groupes d'actions successifs.
 const H_SPACING = 280;
-const V_SPACING = 200;
+// Espacement vertical pour les flux séquentiels simples (sans branche If/Then/Else).
+const V_SPACING = 150;
+// Espacement utilisé à l'intérieur des branches If/Then/Else (entre étapes) et pour
+// réserver la hauteur des groupes qui contiennent un tel bloc.
+const V_BRANCH_STEP = 200;
 const START_X = 60;
 const START_Y = 60;
 // Largeur fixe de tous les nœuds — doit correspondre au CSS .node { width }
 // Utilisée pour convertir un X "centre" en X "coin supérieur gauche" (format React Flow).
-const NODE_WIDTH = 240;
+const NODE_WIDTH = 260;
 const HALF_W = NODE_WIDTH / 2;
 
 const TRIGGER_LABELS = {
@@ -283,9 +287,9 @@ export function getActionSummary(action) {
       return [`${action.method || 'GET'}`, truncate(action.url)];
     case ACTIONS.MQTT.SEND:
     case ACTIONS.ZIGBEE2MQTT.SEND: {
-      const topic = action.topic || null;
+      const topic = truncate(action.topic) || null;
       if (!topic) return null;
-      const msg = action.message ? truncate(action.message, 30) : null;
+      const msg = action.message ? truncate(action.message) : null;
       return msg ? [topic, msg] : topic;
     }
     case ACTIONS.ALARM.SET_ALARM_MODE:
@@ -338,7 +342,7 @@ export function getActionSummary(action) {
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;
       if (!name) return null;
-      if (action.evaluate_value) return [name, `= ${truncate(action.evaluate_value, 25)}`];
+      if (action.evaluate_value) return [name, `= ${truncate(action.evaluate_value, 40)}`];
       if (action.value != null) {
         const isBinary = action.device_feature_type === 'binary';
         const valueDisplay = isBinary ? (action.value === 1 ? 'On' : 'Off') : String(action.value);
@@ -526,7 +530,7 @@ export function sceneToGraph(scene) {
           a.else ? a.else.length : 0
         ));
       }, 0);
-      y += V_SPACING * Math.max(1, maxDepth + 1);
+      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * (maxDepth + 1);
     });
   }
 
@@ -582,7 +586,7 @@ export function sceneToGraph(scene) {
         const thenMaxX = groupStartX - H_SPACING;
         let prevThenIds = null;
         thenGroups.forEach((thenGroup, stepIdx) => {
-          const stepY = rowY + V_SPACING * (1 + stepIdx);
+          const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = thenGroup.length;
           // Clampé pour que le nœud le plus à droite ne franchisse pas la frontière "Suite"
           const stepCenterX = Math.min(thenCenterX, thenMaxX - (count - 1) * H_SPACING / 2);
@@ -620,7 +624,7 @@ export function sceneToGraph(scene) {
         const elseCenterX = elseStartX + H_SPACING * (elseCount0 - 1) / 2;
         let prevElseIds = null;
         elseGroups.forEach((elseGroup, stepIdx) => {
-          const stepY = rowY + V_SPACING * (1 + stepIdx);
+          const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = elseGroup.length;
           // Clampé pour que le nœud le plus à gauche ne franchisse pas la frontière "Suite"
           const stepCenterX = Math.max(elseCenterX, elseStartX + (count - 1) * H_SPACING / 2);
