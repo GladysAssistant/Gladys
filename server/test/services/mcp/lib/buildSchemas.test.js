@@ -192,7 +192,7 @@ describe('build schemas', () => {
     expect(homeSchema.salon.devices).to.not.have.property('device-dimmer-1');
 
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
-    expect(mcpHandler.gladys.device.get.callCount).to.eq(2);
+    expect(mcpHandler.gladys.device.get.callCount).to.eq(1);
   });
 
   it('should handle devices without room assignment in getAllResources', async () => {
@@ -548,7 +548,7 @@ describe('build schemas', () => {
 
     expect(mcpHandler.gladys.room.getAll.callCount).to.eq(1);
     expect(mcpHandler.gladys.scene.get.callCount).to.eq(1);
-    expect(mcpHandler.gladys.device.get.callCount).to.eq(3);
+    expect(mcpHandler.gladys.device.get.callCount).to.eq(1);
   });
 
   it('should handle devices without room assignment in getAllTools', async () => {

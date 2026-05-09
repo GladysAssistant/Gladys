@@ -3,6 +3,19 @@ const { readValues } = require('./device/tuya.deviceMapping');
 const { API } = require('./utils/tuya.constants');
 const { EVENTS } = require('../../../utils/constants');
 
+const getCurrentFeatureLastValue = (gladys, deviceFeature) => {
+  if (!deviceFeature) {
+    return undefined;
+  }
+  if (deviceFeature.selector && gladys && gladys.stateManager && typeof gladys.stateManager.get === 'function') {
+    const currentFeature = gladys.stateManager.get('deviceFeature', deviceFeature.selector);
+    if (currentFeature && Object.prototype.hasOwnProperty.call(currentFeature, 'last_value')) {
+      return currentFeature.last_value;
+    }
+  }
+  return deviceFeature.last_value;
+};
+
 /**
  *
  * @description Poll values of an Tuya device.
@@ -37,8 +50,9 @@ async function poll(device) {
 
     const value = values[code];
     const transformedValue = readValues[deviceFeature.category][deviceFeature.type](value);
+    const currentLastValue = getCurrentFeatureLastValue(this.gladys, deviceFeature);
 
-    if (deviceFeature.last_value !== transformedValue) {
+    if (currentLastValue !== transformedValue) {
       if (transformedValue !== null && transformedValue !== undefined) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: deviceFeature.external_id,

@@ -74,6 +74,10 @@ describe('Tuya device mapping', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
         expect(result).to.eq(1);
       });
+      it('switch string on', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY]('ON');
+        expect(result).to.eq(1);
+      });
       it('energy', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30');
         expect(result).to.eq(0.3);

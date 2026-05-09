@@ -1370,6 +1370,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+    ERROR: 'tuya.error',
   },
   NETATMO: {
     STATUS: 'netatmo.status',
