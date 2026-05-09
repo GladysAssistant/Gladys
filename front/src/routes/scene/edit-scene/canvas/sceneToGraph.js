@@ -25,9 +25,9 @@ export const NODE_TYPES = {
 const H_SPACING = 280;
 // Espacement vertical pour les flux séquentiels simples (sans branche If/Then/Else).
 const V_SPACING = 150;
-// Espacement utilisé à l'intérieur des branches If/Then/Else (entre étapes) et pour
-// réserver la hauteur des groupes qui contiennent un tel bloc.
-const V_BRANCH_STEP = 200;
+// Espacement entre chaque rangée de nœuds à l'intérieur des branches If/Then/Else.
+// Inférieur au V_BRANCH_STEP d'origine pour que l'arête "Suite" reste courte.
+const V_BRANCH_STEP = 160;
 const START_X = 60;
 const START_Y = 60;
 // Largeur fixe de tous les nœuds — doit correspondre au CSS .node { width }
@@ -191,8 +191,12 @@ export function getTriggerSummary(trigger) {
     }
     case EVENTS.MQTT.RECEIVED:
       return trigger.topic || null;
-    case EVENTS.DEVICE.NEW_STATE:
-      return trigger.device_feature_label || trigger.device_feature || null;
+    case EVENTS.DEVICE.NEW_STATE: {
+      const lbl = trigger.device_feature_label || trigger.device_feature || null;
+      if (!lbl) return null;
+      const sep = lbl.indexOf(' › ');
+      return sep === -1 ? truncate(lbl) : [truncate(lbl.substring(0, sep)), truncate(lbl.substring(sep + 3))];
+    }
     case EVENTS.USER_PRESENCE.BACK_HOME:
     case EVENTS.USER_PRESENCE.LEFT_HOME: {
       const user = trigger.user_label || trigger.user || null;
@@ -303,12 +307,21 @@ export function getActionSummary(action) {
       const n = action.if ? action.if.length : 0;
       return n > 0 ? `${n} condition${n > 1 ? 's' : ''}` : null;
     }
-    case ACTIONS.DEVICE.GET_VALUE:
-      return action.device_feature_label || action.device_feature || null;
+    case ACTIONS.DEVICE.GET_VALUE: {
+      const lbl = action.device_feature_label || action.device_feature || null;
+      if (!lbl) return null;
+      const sep = lbl.indexOf(' › ');
+      return sep === -1 ? truncate(lbl) : [truncate(lbl.substring(0, sep)), truncate(lbl.substring(sep + 3))];
+    }
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;
       if (!name) return null;
-      if (action.evaluate_value) return [name, `= ${truncate(action.evaluate_value, 40)}`];
+      if (action.evaluate_value) {
+        const evalLabel = action.evaluate_value_label
+          ? truncate(action.evaluate_value_label, 40)
+          : truncate(action.evaluate_value, 40);
+        return [name, `= ${evalLabel}`];
+      }
       if (action.value != null) {
         const isBinary = action.device_feature_type === 'binary';
         const valueDisplay = isBinary ? (action.value === 1 ? 'On' : 'Off') : String(action.value);
@@ -494,7 +507,9 @@ export function sceneToGraph(scene) {
           a.else ? a.else.length : 0
         ));
       }, 0);
-      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * (maxDepth + 1);
+      // Pour les groupes avec branches : V_BRANCH_STEP * maxDepth (hauteur des branches)
+      // + V_SPACING (marge vers le groupe suivant), ce qui garde l'arête "Suite" courte.
+      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * maxDepth + V_SPACING;
     });
   }
 

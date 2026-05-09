@@ -147,6 +147,7 @@
 /* ─── Node body ──────────────────────────────────────────────────── */
 .nodeBody {
   padding: 8px 10px;
+  min-height: 46px;
 }
 
 .nodeTitle {

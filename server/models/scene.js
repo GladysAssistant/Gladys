@@ -79,6 +79,7 @@ const actionSchema = Joi.object()
     scene_label: Joi.string().allow(null),
     device_feature_label: Joi.string().allow(null),
     calendars_label: Joi.string().allow(null),
+    evaluate_value_label: Joi.string().allow(null),
   })
   .id('action');
 

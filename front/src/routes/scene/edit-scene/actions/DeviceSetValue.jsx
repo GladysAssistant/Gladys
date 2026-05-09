@@ -73,6 +73,32 @@ class DeviceSetValue extends Component {
   handleNewEvalValue = text => {
     this.props.updateActionProperty(this.props.path, 'value', undefined);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', text);
+    // Resolve human-readable label from variable references for canvas display
+    const label = this.resolveEvalValueLabel(text);
+    this.props.updateActionProperty(this.props.path, 'evaluate_value_label', label || undefined);
+  };
+
+  resolveEvalValueLabel = text => {
+    if (!text) return null;
+    const variables = this.props.variables || {};
+    const parts = [];
+    const refRegex = /\{\{([^}]+)\}\}/g;
+    let match;
+    while ((match = refRegex.exec(text)) !== null) {
+      const ref = match[1]; // e.g. "0.0.last_value"
+      const lastDot = ref.lastIndexOf('.');
+      if (lastDot === -1) continue;
+      const varPath = ref.substring(0, lastDot);   // "0.0"
+      const varName = ref.substring(lastDot + 1);   // "last_value"
+      const options = variables[varPath];
+      if (options) {
+        const found = options.find(o => o.name === varName);
+        if (found) { parts.push(found.label); continue; }
+      }
+      parts.push(ref);
+    }
+    if (parts.length === 0) return text.length > 0 ? text : null;
+    return parts.join(', ');
   };
 
   getDeviceFeatureControl = () => {
