@@ -304,8 +304,12 @@ export function getActionSummary(action) {
     case ACTIONS.DEVICE.SET_VALUE: {
       const name = action.device_feature_label || action.device_feature;
       if (!name) return null;
-      if (action.value != null) return [name, `= ${action.value}`];
       if (action.evaluate_value) return [name, `= ${truncate(action.evaluate_value, 25)}`];
+      if (action.value != null) {
+        const isBinary = action.device_feature_type === 'binary';
+        const valueDisplay = isBinary ? (action.value === 1 ? 'On' : 'Off') : String(action.value);
+        return [name, `= ${valueDisplay}`];
+      }
       return name;
     }
     case ACTIONS.USER.SET_SEEN_AT_HOME:
