@@ -521,6 +521,24 @@
   flex-shrink: 0;
 }
 
+.configPanelDocLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #64748b;
+  text-decoration: none;
+  margin-bottom: 8px;
+  padding: 4px 0;
+  gap: 4px;
+  transition: color 0.15s;
+}
+
+.configPanelDocLink:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
 /* Masque les blocs then/else du composant IfThenElse original dans le panneau canvas :
    dans le canvas, les branches sont représentées par des arêtes et nœuds séparés
    dans le graphe React Flow, et non par des sous-listes imbriquées dans le panneau. */
