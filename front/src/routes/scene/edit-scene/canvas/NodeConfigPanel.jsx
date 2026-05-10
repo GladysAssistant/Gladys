@@ -86,6 +86,48 @@ const ACTION_COMPONENTS = {
   [ACTIONS.CONDITION.IF_THEN_ELSE]: CanvasConditionIfThenElse,
 };
 
+const BASE_DOC_URL = 'https://gladysassistant.com/docs/scenes/';
+
+const DOC_URLS = {
+  // Actions – messages
+  [ACTIONS.SMS.SEND]: 'send-a-sms-action',
+  [ACTIONS.MESSAGE.SEND]: 'send-a-message-action',
+  // Actions – lumières
+  [ACTIONS.LIGHT.TURN_ON]: 'turn-on-off-the-lights-action',
+  [ACTIONS.LIGHT.TURN_OFF]: 'turn-on-off-the-lights-action',
+  [ACTIONS.LIGHT.TOGGLE]: 'turn-on-off-the-lights-action',
+  // Actions – prises / switchs
+  [ACTIONS.SWITCH.TURN_ON]: 'turn-on-off-the-switches-action',
+  [ACTIONS.SWITCH.TURN_OFF]: 'turn-on-off-the-switches-action',
+  [ACTIONS.SWITCH.TOGGLE]: 'turn-on-off-the-switches-action',
+  // Actions – appareils
+  [ACTIONS.DEVICE.GET_VALUE]: 'get-last-device-state-action',
+  // Actions – réseau
+  [ACTIONS.HTTP.REQUEST]: 'http-request',
+  [ACTIONS.ZIGBEE2MQTT.SEND]: 'send-a-zigbee2mqtt-message-action',
+  // Actions – temps
+  [ACTIONS.TIME.DELAY]: 'wait-action',
+  // Actions – énergie
+  [ACTIONS.EDF_TEMPO.CONDITION]: 'edf-tempo',
+  // Conditions
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: 'chain-action',
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'continue-only-if-action',
+  [ACTIONS.CONDITION.CHECK_TIME]: 'time-condition',
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'calendar-event-is-running-condition',
+  [ACTIONS.HOUSE.IS_EMPTY]: 'house-empty',
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'house-no-longer-empty',
+  // Déclencheurs
+  [EVENTS.DEVICE.NEW_STATE]: 'device-state-changed-trigger',
+  [EVENTS.TIME.CHANGED]: 'scheduled-trigger',
+  [EVENTS.USER_PRESENCE.BACK_HOME]: 'back-at-home',
+  [EVENTS.USER_PRESENCE.LEFT_HOME]: 'left-home',
+  [EVENTS.HOUSE.EMPTY]: 'house-empty',
+  [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'house-no-longer-empty',
+  [EVENTS.AREA.USER_ENTERED]: 'zone',
+  [EVENTS.AREA.USER_LEFT]: 'zone',
+  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'calendar-event-is-coming-trigger',
+};
+
 const ALARM_TRIGGERS = [
   EVENTS.ALARM.ARM,
   EVENTS.ALARM.ARMING,
@@ -327,6 +369,24 @@ const NodeConfigPanel = ({
       </div>
 
       <div class={style.configPanelFooter}>
+        {(() => {
+          const blockType = isTrigger
+            ? selectedNode.data.trigger && selectedNode.data.trigger.type
+            : selectedNode.data.action && selectedNode.data.action.type;
+          const docSlug = DOC_URLS[blockType];
+          if (!docSlug) return null;
+          return (
+            <a
+              href={`${BASE_DOC_URL}${docSlug}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={style.configPanelDocLink}
+            >
+              <i class="fe fe-book-open mr-1" />
+              Voir la documentation
+            </a>
+          );
+        })()}
         <button class="btn btn-sm btn-outline-danger w-100" onClick={onDelete}>
           <i class="fe fe-trash mr-1" />
           Supprimer ce bloc
