@@ -7,7 +7,7 @@ import style from '../canvasStyle.css';
 const ActionNode = ({ data, selected }) => {
   const summary = getActionSummary(data.action);
   return (
-    <div class={`${style.node} ${style.actionNode} ${selected ? style.nodeSelected : ''}`}>
+    <div class={`${style.node} ${style.actionNode} ${selected ? style.nodeSelected : ''}`} title={(data.action && data.action.comment) || undefined}>
       {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
       <Handle type="target" position={Position.Top} id="input" style={{ top: -16 }} />
       <div class={style.nodeHeader}>

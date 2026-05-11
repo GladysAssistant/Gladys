@@ -19,6 +19,7 @@ import ActionNode from './nodes/ActionNode';
 import ConditionNode from './nodes/ConditionNode';
 import {
   sceneToGraph,
+  checkGraphIssues,
   NODE_TYPES,
   getActionLabel,
   getActionIcon,
@@ -91,6 +92,7 @@ const SceneCanvas = ({
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const [graphWarnings, setGraphWarnings] = useState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   // Mode debug : affiche le payload de sauvegarde dans la console
   const [debugMode, setDebugMode] = useState(false);
@@ -132,29 +134,48 @@ const SceneCanvas = ({
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-        const node = nodesRef.current.find(n => n.id === selectedNodeIdRef.current);
-        if (node) clipboardRef.current = node;
+        const selected = nodesRef.current.filter(n => n.selected);
+        const srcNodes = selected.length > 0
+          ? selected
+          : nodesRef.current.filter(n => n.id === selectedNodeIdRef.current);
+        if (srcNodes.length === 0) return;
+        const selectedIds = new Set(srcNodes.map(n => n.id));
+        const srcEdges = edgesRef.current.filter(
+          ed => selectedIds.has(ed.source) && selectedIds.has(ed.target)
+        );
+        clipboardRef.current = { nodes: srcNodes, edges: srcEdges };
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && clipboardRef.current) {
         e.preventDefault();
-        const src = clipboardRef.current;
-        const id = `new-${uuidv4()}`;
-        const newNode = {
-          ...src,
-          id,
-          selected: false,
-          position: { x: src.position.x + 40, y: src.position.y + 40 },
-          data: JSON.parse(JSON.stringify(src.data)),
-        };
-        setNodes(nds => [...nds, newNode]);
-        setSelectedNodeId(id);
+        const { nodes: srcNodes, edges: srcEdges } = clipboardRef.current;
+        const idMap = {};
+        const newNodes = srcNodes.map(src => {
+          const id = `new-${uuidv4()}`;
+          idMap[src.id] = id;
+          return {
+            ...src,
+            id,
+            selected: true,
+            position: { x: src.position.x + 40, y: src.position.y + 40 },
+            data: JSON.parse(JSON.stringify(src.data)),
+          };
+        });
+        const newEdges = srcEdges.map(ed => ({
+          ...ed,
+          id: `e-${uuidv4()}`,
+          source: idMap[ed.source],
+          target: idMap[ed.target],
+        }));
+        setNodes(nds => [...nds.map(n => ({ ...n, selected: false })), ...newNodes]);
+        setEdges(eds => [...eds, ...newEdges]);
+        setSelectedNodeId(newNodes.length === 1 ? newNodes[0].id : null);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setNodes]);
+  }, [setNodes, setEdges]);
   // ─────────────────────────────────────────────────────────────────────
 
   // ── Persistance des positions dans localStorage (debounce 600ms) ─────
@@ -397,6 +418,9 @@ const SceneCanvas = ({
   // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
   const handleApply = useCallback(() => {
+    const issues = checkGraphIssues(nodesRef.current, edgesRef.current);
+    setGraphWarnings(issues);
+    if (issues.some(w => w.blocking)) return;
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
     saveScene(updatedScene, debugMode);
   }, [scene, saveScene, debugMode]);
@@ -470,16 +494,47 @@ const SceneCanvas = ({
               </button>
             </div>
           </Panel>
+
+          {graphWarnings.length > 0 && (
+            <Panel position="bottom-left">
+              <div class={style.graphWarnings}>
+                {graphWarnings.map((w, i) => (
+                  <div key={i} class={`${style.graphWarning} ${w.type === 'cycle' || w.type === 'incoherence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
+                    <i class={`fe ${w.type === 'cycle' ? 'fe-alert-triangle' : w.type === 'incoherence' ? 'fe-alert-octagon' : 'fe-copy'} mr-2`} style={{ flexShrink: 0 }} />
+                    <span>
+                      {w.type === 'cycle'
+                        ? 'Boucle détectée : des blocs se référencent mutuellement (ex. A → B → A). La sauvegarde est bloquée jusqu\'à ce que le cycle soit supprimé.'
+                        : w.type === 'duplication'
+                          ? `Bloc « ${w.label} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.`
+                          : `Bloc « ${w.label} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal.`
+                      }
+                    </span>
+                    {!w.blocking && (
+                      <button
+                        class={style.graphWarningClose}
+                        onClick={() => setGraphWarnings(ws => ws.filter((_, j) => j !== i))}
+                      >
+                        <i class="fe fe-x" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          )}
         </ReactFlow>
       </div>
 
       {selectorOpen && (
-        <NodeSelector
-          onAddNode={onAddNode}
-          onSelectorPointerDown={onSelectorPointerDown}
-          getDragMoved={getDragMoved}
-          onClose={() => setSelectorOpen(false)}
-        />
+        <>
+          <div class={style.selectorOverlay} onClick={() => setSelectorOpen(false)} />
+          <NodeSelector
+            onAddNode={onAddNode}
+            onSelectorPointerDown={onSelectorPointerDown}
+            getDragMoved={getDragMoved}
+            onClose={() => setSelectorOpen(false)}
+          />
+        </>
       )}
 
       {selectedNode && (

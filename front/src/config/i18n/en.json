@@ -2726,7 +2726,8 @@
       "nodeType": "Type",
       "deleteNode": "Delete",
       "canvasViewTitle": "Graph view",
-      "listViewTitle": "List view"
+      "listViewTitle": "List view",
+      "commentPlaceholder": "Comment visible on hover..."
     }
   },
   "profile": {

@@ -92,6 +92,7 @@ const actionSchema = Joi.object()
     scene_label: Joi.string().allow(null),
     calendars_label: Joi.string().allow(null),
     evaluate_value_label: Joi.string().allow(null),
+    comment: Joi.string().allow(null, ''),
   })
   .id('action');
 
@@ -145,6 +146,7 @@ const triggersSchema = Joi.array().items(
     area_label: Joi.string().allow(null),
     device_feature_label: Joi.string().allow(null),
     calendars_label: Joi.string().allow(null),
+    comment: Joi.string().allow(null, ''),
     // Champ du déclencheur "device.multi-state" : liste de valeurs à surveiller
     values: Joi.array().items(Joi.alternatives().try(Joi.number(), Joi.string())),
   }),

@@ -1,4 +1,5 @@
-import { useCallback } from 'preact/hooks';
+import { useCallback, useEffect, useRef } from 'preact/hooks';
+import { Text, Localizer } from 'preact-i18n';
 import { ACTIONS, EVENTS } from '../../../../../../server/utils/constants';
 import { NODE_TYPES, getActionLabel, getActionIcon, getTriggerLabel, getTriggerIcon, isConditionAction } from './sceneToGraph';
 import style from './canvasStyle.css';
@@ -192,6 +193,16 @@ const NodeConfigPanel = ({
 }) => {
   const isTrigger = selectedNode.type === NODE_TYPES.TRIGGER;
   const headerColor = PANEL_HEADER_COLOR[selectedNode.type] || '#64748b';
+  const commentRef = useRef(null);
+  const commentValue = isTrigger
+    ? (selectedNode.data.trigger && selectedNode.data.trigger.comment) || ''
+    : (selectedNode.data.action && selectedNode.data.action.comment) || '';
+
+  useEffect(() => {
+    if (!commentRef.current) return;
+    commentRef.current.style.height = 'auto';
+    commentRef.current.style.height = commentRef.current.scrollHeight + 'px';
+  }, [commentValue, selectedNode.id]);
   // Chemin de l'action dans la structure JSON de la scène (ex : "1.2" = groupe 1, action 2).
   // Renseigné par sceneToGraph dans node.data.path ; fallback "0.0" pour les nœuds créés
   // manuellement (drag-and-drop) avant leur première reconversion via graphToScene.
@@ -261,6 +272,21 @@ const NodeConfigPanel = ({
       );
     },
     [selectedNode.id, setNodes]
+  );
+
+  const updateComment = useCallback(
+    comment => {
+      setNodes(nds =>
+        nds.map(n => {
+          if (n.id !== selectedNode.id) return n;
+          if (isTrigger) {
+            return { ...n, data: { ...n.data, trigger: { ...n.data.trigger, comment } } };
+          }
+          return { ...n, data: { ...n.data, action: { ...n.data.action, comment } } };
+        })
+      );
+    },
+    [selectedNode.id, isTrigger, setNodes]
   );
 
   // Wrappers défensifs : certains composants appelants testent toujours setVariables
@@ -362,6 +388,23 @@ const NodeConfigPanel = ({
         <button class={style.configPanelClose} onClick={onClose}>
           <i class="fe fe-x" />
         </button>
+      </div>
+
+      <div class={style.configPanelSubHeader}>
+        <Localizer>
+          <textarea
+            ref={commentRef}
+            class={style.configPanelCommentInput}
+            placeholder={<Text id="editScene.canvas.commentPlaceholder" />}
+            value={commentValue}
+            onInput={e => {
+              updateComment(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }}
+            rows={1}
+          />
+        </Localizer>
       </div>
 
       <div class={style.configPanelBody}>

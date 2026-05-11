@@ -14,6 +14,16 @@
  */
 import { NODE_TYPES, isIfThenElse } from './sceneToGraph';
 
+// Champs stockés dans le nœud pour l'affichage canvas mais absents du schéma serveur.
+const CANVAS_ONLY_FIELDS = ['device_feature_type', 'device_feature_category'];
+
+function cleanAction(action) {
+  if (!action) return action;
+  const a = { ...action };
+  CANVAS_ONLY_FIELDS.forEach(f => delete a[f]);
+  return a;
+}
+
 // originalScene est utilisé comme base pour préserver les champs non-graph de la scène
 // (name, icon, selector, triggers…) — seuls triggers et actions sont reconstruits.
 export function graphToScene(nodes, edges, originalScene) {
@@ -180,7 +190,7 @@ export function graphToScene(nodes, edges, originalScene) {
         .map(id => nodes.find(n => n.id === id))
         .filter(Boolean)
         .sort((a, b) => a.position.x - b.position.x);
-      result.push(stepNodes.map(n => n.data.action));
+      result.push(stepNodes.map(n => cleanAction(n.data.action)));
     }
     return result;
   };
@@ -200,7 +210,7 @@ export function graphToScene(nodes, edges, originalScene) {
 
     if (nodesAtLevel.length > 0) {
       const actions = nodesAtLevel.map(n => {
-        const action = { ...n.data.action };
+        const action = cleanAction({ ...n.data.action });
         // Seul IF_THEN_ELSE possède des branches then/else dans le graphe.
         if (n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data.action)) {
           action.then = buildBranchGroup(thenTargets[n.id] || []);
