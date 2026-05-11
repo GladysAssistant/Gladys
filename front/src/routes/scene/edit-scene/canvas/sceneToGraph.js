@@ -24,10 +24,10 @@ export const NODE_TYPES = {
 // V_SPACING : distance verticale entre groupes d'actions successifs.
 const H_SPACING = 280;
 // Espacement vertical pour les flux séquentiels simples (sans branche If/Then/Else).
-const V_SPACING = 150;
+const V_SPACING = 170;
 // Espacement entre chaque rangée de nœuds à l'intérieur des branches If/Then/Else.
 // Inférieur au V_BRANCH_STEP d'origine pour que l'arête "Suite" reste courte.
-const V_BRANCH_STEP = 160;
+const V_BRANCH_STEP = 180;
 const START_X = 60;
 const START_Y = 60;
 // Largeur fixe de tous les nœuds — doit correspondre au CSS .node { width }
