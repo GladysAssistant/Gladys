@@ -35,7 +35,7 @@ async function init() {
   // Set the log level to "notice"
   // Log levels are defined here:
   // https://github.com/project-chip/matter.js/blob/b0ffc2ff3c8acd7fef19918337d4fd95dfa466e6/packages/general/src/log/LogLevel.ts
-  Logger.level = LogLevel('debug');
+  Logger.level = LogLevel('notice');
   const storageService = environment.get(StorageService);
   storageService.location = storagePath;
 
