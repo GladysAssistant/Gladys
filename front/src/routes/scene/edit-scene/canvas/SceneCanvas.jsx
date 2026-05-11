@@ -418,8 +418,9 @@ const SceneCanvas = ({
   // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
   const handleApply = useCallback(() => {
-    const warnings = checkGraphIssues(nodesRef.current, edgesRef.current);
-    setGraphWarnings(warnings);
+    const issues = checkGraphIssues(nodesRef.current, edgesRef.current);
+    setGraphWarnings(issues);
+    if (issues.some(w => w.blocking)) return;
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
     saveScene(updatedScene, debugMode);
   }, [scene, saveScene, debugMode]);
@@ -498,18 +499,24 @@ const SceneCanvas = ({
             <Panel position="bottom-left">
               <div class={style.graphWarnings}>
                 {graphWarnings.map((w, i) => (
-                  <div key={i} class={`${style.graphWarning} ${w.type === 'incoherence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
-                    <i class={`fe ${w.type === 'incoherence' ? 'fe-alert-octagon' : 'fe-copy'} mr-2`} />
-                    {w.type === 'duplication'
-                      ? `Bloc « ${w.label} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.`
-                      : `Bloc « ${w.label} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal.`
-                    }
-                    <button
-                      class={style.graphWarningClose}
-                      onClick={() => setGraphWarnings(ws => ws.filter((_, j) => j !== i))}
-                    >
-                      <i class="fe fe-x" />
-                    </button>
+                  <div key={i} class={`${style.graphWarning} ${w.type === 'cycle' || w.type === 'incoherence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
+                    <i class={`fe ${w.type === 'cycle' ? 'fe-alert-triangle' : w.type === 'incoherence' ? 'fe-alert-octagon' : 'fe-copy'} mr-2`} style={{ flexShrink: 0 }} />
+                    <span>
+                      {w.type === 'cycle'
+                        ? 'Boucle détectée : des blocs se référencent mutuellement (ex. A → B → A). La sauvegarde est bloquée jusqu\'à ce que le cycle soit supprimé.'
+                        : w.type === 'duplication'
+                          ? `Bloc « ${w.label} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.`
+                          : `Bloc « ${w.label} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal.`
+                      }
+                    </span>
+                    {!w.blocking && (
+                      <button
+                        class={style.graphWarningClose}
+                        onClick={() => setGraphWarnings(ws => ws.filter((_, j) => j !== i))}
+                      >
+                        <i class="fe fe-x" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

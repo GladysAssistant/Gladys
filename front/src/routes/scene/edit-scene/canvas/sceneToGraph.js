@@ -529,6 +529,29 @@ export function checkGraphIssues(nodes, edges) {
       }
     });
 
+  // ── Détection de cycle (DFS tricoloré) ──────────────────────────────
+  // Suit toutes les arêtes (peu importe le handle) pour couvrir les boucles
+  // qui passeraient par des branches then/else.
+  // WHITE = non visité, GRAY = en cours de traitement, BLACK = terminé.
+  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const color = {};
+  nodes.forEach(n => { color[n.id] = WHITE; });
+
+  let cycleDetected = false;
+  function dfs(id) {
+    if (cycleDetected) return;
+    if (color[id] === GRAY) { cycleDetected = true; return; }
+    if (color[id] === BLACK) return;
+    color[id] = GRAY;
+    (outgoing[id] || []).forEach(({ target }) => dfs(target));
+    color[id] = BLACK;
+  }
+  nodes.forEach(n => { if (color[n.id] === WHITE) dfs(n.id); });
+
+  if (cycleDetected) {
+    warnings.push({ type: 'cycle', blocking: true });
+  }
+
   return warnings;
 }
 
