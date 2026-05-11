@@ -2702,7 +2702,8 @@
       "nodeType": "Type",
       "deleteNode": "Supprimer",
       "canvasViewTitle": "Vue graphique",
-      "listViewTitle": "Vue liste"
+      "listViewTitle": "Vue liste",
+      "commentPlaceholder": "Commentaire qui sera visible au survol..."
     }
   },
   "profile": {

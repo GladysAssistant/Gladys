@@ -2694,6 +2694,16 @@
         "messagePlaceholder": "Gib die erwartete Message ein",
         "messageDescription": "Gib die erwartete Message ein oder lasse das Feld leer, um die Szene unabhängig von der Message auszuführen"
       }
+    },
+    "canvas": {
+      "addBlock": "Block hinzufügen",
+      "autoLayout": "Auto-Layout",
+      "applyGraph": "Graph anwenden",
+      "nodeType": "Typ",
+      "deleteNode": "Löschen",
+      "canvasViewTitle": "Graphenansicht",
+      "listViewTitle": "Listenansicht",
+      "commentPlaceholder": "Kommentar beim Hover anzeigen..."
     }
   },
   "profile": {

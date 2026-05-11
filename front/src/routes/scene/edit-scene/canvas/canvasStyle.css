@@ -521,6 +521,39 @@
   flex-shrink: 0;
 }
 
+.configPanelSubHeader {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.configPanelCommentInput {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 12px;
+  color: #1e293b;
+  resize: none;
+  max-height: calc(1.45em * 10);
+  overflow-y: auto;
+  background: #f8fafc;
+  line-height: 1.45;
+  box-sizing: border-box;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.configPanelCommentInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+.configPanelCommentInput::placeholder {
+  color: #94a3b8;
+}
+
 .configPanelDocLink {
   display: flex;
   align-items: center;
