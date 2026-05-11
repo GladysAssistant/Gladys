@@ -493,12 +493,15 @@ const SceneCanvas = ({
       </div>
 
       {selectorOpen && (
-        <NodeSelector
-          onAddNode={onAddNode}
-          onSelectorPointerDown={onSelectorPointerDown}
-          getDragMoved={getDragMoved}
-          onClose={() => setSelectorOpen(false)}
-        />
+        <>
+          <div class={style.selectorOverlay} onClick={() => setSelectorOpen(false)} />
+          <NodeSelector
+            onAddNode={onAddNode}
+            onSelectorPointerDown={onSelectorPointerDown}
+            getDragMoved={getDragMoved}
+            onClose={() => setSelectorOpen(false)}
+          />
+        </>
       )}
 
       {selectedNode && (

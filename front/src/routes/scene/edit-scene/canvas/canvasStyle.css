@@ -240,6 +240,13 @@
   color: #065f46;
 }
 
+/* ─── Overlay fermeture selector ────────────────────────────────── */
+.selectorOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+}
+
 /* ─── Node selector panel ────────────────────────────────────────── */
 .selectorPanel {
   position: absolute;
@@ -324,6 +331,8 @@
   transition: color 0.15s, border-color 0.15s;
 }
 .selectorTab:hover { color: #0f172a; }
+.selectorTab:focus,
+.selectorTab:focus-visible { outline: none; }
 .selectorTabActive { color: #3b82f6; border-bottom-color: #3b82f6; }
 
 .selectorList {

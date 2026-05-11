@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useState, useRef, useEffect } from 'preact/hooks';
 import { ACTIONS, EVENTS } from '../../../../../../server/utils/constants';
 import { NODE_TYPES } from './sceneToGraph';
 import style from './canvasStyle.css';
@@ -75,6 +75,9 @@ const TABS = [
 const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose }) => {
   const [activeTab, setActiveTab] = useState('trigger');
   const [search, setSearch] = useState('');
+  const searchRef = useRef(null);
+
+  useEffect(() => { if (searchRef.current) searchRef.current.focus(); }, []);
 
   const filterEntries = entries =>
     search.trim()
@@ -132,6 +135,7 @@ const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose 
       <div class={style.selectorSearch}>
         <i class={`fe fe-search ${style.selectorSearchIcon}`} />
         <input
+          ref={searchRef}
           type="text"
           class={style.selectorSearchInput}
           placeholder="Rechercher..."
@@ -146,7 +150,7 @@ const NodeSelector = ({ onAddNode, onSelectorPointerDown, getDragMoved, onClose 
             key={tab.id}
             class={`${style.selectorTab} ${activeTab === tab.id ? style.selectorTabActive : ''}`}
             style={activeTab === tab.id ? { borderColor: tab.color, color: tab.color } : {}}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => { setActiveTab(tab.id); if (searchRef.current) searchRef.current.focus(); }}
           >
             {tab.label}
           </button>
