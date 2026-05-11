@@ -116,14 +116,16 @@ const SceneCanvas = ({
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
   useEffect(() => { edgesRef.current = edges; }, [edges]);
 
-  // ── Historique Ctrl+Z ─────────────────────────────────────────────────
-  const historyRef = useRef([]);
+  // ── Historique Ctrl+Z / Ctrl+Y ────────────────────────────────────────
+  const undoStackRef = useRef([]);
+  const redoStackRef = useRef([]);
   const pushHistory = useCallback(() => {
-    historyRef.current.push({
+    undoStackRef.current.push({
       nodes: JSON.parse(JSON.stringify(nodesRef.current)),
       edges: JSON.parse(JSON.stringify(edgesRef.current)),
     });
-    if (historyRef.current.length > 50) historyRef.current.shift();
+    if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+    redoStackRef.current = [];
   }, []);
 
   // Wrappers onNodesChange / onEdgesChange : capture un snapshot avant toute
@@ -161,10 +163,28 @@ const SceneCanvas = ({
         return;
       }
 
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
         e.preventDefault();
-        if (historyRef.current.length === 0) return;
-        const snapshot = historyRef.current.pop();
+        if (undoStackRef.current.length === 0) return;
+        redoStackRef.current.push({
+          nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+        });
+        const snapshot = undoStackRef.current.pop();
+        setNodes(snapshot.nodes);
+        setEdges(snapshot.edges);
+        setSelectedNodeId(null);
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        if (redoStackRef.current.length === 0) return;
+        undoStackRef.current.push({
+          nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+        });
+        const snapshot = redoStackRef.current.pop();
         setNodes(snapshot.nodes);
         setEdges(snapshot.edges);
         setSelectedNodeId(null);
@@ -186,11 +206,12 @@ const SceneCanvas = ({
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && clipboardRef.current) {
         e.preventDefault();
-        historyRef.current.push({
+        undoStackRef.current.push({
           nodes: JSON.parse(JSON.stringify(nodesRef.current)),
           edges: JSON.parse(JSON.stringify(edgesRef.current)),
         });
-        if (historyRef.current.length > 50) historyRef.current.shift();
+        if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+        redoStackRef.current = [];
         const { nodes: srcNodes, edges: srcEdges } = clipboardRef.current;
         const idMap = {};
         const newNodes = srcNodes.map(src => {
