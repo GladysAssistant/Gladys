@@ -8,6 +8,7 @@ import SettingsSystemKeepDeviceHistory from './SettingsSystemKeepDeviceHistory';
 import SettingsSystemTimeExpiryState from './SettingsSystemTimeExpiryState';
 import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
 import SettingsSystemDuckDbMigration from './SettingsSystemDuckDbMigration';
+import SettingsSystemDownloadLogs from './SettingsSystemDownloadLogs';
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
@@ -97,10 +98,12 @@ const SystemPage = ({ children, ...props }) => (
         <SettingsSystemDuckDbMigration />
         <SettingsSystemKeepDeviceHistory />
         <SettingsSystemTimeExpiryState />
+       
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
         <SettingsSystemBatteryLevelWarning />
+        <SettingsSystemDownloadLogs />
         <SettingsSystemDatabaseCleaning />
         <SettingsSystemContainers />
       </div>
