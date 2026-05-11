@@ -3432,6 +3432,7 @@
     "category": {
       "button": {
         "click": {
+          "unknown": "{{value}} (unbekannter Wert)",
           "1": "Einfacher Klick",
           "2": "Doppelter Klick",
           "3": "Langer Klick (drücken)",
@@ -3517,8 +3518,7 @@
           "83": "Loslassen Mitte",
           "84": "Loslassen Minus",
           "85": "Doppelt Ein",
-          "86": "Doppelt Aus",
-          "unknown": "{{value}} (unbekannter Wert)"
+          "86": "Doppelt Aus"
         }
       },
       "heater": {

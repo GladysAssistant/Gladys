@@ -3432,6 +3432,7 @@
     "category": {
       "button": {
         "click": {
+          "unknown": "{{value}} (valeur inconnue)",
           "1": "Clic simple",
           "2": "Clic double",
           "3": "Pression clic long",
@@ -3517,8 +3518,7 @@
           "83": "Relâchement Centre",
           "84": "Relâchement Moins",
           "85": "On clic double",
-          "86": "Off clic double",
-          "unknown": "{{value}} (valeur inconnue)"
+          "86": "Off clic double"
         }
       },
       "heater": {
