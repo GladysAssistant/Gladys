@@ -606,7 +606,7 @@ export function sceneToGraph(scene) {
       }, 0);
       // Pour les groupes avec branches : V_BRANCH_STEP * maxDepth (hauteur des branches)
       // + V_SPACING (marge vers le groupe suivant), ce qui garde l'arête "Suite" courte.
-      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * maxDepth + V_SPACING;
+      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * maxDepth + V_SPACING - 20;
     });
   }
 
