@@ -132,29 +132,48 @@ const SceneCanvas = ({
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-        const node = nodesRef.current.find(n => n.id === selectedNodeIdRef.current);
-        if (node) clipboardRef.current = node;
+        const selected = nodesRef.current.filter(n => n.selected);
+        const srcNodes = selected.length > 0
+          ? selected
+          : nodesRef.current.filter(n => n.id === selectedNodeIdRef.current);
+        if (srcNodes.length === 0) return;
+        const selectedIds = new Set(srcNodes.map(n => n.id));
+        const srcEdges = edgesRef.current.filter(
+          ed => selectedIds.has(ed.source) && selectedIds.has(ed.target)
+        );
+        clipboardRef.current = { nodes: srcNodes, edges: srcEdges };
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && clipboardRef.current) {
         e.preventDefault();
-        const src = clipboardRef.current;
-        const id = `new-${uuidv4()}`;
-        const newNode = {
-          ...src,
-          id,
-          selected: false,
-          position: { x: src.position.x + 40, y: src.position.y + 40 },
-          data: JSON.parse(JSON.stringify(src.data)),
-        };
-        setNodes(nds => [...nds, newNode]);
-        setSelectedNodeId(id);
+        const { nodes: srcNodes, edges: srcEdges } = clipboardRef.current;
+        const idMap = {};
+        const newNodes = srcNodes.map(src => {
+          const id = `new-${uuidv4()}`;
+          idMap[src.id] = id;
+          return {
+            ...src,
+            id,
+            selected: true,
+            position: { x: src.position.x + 40, y: src.position.y + 40 },
+            data: JSON.parse(JSON.stringify(src.data)),
+          };
+        });
+        const newEdges = srcEdges.map(ed => ({
+          ...ed,
+          id: `e-${uuidv4()}`,
+          source: idMap[ed.source],
+          target: idMap[ed.target],
+        }));
+        setNodes(nds => [...nds.map(n => ({ ...n, selected: false })), ...newNodes]);
+        setEdges(eds => [...eds, ...newEdges]);
+        setSelectedNodeId(newNodes.length === 1 ? newNodes[0].id : null);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setNodes]);
+  }, [setNodes, setEdges]);
   // ─────────────────────────────────────────────────────────────────────
 
   // ── Persistance des positions dans localStorage (debounce 600ms) ─────
