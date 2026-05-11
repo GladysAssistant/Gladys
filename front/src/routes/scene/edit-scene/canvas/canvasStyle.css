@@ -50,6 +50,50 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
+/* ─── Graph warnings ─────────────────────────────────────────────── */
+.graphWarnings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 520px;
+  margin-left: 60px;
+}
+
+.graphWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.graphWarningInfo {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+.graphWarningDanger {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.graphWarningClose {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.6;
+}
+.graphWarningClose:hover { opacity: 1; }
+
 /* ─── Base node ──────────────────────────────────────────────────── */
 .node {
   position: relative;

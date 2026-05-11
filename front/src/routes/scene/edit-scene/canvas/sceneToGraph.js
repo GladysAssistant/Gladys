@@ -459,6 +459,80 @@ function makeActionNode(id, action, position, extraData) {
 }
 
 /**
+ * Analyse le graphe et retourne un tableau d'objets { type, label } décrivant
+ * les incohérences détectées dans les blocs IF_THEN_ELSE :
+ *
+ *  - 'duplication'  : les sorties 'Oui' et 'Non' convergent vers les mêmes nœuds
+ *                     → ces nœuds seront dupliqués dans chaque branche.
+ *  - 'incoherence'  : la sortie 'Suite' pointe vers des nœuds déjà absorbés par
+ *                     une branche 'Oui'/'Non' → ils seront ignorés dans le flux principal.
+ */
+export function checkGraphIssues(nodes, edges) {
+  const warnings = [];
+
+  const outgoing = {};
+  nodes.forEach(n => { outgoing[n.id] = []; });
+  edges.forEach(e => {
+    if (outgoing[e.source]) {
+      outgoing[e.source].push({ target: e.target, handle: e.sourceHandle || null });
+    }
+  });
+
+  // Retourne l'ensemble de tous les nœuds atteignables depuis startIds
+  // en suivant uniquement les arêtes sans handle (flux séquentiel normal).
+  function reachable(startIds) {
+    const visited = new Set(startIds);
+    let frontier = [...startIds];
+    while (frontier.length > 0) {
+      const next = [];
+      frontier.forEach(id => {
+        (outgoing[id] || []).forEach(({ target, handle }) => {
+          if (!visited.has(target) && handle === null) {
+            visited.add(target);
+            next.push(target);
+          }
+        });
+      });
+      frontier = next;
+    }
+    return visited;
+  }
+
+  nodes
+    .filter(n => n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data && n.data.action))
+    .forEach(condNode => {
+      const label = (condNode.data && condNode.data.label) || 'Si/Alors/Sinon';
+      const thenIds = [];
+      const elseIds = [];
+      const afterIds = [];
+
+      (outgoing[condNode.id] || []).forEach(({ target, handle }) => {
+        if (handle === 'then') thenIds.push(target);
+        else if (handle === 'else') elseIds.push(target);
+        else afterIds.push(target);
+      });
+
+      const thenSet = reachable(thenIds);
+      const elseSet = reachable(elseIds);
+      const afterSet = reachable(afterIds);
+
+      // Duplication : intersection then ∩ else
+      const duplicated = [...thenSet].filter(id => elseSet.has(id));
+      if (duplicated.length > 0) {
+        warnings.push({ type: 'duplication', label });
+      }
+
+      // Incohérence : suite ∩ (then ∪ else)
+      const absorbed = [...afterSet].filter(id => thenSet.has(id) || elseSet.has(id));
+      if (absorbed.length > 0) {
+        warnings.push({ type: 'incoherence', label });
+      }
+    });
+
+  return warnings;
+}
+
+/**
  * Convertit une scène Gladys en graphe React Flow { nodes, edges }.
  *
  * Mise en page automatique :

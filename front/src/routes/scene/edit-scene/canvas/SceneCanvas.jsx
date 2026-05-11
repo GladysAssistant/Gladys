@@ -19,6 +19,7 @@ import ActionNode from './nodes/ActionNode';
 import ConditionNode from './nodes/ConditionNode';
 import {
   sceneToGraph,
+  checkGraphIssues,
   NODE_TYPES,
   getActionLabel,
   getActionIcon,
@@ -91,6 +92,7 @@ const SceneCanvas = ({
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const [graphWarnings, setGraphWarnings] = useState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   // Mode debug : affiche le payload de sauvegarde dans la console
   const [debugMode, setDebugMode] = useState(false);
@@ -416,6 +418,8 @@ const SceneCanvas = ({
   // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
   const handleApply = useCallback(() => {
+    const warnings = checkGraphIssues(nodesRef.current, edgesRef.current);
+    setGraphWarnings(warnings);
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
     saveScene(updatedScene, debugMode);
   }, [scene, saveScene, debugMode]);
@@ -489,6 +493,28 @@ const SceneCanvas = ({
               </button>
             </div>
           </Panel>
+
+          {graphWarnings.length > 0 && (
+            <Panel position="bottom-left">
+              <div class={style.graphWarnings}>
+                {graphWarnings.map((w, i) => (
+                  <div key={i} class={`${style.graphWarning} ${w.type === 'incoherence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
+                    <i class={`fe ${w.type === 'incoherence' ? 'fe-alert-octagon' : 'fe-copy'} mr-2`} />
+                    {w.type === 'duplication'
+                      ? `Bloc « ${w.label} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.`
+                      : `Bloc « ${w.label} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal.`
+                    }
+                    <button
+                      class={style.graphWarningClose}
+                      onClick={() => setGraphWarnings(ws => ws.filter((_, j) => j !== i))}
+                    >
+                      <i class="fe fe-x" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          )}
         </ReactFlow>
       </div>
 
