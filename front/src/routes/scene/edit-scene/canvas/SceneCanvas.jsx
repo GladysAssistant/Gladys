@@ -168,7 +168,7 @@ const SceneCanvas = ({
           target: idMap[ed.target],
         }));
         setNodes(nds => [...nds.map(n => ({ ...n, selected: false })), ...newNodes]);
-        setEdges(eds => [...eds, ...newEdges]);
+        setEdges(eds => [...eds.map(e => ({ ...e, selected: false })), ...newEdges]);
         setSelectedNodeId(newNodes.length === 1 ? newNodes[0].id : null);
       }
     };
@@ -244,9 +244,11 @@ const SceneCanvas = ({
           handleOverride = { style: { stroke: condColor, strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: condColor } };
         }
       }
-      setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds));
+      setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds.map(e => ({ ...e, selected: false }))));
+      setNodes(nds => nds.map(n => ({ ...n, selected: false })));
+      setSelectedNodeId(null);
     },
-    [setEdges, nodes]
+    [setEdges, setNodes, nodes]
   );
 
   // Ctrl/Meta/Shift + clic : désélectionne (ferme le panneau de config).
