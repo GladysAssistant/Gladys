@@ -87,8 +87,8 @@ const SceneCanvas = ({
     return graph;
   }, []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges);
+  const [nodes, setNodes, onNodesChangeBase] = useNodesState(initialGraph.nodes);
+  const [edges, setEdges, onEdgesChangeBase] = useEdgesState(initialGraph.edges);
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
@@ -116,6 +116,36 @@ const SceneCanvas = ({
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
   useEffect(() => { edgesRef.current = edges; }, [edges]);
 
+  // ── Historique Ctrl+Z / Ctrl+Y ────────────────────────────────────────
+  const undoStackRef = useRef([]);
+  const redoStackRef = useRef([]);
+  const pushHistory = useCallback(() => {
+    undoStackRef.current.push({
+      nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+      edges: JSON.parse(JSON.stringify(edgesRef.current)),
+    });
+    if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+    redoStackRef.current = [];
+  }, []);
+
+  // Wrappers onNodesChange / onEdgesChange : capture un snapshot avant toute
+  // suppression déclenchée par la touche Delete sur des nœuds/arêtes sélectionnés.
+  const onNodesChange = useCallback(changes => {
+    if (changes.some(c => c.type === 'remove')) pushHistory();
+    onNodesChangeBase(changes);
+  }, [onNodesChangeBase, pushHistory]);
+
+  const onEdgesChange = useCallback(changes => {
+    if (changes.some(c => c.type === 'remove')) pushHistory();
+    onEdgesChangeBase(changes);
+  }, [onEdgesChangeBase, pushHistory]);
+
+  // Capture un snapshot au début d'un drag pour annuler le déplacement.
+  const onNodeDragStart = useCallback(() => {
+    pushHistory();
+  }, [pushHistory]);
+  // ─────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     const handleKeyDown = e => {
       // Don't intercept shortcuts when the user is typing in a form field
@@ -130,6 +160,34 @@ const SceneCanvas = ({
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         if (handleApplyRef.current) handleApplyRef.current();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (undoStackRef.current.length === 0) return;
+        redoStackRef.current.push({
+          nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+        });
+        const snapshot = undoStackRef.current.pop();
+        setNodes(snapshot.nodes);
+        setEdges(snapshot.edges);
+        setSelectedNodeId(null);
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        if (redoStackRef.current.length === 0) return;
+        undoStackRef.current.push({
+          nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+        });
+        const snapshot = redoStackRef.current.pop();
+        setNodes(snapshot.nodes);
+        setEdges(snapshot.edges);
+        setSelectedNodeId(null);
         return;
       }
 
@@ -148,6 +206,12 @@ const SceneCanvas = ({
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && clipboardRef.current) {
         e.preventDefault();
+        undoStackRef.current.push({
+          nodes: JSON.parse(JSON.stringify(nodesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+        });
+        if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+        redoStackRef.current = [];
         const { nodes: srcNodes, edges: srcEdges } = clipboardRef.current;
         const idMap = {};
         const newNodes = srcNodes.map(src => {
@@ -168,7 +232,7 @@ const SceneCanvas = ({
           target: idMap[ed.target],
         }));
         setNodes(nds => [...nds.map(n => ({ ...n, selected: false })), ...newNodes]);
-        setEdges(eds => [...eds, ...newEdges]);
+        setEdges(eds => [...eds.map(e => ({ ...e, selected: false })), ...newEdges]);
         setSelectedNodeId(newNodes.length === 1 ? newNodes[0].id : null);
       }
     };
@@ -244,9 +308,12 @@ const SceneCanvas = ({
           handleOverride = { style: { stroke: condColor, strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: condColor } };
         }
       }
-      setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds));
+      pushHistory();
+      setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds.map(e => ({ ...e, selected: false }))));
+      setNodes(nds => nds.map(n => ({ ...n, selected: false })));
+      setSelectedNodeId(null);
     },
-    [setEdges, nodes]
+    [setEdges, setNodes, nodes, pushHistory]
   );
 
   // Ctrl/Meta/Shift + clic : désélectionne (ferme le panneau de config).
@@ -278,11 +345,12 @@ const SceneCanvas = ({
   // Supprime un nœud et toutes les arêtes qui lui sont connectées (source ou cible).
   const onDeleteNode = useCallback(
     nodeId => {
+      pushHistory();
       setNodes(nds => nds.filter(n => n.id !== nodeId));
       setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
       setSelectedNodeId(null);
     },
-    [setNodes, setEdges]
+    [setNodes, setEdges, pushHistory]
   );
 
   // Crée un nouveau nœud React Flow à la position donnée.
@@ -290,6 +358,7 @@ const SceneCanvas = ({
   // Pour les actions, isConditionAction détermine si le type doit être CONDITION ou ACTION.
   const createNode = useCallback(
     ({ nodeType, actionType, triggerType }, position) => {
+      pushHistory();
       const id = `new-${uuidv4()}`;
       if (nodeType === NODE_TYPES.TRIGGER) {
         const trigger = { type: triggerType };
@@ -315,7 +384,7 @@ const SceneCanvas = ({
         ]);
       }
     },
-    [setNodes]
+    [setNodes, pushHistory]
   );
 
   // Ajoute un nœud via un clic simple dans la palette (sans drag).
@@ -337,6 +406,7 @@ const SceneCanvas = ({
   // positions depuis zéro via sceneToGraph. Les positions sauvegardées en
   // localStorage sont effacées pour éviter qu'elles ne surchargent le nouveau layout.
   const handleAutoLayout = useCallback(() => {
+    pushHistory();
     const currentScene = graphToScene(nodes, edges, scene);
     const freshGraph = sceneToGraph(currentScene);
     setNodes(freshGraph.nodes);
@@ -344,7 +414,7 @@ const SceneCanvas = ({
     if (positionsKey) {
       try { localStorage.removeItem(positionsKey); } catch {}
     }
-  }, [nodes, edges, scene, setNodes, setEdges, positionsKey]);
+  }, [nodes, edges, scene, setNodes, setEdges, positionsKey, pushHistory]);
   // ─────────────────────────────────────────────────────────────────────
 
   // ── Drag personnalisé depuis la palette NodeSelector ─────────────────
@@ -447,6 +517,7 @@ const SceneCanvas = ({
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           onSelectionChange={onSelectionChange}
+          onNodeDragStart={onNodeDragStart}
           onInit={setReactFlowInstance}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}

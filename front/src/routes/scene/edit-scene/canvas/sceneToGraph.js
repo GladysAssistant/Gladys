@@ -679,7 +679,7 @@ export function sceneToGraph(scene) {
       }, 0);
       // Pour les groupes avec branches : V_BRANCH_STEP * maxDepth (hauteur des branches)
       // + V_SPACING (marge vers le groupe suivant), ce qui garde l'arête "Suite" courte.
-      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * maxDepth + V_SPACING;
+      y += maxDepth === 0 ? V_SPACING : V_BRANCH_STEP * maxDepth + V_SPACING - 20;
     });
   }
 
@@ -728,21 +728,22 @@ export function sceneToGraph(scene) {
         // l'étape 0 doit rester à gauche de (groupStartX - H_SPACING) pour ne pas
         // empiéter sur la colonne "Suite".
         const thenGroups = action.then || [];
-        const thenCount0 = thenGroups.length > 0 ? thenGroups[0].length : 1;
-        // Centre idéal pour la branche then (le nœud rightmost de step-0 s'arrête à groupStartX - H_SPACING).
-        // Pour les étapes plus larges, le centre glisse à gauche pour que rien ne dépasse cette frontière.
-        const thenCenterX = groupStartX - H_SPACING * (thenCount0 + 1) / 2;
         const thenMaxX = groupStartX - H_SPACING;
+        // Centre commun pour toutes les étapes : le plus à gauche (le plus contraignant),
+        // afin que les étapes larges ne débordent pas à droite ET que toutes les étapes
+        // restent centrées au même X (parent centré au-dessus de ses enfants).
+        const thenFinalCenter = thenGroups.reduce((minC, group) => {
+          const count = group.length;
+          return Math.min(minC, thenMaxX - (count - 1) * H_SPACING / 2);
+        }, thenMaxX);
         let prevThenIds = null;
         thenGroups.forEach((thenGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = thenGroup.length;
-          // Clampé pour que le nœud le plus à droite ne franchisse pas la frontière "Suite"
-          const stepCenterX = Math.min(thenCenterX, thenMaxX - (count - 1) * H_SPACING / 2);
           const stepIds = [];
           thenGroup.forEach((thenAction, aIdx) => {
             const thenId = `${id}-then-${stepIdx}-${aIdx}`;
-            const thenX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
+            const thenX = thenFinalCenter + H_SPACING * (aIdx - (count - 1) / 2);
             nodes.push(makeActionNode(thenId, thenAction, { x: thenX - HALF_W, y: stepY }, {
               isBranch: true,
               path: `${groupIdx}.${actionIdx}.then.${stepIdx}.${aIdx}`,
@@ -767,20 +768,21 @@ export function sceneToGraph(scene) {
         // elseStartX = premier X disponible à droite du nœud condition et de ses frères.
         const elseStartX = Math.max(condX + H_SPACING, groupStartX + actionGroup.length * H_SPACING);
         const elseGroups = action.else || [];
-        const elseCount0 = elseGroups.length > 0 ? elseGroups[0].length : 1;
-        // Centre idéal pour la branche else (le nœud leftmost de step-0 commence à elseStartX).
-        // Pour les étapes plus larges, le centre glisse à droite pour que rien ne dépasse à gauche.
-        const elseCenterX = elseStartX + H_SPACING * (elseCount0 - 1) / 2;
+        // Centre commun pour toutes les étapes : le plus à droite (le plus contraignant),
+        // afin que les étapes larges ne débordent pas à gauche ET que toutes les étapes
+        // restent centrées au même X (parent centré au-dessus de ses enfants).
+        const elseFinalCenter = elseGroups.reduce((maxC, group) => {
+          const count = group.length;
+          return Math.max(maxC, elseStartX + (count - 1) * H_SPACING / 2);
+        }, elseStartX);
         let prevElseIds = null;
         elseGroups.forEach((elseGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = elseGroup.length;
-          // Clampé pour que le nœud le plus à gauche ne franchisse pas la frontière "Suite"
-          const stepCenterX = Math.max(elseCenterX, elseStartX + (count - 1) * H_SPACING / 2);
           const stepIds = [];
           elseGroup.forEach((elseAction, aIdx) => {
             const elseId = `${id}-else-${stepIdx}-${aIdx}`;
-            const elseX = stepCenterX + H_SPACING * (aIdx - (count - 1) / 2);
+            const elseX = elseFinalCenter + H_SPACING * (aIdx - (count - 1) / 2);
             nodes.push(makeActionNode(elseId, elseAction, { x: elseX - HALF_W, y: stepY }, {
               isBranch: true,
               path: `${groupIdx}.${actionIdx}.else.${stepIdx}.${aIdx}`,
