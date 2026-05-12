@@ -2727,7 +2727,11 @@
       "deleteNode": "Supprimer",
       "canvasViewTitle": "Vue graphique",
       "listViewTitle": "Vue liste",
-      "commentPlaceholder": "Commentaire qui sera visible au survol..."
+      "commentPlaceholder": "Commentaire qui sera visible au survol...",
+      "warningCycle": "Boucle détectée : le bloc « {{label}} » est impliqué dans une référence circulaire (ex. A → B → A). La sauvegarde est bloquée jusqu'à ce que le cycle soit supprimé.",
+      "warningConvergence": "Convergence détectée : le bloc « {{label}} » reçoit des connexions de niveaux différents (ex. A → C et A → B → C). Supprimez l'une des connexions ou restructurez avec un Si/Alors/Sinon.",
+      "warningDuplication": "Bloc « {{label}} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.",
+      "warningIncoherence": "Bloc « {{label}} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal."
     }
   },
   "profile": {

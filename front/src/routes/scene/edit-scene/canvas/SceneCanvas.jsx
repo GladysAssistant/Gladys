@@ -94,8 +94,17 @@ const SceneCanvas = ({
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [graphWarnings, setGraphWarnings] = useState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  // Mode debug : affiche le payload de sauvegarde dans la console
-  const [debugMode, setDebugMode] = useState(false);
+
+  const errorNodeIds = useMemo(() => {
+    const ids = new Set();
+    graphWarnings.forEach(w => (w.nodeIds || []).forEach(id => ids.add(id)));
+    return ids;
+  }, [graphWarnings]);
+
+  const displayNodes = useMemo(
+    () => nodes.map(n => ({ ...n, data: { ...n.data, hasError: errorNodeIds.has(n.id) } })),
+    [nodes, errorNodeIds]
+  );
 
   // Custom drag state
   const [draggingNode, setDraggingNode] = useState(null); // {nodeType, triggerType, actionType, label, icon}
@@ -487,13 +496,13 @@ const SceneCanvas = ({
   // Convertit le graphe courant en scène Gladys et déclenche la sauvegarde API.
   // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
-  const handleApply = useCallback(() => {
+  const handleApply = useCallback((debug = false) => {
     const issues = checkGraphIssues(nodesRef.current, edgesRef.current);
     setGraphWarnings(issues);
     if (issues.some(w => w.blocking)) return;
     const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
-    saveScene(updatedScene, debugMode);
-  }, [scene, saveScene, debugMode]);
+    saveScene(updatedScene, debug);
+  }, [scene, saveScene]);
 
   // Mise à jour du ref à chaque render : le listener keydown (enregistré une seule fois)
   // appelle toujours la version la plus récente de handleApply via ce ref.
@@ -509,7 +518,7 @@ const SceneCanvas = ({
     <div class={`${style.sceneCanvasOuter} ${draggingNode ? style.isDragging : ''}`}>
       <div class={style.canvasWrapper} ref={canvasRef}>
         <ReactFlow
-          nodes={nodes}
+          nodes={displayNodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
@@ -539,26 +548,17 @@ const SceneCanvas = ({
                 <Text id="editScene.canvas.addBlock">Ajouter un bloc</Text>
               </button>
               <button
-                class={`btn btn-sm ${debugMode ? 'btn-warning' : 'btn-outline-secondary'} ${style.panelBtn}`}
-                onClick={() => setDebugMode(d => !d)}
-                title={debugMode ? 'Debug activé — cliquer pour désactiver' : 'Activer le mode debug (log payload sauvegarde)'}
-              >
-                <i class="fe fe-terminal mr-1" />
-                Debug
-              </button>
-              <button
                 class={`btn btn-sm btn-outline-secondary ${style.panelBtn}`}
                 onClick={handleAutoLayout}
-                title="Réorganiser automatiquement"
               >
                 <i class="fe fe-grid mr-1" />
                 <Text id="editScene.canvas.autoLayout">Réorganiser</Text>
               </button>
               <button
                 class={`btn btn-sm btn-primary ${style.panelBtn}`}
-                onClick={handleApply}
+                onClick={() => handleApply()}
+                onContextMenu={e => { e.preventDefault(); handleApply(true); }}
                 disabled={saving}
-                title="Appliquer le graphe (Ctrl+S)"
               >
                 {saving ? <i class="fe fe-loader mr-1" /> : <i class="fe fe-check mr-1" />}
                 <Text id="editScene.canvas.applyGraph">Appliquer le graphe</Text>
@@ -570,15 +570,13 @@ const SceneCanvas = ({
             <Panel position="bottom-left">
               <div class={style.graphWarnings}>
                 {graphWarnings.map((w, i) => (
-                  <div key={i} class={`${style.graphWarning} ${w.type === 'cycle' || w.type === 'incoherence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
-                    <i class={`fe ${w.type === 'cycle' ? 'fe-alert-triangle' : w.type === 'incoherence' ? 'fe-alert-octagon' : 'fe-copy'} mr-2`} style={{ flexShrink: 0 }} />
+                  <div key={i} class={`${style.graphWarning} ${w.type === 'cycle' || w.type === 'incoherence' || w.type === 'convergence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
+                    <i class={`fe ${w.type === 'cycle' ? 'fe-alert-triangle' : w.type === 'incoherence' ? 'fe-alert-octagon' : w.type === 'convergence' ? 'fe-git-merge' : 'fe-copy'} mr-2`} style={{ flexShrink: 0 }} />
                     <span>
-                      {w.type === 'cycle'
-                        ? 'Boucle détectée : des blocs se référencent mutuellement (ex. A → B → A). La sauvegarde est bloquée jusqu\'à ce que le cycle soit supprimé.'
-                        : w.type === 'duplication'
-                          ? `Bloc « ${w.label} » : les sorties Oui et Non convergent vers les mêmes blocs, qui ont été dupliqués dans chaque branche.`
-                          : `Bloc « ${w.label} » : des blocs reliés à la sortie Suite sont aussi dans une branche Oui/Non — ils seront ignorés dans le flux principal.`
-                      }
+                      {w.type === 'cycle' && <Text id="editScene.canvas.warningCycle" fields={{ label: w.label }} />}
+                      {w.type === 'convergence' && <Text id="editScene.canvas.warningConvergence" fields={{ label: w.label }} />}
+                      {w.type === 'duplication' && <Text id="editScene.canvas.warningDuplication" fields={{ label: w.label }} />}
+                      {w.type === 'incoherence' && <Text id="editScene.canvas.warningIncoherence" fields={{ label: w.label }} />}
                     </span>
                     {!w.blocking && (
                       <button

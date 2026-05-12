@@ -2739,7 +2739,11 @@
       "deleteNode": "Löschen",
       "canvasViewTitle": "Graphenansicht",
       "listViewTitle": "Listenansicht",
-      "commentPlaceholder": "Kommentar beim Hover anzeigen..."
+      "commentPlaceholder": "Kommentar beim Hover anzeigen...",
+      "warningCycle": "Schleife erkannt: Block \"{{label}}\" ist an einer Zirkelreferenz beteiligt (z. B. A → B → A). Das Speichern ist blockiert, bis der Zyklus entfernt wird.",
+      "warningConvergence": "Konvergenz erkannt: Block \"{{label}}\" erhält Verbindungen von verschiedenen Ebenen (z. B. A → C und A → B → C). Entfernen Sie eine Verbindung oder strukturieren Sie mit einem Wenn/Dann/Sonst um.",
+      "warningDuplication": "Block \"{{label}}\": die Ja- und Nein-Ausgänge laufen auf dieselben Blöcke zusammen, die in jedem Zweig dupliziert wurden.",
+      "warningIncoherence": "Block \"{{label}}\": Blöcke, die mit dem Weiter-Ausgang verbunden sind, befinden sich auch in einem Ja/Nein-Zweig — sie werden im Hauptfluss ignoriert."
     }
   },
   "profile": {

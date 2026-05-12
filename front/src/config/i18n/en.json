@@ -2727,7 +2727,11 @@
       "deleteNode": "Delete",
       "canvasViewTitle": "Graph view",
       "listViewTitle": "List view",
-      "commentPlaceholder": "Comment visible on hover..."
+      "commentPlaceholder": "Comment visible on hover...",
+      "warningCycle": "Loop detected: block \"{{label}}\" is involved in a circular reference (e.g. A → B → A). Save is blocked until the cycle is removed.",
+      "warningConvergence": "Convergence detected: block \"{{label}}\" receives connections from different levels (e.g. A → C and A → B → C). Remove one connection or restructure with an If/Then/Else.",
+      "warningDuplication": "Block \"{{label}}\": the Yes and No outputs converge on the same blocks, which have been duplicated in each branch.",
+      "warningIncoherence": "Block \"{{label}}\": blocks connected to the Continue output are also in a Yes/No branch — they will be ignored in the main flow."
     }
   },
   "profile": {
