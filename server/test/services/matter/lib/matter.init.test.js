@@ -5,6 +5,7 @@ const {
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -257,6 +258,18 @@ describe('Matter.init', () => {
       addCumulativeEnergyImportedAttributeListener: fake.returns(null),
     });
 
+    // HEPA Filter Monitoring
+    clusterClients.set(HepaFilterMonitoring.Complete.id, {
+      id: HepaFilterMonitoring.Complete.id,
+      name: 'HepaFilterMonitoring',
+      endpointId: 1,
+      attributes: {
+        condition: {},
+      },
+      commands: {},
+      addConditionAttributeListener: fake.returns(null),
+    });
+
     // Mock commissioning controller
     commissioningController = {
       start: fake.resolves(null),
@@ -281,13 +294,16 @@ describe('Matter.init', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -333,6 +349,8 @@ describe('Matter.init', () => {
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
+    // Wait for background refreshDevices() to complete
+    await matterHandler.refreshDevicesPromise;
     expect(matterHandler.devices).to.have.lengthOf(2);
     // Device selector should be a slug of the name with 4 random characters at the end
     expect(matterHandler.devices[0].selector).to.satisfy(
@@ -574,6 +592,18 @@ describe('Matter.init', () => {
             type: 'index',
             unit: 'kilowatt-hour',
           },
+          {
+            category: 'hepa-filter-monitoring',
+            external_id: 'matter:12345:1:113',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'HepaFilterMonitoring - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[19].selector,
+            type: 'filter-life-remaining',
+            unit: 'percent',
+          },
         ],
         params: [],
       },
@@ -807,6 +837,18 @@ describe('Matter.init', () => {
             type: 'index',
             unit: 'kilowatt-hour',
           },
+          {
+            category: 'hepa-filter-monitoring',
+            external_id: 'matter:12345:1:child_endpoint:2:113',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'HepaFilterMonitoring - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[19].selector,
+            type: 'filter-life-remaining',
+            unit: 'percent',
+          },
         ],
         params: [],
       },
@@ -853,6 +895,14 @@ describe('Matter.init', () => {
     assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+
+  it('should log error when refreshDevices fails in background', async () => {
+    const error = new Error('Test error');
+    matterHandler.refreshDevices = fake.rejects(error);
+    await matterHandler.init();
+    // Wait for background promise to complete - error should be caught and logged, not thrown
+    await matterHandler.refreshDevicesPromise;
   });
 
   it('should return PPM for 0', () => {

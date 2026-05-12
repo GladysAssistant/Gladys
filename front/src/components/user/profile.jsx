@@ -104,7 +104,7 @@ const Profile = ({ children, ...props }) => {
           <Text id="profile.emailLabel" />
         </label>
         <small>
-          <Text id="profile.emailText" />
+          <Text id={props.editingOtherUser ? 'profile.emailTextOtherUser' : 'profile.emailText'} />
         </small>
         <Localizer>
           <input

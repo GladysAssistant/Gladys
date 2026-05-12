@@ -49,11 +49,11 @@ async function config(userId) {
     switch (e.message) {
       case 'Bad status: 401':
       case 'Bad status: 403':
-        throw new BadParameters('CALDAV_BAD_USERNAME_PASSWORD');
+        throw new BadParameters({ message: 'CALDAV_BAD_USERNAME_PASSWORD', log: e.stack });
       case 'Bad status: 404':
-        throw new BadParameters('CALDAV_BAD_URL');
+        throw new BadParameters({ message: 'CALDAV_BAD_URL', log: e.stack });
       default:
-        throw new Error400('CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
+        throw new Error400({ message: 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL', log: e.stack });
     }
   }
 
@@ -75,7 +75,7 @@ async function config(userId) {
     CALDAV_HOME_URL = url.resolve(CALDAV_PRINCIPAL_URL, calendarHomeSet);
   } catch (e) {
     logger.error(e);
-    throw new Error400('CALDAV_BAD_SETTINGS_HOME_URL');
+    throw new Error400({ message: 'CALDAV_BAD_SETTINGS_HOME_URL', log: e.stack });
   }
 
   logger.info(`CalDAV : Home URL found: ${CALDAV_HOME_URL}`);

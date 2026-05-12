@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
@@ -32,6 +32,9 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
+      <div class="alert alert-info">
+        <MarkupText id="integration.mqtt.virtualDevicesExplanation" />
+      </div>
       <CheckMqttPanel />
 
       <div

@@ -2,6 +2,7 @@
   {
     "key": "openWeather",
     "img": "/assets/integrations/cover/openweather.jpg",
-    "whiteBackground": true
+    "whiteBackground": true,
+    "cloud": true
   }
 ]
