@@ -18,7 +18,7 @@ const EditScenePage = ({ children, ...props }) => (
         <div class="container mb-8">
           <div class="mb-4">
             <div class="row justify-content-between">
-              <div class="col-8">
+              <div class="col">
                 <h1 class="page-title">
                   <span>{props.scene.name}</span>
 
@@ -36,7 +36,7 @@ const EditScenePage = ({ children, ...props }) => (
                 </h1>
               </div>
 
-              <div class="col-4">
+              <div class="col-auto">
                 {props.askDeleteScene && (
                   <div class="d-none d-md-flex flex-column flex-lg-row align-items-center text-right">
                     <div class="ml-auto mb-2">
@@ -56,20 +56,20 @@ const EditScenePage = ({ children, ...props }) => (
                 {!props.askDeleteScene && (
                   <div class="text-right d-flex flex-wrap justify-content-end align-items-center" style={{ gap: '6px' }}>
                     {/* View toggle */}
-                    <div class="btn-group mb-0 mb-sm-2 mb-lg-0" role="group">
+                    <div class={style.viewToggle}>
                       <button
                         onClick={props.switchToListView}
-                        className={`btn btn-sm ${!props.canvasView ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                        title="Vue liste"
+                        class={`${style.viewToggleBtn} ${!props.canvasView ? style.viewToggleBtnActive : ''}`}
                       >
                         <i class="fe fe-list" />
+                        <Text id="editScene.canvas.listViewTitle" />
                       </button>
                       <button
                         onClick={props.switchToCanvasView}
-                        className={`btn btn-sm ${props.canvasView ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                        title="Vue graphique"
+                        class={`${style.viewToggleBtn} ${props.canvasView ? style.viewToggleBtnActive : ''}`}
                       >
                         <i class="fe fe-share-2" />
+                        <Text id="editScene.canvas.canvasViewTitle" />
                       </button>
                     </div>
                     <button onClick={props.duplicateScene} className="btn btn-outline-primary mb-0 mb-sm-2 mb-lg-0">

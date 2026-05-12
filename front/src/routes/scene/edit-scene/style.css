@@ -75,3 +75,40 @@
   z-index: -1;
   opacity: 0;
 }
+
+/* ─── View toggle (pill segmenté) ────────────────────────────── */
+.viewToggle {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.viewToggleBtn {
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.viewToggleBtn:focus,
+.viewToggleBtn:focus-visible {
+  outline: none;
+}
+
+.viewToggleBtnActive {
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
