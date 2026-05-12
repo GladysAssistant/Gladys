@@ -2221,7 +2221,16 @@
         "disabledWarningSettings": "Matter n'est pas activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
         "enableButton": "Activer Matter",
         "disableButton": "Désactiver Matter",
-        "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
+        "downloadNodesJson": "Télécharger Noeuds Matter en JSON",
+        "reset": {
+          "title": "Réinitialiser l'intégration",
+          "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Matter. Cela supprimera toutes les données du contrôleur, la sauvegarde et le dossier Matter.",
+          "button": "Réinitialiser",
+          "confirmMessage": "Attention, la réinitialisation de l'intégration supprimera toutes les données du contrôleur Matter, la sauvegarde et le dossier Matter. Tous les appareils Matter actuellement appairés devront être ré-appairés.",
+          "confirmButton": "Oui, tout réinitialiser",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        }
       }
     },
     "mcp": {

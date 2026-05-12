@@ -14,6 +14,7 @@ const { checkIpv6 } = require('./matter.checkIpv6');
 const { refreshDevices } = require('./matter.refreshDevices');
 const { backupController } = require('./matter.backupController');
 const { restoreBackup } = require('./matter.restoreBackup');
+const { reset } = require('./matter.reset');
 
 /**
  * @description Matter handler.
@@ -52,5 +53,6 @@ MatterHandler.prototype.checkIpv6 = checkIpv6;
 MatterHandler.prototype.refreshDevices = refreshDevices;
 MatterHandler.prototype.backupController = backupController;
 MatterHandler.prototype.restoreBackup = restoreBackup;
+MatterHandler.prototype.reset = reset;
 
 module.exports = MatterHandler;

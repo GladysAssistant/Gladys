@@ -2190,7 +2190,16 @@
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
         "enableButton": "Enable Matter",
         "disableButton": "Disable Matter",
-        "downloadNodesJson": "Download Nodes JSON"
+        "downloadNodesJson": "Download Nodes JSON",
+        "reset": {
+          "title": "Reset Integration",
+          "description": "Use this option if you want to start from scratch with Matter. This will delete all controller data, backup, and Matter folder.",
+          "button": "Reset",
+          "confirmMessage": "Warning, resetting the integration will delete all Matter controller data, backup, and Matter folder. All Matter devices currently paired will need to be re-paired.",
+          "confirmButton": "Yes, reset everything",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while resetting the integration."
+        }
       },
       "device": {
         "title": "Matter Devices",
