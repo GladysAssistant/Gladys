@@ -519,15 +519,62 @@ export function checkGraphIssues(nodes, edges) {
       // Duplication : intersection then ∩ else
       const duplicated = [...thenSet].filter(id => elseSet.has(id));
       if (duplicated.length > 0) {
-        warnings.push({ type: 'duplication', label });
+        warnings.push({ type: 'duplication', label, nodeIds: [condNode.id] });
       }
 
       // Incohérence : suite ∩ (then ∪ else)
       const absorbed = [...afterSet].filter(id => thenSet.has(id) || elseSet.has(id));
       if (absorbed.length > 0) {
-        warnings.push({ type: 'incoherence', label });
+        warnings.push({ type: 'incoherence', label, nodeIds: [condNode.id] });
       }
     });
+
+  // ── Détection de convergence ─────────────────────────────────────────
+  // Un nœud C pose problème si deux de ses sources (arêtes entrantes hors then/else)
+  // sont dans une relation ancêtre/descendant : ex. A→C et B→C avec A→B.
+  // Dans ce cas C ne peut pas avoir une position unique dans la séquence de groupes.
+  const incoming = {};
+  nodes.forEach(n => { incoming[n.id] = []; });
+  edges.forEach(e => {
+    if (incoming[e.target]) {
+      incoming[e.target].push({ source: e.source, handle: e.sourceHandle || null });
+    }
+  });
+
+  // BFS depuis 'from' suivant toutes les arêtes — retourne vrai si 'to' est atteignable.
+  function canReach(from, to) {
+    const visited = new Set();
+    const queue = [from];
+    while (queue.length > 0) {
+      const curr = queue.shift();
+      if (curr === to) return true;
+      if (visited.has(curr)) continue;
+      visited.add(curr);
+      (outgoing[curr] || []).forEach(({ target }) => queue.push(target));
+    }
+    return false;
+  }
+
+  nodes.forEach(node => {
+    const sources = (incoming[node.id] || [])
+      .filter(({ handle }) => handle !== 'then' && handle !== 'else')
+      .map(({ source }) => source);
+    if (sources.length < 2) return;
+    for (let i = 0; i < sources.length; i++) {
+      for (let j = 0; j < sources.length; j++) {
+        if (i === j) continue;
+        if (canReach(sources[i], sources[j])) {
+          warnings.push({
+            type: 'convergence',
+            blocking: true,
+            label: (node.data && node.data.label) || '?',
+            nodeIds: [node.id],
+          });
+          return;
+        }
+      }
+    }
+  });
 
   // ── Détection de cycle (DFS tricoloré) ──────────────────────────────
   // Suit toutes les arêtes (peu importe le handle) pour couvrir les boucles
@@ -538,18 +585,29 @@ export function checkGraphIssues(nodes, edges) {
   nodes.forEach(n => { color[n.id] = WHITE; });
 
   let cycleDetected = false;
+  let cycleNodeIds = [];
+  const pathStack = [];
   function dfs(id) {
     if (cycleDetected) return;
-    if (color[id] === GRAY) { cycleDetected = true; return; }
+    if (color[id] === GRAY) {
+      const startIdx = pathStack.indexOf(id);
+      cycleNodeIds = startIdx >= 0 ? pathStack.slice(startIdx) : [id];
+      cycleDetected = true;
+      return;
+    }
     if (color[id] === BLACK) return;
     color[id] = GRAY;
+    pathStack.push(id);
     (outgoing[id] || []).forEach(({ target }) => dfs(target));
+    pathStack.pop();
     color[id] = BLACK;
   }
   nodes.forEach(n => { if (color[n.id] === WHITE) dfs(n.id); });
 
   if (cycleDetected) {
-    warnings.push({ type: 'cycle', blocking: true });
+    const firstNode = nodes.find(n => n.id === cycleNodeIds[0]);
+    const label = (firstNode && firstNode.data && firstNode.data.label) || '?';
+    warnings.push({ type: 'cycle', blocking: true, label, nodeIds: cycleNodeIds });
   }
 
   return warnings;

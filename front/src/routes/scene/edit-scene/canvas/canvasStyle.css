@@ -118,6 +118,9 @@
 .actionNode.nodeSelected    { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.50); }
 .conditionNode.nodeSelected { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.50); }
 
+/* Error highlight — red outline when the node is part of a graph warning */
+.nodeError { outline: 2px solid #ef4444; outline-offset: 3px; }
+
 /* ─── Badge affiché sur les nœuds sélectionnés ───────────────────── */
 .selectedBadge {
   position: absolute;
