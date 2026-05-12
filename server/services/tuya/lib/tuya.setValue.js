@@ -64,8 +64,10 @@ async function setValue(device, deviceFeature, value) {
   const localDps = getLocalDpsFromCode(command);
 
   if (hasLocalConfig && localDps !== null) {
+    const isProtocol34 = protocolVersion === '3.4';
     const isProtocol35 = protocolVersion === '3.5';
-    const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+    const isNewGenProtocol = isProtocol34 || isProtocol35;
+    const TuyaLocalApi = isNewGenProtocol ? TuyAPINewGen : TuyAPI;
     const tuyaOptions = {
       id: topic,
       key: localKey,

@@ -15,11 +15,13 @@ const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.devicePar
  */
 async function localPoll(payload) {
   const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false } = payload || {};
+  const isProtocol34 = protocolVersion === '3.4';
   const isProtocol35 = protocolVersion === '3.5';
+  const isNewGenProtocol = isProtocol34 || isProtocol35;
   const parsedTimeout = Number(timeoutMs);
   const sanitizedTimeout = Number.isFinite(parsedTimeout) ? Math.min(Math.max(parsedTimeout, 500), 30000) : 3000;
   const effectiveTimeout = isProtocol35 && !fastScan ? Math.max(sanitizedTimeout, 5000) : sanitizedTimeout;
-  const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+  const TuyaLocalApi = isNewGenProtocol ? TuyAPINewGen : TuyAPI;
 
   if (!deviceId || !ip || !localKey || !protocolVersion) {
     throw new BadParameters('Missing local connection parameters');
