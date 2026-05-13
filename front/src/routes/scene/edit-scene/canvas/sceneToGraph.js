@@ -755,6 +755,77 @@ export function sceneToGraph(scene) {
   // ou une condition simple (arête verte) au moment de créer les arêtes séquentielles.
   const actionById = {};
 
+  // Couleur d'arête selon le type d'action source.
+  const edgeColorForAction = act => {
+    if (!act || isIfThenElse(act)) return '#94a3b8';
+    if (isCalendarCondition(act)) return act.stop_scene_if_event_found === true ? '#ef4444' : '#10b981';
+    return isConditionAction(act) ? '#10b981' : '#94a3b8';
+  };
+
+  // Construit récursivement les nœuds et arêtes des branches d'un IF_THEN_ELSE imbriqué.
+  // Appelée pour chaque nœud de branche qui est lui-même un IF_THEN_ELSE.
+  function addBranchNodes(parentId, parentCenterX, parentY, basePath, action) {
+    if (!isIfThenElse(action)) return;
+
+    // ── Sous-branche then ──
+    const subThen = action.then || [];
+    const thenBound = parentCenterX - H_SPACING;
+    const thenCenter = subThen.reduce(
+      (minC, g) => Math.min(minC, thenBound - (g.length - 1) * H_SPACING / 2), thenBound
+    );
+    let pThenIds = null, pThenActs = null;
+    subThen.forEach((grp, si) => {
+      const sy = parentY + V_BRANCH_STEP * (1 + si);
+      const cnt = grp.length;
+      const sIds = [];
+      grp.forEach((act, ai) => {
+        const nid = `${parentId}-then-${si}-${ai}`;
+        const nx = thenCenter + H_SPACING * (ai - (cnt - 1) / 2);
+        nodes.push(makeActionNode(nid, act, { x: nx - HALF_W, y: sy }, { isBranch: true, path: `${basePath}.then.${si}.${ai}` }));
+        sIds.push(nid);
+        addBranchNodes(nid, nx, sy, `${basePath}.then.${si}.${ai}`, act);
+      });
+      if (si === 0) {
+        sIds.forEach(nid => edges.push(branchEdge(`e-${parentId}-then-${nid}`, parentId, 'then', nid, '#10b981')));
+      } else {
+        pThenIds.forEach((pid, pi) => {
+          const ec = edgeColorForAction(pThenActs && pThenActs[pi]);
+          sIds.forEach(nid => edges.push(outerEdge(`e-${pid}-${nid}`, pid, nid, undefined, ec)));
+        });
+      }
+      pThenIds = sIds; pThenActs = grp;
+    });
+
+    // ── Sous-branche else ──
+    const subElse = action.else || [];
+    const elseStart = parentCenterX + H_SPACING;
+    const elseCenter = subElse.reduce(
+      (maxC, g) => Math.max(maxC, elseStart + (g.length - 1) * H_SPACING / 2), elseStart
+    );
+    let pElseIds = null, pElseActs = null;
+    subElse.forEach((grp, si) => {
+      const sy = parentY + V_BRANCH_STEP * (1 + si);
+      const cnt = grp.length;
+      const sIds = [];
+      grp.forEach((act, ai) => {
+        const nid = `${parentId}-else-${si}-${ai}`;
+        const nx = elseCenter + H_SPACING * (ai - (cnt - 1) / 2);
+        nodes.push(makeActionNode(nid, act, { x: nx - HALF_W, y: sy }, { isBranch: true, path: `${basePath}.else.${si}.${ai}` }));
+        sIds.push(nid);
+        addBranchNodes(nid, nx, sy, `${basePath}.else.${si}.${ai}`, act);
+      });
+      if (si === 0) {
+        sIds.forEach(nid => edges.push(branchEdge(`e-${parentId}-else-${nid}`, parentId, 'else', nid, '#ef4444')));
+      } else {
+        pElseIds.forEach((pid, pi) => {
+          const ec = edgeColorForAction(pElseActs && pElseActs[pi]);
+          sIds.forEach(nid => edges.push(outerEdge(`e-${pid}-${nid}`, pid, nid, undefined, ec)));
+        });
+      }
+      pElseIds = sIds; pElseActs = grp;
+    });
+  }
+
   actionsGroups.forEach((actionGroup, groupIdx) => {
     const currentIds = [];
     const rowY = groupY[groupIdx];
@@ -794,8 +865,7 @@ export function sceneToGraph(scene) {
           const count = group.length;
           return Math.min(minC, thenMaxX - (count - 1) * H_SPACING / 2);
         }, thenMaxX);
-        let prevThenIds = null;
-        let prevThenActions = null;
+        let prevThenIds = null, prevThenActs = null;
         thenGroups.forEach((thenGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = thenGroup.length;
@@ -808,6 +878,7 @@ export function sceneToGraph(scene) {
               path: `${groupIdx}.${actionIdx}.then.${stepIdx}.${aIdx}`,
             }));
             stepIds.push(thenId);
+            addBranchNodes(thenId, thenX, stepY, `${groupIdx}.${actionIdx}.then.${stepIdx}.${aIdx}`, thenAction);
           });
           if (stepIdx === 0) {
             stepIds.forEach(thenId =>
@@ -815,19 +886,11 @@ export function sceneToGraph(scene) {
             );
           } else {
             prevThenIds.forEach((prevId, pi) => {
-              const prevAct = prevThenActions && prevThenActions[pi];
-              const edgeColor = prevAct && !isIfThenElse(prevAct)
-                ? isCalendarCondition(prevAct)
-                  ? (prevAct.stop_scene_if_event_found === true ? '#ef4444' : '#10b981')
-                  : isConditionAction(prevAct) ? '#10b981' : '#94a3b8'
-                : '#94a3b8';
-              stepIds.forEach(thenId =>
-                edges.push(outerEdge(`e-${prevId}-${thenId}`, prevId, thenId, undefined, edgeColor))
-              );
+              const ec = edgeColorForAction(prevThenActs && prevThenActs[pi]);
+              stepIds.forEach(thenId => edges.push(outerEdge(`e-${prevId}-${thenId}`, prevId, thenId, undefined, ec)));
             });
           }
-          prevThenIds = stepIds;
-          prevThenActions = thenGroup;
+          prevThenIds = stepIds; prevThenActs = thenGroup;
         });
 
         // Branche "Non" (else) — placée à DROITE de tous les nœuds frères du groupe.
@@ -841,8 +904,7 @@ export function sceneToGraph(scene) {
           const count = group.length;
           return Math.max(maxC, elseStartX + (count - 1) * H_SPACING / 2);
         }, elseStartX);
-        let prevElseIds = null;
-        let prevElseActions = null;
+        let prevElseIds = null, prevElseActs = null;
         elseGroups.forEach((elseGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = elseGroup.length;
@@ -855,6 +917,7 @@ export function sceneToGraph(scene) {
               path: `${groupIdx}.${actionIdx}.else.${stepIdx}.${aIdx}`,
             }));
             stepIds.push(elseId);
+            addBranchNodes(elseId, elseX, stepY, `${groupIdx}.${actionIdx}.else.${stepIdx}.${aIdx}`, elseAction);
           });
           if (stepIdx === 0) {
             stepIds.forEach(elseId =>
@@ -862,19 +925,11 @@ export function sceneToGraph(scene) {
             );
           } else {
             prevElseIds.forEach((prevId, pi) => {
-              const prevAct = prevElseActions && prevElseActions[pi];
-              const edgeColor = prevAct && !isIfThenElse(prevAct)
-                ? isCalendarCondition(prevAct)
-                  ? (prevAct.stop_scene_if_event_found === true ? '#ef4444' : '#10b981')
-                  : isConditionAction(prevAct) ? '#10b981' : '#94a3b8'
-                : '#94a3b8';
-              stepIds.forEach(elseId =>
-                edges.push(outerEdge(`e-${prevId}-${elseId}`, prevId, elseId, undefined, edgeColor))
-              );
+              const ec = edgeColorForAction(prevElseActs && prevElseActs[pi]);
+              stepIds.forEach(elseId => edges.push(outerEdge(`e-${prevId}-${elseId}`, prevId, elseId, undefined, ec)));
             });
           }
-          prevElseIds = stepIds;
-          prevElseActions = elseGroup;
+          prevElseIds = stepIds; prevElseActs = elseGroup;
         });
       }
 
