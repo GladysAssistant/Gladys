@@ -190,7 +190,15 @@ export function graphToScene(nodes, edges, originalScene) {
         .map(id => nodes.find(n => n.id === id))
         .filter(Boolean)
         .sort((a, b) => a.position.x - b.position.x);
-      result.push(stepNodes.map(n => cleanAction(n.data.action)));
+      result.push(stepNodes.map(n => {
+        const action = cleanAction({ ...n.data.action });
+        // Un IF_THEN_ELSE imbriqué dans une branche doit reconstruire ses propres branches.
+        if (n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data.action)) {
+          action.then = buildBranchGroup(thenTargets[n.id] || []);
+          action.else = buildBranchGroup(elseTargets[n.id] || []);
+        }
+        return action;
+      }));
     }
     return result;
   };
