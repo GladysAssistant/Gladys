@@ -795,6 +795,7 @@ export function sceneToGraph(scene) {
           return Math.min(minC, thenMaxX - (count - 1) * H_SPACING / 2);
         }, thenMaxX);
         let prevThenIds = null;
+        let prevThenActions = null;
         thenGroups.forEach((thenGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = thenGroup.length;
@@ -813,13 +814,20 @@ export function sceneToGraph(scene) {
               edges.push(branchEdge(`e-${id}-then-${thenId}`, id, 'then', thenId, '#10b981'))
             );
           } else {
-            prevThenIds.forEach(prevId =>
+            prevThenIds.forEach((prevId, pi) => {
+              const prevAct = prevThenActions && prevThenActions[pi];
+              const edgeColor = prevAct && !isIfThenElse(prevAct)
+                ? isCalendarCondition(prevAct)
+                  ? (prevAct.stop_scene_if_event_found === true ? '#ef4444' : '#10b981')
+                  : isConditionAction(prevAct) ? '#10b981' : '#94a3b8'
+                : '#94a3b8';
               stepIds.forEach(thenId =>
-                edges.push(outerEdge(`e-${prevId}-${thenId}`, prevId, thenId))
-              )
-            );
+                edges.push(outerEdge(`e-${prevId}-${thenId}`, prevId, thenId, undefined, edgeColor))
+              );
+            });
           }
           prevThenIds = stepIds;
+          prevThenActions = thenGroup;
         });
 
         // Branche "Non" (else) — placée à DROITE de tous les nœuds frères du groupe.
@@ -834,6 +842,7 @@ export function sceneToGraph(scene) {
           return Math.max(maxC, elseStartX + (count - 1) * H_SPACING / 2);
         }, elseStartX);
         let prevElseIds = null;
+        let prevElseActions = null;
         elseGroups.forEach((elseGroup, stepIdx) => {
           const stepY = rowY + V_BRANCH_STEP * (1 + stepIdx);
           const count = elseGroup.length;
@@ -852,13 +861,20 @@ export function sceneToGraph(scene) {
               edges.push(branchEdge(`e-${id}-else-${elseId}`, id, 'else', elseId, '#ef4444'))
             );
           } else {
-            prevElseIds.forEach(prevId =>
+            prevElseIds.forEach((prevId, pi) => {
+              const prevAct = prevElseActions && prevElseActions[pi];
+              const edgeColor = prevAct && !isIfThenElse(prevAct)
+                ? isCalendarCondition(prevAct)
+                  ? (prevAct.stop_scene_if_event_found === true ? '#ef4444' : '#10b981')
+                  : isConditionAction(prevAct) ? '#10b981' : '#94a3b8'
+                : '#94a3b8';
               stepIds.forEach(elseId =>
-                edges.push(outerEdge(`e-${prevId}-${elseId}`, prevId, elseId))
-              )
-            );
+                edges.push(outerEdge(`e-${prevId}-${elseId}`, prevId, elseId, undefined, edgeColor))
+              );
+            });
           }
           prevElseIds = stepIds;
+          prevElseActions = elseGroup;
         });
       }
 
