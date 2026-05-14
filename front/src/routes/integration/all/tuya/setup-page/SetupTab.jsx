@@ -152,32 +152,12 @@ class SetupTab extends Component {
       tuyaJustSavedMissing: false
     });
     try {
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ENDPOINT', {
-        value: tuyaEndpoint
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_ACCESS_KEY', {
-        value: tuyaAccessKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_SECRET_KEY', {
-        value: tuyaSecretKey
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_ACCOUNT_UID', {
-        value: tuyaAppAccountId
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_APP_USERNAME', {
-        value: tuyaAppUsername
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_LAST_CONNECTED_CONFIG_HASH', {
-        value: ''
-      });
-
-      await this.props.httpClient.post('/api/v1/service/tuya/variable/TUYA_MANUAL_DISCONNECT', {
-        value: 'false'
+      await this.props.httpClient.post('/api/v1/service/tuya/configuration', {
+        endpoint: tuyaEndpoint,
+        accessKey: tuyaAccessKey,
+        secretKey: tuyaSecretKey,
+        appAccountId: tuyaAppAccountId,
+        appUsername: tuyaAppUsername
       });
 
       const configured = !!(tuyaEndpoint && tuyaAccessKey && tuyaSecretKey && tuyaAppAccountId);
@@ -427,8 +407,14 @@ class SetupTab extends Component {
                   )}
                 </div>
               )}
-              <p>
-                <MarkupText id="integration.tuya.setup.cloudTitle" />
+              <div class="alert alert-info">
+                <Text id="integration.tuya.localModeLimitInfo" />
+              </div>
+              <div>
+                <strong>
+                  <Text id="integration.tuya.setup.cloudTitle" />
+                </strong>
+                <br />
                 <MarkupText id="integration.tuya.setup.description" />
                 <MarkupText id="integration.tuya.setup.descriptionCreateAccount" />
                 <MarkupText id="integration.tuya.setup.descriptionCreateProject" />
@@ -438,11 +424,17 @@ class SetupTab extends Component {
                 <MarkupText id="integration.tuya.setup.descriptionTrial" />
                 <MarkupText id="integration.tuya.setup.descriptionCloudLimit" />
                 <MarkupText id="integration.tuya.setup.descriptionControllable" />
-                <MarkupText id="integration.tuya.setup.localTitle" />
+                <br />
+                <strong>
+                  <Text id="integration.tuya.setup.localTitle" />
+                </strong>
+                <br />
                 <MarkupText id="integration.tuya.setup.descriptionLocalMode" />
                 <MarkupText id="integration.tuya.setup.descriptionLocalKeepsApp" />
                 <MarkupText id="integration.tuya.setup.descriptionCameraLimit" />
-              </p>
+              </div>
+
+              <hr class="mt-4 mb-4" />
 
               <form>
                 <div class="form-group">
@@ -562,7 +554,7 @@ class SetupTab extends Component {
                       type="button"
                       class="btn btn-outline-danger"
                       onClick={this.disconnectFromCloud}
-                      disabled={!state.tuyaConfigured || state.tuyaDisconnecting || state.tuyaConnecting}
+                      disabled={state.tuyaDisconnecting || state.tuyaConnecting}
                     >
                       <Text id="integration.tuya.setup.disconnectLabel" />
                     </button>

@@ -12,6 +12,7 @@ const { STATUS } = require('./utils/tuya.constants');
 function disconnect(options = {}) {
   logger.debug('Disconnecting from Tuya...');
   const { manual = false } = options;
+  this.stopReconnect();
   this.connector = null;
   this.status = STATUS.NOT_INITIALIZED;
   this.lastError = null;

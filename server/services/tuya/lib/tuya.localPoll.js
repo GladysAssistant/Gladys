@@ -19,11 +19,11 @@ async function localPoll(payload) {
   const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false, logDps = true } = payload || {};
   const isProtocol34 = protocolVersion === '3.4';
   const isProtocol35 = protocolVersion === '3.5';
-  const isProtocol34Or35 = isProtocol34 || isProtocol35;
+  const isNewGenProtocol = isProtocol34 || isProtocol35;
   const parsedTimeout = Number(timeoutMs);
   const sanitizedTimeout = Number.isFinite(parsedTimeout) ? Math.min(Math.max(parsedTimeout, 500), 30000) : 3000;
-  const effectiveTimeout = isProtocol34Or35 && !fastScan ? Math.max(sanitizedTimeout, 5000) : sanitizedTimeout;
-  const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+  const effectiveTimeout = isProtocol35 && !fastScan ? Math.max(sanitizedTimeout, 5000) : sanitizedTimeout;
+  const TuyaLocalApi = isNewGenProtocol ? TuyAPINewGen : TuyAPI;
 
   if (!deviceId || !ip || !localKey || !protocolVersion) {
     throw new BadParameters('Missing local connection parameters');
@@ -39,6 +39,8 @@ async function localPoll(payload) {
     issueRefreshOnPing: false,
   };
   if (isProtocol35) {
+    // Protocol 3.5 has a heavier handshake than 3.1/3.3/3.4: enforce a 5s socket
+    // floor and disable keepAlive so the socket closes promptly after the poll.
     tuyaOptions.keepAlive = false;
     tuyaOptions.socketTimeout = Math.max(effectiveTimeout, 5000);
   }
@@ -98,12 +100,11 @@ async function localPoll(payload) {
   };
 
   try {
-    let attempts = [{ schema: true }];
-    if (isProtocol35) {
-      attempts = [{ schema: true }, { schema: true, dps: [1] }, {}];
-    } else if (isProtocol34) {
-      attempts = [{ schema: true }, { schema: true }];
-    }
+    // Protocol 3.5 sometimes rejects a bare `schema:true` get on first contact.
+    // Fall back to probing DPS 1 (the standard switch DPS for Tuya devices) and
+    // finally an empty get as last resort. Other protocols only need the schema.
+    const attempts =
+      protocolVersion === '3.5' ? [{ schema: true }, { schema: true, dps: [1] }, {}] : [{ schema: true }];
     const tryAttempt = async (index) => {
       try {
         return await runGet(attempts[index]);
@@ -123,15 +124,19 @@ async function localPoll(payload) {
     if (logDps) {
       logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
     }
-    tuyaLocal.removeListener('error', onError);
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
       logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
+    // Close the socket on failure: leaving it half-open made the device refuse
+    // subsequent local connections (cascading ECONNRESET observed in runtime).
+    // Keep the `'error'` listener registered until the TuyaDevice instance is
+    // garbage-collected — removing it before late socket events arrive caused
+    // those events to bubble up as uncaughtException. Ported from PR7 commit
+    // 547f05c1.
     try {
-      tuyaLocal.removeListener('error', onError);
       await tuyaLocal.disconnect();
     } catch (err) {
       // ignore

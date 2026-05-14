@@ -115,7 +115,17 @@ const extractShadowValues = (response) => {
   return extractValuesFromResultArray(properties);
 };
 
-const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeatures, topic) {
+/**
+ * @description Poll the given features against the Tuya cloud API and emit state changes.
+ * @param {object} self - The TuyaHandler instance (passed explicitly to avoid `this` rebinding).
+ * @param {object} device - The Gladys device (used to resolve the cloud read strategy).
+ * @param {Array} deviceFeatures - Features to poll.
+ * @param {string} topic - Tuya device id used for the API path and logs.
+ * @returns {Promise<object>} Summary with polled/handled/changed/missing/skipped counters.
+ * @example
+ * const summary = await pollCloudFeatures(this, device, deviceFeatures, topic);
+ */
+async function pollCloudFeatures(self, device, deviceFeatures, topic) {
   const summary = {
     polled: Array.isArray(deviceFeatures) ? deviceFeatures.length : 0,
     handled: 0,
@@ -127,7 +137,7 @@ const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeature
     return summary;
   }
 
-  if (!this.connector || typeof this.connector.request !== 'function') {
+  if (!self.connector || typeof self.connector.request !== 'function') {
     logger.warn(`[Tuya][poll][cloud] connector unavailable for device=${topic}`);
     return summary;
   }
@@ -135,11 +145,11 @@ const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeature
   const cloudReadStrategy = getConfiguredCloudReadStrategy(device);
   const response =
     cloudReadStrategy === CLOUD_STRATEGY.SHADOW
-      ? await this.connector.request({
+      ? await self.connector.request({
           method: 'GET',
           path: `${API.VERSION_2_0}/thing/${topic}/shadow/properties`,
         })
-      : await this.connector.request({
+      : await self.connector.request({
           method: 'GET',
           path: `${API.VERSION_1_0}/devices/${topic}/status`,
         });
@@ -175,8 +185,8 @@ const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeature
       logger.warn(`[Tuya][poll][cloud] reader failed for device=${topic} code=${code}`, e);
       return;
     }
-    const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
-    const { changed } = emitFeatureState(this.gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
+    const { lastValue, lastValueChanged } = getCurrentFeatureState(self.gladys, deviceFeature);
+    const { changed } = emitFeatureState(self.gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
     if (changed) {
       summary.changed += 1;
     }
@@ -184,7 +194,7 @@ const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeature
   });
 
   return summary;
-};
+}
 
 /**
  *
@@ -305,7 +315,7 @@ async function poll(device) {
 
         fallbackReason = 'partial_local_mapping';
         try {
-          cloudSummary = await pollCloudFeatures.call(this, device, pendingCloudFeatures, topic);
+          cloudSummary = await pollCloudFeatures(this, device, pendingCloudFeatures, topic);
         } catch (e) {
           logger.warn(`[Tuya][poll] local poll succeeded but cloud fallback failed for ${topic}`, e);
           fallbackReason = 'cloud_fallback_failed';
@@ -325,8 +335,21 @@ async function poll(device) {
     }
   }
 
+  // When the device explicitly opted into local mode and the cloud connector
+  // is missing, skip the cloud fallback to avoid flooding the logs with a
+  // `connector unavailable` warning on every poll cycle. The cloud-direct
+  // path (LOCAL_OVERRIDE=false) still goes through pollCloudFeatures, which
+  // surfaces the warn so a missing connector is visible.
+  if (hasLocalConfig && (!this.connector || typeof this.connector.request !== 'function')) {
+    fallbackReason = fallbackReason === 'none' ? 'cloud_unavailable' : `${fallbackReason}+cloud_unavailable`;
+    logger.debug(
+      `[Tuya][poll] device=${topic} mode=${modeUsed} local_handled=${localHandled} local_changed=${localChanged} cloud_handled=0 cloud_changed=0 cloud_missing=0 fallback=${fallbackReason}`,
+    );
+    return;
+  }
+
   try {
-    cloudSummary = await pollCloudFeatures.call(this, device, deviceFeatures, topic);
+    cloudSummary = await pollCloudFeatures(this, device, deviceFeatures, topic);
   } catch (e) {
     logger.warn(`[Tuya][poll] cloud poll failed for ${topic}`, e);
     fallbackReason = fallbackReason === 'none' ? 'cloud_poll_failed' : `${fallbackReason}+cloud_poll_failed`;

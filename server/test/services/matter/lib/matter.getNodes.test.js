@@ -21,15 +21,14 @@ describe('Matter.getNodes', () => {
   });
 
   it('should return all nodes', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(6, {
+    const clusterClient = {
       id: 2,
       name: 'OnOff',
       attributes: {
         onOff: {},
       },
       commands: {},
-    });
+    };
     matterHandler.commissioningController = {
       getNode: fake.returns({
         isConnected: true,
@@ -37,13 +36,13 @@ describe('Matter.getNodes', () => {
           {
             number: 1,
             name: 'Test Device',
-            clusterClients: new Map(),
-            childEndpoints: [
+            getAllClusterClients: () => [],
+            getChildEndpoints: () => [
               {
                 name: 'Test Device child',
                 number: 2,
-                clusterClients,
-                childEndpoints: [],
+                getAllClusterClients: () => [clusterClient],
+                getChildEndpoints: () => [],
               },
             ],
           },

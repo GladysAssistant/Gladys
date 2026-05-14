@@ -1,4 +1,5 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
+const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
 const { resolveCloudReadStrategy } = require('../utils/tuya.cloudStrategy');
@@ -259,6 +260,7 @@ function convertDevice(tuyaDevice) {
   if (tuyaReport) {
     device.tuya_report = mergeTuyaReport(null, tuyaReport);
   }
+  addSelector(device);
   return device;
 }
 

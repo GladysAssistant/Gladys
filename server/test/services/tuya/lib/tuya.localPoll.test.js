@@ -116,16 +116,14 @@ describe('TuyaHandler.localPoll', () => {
     expect(get.calledTwice).to.equal(true);
   });
 
-  it('should retry once for protocol 3.4', async () => {
+  it('should route protocol 3.4 to tuyapi-newgen with a single schema attempt', async () => {
     const connect = sinon.stub().resolves();
-    const get = sinon
-      .stub()
-      .onFirstCall()
-      .rejects(new Error('fail'))
-      .onSecondCall()
-      .resolves({ dps: { 1: true } });
+    const get = sinon.stub().resolves({ dps: { 1: true } });
     const disconnect = sinon.stub().resolves();
     function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.4');
+    }
+    function TuyAPINewGenStub() {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
@@ -133,17 +131,19 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
-      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
     });
     const result = await localPoll({
       deviceId: 'device',
       ip: '1.1.1.1',
       localKey: 'key',
       protocolVersion: '3.4',
-      timeoutMs: 1000,
     });
     expect(result).to.deep.equal({ dps: { 1: true } });
-    expect(get.calledTwice).to.equal(true);
+    expect(connect.calledOnce).to.equal(true);
+    expect(get.calledOnce).to.equal(true);
+    expect(get.firstCall.args[0]).to.deep.equal({ schema: true });
+    expect(disconnect.calledOnce).to.equal(true);
   });
 
   it('should throw on object without dps', async () => {

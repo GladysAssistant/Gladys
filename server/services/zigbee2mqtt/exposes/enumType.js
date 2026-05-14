@@ -28,6 +28,8 @@ addMapping('action', BUTTON_STATUS.LONG_CLICK, 'long');
 
 addMapping('action', BUTTON_STATUS.ON, 'on');
 addMapping('action', BUTTON_STATUS.OFF, 'off');
+addMapping('action', BUTTON_STATUS.ON_DOUBLE, 'on_double');
+addMapping('action', BUTTON_STATUS.OFF_DOUBLE, 'off_double');
 addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_DOWN, 'brightness_move_down');
 addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_UP, 'brightness_move_up');
 addMapping('action', BUTTON_STATUS.BRIGHTNESS_STOP, 'brightness_stop');

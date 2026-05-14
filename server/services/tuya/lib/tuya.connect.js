@@ -81,7 +81,7 @@ const validateAppAccount = async (connector, appAccountId) => {
 async function connect(configuration) {
   const { baseUrl, accessKey, secretKey, appAccountId } = configuration;
 
-  if (!baseUrl || !accessKey || !secretKey) {
+  if (!baseUrl || !accessKey || !secretKey || !appAccountId) {
     this.status = STATUS.NOT_INITIALIZED;
     throw new ServiceNotConfiguredError('Tuya is not configured.');
   }

@@ -59,6 +59,16 @@ module.exports = function MatterController(matterHandler) {
     res.json({ success: true });
   }
 
+  /**
+   * @api {post} /api/v1/service/matter/reset Reset Matter integration
+   * @apiName reset
+   * @apiGroup Matter
+   */
+  async function reset(req, res) {
+    await matterHandler.reset();
+    res.json({ success: true });
+  }
+
   return {
     'post /api/v1/service/matter/pair-device': {
       authenticated: true,
@@ -79,6 +89,11 @@ module.exports = function MatterController(matterHandler) {
     'post /api/v1/service/matter/node/:node_id/decommission': {
       authenticated: true,
       controller: asyncMiddleware(decommissionNode),
+    },
+    'post /api/v1/service/matter/reset': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(reset),
     },
   };
 };

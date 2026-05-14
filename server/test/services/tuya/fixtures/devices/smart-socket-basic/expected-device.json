@@ -1,7 +1,7 @@
 {
   "name": "Kitchen Plug",
   "external_id": "tuya:socket-device-id",
-  "selector": "tuya:socket-device-id",
+  "selector": "tuya-socket-device-id",
   "device_type": "smart-socket",
   "model": "Mini Plug",
   "product_id": "cya3zxfd38g4qp8d",
@@ -21,14 +21,19 @@
     "PRODUCT_KEY": "socket-key"
   },
   "tuya_mapping": {
-    "ignored_local_dps": ["11"],
-    "ignored_cloud_codes": ["countdown", "countdown_1"]
+    "ignored_local_dps": [
+      "11"
+    ],
+    "ignored_cloud_codes": [
+      "countdown",
+      "countdown_1"
+    ]
   },
   "features": [
     {
       "name": "switch_1",
       "external_id": "tuya:socket-device-id:switch_1",
-      "selector": "tuya:socket-device-id:switch_1",
+      "selector": "tuya-socket-device-id-switch-1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
@@ -39,7 +44,7 @@
     {
       "name": "cur_power",
       "external_id": "tuya:socket-device-id:cur_power",
-      "selector": "tuya:socket-device-id:cur_power",
+      "selector": "tuya-socket-device-id-cur-power",
       "category": "switch",
       "type": "power",
       "read_only": true,
