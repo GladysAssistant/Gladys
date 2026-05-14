@@ -318,8 +318,7 @@ async function poll(device) {
   // path (LOCAL_OVERRIDE=false) still goes through pollCloudFeatures, which
   // surfaces the warn so a missing connector is visible.
   if (hasLocalConfig && (!this.connector || typeof this.connector.request !== 'function')) {
-    fallbackReason =
-      fallbackReason === 'none' ? 'cloud_unavailable' : `${fallbackReason}+cloud_unavailable`;
+    fallbackReason = fallbackReason === 'none' ? 'cloud_unavailable' : `${fallbackReason}+cloud_unavailable`;
     logger.debug(
       `[Tuya][poll] device=${topic} mode=${modeUsed} local_handled=${localHandled} local_changed=${localChanged} cloud_handled=0 cloud_changed=0 cloud_missing=0 fallback=${fallbackReason}`,
     );
