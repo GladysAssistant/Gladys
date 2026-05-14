@@ -31,6 +31,8 @@ describe('TuyaHandler.init', () => {
   beforeEach(() => {
     sinon.reset();
     tuyaHandler.status = 'UNKNOWN';
+    tuyaHandler.loadDevices = sinon.stub().resolves([]);
+    tuyaHandler.startReconnect = sinon.stub();
   });
 
   afterEach(() => {
@@ -78,6 +80,37 @@ describe('TuyaHandler.init', () => {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
       payload: { status: STATUS.CONNECTED, error: null },
     });
+
+    assert.calledOnce(tuyaHandler.loadDevices);
+    assert.calledOnce(tuyaHandler.startReconnect);
+  });
+
+  it('should throw ServiceNotConfiguredError when not configured', async () => {
+    gladys.variable.getValue
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns(null)
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns(null);
+
+    try {
+      await tuyaHandler.init();
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.eq('Tuya is not configured.');
+    }
+
+    expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
+    expect(tuyaHandler.autoReconnectAllowed).to.equal(false);
+    assert.notCalled(client.init);
+    assert.notCalled(gladys.event.emit);
+    assert.notCalled(tuyaHandler.loadDevices);
+    assert.notCalled(tuyaHandler.startReconnect);
   });
 
   it('should not connect when manual disconnect is enabled', async () => {
@@ -102,6 +135,8 @@ describe('TuyaHandler.init', () => {
     expect(tuyaHandler.status).to.eq(STATUS.NOT_INITIALIZED);
 
     assert.notCalled(client.init);
+    assert.notCalled(tuyaHandler.loadDevices);
+    assert.notCalled(tuyaHandler.startReconnect);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
       payload: { status: STATUS.NOT_INITIALIZED, manual_disconnect: true },

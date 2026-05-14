@@ -106,7 +106,7 @@ describe('CalDAV config', () => {
     await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'MISSING_PARAMETERS');
   });
 
-  it('should failed to get CALDAV_PRINCIPAL_URL', async () => {
+  it('should failed with CALDAV_BAD_USERNAME_PASSWORD error', async () => {
     configEnv.gladys.variable.getValue
       .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
       .returns('https://caldav.host.com');
@@ -117,7 +117,7 @@ describe('CalDAV config', () => {
       .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
       .returns('12345');
 
-    send.withArgs('request1', 'https://caldav.host.com').rejects();
+    send.withArgs('request1', 'https://caldav.host.com').rejects(new Error('Bad status: 401'));
 
     configEnv.dav.request.propfind
       .withArgs({
@@ -127,7 +127,82 @@ describe('CalDAV config', () => {
       })
       .returns('request1');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
+    try {
+      await configEnv.config(userId);
+      expect.fail('Expected config() to reject');
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error);
+      expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_USERNAME_PASSWORD');
+      expect(error)
+        .to.have.nested.property('message.log')
+        .that.is.a('string');
+    }
+  });
+
+  it('should failed with CALDAV_BAD_URL error', async () => {
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('https://caldav.host.com');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    send.withArgs('request1', 'https://caldav.host.com').rejects(new Error('Bad status: 404'));
+
+    configEnv.dav.request.propfind
+      .withArgs({
+        props: [{ name: 'current-user-principal', namespace: namespace.DAV }],
+        depth: 0,
+        mergeResponses: true,
+      })
+      .returns('request1');
+
+    try {
+      await configEnv.config(userId);
+      expect.fail('Expected config() to reject');
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error);
+      expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_URL');
+      expect(error)
+        .to.have.nested.property('message.log')
+        .that.is.a('string');
+    }
+  });
+
+  it('should failed with CALDAV_BAD_SETTINGS_PRINCIPAL_URL error', async () => {
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_URL', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('https://caldav.host.com');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_USERNAME', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('tony');
+    configEnv.gladys.variable.getValue
+      .withArgs('CALDAV_PASSWORD', '5d6c666f-56be-4929-9104-718a78556844', userId)
+      .returns('12345');
+
+    send.withArgs('request1', 'https://caldav.host.com').rejects(new Error());
+
+    configEnv.dav.request.propfind
+      .withArgs({
+        props: [{ name: 'current-user-principal', namespace: namespace.DAV }],
+        depth: 0,
+        mergeResponses: true,
+      })
+      .returns('request1');
+
+    try {
+      await configEnv.config(userId);
+      expect.fail('Expected config() to reject');
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error);
+      expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
+      expect(error)
+        .to.have.nested.property('message.log')
+        .that.is.a('string');
+    }
   });
 
   it('should failed to get CALDAV_HOME_URL', async () => {
@@ -145,7 +220,7 @@ describe('CalDAV config', () => {
       .withArgs('request1', 'https://caldav.host.com')
       .returns({ props: { currentUserPrincipal: 'https://caldav.host.com/principal' } })
       .withArgs('request2', 'https://caldav.host.com/principal')
-      .rejects();
+      .rejects(new Error());
 
     configEnv.dav.request.propfind
       .withArgs({
@@ -161,6 +236,15 @@ describe('CalDAV config', () => {
       })
       .returns('request2');
 
-    await expect(configEnv.config(userId)).to.be.rejectedWith(Error, 'CALDAV_BAD_SETTINGS_HOME_URL');
+    try {
+      await configEnv.config(userId);
+      expect.fail('Expected config() to reject');
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error);
+      expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_HOME_URL');
+      expect(error)
+        .to.have.nested.property('message.log')
+        .that.is.a('string');
+    }
   });
 });

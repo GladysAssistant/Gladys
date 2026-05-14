@@ -1,9 +1,11 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
+const { fake } = sinon;
 const NukiHandler = require('../../../../../services/nuki/lib');
 
 const { serviceId, existingDevice } = require('../../mocks/consts.test');
+const { mqttService } = require('../../mocks/mqtt.mock.test');
 
 const gladys = {
   stateManager: {
@@ -13,6 +15,9 @@ const gladys = {
       }
       return undefined;
     },
+  },
+  service: {
+    getService: fake.returns(mqttService),
   },
 };
 

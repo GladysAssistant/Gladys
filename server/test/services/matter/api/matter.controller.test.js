@@ -28,6 +28,7 @@ describe('MatterController', () => {
       }),
       decommission: fake.resolves(null),
       listenToStateChange: fake.resolves(null),
+      reset: fake.resolves(null),
     };
     controller = MatterController(matterHandler);
     sinon.reset();
@@ -120,6 +121,16 @@ describe('MatterController', () => {
 
     await controller['post /api/v1/service/matter/node/:node_id/decommission'].controller(req, res);
     assert.calledOnce(matterHandler.decommission);
+    assert.calledWith(res.json, { success: true });
+  });
+  it('should reset matter integration', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/matter/reset'].controller(req, res);
+    assert.calledOnce(matterHandler.reset);
     assert.calledWith(res.json, { success: true });
   });
 });
