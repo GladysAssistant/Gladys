@@ -243,7 +243,12 @@ class TuyaDeviceBox extends Component {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
-    const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
+    // Probe legacy protocols (3.3 / 3.1) first, newgen protocols (3.5 / 3.4) last:
+    // newgen attempts on a 3.3 device produce HMAC mismatch errors that put the
+    // device into a short-lived protective state and cause subsequent local
+    // connections to fail with ECONNRESET. Most Tuya consumer devices speak 3.3,
+    // so this order also returns faster in the common case.
+    const tryProtocols = ['3.3', '3.1', '3.5', '3.4'];
     const selectedProtocol = getParam('PROTOCOL_VERSION') || currentDevice.protocol_version;
     const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
     try {

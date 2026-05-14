@@ -123,14 +123,23 @@ async function localPoll(payload) {
     if (logDps) {
       logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
     }
-    tuyaLocal.removeListener('error', onError);
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
       logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
-    tuyaLocal.removeListener('error', onError);
+    // Close the socket on failure: leaving it half-open made the device refuse
+    // subsequent local connections (cascading ECONNRESET observed in runtime).
+    // Keep the `'error'` listener registered until the TuyaDevice instance is
+    // garbage-collected — removing it before late socket events arrive caused
+    // those events to bubble up as uncaughtException. Ported from PR7 commit
+    // 547f05c1.
+    try {
+      await tuyaLocal.disconnect();
+    } catch (err) {
+      // ignore
+    }
     throw e;
   }
 }
