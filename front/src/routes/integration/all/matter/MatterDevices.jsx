@@ -144,38 +144,44 @@ class MatterDevices extends Component {
 
       const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
 
-      // We group all paired devices by unique_id (one unique id can be shared by multiple devices)
-      const pairedDevicesGroupedByUniqueId = pairedDevices.reduce((acc, pairDevice) => {
-        const pairedDeviceUniqueId = getDeviceParam(pairDevice, 'UNIQUE_ID');
-        acc[pairedDeviceUniqueId] = acc[pairedDeviceUniqueId] || [];
-        acc[pairedDeviceUniqueId].push(pairDevice);
-        return acc;
-      }, {});
+      // The external_id of a Matter device is `matter:<nodeId>:<devicePath>`.
+      // The device path identifies the endpoint inside the node and is stable across re-pairings,
+      // while the node id changes when a device is re-commissioned. We use UNIQUE_ID + device path
+      // to reliably match a paired device with its already-existing counterpart in Gladys, even
+      // when multiple endpoints of the same physical device share the same UNIQUE_ID.
+      const getDevicePath = externalId =>
+        externalId
+          .split(':')
+          .slice(2)
+          .join(':');
 
-      // We group all devices already in Gladys by unique_id (one unique id can be shared by multiple devices)
-      const devicesGroupedByUniqueId = this.state.matterDevices.reduce((acc, device) => {
+      // We index all devices already in Gladys by `<unique_id>::<device_path>`
+      const existingDevicesByUniqueIdAndPath = new Map();
+      this.state.matterDevices.forEach(device => {
         const deviceUniqueId = getDeviceParam(device, 'UNIQUE_ID');
-        acc[deviceUniqueId] = acc[deviceUniqueId] || [];
-        acc[deviceUniqueId].push(device);
-        return acc;
-      }, {});
-
-      Object.entries(pairedDevicesGroupedByUniqueId).forEach(([uniqueId, pairedDevices]) => {
-        // We find all devices already created with the same unique id
-        const devices = devicesGroupedByUniqueId[uniqueId];
-        if (!devices) {
+        if (!deviceUniqueId) {
           return;
         }
+        existingDevicesByUniqueIdAndPath.set(
+          `${deviceUniqueId}::${getDevicePath(device.external_id)}`,
+          device
+        );
+      });
 
-        // We can only match paired device with existing device if they have exactly the same number of devices
-        if (devices.length !== pairedDevices.length) {
+      // For each paired device, we look for an existing Gladys device with the same UNIQUE_ID and
+      // the same device path. If found and the external_id differs (i.e. the node id has changed),
+      // we register it so the user can update the existing device instead of creating a duplicate.
+      pairedDevices.forEach(pairedDevice => {
+        const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
+        if (!pairedDeviceUniqueId) {
           return;
         }
-
-        // We match devices by position
-        pairedDevices.forEach((pairedDevice, index) => {
-          devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, devices[index].external_id);
-        });
+        const existingDevice = existingDevicesByUniqueIdAndPath.get(
+          `${pairedDeviceUniqueId}::${getDevicePath(pairedDevice.external_id)}`
+        );
+        if (existingDevice && existingDevice.external_id !== pairedDevice.external_id) {
+          devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, existingDevice.external_id);
+        }
       });
 
       this.setState({
