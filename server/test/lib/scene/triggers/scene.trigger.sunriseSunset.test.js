@@ -1,15 +1,15 @@
 const sinon = require('sinon');
-const EventEmitter = require('events');
 
 const { assert, fake } = sinon;
 
-const { EVENTS, ACTIONS } = require('../../../../utils/constants');
-const SceneManager = require('../../../../lib/scene');
+const EventEmitter = require('events');
 const StateManager = require('../../../../lib/state');
+const SceneManager = require('../../../../lib/scene');
+const { ACTIONS, EVENTS } = require('../../../../utils/constants');
 
 const event = new EventEmitter();
 
-describe('Scene.triggers.alarmMode', () => {
+describe('Scene.triggers.sunriseSunset', () => {
   let sceneManager;
 
   const device = {
@@ -17,6 +17,14 @@ describe('Scene.triggers.alarmMode', () => {
   };
 
   const brain = {};
+
+  const service = {
+    getService: fake.returns({
+      device: {
+        subscribe: fake.returns(null),
+      },
+    }),
+  };
 
   beforeEach(() => {
     const house = {
@@ -38,35 +46,37 @@ describe('Scene.triggers.alarmMode', () => {
 
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('should execute scene with alarm.arm trigger', async () => {
-    await sceneManager.addScene({
+  it('should execute scene with sunrise trigger', async () => {
+    const addedScene = await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
         [
           {
-            type: ACTIONS.LIGHT.TURN_OFF,
+            type: ACTIONS.LIGHT.TURN_ON,
             devices: ['light-1'],
           },
         ],
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.ARM,
+          type: EVENTS.TIME.SUNRISE,
           house: 'house-1',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.ARM,
-      house: 'house-1',
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: addedScene.triggers[0].house,
+      },
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
@@ -79,7 +89,8 @@ describe('Scene.triggers.alarmMode', () => {
       });
     });
   });
-  it('should execute scene with alarm.arming trigger', async () => {
+
+  it('should execute scene with sunset trigger', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -93,14 +104,16 @@ describe('Scene.triggers.alarmMode', () => {
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.ARMING,
+          type: EVENTS.TIME.SUNSET,
           house: 'house-1',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.ARMING,
-      house: 'house-1',
+      type: EVENTS.TIME.SUNSET,
+      house: {
+        selector: 'house-1',
+      },
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
@@ -113,28 +126,72 @@ describe('Scene.triggers.alarmMode', () => {
       });
     });
   });
-  it('should execute scene with alarm.disarm trigger', async () => {
+
+  it('should not execute scene, sunrise trigger with offset=30 when event has offset=0', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
         [
           {
-            type: ACTIONS.LIGHT.TURN_OFF,
+            type: ACTIONS.LIGHT.TURN_ON,
             devices: ['light-1'],
           },
         ],
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.DISARM,
+          type: EVENTS.TIME.SUNRISE,
           house: 'house-1',
+          offset: 30,
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.DISARM,
-      house: 'house-1',
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 0,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene, sunrise trigger with offset=30 when event has offset=30', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+          offset: 30,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.TIME.SUNRISE,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 30,
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
@@ -147,7 +204,8 @@ describe('Scene.triggers.alarmMode', () => {
       });
     });
   });
-  it('should execute scene with alarm.partial-arm trigger', async () => {
+
+  it('should not execute scene, sunset trigger with offset=-15 when event has offset=0', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -161,116 +219,18 @@ describe('Scene.triggers.alarmMode', () => {
       ],
       triggers: [
         {
-          type: EVENTS.ALARM.PARTIAL_ARM,
+          type: EVENTS.TIME.SUNSET,
           house: 'house-1',
+          offset: -15,
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.ALARM.PARTIAL_ARM,
-      house: 'house-1',
-    });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(() => {
-        try {
-          assert.calledOnce(device.setValue);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-  });
-  it('should execute scene with alarm.panic trigger', async () => {
-    await sceneManager.addScene({
-      selector: 'my-scene',
-      active: true,
-      actions: [
-        [
-          {
-            type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
-          },
-        ],
-      ],
-      triggers: [
-        {
-          type: EVENTS.ALARM.PANIC,
-          house: 'house-1',
-        },
-      ],
-    });
-    sceneManager.checkTrigger({
-      type: EVENTS.ALARM.PANIC,
-      house: 'house-1',
-    });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(() => {
-        try {
-          assert.calledOnce(device.setValue);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-  });
-  it('should execute scene with alarm.too-many-codes-tests trigger', async () => {
-    await sceneManager.addScene({
-      selector: 'my-scene',
-      active: true,
-      actions: [
-        [
-          {
-            type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
-          },
-        ],
-      ],
-      triggers: [
-        {
-          type: EVENTS.ALARM.TOO_MANY_CODES_TESTS,
-          house: 'house-1',
-        },
-      ],
-    });
-    sceneManager.checkTrigger({
-      type: EVENTS.ALARM.TOO_MANY_CODES_TESTS,
-      house: 'house-1',
-    });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(() => {
-        try {
-          assert.calledOnce(device.setValue);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-  });
-  it('should not execute scene (house not matching)', async () => {
-    await sceneManager.addScene({
-      selector: 'my-scene',
-      active: true,
-      actions: [
-        [
-          {
-            type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
-          },
-        ],
-      ],
-      triggers: [
-        {
-          type: EVENTS.ALARM.ARM,
-          house: 'house-2',
-        },
-      ],
-    });
-    sceneManager.checkTrigger({
-      type: EVENTS.ALARM.ARM,
-      house: 'house-1',
+      type: EVENTS.TIME.SUNSET,
+      house: {
+        selector: 'house-1',
+      },
+      offset: 0,
     });
     return new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {

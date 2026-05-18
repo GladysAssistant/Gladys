@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
+const { EVENTS } = require('../../../utils/constants');
 
 const SceneManager = proxyquire('../../../lib/scene', {
   suncalc: {
@@ -38,6 +39,7 @@ describe('SceneManager.dailyUpdate', () => {
   beforeEach(async () => {
     house.get = fake.resolves([
       {
+        selector: 'house-1',
         latitude: 12,
         longitude: 13,
       },
@@ -113,5 +115,157 @@ describe('SceneManager.dailyUpdate', () => {
     house.get = fake.resolves([]);
     await sceneManager.dailyUpdate();
     expect(sceneManager.jobs).to.have.lengthOf(0);
+  });
+
+  it('should schedule extra job for sunrise when a scene has offset=30', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-offset',
+      active: true,
+      actions: [],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNRISE,
+          house: 'house-1',
+          offset: 30,
+        },
+      ],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // offset=0 sunrise + offset=30 sunrise + offset=0 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
+
+    // Trigger all jobs and verify events are emitted with correct offsets
+    const emittedOffsets = [];
+    event.emit = (eventName, payload) => {
+      emittedOffsets.push(payload.offset);
+    };
+    sceneManager.jobs.forEach((job) => {
+      job.callback();
+    });
+    expect(emittedOffsets).to.include(0);
+    expect(emittedOffsets).to.include(30);
+  });
+
+  it('should schedule extra job for sunset when a scene has negative offset=-15', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-offset-neg',
+      active: true,
+      actions: [],
+      triggers: [
+        {
+          type: EVENTS.TIME.SUNSET,
+          house: 'house-1',
+          offset: -15,
+        },
+      ],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // offset=0 sunrise + offset=0 sunset + offset=-15 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
+
+    const emittedOffsets = [];
+    event.emit = (eventName, payload) => {
+      emittedOffsets.push(payload.offset);
+    };
+    sceneManager.jobs.forEach((job) => {
+      job.callback();
+    });
+    expect(emittedOffsets).to.include(0);
+    expect(emittedOffsets).to.include(-15);
+  });
+
+  it('should not add extra jobs for an inactive scene with a sunrise trigger', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-inactive',
+      active: false,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // Inactive scene offsets must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should not add extra jobs for a scene with no triggers', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-no-triggers',
+      active: true,
+      actions: [],
+      triggers: null,
+    });
+    await sceneManager.dailyUpdate();
+    // Scene without triggers must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should ignore a non-numeric offset (string)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-bad-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 'abc' }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // invalid offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should ignore an offset exceeding 24h (offset > 1440)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-huge-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 1500 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // out-of-day offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should ignore a large negative offset exceeding 24h (offset < -1440)', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-huge-neg-offset',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNSET, house: 'house-1', offset: -1500 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // out-of-day offset must be ignored: only offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(2);
+  });
+
+  it('should deduplicate offsets when multiple scenes share the same offset', async () => {
+    brain.addNamedEntity = fake.returns(null);
+    await sceneManager.addScene({
+      selector: 'scene-a',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
+    });
+    // flush first addScene auto-triggered dailyUpdate
+    await Promise.resolve();
+    await sceneManager.addScene({
+      selector: 'scene-b',
+      active: true,
+      actions: [],
+      triggers: [{ type: EVENTS.TIME.SUNRISE, house: 'house-1', offset: 30 }],
+    });
+    // addScene auto-triggers dailyUpdate(); flush microtask to let it complete
+    await Promise.resolve();
+    // offset=0 sunrise + offset=30 sunrise (deduplicated) + offset=0 sunset = 3 jobs
+    expect(sceneManager.jobs).to.have.lengthOf(3);
   });
 });

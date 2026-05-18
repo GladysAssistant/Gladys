@@ -75,6 +75,17 @@ addMapping('action', BUTTON_STATUS.DOWN_HOLD, 'down-hold');
 addMapping('action', BUTTON_STATUS.OFF_PRESS, 'off-press');
 addMapping('action', BUTTON_STATUS.OFF_HOLD, 'off-hold');
 
+// For Philips Hue Dimmer Switch v2
+// https://www.zigbee2mqtt.io/devices/929002398602.html
+addMapping('action', BUTTON_STATUS.ON_PRESS, 'on_press');
+addMapping('action', BUTTON_STATUS.ON_HOLD, 'on_hold');
+addMapping('action', BUTTON_STATUS.UP_PRESS, 'up_press');
+addMapping('action', BUTTON_STATUS.UP_HOLD, 'up_hold');
+addMapping('action', BUTTON_STATUS.DOWN_PRESS, 'down_press');
+addMapping('action', BUTTON_STATUS.DOWN_HOLD, 'down_hold');
+addMapping('action', BUTTON_STATUS.OFF_PRESS, 'off_press');
+addMapping('action', BUTTON_STATUS.OFF_HOLD, 'off_hold');
+
 addMapping('action', BUTTON_STATUS.INITIAL_PRESS, 'initial_press');
 addMapping('action', BUTTON_STATUS.LONG_PRESS, 'long_press');
 addMapping('action', BUTTON_STATUS.SHORT_RELEASE, 'short_release');

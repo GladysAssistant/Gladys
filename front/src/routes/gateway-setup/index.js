@@ -28,8 +28,12 @@ class LinkGatewayUser extends Component {
     this.setState({ savingUserLoading: true });
     try {
       await this.props.session.gatewayClient.updateUserIdInGladys(this.state.selectedUser);
-      await this.props.httpClient.get('/api/v1/me');
-      // hard redirect, to reload websocket connection
+      // Hard redirect to /dashboard to force a fresh websocket session against the
+      // gateway. The previous session was opened at login time with no local_user_id
+      // (or a stale one), so any call to a local Gladys API right now would fail with
+      // GATEWAY_USER_NOT_LINKED. If the user has not been accepted locally yet,
+      // checkSession / checkIfGladysUserIsLinkedToExistingUser will detect it after
+      // the reload and show the proper "errorNotAcceptedLocally" message.
       window.location = '/dashboard';
     } catch (e) {
       console.error(e);
