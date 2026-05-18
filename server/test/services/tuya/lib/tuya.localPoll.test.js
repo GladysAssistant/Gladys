@@ -547,4 +547,47 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
     expect(updated.device_type).to.equal('smart-meter');
     expect(updated.features.length).to.be.greaterThan(0);
   });
+
+  it('should preserve the existing device when convertDevice throws during rebuild', () => {
+    const { updateDiscoveredDeviceAfterLocalPoll: updateWithThrowingConvertDevice } = proxyquire(
+      '../../../../services/tuya/lib/tuya.localPoll',
+      {
+        './device/tuya.convertDevice': {
+          convertDevice() {
+            throw new Error('convertDevice boom');
+          },
+        },
+      },
+    );
+
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: 'bbcg1hrkrj5rifsd',
+          params: [],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateWithThrowingConvertDevice(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    // Rebuild swallowed: features stay empty but the rest of the local-poll
+    // update path still runs and resolves product_id from the existing data.
+    expect(updated).to.not.equal(null);
+    expect(updated.features).to.deep.equal([]);
+    expect(updated.product_id).to.equal('bbcg1hrkrj5rifsd');
+  });
 });
