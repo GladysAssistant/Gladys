@@ -43,6 +43,7 @@ const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistorica
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 const { destroyParam } = require('./device.destroyParam');
 const { destroyStatesFrom } = require('./device.destroyStatesFrom');
+const { destroyStatesBetween } = require('./device.destroyStatesBetween');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -148,5 +149,6 @@ DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalSta
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 DeviceManager.prototype.destroyParam = destroyParam;
 DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;
+DeviceManager.prototype.destroyStatesBetween = destroyStatesBetween;
 
 module.exports = DeviceManager;

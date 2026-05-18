@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon');
+
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 
@@ -45,6 +47,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
 
@@ -74,7 +77,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     expect(roundedTime.getMilliseconds()).to.equal(0);
 
     // Verify jobId was passed
-    expect(callArgs[1]).to.equal(jobId);
+    expect(callArgs[2]).to.equal(jobId);
   });
 
   it('should round time to 00:30 when current time is at or after 30 minutes', async () => {
@@ -95,7 +98,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     expect(roundedTime.getMilliseconds()).to.equal(0);
 
     // Verify jobId was passed
-    expect(callArgs[1]).to.equal(jobId);
+    expect(callArgs[2]).to.equal(jobId);
   });
 
   it('should round time to 00:00 when current time is exactly at 00:00', async () => {
@@ -210,6 +213,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     // Verify jobId was passed correctly
     assert.calledOnce(calculateConsumptionFromIndex);
     const callArgs = calculateConsumptionFromIndex.getCall(0).args;
-    expect(callArgs[1]).to.equal('specific-job-id-12345');
+    expect(callArgs[2]).to.equal('specific-job-id-12345');
   });
 });
