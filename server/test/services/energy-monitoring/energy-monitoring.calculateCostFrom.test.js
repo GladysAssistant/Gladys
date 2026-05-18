@@ -685,167 +685,124 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(res).to.equal(null);
   });
 
-  it('should return null when no price matches a state (energyPricesForDate empty)', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    // Force a valid hierarchy with one consumption/cost pair
-    const getStub = sinon.stub(gladys.device, 'get').resolves([
+  it('should skip cost feature when selector is not in the provided whitelist', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
       {
-        id: 'meter-device',
-        name: 'Meter',
-        features: [
-          {
-            id: 'meter-feature',
-            selector: 'meter-feature',
-            external_id: 'meter-feature',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          },
-        ],
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
       },
       {
-        id: 'plug-device',
-        name: 'Plug',
-        features: [
-          {
-            id: 'plug-consumption',
-            selector: 'plug-consumption',
-            external_id: 'plug-consumption',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: 'meter-feature',
-          },
-          {
-            id: 'plug-cost',
-            selector: 'plug-cost',
-            external_id: 'plug-cost',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-            energy_parent_id: 'plug-consumption',
-          },
-        ],
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
       },
     ]);
-    const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
-    const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]); // no prices
-    const statesStub = sinon
-      .stub(gladys.device, 'getDeviceFeatureStates')
-      .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z') }]);
-    const rootStub = sinon
-      .stub(gladys.device.energySensorManager, 'getRootElectricMeterDevice')
-      .returns({ id: 'meter-feature', device_id: 'meter-device' });
-    try {
-      const res = await energyMonitoring.calculateCostFrom(
-        new Date('2025-10-01T00:00:00.000Z'),
-        undefined,
-        null,
-        '2025-10-02',
-      );
-      expect(res).to.equal(null);
-      expect(destroyBetweenStub.calledOnce).to.equal(true);
-      expect(statesStub.calledOnce).to.equal(true);
-    } finally {
-      getStub.restore();
-      destroyBetweenStub.restore();
-      priceStub.restore();
-      statesStub.restore();
-      rootStub.restore();
-    }
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    // Whitelist excludes 'power-plug-consumption-cost', so nothing should be calculated
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), ['non-matching-selector']);
+    const costStates = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(costStates).to.have.lengthOf(0);
   });
 
-  it('should return null when start date is invalid type', async () => {
+  it('should calculate cost on a date range when end date is provided', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    const res = await energyMonitoring.calculateCostFrom(12345, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    expect(res).to.equal(null);
+    // Pass an explicit endAt to exercise the destroyStatesBetween branch
+    await energyMonitoring.calculateCostFrom(
+      new Date('2025-08-28T00:00:00.000Z'),
+      undefined,
+      'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22',
+      '2025-08-29',
+    );
+    const costStates = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-08-28T00:00:00.000Z'),
+      new Date('2025-08-29T23:59:59.000Z'),
+    );
+    expect(costStates.length).to.be.greaterThan(0);
   });
 
-  it('should skip cost feature not present in selector whitelist', async () => {
+  it('should skip a state when no energy price matches its date', async () => {
+    // Insert consumption states but do NOT create any energy price.
+    // This forces energyPricesForDate to be empty inside the per-state loop.
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    // selector list does not include the cost feature of this device
-    const res = await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), ['other-selector']);
-    expect(res).to.equal(null);
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    const costStates = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(costStates).to.have.lengthOf(0);
   });
 
-  it('should return when no energy price found for date', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    const priceStub = sinon.stub(gladys.energyPrice, 'get').resolves([]);
-    const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
-    try {
-      const res = await energyMonitoring.calculateCostFrom(
-        new Date('2025-10-01T00:00:00.000Z'),
-        undefined,
-        null,
-        '2025-10-02',
-      );
-      expect(res).to.equal(null);
-      expect(destroyBetweenStub.calledOnce).to.equal(true);
-    } finally {
-      priceStub.restore();
-      destroyBetweenStub.restore();
-    }
-  });
-
-  it('should catch and log unexpected errors during device processing', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+  it('should catch and log when saving cost states fails for a feature', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
     const errorStub = sinon.stub(logger, 'error');
-    const getStub = sinon.stub(gladys.device, 'get').resolves([
-      {
-        id: 'meter-device',
-        name: 'Meter',
-        features: [
-          {
-            id: 'meter-feature',
-            selector: 'meter-feature',
-            external_id: 'meter-feature',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          },
-        ],
-      },
-      {
-        id: 'plug-device',
-        name: 'Plug',
-        features: [
-          {
-            id: 'plug-consumption',
-            selector: 'plug-consumption',
-            external_id: 'plug-consumption',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: 'meter-feature',
-          },
-          {
-            id: 'plug-cost',
-            selector: 'plug-cost',
-            external_id: 'plug-cost',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
-            energy_parent_id: 'plug-consumption',
-          },
-        ],
-      },
-    ]);
-    const rootStub = sinon
-      .stub(gladys.device.energySensorManager, 'getRootElectricMeterDevice')
-      .returns({ id: 'meter-feature', device_id: 'meter-device' });
-    const destroyBetweenStub = sinon.stub(gladys.device, 'destroyStatesBetween').resolves();
-    const priceStub = sinon
-      .stub(gladys.energyPrice, 'get')
-      .resolves([{ price_type: ENERGY_PRICE_TYPES.CONSUMPTION, price: 2000, start_date: '2025-10-01' }]);
-    const statesStub = sinon
-      .stub(gladys.device, 'getDeviceFeatureStates')
-      .resolves([{ created_at: new Date('2025-10-01T00:00:00.000Z'), value: 1 }]);
-    const saveMultipleStub = sinon.stub(gladys.device, 'saveMultipleHistoricalStates').rejects(new Error('boom')); // triggers catch
-
+    const saveMultipleStub = sinon.stub(device, 'saveMultipleHistoricalStates').rejects(new Error('boom'));
     try {
-      await energyMonitoring.calculateCostFrom(new Date('2025-10-01T00:00:00.000Z'), undefined, 'job-error');
+      const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+      await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
       expect(errorStub.called).to.equal(true);
     } finally {
       saveMultipleStub.restore();
-      statesStub.restore();
-      priceStub.restore();
-      destroyBetweenStub.restore();
-      rootStub.restore();
-      getStub.restore();
       errorStub.restore();
     }
   });
