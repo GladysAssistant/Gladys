@@ -59,6 +59,23 @@ describe('scene.init', () => {
     scheduler.scheduleJob.getCall(3).callback();
     assert.calledOnceWithExactly(event.emit, 'calendar.check-if-event-is-coming');
   });
+  it('should call dailyUpdate only once during init, even with multiple sunrise/sunset scenes', async () => {
+    await db.Scene.create({
+      name: 'sunrise-scene-1',
+      icon: 'activity',
+      triggers: [{ type: 'time.sunrise', house: 'my-house' }],
+      actions: [[]],
+    });
+    await db.Scene.create({
+      name: 'sunrise-scene-2',
+      icon: 'activity',
+      triggers: [{ type: 'time.sunset', house: 'my-house' }],
+      actions: [[]],
+    });
+    sceneManager.dailyUpdate = fake.resolves(null);
+    await sceneManager.init();
+    assert.calledOnce(sceneManager.dailyUpdate);
+  });
   it('should init scene with failure but not crash', async () => {
     await db.Scene.create({
       name: 'broken-scene',
