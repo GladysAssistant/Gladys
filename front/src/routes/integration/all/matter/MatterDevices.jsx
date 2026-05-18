@@ -162,10 +162,7 @@ class MatterDevices extends Component {
         if (!deviceUniqueId) {
           return;
         }
-        existingDevicesByUniqueIdAndPath.set(
-          `${deviceUniqueId}::${getDevicePath(device.external_id)}`,
-          device
-        );
+        existingDevicesByUniqueIdAndPath.set(`${deviceUniqueId}::${getDevicePath(device.external_id)}`, device);
       });
 
       // For each paired device, we look for an existing Gladys device with the same UNIQUE_ID and
