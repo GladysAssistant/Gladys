@@ -190,6 +190,7 @@ class TuyaLocalPollSection extends Component {
 
         <div class="form-group">
           <button
+            type="button"
             onClick={this.pollLocal}
             class="btn btn-outline-secondary"
             disabled={!canPollLocal || localPollStatus === RequestStatus.Getting}

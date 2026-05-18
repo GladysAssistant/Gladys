@@ -264,6 +264,37 @@ describe('TuyaHandler.localScan', () => {
     });
   });
 
+  it('should instantiate parsers for protocols 3.1, 3.4 and 3.5', async () => {
+    const instances = [];
+    class MessageParserStub {
+      constructor(options) {
+        instances.push(options.version);
+      }
+
+      parse() {
+        return null;
+      }
+    }
+    const dgramStub = {
+      createSocket: () => ({
+        on: () => {},
+        bind: () => {},
+        close: () => {},
+      }),
+    };
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+    await clock.tickAsync(1100);
+    await promise;
+    clock.restore();
+    expect(instances).to.deep.equal([3.1, 3.4, 3.5]);
+  });
+
   it('should handle socket address errors on bind', async () => {
     const sockets = [];
     const dgramStub = {

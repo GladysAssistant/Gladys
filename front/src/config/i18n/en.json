@@ -505,6 +505,11 @@
     "createDashboardButton": "Create"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
@@ -873,7 +878,16 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
-        "connectionUrl": "Zigbee2mqtt Interface URL: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "Zigbee2mqtt Interface URL: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "reset": {
+          "title": "Reset Integration",
+          "description": "Use this option if you want to start from scratch with Zigbee2mqtt. This can be useful if your configuration is corrupted or if you want to change your Zigbee coordinator.",
+          "button": "Reset",
+          "confirmMessage": "Warning, resetting the integration will delete all Zigbee2mqtt files on disk and all saved settings. All Zigbee devices currently paired to Zigbee2mqtt will need to be re-paired.",
+          "confirmButton": "Yes, reset everything",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while resetting the integration."
+        }
       },
       "device": {
         "title": "Zigbee2mqtt devices",
@@ -924,7 +938,8 @@
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
-        "confirmDisableLabel": "Are you sur you to disable Node-RED ?",
+        "confirmDisableWarning": "Warning: Disabling Node-RED will permanently delete all your Node-RED data, including all your flows and configurations. This action cannot be undone.",
+        "confirmDisableLabel": "Are you sure you want to disable Node-RED?",
         "confirmDisableCancelButton": "Cancel",
         "activationNodeRed": "Activating...",
         "serviceStatus": "Node-RED Service Status",
@@ -1060,7 +1075,11 @@
       "reloadButton": "Reload",
       "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
       "resetButton": "Reset",
-      "resetError": "An error appears while resetting bridge."
+      "resetError": "An error appears while resetting bridge.",
+      "mdns": "If you encounter connection problems between your Home app and the Gladys HomeKit bridge, it is possible that your local network is having difficulty finding the HomeKit bridge. You can try changing the mDNS advertiser used among the available options.",
+      "saveMDNSButton": "Save",
+      "saveMDNSSuccess": "mDNS advertiser saved successfully. The HomeKit service will restart automatically, please wait a few seconds before adding it to your Home app.",
+      "saveMDNSError": "An error occurred while saving the mDNS advertiser."
     },
     "owntracks": {
       "title": "OwnTracks",
@@ -1097,6 +1116,7 @@
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed or available",
       "partiallyManagedModelButton": "Model partially managed",
+      "localModeLimitInfo": "Local mode is still being improved. For some devices, commands or state updates may still use Tuya cloud even if Local mode is selected.",
       "status": {
         "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
         "setupPageLink": "Tuya configuration page.",
@@ -1155,7 +1175,7 @@
       },
       "setup": {
         "title": "Tuya configuration",
-        "cloudTitle": "<strong>Cloud</strong><br />",
+        "cloudTitle": "Cloud",
         "description": "You can connect Gladys to your Tuya cloud account to control the related devices. Documentation is available in the left menu or <a href=\"https://gladysassistant.com/en/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
         "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Sign up</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Log in</a>).",
         "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account (console: <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
@@ -1165,7 +1185,7 @@
         "descriptionTrial": "Tuya Cloud projects have a <strong>trial period</strong>: make sure to <strong>renew</strong> or <strong>extend</strong> it regularly to avoid service interruptions.",
         "descriptionCloudLimit": "Note: the Tuya Cloud trial allows up to <strong>10 controllable devices</strong>. Additional devices may stay <strong>read-only</strong> until you upgrade.",
         "descriptionControllable": "Some devices are <strong>read-only</strong> by default. In Tuya IoT Platform, open <strong>Device Permission</strong> and click <strong>Change</strong> to make them controllable.",
-        "localTitle": "<br /><strong>Local</strong><br />",
+        "localTitle": "Local",
         "descriptionLocalMode": "Local mode can be used after the cloud setup: provide the local IP and protocol version on each device to poll locally. If devices are on the same network as the Gladys machine, the IP discovery and protocol version are detected automatically. This lets you avoid renewing the cloud trial, but the cloud is still needed when you add a new device from the Tuya app.",
         "descriptionLocalKeepsApp": "<strong>Local control</strong> does not disable control from the Tuya/Smart Life app.",
         "descriptionCameraLimit": "<strong>Cameras</strong>: video streaming is not supported in Gladys yet.",
@@ -1331,7 +1351,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration handles a limited number of Z-Wave devices. If you have unsupported devices, don't hesitate to submit them so they can be added!",
+      "alphaWarning": "If you have unsupported devices, please submit them on the forum so we can add support for them!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
@@ -1428,8 +1448,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connect to a local or remote MQTT server",
+      "title": "MQTT Virtual Devices",
+      "description": "Create virtual devices controllable via MQTT.",
+      "virtualDevicesExplanation": "This integration allows you to create virtual devices, which are controllable via MQTT, HTTP, in scenes and on the dashboard. To use Zigbee devices, please use the <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a> integration. To use Z-Wave devices, please use the <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a> integration. To use Nuki MQTT devices, please use the <a href=\"/dashboard/integration/device/nuki\">Nuki</a> integration.",
       "deviceTab": "Devices",
       "debugTab": "MQTT Debug",
       "setupTab": "Setup",
@@ -1916,13 +1937,16 @@
       "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
       "calendarChoiceSuccess": "Your choices have been saved.",
       "calendarChoiceError": "An error occurred while saving.",
+      "logTitle": "Log",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Control your Bluetooth devices and detect your presence.",
+      "title": "Bluetooth Presence",
+      "description": "Presence detection via Bluetooth.",
+      "warningTitle": "Important limitations",
+      "warningMessage": "This integration detects the presence of Bluetooth devices such as Bluetooth keychains or beacons. Warning: tracking phones and smartwatches does not work, as manufacturers have implemented anti-tracking protections (MAC address rotation, etc.).",
       "deviceTab": "Devices",
       "discoverTab": "Bluetooth discover",
       "setupTab": "Presence scanner",
@@ -1968,7 +1992,7 @@
         "title": "Presence scanner",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "errorLabel": "An error occurred while loading configuration.",
-        "presenceScannerDescription": "The presence scanner feature is doing a bluetooth scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
+        "presenceScannerDescription": "The presence scanner does a Bluetooth scan at a defined interval. When a device is detected, it will be flagged as \"seen\" in Gladys. In scenes, you can create a trigger on this state change.",
         "presenceScannerStatusLabel": "Enable or disable presence scanner",
         "presenceScannerFrequencyLabel": "Scanner interval",
         "presenceScannerFrequencyUnit": "minutes",
@@ -2159,7 +2183,8 @@
         "pairingCodeHelp": "Enter the 11- or 21-digit pairing code provided by your Matter device",
         "addButton": "Add to Gladys",
         "loading": "Connecting to device, this may take a few minutes.",
-        "error": "Impossible to add this Matter device to Gladys, are you sure this device is on the same network as Gladys? Is Gladys launched with network=host?"
+        "error": "Unable to add this Matter device to Gladys. Please check that:<br/>- The device is on the same network as Gladys<br/>- Gladys is running with network=host<br/>- If you are using a Thread Border Router, you must use a pairing code provided by the router's app (see warning above)",
+        "borderRouterWarning": "<b>Warning:</b> If you are using a Thread Border Router (Apple TV, IKEA Dirigera, Aqara) and your Thread devices are connected to this router, you must use a pairing code provided by the router's app, not the code printed on the device."
       },
       "settings": {
         "title": "Matter Settings",
@@ -2179,7 +2204,16 @@
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
         "enableButton": "Enable Matter",
         "disableButton": "Disable Matter",
-        "downloadNodesJson": "Download Nodes JSON"
+        "downloadNodesJson": "Download Nodes JSON",
+        "reset": {
+          "title": "Reset Integration",
+          "description": "Use this option if you want to start from scratch with Matter. This will delete all controller data, backup, and Matter folder.",
+          "button": "Reset",
+          "confirmMessage": "Warning, resetting the integration will delete all Matter controller data, backup, and Matter folder. All Matter devices currently paired will need to be re-paired.",
+          "confirmButton": "Yes, reset everything",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while resetting the integration."
+        }
       },
       "device": {
         "title": "Matter Devices",
@@ -2751,6 +2785,7 @@
     "day": "Day",
     "selectorText": "The selector is the unique identifier of your user. It can be used in the API.",
     "emailText": "Your email is just an identifier for login, it's only saved locally",
+    "emailTextOtherUser": "The email is just an identifier for login, it's only saved locally",
     "profilePictureLabel": "Profile Picture",
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",
@@ -3420,6 +3455,7 @@
     "category": {
       "button": {
         "click": {
+          "unknown": "{{value}} (unknown value)",
           "1": "Simple click",
           "2": "Double click",
           "3": "Long click press",
@@ -3504,7 +3540,8 @@
           "82": "Release Plus (Aqara W100)",
           "83": "Release Center (Aqara W100)",
           "84": "Release Minus (Aqara W100)",
-          "unknown": "{{value}} (unknown value)"
+          "85": "On double",
+          "86": "Off double"
         }
       },
       "heater": {
@@ -3983,6 +4020,10 @@
     "uv-sensor": {
       "shortCategoryName": "UV Sensor",
       "integer": "UV Index"
+    },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "HEPA filter monitoring",
+      "filter-life-remaining": "Filter life remaining"
     },
     "duration": {
       "shortCategoryName": "Duration",

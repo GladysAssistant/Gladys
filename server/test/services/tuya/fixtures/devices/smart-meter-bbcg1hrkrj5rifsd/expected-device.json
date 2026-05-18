@@ -1,7 +1,7 @@
 {
   "name": "Production solaire",
   "external_id": "tuya:smart-meter-device-id",
-  "selector": "tuya:smart-meter-device-id",
+  "selector": "tuya-smart-meter-device-id",
   "device_type": "smart-meter",
   "model": "Smart Meter",
   "product_id": "bbcg1hrkrj5rifsd",
@@ -66,7 +66,7 @@
     {
       "name": "energy_reserse_b",
       "external_id": "tuya:smart-meter-device-id:energy_reserse_b",
-      "selector": "tuya:smart-meter-device-id:energy_reserse_b",
+      "selector": "tuya-smart-meter-device-id-energy-reserse-b",
       "category": "energy-sensor",
       "type": "export-index",
       "read_only": true,
@@ -79,7 +79,7 @@
     {
       "name": "energy_reverse_a",
       "external_id": "tuya:smart-meter-device-id:energy_reverse_a",
-      "selector": "tuya:smart-meter-device-id:energy_reverse_a",
+      "selector": "tuya-smart-meter-device-id-energy-reverse-a",
       "category": "energy-sensor",
       "type": "export-index",
       "read_only": true,
@@ -92,7 +92,7 @@
     {
       "name": "reverse_energy_total",
       "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
-      "selector": "tuya:smart-meter-device-id:reverse_energy_total",
+      "selector": "tuya-smart-meter-device-id-reverse-energy-total",
       "category": "energy-sensor",
       "type": "export-index",
       "read_only": true,
@@ -105,7 +105,7 @@
     {
       "name": "current_a",
       "external_id": "tuya:smart-meter-device-id:current_a",
-      "selector": "tuya:smart-meter-device-id:current_a",
+      "selector": "tuya-smart-meter-device-id-current-a",
       "category": "energy-sensor",
       "type": "current",
       "read_only": true,
@@ -118,7 +118,7 @@
     {
       "name": "current_b",
       "external_id": "tuya:smart-meter-device-id:current_b",
-      "selector": "tuya:smart-meter-device-id:current_b",
+      "selector": "tuya-smart-meter-device-id-current-b",
       "category": "energy-sensor",
       "type": "current",
       "read_only": true,
@@ -131,7 +131,7 @@
     {
       "name": "energy_forword_a",
       "external_id": "tuya:smart-meter-device-id:energy_forword_a",
-      "selector": "tuya:smart-meter-device-id:energy_forword_a",
+      "selector": "tuya-smart-meter-device-id-energy-forword-a",
       "category": "energy-sensor",
       "type": "energy",
       "read_only": true,
@@ -144,7 +144,7 @@
     {
       "name": "energy_forword_b",
       "external_id": "tuya:smart-meter-device-id:energy_forword_b",
-      "selector": "tuya:smart-meter-device-id:energy_forword_b",
+      "selector": "tuya-smart-meter-device-id-energy-forword-b",
       "category": "energy-sensor",
       "type": "energy",
       "read_only": true,
@@ -157,7 +157,7 @@
     {
       "name": "forward_energy_total",
       "external_id": "tuya:smart-meter-device-id:forward_energy_total",
-      "selector": "tuya:smart-meter-device-id:forward_energy_total",
+      "selector": "tuya-smart-meter-device-id-forward-energy-total",
       "category": "energy-sensor",
       "type": "energy",
       "read_only": true,
@@ -170,7 +170,7 @@
     {
       "name": "power_a",
       "external_id": "tuya:smart-meter-device-id:power_a",
-      "selector": "tuya:smart-meter-device-id:power_a",
+      "selector": "tuya-smart-meter-device-id-power-a",
       "category": "energy-sensor",
       "type": "power",
       "read_only": true,
@@ -183,7 +183,7 @@
     {
       "name": "power_b",
       "external_id": "tuya:smart-meter-device-id:power_b",
-      "selector": "tuya:smart-meter-device-id:power_b",
+      "selector": "tuya-smart-meter-device-id-power-b",
       "category": "energy-sensor",
       "type": "power",
       "read_only": true,
@@ -196,7 +196,7 @@
     {
       "name": "total_power",
       "external_id": "tuya:smart-meter-device-id:total_power",
-      "selector": "tuya:smart-meter-device-id:total_power",
+      "selector": "tuya-smart-meter-device-id-total-power",
       "category": "energy-sensor",
       "type": "power",
       "read_only": true,
@@ -209,7 +209,7 @@
     {
       "name": "voltage_a",
       "external_id": "tuya:smart-meter-device-id:voltage_a",
-      "selector": "tuya:smart-meter-device-id:voltage_a",
+      "selector": "tuya-smart-meter-device-id-voltage-a",
       "category": "energy-sensor",
       "type": "voltage",
       "read_only": true,

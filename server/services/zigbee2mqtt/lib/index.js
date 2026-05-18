@@ -26,6 +26,7 @@ const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { readZ2mContainerLogs } = require('./readZ2mContainerLogs');
+const { reset } = require('./reset');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 // EVENTS
@@ -96,6 +97,7 @@ Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 Zigbee2mqttManager.prototype.readZ2mContainerLogs = readZ2mContainerLogs;
+Zigbee2mqttManager.prototype.reset = reset;
 
 // EVENTS
 Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;

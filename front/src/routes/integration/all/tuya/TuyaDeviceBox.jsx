@@ -126,15 +126,16 @@ class TuyaDeviceBox extends Component {
     const isNewDevice = !currentDevice || currentDevice.external_id !== nextDevice.external_id;
     const baselineDevice = this.state.baselineDevice;
     const shouldRefreshBaseline = isNewDevice || !baselineDevice || baselineDevice.updated_at !== nextDevice.updated_at;
-    let mergedNextDevice =
-      currentDevice && currentDevice.specifications && !nextDevice.specifications
-        ? { ...nextDevice, specifications: currentDevice.specifications }
-        : nextDevice;
-    if (currentDevice && currentDevice.tuya_report && !mergedNextDevice.tuya_report) {
-      mergedNextDevice = {
-        ...mergedNextDevice,
-        tuya_report: currentDevice.tuya_report
-      };
+    // Only carry forward specifications/tuya_report when refreshing the SAME device with a partial
+    // payload. Across devices (isNewDevice=true) we must never inherit the previous device's data.
+    let mergedNextDevice = nextDevice;
+    if (!isNewDevice && currentDevice) {
+      if (currentDevice.specifications && !mergedNextDevice.specifications) {
+        mergedNextDevice = { ...mergedNextDevice, specifications: currentDevice.specifications };
+      }
+      if (currentDevice.tuya_report && !mergedNextDevice.tuya_report) {
+        mergedNextDevice = { ...mergedNextDevice, tuya_report: currentDevice.tuya_report };
+      }
     }
     if (isNewDevice) {
       this.setState({

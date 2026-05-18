@@ -446,3 +446,8 @@ body {
   fill: #FFA000;
   stroke: #FFA000;
 }
+
+.integration-tag {
+  font-size: 0.7rem;
+  margin-right: 6px;
+}

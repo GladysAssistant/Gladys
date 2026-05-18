@@ -29,6 +29,11 @@ const getLocalDpsFromCode = (code, device) => {
     return null;
   }
 
+  // Generic fallback for devices without a dedicated local mapping: most
+  // Tuya switch/socket devices expose `switch`/`power` on DPS 1 and
+  // `switch_N` (e.g. `switch_2`) on DPS N. This is a read-only inference
+  // used to bootstrap unsupported devices in local mode; dedicated device
+  // types should opt out by setting `strict: true` in their local mapping.
   if (normalized === 'switch' || normalized === 'power') {
     return 1;
   }

@@ -28,6 +28,7 @@ async function localScan(input = 10) {
   const sockets = [];
   const parsers = [
     new MessageParser({ key: UDP_KEY, version: 3.1 }),
+    new MessageParser({ key: UDP_KEY, version: 3.4 }),
     new MessageParser({ key: UDP_KEY, version: 3.5 }),
   ];
 

@@ -41,7 +41,8 @@ async function getAllResources() {
     };
   });
 
-  const sensorDevices = (await this.gladys.device.get())
+  const allDevices = await this.gladys.device.get();
+  const sensorDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSensorFeature(feature));
     })
@@ -66,7 +67,7 @@ async function getAllResources() {
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
-  const switchableDevices = (await this.gladys.device.get())
+  const switchableDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
@@ -128,7 +129,9 @@ async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const sensorDevices = (await this.gladys.device.get())
+
+  const allDevices = await this.gladys.device.get();
+  const sensorDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSensorFeature(feature));
     })
@@ -147,7 +150,7 @@ async function getAllTools() {
     ),
   ];
 
-  const switchableDevices = (await this.gladys.device.get())
+  const switchableDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
@@ -166,7 +169,7 @@ async function getAllTools() {
     ),
   ];
 
-  const historyDevices = (await this.gladys.device.get())
+  const historyDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isHistoryFeature(feature));
     })
@@ -445,6 +448,23 @@ async function getAllTools() {
             interval ? intervalByName[interval] : THIRTY_DAYS_IN_MINUTES,
             500,
           );
+          aggStates.values = aggStates.values.map((v) => {
+            let decimalPlaces;
+            if (typeof v.value === 'number') {
+              decimalPlaces = Math.max(
+                v.min_value?.toString().split('.')[1]?.length || 2,
+                v.max_value?.toString().split('.')[1]?.length || 2,
+              );
+            }
+
+            return {
+              ...v,
+              ...(decimalPlaces && {
+                value: Number(v.value.toFixed(decimalPlaces)),
+                sum_value: Number(v.sum_value.toFixed(decimalPlaces)),
+              }),
+            };
+          });
 
           return {
             content: [

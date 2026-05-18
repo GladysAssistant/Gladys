@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { addSelector } = require('../../../../utils/addSelector');
 const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../mappings');
 
 /**
@@ -59,6 +60,7 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     feature.scale = valuesObject.scale;
   }
 
+  addSelector(feature);
   return feature;
 }
 
