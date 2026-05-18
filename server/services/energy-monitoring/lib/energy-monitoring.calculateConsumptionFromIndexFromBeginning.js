@@ -14,14 +14,19 @@ const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
 /**
- * @description Calculate consumption from index for all 30-minute windows from the beginning of the instance until now.
+ * @description Calculate consumption from index for all 30-minute windows from the beginning.
  * This function finds the oldest device state for energy index devices and processes all 30-minute windows.
+ * @param {Array<string>} featureSelectors - Optional whitelist of consumption feature selectors.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
- * @example
- * calculateConsumptionFromIndexFromBeginning('12345678-1234-1234-1234-1234567890ab');
+ * @example <caption>Recalculate full history</caption>
+ * calculateConsumptionFromIndexFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndexFromBeginning(jobId) {
+async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobId) {
+  const selectors = Array.isArray(featureSelectors)
+    ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+    : [];
+  const selectorSet = new Set(selectors);
   return queueWrapper(this.queue, async () => {
     const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
     logger.info(`Calculating consumption from index from beginning in timezone ${systemTimezone}`);
@@ -40,25 +45,52 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
       const indexFeatures = energyDevice.features.filter(
         (f) => ENERGY_INDEX_FEATURE_TYPES[f.category] && ENERGY_INDEX_FEATURE_TYPES[f.category].includes(f.type),
       );
+      const indexById = new Map(indexFeatures.map((f) => [f.id, f]));
 
-      const consumptionFeatures = energyDevice.features.filter(
-        (f) =>
+      const consumptionFeatures = energyDevice.features.filter((f) => {
+        const isConsumption =
           f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-      );
+          f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION;
+        if (!isConsumption) {
+          return false;
+        }
+        if (selectorSet.size === 0) {
+          return true;
+        }
+        const featureSelector = f.selector || f.external_id || f.id;
+        return selectorSet.has(featureSelector);
+      });
 
-      if (indexFeatures.length > 0 && consumptionFeatures.length > 0) {
+      const matchedPairs = consumptionFeatures
+        .map((consumptionFeature) => ({
+          consumptionFeature,
+          indexFeature: indexById.get(consumptionFeature.energy_parent_id),
+        }))
+        .filter((pair) => !!pair.indexFeature);
+
+      if (matchedPairs.length > 0) {
+        const uniqueIndexFeatures = new Map();
+        const uniqueConsumptionFeatures = new Map();
+        matchedPairs.forEach((pair) => {
+          uniqueIndexFeatures.set(pair.indexFeature.id, pair.indexFeature);
+          uniqueConsumptionFeatures.set(pair.consumptionFeature.id, pair.consumptionFeature);
+        });
         devicesWithBothFeatures.push({
           device: energyDevice,
-          indexFeatures,
+          indexFeatures: Array.from(uniqueIndexFeatures.values()),
+          consumptionFeatures: Array.from(uniqueConsumptionFeatures.values()),
         });
       }
     });
 
-    await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
-      // Reset the last processed timestamp
-      logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
-      await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
+    const shouldRestoreLastProcessedByContext = selectorSet.size > 0;
+    const originalLastProcessedByDeviceId = new Map();
+    devicesWithBothFeatures.forEach(({ device }) => {
+      const params = Array.isArray(device.params) ? device.params : [];
+      const lastProcessedParam = params.find((p) => p.name === ENERGY_INDEX_LAST_PROCESSED);
+      if (lastProcessedParam && lastProcessedParam.value) {
+        originalLastProcessedByDeviceId.set(device.id, lastProcessedParam.value);
+      }
     });
 
     logger.info(
@@ -88,9 +120,7 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
       return null;
     }
 
-    logger.info(`Oldest device state found at: ${oldestStateTime}`);
-
-    // Round the oldest time down to the nearest 30-minute mark
+    // Round the start time down to the nearest 30-minute mark
     const startTime = dayjs(oldestStateTime).tz(systemTimezone);
     const roundedStartTime = startTime
       .minute(startTime.minute() < 30 ? 0 : 30)
@@ -118,39 +148,87 @@ async function calculateConsumptionFromIndexFromBeginning(jobId) {
       currentWindow = currentWindow.add(30, 'minute');
     }
 
-    logger.info(`Generated ${windows.length} thirty-minute windows to process`);
+    logger.info(
+      `Generated ${windows.length} thirty-minute windows to process for ${devicesWithBothFeatures.length} devices`,
+    );
+
+    const deletionStartTime = roundedStartTime.toDate();
+    const consumptionFeaturesToReset = new Map();
+    devicesWithBothFeatures.forEach((deviceWithBothFeatures) => {
+      (deviceWithBothFeatures.consumptionFeatures || []).forEach((feature) => {
+        if (!feature.selector) {
+          return;
+        }
+        consumptionFeaturesToReset.set(feature.selector, feature);
+      });
+    });
+
+    await Promise.each(Array.from(consumptionFeaturesToReset.values()), async (feature) => {
+      const { selector } = feature;
+      await this.gladys.device.destroyStatesFrom(selector, deletionStartTime);
+    });
 
     // Process each window sequentially
     let processedWindows = 0;
     let successfulWindows = 0;
     let failedWindows = 0;
 
-    await Promise.each(windows, async (windowTime) => {
-      try {
-        // Call the existing calculateConsumptionFromIndex function for each window
-        await this.calculateConsumptionFromIndex(windowTime);
-        successfulWindows += 1;
+    const selectorArray = Array.from(selectorSet);
+    try {
+      // Reset the last processed timestamp
+      await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
+        logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
+        await this.gladys.device.destroyParam(deviceWithBothFeatures.device, ENERGY_INDEX_LAST_PROCESSED);
+      });
 
-        // Update job progress
-        processedWindows += 1;
-        const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
+      await Promise.each(windows, async (windowTime) => {
+        try {
+          // Call the existing calculateConsumptionFromIndex function for each window
+          // Avoid double progress updates: outer job manages progress, so inner call runs without jobId
+          await this.calculateConsumptionFromIndex(windowTime, selectorArray, null);
+          successfulWindows += 1;
 
-        logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
-      } catch (error) {
-        failedWindows += 1;
-        logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
+          // Update job progress
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
 
-        // Continue processing other windows even if one fails
-        processedWindows += 1;
-        const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
+          logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
+        } catch (error) {
+          failedWindows += 1;
+          logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
+
+          // Continue processing other windows even if one fails
+          processedWindows += 1;
+          if (jobId) {
+            const progressPercentage = Math.round((processedWindows / windows.length) * 100);
+            await this.gladys.job.updateProgress(jobId, progressPercentage);
+          }
+        }
+      });
+    } finally {
+      const shouldRestoreLastProcessed = shouldRestoreLastProcessedByContext || failedWindows > 0;
+      if (shouldRestoreLastProcessed) {
+        await Promise.each(devicesWithBothFeatures, async ({ device }) => {
+          const originalValue = originalLastProcessedByDeviceId.get(device.id);
+          if (originalValue) {
+            await this.gladys.device.setParam(device, ENERGY_INDEX_LAST_PROCESSED, originalValue);
+          } else {
+            await this.gladys.device.destroyParam(device, ENERGY_INDEX_LAST_PROCESSED);
+          }
+        });
       }
-    });
+    }
 
     logger.info(
       `Finished processing all windows. Successful: ${successfulWindows}, Failed: ${failedWindows}, Total: ${windows.length}`,
     );
+
+    if (jobId) {
+      await this.gladys.job.updateProgress(jobId, 100);
+    }
 
     return null;
   });
