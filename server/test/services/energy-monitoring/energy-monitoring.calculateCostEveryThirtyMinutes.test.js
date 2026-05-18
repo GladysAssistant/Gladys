@@ -1,11 +1,7 @@
-const { fake, assert } = require('sinon');
-const EventEmitter = require('events');
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+const sinon = require('sinon');
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+const { fake, assert } = sinon;
+const EventEmitter = require('events');
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
@@ -37,6 +33,7 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
   let device;
   let energyPrice;
   let gladys;
+
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
@@ -49,6 +46,7 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
+        wrapperDetached: (name, func) => func,
       },
     };
   });
