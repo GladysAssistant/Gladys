@@ -54,7 +54,7 @@ async function update(selector, scene) {
     this.brain.removeNamedEntity('scene', plainScene.selector, oldName);
   }
   // add scene to live store
-  this.addScene(plainScene);
+  await this.addScene(plainScene);
   // return updated scene
   return plainScene;
 }
