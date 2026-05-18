@@ -4,6 +4,7 @@ const { formatDateInUTC } = require('../../utils/date');
 
 /**
  * @description Destroy states between two dates.
+ * If from is after to, no states are deleted (silent no-op).
  * @param {string} selector - Device feature selector.
  * @param {Date} from - The start date (inclusive).
  * @param {Date} to - The end date (inclusive).
