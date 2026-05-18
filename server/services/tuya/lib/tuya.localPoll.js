@@ -177,31 +177,37 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   const hasFeatures = Array.isArray(device.features) && device.features.length > 0;
   const hasDeviceMetadata = Boolean(device.properties || device.thing_model || device.specifications);
   if (!hasFeatures && hasDeviceMetadata) {
-    const rebuiltDevice = convertDevice.call(tuyaManager, {
-      id: deviceId,
-      name: device.name,
-      product_name: device.model,
-      model: device.model,
-      product_id: resolvedProductId,
-      product_key: resolvedProductKey,
-      local_key: resolvedLocalKey,
-      ip: resolvedIp,
-      cloud_ip: resolvedCloudIp,
-      protocol_version: resolvedProtocolVersion,
-      local_override: true,
-      online: device.online,
-      properties: device.properties,
-      thing_model: device.thing_model,
-      specifications: device.specifications || {},
-      category: device.category,
-      tuya_report: device.tuya_report,
-    });
+    try {
+      const rebuiltDevice = convertDevice.call(tuyaManager, {
+        id: deviceId,
+        name: device.name,
+        product_name: device.model,
+        model: device.model,
+        product_id: resolvedProductId,
+        product_key: resolvedProductKey,
+        local_key: resolvedLocalKey,
+        ip: resolvedIp,
+        cloud_ip: resolvedCloudIp,
+        protocol_version: resolvedProtocolVersion,
+        local_override: true,
+        online: device.online,
+        properties: device.properties,
+        thing_model: device.thing_model,
+        specifications: device.specifications || {},
+        category: device.category,
+        tuya_report: device.tuya_report,
+      });
 
-    if (Array.isArray(rebuiltDevice.features) && rebuiltDevice.features.length > 0) {
-      device = {
-        ...device,
-        ...rebuiltDevice,
-      };
+      if (Array.isArray(rebuiltDevice.features) && rebuiltDevice.features.length > 0) {
+        device = {
+          ...device,
+          ...rebuiltDevice,
+        };
+      }
+    } catch (err) {
+      // Keep the existing device when convertDevice throws on malformed metadata,
+      // so the local-poll update still succeeds with the partial data we already have.
+      logger.warn(`[Tuya][localPoll] convertDevice rebuild failed for device=${deviceId}`, err);
     }
   }
 

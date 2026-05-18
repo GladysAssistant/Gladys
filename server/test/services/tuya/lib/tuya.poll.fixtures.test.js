@@ -24,12 +24,20 @@ const getFeatureCode = (feature) => {
     .pop();
 };
 
-const forceCloudMode = (device) => ({
-  ...device,
-  params: (Array.isArray(device.params) ? device.params : []).map((param) =>
-    param.name === 'LOCAL_OVERRIDE' ? { ...param, value: false } : param,
-  ),
-});
+const forceCloudMode = (device) => {
+  const params = Array.isArray(device.params) ? [...device.params] : [];
+  const existingIndex = params.findIndex((param) => param && param.name === 'LOCAL_OVERRIDE');
+  if (existingIndex >= 0) {
+    params[existingIndex] = { ...params[existingIndex], value: false };
+  } else {
+    params.push({ name: 'LOCAL_OVERRIDE', value: false });
+  }
+  return {
+    ...device,
+    local_override: false,
+    params,
+  };
+};
 
 describe('TuyaHandler.poll fixtures', () => {
   const cloudCases = loadFixtureCases('pollCloud');
