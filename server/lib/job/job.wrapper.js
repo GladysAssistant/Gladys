@@ -3,15 +3,47 @@ const logger = require('../../utils/logger');
 
 /**
  * @public
- * @description Start a job.
+ * @description Wrap a function so the surrounding code starts/finishes a job around its execution.
  * @param {string} type - Type of the job.
  * @param {Function} func - The function to wrap.
- * @returns {Function} Return function.
+ * @param {object} [options] - Wrapper options.
+ * @param {boolean} [options.detached=false] - When false (default), the wrapper awaits
+ *   `func` and re-throws any error to the caller (legacy behavior). When true, the wrapper
+ *   starts the job, returns it immediately, and runs `func` in the background; errors are
+ *   reported on the job (status=FAILED) and never re-thrown to the caller.
+ * @returns {Function} Wrapped function.
  * @example
  * gladys.job.wrapper('daily-aggregation', func);
+ * gladys.job.wrapper('long-running-recalc', func, { detached: true });
  */
-function wrapper(type, func) {
+function wrapper(type, func, { detached = false } = {}) {
   return async (...args) => {
+    if (detached) {
+      // Fire-and-forget: start the job, run func in background, never throw to the caller.
+      const job = await this.start(type);
+      (async () => {
+        try {
+          await func(...args, job.id);
+          await this.finish(job.id, JOB_STATUS.SUCCESS);
+        } catch (error) {
+          const data = {
+            ...(job.data || {}),
+            error_type: JOB_ERROR_TYPES.UNKNOWN_ERROR,
+          };
+          if (error && error.toString) {
+            data.error = error.toString();
+          }
+          try {
+            await this.finish(job.id, JOB_STATUS.FAILED, data);
+          } catch (finishError) {
+            logger.error(`job.wrapper: failed to finish job ${type}`, finishError);
+          }
+        }
+      })();
+      return job;
+    }
+
+    // Legacy synchronous mode (behavior strictly preserved).
     let job;
     try {
       job = await this.start(type);
@@ -33,46 +65,6 @@ function wrapper(type, func) {
   };
 }
 
-/**
- * @public
- * @description Start a job and run it in background without awaiting completion.
- * @param {string} type - Type of the job.
- * @param {Function} func - The function to wrap.
- * @returns {Function} Return function that resolves when job is started.
- * @example
- * gladys.job.wrapperDetached('daily-aggregation', func);
- */
-function wrapperDetached(type, func) {
-  return async (...args) => {
-    const job = await this.start(type);
-
-    const runJob = async () => {
-      try {
-        await func(...args, job.id);
-        await this.finish(job.id, JOB_STATUS.SUCCESS);
-      } catch (error) {
-        const data = {
-          ...(job.data || {}),
-          error_type: JOB_ERROR_TYPES.UNKNOWN_ERROR,
-        };
-        if (error && error.toString) {
-          data.error = error.toString();
-        }
-        try {
-          await this.finish(job.id, JOB_STATUS.FAILED, data);
-        } catch (finishError) {
-          logger.error(`job.wrapperDetached: failed to finish job ${type}`, finishError);
-        }
-      }
-    };
-
-    runJob();
-
-    return job;
-  };
-}
-
 module.exports = {
   wrapper,
-  wrapperDetached,
 };

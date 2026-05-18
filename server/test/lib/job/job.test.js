@@ -172,7 +172,7 @@ describe('Job', () => {
       expect(lastJob).to.have.property('status', JOB_STATUS.FAILED);
     });
   });
-  describe('job.wrapperDetached', () => {
+  describe('job.wrapper with { detached: true }', () => {
     const job = new Job(event);
     const sleep = (ms) =>
       new Promise((resolve) => {
@@ -191,8 +191,8 @@ describe('Job', () => {
       return waitForStatus(jobId, status, startedAt);
     };
 
-    it('should run wrapperDetached', async () => {
-      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {});
+    it('should run detached wrapper', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {}, { detached: true });
       const startedJob = await wrapped();
       expect(startedJob).to.have.property('id');
 
@@ -200,10 +200,14 @@ describe('Job', () => {
       expect(finishedJob).to.have.property('status', JOB_STATUS.SUCCESS);
     });
 
-    it('should run wrapperDetached with failed job', async () => {
-      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
-        throw new Error('failed');
-      });
+    it('should run detached wrapper with failed job', async () => {
+      const wrapped = job.wrapper(
+        JOB_TYPES.GLADYS_GATEWAY_BACKUP,
+        () => {
+          throw new Error('failed');
+        },
+        { detached: true },
+      );
       const startedJob = await wrapped();
       expect(startedJob).to.have.property('id');
 
@@ -212,18 +216,22 @@ describe('Job', () => {
       expect(finishedJob.data.error).to.include('failed');
     });
 
-    it('should log finish error when job.finish fails in wrapperDetached', async () => {
+    it('should log finish error when job.finish fails in detached mode', async () => {
       const finishStub = sandbox.stub(job, 'finish').rejects(new Error('finish-fail'));
       const loggerErrorStub = sandbox.stub(logger, 'error');
-      const wrapped = job.wrapperDetached(JOB_TYPES.GLADYS_GATEWAY_BACKUP, () => {
-        throw new Error('boom');
-      });
+      const wrapped = job.wrapper(
+        JOB_TYPES.GLADYS_GATEWAY_BACKUP,
+        () => {
+          throw new Error('boom');
+        },
+        { detached: true },
+      );
       const startedJob = await wrapped();
       // Even if finish fails, we should still get a job object back
       expect(startedJob).to.have.property('id');
       await sleep(50);
       expect(loggerErrorStub.called).to.equal(true);
-      expect(loggerErrorStub.firstCall.args[0]).to.include('job.wrapperDetached');
+      expect(loggerErrorStub.firstCall.args[0]).to.include('job.wrapper');
       finishStub.restore();
     });
   });
