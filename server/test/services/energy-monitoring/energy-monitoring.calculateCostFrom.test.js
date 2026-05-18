@@ -71,7 +71,6 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       job: {
         updateProgress: sinon.fake.returns(null),
         wrapper: (name, func) => func,
-        wrapperDetached: (name, func) => func,
       },
     };
     // We create a new electrical meter device

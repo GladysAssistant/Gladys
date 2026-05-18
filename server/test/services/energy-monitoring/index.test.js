@@ -25,7 +25,6 @@ describe('EnergyMonitoring Service', () => {
       job: {
         updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
-        wrapperDetached: (name, func) => func,
       },
     };
 

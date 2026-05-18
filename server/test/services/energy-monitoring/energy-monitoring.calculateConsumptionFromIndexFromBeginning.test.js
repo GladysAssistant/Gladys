@@ -67,7 +67,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       job: {
         updateProgress: stub().returns(null),
         wrapper: (name, func) => func,
-        wrapperDetached: (name, func) => func,
       },
     };
 
@@ -376,7 +375,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
       const getStub = stub(gladys.device, 'get').returns([customDevice]);
       const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
-      const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
 
       const calls = [];
       const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(
@@ -390,7 +388,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
       calcStub.restore();
       destroyFromStub.restore();
-      destroyBetweenStub.restore();
       getStub.restore();
 
       expect(calls.length).to.be.greaterThan(0);
@@ -630,18 +627,16 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
       { oldest_created_at: '2023-10-03T10:00:00.000Z' },
     ]);
-    const destroyBetweenStub = stub(gladys.device, 'destroyStatesBetween').resolves();
     const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
     const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
     clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
     await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-mixed');
     // calc called for windows
     expect(calcStub.called).to.equal(true);
-    // destroyStatesBetween should not throw even with missing selector feature
-    expect(destroyBetweenStub.called || destroyFromStub.called).to.equal(true);
+    // destroyStatesFrom is called with the consumption feature selector when it has a selector
+    expect(destroyFromStub.called).to.equal(true);
     calcStub.restore();
     destroyFromStub.restore();
-    destroyBetweenStub.restore();
     oldestStub.restore();
     getStub.restore();
   });

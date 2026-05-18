@@ -35,7 +35,6 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
       device,
       job: {
         wrapper: (name, func) => func,
-        wrapperDetached: (name, func) => func,
         updateProgress: sinon.fake.resolves(null),
       },
     };
