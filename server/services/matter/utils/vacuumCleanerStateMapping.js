@@ -40,6 +40,23 @@ const MATTER_RVC_CLEAN_MODE = {
 };
 
 /**
+ * Matter Common ModeTag values (shared across mode clusters, from Matter specification).
+ * Range: 0x0000-0x3FFF.
+ */
+const MATTER_COMMON_MODE_TAG = {
+  AUTO: 0,
+  QUICK: 1,
+  QUIET: 2,
+  LOW_NOISE: 3,
+  LOW_ENERGY: 4,
+  VACATION: 5,
+  MIN: 6,
+  MAX: 7,
+  NIGHT: 8,
+  DAY: 9,
+};
+
+/**
  * Matter RvcRunMode ModeTag values (from Matter specification).
  * These are used in the modeTags array of supportedModes to identify mode types.
  */
@@ -60,44 +77,97 @@ const MATTER_RVC_CLEAN_MODE_TAG = {
 };
 
 /**
- * @description Find the Matter mode value for a given Gladys mode using supportedModes.
- * @param {Array} supportedModes - The supportedModes array from the cluster.
- * @param {number} targetModeTag - The ModeTag to search for.
- * @returns {number|null} The Matter mode value, or null if not found.
+ * @description Compute a score representing how well a mode's modeTags match a preference.
+ * Returns 0 if there is no match (no primary tag present, or an exclude tag present).
+ * Higher score = better match.
+ * @param {Array} modeTags - The modeTags array of a Matter mode.
+ * @param {object} preference - The preference object with primaryTags, excludeTags, preferTags arrays.
+ * @returns {number} The match score (0 = no match).
  * @example
- * const matterMode = findMatterModeByTag(supportedModes, 16384); // Returns mode value for Idle tag
+ * const score = scoreModeMatch([{ value: 16385 }, { value: 0 }], { primaryTags: [16385], excludeTags: [16386], preferTags: [0] });
  */
-function findMatterModeByTag(supportedModes, targetModeTag) {
-  if (!supportedModes || !Array.isArray(supportedModes)) {
-    return null;
+function scoreModeMatch(modeTags, preference) {
+  if (!modeTags || !Array.isArray(modeTags)) {
+    return 0;
   }
-  const foundMode = supportedModes.find(
-    (mode) => mode.modeTags && Array.isArray(mode.modeTags) && mode.modeTags.some((tag) => tag.value === targetModeTag),
-  );
-  return foundMode ? foundMode.mode : null;
+  const tagValues = modeTags.map((t) => t.value);
+  // Must have at least one primary tag
+  const hasPrimary = preference.primaryTags.some((t) => tagValues.includes(t));
+  if (!hasPrimary) {
+    return 0;
+  }
+  // Must not have any exclude tag
+  const hasExclude = preference.excludeTags.some((t) => tagValues.includes(t));
+  if (hasExclude) {
+    return 0;
+  }
+  // Specificity bonus: type-based preferences (manufacturer-specific tags >= 16384) are more
+  // discriminative than intensity-based ones. This ensures e.g. mode "Vacuum: Quiet" maps to
+  // Gladys VACUUM rather than QUIET when both could match.
+  const specificityBonus = preference.primaryTags.every((t) => t >= 16384) ? 50 : 0;
+  // Base score + bonus for each preferred tag present
+  const preferBonus = preference.preferTags.filter((t) => tagValues.includes(t)).length * 10;
+  return 100 + specificityBonus + preferBonus;
 }
 
 /**
- * @description Find the Gladys mode for a given Matter mode value using supportedModes.
+ * @description Find the best Matter mode value matching a Gladys mode using preferences.
  * @param {Array} supportedModes - The supportedModes array from the cluster.
- * @param {number} matterModeValue - The Matter mode value to convert.
- * @param {object} modeTagMapping - Mapping of ModeTag values to Gladys mode values.
- * @returns {number|null} The Gladys mode value, or null if not found.
+ * @param {number} gladysMode - The Gladys mode value to convert.
+ * @param {Array} preferences - Array of preference objects (one per Gladys mode).
+ * @returns {number|null} The best matching Matter mode value, or null if no match found.
  * @example
- * const gladysMode = findGladysModeByMatterValue(supportedModes, 1, tagMapping); // Returns Gladys mode
+ * const matterMode = findMatterModeForGladys(supportedModes, VACUUM_CLEANER_CLEAN_MODE.MOP, GLADYS_CLEAN_MODE_PREFERENCES);
  */
-function findGladysModeByMatterValue(supportedModes, matterModeValue, modeTagMapping) {
+function findMatterModeForGladys(supportedModes, gladysMode, preferences) {
   if (!supportedModes || !Array.isArray(supportedModes)) {
     return null;
   }
-  const matchingMode = supportedModes.find(
-    (mode) => mode.mode === matterModeValue && mode.modeTags && Array.isArray(mode.modeTags),
-  );
-  if (!matchingMode) {
+  const preference = preferences.find((p) => p.gladys === gladysMode);
+  if (!preference) {
     return null;
   }
-  const matchingTag = matchingMode.modeTags.find((tag) => modeTagMapping[tag.value] !== undefined);
-  return matchingTag ? modeTagMapping[matchingTag.value] : null;
+  let bestMode = null;
+  let bestScore = 0;
+  supportedModes.forEach((mode) => {
+    const score = scoreModeMatch(mode.modeTags, preference);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMode = mode.mode;
+    }
+  });
+  return bestMode;
+}
+
+/**
+ * @description Find the best Gladys mode for a given Matter mode using preferences.
+ * Preferences are tried in order (most specific first); ties are broken by preference order.
+ * @param {Array} supportedModes - The supportedModes array from the cluster.
+ * @param {number} matterModeValue - The Matter mode value to convert.
+ * @param {Array} preferences - Array of preference objects (one per Gladys mode), most specific first.
+ * @returns {number|null} The best matching Gladys mode value, or null if no match found.
+ * @example
+ * const gladysMode = findGladysModeForMatter(supportedModes, 5, GLADYS_CLEAN_MODE_PREFERENCES);
+ */
+function findGladysModeForMatter(supportedModes, matterModeValue, preferences) {
+  if (!supportedModes || !Array.isArray(supportedModes)) {
+    return null;
+  }
+  const matchingMode = supportedModes.find((m) => m.mode === matterModeValue);
+  if (!matchingMode || !matchingMode.modeTags) {
+    return null;
+  }
+  let bestGladys = null;
+  let bestScore = 0;
+  // Iterate in order: tiebreaker favors earlier (more specific) preferences
+  preferences.forEach((preference) => {
+    const score = scoreModeMatch(matchingMode.modeTags, preference);
+    if (score > bestScore) {
+      bestScore = score;
+      bestGladys = preference.gladys;
+    }
+  });
+  return bestGladys;
 }
 
 /**
@@ -157,13 +227,30 @@ function convertGladysOperationalStateToMatter(gladysState) {
 }
 
 /**
- * Mapping of RvcRunMode ModeTag values to Gladys VACUUM_CLEANER_MODE values.
+ * Preferences for converting between Gladys VACUUM_CLEANER_MODE and Matter RvcRunMode.
+ * Order matters: most specific preferences first (used as tiebreaker).
+ * Each entry describes how to find the best Matter mode for a Gladys mode and vice versa.
  */
-const RVC_RUN_MODE_TAG_TO_GLADYS = {
-  [MATTER_RVC_RUN_MODE_TAG.IDLE]: VACUUM_CLEANER_MODE.IDLE,
-  [MATTER_RVC_RUN_MODE_TAG.CLEANING]: VACUUM_CLEANER_MODE.CLEANING,
-  [MATTER_RVC_RUN_MODE_TAG.MAPPING]: VACUUM_CLEANER_MODE.MAPPING,
-};
+const GLADYS_RUN_MODE_PREFERENCES = [
+  {
+    gladys: VACUUM_CLEANER_MODE.IDLE,
+    primaryTags: [MATTER_RVC_RUN_MODE_TAG.IDLE],
+    excludeTags: [],
+    preferTags: [],
+  },
+  {
+    gladys: VACUUM_CLEANER_MODE.CLEANING,
+    primaryTags: [MATTER_RVC_RUN_MODE_TAG.CLEANING],
+    excludeTags: [],
+    preferTags: [],
+  },
+  {
+    gladys: VACUUM_CLEANER_MODE.MAPPING,
+    primaryTags: [MATTER_RVC_RUN_MODE_TAG.MAPPING],
+    excludeTags: [],
+    preferTags: [],
+  },
+];
 
 /**
  * @description Convert Matter RvcRunMode to Gladys vacuum cleaner mode.
@@ -177,10 +264,10 @@ const RVC_RUN_MODE_TAG_TO_GLADYS = {
 function convertMatterRunModeToGladys(matterMode, supportedModesData = null) {
   // Try dynamic mapping using supportedModes
   if (supportedModesData && supportedModesData.supportedModes) {
-    const gladysMode = findGladysModeByMatterValue(
+    const gladysMode = findGladysModeForMatter(
       supportedModesData.supportedModes,
       matterMode,
-      RVC_RUN_MODE_TAG_TO_GLADYS,
+      GLADYS_RUN_MODE_PREFERENCES,
     );
     if (gladysMode !== null) {
       return gladysMode;
@@ -202,15 +289,6 @@ function convertMatterRunModeToGladys(matterMode, supportedModesData = null) {
 }
 
 /**
- * Mapping of Gladys VACUUM_CLEANER_MODE values to RvcRunMode ModeTag values.
- */
-const GLADYS_TO_RVC_RUN_MODE_TAG = {
-  [VACUUM_CLEANER_MODE.IDLE]: MATTER_RVC_RUN_MODE_TAG.IDLE,
-  [VACUUM_CLEANER_MODE.CLEANING]: MATTER_RVC_RUN_MODE_TAG.CLEANING,
-  [VACUUM_CLEANER_MODE.MAPPING]: MATTER_RVC_RUN_MODE_TAG.MAPPING,
-};
-
-/**
  * @description Convert Gladys vacuum cleaner mode to Matter RvcRunMode.
  * Uses dynamic supportedModes if available, otherwise falls back to static mapping.
  * @param {number} gladysMode - The Gladys vacuum cleaner mode.
@@ -222,13 +300,14 @@ const GLADYS_TO_RVC_RUN_MODE_TAG = {
 function convertGladysRunModeToMatter(gladysMode, supportedModesData = null) {
   // Try dynamic mapping using supportedModes
   if (supportedModesData && supportedModesData.supportedModes) {
-    const targetModeTag = GLADYS_TO_RVC_RUN_MODE_TAG[gladysMode];
-    if (targetModeTag !== undefined) {
-      const matterMode = findMatterModeByTag(supportedModesData.supportedModes, targetModeTag);
-      if (matterMode !== null) {
-        logger.debug(`Matter: Converted Gladys mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`);
-        return matterMode;
-      }
+    const matterMode = findMatterModeForGladys(
+      supportedModesData.supportedModes,
+      gladysMode,
+      GLADYS_RUN_MODE_PREFERENCES,
+    );
+    if (matterMode !== null) {
+      logger.debug(`Matter: Converted Gladys mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`);
+      return matterMode;
     }
     logger.debug(`Matter: No supportedModes mapping found for Gladys mode ${gladysMode}, using fallback`);
   }
@@ -247,22 +326,63 @@ function convertGladysRunModeToMatter(gladysMode, supportedModesData = null) {
 }
 
 /**
- * Mapping of RvcCleanMode ModeTag values to Gladys VACUUM_CLEANER_CLEAN_MODE values.
+ * Preferences for converting between Gladys VACUUM_CLEANER_CLEAN_MODE and Matter RvcCleanMode.
+ * Order matters: most specific preferences first (type-based modes before intensity-based modes).
+ * For Matter→Gladys, the first matching preference wins ties.
+ * For Gladys→Matter, the highest score wins (more preferTags = more specific match).
+ *
+ * Type-based modes (DEEP_CLEAN, VACUUM, MOP) target manufacturer-specific tags 16384-16386.
+ * Intensity-based modes (AUTO, QUICK, QUIET, LOW_NOISE) target Common ModeTags 0-4 and prefer
+ * dual-purpose modes (Vacuum & Mop) when available.
  */
-const RVC_CLEAN_MODE_TAG_TO_GLADYS = {
-  [MATTER_RVC_CLEAN_MODE_TAG.DEEP_CLEAN]: VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
-  [MATTER_RVC_CLEAN_MODE_TAG.VACUUM]: VACUUM_CLEANER_CLEAN_MODE.VACUUM,
-  [MATTER_RVC_CLEAN_MODE_TAG.MOP]: VACUUM_CLEANER_CLEAN_MODE.MOP,
-};
-
-/**
- * Mapping of Gladys VACUUM_CLEANER_CLEAN_MODE values to RvcCleanMode ModeTag values.
- */
-const GLADYS_TO_RVC_CLEAN_MODE_TAG = {
-  [VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN]: MATTER_RVC_CLEAN_MODE_TAG.DEEP_CLEAN,
-  [VACUUM_CLEANER_CLEAN_MODE.VACUUM]: MATTER_RVC_CLEAN_MODE_TAG.VACUUM,
-  [VACUUM_CLEANER_CLEAN_MODE.MOP]: MATTER_RVC_CLEAN_MODE_TAG.MOP,
-};
+const GLADYS_CLEAN_MODE_PREFERENCES = [
+  // Type-based: most specific first (so they win ties for Matter→Gladys)
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+    primaryTags: [MATTER_RVC_CLEAN_MODE_TAG.DEEP_CLEAN],
+    excludeTags: [],
+    preferTags: [],
+  },
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+    primaryTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM],
+    excludeTags: [MATTER_RVC_CLEAN_MODE_TAG.MOP],
+    preferTags: [MATTER_COMMON_MODE_TAG.AUTO],
+  },
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.MOP,
+    primaryTags: [MATTER_RVC_CLEAN_MODE_TAG.MOP],
+    excludeTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM],
+    preferTags: [MATTER_COMMON_MODE_TAG.AUTO],
+  },
+  // Intensity-based: prefer dual-purpose (Vacuum & Mop) modes
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.AUTO,
+    primaryTags: [MATTER_COMMON_MODE_TAG.AUTO],
+    excludeTags: [],
+    preferTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM, MATTER_RVC_CLEAN_MODE_TAG.MOP],
+  },
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.QUICK,
+    primaryTags: [MATTER_COMMON_MODE_TAG.QUICK],
+    excludeTags: [],
+    preferTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM, MATTER_RVC_CLEAN_MODE_TAG.MOP],
+  },
+  {
+    gladys: VACUUM_CLEANER_CLEAN_MODE.QUIET,
+    primaryTags: [MATTER_COMMON_MODE_TAG.QUIET],
+    excludeTags: [],
+    preferTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM, MATTER_RVC_CLEAN_MODE_TAG.MOP],
+  },
+  {
+    // Gladys LOW_NOISE accepts both Matter LowNoise (3) and LowEnergy (4) tags,
+    // since Roborock and similar manufacturers use LowEnergy for energy-saving modes.
+    gladys: VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE,
+    primaryTags: [MATTER_COMMON_MODE_TAG.LOW_NOISE, MATTER_COMMON_MODE_TAG.LOW_ENERGY],
+    excludeTags: [],
+    preferTags: [MATTER_RVC_CLEAN_MODE_TAG.VACUUM, MATTER_RVC_CLEAN_MODE_TAG.MOP],
+  },
+];
 
 /**
  * @description Convert Matter RvcCleanMode to Gladys vacuum cleaner clean mode.
@@ -276,10 +396,10 @@ const GLADYS_TO_RVC_CLEAN_MODE_TAG = {
 function convertMatterCleanModeToGladys(matterMode, supportedModesData = null) {
   // Try dynamic mapping using supportedModes
   if (supportedModesData && supportedModesData.supportedModes) {
-    const gladysMode = findGladysModeByMatterValue(
+    const gladysMode = findGladysModeForMatter(
       supportedModesData.supportedModes,
       matterMode,
-      RVC_CLEAN_MODE_TAG_TO_GLADYS,
+      GLADYS_CLEAN_MODE_PREFERENCES,
     );
     if (gladysMode !== null) {
       return gladysMode;
@@ -321,15 +441,16 @@ function convertMatterCleanModeToGladys(matterMode, supportedModesData = null) {
 function convertGladysCleanModeToMatter(gladysMode, supportedModesData = null) {
   // Try dynamic mapping using supportedModes
   if (supportedModesData && supportedModesData.supportedModes) {
-    const targetModeTag = GLADYS_TO_RVC_CLEAN_MODE_TAG[gladysMode];
-    if (targetModeTag !== undefined) {
-      const matterMode = findMatterModeByTag(supportedModesData.supportedModes, targetModeTag);
-      if (matterMode !== null) {
-        logger.debug(
-          `Matter: Converted Gladys clean mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`,
-        );
-        return matterMode;
-      }
+    const matterMode = findMatterModeForGladys(
+      supportedModesData.supportedModes,
+      gladysMode,
+      GLADYS_CLEAN_MODE_PREFERENCES,
+    );
+    if (matterMode !== null) {
+      logger.debug(
+        `Matter: Converted Gladys clean mode ${gladysMode} to Matter mode ${matterMode} using supportedModes`,
+      );
+      return matterMode;
     }
     logger.debug(`Matter: No supportedModes mapping found for Gladys clean mode ${gladysMode}, using fallback`);
   }

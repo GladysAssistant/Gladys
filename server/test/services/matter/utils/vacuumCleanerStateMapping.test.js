@@ -351,6 +351,207 @@ describe('Matter.vacuumCleanerStateMapping', () => {
           MATTER_RVC_CLEAN_MODE.AUTO,
         );
       });
+
+      it('should ignore modes with missing modeTags during scoring (Gladys to Matter)', () => {
+        // One mode has no modeTags array, scoreModeMatch should return 0 for it
+        const data = {
+          clusterType: 'RvcCleanMode',
+          supportedModes: [
+            { mode: 1, label: 'Broken' }, // missing modeTags
+            { mode: 2, label: 'Vacuum', modeTags: [{ value: 16385 }] },
+          ],
+        };
+        expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, data)).to.equal(2);
+      });
+
+      it('should return null and fallback when no preference exists for the Gladys mode', () => {
+        // Gladys mode 99 has no entry in GLADYS_CLEAN_MODE_PREFERENCES
+        const data = {
+          clusterType: 'RvcCleanMode',
+          supportedModes: [{ mode: 1, label: 'Vacuum', modeTags: [{ value: 16385 }] }],
+        };
+        // Should fallback to static mapping which returns 99 as-is
+        expect(convertGladysCleanModeToMatter(99, data)).to.equal(99);
+      });
+    });
+
+    describe('real-world Roborock RvcCleanMode mapping', () => {
+      // Real supportedModes returned by Matterbridge Roborock plugin
+      const roborockRealSupportedModes = {
+        clusterType: 'RvcCleanMode',
+        supportedModes: [
+          { label: 'Vacuum & Mop: Default', mode: 5, modeTags: [{ value: 16386 }, { value: 16385 }, { value: 0 }] },
+          { label: 'Vacuum & Mop: Quick', mode: 6, modeTags: [{ value: 16386 }, { value: 16385 }, { value: 1 }] },
+          { label: 'Vacuum & Mop: Max', mode: 7, modeTags: [{ value: 16386 }, { value: 16385 }, { value: 7 }] },
+          { label: 'Vacuum & Mop: Min', mode: 8, modeTags: [{ value: 16386 }, { value: 16385 }, { value: 6 }] },
+          { label: 'Vacuum & Mop: Quiet', mode: 9, modeTags: [{ value: 16386 }, { value: 16385 }, { value: 2 }] },
+          {
+            label: 'Vacuum & Mop: Energy Saving',
+            mode: 10,
+            modeTags: [{ value: 16386 }, { value: 16385 }, { value: 4 }],
+          },
+          { label: 'Mop: Default', mode: 31, modeTags: [{ value: 16386 }, { value: 0 }] },
+          { label: 'Mop: Max', mode: 32, modeTags: [{ value: 16386 }, { value: 7 }] },
+          { label: 'Mop: Min', mode: 33, modeTags: [{ value: 16386 }, { value: 6 }] },
+          { label: 'Mop: Quick', mode: 34, modeTags: [{ value: 16386 }, { value: 1 }] },
+          { label: 'Mop: Deep', mode: 35, modeTags: [{ value: 16386 }, { value: 16384 }] },
+          { label: 'Vacuum: Default', mode: 66, modeTags: [{ value: 16385 }, { value: 0 }] },
+          { label: 'Vacuum: Max', mode: 67, modeTags: [{ value: 16385 }, { value: 7 }] },
+          { label: 'Vacuum: Quiet', mode: 68, modeTags: [{ value: 16385 }, { value: 2 }] },
+          { label: 'Vacuum: Quick', mode: 69, modeTags: [{ value: 16385 }, { value: 1 }] },
+        ],
+      };
+
+      describe('Gladys → Matter (setValue)', () => {
+        it('should map Gladys VACUUM to mode 66 (Vacuum: Default)', () => {
+          expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, roborockRealSupportedModes)).to.equal(
+            66,
+          );
+        });
+
+        it('should map Gladys MOP to mode 31 (Mop: Default)', () => {
+          expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.MOP, roborockRealSupportedModes)).to.equal(
+            31,
+          );
+        });
+
+        it('should map Gladys DEEP_CLEAN to mode 35 (Mop: Deep)', () => {
+          expect(
+            convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN, roborockRealSupportedModes),
+          ).to.equal(35);
+        });
+
+        it('should map Gladys AUTO to mode 5 (Vacuum & Mop: Default)', () => {
+          expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO, roborockRealSupportedModes)).to.equal(
+            5,
+          );
+        });
+
+        it('should map Gladys QUICK to mode 6 (Vacuum & Mop: Quick)', () => {
+          expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUICK, roborockRealSupportedModes)).to.equal(
+            6,
+          );
+        });
+
+        it('should map Gladys QUIET to mode 9 (Vacuum & Mop: Quiet)', () => {
+          expect(convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUIET, roborockRealSupportedModes)).to.equal(
+            9,
+          );
+        });
+
+        it('should map Gladys LOW_NOISE to mode 10 (Vacuum & Mop: Energy Saving)', () => {
+          expect(
+            convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE, roborockRealSupportedModes),
+          ).to.equal(10);
+        });
+      });
+
+      describe('Matter → Gladys (state change)', () => {
+        it('should map mode 5 (Vacuum & Mop: Default) to Gladys AUTO (intensity wins for dual-purpose mode)', () => {
+          expect(convertMatterCleanModeToGladys(5, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.AUTO,
+          );
+        });
+
+        it('should map mode 6 (Vacuum & Mop: Quick) to Gladys QUICK', () => {
+          expect(convertMatterCleanModeToGladys(6, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.QUICK,
+          );
+        });
+
+        it('should map mode 9 (Vacuum & Mop: Quiet) to Gladys QUIET', () => {
+          expect(convertMatterCleanModeToGladys(9, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.QUIET,
+          );
+        });
+
+        it('should map mode 10 (Vacuum & Mop: Energy Saving) to Gladys LOW_NOISE', () => {
+          expect(convertMatterCleanModeToGladys(10, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE,
+          );
+        });
+
+        it('should map mode 31 (Mop: Default) to Gladys MOP (type wins over intensity)', () => {
+          expect(convertMatterCleanModeToGladys(31, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.MOP,
+          );
+        });
+
+        it('should map mode 35 (Mop: Deep) to Gladys DEEP_CLEAN (most specific tag wins)', () => {
+          expect(convertMatterCleanModeToGladys(35, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+          );
+        });
+
+        it('should map mode 66 (Vacuum: Default) to Gladys VACUUM (type wins over intensity)', () => {
+          expect(convertMatterCleanModeToGladys(66, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+          );
+        });
+
+        it('should map mode 68 (Vacuum: Quiet) to Gladys VACUUM (type wins)', () => {
+          expect(convertMatterCleanModeToGladys(68, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+          );
+        });
+      });
+
+      describe('roundtrip Gladys → Matter → Gladys', () => {
+        it('should preserve VACUUM through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.VACUUM, roborockRealSupportedModes);
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.VACUUM,
+          );
+        });
+
+        it('should preserve MOP through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.MOP, roborockRealSupportedModes);
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.MOP,
+          );
+        });
+
+        it('should preserve DEEP_CLEAN through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(
+            VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+            roborockRealSupportedModes,
+          );
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.DEEP_CLEAN,
+          );
+        });
+
+        it('should preserve AUTO through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.AUTO, roborockRealSupportedModes);
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.AUTO,
+          );
+        });
+
+        it('should preserve QUICK through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUICK, roborockRealSupportedModes);
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.QUICK,
+          );
+        });
+
+        it('should preserve QUIET through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(VACUUM_CLEANER_CLEAN_MODE.QUIET, roborockRealSupportedModes);
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.QUIET,
+          );
+        });
+
+        it('should preserve LOW_NOISE through roundtrip', () => {
+          const matter = convertGladysCleanModeToMatter(
+            VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE,
+            roborockRealSupportedModes,
+          );
+          expect(convertMatterCleanModeToGladys(matter, roborockRealSupportedModes)).to.equal(
+            VACUUM_CLEANER_CLEAN_MODE.LOW_NOISE,
+          );
+        });
+      });
     });
   });
 });
