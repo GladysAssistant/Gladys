@@ -715,7 +715,6 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(costStates).to.have.lengthOf(0);
   });
 
-
   it('should skip a state when no energy price matches its date', async () => {
     // Insert consumption states but do NOT create any energy price.
     // This forces energyPricesForDate to be empty inside the per-state loop.
