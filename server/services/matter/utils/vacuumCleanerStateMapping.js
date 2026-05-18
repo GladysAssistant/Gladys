@@ -84,7 +84,7 @@ const MATTER_RVC_CLEAN_MODE_TAG = {
  * @param {object} preference - The preference object with primaryTags, excludeTags, preferTags arrays.
  * @returns {number} The match score (0 = no match).
  * @example
- * const score = scoreModeMatch([{ value: 16385 }, { value: 0 }], { primaryTags: [16385], excludeTags: [16386], preferTags: [0] });
+ * const score = scoreModeMatch([{ value: 16385 }], { primaryTags: [16385], excludeTags: [], preferTags: [] });
  */
 function scoreModeMatch(modeTags, preference) {
   if (!modeTags || !Array.isArray(modeTags)) {
@@ -117,7 +117,7 @@ function scoreModeMatch(modeTags, preference) {
  * @param {Array} preferences - Array of preference objects (one per Gladys mode).
  * @returns {number|null} The best matching Matter mode value, or null if no match found.
  * @example
- * const matterMode = findMatterModeForGladys(supportedModes, VACUUM_CLEANER_CLEAN_MODE.MOP, GLADYS_CLEAN_MODE_PREFERENCES);
+ * const matterMode = findMatterModeForGladys(supportedModes, gladysMode, preferences);
  */
 function findMatterModeForGladys(supportedModes, gladysMode, preferences) {
   if (!supportedModes || !Array.isArray(supportedModes)) {
