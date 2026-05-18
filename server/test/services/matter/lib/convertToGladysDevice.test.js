@@ -81,17 +81,17 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should create vacuum cleaner features for RvcOperationalState cluster', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(RvcOperationalState.Complete.id, {
+    const clusterClient = {
       id: RvcOperationalState.Complete.id,
       name: 'RvcOperationalState',
       endpointId: 2,
-    });
+    };
 
     const device = {
       name: 'Robot Vacuum',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:2');
@@ -122,17 +122,17 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should create vacuum cleaner run mode feature for RvcRunMode cluster', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(RvcRunMode.Complete.id, {
+    const clusterClient = {
       id: RvcRunMode.Complete.id,
       name: 'RvcRunMode',
       endpointId: 2,
-    });
+    };
 
     const device = {
       name: 'Robot Vacuum',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
@@ -152,17 +152,17 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should create vacuum cleaner clean mode feature for RvcCleanMode cluster', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(RvcCleanMode.Complete.id, {
+    const clusterClient = {
       id: RvcCleanMode.Complete.id,
       name: 'RvcCleanMode',
       endpointId: 2,
-    });
+    };
 
     const device = {
       name: 'Robot Vacuum',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
@@ -182,20 +182,20 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should create battery feature for PowerSource cluster with battery support', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(PowerSource.Complete.id, {
+    const clusterClient = {
       id: PowerSource.Complete.id,
       name: 'PowerSource',
       endpointId: 2,
       supportedFeatures: {
         battery: true,
       },
-    });
+    };
 
     const device = {
       name: 'Robot Vacuum',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
@@ -216,20 +216,20 @@ describe('Matter.convertToGladysDevice', () => {
   });
 
   it('should not create battery feature for PowerSource cluster without battery support', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(PowerSource.Complete.id, {
+    const clusterClient = {
       id: PowerSource.Complete.id,
       name: 'PowerSource',
       endpointId: 2,
       supportedFeatures: {
         wired: true,
       },
-    });
+    };
 
     const device = {
       name: 'Wired Device',
       number: 2,
-      clusterClients,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
     };
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');

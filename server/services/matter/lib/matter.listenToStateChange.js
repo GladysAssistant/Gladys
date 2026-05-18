@@ -418,7 +418,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const rvcOperationalState = device.clusterClients.get(RvcOperationalState.Complete.id);
+  const rvcOperationalState = device.getClusterClientById(RvcOperationalState.Complete.id);
   if (rvcOperationalState && !this.stateChangeListeners.has(rvcOperationalState)) {
     logger.debug(`Matter: Adding state change listener for RvcOperationalState cluster ${rvcOperationalState.name}`);
     this.stateChangeListeners.add(rvcOperationalState);
@@ -434,7 +434,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const rvcRunMode = device.clusterClients.get(RvcRunMode.Complete.id);
+  const rvcRunMode = device.getClusterClientById(RvcRunMode.Complete.id);
   if (rvcRunMode && !this.stateChangeListeners.has(rvcRunMode)) {
     logger.debug(`Matter: Adding state change listener for RvcRunMode cluster ${rvcRunMode.name}`);
     this.stateChangeListeners.add(rvcRunMode);
@@ -463,7 +463,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const rvcCleanMode = device.clusterClients.get(RvcCleanMode.Complete.id);
+  const rvcCleanMode = device.getClusterClientById(RvcCleanMode.Complete.id);
   if (rvcCleanMode && !this.stateChangeListeners.has(rvcCleanMode)) {
     logger.debug(`Matter: Adding state change listener for RvcCleanMode cluster ${rvcCleanMode.name}`);
     this.stateChangeListeners.add(rvcCleanMode);
@@ -492,7 +492,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const powerSource = device.clusterClients.get(PowerSource.Complete.id);
+  const powerSource = device.getClusterClientById(PowerSource.Complete.id);
   if (powerSource && !this.stateChangeListeners.has(powerSource)) {
     logger.debug(`Matter: Adding state change listener for PowerSource cluster ${powerSource.name}`);
     this.stateChangeListeners.add(powerSource);

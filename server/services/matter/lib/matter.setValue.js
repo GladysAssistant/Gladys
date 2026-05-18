@@ -202,7 +202,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK
   ) {
-    const rvcOperationalState = targetDevice.clusterClients.get(RvcOperationalState.Complete.id);
+    const rvcOperationalState = targetDevice.getClusterClientById(RvcOperationalState.Complete.id);
     if (!rvcOperationalState) {
       throw new Error('Device does not support RvcOperationalState cluster');
     }
@@ -218,7 +218,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE
   ) {
-    const rvcRunMode = targetDevice.clusterClients.get(RvcRunMode.Complete.id);
+    const rvcRunMode = targetDevice.getClusterClientById(RvcRunMode.Complete.id);
     if (!rvcRunMode) {
       throw new Error('Device does not support RvcRunMode cluster');
     }
@@ -236,7 +236,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE
   ) {
-    const rvcCleanMode = targetDevice.clusterClients.get(RvcCleanMode.Complete.id);
+    const rvcCleanMode = targetDevice.getClusterClientById(RvcCleanMode.Complete.id);
     if (!rvcCleanMode) {
       throw new Error('Device does not support RvcCleanMode cluster');
     }
