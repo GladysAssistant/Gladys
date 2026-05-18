@@ -11,6 +11,17 @@ const { loadDevices } = require('./tuya.loadDevices');
 const { loadDeviceDetails } = require('./tuya.loadDeviceDetails');
 const { setValue } = require('./tuya.setValue');
 const { poll } = require('./tuya.poll');
+const { localScan } = require('./tuya.localScan');
+const { localPoll } = require('./tuya.localPoll');
+const { getStatus } = require('./tuya.getStatus');
+const { manualDisconnect } = require('./tuya.manualDisconnect');
+const {
+  tryReconnect,
+  scheduleQuickReconnects,
+  clearQuickReconnects,
+  startReconnect,
+  stopReconnect,
+} = require('./tuya.reconnect');
 
 const { STATUS } = require('./utils/tuya.constants');
 
@@ -20,6 +31,11 @@ const TuyaHandler = function TuyaHandler(gladys, serviceId) {
 
   this.connector = null;
   this.status = STATUS.NOT_INITIALIZED;
+  this.lastError = null;
+  this.autoReconnectAllowed = false;
+  this.reconnectInterval = null;
+  this.quickReconnectTimeouts = [];
+  this.quickReconnectInProgress = false;
 };
 
 TuyaHandler.prototype.init = init;
@@ -35,5 +51,14 @@ TuyaHandler.prototype.loadDevices = loadDevices;
 TuyaHandler.prototype.loadDeviceDetails = loadDeviceDetails;
 TuyaHandler.prototype.setValue = setValue;
 TuyaHandler.prototype.poll = poll;
+TuyaHandler.prototype.localScan = localScan;
+TuyaHandler.prototype.localPoll = localPoll;
+TuyaHandler.prototype.getStatus = getStatus;
+TuyaHandler.prototype.manualDisconnect = manualDisconnect;
+TuyaHandler.prototype.tryReconnect = tryReconnect;
+TuyaHandler.prototype.scheduleQuickReconnects = scheduleQuickReconnects;
+TuyaHandler.prototype.clearQuickReconnects = clearQuickReconnects;
+TuyaHandler.prototype.startReconnect = startReconnect;
+TuyaHandler.prototype.stopReconnect = stopReconnect;
 
 module.exports = TuyaHandler;

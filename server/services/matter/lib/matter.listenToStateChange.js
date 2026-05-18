@@ -41,8 +41,8 @@ const {
  * @example matter.listenToStateChange(nodeId, device);
  */
 async function listenToStateChange(nodeId, devicePath, device) {
-  // Get the OnOff cluster from clusterClients map
-  const onOff = device.clusterClients.get(OnOff.Complete.id);
+  // Get the OnOff cluster
+  const onOff = device.getClusterClientById(OnOff.Complete.id);
 
   // We only add the listener if it's not already added
   if (onOff && !this.stateChangeListeners.has(onOff)) {
@@ -58,7 +58,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const booleanState = device.clusterClients.get(BooleanState.Complete.id);
+  const booleanState = device.getClusterClientById(BooleanState.Complete.id);
   if (booleanState && !this.stateChangeListeners.has(booleanState)) {
     logger.debug(`Matter: Adding state change listener for BooleanState cluster ${booleanState.name}`);
     this.stateChangeListeners.add(booleanState);
@@ -71,7 +71,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const switchCluster = device.clusterClients.get(Switch.Complete.id);
+  const switchCluster = device.getClusterClientById(Switch.Complete.id);
   if (switchCluster && !this.stateChangeListeners.has(switchCluster)) {
     logger.debug(`Matter: Adding state change listener for Switch cluster ${switchCluster.name}`);
     this.stateChangeListeners.add(switchCluster);
@@ -113,7 +113,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const occupancy = device.clusterClients.get(OccupancySensing.Complete.id);
+  const occupancy = device.getClusterClientById(OccupancySensing.Complete.id);
   if (occupancy && !this.stateChangeListeners.has(occupancy)) {
     logger.debug(`Matter: Adding state change listener for OccupancySensing cluster ${occupancy.name}`);
     this.stateChangeListeners.add(occupancy);
@@ -127,7 +127,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const illuminance = device.clusterClients.get(IlluminanceMeasurement.Complete.id);
+  const illuminance = device.getClusterClientById(IlluminanceMeasurement.Complete.id);
   if (illuminance && !this.stateChangeListeners.has(illuminance)) {
     logger.debug(`Matter: Adding state change listener for IlluminanceMeasurement cluster ${illuminance.name}`);
     this.stateChangeListeners.add(illuminance);
@@ -142,7 +142,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const temperatureSensor = device.clusterClients.get(TemperatureMeasurement.Complete.id);
+  const temperatureSensor = device.getClusterClientById(TemperatureMeasurement.Complete.id);
   if (temperatureSensor && !this.stateChangeListeners.has(temperatureSensor)) {
     logger.debug(`Matter: Adding state change listener for TemperatureMeasurement cluster ${temperatureSensor.name}`);
     this.stateChangeListeners.add(temperatureSensor);
@@ -156,7 +156,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const windowCover = device.clusterClients.get(WindowCovering.Complete.id);
+  const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
 
   if (windowCover && !this.stateChangeListeners.has(windowCover)) {
     logger.debug(`Matter: Adding state change listener for WindowCovering cluster ${windowCover.name}`);
@@ -171,7 +171,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const levelControl = device.clusterClients.get(LevelControl.Complete.id);
+  const levelControl = device.getClusterClientById(LevelControl.Complete.id);
   if (levelControl && !this.stateChangeListeners.has(levelControl)) {
     logger.debug(`Matter: Adding state change listener for LevelControl cluster ${levelControl.name}`);
     this.stateChangeListeners.add(levelControl);
@@ -185,7 +185,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const colorControl = device.clusterClients.get(ColorControl.Complete.id);
+  const colorControl = device.getClusterClientById(ColorControl.Complete.id);
   if (colorControl && !this.stateChangeListeners.has(colorControl)) {
     logger.debug(`Matter: Adding state change listener for ColorControl cluster ${colorControl.name}`);
     this.stateChangeListeners.add(colorControl);
@@ -229,7 +229,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const relativeHumidityMeasurement = device.clusterClients.get(RelativeHumidityMeasurement.Complete.id);
+  const relativeHumidityMeasurement = device.getClusterClientById(RelativeHumidityMeasurement.Complete.id);
   if (relativeHumidityMeasurement && !this.stateChangeListeners.has(relativeHumidityMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for RelativeHumidityMeasurement cluster ${relativeHumidityMeasurement.name}`,
@@ -245,7 +245,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const pm25ConcentrationMeasurement = device.clusterClients.get(Pm25ConcentrationMeasurement.Complete.id);
+  const pm25ConcentrationMeasurement = device.getClusterClientById(Pm25ConcentrationMeasurement.Complete.id);
   if (pm25ConcentrationMeasurement && !this.stateChangeListeners.has(pm25ConcentrationMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for Pm25ConcentrationMeasurement cluster ${pm25ConcentrationMeasurement.name}`,
@@ -261,7 +261,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const pm10ConcentrationMeasurement = device.clusterClients.get(Pm10ConcentrationMeasurement.Complete.id);
+  const pm10ConcentrationMeasurement = device.getClusterClientById(Pm10ConcentrationMeasurement.Complete.id);
   if (pm10ConcentrationMeasurement && !this.stateChangeListeners.has(pm10ConcentrationMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for Pm10ConcentrationMeasurement cluster ${pm10ConcentrationMeasurement.name}`,
@@ -277,7 +277,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const totalVolatileOrganicCompoundsConcentrationMeasurement = device.clusterClients.get(
+  const totalVolatileOrganicCompoundsConcentrationMeasurement = device.getClusterClientById(
     TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
   );
   if (
@@ -298,7 +298,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const formaldehydeConcentrationMeasurement = device.clusterClients.get(
+  const formaldehydeConcentrationMeasurement = device.getClusterClientById(
     FormaldehydeConcentrationMeasurement.Complete.id,
   );
   if (formaldehydeConcentrationMeasurement && !this.stateChangeListeners.has(formaldehydeConcentrationMeasurement)) {
@@ -316,7 +316,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const thermostat = device.clusterClients.get(Thermostat.Complete.id);
+  const thermostat = device.getClusterClientById(Thermostat.Complete.id);
   if (thermostat && !this.stateChangeListeners.has(thermostat)) {
     logger.debug(`Matter: Adding state change listener for Thermostat cluster ${thermostat.name}`);
     this.stateChangeListeners.add(thermostat);
@@ -341,7 +341,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const electricalPowerMeasurement = device.clusterClients.get(ElectricalPowerMeasurement.Complete.id);
+  const electricalPowerMeasurement = device.getClusterClientById(ElectricalPowerMeasurement.Complete.id);
   if (electricalPowerMeasurement && !this.stateChangeListeners.has(electricalPowerMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for ElectricalPowerMeasurement cluster ${electricalPowerMeasurement.name}`,
@@ -383,7 +383,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const electricalEnergyMeasurement = device.clusterClients.get(ElectricalEnergyMeasurement.Complete.id);
+  const electricalEnergyMeasurement = device.getClusterClientById(ElectricalEnergyMeasurement.Complete.id);
   if (electricalEnergyMeasurement && !this.stateChangeListeners.has(electricalEnergyMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for ElectricalEnergyMeasurement cluster ${electricalEnergyMeasurement.name}`,
@@ -404,7 +404,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const hepaFilterMonitoring = device.clusterClients.get(HepaFilterMonitoring.Complete.id);
+  const hepaFilterMonitoring = device.getClusterClientById(HepaFilterMonitoring.Complete.id);
   if (hepaFilterMonitoring && !this.stateChangeListeners.has(hepaFilterMonitoring)) {
     logger.debug(`Matter: Adding state change listener for HepaFilterMonitoring cluster ${hepaFilterMonitoring.name}`);
     this.stateChangeListeners.add(hepaFilterMonitoring);

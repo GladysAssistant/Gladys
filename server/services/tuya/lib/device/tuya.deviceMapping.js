@@ -4,6 +4,7 @@ const {
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
 } = require('../../../../utils/constants');
+const { normalizeBoolean } = require('../utils/tuya.normalize');
 
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
 
@@ -146,7 +147,7 @@ const writeValues = {
 const readValues = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (valueFromDevice) => {
-      return valueFromDevice === true ? 1 : 0;
+      return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
     [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: (valueFromDevice) => {
       return valueFromDevice;
@@ -164,7 +165,7 @@ const readValues = {
 
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
-      return valueFromDevice === true ? 1 : 0;
+      return normalizeBoolean(valueFromDevice) ? 1 : 0;
     },
     [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10) / 100;

@@ -53,15 +53,15 @@ describe('Matter.listenToStateChange', () => {
   });
 
   it('should listen to state change (ON)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(OnOff.Complete.id, {
+    const clusterClient = {
+      id: OnOff.Complete.id,
       addOnOffAttributeListener: (callback) => {
         callback(true);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -70,15 +70,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (OFF)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(OnOff.Complete.id, {
+    const clusterClient = {
+      id: OnOff.Complete.id,
       addOnOffAttributeListener: (callback) => {
         callback(false);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -87,15 +87,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change in nested child endpoint (OFF)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(OnOff.Complete.id, {
+    const clusterClient = {
+      id: OnOff.Complete.id,
       addOnOffAttributeListener: (callback) => {
         callback(false);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1:child_endpoint:2', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -104,15 +104,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (BooleanState = true)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(BooleanState.Complete.id, {
+    const clusterClient = {
+      id: BooleanState.Complete.id,
       addStateValueAttributeListener: (callback) => {
         callback(true);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -121,8 +121,8 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to switch events', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Switch.Complete.id, {
+    const clusterClient = {
+      id: Switch.Complete.id,
       addInitialPressEventListener: (callback) => {
         callback();
       },
@@ -135,10 +135,10 @@ describe('Matter.listenToStateChange', () => {
       addLongReleaseEventListener: (callback) => {
         callback();
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -159,15 +159,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Occupancy = true)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(OccupancySensing.Complete.id, {
+    const clusterClient = {
+      id: OccupancySensing.Complete.id,
       addOccupancyAttributeListener: (callback) => {
         callback({ occupied: true });
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -176,15 +176,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Occupancy = false)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(OccupancySensing.Complete.id, {
+    const clusterClient = {
+      id: OccupancySensing.Complete.id,
       addOccupancyAttributeListener: (callback) => {
         callback({ occupied: false });
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -193,16 +193,16 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (IlluminanceMeasurement)', async () => {
-    const clusterClients = new Map();
     // Matter: Illuminance attribute changed to 21327 (Converted to 136 lux)
-    clusterClients.set(IlluminanceMeasurement.Complete.id, {
+    const clusterClient = {
+      id: IlluminanceMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(21327);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -211,15 +211,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (TemperatureMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(TemperatureMeasurement.Complete.id, {
+    const clusterClient = {
+      id: TemperatureMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(2150);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -228,15 +228,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (RelativeHumidityMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(RelativeHumidityMeasurement.Complete.id, {
+    const clusterClient = {
+      id: RelativeHumidityMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(5000);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -245,15 +245,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Pm25ConcentrationMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Pm25ConcentrationMeasurement.Complete.id, {
+    const clusterClient = {
+      id: Pm25ConcentrationMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(100);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -262,15 +262,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Pm10ConcentrationMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Pm10ConcentrationMeasurement.Complete.id, {
+    const clusterClient = {
+      id: Pm10ConcentrationMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(100);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -279,15 +279,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (TotalVolatileOrganicCompoundsConcentrationMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
+    const clusterClient = {
+      id: TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
       addLevelValueAttributeListener: (callback) => {
         callback(3);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -296,15 +296,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (FormaldehydeConcentrationMeasurement)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(FormaldehydeConcentrationMeasurement.Complete.id, {
+    const clusterClient = {
+      id: FormaldehydeConcentrationMeasurement.Complete.id,
       addMeasuredValueAttributeListener: (callback) => {
         callback(100);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -313,18 +313,18 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Thermostat heating)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Thermostat.Complete.id, {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
       supportedFeatures: {
         heating: true,
       },
       addOccupiedHeatingSetpointAttributeListener: (callback) => {
         callback(2000);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -333,18 +333,18 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (Thermostat cooling)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(Thermostat.Complete.id, {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
       supportedFeatures: {
         cooling: true,
       },
       addOccupiedCoolingSetpointAttributeListener: (callback) => {
         callback(2000);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -353,15 +353,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (WindowCovering)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(WindowCovering.Complete.id, {
+    const clusterClient = {
+      id: WindowCovering.Complete.id,
       addCurrentPositionLiftPercent100thsAttributeListener: (callback) => {
         callback(8400);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -370,15 +370,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (LevelControl)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(LevelControl.Complete.id, {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
       addCurrentLevelAttributeListener: (callback) => {
         callback(99);
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -387,7 +387,7 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (ColorControl)', async () => {
-    const clusterClients = new Map();
+    let clusterClient;
     const promise = new Promise((resolve) => {
       let callCount = 0;
       const checkThatEveryThingWasCalled = () => {
@@ -396,7 +396,8 @@ describe('Matter.listenToStateChange', () => {
           resolve();
         }
       };
-      clusterClients.set(ColorControl.Complete.id, {
+      clusterClient = {
+        id: ColorControl.Complete.id,
         supportedFeatures: {
           hueSaturation: true,
         },
@@ -416,11 +417,11 @@ describe('Matter.listenToStateChange', () => {
           checkThatEveryThingWasCalled();
           return 40;
         },
-      });
+      };
     });
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     // We need to make sure that we called all 4 functions before checking the events
@@ -436,17 +437,17 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (ElectricalPowerMeasurement - ActivePower)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
       addActivePowerAttributeListener: (callback) => {
         callback(1500000); // 1500000 mW = 1500 W
       },
       addVoltageAttributeListener: () => {},
       addActiveCurrentAttributeListener: () => {},
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -455,8 +456,8 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (ElectricalPowerMeasurement - Voltage)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
       supportedFeatures: {
         voltage: true,
       },
@@ -465,10 +466,10 @@ describe('Matter.listenToStateChange', () => {
         callback(230000); // 230000 mV = 230 V
       },
       addActiveCurrentAttributeListener: () => {},
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -477,8 +478,8 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (ElectricalPowerMeasurement - ActiveCurrent)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(ElectricalPowerMeasurement.Complete.id, {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
       supportedFeatures: {
         current: true,
       },
@@ -487,10 +488,10 @@ describe('Matter.listenToStateChange', () => {
       addActiveCurrentAttributeListener: (callback) => {
         callback(6500); // 6500 mA = 6.5 A
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -499,18 +500,18 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (ElectricalEnergyMeasurement - CumulativeEnergy)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(ElectricalEnergyMeasurement.Complete.id, {
+    const clusterClient = {
+      id: ElectricalEnergyMeasurement.Complete.id,
       supportedFeatures: {
         cumulativeEnergy: true,
       },
       addCumulativeEnergyImportedAttributeListener: (callback) => {
         callback({ energy: 1500000000 }); // 1500000000 mWh = 1500 kWh
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
@@ -519,15 +520,15 @@ describe('Matter.listenToStateChange', () => {
     });
   });
   it('should listen to state change (HepaFilterMonitoring)', async () => {
-    const clusterClients = new Map();
-    clusterClients.set(HepaFilterMonitoring.Complete.id, {
+    const clusterClient = {
+      id: HepaFilterMonitoring.Complete.id,
       addConditionAttributeListener: (callback) => {
         callback(75); // 75% filter life remaining
       },
-    });
+    };
     const device = {
       number: 1,
-      clusterClients,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
