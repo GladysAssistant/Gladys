@@ -24,18 +24,16 @@ const isNullOrEmpty = (value) => value === null || value === undefined || value 
 /**
  * @description Calculate energy monitoring cost from a specific date.
  * @param {Date} startAt - The start date.
- * @param {Array<string>|string} featureSelectors - Optional whitelist of cost feature selectors to process.
- * When a string is provided and jobId is undefined, it is treated as the jobId (backward compatibility
- * with the legacy 2-argument signature used by pre-existing tests).
+ * @param {Array<string>} featureSelectors - Optional whitelist of cost feature selectors to process.
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
  * @example
  * calculateCostFrom(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
  */
 async function calculateCostFrom(startAt, featureSelectors, jobId) {
-  const isSelectorsArray = Array.isArray(featureSelectors);
-  const selectors = isSelectorsArray ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0) : [];
-  const resolvedJobId = typeof featureSelectors === 'string' && jobId === undefined ? featureSelectors : jobId;
+  const selectors = Array.isArray(featureSelectors)
+    ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+    : [];
   const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
@@ -224,12 +222,12 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
       logger.error(e);
     }
     // Update the progress in percentage
-    if (resolvedJobId) {
-      await this.gladys.job.updateProgress(resolvedJobId, Math.round(((index + 1) / energyDevices.length) * 100));
+    if (jobId) {
+      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / energyDevices.length) * 100));
     }
   });
-  if (resolvedJobId) {
-    await this.gladys.job.updateProgress(resolvedJobId, 100);
+  if (jobId) {
+    await this.gladys.job.updateProgress(jobId, 100);
   }
   return null;
 }
