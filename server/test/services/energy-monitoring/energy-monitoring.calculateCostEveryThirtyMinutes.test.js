@@ -1,7 +1,11 @@
-const sinon = require('sinon');
-
-const { fake, assert } = sinon;
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
@@ -33,7 +37,6 @@ describe('EnergyMonitoring.calculateCostEveryThirtyMinutes', () => {
   let device;
   let energyPrice;
   let gladys;
-
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);

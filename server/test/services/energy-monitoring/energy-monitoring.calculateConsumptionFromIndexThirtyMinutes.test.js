@@ -1,6 +1,4 @@
-const sinon = require('sinon');
-
-const { fake, assert } = sinon;
+const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 

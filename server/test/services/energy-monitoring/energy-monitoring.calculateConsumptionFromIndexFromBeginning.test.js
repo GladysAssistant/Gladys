@@ -1,7 +1,5 @@
-const sinon = require('sinon');
 const { expect } = require('chai');
-
-const { useFakeTimers, stub } = sinon;
+const { useFakeTimers, stub } = require('sinon');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -17,7 +15,6 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
-const { clearDuckDb } = require('../../utils/duckdb');
 
 describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let gladys;
@@ -27,13 +24,13 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   let serviceManager;
   let device;
   let job;
+
   // Test device IDs (using proper UUID format)
   const testDeviceId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
   const testIndexFeatureId = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';
   const testConsumptionFeatureId = 'c3d4e5f6-a7b8-9012-cdef-123456789012';
 
   beforeEach(async () => {
-    await clearDuckDb();
     // Create event emitter and components
     const event = new EventEmitter();
     job = new Job(event);
@@ -116,9 +113,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   afterEach(async () => {
     if (clock) {
       clock.restore();
-      clock = null;
     }
-    await clearDuckDb();
   });
 
   describe('Basic functionality', () => {
@@ -128,14 +123,14 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         where: { id: testConsumptionFeatureId },
       });
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null);
     });
 
     it('should return null when no device states found in database', async () => {
       // No device states inserted, so database should be empty
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null);
     });
@@ -164,7 +159,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be just after the last state
       clock = useFakeTimers(new Date(baseTime.getTime() + 5 * 60 * 1000)); // 5 minutes after
 
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       // Verify that consumption states were created
       const consumptionStates = await db.duckDbReadConnectionAllAsync(
@@ -192,7 +187,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be 1 hour after the newest state
       clock = useFakeTimers(new Date('2023-10-03T12:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -284,7 +279,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time
       clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -321,6 +316,47 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         { value: 0, created_at: new Date('2023-10-03T11:00:00.000Z') },
       ]);
     });
+  });
+
+  it('should continue processing windows even when some fail', async () => {
+    // Insert test states
+    const baseTime = new Date('2023-10-03T10:00:00.000Z');
+    const states = [
+      { value: 1000, created_at: baseTime },
+      {
+        value: 1050,
+        created_at: new Date(baseTime.getTime() + 30 * 60 * 1000),
+      },
+    ];
+
+    await db.duckDbBatchInsertState(testIndexFeatureId, states);
+
+    // Mock current time to create multiple windows
+    clock = useFakeTimers(new Date('2023-10-03T11:30:00.000Z'));
+
+    // Stub calculateConsumptionFromIndex to throw error on second call
+    let callCount = 0;
+    const originalCalculateConsumptionFromIndex = energyMonitoring.calculateConsumptionFromIndex;
+    energyMonitoring.calculateConsumptionFromIndex = async (jobId, windowTime) => {
+      callCount += 1;
+      if (callCount === 2) {
+        throw new Error('Simulated error for testing');
+      }
+      return originalCalculateConsumptionFromIndex.call(energyMonitoring, jobId, windowTime);
+    };
+
+    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
+
+    // Restore original function
+    energyMonitoring.calculateConsumptionFromIndex = originalCalculateConsumptionFromIndex;
+
+    expect(result).to.equal(null); // Function should complete successfully despite errors
+
+    // Verify that job progress was updated (should be called for each window)
+    expect(gladys.job.updateProgress.called).to.equal(true);
+
+    // Should have processed multiple windows (at least 3: 10:00, 10:30, 11:00, 11:30)
+    expect(callCount).to.be.at.least(3);
   });
 
   describe('Progress updates', () => {
@@ -499,47 +535,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       oldestStub.restore();
       getStub.restore();
     });
-  });
-
-  it('should continue processing windows even when some fail', async () => {
-    // Insert test states
-    const baseTime = new Date('2023-10-03T10:00:00.000Z');
-    const states = [
-      { value: 1000, created_at: baseTime },
-      {
-        value: 1050,
-        created_at: new Date(baseTime.getTime() + 30 * 60 * 1000),
-      },
-    ];
-
-    await db.duckDbBatchInsertState(testIndexFeatureId, states);
-
-    // Mock current time to create multiple windows
-    clock = useFakeTimers(new Date('2023-10-03T11:30:00.000Z'));
-
-    // Stub calculateConsumptionFromIndex to throw error on second call
-    let callCount = 0;
-    const originalCalculateConsumptionFromIndex = energyMonitoring.calculateConsumptionFromIndex;
-    energyMonitoring.calculateConsumptionFromIndex = async (...args) => {
-      callCount += 1;
-      if (callCount === 2) {
-        throw new Error('Simulated error for testing');
-      }
-      return originalCalculateConsumptionFromIndex.apply(energyMonitoring, args);
-    };
-
-    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-123');
-
-    // Restore original function
-    energyMonitoring.calculateConsumptionFromIndex = originalCalculateConsumptionFromIndex;
-
-    expect(result).to.equal(null); // Function should complete successfully despite errors
-
-    // Verify that job progress was updated (should be called for each window)
-    expect(gladys.job.updateProgress.called).to.equal(true);
-
-    // Should have processed multiple windows (at least 3: 10:00, 10:30, 11:00, 11:30)
-    expect(callCount).to.be.at.least(3);
   });
 
   it('should skip consumption features without selector', async () => {

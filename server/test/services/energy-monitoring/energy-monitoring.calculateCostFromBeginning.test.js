@@ -1,7 +1,12 @@
-const sinon = require('sinon');
-
-const { fake, assert } = sinon;
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
@@ -32,7 +37,6 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
   let device;
   let energyPrice;
   let gladys;
-
   beforeEach(async () => {
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
@@ -48,16 +52,16 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
       },
     };
   });
-  it('should calculate cost from beginning with empty selectors', async () => {
+  it('should calculate cost from beginning', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    energyMonitoring.calculateCostFrom = fake.resolves(null);
+    energyMonitoring.calculateCostFrom = fake.returns(null);
     await energyMonitoring.calculateCostFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
     assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), [], '12345678-1234-1234-1234-1234567890ab');
   });
 
   it('should forward selectors and job id', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
-    energyMonitoring.calculateCostFrom = fake.resolves(null);
+    energyMonitoring.calculateCostFrom = fake.returns(null);
     await energyMonitoring.calculateCostFromBeginning(['feature-1', 'feature-2'], 'job-456');
     assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), ['feature-1', 'feature-2'], 'job-456');
   });

@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const { fake, stub } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -6,7 +6,6 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const historicalTempoData = require('./data/tempo_mock');
 const logger = require('../../../utils/logger');
-const { clearDuckDb } = require('../../utils/duckdb');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -32,8 +31,8 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 const brain = {
-  addNamedEntity: sinon.fake.returns(null),
-  removeNamedEntity: sinon.fake.returns(null),
+  addNamedEntity: fake.returns(null),
+  removeNamedEntity: fake.returns(null),
 };
 const variable = {
   getValue: (name) => {
@@ -51,12 +50,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
   let energyPrice;
   let electricalMeterDevice;
   let gladys;
-
-  afterEach(async () => {
-    await clearDuckDb();
-  });
   beforeEach(async () => {
-    await clearDuckDb();
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
     stateManager = new StateManager(event);
     serviceManager = new ServiceManager({}, stateManager);
     device = new Device(event, {}, stateManager, serviceManager, {}, variable, job, brain);
@@ -66,10 +61,10 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       device,
       energyPrice,
       gateway: {
-        getEdfTempoHistorical: sinon.fake.resolves(historicalTempoData),
+        getEdfTempoHistorical: fake.resolves(historicalTempoData),
       },
       job: {
-        updateProgress: sinon.fake.returns(null),
+        updateProgress: fake.returns(null),
         wrapper: (name, func) => func,
       },
     };
@@ -458,7 +453,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, null, '43732e67-6669-4a95-83d6-38c50b835387');
+    await energyMonitoring.calculateCostFrom(date, undefined, '43732e67-6669-4a95-83d6-38c50b835387');
     const deviceFeatureState = await device.getDeviceFeatureStates(
       'power-plug-consumption-cost-2',
       new Date('2025-01-01T00:00:00.000Z'),
@@ -495,7 +490,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     });
     const energyMonitoring = new EnergyMonitoring(gladys, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, null, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
     // No assertion needed; executing the branch covers the logger line.
   });
   it('should handle device with no daily consumption feature (logs missing daily feature)', async () => {
@@ -509,7 +504,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     });
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, null, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     // The code path logs the absence of a daily consumption feature.
   });
   it('should handle case where no energy price is found for the device at the given date (logs and returns)', async () => {
@@ -579,7 +574,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, null, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
     // This executes the branch where no energy price is found for the state timestamp.
   });
   it('should catch and log an error during processing', async () => {
@@ -591,7 +586,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     try {
       const energyMonitoring = new EnergyMonitoring(gladys, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
       const date = new Date('2025-08-28T00:00:00.000Z');
-      await energyMonitoring.calculateCostFrom(date, null, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
+      await energyMonitoring.calculateCostFrom(date, undefined, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
     } finally {
       // Restore original function to avoid side effects on other tests
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
@@ -658,7 +653,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       const date = new Date('2025-08-28T00:00:00.000Z');
 
       // This should not throw - it should skip the broken feature and log a warning
-      await energyMonitoring.calculateCostFrom(date, null, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
+      await energyMonitoring.calculateCostFrom(date, undefined, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
 
       // Verify that no cost states were created for the broken feature
       const costStates = await device.getDeviceFeatureStates(
@@ -671,17 +666,6 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       // Restore original function
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
     }
-  });
-
-  it('should return null when start date is after end date', async () => {
-    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
-    const res = await energyMonitoring.calculateCostFrom(
-      '2025-12-31',
-      'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22',
-      null,
-      '2025-01-01',
-    );
-    expect(res).to.equal(null);
   });
 
   it('should skip cost feature when selector is not in the provided whitelist', async () => {
@@ -758,8 +742,8 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
         created_at: new Date('2025-08-28T15:01:00.000Z'),
       },
     ]);
-    const errorStub = sinon.stub(logger, 'error');
-    const saveMultipleStub = sinon.stub(device, 'saveMultipleHistoricalStates').rejects(new Error('boom'));
+    const errorStub = stub(logger, 'error');
+    const saveMultipleStub = stub(device, 'saveMultipleHistoricalStates').rejects(new Error('boom'));
     try {
       const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
       await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));

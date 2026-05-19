@@ -1,6 +1,4 @@
-const sinon = require('sinon');
-
-const { fake, assert } = sinon;
+const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
@@ -835,25 +833,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       await energyMonitoring.calculateConsumptionFromIndex(testTime, ['non-matching-selector']);
 
       expect(device.saveHistoricalState.called).to.equal(false);
-    });
-
-    it('should update job progress when jobId is provided', async () => {
-      const testTime = new Date('2023-10-03T14:00:00.000Z');
-      device.get = fake.returns([mockDevice]);
-      device.getDeviceFeatureStates = fake.returns([
-        { created_at: '2023-10-03T13:30:00.000Z', value: 1000 },
-        { created_at: '2023-10-03T14:00:00.000Z', value: 1010 },
-      ]);
-      gladys.job.updateProgress.resetHistory();
-      await energyMonitoring.calculateConsumptionFromIndex(testTime, undefined, 'job-progress');
-      // Two calls: one during processing, one final at 100%
-      expect(gladys.job.updateProgress.callCount).to.equal(2);
-      const firstCall = gladys.job.updateProgress.getCall(0).args;
-      expect(firstCall[0]).to.equal('job-progress');
-      expect(firstCall[1]).to.equal(100);
-      const finalCall = gladys.job.updateProgress.getCall(1).args;
-      expect(finalCall[0]).to.equal('job-progress');
-      expect(finalCall[1]).to.equal(100);
     });
   });
 });
