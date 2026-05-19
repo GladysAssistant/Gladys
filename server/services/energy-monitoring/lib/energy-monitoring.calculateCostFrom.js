@@ -38,17 +38,6 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
   const resolvedJobId = typeof featureSelectors === 'string' && jobId === undefined ? featureSelectors : jobId;
   const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-  const parseDateWithBoundary = (value) => {
-    if (value instanceof Date) {
-      return value;
-    }
-    if (typeof value !== 'string') {
-      return null;
-    }
-    const parsed = dayjs.tz(`${value} 00:00:00`, systemTimezone);
-    return parsed.isValid() ? parsed.toDate() : null;
-  };
-  const parsedStartAt = parseDateWithBoundary(startAt) || new Date(0);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -143,8 +132,8 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
             return;
           }
           // First, clean the cost feature states
-          logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${parsedStartAt}`);
-          await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, parsedStartAt);
+          logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
+          await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
           // Get the energy prices from this electrical meter device
           const energyPrices = await this.gladys.energyPrice.get({
             electric_meter_device_id: electricMeterFeature.device_id,
@@ -156,7 +145,7 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
             );
             // Subtract 1 day to ensure we have tempo data for hours before 6AM that use previous day's color
             const startDateAsDayString = dayjs
-              .tz(parsedStartAt, systemTimezone)
+              .tz(startAt, systemTimezone)
               .subtract(1, 'day')
               .format('YYYY-MM-DD');
             edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
@@ -165,7 +154,7 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
           // We get all the states of the consumption feature in the time range
           const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
             ecf.consumptionFeature.selector,
-            parsedStartAt,
+            startAt,
             new Date(),
           );
           const deviceFeatureCostStatesToInsert = [];
