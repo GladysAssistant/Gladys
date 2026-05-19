@@ -58,12 +58,8 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, featureSel
 
       if (consumptionFeature) {
         // If a whitelist is provided, only keep matches
-        if (selectorSet.size > 0) {
-          const consumptionSelector =
-            consumptionFeature.selector || consumptionFeature.external_id || consumptionFeature.id;
-          if (!selectorSet.has(consumptionSelector)) {
-            return;
-          }
+        if (selectorSet.size > 0 && !selectorSet.has(consumptionFeature.selector)) {
+          return;
         }
         devicesWithBothFeatures.push({
           device: energyDevice,

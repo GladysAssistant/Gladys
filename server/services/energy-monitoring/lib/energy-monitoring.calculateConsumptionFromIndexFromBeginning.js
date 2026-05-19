@@ -57,8 +57,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
         if (selectorSet.size === 0) {
           return true;
         }
-        const featureSelector = f.selector || f.external_id || f.id;
-        return selectorSet.has(featureSelector);
+        return selectorSet.has(f.selector);
       });
 
       const matchedPairs = consumptionFeatures
@@ -156,9 +155,6 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
     const consumptionFeaturesToReset = new Map();
     devicesWithBothFeatures.forEach((deviceWithBothFeatures) => {
       (deviceWithBothFeatures.consumptionFeatures || []).forEach((feature) => {
-        if (!feature.selector) {
-          return;
-        }
         consumptionFeaturesToReset.set(feature.selector, feature);
       });
     });

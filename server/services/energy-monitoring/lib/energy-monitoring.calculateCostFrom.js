@@ -109,14 +109,8 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
       // For each energy consumption feature
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
         try {
-          if (selectorSet.size > 0) {
-            const costSelector =
-              ecf.consumptionCostFeature.selector ||
-              ecf.consumptionCostFeature.external_id ||
-              ecf.consumptionCostFeature.id;
-            if (!selectorSet.has(costSelector)) {
-              return;
-            }
+          if (selectorSet.size > 0 && !selectorSet.has(ecf.consumptionCostFeature.selector)) {
+            return;
           }
           // Get the feature of the root electrical meter device
           const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(

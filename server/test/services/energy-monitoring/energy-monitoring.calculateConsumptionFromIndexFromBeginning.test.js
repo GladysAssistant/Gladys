@@ -372,66 +372,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
   });
 
   describe('Edge cases on params and selectors', () => {
-    it('should skip consumption features without selector and still process valid ones', async () => {
-      const customDevice = {
-        id: 'custom-device',
-        name: 'Custom Energy Device',
-        params: [],
-        features: [
-          {
-            id: '11111111-1111-1111-1111-111111111111',
-            selector: 'custom-index',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
-            energy_parent_id: null,
-          },
-          {
-            id: '22222222-2222-2222-2222-222222222222',
-            selector: null,
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: '11111111-1111-1111-1111-111111111111',
-          },
-          {
-            id: '33333333-3333-3333-3333-333333333333',
-            selector: 'valid-consumption',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-            energy_parent_id: '11111111-1111-1111-1111-111111111111',
-          },
-        ],
-      };
-
-      await db.duckDbBatchInsertState('11111111-1111-1111-1111-111111111111', [
-        { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
-        { value: 1020, created_at: new Date('2023-10-03T10:30:00.000Z') },
-      ]);
-
-      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
-
-      const getStub = stub(gladys.device, 'get').returns([customDevice]);
-      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
-
-      const calls = [];
-      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(
-        async (windowTime, selectors) => {
-          calls.push(selectors);
-          return null;
-        },
-      );
-
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(['valid-consumption'], 'job-selectors');
-
-      calcStub.restore();
-      destroyFromStub.restore();
-      getStub.restore();
-
-      expect(calls.length).to.be.greaterThan(0);
-      calls.forEach((selectors) => {
-        expect(selectors).to.deep.equal(['valid-consumption']);
-      });
-    });
-
     it('should restore previous last processed timestamp on selector-based recalculation', async () => {
       const customDevice = {
         id: 'custom-device',
@@ -537,18 +477,6 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     });
   });
 
-  it('should skip consumption features without selector', async () => {
-    // Device with missing selector on consumption feature
-    const getStub = stub(gladys.device, 'get').resolves([]);
-    clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
-    const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
-    await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-noselector');
-    // No devices to process => calc not called
-    expect(calcStub.called).to.equal(false);
-    getStub.restore();
-    calcStub.restore();
-  });
-
   it('should return null when no oldest state exists (effectiveStartAt falsy)', async () => {
     const deviceWithFeatures = {
       id: 'no-state-device',
@@ -582,57 +510,5 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
     oldestStub.restore();
     getStub.restore();
     calcStub.restore();
-  });
-
-  it('should skip consumption features without selector and still process valid ones for mixed device with missing selector', async () => {
-    const mixedDevice = {
-      id: 'device-with-mixed-consumption',
-      name: 'Mixed Consumption Device',
-      features: [
-        {
-          id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
-          selector: 'mix-index',
-          external_id: 'mix-index',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
-          energy_parent_id: null,
-        },
-        {
-          id: 'mix-consumption-valid',
-          selector: 'mix-consumption-valid',
-          external_id: 'mix-consumption-valid',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
-        },
-        {
-          id: 'mix-consumption-missing',
-          selector: null,
-          external_id: 'mix-consumption-missing',
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-          energy_parent_id: 'aaaabbbb-cccc-dddd-eeee-ffffffffffff',
-        },
-      ],
-    };
-    await db.duckDbBatchInsertState('aaaabbbb-cccc-dddd-eeee-ffffffffffff', [
-      { value: 1000, created_at: new Date('2023-10-03T10:00:00.000Z') },
-    ]);
-    const getStub = stub(gladys.device, 'get').resolves([mixedDevice]);
-    const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
-      { oldest_created_at: '2023-10-03T10:00:00.000Z' },
-    ]);
-    const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
-    const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
-    clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
-    await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-mixed');
-    // calc called for windows
-    expect(calcStub.called).to.equal(true);
-    // destroyStatesFrom is called with the consumption feature selector when it has a selector
-    expect(destroyFromStub.called).to.equal(true);
-    calcStub.restore();
-    destroyFromStub.restore();
-    oldestStub.restore();
-    getStub.restore();
   });
 });
