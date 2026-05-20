@@ -3248,6 +3248,7 @@
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
     "aqi": "Indice de Qualité de l'Air",
+    "ph": "pH",
     "milligram-per-cubic-meter": "Milligramme par mètre cube (mg/m³)",
     "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
     "nanogram-per-cubic-meter": "Nanogramme par mètre cube (ng/m³)",
@@ -3343,6 +3344,7 @@
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
     "aqi": "AQI",
+    "ph": "pH",
     "milligram-per-cubic-meter": "mg/m³",
     "microgram-per-cubic-meter": "µg/m³",
     "nanogram-per-cubic-meter": "ng/m³",
@@ -4061,6 +4063,14 @@
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
+    },
+    "ph-sensor": {
+      "shortCategoryName": "Capteur de pH",
+      "decimal": "pH (Décimale)"
+    },
+    "orp-sensor": {
+      "shortCategoryName": "Capteur ORP (Redox)",
+      "decimal": "ORP / Capacité de désinfection (Décimale)"
     },
     "text": {
       "shortCategoryName": "Texte",
