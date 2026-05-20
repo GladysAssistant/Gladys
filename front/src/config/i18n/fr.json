@@ -479,7 +479,7 @@
         "thresholdsNoRange": "La fonctionnalité sélectionnée n'a pas de valeur minimale ou maximale définie, les seuils ne peuvent pas être configurés.",
         "colorLowLabel": "Couleur en dessous du seuil bas",
         "colorInRangeLabel": "Couleur entre les seuils",
-        "colorHighLabel": "Couleur au dessus du seuil haut",
+        "colorHighLabel": "Couleur au-dessus du seuil haut",
         "thresholdsLegendLabel": "Seuils :"
       },
       "energyConsumption": {

@@ -196,10 +196,18 @@ class GaugeBox extends Component {
     if (prevProps.box.device_feature !== this.props.box.device_feature) {
       this.getDevice();
     }
-    if (
+    const valueChanged =
       this.state.deviceFeature &&
-      (!prevState.deviceFeature || prevState.deviceFeature.last_value !== this.state.deviceFeature.last_value)
-    ) {
+      (!prevState.deviceFeature || prevState.deviceFeature.last_value !== this.state.deviceFeature.last_value);
+    const gaugeStyleChanged =
+      this.state.deviceFeature &&
+      (prevProps.box.gauge_use_custom_value !== this.props.box.gauge_use_custom_value ||
+        prevProps.box.gauge_min !== this.props.box.gauge_min ||
+        prevProps.box.gauge_max !== this.props.box.gauge_max ||
+        prevProps.box.gauge_color_low !== this.props.box.gauge_color_low ||
+        prevProps.box.gauge_color_in_range !== this.props.box.gauge_color_in_range ||
+        prevProps.box.gauge_color_high !== this.props.box.gauge_color_high);
+    if (valueChanged || gaugeStyleChanged) {
       // Only initialize the chart if it doesn't exist yet
       if (!this.chart) {
         this.initChart();
