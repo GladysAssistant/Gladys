@@ -474,7 +474,13 @@
         "selectDeviceLabel": "Sélectionner la fonctionnalité à afficher",
         "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
         "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
-        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
+        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur",
+        "thresholdsLabel": "Configurer des seuils personnalisés",
+        "thresholdsNoRange": "La fonctionnalité sélectionnée n'a pas de valeur minimale ou maximale définie, les seuils ne peuvent pas être configurés.",
+        "colorLowLabel": "Couleur en dessous du seuil bas",
+        "colorInRangeLabel": "Couleur entre les seuils",
+        "colorHighLabel": "Couleur au dessus du seuil haut",
+        "thresholdsLegendLabel": "Seuils :"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",

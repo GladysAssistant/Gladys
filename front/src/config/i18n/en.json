@@ -453,7 +453,13 @@
         "selectDeviceLabel": "Select feature to display",
         "noDeviceFeatureSelector": "No feature selected",
         "errorLoadingDevice": "An error occurred while loading the device",
-        "noDeviceFeatureLastValue": "This feature has not received any value yet"
+        "noDeviceFeatureLastValue": "This feature has not received any value yet",
+        "thresholdsLabel": "Configure custom thresholds",
+        "thresholdsNoRange": "The selected feature has no minimum or maximum value defined, thresholds cannot be configured.",
+        "colorLowLabel": "Color below the low threshold",
+        "colorInRangeLabel": "Color between the thresholds",
+        "colorHighLabel": "Color above the high threshold",
+        "thresholdsLegendLabel": "Thresholds:"
       },
       "energyConsumption": {
         "editName": "Widget Name (optional)",

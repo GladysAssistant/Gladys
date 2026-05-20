@@ -7,6 +7,31 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { checkAndConvertUnit } from '../../../../../server/utils/units';
 
+const DEFAULT_GAUGE_COLOR_LOW = '#316cbe';
+const DEFAULT_GAUGE_COLOR_IN_RANGE = '#00b894';
+const DEFAULT_GAUGE_COLOR_HIGH = '#d63031';
+
+const getZoneColor = (value, box) => {
+  if (!box.gauge_use_custom_value) {
+    return null;
+  }
+  const colorLow = box.gauge_color_low || DEFAULT_GAUGE_COLOR_LOW;
+  const colorInRange = box.gauge_color_in_range || DEFAULT_GAUGE_COLOR_IN_RANGE;
+  const colorHigh = box.gauge_color_high || DEFAULT_GAUGE_COLOR_HIGH;
+  const min = typeof box.gauge_min === 'number' ? box.gauge_min : null;
+  const max = typeof box.gauge_max === 'number' ? box.gauge_max : null;
+  if (min === null || max === null) {
+    return colorInRange;
+  }
+  if (value < min) {
+    return colorLow;
+  }
+  if (value > max) {
+    return colorHigh;
+  }
+  return colorInRange;
+};
+
 class GaugeBox extends Component {
   state = {
     deviceFeature: null,
@@ -83,8 +108,8 @@ class GaugeBox extends Component {
     // Update the chart series with the new percentage
     this.chart.updateSeries([percentage]);
 
-    // Update the value formatter to show the actual value with unit if available
-    this.chart.updateOptions({
+    const zoneColor = getZoneColor(value, this.props.box);
+    const updatedOptions = {
       plotOptions: {
         radialBar: {
           dataLabels: {
@@ -94,7 +119,24 @@ class GaugeBox extends Component {
           }
         }
       }
-    });
+    };
+    if (zoneColor) {
+      updatedOptions.colors = [zoneColor];
+      updatedOptions.fill = { type: 'solid', colors: [zoneColor] };
+    } else {
+      updatedOptions.fill = {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          shadeIntensity: 0.15,
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 50, 65, 91]
+        }
+      };
+    }
+    this.chart.updateOptions(updatedOptions);
   };
 
   formatValueWithUnit = (value, unit) => {
@@ -195,6 +237,8 @@ class GaugeBox extends Component {
       this.chart.destroy();
     }
 
+    const zoneColor = getZoneColor(value, this.props.box);
+
     // Configure chart options
     const options = {
       series: [percentage],
@@ -225,17 +269,20 @@ class GaugeBox extends Component {
           }
         }
       },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'dark',
-          shadeIntensity: 0.15,
-          inverseColors: false,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 50, 65, 91]
-        }
-      },
+      fill: zoneColor
+        ? { type: 'solid', colors: [zoneColor] }
+        : {
+            type: 'gradient',
+            gradient: {
+              shade: 'dark',
+              shadeIntensity: 0.15,
+              inverseColors: false,
+              opacityFrom: 1,
+              opacityTo: 1,
+              stops: [0, 50, 65, 91]
+            }
+          },
+      colors: zoneColor ? [zoneColor] : undefined,
       stroke: {
         dashArray: 4
       },
@@ -247,10 +294,48 @@ class GaugeBox extends Component {
     this.chart.render();
   }
 
+  renderThresholdsLegend() {
+    const { box } = this.props;
+    const { deviceFeature } = this.state;
+    if (!box.gauge_use_custom_value || !deviceFeature) {
+      return null;
+    }
+    const min = typeof box.gauge_min === 'number' ? box.gauge_min : null;
+    const max = typeof box.gauge_max === 'number' ? box.gauge_max : null;
+    if (min === null || max === null) {
+      return null;
+    }
+    const colorLow = box.gauge_color_low || DEFAULT_GAUGE_COLOR_LOW;
+    const colorInRange = box.gauge_color_in_range || DEFAULT_GAUGE_COLOR_IN_RANGE;
+    const colorHigh = box.gauge_color_high || DEFAULT_GAUGE_COLOR_HIGH;
+    const minLabel = this.formatValueWithUnit(min, deviceFeature.unit);
+    const maxLabel = this.formatValueWithUnit(max, deviceFeature.unit);
+    return (
+      <div class="card-body py-2 px-3 d-flex flex-wrap justify-content-center align-items-center gauge-thresholds-legend">
+        <small class="text-muted mr-2">
+          <Text id="dashboard.boxes.gauge.thresholdsLegendLabel" />
+        </small>
+        <small class="d-inline-flex align-items-center mr-3">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorLow }} />
+          {`< ${minLabel}`}
+        </small>
+        <small class="d-inline-flex align-items-center mr-3">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorInRange }} />
+          {`${minLabel} – ${maxLabel}`}
+        </small>
+        <small class="d-inline-flex align-items-center">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorHigh }} />
+          {`> ${maxLabel}`}
+        </small>
+      </div>
+    );
+  }
+
   render(props, { deviceFeature, error, noDeviceFeatureSelector, noDeviceFeatureLastValue }) {
     return (
       <div class="card">
         {deviceFeature && <div ref={el => (this.chartElement = el)} class="gauge-chart" />}
+        {this.renderThresholdsLegend()}
         {error && (
           <div class="card-body">
             <div class="alert alert-danger">
