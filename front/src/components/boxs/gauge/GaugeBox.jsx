@@ -196,6 +196,15 @@ class GaugeBox extends Component {
     if (prevProps.box.device_feature !== this.props.box.device_feature) {
       this.getDevice();
     }
+    // The selected feature identity changed (unit/range/label all differ):
+    // the chart must be fully rebuilt, updateChartValue would not refresh the label.
+    const deviceFeatureIdentityChanged =
+      this.state.deviceFeature &&
+      (!prevState.deviceFeature ||
+        prevState.deviceFeature.selector !== this.state.deviceFeature.selector ||
+        prevState.deviceFeature.unit !== this.state.deviceFeature.unit ||
+        prevState.deviceFeature.min !== this.state.deviceFeature.min ||
+        prevState.deviceFeature.max !== this.state.deviceFeature.max);
     const valueChanged =
       this.state.deviceFeature &&
       (!prevState.deviceFeature || prevState.deviceFeature.last_value !== this.state.deviceFeature.last_value);
@@ -207,7 +216,9 @@ class GaugeBox extends Component {
         prevProps.box.gauge_color_low !== this.props.box.gauge_color_low ||
         prevProps.box.gauge_color_in_range !== this.props.box.gauge_color_in_range ||
         prevProps.box.gauge_color_high !== this.props.box.gauge_color_high);
-    if (valueChanged || gaugeStyleChanged) {
+    if (deviceFeatureIdentityChanged) {
+      this.initChart();
+    } else if (valueChanged || gaugeStyleChanged) {
       // Only initialize the chart if it doesn't exist yet
       if (!this.chart) {
         this.initChart();
