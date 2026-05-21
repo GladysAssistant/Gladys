@@ -4069,8 +4069,8 @@
       "decimal": "pH (Décimale)"
     },
     "orp-sensor": {
-      "shortCategoryName": "Capteur ORP (Redox)",
-      "decimal": "ORP / Capacité de désinfection (Décimale)"
+      "shortCategoryName": "Capteur Redox / ORP",
+      "decimal": "Redox / ORP (Décimale)"
     },
     "text": {
       "shortCategoryName": "Texte",
