@@ -4076,7 +4076,7 @@
     },
     "orp-sensor": {
       "shortCategoryName": "ORP-Sensor (Redox)",
-      "decimal": "ORP / Desinfektionskapazität (Dezimal)"
+      "decimal": "ORP / Redox (Dezimal)"
     },
     "text": {
       "shortCategoryName": "Text",
