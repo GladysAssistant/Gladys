@@ -220,6 +220,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: maxLevel,
           });
         } else {
+          const minLevel = await clusterClient.getMinLevelAttribute();
+          const maxLevel = await clusterClient.getMaxLevelAttribute();
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Volume)`,
             selector: slugify(`matter-${device.name}-${clusterClient.name}-volume`, true),
@@ -228,8 +230,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             read_only: false,
             has_feedback: true,
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:volume`,
-            min: 0,
-            max: 254,
+            min: minLevel,
+            max: maxLevel,
           });
         }
       } else if (clusterIndex === ColorControl.Complete.id) {

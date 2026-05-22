@@ -208,12 +208,14 @@ async function setValue(gladysDevice, gladysFeature, value) {
       throw new Error('Device does not support MediaPlayback cluster');
     }
 
-    if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PLAY) {
-      await mediaPlayback.play();
-    } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PAUSE) {
-      await mediaPlayback.pause();
-    } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.STOP) {
-      await mediaPlayback.stop();
+    if (value === 1) {
+      if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PLAY) {
+        await mediaPlayback.play();
+      } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PAUSE) {
+        await mediaPlayback.pause();
+      } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.STOP) {
+        await mediaPlayback.stop();
+      }
     }
   }
 
