@@ -18,6 +18,8 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  MediaPlayback,
+  KeypadInput,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -203,23 +205,33 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 1,
         });
-      } else if (
-        clusterIndex === LevelControl.Complete.id &&
-        clusterClient.supportedFeatures &&
-        clusterClient.supportedFeatures.lighting
-      ) {
-        const minLevel = await clusterClient.getMinLevelAttribute();
-        const maxLevel = await clusterClient.getMaxLevelAttribute();
-        gladysDevice.features.push({
-          ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-          read_only: false,
-          has_feedback: true,
-          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: minLevel,
-          max: maxLevel,
-        });
+      } else if (clusterIndex === LevelControl.Complete.id) {
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.lighting) {
+          const minLevel = await clusterClient.getMinLevelAttribute();
+          const maxLevel = await clusterClient.getMaxLevelAttribute();
+          gladysDevice.features.push({
+            ...commonNewFeature,
+            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+            type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+            min: minLevel,
+            max: maxLevel,
+          });
+        } else {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Volume)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-volume`, true),
+            category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+            type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:volume`,
+            min: 0,
+            max: 254,
+          });
+        }
       } else if (clusterIndex === ColorControl.Complete.id) {
         if (clusterClient.supportedFeatures.hueSaturation) {
           gladysDevice.features.push({
@@ -415,6 +427,107 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 100,
+        });
+      } else if (clusterIndex === MediaPlayback.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Play)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-play`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:play`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Pause)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-pause`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.PAUSE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:pause`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Stop)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-stop`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.STOP,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:stop`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === KeypadInput.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Up)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-up`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.UP,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:up`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Down)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-down`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.DOWN,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:down`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Left)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-left`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.LEFT,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:left`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Right)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-right`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.RIGHT,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:right`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Enter)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-enter`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.ENTER,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:enter`,
+          min: 0,
+          max: 1,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Return)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-return`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: DEVICE_FEATURE_TYPES.TELEVISION.RETURN,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:return`,
+          min: 0,
+          max: 1,
         });
       }
     });
