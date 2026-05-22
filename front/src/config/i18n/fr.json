@@ -505,6 +505,11 @@
     "createDashboardButton": "Créer"
   },
   "integration": {
+    "tags": {
+      "gladysPlus": "Gladys Plus",
+      "cloud": "Cloud",
+      "local": "Local"
+    },
     "root": {
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
@@ -744,13 +749,16 @@
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
       "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
+      "logTitle": "Journal",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
     },
     "bluetooth": {
-      "title": "Bluetooth",
-      "description": "Contrôler vos appareils Bluetooth.",
+      "title": "Présence Bluetooth",
+      "description": "Détection de présence via Bluetooth.",
+      "warningTitle": "Limitations importantes",
+      "warningMessage": "Cette intégration permet de détecter la présence d'appareils Bluetooth tels que des porte-clés Bluetooth ou des balises (beacons). Attention : le suivi de téléphones et montres connectées ne fonctionne pas, car les constructeurs ont mis en place des protections anti-tracking (rotation des adresses MAC, etc.).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Bluetooth",
       "setupTab": "Scanner de présence",
@@ -796,7 +804,7 @@
         "title": "Scanner de présence",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
-        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil bluetooth est détecté.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan Bluetooth à interval régulier. Dès qu'un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état.",
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan bluetooth",
         "presenceScannerFrequencyUnit": "minutes",
@@ -1156,7 +1164,16 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "reset": {
+          "title": "Réinitialiser l'intégration",
+          "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Zigbee2mqtt. Cela peut être utile si votre configuration est corrompue ou si vous souhaitez changer de coordinateur Zigbee.",
+          "button": "Réinitialiser",
+          "confirmMessage": "Attention, réinitialiser l'intégration supprimera tous les fichiers liés à Zigbee2mqtt sur le disque et tous les paramètres enregistrés. Tous les appareils Zigbee actuellement appairés à Zigbee2mqtt devront être ré-appairés.",
+          "confirmButton": "Oui, tout réinitialiser",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        }
       },
       "device": {
         "title": "Appareils Zigbee",
@@ -1207,7 +1224,8 @@
         "enableLabel": "Activation du service Node-RED",
         "enableNodeRed": "Activer",
         "disableNodeRed": "Désactiver",
-        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
+        "confirmDisableWarning": "Attention : La désactivation de Node-RED supprimera définitivement toutes vos données Node-RED, y compris tous vos flows et configurations. Cette action est irréversible.",
+        "confirmDisableLabel": "Êtes-vous sûr de vouloir désactiver Node-RED ?",
         "confirmDisableCancelButton": "Annuler",
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-RED",
@@ -1343,7 +1361,11 @@
       "reloadButton": "Relancer",
       "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
       "resetButton": "Réinitialiser",
-      "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
+      "resetError": "Une erreur est survenue pendant la réinitialisation du pont",
+      "mdns": "Si vous rencontrez des problèmes de connexion entre votre application Maison et le pont Gladys HomeKit, il est possible que votre réseau local ait des difficultés à trouver le pont HomeKit. Vous pouvez essayer de modifier l'annonceur mDNS utilisé parmi les options disponibles.",
+      "saveMDNSButton": "Enregistrer",
+      "saveMDNSSuccess": "L'annonceur mDNS a été enregistré avec succès. Le redémarrage du service HomeKit est automatique, attendez quelques secondes avant de l'ajouter à votre application Maison.",
+      "saveMDNSError": "Une erreur est survenue lors de l'enregistrement de l'annonceur mDNS."
     },
     "owntracks": {
       "title": "OwnTracks",
@@ -1379,6 +1401,7 @@
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "localModeLimitInfo": "Le mode local est encore en amélioration. Pour certains appareils, les commandes ou retours d'état peuvent encore passer par le cloud Tuya, même si le mode Local est activé.",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
         "setupPageLink": "page de configuration Tuya.",
@@ -1390,23 +1413,56 @@
         "updates": "Vérifier les mises à jour",
         "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil Tuya trouvé.",
-        "featuresLabel": "Fonctionnalités"
+        "featuresLabel": "Fonctionnalités",
+        "idLabel": "Identifiant de l'appareil",
+        "localKeyLabel": "Clé locale",
+        "protocolVersionLabel": "Version du protocole",
+        "protocol35OptionUnsupported": "3.5 (Non supporté)",
+        "protocolVersionRequired": "Le protocole 3.5 n'est pas encore supporté mais le sera prochainement.",
+        "ipAddressLabel": "Adresse IP",
+        "ipModeLocal": "Local",
+        "ipModeCloud": "Cloud",
+        "localInfoHelp": "Utilisez le bouton Cloud/Local pour choisir le mode de communication. Le mode local permet de modifier l'IP locale. Le mode cloud affiche l'IP cloud (lecture seule).",
+        "localPollButton": "Lecture locale des DP",
+        "localPollInProgress": "Lecture locale en cours... protocole {{protocol}}.",
+        "localPollHelp": "Si vous connaissez le protocole, sélectionnez-le puis cliquez pour vérifier. Sinon, cliquez directement pour un scan complet (plus long).",
+        "localPollRequired": "Le mode local est activé et les paramètres locaux ont changé. Lancez une lecture locale des DP avec succès avant de sauvegarder. Si vous n'arrivez pas à faire fonctionner le local, repassez en mode cloud.",
+        "localPollSuccess": "Lecture locale OK.",
+        "localPollError": "Échec de la lecture locale :",
+        "productIdLabel": "Identifiant produit",
+        "productKeyLabel": "Clé produit"
       },
       "discover": {
         "title": "Appareils détectés sur votre compte cloud Tuya",
         "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
+        "localDiscoveryInfo": "<strong class=\"h5 d-block\">Scan Cloud</strong>Rafraîchit la liste cloud. Assurez-vous que vos appareils sont en mode <strong>contrôlable</strong> dans Tuya, sinon ils resteront en <strong>lecture seule</strong>. La période d'essai est limitée à <strong>10 appareils contrôlables</strong> : les autres n'auront que le <strong>retour d'état</strong>.<br /><br /><strong class=\"h5 d-block\">Scan local auto</strong>Lance un scan sur votre réseau local (broadcast UDP, même plage IP que Gladys). Si un appareil n'est pas trouvé, renseignez l'<strong>IP locale</strong> et la <strong>version du protocole</strong> (ou laissez vide si vous ne la connaissez pas), puis utilisez \"<strong>Lecture locale des DP</strong>\" pour valider la communication locale.<br /><br />Utilisez <strong>Sauvegarder</strong> pour créer un appareil et <strong>Mettre à jour</strong> pour appliquer des changements ou passer l'appareil en local.",
+        "scanCloudInProgress": "Scan en cours... récupération cloud des appareils. Cela peut prendre un moment.",
+        "scanLocalInProgressConnected": "Scan en cours... récupération des informations locales des appareils. Cela peut prendre un moment.",
+        "scanLocalInProgressDisconnected": "Scan en cours... récupération des appareils en local. Cela peut prendre un moment.",
+        "scanCloud": "Scan Cloud",
+        "localScanAuto": "Scan local auto",
+        "udpScanError": "Erreur lors du scan UDP local.",
+        "udpScanPortInUse": "Impossible d'écouter sur les ports {{ports}} (déjà utilisés). Fermez les services qui écoutent sur ces ports puis relancez le scan.",
         "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
         "scan": "Scanner"
       },
       "setup": {
         "title": "Configuration Tuya",
-        "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
-        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a>.",
-        "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya.",
-        "descriptionGetKeys": "Vous aurez accès aux deux clés : Access Key et Secret Key.",
-        "descriptionGetAppAccountUid": "Pour avoir votre \"App account UID\", il faut vous rendre dans la section \"Devices\" -> \"Link Tuya App Account\" et ajouter un compte d'application.",
-        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalisé, votre \"App account UID\" sera dans la colonne UID.",
+        "cloudTitle": "Cloud",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés. La documentation est disponible dans le menu de gauche ou <a href=\"https://gladysassistant.com/fr/docs/integrations/tuya\" target=\"_blank\" rel=\"noopener noreferrer\">ici</a>.",
+        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a> (<a href=\"https://auth.tuya.com/register\" target=\"_blank\" rel=\"noopener noreferrer\">Créer un compte</a> / <a href=\"https://auth.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Se connecter</a>).",
+        "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya (console : <a href=\"https://platform.tuya.com/cloud\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Platform</a>).",
+        "descriptionGetKeys": "Vous aurez accès aux deux clés : <strong>Client ID</strong> et <strong>Client Secret</strong>.",
+        "descriptionGetAppAccountUid": "Pour avoir votre <strong>App account UID</strong>, il faut vous rendre dans la section \"Devices\" -> \"Link Tuya App Account\" et ajouter un compte d'application.",
+        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalisé, votre <strong>App account UID</strong> sera dans la colonne UID.",
+        "descriptionTrial": "Les projets Tuya Cloud ont une <strong>période d'essai</strong> : pensez à la <strong>renouveler</strong> ou l'<strong>étendre</strong> régulièrement pour éviter les coupures.",
+        "descriptionCloudLimit": "À noter : l'essai Tuya Cloud permet jusqu'à <strong>10 appareils contrôlables</strong>. Les appareils supplémentaires peuvent rester en <strong>lecture seule</strong> tant que vous n'avez pas mis à niveau.",
+        "descriptionControllable": "Certains appareils sont en <strong>lecture seule</strong> par défaut. Dans la Tuya IoT Platform, ouvrez <strong>Device Permission</strong> puis cliquez sur <strong>Change</strong> pour les rendre contrôlables.",
+        "localTitle": "Local",
+        "descriptionLocalMode": "Le mode local peut être utilisé après la configuration cloud : renseignez l'IP locale et la version du protocole sur chaque appareil pour interroger en local. Si les appareils sont sur le même réseau que la machine Gladys, la découverte IP et la version du protocole sont automatiquement détectées. Ce mode permet de se passer du renouvellement cloud, mais il reste nécessaire lors de l'ajout d'un nouvel appareil depuis l'application Tuya.",
+        "descriptionLocalKeepsApp": "<strong>Le contrôle en local</strong> ne désactive pas le contrôle via l'application Tuya/Smart Life.",
+        "descriptionCameraLimit": "<strong>Caméras</strong> : le flux vidéo n'est pas encore pris en charge dans Gladys.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Western America",
@@ -1416,17 +1472,30 @@
           "india": "India"
         },
         "endpoint": "Endpoint",
-        "accessKey": "Access Key",
-        "accessKeyPlaceholder": "Entrez l'Access Key de Tuya",
-        "secretKey": "Secret Key",
-        "secretKeyPlaceholder": "Entrez la Secret Key de Tuya",
-        "appAccountId": "App account UID",
+        "accessKey": "Client ID",
+        "accessKeyPlaceholder": "Entrez le 'Client ID' de Tuya",
+        "secretKey": "Client Secret",
+        "secretKeyPlaceholder": "Entrez le 'Client Secret' de Tuya",
+        "appAccountId": "App account User ID",
         "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
-        "saveLabel": "Enregistrer la configuration",
+        "appUsername": "Identifiant Smart Life (optionnel)",
+        "appUsernamePlaceholder": "Email ou téléphone du compte Smart Life",
+        "saveLabel": "Enregistrer la configuration et se connecter",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
-        "connected": "Connexion réussie au compte cloud Tuya !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "errorInvalidEndpoint": "L'endpoint semble incorrect. Veuillez vérifier l'endpoint.",
+        "errorInvalidClientId": "Le Client ID semble invalide. Veuillez vérifier le Client ID.",
+        "errorInvalidClientSecret": "Le Client Secret semble invalide. Veuillez vérifier le Client Secret.",
+        "errorInvalidAppAccountUid": "L'UID du compte d'application semble invalide. Veuillez vérifier l'UID du compte d'application.",
+        "notConfigured": "Informations de connexion au compte cloud Tuya non renseignées ou manquantes !",
+        "connectedAfterSave": "Connexion au compte cloud Tuya réussie !",
+        "connectedStatus": "Connecté au compte cloud Tuya.",
+        "disconnectSuccess": "Déconnexion du compte cloud Tuya réussie ! Le service local fonctionne toujours (vous ne serez pas reconnecté automatiquement au redémarrage de Gladys).",
+        "disconnectedUnexpected": "Vous avez été déconnecté du cloud Tuya ! Vérifiez vos informations de connexion et l'état de votre abonnement d'essai <a href=\"https://eu.platform.tuya.com/cloud/products?productType=all\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya IoT Core</a>.",
+        "disconnectedManual": "Déconnecté du cloud Tuya ! Le service local fonctionne toujours (vous ne serez pas reconnecté automatiquement au redémarrage de Gladys).",
+        "disconnectedMissingConfig": "Déconnecté du cloud Tuya.",
+        "disconnectLabel": "Se déconnecter du cloud"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
@@ -1556,7 +1625,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "alphaWarning": "Cette intégration gère un nombre limité d'appareils Z-Wave, si tu as des appareils non-gérés, n'hésite pas à nous le soumettre pour qu'il soit ajouté !",
+      "alphaWarning": "Si vous avez des appareils Z-Wave non gérés, n'hésitez pas à nous les soumettre sur le forum pour qu'ils soient ajoutés !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",
@@ -1653,8 +1722,9 @@
       }
     },
     "mqtt": {
-      "title": "MQTT",
-      "description": "Connexion à un serveur MQTT, en local ou en distant.",
+      "title": "Appareils virtuels MQTT",
+      "description": "Créez des appareils virtuels contrôlables via MQTT.",
+      "virtualDevicesExplanation": "Cette intégration permet de créer des appareils virtuels, qui sont contrôlables via MQTT, via HTTP, dans les scènes et sur le tableau de bord. Pour utiliser des appareils Zigbee, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>. Pour utiliser des appareils Z-Wave, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>. Pour utiliser des appareils MQTT Nuki, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/nuki\">Nuki</a>.",
       "deviceTab": "Appareils",
       "debugTab": "Debug MQTT",
       "setupTab": "Configuration",
@@ -2175,7 +2245,8 @@
         "pairingCodeHelp": "Entrez le code d'appairage à 11 ou 21 chiffres fourni par votre appareil Matter",
         "addButton": "Ajouter à Gladys",
         "loading": "Connexion au périphérique, cela peut prendre quelques minutes.",
-        "error": "Impossible d'ajouter cet appareil Matter à Gladys, êtes-vous sûr que cet appareil est bien sur le même réseau que Gladys ? Est-ce que Gladys est bien lancé en network=host ?"
+        "error": "Impossible d'ajouter cet appareil Matter à Gladys. Vérifiez que :<br/>- L'appareil est bien sur le même réseau que Gladys<br/>- Gladys est bien lancé en network=host<br/>- Si vous utilisez un Thread Border Router, vous devez utiliser un code d'appairage fourni par l'application du routeur (voir avertissement ci-dessus)",
+        "borderRouterWarning": "<b>Attention :</b> Si vous utilisez un Thread Border Router (Apple TV, IKEA Dirigera, Aqara) et que vos appareils Thread sont connectés à ce routeur, vous devez utiliser un code d'appairage fourni par l'application du routeur, et non pas le code imprimé sur l'appareil."
       },
       "settings": {
         "title": "Paramètres Matter",
@@ -2195,7 +2266,16 @@
         "disabledWarningSettings": "Matter n'est pas activé, veuillez cliquer sur le bouton ci-dessous pour l'activer.",
         "enableButton": "Activer Matter",
         "disableButton": "Désactiver Matter",
-        "downloadNodesJson": "Télécharger Noeuds Matter en JSON"
+        "downloadNodesJson": "Télécharger Noeuds Matter en JSON",
+        "reset": {
+          "title": "Réinitialiser l'intégration",
+          "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Matter. Cela supprimera toutes les données du contrôleur, la sauvegarde et le dossier Matter.",
+          "button": "Réinitialiser",
+          "confirmMessage": "Attention, la réinitialisation de l'intégration supprimera toutes les données du contrôleur Matter, la sauvegarde et le dossier Matter. Tous les appareils Matter actuellement appairés devront être ré-appairés.",
+          "confirmButton": "Oui, tout réinitialiser",
+          "cancelButton": "Annuler",
+          "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
+        }
       }
     },
     "mcp": {
@@ -2656,6 +2736,13 @@
       "warning": {
         "houseWithoutCoordinate": "Votre maison n'a pas de coordonnées renseignées. Ce déclencheur ne peut fonctionner sans cette donnée. Veuillez-vous rendre dans Paramètres/Maisons et cliquer sur la carte pour définir les coordonnées de cette maison."
       },
+      "sunriseSunsetTrigger": {
+        "offsetLabel": "Quand",
+        "atExactTime": "À l'heure exacte",
+        "before": "Avant",
+        "after": "Après",
+        "minutes": "minutes"
+      },
       "userPresence": {
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",
         "leftHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné partira de la maison sélectionnée.",
@@ -2739,6 +2826,7 @@
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
     "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local.",
+    "emailTextOtherUser": "L'email sert juste d'identifiant, il n'est enregistré qu'en local.",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
@@ -3497,7 +3585,9 @@
           "81": "Maintien Moins",
           "82": "Relâchement Plus",
           "83": "Relâchement Centre",
-          "84": "Relâchement Moins"
+          "84": "Relâchement Moins",
+          "85": "On clic double",
+          "86": "Off clic double"
         }
       },
       "heater": {
@@ -3975,6 +4065,10 @@
     "uv-sensor": {
       "shortCategoryName": "Capteur d'UV",
       "integer": "Indice UV"
+    },
+    "hepa-filter-monitoring": {
+      "shortCategoryName": "Surveillance filtre HEPA",
+      "filter-life-remaining": "Durée de vie restante du filtre"
     },
     "duration": {
       "shortCategoryName": "Durée",

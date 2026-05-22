@@ -46,7 +46,7 @@ describe('Scene.triggers.alarmMode', () => {
   });
 
   it('should execute scene with alarm.arm trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -80,7 +80,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should execute scene with alarm.arming trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -114,7 +114,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should execute scene with alarm.disarm trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -148,7 +148,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should execute scene with alarm.partial-arm trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -182,7 +182,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should execute scene with alarm.panic trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -216,7 +216,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should execute scene with alarm.too-many-codes-tests trigger', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [
@@ -250,7 +250,7 @@ describe('Scene.triggers.alarmMode', () => {
     });
   });
   it('should not execute scene (house not matching)', async () => {
-    sceneManager.addScene({
+    await sceneManager.addScene({
       selector: 'my-scene',
       active: true,
       actions: [

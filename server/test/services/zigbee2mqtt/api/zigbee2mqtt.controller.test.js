@@ -25,6 +25,7 @@ const zigbee2mqttManager = {
   disconnect: fake.returns(true),
   setPermitJoin: fake.returns(true),
   getPermitJoin: fake.returns(true),
+  reset: fake.resolves(true),
 };
 
 describe('zigbee2mqtt API', () => {
@@ -159,5 +160,16 @@ describe('zigbee2mqtt API', () => {
     await controller['get /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
     assert.calledOnce(zigbee2mqttManager.getPermitJoin);
     assert.calledWith(res.json, true);
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/reset', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/reset'].controller(req, res);
+    assert.calledOnce(zigbee2mqttManager.reset);
+    assert.calledWith(res.json, { success: true });
   });
 });

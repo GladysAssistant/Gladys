@@ -61,4 +61,59 @@ describe('EnergyPrice.getDefaultElectricMeterFeatureId', () => {
     // Verify the result is null
     expect(featureId).to.equal(null);
   });
+
+  it('should return null when device does not exist in state manager', async () => {
+    // Create an energy price entry with an electric meter device ID
+    const electricMeterDeviceId = '7f85c2f8-86cc-4600-84db-6c074dadb4e8';
+    await db.EnergyPrice.create({
+      contract: 'base',
+      price_type: 'consumption',
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 20,
+      electric_meter_device_id: electricMeterDeviceId,
+    });
+
+    // Don't set up the device in state manager (simulating deleted device)
+
+    // Call the function
+    const featureId = await energyPrice.getDefaultElectricMeterFeatureId();
+
+    // Verify the result is null
+    expect(featureId).to.equal(null);
+  });
+
+  it('should return null when device has no energy sensor feature', async () => {
+    // Create an energy price entry with an electric meter device ID
+    const electricMeterDeviceId = '7f85c2f8-86cc-4600-84db-6c074dadb4e8';
+    await db.EnergyPrice.create({
+      contract: 'base',
+      price_type: 'consumption',
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 20,
+      electric_meter_device_id: electricMeterDeviceId,
+    });
+
+    // Set up the device in state manager without an energy sensor feature
+    const mockDevice = {
+      id: electricMeterDeviceId,
+      name: 'Electric Meter',
+      selector: 'electric-meter',
+      features: [
+        {
+          id: 'some-other-feature-id',
+          category: 'temperature-sensor',
+          type: 'decimal',
+        },
+      ],
+    };
+    stateManager.setState('deviceById', electricMeterDeviceId, mockDevice);
+
+    // Call the function
+    const featureId = await energyPrice.getDefaultElectricMeterFeatureId();
+
+    // Verify the result is null
+    expect(featureId).to.equal(null);
+  });
 });

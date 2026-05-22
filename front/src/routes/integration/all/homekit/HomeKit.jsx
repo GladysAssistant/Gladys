@@ -5,6 +5,13 @@ import cx from 'classnames';
 import style from './style.css';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
+const mdnsAdvertisers = {
+  AVAHI: 'avahi',
+  BONJOUR: 'bonjour-hap',
+  CIAO: 'ciao',
+  RESOLVED: 'resolved'
+};
+
 const HomKitPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
@@ -67,6 +74,35 @@ const HomKitPage = ({ children, ...props }) => (
                           <Text id={`integration.homekit.qrCode`} />
                           {props.homekitSetupDataUrl && (
                             <img class="mx-auto d-block mb-3" src={props.homekitSetupDataUrl} />
+                          )}
+                          <div class="input-group mb-2">
+                            <p className={style.buttonDescription}>
+                              <Text id="integration.homekit.mdns" />
+                            </p>
+                            <select
+                              class="form-control"
+                              onChange={props.updateMDNSAdvertiser}
+                              value={props.homekitMdnsAdvertiser}
+                            >
+                              {Object.keys(mdnsAdvertisers).map(mdns => (
+                                <option value={mdnsAdvertisers[mdns]}>{mdns}</option>
+                              ))}
+                            </select>
+                            <div class="input-group-append">
+                              <button class="btn btn-success" onClick={props.saveMDNSAdvertiser}>
+                                <Text id="integration.homekit.saveMDNSButton" />
+                              </button>
+                            </div>
+                          </div>
+                          {props.homekitSaveMDNSStatus === RequestStatus.Success && (
+                            <div class="alert alert-success">
+                              <Text id="integration.homekit.saveMDNSSuccess" />
+                            </div>
+                          )}
+                          {props.homekitSaveMDNSStatus === RequestStatus.Error && (
+                            <div class="alert alert-danger">
+                              <Text id="integration.homekit.saveMDNSError" />
+                            </div>
                           )}
                           <p className={style.buttonDescription}>
                             <Text id={`integration.homekit.reload`} />

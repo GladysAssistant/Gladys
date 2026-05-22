@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const { Error429 } = require('../../utils/httpErrors');
+const { resizeImage } = require('../../utils/resizeImage');
 
 const intentTranslation = {
   SHOW_CAMERA: 'camera.get-image',
@@ -31,30 +32,34 @@ const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY', 'NO_
  */
 async function forwardMessageToOpenAI({ message, image, previousQuestions, context }) {
   try {
+    // Resize image to reduce API costs (640x480 is sufficient for security camera AI analysis)
+    const resizedImage = image ? await resizeImage(image) : undefined;
+
     const response = await this.openAIAsk({
       question: message.text,
-      image,
+      image: resizedImage,
       previous_questions: previousQuestions,
     });
 
     const classification = {};
+    classification.entities = [];
 
     // add room entity
     if (response.room) {
       const roomId = this.brain.getEntityIdByName('room', response.room);
-      classification.entities = [{ entity: 'room', option: roomId, sourceText: response.room }];
+      classification.entities.push({ entity: 'room', option: roomId, sourceText: response.room });
     }
 
     // add scene entity
     if (response.scene) {
       const sceneSelector = this.brain.getEntityIdByName('scene', response.scene);
-      classification.entities = [{ entity: 'scene', option: sceneSelector, sourceText: response.scene }];
+      classification.entities.push({ entity: 'scene', option: sceneSelector, sourceText: response.scene });
     }
 
     // add device entity
     if (response.device) {
       const deviceSelector = this.brain.getEntityIdByName('device', response.device);
-      classification.entities = [{ entity: 'device', option: deviceSelector, sourceText: response.device }];
+      classification.entities.push({ entity: 'device', option: deviceSelector, sourceText: response.device });
     }
 
     classification.intent = intentTranslation[response.type];

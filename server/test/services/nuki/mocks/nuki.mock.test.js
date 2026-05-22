@@ -10,7 +10,10 @@ const NukiHandlerMock = function NukiHandlerMock(gladys, serviceId) {
 // COMMANDS
 NukiHandlerMock.prototype.start = fake.returns(null);
 NukiHandlerMock.prototype.stop = fake.returns(null);
-NukiHandlerMock.prototype.getStatus = fake.resolves(true);
+NukiHandlerMock.prototype.getStatus = fake.resolves({
+  mqttOk: true,
+  webOk: true,
+});
 
 // CONFIG
 NukiHandlerMock.prototype.getConfiguration = fake.resolves({

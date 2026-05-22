@@ -291,6 +291,9 @@ class SetupTab extends Component {
           )}
           {dockerBased && networkModeValid && nodeRedEnabled && showConfirmDelete && (
             <div style="row-gap: 1em" class="d-flex justify-content-between align-items-start flex-column">
+              <div class="alert alert-danger">
+                <Text id="integration.nodeRed.setup.confirmDisableWarning" />
+              </div>
               <Text id="integration.nodeRed.setup.confirmDisableLabel" />
               <div>
                 <button
