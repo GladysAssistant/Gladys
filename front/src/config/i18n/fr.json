@@ -2130,7 +2130,7 @@
       "eggDuration": "Comment cuire les oeufs durs ?",
       "showMeTheCameraInTheKitchen": "Montre-moi la caméra de la cuisine",
       "activateOpenAiChat": "Activer l'IA dans le chat Gladys",
-      "rateLimit": "L'API d'IA étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
+      "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
       "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
     },

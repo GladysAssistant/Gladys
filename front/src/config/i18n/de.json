@@ -2130,7 +2130,7 @@
       "eggDuration": "\"Wie kocht man harte Eier?\"",
       "showMeTheCameraInTheKitchen": "\"Zeige mir die Kamera in der Küche\"",
       "activateOpenAiChat": "Aktiviere die KI im Gladys-Chat",
-      "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 1000 Anfragen pro Monat begrenzt.",
+      "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
     },

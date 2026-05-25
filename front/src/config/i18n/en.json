@@ -2130,7 +2130,7 @@
       "eggDuration": "How do you make hard boiled eggs ?",
       "showMeTheCameraInTheKitchen": "Show me the camera in the kitchen",
       "activateOpenAiChat": "Activate AI in Gladys chat",
-      "rateLimit": "As the AI API is not free, this integration is limited to 1000 requests per month.",
+      "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
     },
