@@ -2123,7 +2123,7 @@
       "title": "Künstliche Intelligenz",
       "documentation": "KI-Dokumentation",
       "description": "Gib Gladys die Kraft der künstlichen Intelligenz.",
-      "firstExplanation": "Gladys kann eine künstliche Intelligenz (Mistral-Modelle, in Frankreich bei Scaleway gehostet) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
+      "firstExplanation": "Gladys kann künstliche Intelligenz (Mistral-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
       "aFewExamples": "Einige Beispiele für Dinge, die du der KI sagen kannst:",
       "turnOnTheLight": "\"Schalte das Licht in der Küche ein\"",
       "sizeOfEiffelTower": "\"Wie groß ist der Eiffelturm?\"",
@@ -3134,8 +3134,8 @@
         "description": "Steuere Gladys per Sprache mit Google Home und Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral KI (in Frankreich gehostet)",
-        "description": "Sprich mit deinem Zuhause dank einer KI, die in Frankreich bei Scaleway gehostet wird."
+        "title": "Mistral KI",
+        "description": "Sprich mit deinem Zuhause dank Mistral-KI-Modellen, in Gladys Plus enthalten."
       },
       "cameraStreaming": {
         "title": "Kamera-Streaming",
@@ -3179,7 +3179,7 @@
         "everythingInLite": "Alles aus Lite, und zusätzlich:",
         "backups": "Verschlüsselte tägliche Backups",
         "cameraStreaming": "Kamera-Streaming aus der Ferne",
-        "ai": "KI-Integration (Mistral, gehostet in Frankreich)",
+        "ai": "KI-Integration (Mistral)",
         "enedis": "Enedis-Integration (Stromverbrauch)",
         "mcp": "MCP-Server für deine bevorzugten KIs"
       }
@@ -3188,10 +3188,10 @@
     "privacyTitle": "Privacy-first, in Europa gehostet",
     "privacySubtitle": "Deine Daten bleiben deine. Das nehmen wir sehr ernst.",
     "privacy": {
-      "aiTitle": "KI in Frankreich gehostet",
-      "aiDescription": "Die von Gladys Plus genutzten Mistral-Modelle laufen bei Scaleway, in Frankreich. Nichts verlässt das Land für die KI-Inferenz.",
+      "aiTitle": "Datenschutzfreundliche KI",
+      "aiDescription": "Gladys Plus nutzt Mistral-Modelle für KI-Funktionen. Deine Daten werden nicht weiterverkauft oder für Werbung genutzt.",
       "infraTitle": "Infrastruktur in Europa",
-      "infraDescription": "Die Gladys-Plus-Infrastruktur (API, Backups, Relays) läuft in Rechenzentren in Frankreich und Deutschland, DSGVO-konform.",
+      "infraDescription": "Die Gladys-Plus-Infrastruktur (API, Backups, Relays) läuft in europäischen Rechenzentren, DSGVO-konform.",
       "e2eTitle": "Ende-zu-Ende-Verschlüsselung",
       "e2eDescription": "Deine Befehle und Backups werden mit Schlüsseln verschlüsselt, die nur deine lokale Instanz besitzt."
     },
@@ -3217,10 +3217,10 @@
     },
     "openai": {
       "title": "Sprich mit deinem Zuhause dank Mistral KI",
-      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren. Mistral-Modelle in Frankreich bei Scaleway gehostet, nichts verlässt das Land.",
+      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren.",
       "feature1": "Licht an, Ventilator aus, per Nachricht im Chat",
       "feature2": "Proaktive KI in Szenen: führt regelmäßig Smart-Home-Abfragen aus (Kennzeichen lesen, CO₂-Wert prüfen, eine Kamera überwachen…)",
-      "feature3": "Mistral-Modelle in Frankreich gehostet · keine weiterverkauften Daten"
+      "feature3": "Mistral KI · keine weiterverkauften Daten"
     },
     "enedis": {
       "title": "Verfolge deinen Stromverbrauch mit Enedis",
@@ -3249,11 +3249,11 @@
     },
     "askAi": {
       "title": "Diese Aktion erfordert Gladys Plus",
-      "description": "Die Aktion „KI fragen“ nutzt Mistral-Modelle, die in Frankreich über Gladys Plus gehostet werden, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
-      "compactDescription": "Diese Aktion nutzt die in Frankreich gehostete Mistral-KI über Gladys Plus.",
+      "description": "Die Aktion „KI fragen“ nutzt Mistral-KI über Gladys Plus, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
+      "compactDescription": "Diese Aktion nutzt Mistral-KI über Gladys Plus.",
       "feature1": "Stelle der KI in einer Szene eine offene Frage",
       "feature2": "Hänge ein Kamerabild an und die KI kann beschreiben, was sie sieht",
-      "feature3": "Mistral-Modelle in Frankreich gehostet · keine weiterverkauften Daten"
+      "feature3": "Mistral KI · keine weiterverkauften Daten"
     },
     "tts": {
       "title": "Diese Aktion erfordert Gladys Plus",
@@ -4263,7 +4263,7 @@
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
     "gpt3Integration": "KI-Integration",
-    "gpt3IntegrationExplanation": "Gladys ist jetzt mit einer in Frankreich gehosteten KI (Mistral-Modelle) kompatibel, was Gladys eine übergroße Intelligenz verleiht! Für weitere Informationen ",
+    "gpt3IntegrationExplanation": "Gladys ist jetzt mit Mistral-KI über Gladys Plus kompatibel, was Gladys eine übergroße Intelligenz verleiht! Für weitere Informationen ",
     "gpt3ClickHere": "klicke hier!",
     "gladysAlt": "Gladys",
     "examples": {

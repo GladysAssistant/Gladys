@@ -2123,7 +2123,7 @@
       "title": "Artificial Intelligence",
       "documentation": "AI documentation",
       "description": "Give Gladys the power of artificial intelligence.",
-      "firstExplanation": "Gladys can use an artificial intelligence (Mistral models, hosted in France at Scaleway) to help you communicate with your connected home.",
+      "firstExplanation": "Gladys can use artificial intelligence (Mistral models via Gladys Plus) to help you communicate with your connected home.",
       "aFewExamples": "A few examples of things you can ask: ",
       "turnOnTheLight": "Turn on the light in the kitchen",
       "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
@@ -3134,8 +3134,8 @@
         "description": "Control Gladys with your voice using Google Home and Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral AI (hosted in France)",
-        "description": "Talk to your home using AI models hosted in France at Scaleway."
+        "title": "Mistral AI",
+        "description": "Talk to your home using Mistral AI models, included with Gladys Plus."
       },
       "cameraStreaming": {
         "title": "Camera streaming",
@@ -3179,7 +3179,7 @@
         "everythingInLite": "Everything in Lite, plus:",
         "backups": "Encrypted daily backups",
         "cameraStreaming": "Remote camera streaming",
-        "ai": "AI integration (Mistral, hosted in France)",
+        "ai": "AI integration (Mistral)",
         "enedis": "Enedis integration (electric consumption)",
         "mcp": "MCP server to plug your favourite AIs"
       }
@@ -3188,10 +3188,10 @@
     "privacyTitle": "Privacy-first, hosted in Europe",
     "privacySubtitle": "Your data stays yours. We take this very seriously.",
     "privacy": {
-      "aiTitle": "AI hosted in France",
-      "aiDescription": "The Mistral models used by Gladys Plus run at Scaleway, in France. Nothing leaves the country for AI inference.",
+      "aiTitle": "Privacy-friendly AI",
+      "aiDescription": "Gladys Plus uses Mistral models for AI features. Your data is not resold or used for advertising.",
       "infraTitle": "Infrastructure in Europe",
-      "infraDescription": "The Gladys Plus infrastructure (API, backups, relays) runs in data centers in France and Germany, GDPR compliant.",
+      "infraDescription": "The Gladys Plus infrastructure (API, backups, relays) runs in European data centers, GDPR compliant.",
       "e2eTitle": "End-to-end encryption",
       "e2eDescription": "Your commands and backups are encrypted with keys that only your local Gladys instance owns."
     },
@@ -3217,10 +3217,10 @@
     },
     "openai": {
       "title": "Talk to your home with Mistral AI",
-      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat. Mistral models are hosted in France at Scaleway, nothing leaves the country.",
+      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat.",
       "feature1": "Turn the lights on, turn the fan off, by sending a message in the chat",
       "feature2": "Proactive AI in scenes: run home automation questions on a schedule (read a licence plate, check CO₂ levels, monitor a camera…)",
-      "feature3": "Mistral models hosted in France · no data resold"
+      "feature3": "Mistral AI · no data resold"
     },
     "enedis": {
       "title": "Track your electric consumption with Enedis",
@@ -3249,11 +3249,11 @@
     },
     "askAi": {
       "title": "This action requires Gladys Plus",
-      "description": "The \"Ask AI\" action uses Mistral models hosted in France via Gladys Plus to answer questions and analyse camera images inside your scenes.",
-      "compactDescription": "This action uses the Mistral AI hosted in France via Gladys Plus.",
+      "description": "The \"Ask AI\" action uses Mistral AI via Gladys Plus to answer questions and analyse camera images inside your scenes.",
+      "compactDescription": "This action uses Mistral AI via Gladys Plus.",
       "feature1": "Ask an open question to the AI inside a scene",
       "feature2": "Attach a camera image and the AI can describe what it sees",
-      "feature3": "Mistral models hosted in France · no data resold"
+      "feature3": "Mistral AI · no data resold"
     },
     "tts": {
       "title": "This action requires Gladys Plus",
@@ -4263,7 +4263,7 @@
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
     "gpt3Integration": "Artificial Intelligence integration",
-    "gpt3IntegrationExplanation": "Gladys is now compatible with an AI hosted in France (Mistral models), which gives her an over-sized intelligence! For more information,",
+    "gpt3IntegrationExplanation": "Gladys is now compatible with Mistral AI via Gladys Plus, which gives her an over-sized intelligence! For more information,",
     "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
     "examples": {
