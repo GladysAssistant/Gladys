@@ -6,6 +6,7 @@ import get from 'get-value';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 
 class AskAI extends Component {
   getOptions = async () => {
@@ -98,6 +99,13 @@ class AskAI extends Component {
   render(props, { selectedUserOption, userOptions, selectedCameraOption, cameraOptions }) {
     return (
       <div>
+        <GladysPlusUpsell
+          compact
+          icon="fe-cpu"
+          utmCampaign="scene_action_ask_ai"
+          titleKey="gladysPlusUpsell.askAi.title"
+          descriptionKey="gladysPlusUpsell.askAi.compactDescription"
+        />
         <p>
           <Text id="editScene.actionsCard.askAi.description" />
         </p>

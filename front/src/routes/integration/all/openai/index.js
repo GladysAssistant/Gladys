@@ -1,7 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { MarkupText, Text } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import Layout from './Layout';
+import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 
 class OpenAIGateway extends Component {
   getOpenAiEnabledStatus = async () => {
@@ -72,9 +73,18 @@ class OpenAIGateway extends Component {
           </div>
           <div class="card-body">
             {gladysPlusConnected === false && (
-              <div class="alert alert-warning">
-                <Text id="integration.openai.notOnGladysPlus" />{' '}
-                <MarkupText id="integration.openai.subscribeToGladysPlus" />
+              <div class="mb-4">
+                <GladysPlusUpsellCard
+                  icon="fe-cpu"
+                  utmCampaign="integration_openai"
+                  titleKey="gladysPlusUpsell.openai.title"
+                  descriptionKey="gladysPlusUpsell.openai.description"
+                  featureKeys={[
+                    'gladysPlusUpsell.openai.feature1',
+                    'gladysPlusUpsell.openai.feature2',
+                    'gladysPlusUpsell.openai.feature3'
+                  ]}
+                />
               </div>
             )}
             <p>

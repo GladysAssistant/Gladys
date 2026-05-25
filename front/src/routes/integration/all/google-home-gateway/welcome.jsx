@@ -1,6 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 
 const GoogleWelcomePage = ({ user }) => (
   <div class="page">
@@ -30,6 +31,17 @@ const GoogleWelcomePage = ({ user }) => (
             </div>
 
             <div class="col-lg-9">
+              <GladysPlusUpsell
+                icon="fe-mic"
+                utmCampaign="integration_google_home"
+                titleKey="gladysPlusUpsell.googleHome.title"
+                descriptionKey="gladysPlusUpsell.googleHome.description"
+                featureKeys={[
+                  'gladysPlusUpsell.googleHome.feature1',
+                  'gladysPlusUpsell.googleHome.feature2',
+                  'gladysPlusUpsell.googleHome.feature3'
+                ]}
+              />
               <div class="card">
                 <div class="card-header">
                   <h1 class="card-title">

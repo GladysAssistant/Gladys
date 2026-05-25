@@ -2120,18 +2120,18 @@
       }
     },
     "openai": {
-      "title": "OpenAI ChatGPT",
-      "documentation": "Documentation ChatGPT",
+      "title": "Intelligence Artificielle",
+      "documentation": "Documentation IA",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
+      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles Mistral, hébergée en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
       "aFewExamples": "Quelques exemples :",
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
       "showMeTheCameraInTheKitchen": "Montre-moi la caméra de la cuisine",
-      "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
-      "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
-      "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "activateOpenAiChat": "Activer l'IA dans le chat Gladys",
+      "rateLimit": "L'API d'IA étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
+      "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
     },
     "callmebot": {
@@ -2313,7 +2313,7 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "askAi": {
-        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
         "userLabel": "Gladys répondra à",
         "cameraLabel": "Joindre une image de caméra (optionnel)",
         "textLabel": "Ma question pour l'IA",
@@ -2507,7 +2507,6 @@
       },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
-        "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
@@ -3114,11 +3113,156 @@
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
     "pricingSentence": "Gladys Assistant est gratuit à utiliser, mais vous pouvez vous abonner à Gladys Plus pour des fonctionnalités supplémentaires tel que l'accès à distance chiffré de bout en bout, les sauvegardes automatiques, l'accès à une API REST ouverte accessible de partout dans le monde.",
+    "heroTitle": "Contrôle ta maison depuis n'importe où, en toute sécurité",
+    "heroSubtitle": "Gladys Plus débloque l'accès à distance chiffré, les sauvegardes automatiques et les intégrations avancées pour ton instance Gladys.",
+    "heroReassurance": "1 mois d'essai gratuit · Sans carte bancaire · Sans engagement",
+    "startFreeTrialButton": "Démarrer mon essai gratuit",
+    "alreadySubscriberButton": "J'ai déjà un compte",
+    "featuresTitle": "Tout ce qui est inclus",
+    "featuresSubtitle": "Une suite complète pour rendre ta domotique vraiment utile au quotidien.",
+    "features": {
+      "remoteAccess": {
+        "title": "Accès distant chiffré",
+        "description": "Contrôle ta maison de partout, chiffré de bout en bout, sans ouvrir de port."
+      },
+      "backups": {
+        "title": "Sauvegardes quotidiennes",
+        "description": "Sauvegardes chiffrées tous les jours, restauration en un clic."
+      },
+      "voiceAssistants": {
+        "title": "Google Home & Alexa",
+        "description": "Pilote Gladys à la voix avec Google Home et Amazon Alexa."
+      },
+      "ai": {
+        "title": "IA Mistral (France)",
+        "description": "Parle à ta maison avec une IA hébergée en France chez Scaleway."
+      },
+      "cameraStreaming": {
+        "title": "Streaming caméra",
+        "description": "Visualise tes caméras à distance, en direct, chiffré de bout en bout."
+      },
+      "enedis": {
+        "title": "Intégration Enedis",
+        "description": "Suis ta consommation électrique directement depuis Gladys."
+      },
+      "mcp": {
+        "title": "Serveur MCP",
+        "description": "Branche tes IA préférées (Claude, Mistral…) sur Gladys via le protocole MCP."
+      },
+      "openApi": {
+        "title": "API REST ouverte",
+        "description": "Intègre Gladys à tes propres outils via une API ouverte et documentée."
+      }
+    },
+    "plansTitle": "Deux formules, sans surprise",
+    "plansSubtitle": "Lite pour l'essentiel, Plus pour l'expérience complète. Tu peux passer de l'une à l'autre à tout moment.",
+    "perMonth": "/ mois",
+    "litePlan": {
+      "name": "Lite",
+      "tagline": "L'essentiel pour l'accès à distance",
+      "price": "5,83 €",
+      "priceDetail": "Facturé 69,99 € par an (économise 17 %)",
+      "features": {
+        "remoteAccess": "Accès à distance chiffré de bout en bout",
+        "voiceAssistants": "Google Home & Amazon Alexa",
+        "openApi": "API REST ouverte",
+        "familyAccounts": "Comptes pour toute la famille"
+      }
+    },
+    "plusPlan": {
+      "name": "Plus",
+      "tagline": "Toutes les intégrations avancées",
+      "price": "8,33 €",
+      "priceDetail": "Facturé 99,99 € par an (économise 17 %)",
+      "popularBadge": "Le plus populaire",
+      "features": {
+        "everythingInLite": "Tout ce qui est dans Lite, et en plus :",
+        "backups": "Sauvegardes quotidiennes chiffrées",
+        "cameraStreaming": "Streaming caméra à distance",
+        "ai": "Intégration IA (Mistral, hébergée en France)",
+        "enedis": "Intégration Enedis (consommation électrique)",
+        "mcp": "Serveur MCP pour brancher tes IA préférées"
+      }
+    },
+    "reassuranceBar": "1 mois d'essai gratuit · sans carte bancaire · satisfait ou remboursé · sans engagement",
+    "privacyTitle": "Privacy-first, hébergé en Europe",
+    "privacySubtitle": "Tes données restent les tiennes, on est très sérieux là-dessus.",
+    "privacy": {
+      "aiTitle": "IA hébergée en France",
+      "aiDescription": "Les modèles Mistral utilisés par Gladys Plus tournent chez Scaleway, en France. Rien ne sort du pays pour l'inférence IA.",
+      "infraTitle": "Infrastructure en Europe",
+      "infraDescription": "L'infrastructure Gladys Plus (API, sauvegardes, relais) est hébergée en France et en Allemagne, sous RGPD.",
+      "e2eTitle": "Chiffrement de bout en bout",
+      "e2eDescription": "Tes commandes et tes sauvegardes sont chiffrées avec des clés que seule ton instance locale possède."
+    },
     "whyIsGladysPlusPaid": "Pourquoi Gladys Plus est-il payant et pas gratuit comme Gladys ?",
-    "whyIsGladysPlusPaidAnswer": "Gladys Plus est un service en ligne qui a des coûts: hébergement, bande passante, stockage, développement et maintenance. Pour supporter ces coûts, nous préférons demander une modeste participation mensuelle plutôt que de mettre de la publicité, ou vendre les données des utilisateurs: ce n'est pas la philosophie du projet ! Nous sommes des fervents défenseurs du libre, et souhaitons que chacun reste propriétaire de ses données, surtout quand cela touche à un sujet aussi important que la maison connectée.",
-    "supportOpenSource": "En vous abonnant à Gladys Plus, vous supportez le développement d'une alternative open-source et respectueuse de la vie privée. Merci d'avance pour votre soutien ! 🙂",
+    "whyIsGladysPlusPaidAnswer": "Gladys et tout son code source sont gratuits et open-source pour toujours. Mais open-source ne veut pas dire gratuit à faire vivre : serveurs, bande passante, stockage, communauté, matériel, et surtout le temps passé sur le projet. Plutôt que d'ajouter de la publicité ou de revendre tes données, on préfère une modeste participation mensuelle. Pas d'investisseurs, pas de pub, pas de revente de données.",
+    "supportOpenSource": "En vous abonnant à Gladys Plus, vous soutenez le développement d'une alternative open-source et respectueuse de la vie privée. Merci d'avance pour votre soutien ! 🙂",
     "knowMoreButton": "En savoir plus sur Gladys Plus",
     "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier !"
+  },
+  "gladysPlusUpsell": {
+    "freeTrialNotice": "1 mois d'essai gratuit, sans carte bancaire, sans engagement.",
+    "tryFreeButton": "Démarrer mon essai gratuit",
+    "upgradeButton": "Mettre à jour mon abonnement",
+    "learnMoreButton": "En savoir plus",
+    "backup": {
+      "subscribeTitle": "Active les sauvegardes automatiques avec Gladys Plus",
+      "subscribeDescription": "Sauvegarde ton instance Gladys tous les jours, chiffrée de bout en bout, et restaure-la en un clic, où que tu sois.",
+      "feature1": "Sauvegardes quotidiennes chiffrées (E2E)",
+      "feature2": "Restauration en un clic depuis n'importe quelle installation",
+      "feature3": "Accès distant sécurisé inclus",
+      "upgradeTitle": "Passe à la formule Plus pour activer les sauvegardes",
+      "upgradeDescription": "Les sauvegardes chiffrées sont incluses dans la formule Plus. Tu peux changer de formule depuis la facturation, en un clic."
+    },
+    "openai": {
+      "title": "Discute avec ta maison grâce à l'IA Mistral",
+      "description": "Gladys Plus inclut une IA conversationnelle pour discuter avec ta maison par message dans le chat Gladys. Modèles Mistral hébergés en France chez Scaleway, rien ne sort du pays.",
+      "feature1": "Allume la lumière, éteins le ventilateur, par message dans le chat",
+      "feature2": "IA proactive dans les scènes : exécute des questions domotiques à intervalle régulier (lire une plaque d'immatriculation, vérifier le niveau de CO₂, surveiller une caméra…)",
+      "feature3": "Modèles Mistral hébergés en France · pas de données revendues"
+    },
+    "enedis": {
+      "title": "Suis ta consommation électrique avec Enedis",
+      "description": "Gladys Plus inclut l'intégration officielle Enedis pour récupérer ta consommation électrique, l'afficher sur tes dashboards et déclencher des scènes selon ta conso.",
+      "feature1": "Connexion officielle Enedis (data hub)",
+      "feature2": "Historique automatique, mis à jour chaque jour",
+      "feature3": "Scènes basées sur ta consommation"
+    },
+    "camera": {
+      "upgradeTitle": "Active le streaming caméra à distance",
+      "upgradeDescription": "Le streaming caméra à distance est inclus dans la formule Plus. Tu peux changer de formule en un clic depuis la facturation."
+    },
+    "alexa": {
+      "title": "Connecte Amazon Alexa à Gladys avec Gladys Plus",
+      "description": "Gladys Plus inclut l'intégration officielle Amazon Alexa pour piloter tes appareils Gladys à la voix depuis n'importe quelle enceinte Alexa.",
+      "feature1": "Allume la lumière à la voix",
+      "feature2": "Compatible avec toutes les enceintes Echo et appareils Alexa",
+      "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "googleHome": {
+      "title": "Connecte Google Home à Gladys avec Gladys Plus",
+      "description": "Gladys Plus inclut l'intégration officielle Google Home pour piloter tes appareils Gladys à la voix depuis Google Assistant.",
+      "feature1": "Allume la lumière à la voix",
+      "feature2": "Compatible avec Google Nest, Google Home et l'app Google Assistant",
+      "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "askAi": {
+      "title": "Cette action nécessite Gladys Plus",
+      "description": "L'action « Demander à l'IA » utilise les modèles Mistral hébergés en France via Gladys Plus pour répondre à des questions et analyser des images de caméra dans tes scènes.",
+      "compactDescription": "Cette action utilise l'IA Mistral hébergée en France via Gladys Plus.",
+      "feature1": "Pose une question ouverte à l'IA dans une scène",
+      "feature2": "Joins une image de caméra et l'IA peut décrire ce qu'elle voit",
+      "feature3": "Modèles Mistral hébergés en France · pas de données revendues"
+    },
+    "tts": {
+      "title": "Cette action nécessite Gladys Plus",
+      "description": "L'action « Parler sur une enceinte » utilise les API Text-to-Speech via Gladys Plus pour faire parler Gladys sur tes enceintes (Sonos, Google Cast, etc.) avec une voix naturelle.",
+      "compactDescription": "Cette action utilise les API Text-to-Speech via Gladys Plus.",
+      "feature1": "Voix naturelles, multilingues",
+      "feature2": "Compatible Sonos, Google Cast, Chromecast…",
+      "feature3": "Utilisable dans n'importe quelle scène Gladys"
+    }
   },
   "gatewayLogin": {
     "cardTitle": "Connexion à Gladys Plus",
@@ -4119,8 +4263,8 @@
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
-    "gpt3Integration": "Intégration avec ChatGPT",
-    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec ChatGPT, ce qui lui donne une intelligence sur-dimensionnée ! Pour en savoir plus,",
+    "gpt3Integration": "Intégration Intelligence Artificielle",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec une IA hébergée en France (modèles Mistral), ce qui lui donne une intelligence sur-dimensionnée ! Pour en savoir plus,",
     "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
