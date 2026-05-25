@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
+import GladysPlusUpsellCard from '../../../components/gateway/GladysPlusUpsellCard';
 
-const GatewayPage = ({}) => (
+const UpgradePlan = () => (
   <SettingsLayout>
     <div class="row">
       <div class="col-md-12">
@@ -12,7 +13,21 @@ const GatewayPage = ({}) => (
             </h2>
           </div>
           <div class="card-body">
-            <Text id="gatewayBackup.youNeedToUpgrade" />
+            <p>
+              <Text id="gatewayBackup.youNeedToUpgrade" />
+            </p>
+            <GladysPlusUpsellCard
+              variant="upgrade"
+              icon="fe-database"
+              utmCampaign="settings_backup_upgrade"
+              titleKey="gladysPlusUpsell.backup.upgradeTitle"
+              descriptionKey="gladysPlusUpsell.backup.upgradeDescription"
+              featureKeys={[
+                'gladysPlusUpsell.backup.feature1',
+                'gladysPlusUpsell.backup.feature2',
+                'gladysPlusUpsell.backup.feature3'
+              ]}
+            />
           </div>
         </div>
       </div>
@@ -20,4 +35,4 @@ const GatewayPage = ({}) => (
   </SettingsLayout>
 );
 
-export default GatewayPage;
+export default UpgradePlan;
