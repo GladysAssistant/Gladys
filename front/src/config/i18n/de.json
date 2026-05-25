@@ -4264,19 +4264,34 @@
     "goBack": "Zurück"
   },
   "chat": {
-    "whatCanYouAsk": "Was kann ich fragen?",
     "emptyStateMessage": "Schick mir eine Nachricht!",
     "messagePlaceholder": "Tippe deine Nachricht …",
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
-    "gpt3Integration": "KI-Integration",
-    "gpt3IntegrationExplanation": "Gladys ist jetzt mit Mistral-KI über Gladys Plus kompatibel, was Gladys eine übergroße Intelligenz verleiht! Für weitere Informationen ",
-    "gpt3ClickHere": "klicke hier!",
     "gladysAlt": "Gladys",
-    "examples": {
-      "whatsTheWeatherLike": "\"Wie ist das Wetter?\"",
-      "whatsTheTemperatureKitchen": "\"Wie ist die Temperatur in der Küche?\"",
-      "showCameraImage": "\"Zeige mir das Kamerabild in der Küche\""
+    "sidebar": {
+      "title": "Wie funktioniert der Chat?",
+      "intro": "Gladys antwortet auf deine Nachrichten auf zwei Arten — je nachdem, ob du Gladys Plus hast.",
+      "localBadge": "Lokal",
+      "localTitle": "Lokales Modell (Standard)",
+      "localDescription": "Ohne Gladys Plus nutzt Gladys ein sehr begrenztes lokales Modell: Es versteht nur wenige einfache Befehle, jeweils eine Aktion, und kann keine offenen Fragen beantworten.",
+      "localHint": "Beispiele, die funktionieren (ein Befehl pro Nachricht):",
+      "localExample1": "„Schalte das Licht im Wohnzimmer ein.“",
+      "localExample2": "„Zeige mir die Garagenkamera.“",
+      "localExample3": "„Starte die Szene ‚Gute Nacht‘.“",
+      "localExample4": "„Wie warm ist es im Schlafzimmer?“",
+      "plusTitle": "Erweiterte KI (Gladys Plus)",
+      "plusDescription": "Mit Gladys Plus schaltest du deutlich leistungsfähigere Mistral-Modelle frei: offene Fragen, kontextuelle Antworten, Kamerabildanalyse und mehr.",
+      "plusNotConfigured": "Verbinde Gladys Plus, um die erweiterte KI in diesem Chat zu aktivieren.",
+      "plusConfiguredNotEnabled": "Gladys Plus ist verbunden, aber die KI ist im Chat noch nicht aktiviert.",
+      "plusConfigureLink": "KI aktivieren →",
+      "plusActive": "Die erweiterte KI ist in diesem Chat aktiviert.",
+      "upsellTitle": "Erweiterte KI freischalten",
+      "upsellCompactDescription": "Gladys Plus aktiviert Mistral-Modelle in diesem Chat: offene Fragen, Kameranalyse und mehr.",
+      "upsellDescription": "Von einfachen Befehlen zu echter künstlicher Intelligenz in deinem Gladys-Chat.",
+      "upsellFeature1": "Stelle deinem Zuhause offene Fragen",
+      "upsellFeature2": "Analysiere, was deine Kameras sehen",
+      "upsellFeature3": "Mistral KI · keine weiterverkauften Daten"
     }
   },
   "header": {

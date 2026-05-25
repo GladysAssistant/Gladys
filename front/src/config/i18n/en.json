@@ -4264,19 +4264,34 @@
     "goBack": "Go Back"
   },
   "chat": {
-    "whatCanYouAsk": "What can I ask?",
     "emptyStateMessage": "Send me a message!",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
-    "gpt3Integration": "Artificial Intelligence integration",
-    "gpt3IntegrationExplanation": "Gladys is now compatible with Mistral AI via Gladys Plus, which gives her an over-sized intelligence! For more information,",
-    "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
-    "examples": {
-      "whatsTheWeatherLike": "\"What's the weather like?\"",
-      "whatsTheTemperatureKitchen": "\"What's the temperature in the kitchen?\"",
-      "showCameraImage": "\"Show me camera image in the kitchen\""
+    "sidebar": {
+      "title": "How does the chat work?",
+      "intro": "Gladys answers your messages in two different ways, depending on whether you have Gladys Plus.",
+      "localBadge": "Local",
+      "localTitle": "Local model (default)",
+      "localDescription": "Without Gladys Plus, Gladys uses a very limited local model: it only understands a few simple commands, one action at a time, and cannot answer open-ended questions.",
+      "localHint": "Examples that work (one command at a time):",
+      "localExample1": "\"Turn on the living room light.\"",
+      "localExample2": "\"Show me the garage camera.\"",
+      "localExample3": "\"Start the \"Good night\" scene.\"",
+      "localExample4": "\"What's the temperature in the bedroom?\"",
+      "plusTitle": "Advanced AI (Gladys Plus)",
+      "plusDescription": "With Gladys Plus, you unlock much more capable Mistral models: open questions, contextual answers, camera image analysis, and more.",
+      "plusNotConfigured": "Connect Gladys Plus to enable advanced AI in this chat.",
+      "plusConfiguredNotEnabled": "Gladys Plus is connected, but AI is not enabled in the chat yet.",
+      "plusConfigureLink": "Enable AI →",
+      "plusActive": "Advanced AI is enabled in this chat.",
+      "upsellTitle": "Unlock advanced AI",
+      "upsellCompactDescription": "Gladys Plus enables Mistral models in this chat: open questions, camera analysis, and more.",
+      "upsellDescription": "Go from basic commands to real artificial intelligence in your Gladys chat.",
+      "upsellFeature1": "Ask open-ended questions to your home",
+      "upsellFeature2": "Analyse what your cameras see",
+      "upsellFeature3": "Mistral AI · no data resold"
     }
   },
   "header": {

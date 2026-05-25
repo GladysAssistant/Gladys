@@ -4264,19 +4264,34 @@
     "goBack": "Retour"
   },
   "chat": {
-    "whatCanYouAsk": "Demandez moi...",
     "emptyStateMessage": "Envoie-moi un message !",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
-    "gpt3Integration": "Intégration Intelligence Artificielle",
-    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec une IA hébergée en France (modèles Mistral), ce qui lui donne une intelligence sur-dimensionnée ! Pour en savoir plus,",
-    "gpt3ClickHere": "cliquez-ici !",
-    "examples": {
-      "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
-      "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",
-      "showCameraImage": "\"Montre moi la caméra de la cuisine\""
+    "sidebar": {
+      "title": "Comment fonctionne le chat ?",
+      "intro": "Gladys répond à tes messages de deux façons selon que tu es abonné à Gladys Plus ou non.",
+      "localBadge": "Local",
+      "localTitle": "Modèle local (par défaut)",
+      "localDescription": "Sans Gladys Plus, Gladys utilise un modèle local ultra limité : il ne comprend que quelques commandes simples, une action à la fois, et ne sait pas répondre aux questions ouvertes.",
+      "localHint": "Exemples de commandes qui fonctionnent (une seule à la fois) :",
+      "localExample1": "« Allume la lumière du salon. »",
+      "localExample2": "« Montre-moi la caméra du garage. »",
+      "localExample3": "« Lance la scène « Bonne nuit ». »",
+      "localExample4": "« Quelle température fait-il dans la chambre ? »",
+      "plusTitle": "IA avancée (Gladys Plus)",
+      "plusDescription": "Avec Gladys Plus, tu débloques des modèles Mistral bien plus puissants : questions ouvertes, réponses contextuelles, analyse d'images de caméra, et bien plus.",
+      "plusNotConfigured": "Connecte Gladys Plus pour activer l'IA avancée dans ce chat.",
+      "plusConfiguredNotEnabled": "Gladys Plus est connecté, mais l'IA n'est pas encore activée dans le chat.",
+      "plusConfigureLink": "Activer l'IA →",
+      "plusActive": "L'IA avancée est activée dans ce chat.",
+      "upsellTitle": "Débloque l'IA avancée",
+      "upsellCompactDescription": "Gladys Plus active les modèles Mistral dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
+      "upsellDescription": "Passe des commandes basiques à une vraie intelligence artificielle dans ton chat Gladys.",
+      "upsellFeature1": "Pose des questions ouvertes à ta maison",
+      "upsellFeature2": "Analyse ce que voient tes caméras",
+      "upsellFeature3": "Modèles Mistral hébergés en France"
     }
   },
   "header": {

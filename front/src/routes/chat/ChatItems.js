@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import style from './style.css';
+import ChatMessageText from './ChatMessageText';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -16,7 +17,7 @@ const IncomingMessage = ({ children, ...props }) => (
     <div class={style.received_msg}>
       <div class={style.received_withd_msg}>
         <p class={style.msg_txt_wrap}>
-          {props.message.text}
+          <ChatMessageText text={props.message.text} />
           {props.message.file && (
             <span>
               <img class={style.imageInMessage} src={`data:${props.message.file}`} alt={props.message.text} />
@@ -37,7 +38,9 @@ const IncomingMessage = ({ children, ...props }) => (
 const OutGoingMessage = ({ children, ...props }) => (
   <div class={style.outgoing_msg}>
     <div class={style.sent_msg}>
-      <p class={style.msg_txt_wrap}>{props.message.text}</p>
+      <p class={style.msg_txt_wrap}>
+        <ChatMessageText text={props.message.text} />
+      </p>
       <span class={style.time_date}>
         {' '}
         {props.message.tempId ? (
