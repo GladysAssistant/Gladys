@@ -2123,7 +2123,7 @@
       "title": "Intelligence Artificielle",
       "documentation": "Documentation IA",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles Mistral, hébergée en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
+      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles Mistral, hébergés en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
       "examplesIntro": "Voici ce que tu peux faire avec l'IA :",
       "examplesChatTitle": "Dans le chat Gladys",
       "examplesChatHint": "Actions disponibles : lumières et prises par pièce, caméras, scènes, température et humidité.",
@@ -3119,7 +3119,7 @@
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
-    "pricingSentence": "Gladys Assistant est gratuit à utiliser, mais vous pouvez vous abonner à Gladys Plus pour des fonctionnalités supplémentaires tel que l'accès à distance chiffré de bout en bout, les sauvegardes automatiques, l'accès à une API REST ouverte accessible de partout dans le monde.",
+    "pricingSentence": "Gladys Assistant est gratuit, mais tu peux t'abonner à Gladys Plus pour l'accès à distance chiffré de bout en bout, les sauvegardes automatiques et une API REST ouverte depuis n'importe où.",
     "heroTitle": "Contrôle ta maison depuis n'importe où, en toute sécurité",
     "heroSubtitle": "Gladys Plus débloque l'accès à distance chiffré, les sauvegardes automatiques et les intégrations avancées pour ton instance Gladys.",
     "heroReassurance": "1 mois d'essai gratuit · Sans carte bancaire · Sans engagement",
@@ -3186,7 +3186,7 @@
         "everythingInLite": "Tout ce qui est dans Lite, et en plus :",
         "backups": "Sauvegardes quotidiennes chiffrées",
         "cameraStreaming": "Streaming caméra à distance",
-        "ai": "Intégration IA (Mistral, hébergée en France)",
+        "ai": "Intégration IA (Mistral, hébergés en France)",
         "enedis": "Intégration Enedis (consommation électrique)",
         "mcp": "Serveur MCP pour brancher tes IA préférées"
       }
@@ -3204,9 +3204,9 @@
     },
     "whyIsGladysPlusPaid": "Pourquoi Gladys Plus est-il payant et pas gratuit comme Gladys ?",
     "whyIsGladysPlusPaidAnswer": "Gladys et tout son code source sont gratuits et open-source pour toujours. Mais open-source ne veut pas dire gratuit à faire vivre : serveurs, bande passante, stockage, communauté, matériel, et surtout le temps passé sur le projet. Plutôt que d'ajouter de la publicité ou de revendre tes données, on préfère une modeste participation mensuelle. Pas d'investisseurs, pas de pub, pas de revente de données.",
-    "supportOpenSource": "En vous abonnant à Gladys Plus, vous soutenez le développement d'une alternative open-source et respectueuse de la vie privée. Merci d'avance pour votre soutien ! 🙂",
+    "supportOpenSource": "En t'abonnant à Gladys Plus, tu soutiens le développement d'une alternative open-source et respectueuse de la vie privée. Merci pour ton soutien ! 🙂",
     "knowMoreButton": "En savoir plus sur Gladys Plus",
-    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier !"
+    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Connecte-toi ici !"
   },
   "gladysPlusUpsell": {
     "freeTrialNotice": "1 mois d'essai gratuit, sans carte bancaire, sans engagement.",

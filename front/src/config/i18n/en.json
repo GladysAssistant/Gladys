@@ -3167,8 +3167,8 @@
     "litePlan": {
       "name": "Lite",
       "tagline": "The essentials for remote access",
-      "price": "$5.83",
-      "priceDetail": "Billed $69.99 per year (save 17%)",
+      "price": "€5.83",
+      "priceDetail": "Billed €69.99 per year (save 17%)",
       "features": {
         "remoteAccess": "End-to-end encrypted remote access",
         "voiceAssistants": "Google Home & Amazon Alexa",
@@ -3179,8 +3179,8 @@
     "plusPlan": {
       "name": "Plus",
       "tagline": "All advanced integrations",
-      "price": "$8.33",
-      "priceDetail": "Billed $99.99 per year (save 17%)",
+      "price": "€8.33",
+      "priceDetail": "Billed €99.99 per year (save 17%)",
       "popularBadge": "Most popular",
       "features": {
         "everythingInLite": "Everything in Lite, plus:",

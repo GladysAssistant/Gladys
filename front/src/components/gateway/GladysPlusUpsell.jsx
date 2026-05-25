@@ -20,8 +20,14 @@ class GladysPlusUpsell extends Component {
   };
 
   fetchStatus = async () => {
+    const { httpClient } = this.props;
+    if (!httpClient) {
+      console.error('GladysPlusUpsell: httpClient is required');
+      this.setState({ gladysPlusConnected: false });
+      return;
+    }
     try {
-      const response = await this.props.httpClient.get('/api/v1/gateway/status');
+      const response = await httpClient.get('/api/v1/gateway/status');
       this.setState({ gladysPlusConnected: response.configured === true });
     } catch (e) {
       console.error(e);
@@ -37,8 +43,9 @@ class GladysPlusUpsell extends Component {
     if (gladysPlusConnected !== false) {
       return null;
     }
-    return <GladysPlusUpsellCard {...props} />;
+    const { httpClient: _httpClient, ...cardProps } = props;
+    return <GladysPlusUpsellCard {...cardProps} />;
   }
 }
 
-export default connect('httpClient', {})(GladysPlusUpsell);
+export default connect('user,httpClient', {})(GladysPlusUpsell);
