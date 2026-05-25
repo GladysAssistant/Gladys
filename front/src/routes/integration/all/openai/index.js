@@ -91,20 +91,47 @@ class OpenAIGateway extends Component {
               <Text id="integration.openai.firstExplanation" />{' '}
             </p>
             <p>
-              <Text id="integration.openai.aFewExamples" />
+              <Text id="integration.openai.examplesIntro" />
+            </p>
+            <p class="mb-1">
+              <strong>
+                <Text id="integration.openai.examplesChatTitle" />
+              </strong>
+            </p>
+            <p class="text-muted small mb-2">
+              <Text id="integration.openai.examplesChatHint" />
             </p>
             <ul>
               <li>
-                <Text id="integration.openai.turnOnTheLight" />
+                <Text id="integration.openai.exampleChat1" />
               </li>
               <li>
-                <Text id="integration.openai.showMeTheCameraInTheKitchen" />
+                <Text id="integration.openai.exampleChat2" />
               </li>
               <li>
-                <Text id="integration.openai.sizeOfEiffelTower" />
+                <Text id="integration.openai.exampleChat3" />
               </li>
               <li>
-                <Text id="integration.openai.eggDuration" />
+                <Text id="integration.openai.exampleChat4" />
+              </li>
+            </ul>
+            <p class="mb-1 mt-3">
+              <strong>
+                <Text id="integration.openai.examplesSceneTitle" />
+              </strong>
+            </p>
+            <p class="text-muted small">
+              <Text id="integration.openai.examplesSceneIntro" />
+            </p>
+            <ul>
+              <li>
+                <Text id="integration.openai.exampleScene1" />
+              </li>
+              <li>
+                <Text id="integration.openai.exampleScene2" />
+              </li>
+              <li>
+                <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
             <p>
