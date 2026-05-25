@@ -43,12 +43,7 @@ const GatewayPricing = ({ children, ...props }) => {
             <Text id="gatewayPricing.heroSubtitle" />
           </p>
           <div class="d-flex flex-wrap justify-content-center">
-            <a
-              class="btn btn-success btn-lg mr-2 mb-2"
-              href={heroCtaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a class="btn btn-success btn-lg mr-2 mb-2" href={heroCtaUrl} target="_blank" rel="noopener noreferrer">
               <Text id="gatewayPricing.startFreeTrialButton" /> <i class="fe fe-external-link ml-1" />
             </a>
             <button class="btn btn-outline-primary btn-lg mb-2" onClick={props.displayGatewayLoginForm}>
@@ -133,12 +128,7 @@ const GatewayPricing = ({ children, ...props }) => {
                   </li>
                 ))}
               </ul>
-              <a
-                href={liteCtaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-outline-success btn-block"
-              >
+              <a href={liteCtaUrl} target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-block">
                 <Text id="gatewayPricing.startFreeTrialButton" />
               </a>
             </div>
@@ -268,12 +258,7 @@ const GatewayPricing = ({ children, ...props }) => {
       {/* FINAL CTA */}
       <div class="row mt-4 mb-3">
         <div class="col-md-12 text-center">
-          <a
-            class="btn btn-success btn-lg mr-2 mb-2"
-            href={finalCtaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a class="btn btn-success btn-lg mr-2 mb-2" href={finalCtaUrl} target="_blank" rel="noopener noreferrer">
             <Text id="gatewayPricing.startFreeTrialButton" /> <i class="fe fe-external-link ml-1" />
           </a>
           <button class="btn btn-link btn-lg mb-2" onClick={props.displayGatewayLoginForm}>
