@@ -107,18 +107,37 @@ describe('GET /api/v1/gateway/backup/restore/status', () => {
   });
 });
 
-describe('POST /api/v1/gateway/openai/ask', () => {
-  it('should return GPT-3 response', async () => {
+describe('POST /api/v1/gateway/aichat/chat', () => {
+  it('should return AI chat response', async () => {
     nock(config.gladysGatewayServerUrl)
-      .post('/openai/ask')
+      .post('/aichat/chat')
       .reply(200, {
-        answer: 'this is my answer',
+        choices: [
+          {
+            message: {
+              content: 'this is my answer',
+            },
+          },
+        ],
       });
     const response = await authenticatedRequest
-      .post('/api/v1/gateway/openai/ask')
+      .post('/api/v1/gateway/aichat/chat')
+      .send({
+        messages: [{ role: 'user', content: 'hello' }],
+        tools: [],
+        tool_choice: 'auto',
+      })
       .expect('Content-Type', /json/)
       .expect(200);
-    expect(response.body).to.have.property('answer', 'this is my answer');
+    expect(response.body).to.deep.equal({
+      choices: [
+        {
+          message: {
+            content: 'this is my answer',
+          },
+        },
+      ],
+    });
   });
 });
 

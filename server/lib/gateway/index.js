@@ -5,6 +5,11 @@ const logger = require('../../utils/logger');
 const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
+// `@gladysassistant/gladys-gateway-js` expects `{ debug, info, warn, error }`.
+// The runtime logger comes from `tracer`; it's compatible, but the type-checker is picky.
+// We intentionally cast to `any` to avoid type mismatch noise.
+const gatewayJsLogger = /** @type {any} */ (logger);
+
 const { backup } = require('./gateway.backup');
 const { forwardDeviceStateToAlexa } = require('./gateway.forwardDeviceStateToAlexa');
 const { forwardDeviceStateToGoogleHome } = require('./gateway.forwardDeviceStateToGoogleHome');
@@ -31,9 +36,9 @@ const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { getEdfTempo } = require('./gateway.getEdfTempo');
 const { getEdfTempoHistorical } = require('./gateway.getEdfTempoHistorical');
-const { openAIAsk } = require('./gateway.openAIAsk');
 const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
-const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
+const { aiChat } = require('./gateway.aiChat');
+const { forwardMessageToAiChat } = require('./gateway.forwardMessageToAiChat');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -81,7 +86,7 @@ const Gateway = function Gateway(
   this.gladysGatewayClient = new GladysGatewayClient({
     cryptoLib: webcrypto,
     serverUrl: config.gladysGatewayServerUrl,
-    logger,
+    logger: gatewayJsLogger,
   });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
 
@@ -94,7 +99,7 @@ const Gateway = function Gateway(
   this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
-  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToOpenAI.bind(this)));
+  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToAiChat.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -123,8 +128,8 @@ Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.getEdfTempo = getEdfTempo;
 Gateway.prototype.getEdfTempoHistorical = getEdfTempoHistorical;
-Gateway.prototype.openAIAsk = openAIAsk;
-Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
+Gateway.prototype.aiChat = aiChat;
+Gateway.prototype.forwardMessageToAiChat = forwardMessageToAiChat;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;

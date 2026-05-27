@@ -103,7 +103,6 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       { created_at: '2025-01-03', day_type: 'red' },
     ]),
     ttsGetToken: fake.resolves({ url: 'http://test.com' }),
-    openAIAsk: fake.resolves({ answer: 'this is the answer' }),
   };
 };
 

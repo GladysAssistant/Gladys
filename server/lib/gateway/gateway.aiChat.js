@@ -3,17 +3,21 @@ const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
- * @description Ask OpenAI a question.
- * @param {object} body - The query to ask.
- * @returns {Promise} Resolve with OpenAI response.
- * @example
- * openAIAsk({
- *    question
- * })
+ * @public
+ * @description Ask the Gladys Gateway AI endpoint.
+ * @param {object} body
+ * @returns {Promise<object>} Chat completion-like response.
  */
-async function openAIAsk(body) {
+async function aiChat(body) {
   try {
     const response = await this.gladysGatewayClient.openAIAsk(body);
+    // return await requestApi.post(`${this.gladysGatewayClient.serverUrl}${AI_CHAT_PATH}`, body, this.gladysGatewayClient);
+    /* const { data } =  await axios.post('http://0.0.0.0:8787', body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer test`,
+      },
+    }); */
     return response;
   } catch (e) {
     logger.debug(e);
@@ -30,5 +34,5 @@ async function openAIAsk(body) {
 }
 
 module.exports = {
-  openAIAsk,
+  aiChat,
 };

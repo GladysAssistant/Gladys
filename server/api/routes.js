@@ -365,9 +365,9 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
-    'post /api/v1/gateway/openai/ask': {
+    'post /api/v1/gateway/aichat/chat': {
       authenticated: true,
-      controller: gatewayController.openAIAsk,
+      controller: gatewayController.aiChat,
     },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,
