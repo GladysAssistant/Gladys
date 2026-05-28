@@ -83,7 +83,7 @@ function createActions(store) {
       }
     },
     async sendMessage(state) {
-      if (!state.currentMessageTextInput || state.currentMessageTextInput.length === 0) {
+      if (!state.currentMessageTextInput || state.currentMessageTextInput.trim().length === 0) {
         return;
       }
       store.setState({
