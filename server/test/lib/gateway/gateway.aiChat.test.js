@@ -1,20 +1,10 @@
 const { expect, assert } = require('chai');
-const { fake, stub, assert: sinonAssert } = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const { Error403, Error429 } = require('../../../utils/httpErrors');
+const Gateway = require('../../../lib/gateway');
 
 const event = new EventEmitter();
-
-const postMock = stub().resolves({ answer: 'this is the answer' });
-
-const Gateway = proxyquire('../../../lib/gateway', {
-  './gateway.aiChat': proxyquire('../../../lib/gateway/gateway.aiChat', {
-    '@gladysassistant/gladys-gateway-js/lib/request': {
-      post: postMock,
-    },
-  }),
-});
 
 const job = {
   wrapper: (type, func) => {
@@ -33,10 +23,7 @@ describe('gateway.aiChat', () => {
 
   beforeEach(() => {
     gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
-    gateway.gladysGatewayClient.serverUrl = 'https://api.gladysgateway.com';
-    postMock.resetHistory();
-    postMock.reset();
-    postMock.resolves({ answer: 'this is the answer' });
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({ answer: 'this is the answer' });
   });
 
   it('should call aichat endpoint', async () => {
@@ -44,7 +31,7 @@ describe('gateway.aiChat', () => {
     const data = await gateway.aiChat(body);
 
     expect(data).to.deep.equal({ answer: 'this is the answer' });
-    sinonAssert.calledWith(postMock, 'https://api.gladysgateway.com/aichat/chat', body, gateway.gladysGatewayClient);
+    expect(gateway.gladysGatewayClient.openAIAsk.calledOnceWith(body)).to.equal(true);
   });
 
   it('should throw Error403 on forbidden', async () => {
@@ -54,7 +41,7 @@ describe('gateway.aiChat', () => {
       status: 403,
       data: { error_message: 'forbidden' },
     };
-    postMock.rejects(error);
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(error);
     const promise = gateway.aiChat({ messages: [] });
     await assert.isRejected(promise, Error403);
   });
@@ -66,7 +53,7 @@ describe('gateway.aiChat', () => {
       status: 429,
       data: { error_message: 'too many requests' },
     };
-    postMock.rejects(error);
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(error);
     const promise = gateway.aiChat({ messages: [] });
     await assert.isRejected(promise, Error429);
   });
@@ -77,7 +64,7 @@ describe('gateway.aiChat', () => {
     error.response = {
       status: 500,
     };
-    postMock.rejects(error);
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(error);
     const promise = gateway.aiChat({ messages: [] });
     await assert.isRejected(promise, Error);
   });

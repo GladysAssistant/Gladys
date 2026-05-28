@@ -29,8 +29,10 @@ const config = {
 
 describe('system.getGladysBasePath', () => {
   let system;
+  const sqliteFilePathBeforeSuite = process.env.SQLITE_FILE_PATH;
 
   beforeEach(async () => {
+    delete process.env.SQLITE_FILE_PATH;
     system = new System(sequelize, event, config, job);
     system.getGladysContainerId = fake.resolves('containerid');
     system.getContainerMounts = fake.resolves([]);
@@ -40,7 +42,16 @@ describe('system.getGladysBasePath', () => {
   });
 
   afterEach(() => {
+    delete process.env.SQLITE_FILE_PATH;
     sinon.reset();
+  });
+
+  after(() => {
+    if (sqliteFilePathBeforeSuite === undefined) {
+      delete process.env.SQLITE_FILE_PATH;
+    } else {
+      process.env.SQLITE_FILE_PATH = sqliteFilePathBeforeSuite;
+    }
   });
   it('should return default basePath because no mount', async () => {
     const result = await system.getGladysBasePath();

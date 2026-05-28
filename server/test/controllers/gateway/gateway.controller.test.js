@@ -110,7 +110,7 @@ describe('GET /api/v1/gateway/backup/restore/status', () => {
 describe('POST /api/v1/gateway/aichat/chat', () => {
   it('should return AI chat response', async () => {
     nock(config.gladysGatewayServerUrl)
-      .post('/aichat/chat')
+      .post('/openai/ask')
       .reply(200, {
         choices: [
           {
