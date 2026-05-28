@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 const {
   OnOff,
   WindowCovering,
@@ -7,7 +6,7 @@ const {
   Thermostat,
   MediaPlayback,
   KeypadInput,
-} = require('@matter/main/clusters');
+} = require('@matter/main/clusters'); // eslint-disable-line import/no-unresolved
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
