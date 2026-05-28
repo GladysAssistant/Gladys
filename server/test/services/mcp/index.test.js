@@ -20,6 +20,12 @@ describe('MCPService', () => {
       house: {
         get: async () => [],
       },
+      calendar: {
+        get: async () => [],
+      },
+      area: {
+        get: async () => [],
+      },
       device: {
         get: async () => [],
         getBySelector: async () => null,
