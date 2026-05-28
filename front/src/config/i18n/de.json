@@ -4279,6 +4279,12 @@
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
     "gladysAlt": "Gladys",
+    "toolCall": {
+      "statusUsed": "Verwendet",
+      "statusError": "Fehler",
+      "showDetails": "Details anzeigen",
+      "hideDetails": "Details ausblenden"
+    },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
       "intro": "Gladys antwortet auf deine Nachrichten auf zwei Arten — je nachdem, ob du Gladys Plus hast.",
