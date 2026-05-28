@@ -1044,4 +1044,6 @@ async function getAllTools() {
 module.exports = {
   getAllResources,
   getAllTools,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
 };

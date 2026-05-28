@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 const { stub, fake } = require('sinon');
-const { getAllResources, getAllTools } = require('../../../../services/mcp/lib/buildSchemas');
+const {
+  getAllResources,
+  getAllTools,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
+} = require('../../../../services/mcp/lib/buildSchemas');
 const {
   isSensorFeature,
   isSwitchableFeature,
@@ -940,5 +945,73 @@ describe('build schemas', () => {
     }
     expect(unknownThrown).to.be.an('error');
     expect(unknownThrown.message).to.eq('db down');
+  });
+
+  it('should cover helper branches for action type extraction and union flattening', () => {
+    expect(extractProvidedActionTypes(null)).to.deep.equal([]);
+    expect(extractProvidedActionTypes({ actions: [1, { type: 'a' }, ['x', { type: 'b' }]] })).to.deep.equal(['a', 'b']);
+
+    expect(flattenUnionIssues(null)).to.deep.equal([]);
+    expect(
+      flattenUnionIssues({
+        path: ['actions'],
+        errors: [[{ path: ['0'], message: 'invalid 0' }], { path: ['1'], message: 'invalid 1' }],
+      }),
+    ).to.deep.equal([
+      { path: 'actions.0', message: 'invalid 0' },
+      { path: 'actions.1', message: 'invalid 1' },
+    ]);
+    expect(
+      flattenUnionIssues({
+        path: ['actions'],
+        issues: [{ path: ['2'], message: 'invalid 2' }],
+      }),
+    ).to.deep.equal([{ path: 'actions.2', message: 'invalid 2' }]);
+    expect(flattenUnionIssues({ path: ['actions'] })).to.deep.equal([]);
+  });
+
+  it('should cover filtered-out feature branches in device state and turn-on-off tools', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const devices = [
+      {
+        selector: 'device-mixed-1',
+        name: 'Mixed Device',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          { id: 1, selector: 'f-light', name: 'Light', category: 'light', type: 'binary', last_value: 1 },
+          { id: 2, selector: 'f-switch', name: 'Switch', category: 'switch', type: 'binary', last_value: 0 },
+        ],
+      },
+    ];
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([{ id: 'u1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'h1', name: 'House', selector: 'house' }]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().resolves(devices[0]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    await tools[3].cb({ room: 'salon', device_type: 'light' });
+    await tools[4].cb({ action: 'off', room: 'salon', device_category: 'switch' });
+    expect(mcpHandler.gladys.device.setValue.calledOnce).to.equal(true);
   });
 });
