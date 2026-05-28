@@ -34,10 +34,8 @@ const IntegrationPage = connect(
       textarea.style.height = 'auto';
       const computed = window.getComputedStyle(textarea);
       const lineHeight = parseFloat(computed.lineHeight) || 24;
-      const verticalPadding =
-        (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
-      const verticalBorder =
-        (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
+      const verticalPadding = (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+      const verticalBorder = (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
       const maxLines = 11;
       const maxHeight = lineHeight * maxLines + verticalPadding + verticalBorder;
       textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
