@@ -33,6 +33,21 @@ const triggerSchemaByType = (type, specificShape) =>
     })
     .strict();
 
+/**
+ * @description Build Zod input schema for scene.create tool.
+ * @param {Array<string>} [sceneSelectors] - Allowed scene selectors.
+ * @param {Array<string>} [userSelectors] - Allowed user selectors.
+ * @param {Array<string>} [houseSelectors] - Allowed house selectors.
+ * @param {Array<string>} [lightDeviceSelectors] - Allowed light device selectors.
+ * @param {Array<string>} [switchDeviceSelectors] - Allowed switch device selectors.
+ * @param {Array<string>} [musicNotificationDeviceSelectors] - Allowed music notification device selectors.
+ * @param {Array<string>} [deviceFeatureSelectors] - Allowed device feature selectors.
+ * @param {Array<string>} [calendarSelectors] - Allowed calendar selectors.
+ * @param {Array<string>} [areaSelectors] - Allowed area selectors.
+ * @returns {object} Scene creation Zod schema.
+ * @example
+ * createSceneCreateInputSchema(['scene-a'], ['john'], ['main-house']);
+ */
 function createSceneCreateInputSchema(
   sceneSelectors = [],
   userSelectors = [],
@@ -398,6 +413,13 @@ function createSceneCreateInputSchema(
   });
 }
 
+/**
+ * @description Extract all declared action types from raw scene payload.
+ * @param {object} rawScene - Raw scene payload.
+ * @returns {Array<string>} Distinct action types.
+ * @example
+ * extractProvidedActionTypes({ actions: [[{ type: 'ai.ask' }]] });
+ */
 function extractProvidedActionTypes(rawScene) {
   if (!rawScene || !Array.isArray(rawScene.actions)) {
     return [];
@@ -421,6 +443,14 @@ function extractProvidedActionTypes(rawScene) {
   ];
 }
 
+/**
+ * @description Recursively flatten nested union issues from Zod.
+ * @param {object} issue - Zod issue object.
+ * @param {Array<string|number>} [parentPath] - Parent path segments.
+ * @returns {Array<{path: string, message: string}>} Flat issues list.
+ * @example
+ * flattenUnionIssues({ path: ['actions'], message: 'Invalid input' });
+ */
 function flattenUnionIssues(issue, parentPath = []) {
   if (!issue || typeof issue !== 'object') {
     return [];
@@ -451,6 +481,14 @@ function flattenUnionIssues(issue, parentPath = []) {
   return [];
 }
 
+/**
+ * @description Format one Zod issue into actionable validation text.
+ * @param {object} issue - Zod issue.
+ * @param {object} rawScene - Raw scene payload submitted by model.
+ * @returns {string} Human-readable issue string.
+ * @example
+ * formatSceneCreateZodIssue({ path: ['actions'], code: 'invalid_union', message: 'Invalid input' }, {});
+ */
 function formatSceneCreateZodIssue(issue, rawScene) {
   const path = issue.path.join('.') || 'root';
   if (issue.code === 'invalid_union') {

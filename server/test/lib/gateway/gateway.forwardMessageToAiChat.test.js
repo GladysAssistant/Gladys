@@ -34,6 +34,7 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @param {Function} options.aiChat - aiChat mock.
  * @param {Function} options.reply - Message reply mock.
  * @param {Function} options.replyByIntent - Message replyByIntent mock.
+ * @param {Function} [options.eventEmit] - Event emitter mock.
  * @returns {object} Bound context object.
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });

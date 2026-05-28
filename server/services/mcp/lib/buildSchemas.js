@@ -127,9 +127,10 @@ async function getAllResources() {
 
 /**
  * @description Get all tools available in the MCP service.
+ * @param {string} [userId] - Optional user id used to scope private calendars.
  * @returns {Promise<Array>} Array of tools with their intent and configuration.
  * @example
- * getAllTools()
+ * getAllTools('0cd30aef-9c4e-4a23-88e3-3547971296e5')
  */
 async function getAllTools(userId) {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
