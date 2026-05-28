@@ -211,17 +211,17 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('[type="checkbox"]').should('not.be.checked');
+    cy.get('.custom-switch-input').first().should('not.be.checked');
 
     cy.visit('/dashboard/scene');
 
-    cy.get('[type="checkbox"]').should('not.be.checked');
+    cy.get('.custom-switch-input').first().should('not.be.checked');
 
     cy.get('.custom-switch-indicator').click();
 
     cy.visit('/dashboard/scene');
 
-    cy.get('[type="checkbox"]').should('be.checked');
+    cy.get('.custom-switch-input').first().should('be.checked');
   });
   it('Should duplicate existing scene', () => {
     cy.login();
