@@ -454,6 +454,7 @@ module.exports = {
   forwardMessageToAiChat,
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
+  formatToolCallTraceText,
   shouldSendAssistantTextReply,
   isNoResponseSentinel,
   isToolExecutionErrorText,

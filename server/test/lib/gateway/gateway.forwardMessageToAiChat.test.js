@@ -1,4 +1,4 @@
-const { fake, stub, assert } = require('sinon');
+const { fake, stub, assert, match } = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -484,5 +484,279 @@ describe('gateway.forwardMessageToAiChat', () => {
     expect(result).to.equal(null);
     assert.notCalled(reply);
     assert.calledWith(replyByIntent, message, 'openai.request.tooManyRequests', context);
+  });
+
+  it('should reply with generic failure on non-429 errors', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.rejects(new Error('gateway down'));
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'hello', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.equal(null);
+    assert.notCalled(reply);
+    assert.calledWith(replyByIntent, message, 'openai.request.fail', context);
+  });
+
+  it('should ignore invalid json tool arguments', async () => {
+    const toolCb = fake.resolves({ content: [{ type: 'text', text: 'ok' }] });
+    const tools = [
+      {
+        intent: 'device.get-state',
+        config: { title: 'Get state', inputSchema: {} },
+        cb: toolCb,
+      },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [{ id: 'bad_json', function: { name: 'device_get_state', arguments: '{"a":' } }],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [{ message: { content: 'done' } }],
+    });
+
+    const reply = fake.resolves(null);
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message: { text: 'state?', user: { id: 'user-id' } },
+        previousQuestions: [],
+        context: {},
+      },
+    );
+
+    expect(result).to.deep.equal({ answer: 'done', imagesSent: 0 });
+    assert.calledWith(toolCb, {});
+  });
+
+  it('should execute scene_create success branch', async () => {
+    const toolCb = fake.resolves({ content: [{ type: 'text', text: 'created' }] });
+    const tools = [
+      {
+        intent: 'scene.create',
+        config: { title: 'Create scene', inputSchema: { name: z.string() } },
+        cb: toolCb,
+      },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [{ id: 'call_scene_ok', function: { name: 'scene_create', arguments: '{"name":"x"}' } }],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [{ message: { content: 'ok' } }],
+    });
+
+    const reply = fake.resolves(null);
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message: { text: 'create', user: { id: 'user-id' } },
+        previousQuestions: [],
+        context: {},
+      },
+    );
+
+    expect(result).to.deep.equal({ answer: 'ok', imagesSent: 0 });
+    assert.calledWith(toolCb, { name: 'x' });
+  });
+
+  it('should send second camera image with empty text reply path', async () => {
+    const toolCb = fake.resolves({
+      content: [
+        { type: 'image', data: 'img1', mimeType: 'image/jpeg' },
+        { type: 'image', data: 'img2', mimeType: 'image/jpeg' },
+      ],
+    });
+    const tools = [
+      {
+        intent: 'camera.get-image',
+        config: { title: 'Get camera image', inputSchema: {} },
+        cb: toolCb,
+      },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [{ id: 'call_cam_2', function: { name: 'camera_get_image', arguments: '{}' } }],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [{ message: { content: 'NO_RESPONSE' } }],
+    });
+
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'camera', user: { id: 'user-id' } };
+    const context = {};
+    await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    assert.calledWith(replyByIntent, message, 'camera.get-image.success', context, 'image/jpeg;base64,img1');
+    assert.calledWith(reply, message, '', context, 'image/jpeg;base64,img2');
+  });
+
+  it('should use fallback assistant extraction for apiResponse.message', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({ message: { content: 'fallback message shape' } });
+    const reply = fake.resolves(null);
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools: [], aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message: { text: 'hi', user: { id: 'user-id' } },
+        previousQuestions: [null],
+        context: {},
+      },
+    );
+    expect(result).to.deep.equal({ answer: 'fallback message shape', imagesSent: 0 });
+  });
+
+  it('should fail gracefully when MCP service is not available', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const replyByIntent = fake.resolves(null);
+    const result = await forwardMessageToAiChat.call(
+      {
+        serviceManager: { getService: fake.returns(null) },
+        aiChat: fake(),
+        message: { reply: fake.resolves(null), replyByIntent },
+      },
+      {
+        message: { text: 'hello', user: { id: 'user-id' } },
+        previousQuestions: [],
+        context: {},
+      },
+    );
+
+    expect(result).to.equal(null);
+    assert.calledWith(replyByIntent, match.any, 'openai.request.fail', {});
+  });
+
+  it('should cover loadPrompt cache branch when called twice', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({ choices: [{ message: { content: 'ok' } }] });
+    const reply = fake.resolves(null);
+    const ctx = buildContext({ tools: [], aiChat, reply, replyByIntent: fake.resolves(null) });
+    const request = {
+      message: { text: 'hello', user: { id: 'user-id' } },
+      previousQuestions: [],
+      context: {},
+    };
+
+    await forwardMessageToAiChat.call(ctx, request);
+    await forwardMessageToAiChat.call(ctx, request);
+    assert.calledTwice(aiChat);
+  });
+
+  it('should cover tool result formatter edge branches through tool outputs', async () => {
+    const nullTool = fake.resolves(null);
+    const stringTool = fake.resolves('plain-string-result');
+    const objectTool = fake.resolves({ hello: 'world' });
+    const unknownContentTool = fake.resolves({ content: [{ type: 'unknown-type', nested: true }] });
+    const undefinedContentTool = fake.resolves({ content: [undefined] });
+    const circular = {};
+    circular.self = circular;
+    const circularTool = fake.resolves({ content: [circular] });
+    const longTextTool = fake.resolves({ content: [{ type: 'text', text: 'x'.repeat(5001) }] });
+    const tools = [
+      { intent: 'a.null', config: { title: 'a', inputSchema: {} }, cb: nullTool },
+      { intent: 'b.string', config: { title: 'b', inputSchema: {} }, cb: stringTool },
+      { intent: 'c.object', config: { title: 'c', inputSchema: {} }, cb: objectTool },
+      { intent: 'd.unknown', config: { title: 'd', inputSchema: {} }, cb: unknownContentTool },
+      { intent: 'e.undefined', config: { title: 'e', inputSchema: {} }, cb: undefinedContentTool },
+      { intent: 'f.circular', config: { title: 'f', inputSchema: {} }, cb: circularTool },
+      { intent: 'g.long', config: { title: 'g', inputSchema: {} }, cb: longTextTool },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [
+              { id: 'a', function: { name: 'a_null', arguments: '{}' } },
+              { id: 'b', function: { name: 'b_string', arguments: '{}' } },
+              { id: 'c', function: { name: 'c_object', arguments: '{}' } },
+              { id: 'd', function: { name: 'd_unknown', arguments: '{}' } },
+              { id: 'e', function: { name: 'e_undefined', arguments: '{}' } },
+              { id: 'f', function: { name: 'f_circular', arguments: '{}' } },
+              { id: 'g', function: { name: 'g_long', arguments: '{}' } },
+            ],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [{ message: { content: ''.padStart(3001, 'y') } }],
+    });
+    const reply = fake.resolves(null);
+    await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }), {
+      message: { text: 'run many tools', user: { id: 'user-id' } },
+      previousQuestions: [],
+      context: {},
+    });
+  });
+});
+
+describe('gateway.forwardMessageToAiChat helpers', () => {
+  it('should cover image and reply helper branches', () => {
+    const {
+      imageContentToMessageFile,
+      extractMessageFilesFromToolResult,
+      shouldSendAssistantTextReply,
+      isNoResponseSentinel,
+      isToolExecutionErrorText,
+    } = getModule();
+
+    expect(imageContentToMessageFile(null)).to.equal(null);
+    expect(imageContentToMessageFile({ data: 'data:image/png;base64,abc', mimeType: 'image/png' })).to.equal(
+      'image/png;base64,abc',
+    );
+    expect(extractMessageFilesFromToolResult({})).to.deep.equal([]);
+
+    expect(shouldSendAssistantTextReply('', false)).to.equal(false);
+    expect(shouldSendAssistantTextReply('https://example.com', true)).to.equal(false);
+    expect(shouldSendAssistantTextReply('plain text', true)).to.equal(true);
+
+    expect(isNoResponseSentinel('NO_RESPONSE')).to.equal(true);
+    expect(isToolExecutionErrorText('Error while running tool "x": boom')).to.equal(true);
+  });
+
+  it('should format tool call trace text fallback name', () => {
+    const { formatToolCallTraceText } = getModule();
+    expect(formatToolCallTraceText('', {})).to.equal('tool_call');
   });
 });
