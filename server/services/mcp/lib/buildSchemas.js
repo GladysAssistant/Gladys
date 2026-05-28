@@ -137,6 +137,10 @@ async function getAllTools() {
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const calendarsRaw = this.gladys.calendar?.get ? await this.gladys.calendar.get() : [];
+  const calendars = (calendarsRaw || []).map(({ id, name, selector }) => ({ id, name, selector }));
+  const areasRaw = this.gladys.area?.get ? await this.gladys.area.get() : [];
+  const areas = (areasRaw || []).map(({ id, name, selector }) => ({ id, name, selector }));
 
   const allDevices = await this.gladys.device.get();
   const sensorDevices = allDevices
@@ -183,11 +187,24 @@ async function getAllTools() {
   const lightDeviceSelectors = switchableDevices
     .filter((device) => device.features.some((feature) => feature.category === 'light' && feature.type === 'binary'))
     .map((device) => device.selector);
+  const switchDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'switch' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const musicNotificationDeviceSelectors = allDevices
+    .filter((device) =>
+      device.features.some((feature) => feature.category === 'music' && feature.type === 'play_notification'),
+    )
+    .map((device) => device.selector);
   const sceneCreateInputSchema = createSceneCreateInputSchema(
+    scenes.map(({ selector }) => selector),
     users.map(({ selector }) => selector),
     houses.map(({ selector }) => selector),
     lightDeviceSelectors,
+    switchDeviceSelectors,
+    musicNotificationDeviceSelectors,
     deviceFeatureSelectors,
+    calendars.map(({ selector }) => selector),
+    areas.map(({ selector }) => selector),
   );
 
   const historyDevices = allDevices

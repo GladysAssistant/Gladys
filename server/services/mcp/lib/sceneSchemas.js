@@ -34,16 +34,30 @@ const triggerSchemaByType = (type, specificShape) =>
     .strict();
 
 function createSceneCreateInputSchema(
+  sceneSelectors = [],
   userSelectors = [],
   houseSelectors = [],
   lightDeviceSelectors = [],
+  switchDeviceSelectors = [],
+  musicNotificationDeviceSelectors = [],
   deviceFeatureSelectors = [],
+  calendarSelectors = [],
+  areaSelectors = [],
 ) {
+  const sceneSelectorSchema = sceneSelectors.length > 0 ? z.enum(sceneSelectors) : z.string();
   const userSelectorSchema = userSelectors.length > 0 ? z.enum(userSelectors) : z.string();
   const houseSelectorSchema = houseSelectors.length > 0 ? z.enum(houseSelectors) : z.string();
   const lightDevicesSchema =
     lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
+  const switchDevicesSchema =
+    switchDeviceSelectors.length > 0 ? z.array(z.enum(switchDeviceSelectors)) : z.array(z.string());
+  const musicNotificationDevicesSchema =
+    musicNotificationDeviceSelectors.length > 0
+      ? z.enum(musicNotificationDeviceSelectors)
+      : z.string();
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
+  const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
+  const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
       actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
@@ -69,13 +83,13 @@ function createSceneCreateInputSchema(
         blinking_time: z.number(),
       }),
       actionSchemaByType(ACTIONS.SWITCH.TURN_ON, {
-        devices: z.array(z.string()),
+        devices: switchDevicesSchema,
       }),
       actionSchemaByType(ACTIONS.SWITCH.TURN_OFF, {
-        devices: z.array(z.string()),
+        devices: switchDevicesSchema,
       }),
       actionSchemaByType(ACTIONS.SWITCH.TOGGLE, {
-        devices: z.array(z.string()),
+        devices: switchDevicesSchema,
       }),
       actionSchemaByType(ACTIONS.TIME.DELAY, {
         value: z.number().optional(),
@@ -83,7 +97,7 @@ function createSceneCreateInputSchema(
         unit: z.enum(['milliseconds', 'seconds', 'minutes', 'hours']),
       }),
       actionSchemaByType(ACTIONS.SCENE.START, {
-        scene: z.string(),
+        scene: sceneSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.MESSAGE.SEND, {
         user: userSelectorSchema,
@@ -121,17 +135,17 @@ function createSceneCreateInputSchema(
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
       actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
-        house: z.string(),
+        house: houseSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.HOUSE.IS_NOT_EMPTY, {
-        house: z.string(),
+        house: houseSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.USER.SET_SEEN_AT_HOME, {
-        house: z.string(),
+        house: houseSelectorSchema,
         user: userSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.USER.SET_OUT_OF_HOME, {
-        house: z.string(),
+        house: houseSelectorSchema,
         user: userSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.HTTP.REQUEST, {
@@ -143,12 +157,12 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.USER.CHECK_PRESENCE, {
         user: userSelectorSchema,
-        house: z.string(),
+        house: houseSelectorSchema,
         minutes: z.number(),
-        device_features: z.array(z.string()).min(1),
+        device_features: z.array(deviceFeatureSelectorSchema).min(1),
       }),
       actionSchemaByType(ACTIONS.CALENDAR.IS_EVENT_RUNNING, {
-        calendars: z.array(z.string()).min(1),
+        calendars: z.array(calendarSelectorSchema).min(1),
         calendar_event_name_comparator: calendarComparatorSchema,
         calendar_event_name: z.string().optional(),
         stop_scene_if_event_found: z.boolean().optional(),
@@ -163,11 +177,11 @@ function createSceneCreateInputSchema(
         edf_tempo_peak_hour_type: z.enum(['peak-hour', 'off-peak-hour', 'no-check']).optional(),
       }),
       actionSchemaByType(ACTIONS.ALARM.CHECK_ALARM_MODE, {
-        house: z.string(),
+        house: houseSelectorSchema,
         alarm_mode: z.enum(ALARM_MODES_LIST),
       }),
       actionSchemaByType(ACTIONS.ALARM.SET_ALARM_MODE, {
-        house: z.string(),
+        house: houseSelectorSchema,
         alarm_mode: z.enum(ALARM_MODES_LIST),
       }),
       actionSchemaByType(ACTIONS.MQTT.SEND, {
@@ -179,7 +193,7 @@ function createSceneCreateInputSchema(
         message: z.string(),
       }),
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
-        device: z.string(),
+        device: musicNotificationDevicesSchema,
         text: z.string(),
         volume: z
           .number()
@@ -201,7 +215,7 @@ function createSceneCreateInputSchema(
 
   const sceneTriggerSchema = z.union([
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
-      device_feature: z.string(),
+      device_feature: deviceFeatureSelectorSchema,
       operator: comparisonOperatorSchema,
       value: z.union([z.number(), z.string()]),
       threshold_only: z.boolean().optional(),
@@ -304,36 +318,36 @@ function createSceneCreateInputSchema(
       user: userSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.HOUSE.EMPTY, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.HOUSE.NO_LONGER_EMPTY, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.AREA.USER_ENTERED, {
       user: userSelectorSchema,
-      area: z.string(),
+      area: areaSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.AREA.USER_LEFT, {
       user: userSelectorSchema,
-      area: z.string(),
+      area: areaSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.ARM, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.ARMING, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.DISARM, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.PARTIAL_ARM, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.PANIC, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.ALARM.TOO_MANY_CODES_TESTS, {
-      house: z.string(),
+      house: houseSelectorSchema,
     }),
     triggerSchemaByType(EVENTS.SYSTEM.START, {}),
     triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
