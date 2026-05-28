@@ -106,6 +106,10 @@ function isNoResponseSentinel(text) {
   return normalized === 'NO_RESPONSE';
 }
 
+function isToolExecutionErrorText(text) {
+  return typeof text === 'string' && text.startsWith('Error while running tool');
+}
+
 /**
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
@@ -165,6 +169,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     let assistantMessage = null;
     const imagesSentToUser = [];
+    let lastSceneCreateErrorText = null;
+    let sceneCreateSuccessCount = 0;
+    let sceneCreateToolCallCount = 0;
 
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
       const apiResponse = await this.aiChat({
@@ -225,7 +232,14 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
         let toolResultText;
         try {
+          if (functionName === 'scene_create') {
+            sceneCreateToolCallCount += 1;
+          }
           const toolResult = await cb(toolArgs);
+          if (functionName === 'scene_create') {
+            sceneCreateSuccessCount += 1;
+            lastSceneCreateErrorText = null;
+          }
           imagesSentToUser.push(...extractMessageFilesFromToolResult(toolResult));
           toolResultText = formatToolResultForChat(toolResult);
         } catch (toolError) {
@@ -233,6 +247,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           // conversation. The model can then report the error to the user or retry.
           logger.warn(`Tool "${functionName}" failed:`, toolError);
           toolResultText = `Error while running tool "${functionName}": ${toolError?.message ?? 'unknown error'}`;
+          if (functionName === 'scene_create') {
+            lastSceneCreateErrorText = toolResultText;
+          }
         }
 
         messagesForApi.push({
@@ -259,6 +276,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       if (lastToolMessage) {
         finalAnswer = truncate(lastToolMessage.content.trim(), MAX_FALLBACK_ANSWER_CHARS);
       }
+    }
+    if (sceneCreateSuccessCount === 0 && isToolExecutionErrorText(lastSceneCreateErrorText)) {
+      finalAnswer = lastSceneCreateErrorText;
     }
 
     if (imagesSentToUser.length > 0) {
@@ -293,5 +313,6 @@ module.exports = {
   imageContentToMessageFile,
   shouldSendAssistantTextReply,
   isNoResponseSentinel,
+  isToolExecutionErrorText,
 };
 

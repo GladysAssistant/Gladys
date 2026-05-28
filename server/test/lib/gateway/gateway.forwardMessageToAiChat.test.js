@@ -370,6 +370,63 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.notCalled(replyByIntent);
   });
 
+  it('should not confirm scene creation when scene_create tool keeps failing', async () => {
+    const toolCb = fake.rejects(new Error('scene.create validation failed (422): actions: Invalid input'));
+    const tools = [
+      {
+        intent: 'scene.create',
+        config: {
+          title: 'Create scene',
+          inputSchema: { name: z.string() },
+        },
+        cb: toolCb,
+      },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [{ id: 'call_scene_1', function: { name: 'scene_create', arguments: '{"name":"bad"}' } }],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [
+        {
+          message: {
+            content: 'La scène a été créée avec succès.',
+          },
+        },
+      ],
+    });
+
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'create scene', user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({
+      answer: 'Error while running tool "scene_create": scene.create validation failed (422): actions: Invalid input',
+      imagesSent: 0,
+    });
+    assert.calledOnce(reply);
+    assert.calledWith(
+      reply,
+      message,
+      'Error while running tool "scene_create": scene.create validation failed (422): actions: Invalid input',
+    );
+  });
+
   it('should reply with too many requests message on Error429', async () => {
     const { forwardMessageToAiChat } = getModule({ tools: [] });
     const aiChat = fake.rejects(new Error429('rate limit'));

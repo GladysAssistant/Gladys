@@ -1,4 +1,6 @@
 const z = require('zod/v4');
+const iconList = require('../../../config/icons.json');
+const { ACTIONS, EVENTS, ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../../../utils/constants');
 
 const noRoom = {
   id: null,
@@ -23,6 +25,344 @@ const intervalByName = {
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES,
 };
+const hhmmPattern = /^([0-9]{2}):([0-9]{2})$/;
+
+const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
+const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
+const triggerSchedulerTypeSchema = z.enum(['every-month', 'every-week', 'every-day', 'interval', 'custom-time']);
+const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
+
+const sceneConditionSchema = z
+  .object({
+    variable: z.string(),
+    operator: comparisonOperatorSchema,
+    value: z.union([z.number(), z.string()]).optional(),
+    evaluate_value: z.string().optional(),
+  })
+  .strict();
+
+const actionSchemaByType = (type, specificShape) =>
+  z
+    .object({
+      type: z.literal(type),
+      ...specificShape,
+    })
+    .strict();
+
+const triggerSchemaByType = (type, specificShape) =>
+  z
+    .object({
+      type: z.literal(type),
+      ...specificShape,
+    })
+    .strict();
+
+function createSceneCreateInputSchema(userSelectors = [], houseSelectors = [], lightDeviceSelectors = []) {
+  const userSelectorSchema = userSelectors.length > 0 ? z.enum(userSelectors) : z.string();
+  const houseSelectorSchema = houseSelectors.length > 0 ? z.enum(houseSelectors) : z.string();
+  const lightDevicesSchema = lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
+  let sceneActionSchema;
+  sceneActionSchema = z.lazy(() =>
+    z.discriminatedUnion('type', [
+      actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
+        device_feature: z.string().optional(),
+        device: z.string().optional(),
+        feature_category: z.string().optional(),
+        feature_type: z.string().optional(),
+        value: z.number().optional(),
+        evaluate_value: z.string().optional(),
+      }),
+      actionSchemaByType(ACTIONS.LIGHT.TURN_ON, {
+        devices: lightDevicesSchema,
+      }),
+      actionSchemaByType(ACTIONS.LIGHT.TURN_OFF, {
+        devices: lightDevicesSchema,
+      }),
+      actionSchemaByType(ACTIONS.LIGHT.TOGGLE, {
+        devices: lightDevicesSchema,
+      }),
+      actionSchemaByType(ACTIONS.LIGHT.BLINK, {
+        devices: lightDevicesSchema,
+        blinking_speed: z.enum(['slow', 'medium', 'fast']),
+        blinking_time: z.number(),
+      }),
+      actionSchemaByType(ACTIONS.SWITCH.TURN_ON, {
+        devices: z.array(z.string()),
+      }),
+      actionSchemaByType(ACTIONS.SWITCH.TURN_OFF, {
+        devices: z.array(z.string()),
+      }),
+      actionSchemaByType(ACTIONS.SWITCH.TOGGLE, {
+        devices: z.array(z.string()),
+      }),
+      actionSchemaByType(ACTIONS.TIME.DELAY, {
+        value: z.number().optional(),
+        evaluate_value: z.string().optional(),
+        unit: z.enum(['milliseconds', 'seconds', 'minutes', 'hours']),
+      }),
+      actionSchemaByType(ACTIONS.SCENE.START, {
+        scene: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.MESSAGE.SEND, {
+        user: userSelectorSchema,
+        text: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.MESSAGE.SEND_CAMERA, {
+        user: userSelectorSchema,
+        text: z.string(),
+        camera: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.AI.ASK, {
+        user: userSelectorSchema,
+        text: z.string(),
+        camera: z.string().optional(),
+      }),
+      actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
+        device_feature: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
+        conditions: z.array(sceneConditionSchema).min(1),
+      }),
+      actionSchemaByType(ACTIONS.CONDITION.CHECK_TIME, {
+        before: z.string().regex(hhmmPattern).optional(),
+        after: z.string().regex(hhmmPattern).optional(),
+        days_of_the_week: z.array(weekDaysSchema).optional(),
+      }),
+      actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
+        house: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.HOUSE.IS_NOT_EMPTY, {
+        house: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.USER.SET_SEEN_AT_HOME, {
+        house: z.string(),
+        user: userSelectorSchema,
+      }),
+      actionSchemaByType(ACTIONS.USER.SET_OUT_OF_HOME, {
+        house: z.string(),
+        user: userSelectorSchema,
+      }),
+      actionSchemaByType(ACTIONS.HTTP.REQUEST, {
+        method: z.enum(['get', 'post', 'patch', 'put', 'delete']),
+        url: z.string(),
+        headers: z.array(z.object({ key: z.string(), value: z.string() }).strict()).optional(),
+        body: z.string().optional(),
+        request_response_keys: z.array(z.string()).optional(),
+      }),
+      actionSchemaByType(ACTIONS.USER.CHECK_PRESENCE, {
+        user: userSelectorSchema,
+        house: z.string(),
+        minutes: z.number(),
+        device_features: z.array(z.string()).min(1),
+      }),
+      actionSchemaByType(ACTIONS.CALENDAR.IS_EVENT_RUNNING, {
+        calendars: z.array(z.string()).min(1),
+        calendar_event_name_comparator: calendarComparatorSchema,
+        calendar_event_name: z.string().optional(),
+        stop_scene_if_event_found: z.boolean().optional(),
+        stop_scene_if_event_not_found: z.boolean().optional(),
+      }),
+      actionSchemaByType(ACTIONS.ECOWATT.CONDITION, {
+        ecowatt_network_status: z.enum(['ok', 'warning', 'critical']),
+      }),
+      actionSchemaByType(ACTIONS.EDF_TEMPO.CONDITION, {
+        edf_tempo_peak_day_type: z.enum(['blue', 'white', 'red', 'no-check']),
+        edf_tempo_day: z.enum(['today', 'tomorrow']),
+        edf_tempo_peak_hour_type: z.enum(['peak-hour', 'off-peak-hour', 'no-check']).optional(),
+      }),
+      actionSchemaByType(ACTIONS.ALARM.CHECK_ALARM_MODE, {
+        house: z.string(),
+        alarm_mode: z.enum(ALARM_MODES_LIST),
+      }),
+      actionSchemaByType(ACTIONS.ALARM.SET_ALARM_MODE, {
+        house: z.string(),
+        alarm_mode: z.enum(ALARM_MODES_LIST),
+      }),
+      actionSchemaByType(ACTIONS.MQTT.SEND, {
+        topic: z.string(),
+        message: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.ZIGBEE2MQTT.SEND, {
+        topic: z.string(),
+        message: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
+        device: z.string(),
+        text: z.string(),
+        volume: z.number().int().min(0).max(100).optional(),
+      }),
+      actionSchemaByType(ACTIONS.SMS.SEND, {
+        text: z.string(),
+      }),
+      actionSchemaByType(ACTIONS.CONDITION.IF_THEN_ELSE, {
+        if: z.array(sceneActionSchema).min(1),
+        then: z.array(z.array(sceneActionSchema)),
+        else: z.array(z.array(sceneActionSchema)),
+      }),
+    ]),
+  );
+
+  const sceneTriggerSchema = z.union([
+  triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+    device_feature: z.string(),
+    operator: comparisonOperatorSchema,
+    value: z.union([z.number(), z.string()]),
+    threshold_only: z.boolean().optional(),
+    for_duration: z.number().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.CHANGED, {
+    scheduler_type: z.literal('every-month'),
+    day_of_the_month: z.number().min(1).max(31),
+    time: z.string().regex(hhmmPattern),
+    date: z.string().optional(),
+    interval: z.number().optional(),
+    unit: z.string().optional(),
+    days_of_the_week: z.array(weekDaysSchema).optional(),
+    key: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.CHANGED, {
+    scheduler_type: z.literal('every-week'),
+    days_of_the_week: z.array(weekDaysSchema).optional(),
+    time: z.string().regex(hhmmPattern),
+    date: z.string().optional(),
+    interval: z.number().optional(),
+    unit: z.string().optional(),
+    day_of_the_month: z.number().min(1).max(31).optional(),
+    key: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.CHANGED, {
+    scheduler_type: z.literal('every-day'),
+    time: z.string().regex(hhmmPattern),
+    date: z.string().optional(),
+    interval: z.number().optional(),
+    unit: z.string().optional(),
+    days_of_the_week: z.array(weekDaysSchema).optional(),
+    day_of_the_month: z.number().min(1).max(31).optional(),
+    key: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.CHANGED, {
+    scheduler_type: z.literal('custom-time'),
+    date: z.string(),
+    time: z.string().regex(hhmmPattern),
+    interval: z.number().optional(),
+    unit: z.string().optional(),
+    days_of_the_week: z.array(weekDaysSchema).optional(),
+    day_of_the_month: z.number().min(1).max(31).optional(),
+    key: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.CHANGED, {
+    scheduler_type: z.literal('interval'),
+    interval: z.number(),
+    unit: z.enum(['second', 'minute', 'hour']),
+    date: z.string().optional(),
+    time: z.string().regex(hhmmPattern).optional(),
+    days_of_the_week: z.array(weekDaysSchema).optional(),
+    day_of_the_month: z.number().min(1).max(31).optional(),
+    key: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.SUNRISE, {
+    house: houseSelectorSchema,
+    offset: z.number().int().min(-1440).max(1440).optional(),
+  }),
+  triggerSchemaByType(EVENTS.TIME.SUNSET, {
+    house: houseSelectorSchema,
+    offset: z.number().int().min(-1440).max(1440).optional(),
+  }),
+  triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
+    user: userSelectorSchema,
+  }),
+  triggerSchemaByType(EVENTS.USER_PRESENCE.LEFT_HOME, {
+    user: userSelectorSchema,
+  }),
+  triggerSchemaByType(EVENTS.HOUSE.EMPTY, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.HOUSE.NO_LONGER_EMPTY, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.AREA.USER_ENTERED, {
+    user: userSelectorSchema,
+    area: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.AREA.USER_LEFT, {
+    user: userSelectorSchema,
+    area: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.ARM, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.ARMING, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.DISARM, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.PARTIAL_ARM, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.PANIC, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.ALARM.TOO_MANY_CODES_TESTS, {
+    house: z.string(),
+  }),
+  triggerSchemaByType(EVENTS.SYSTEM.START, {}),
+  triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
+    topic: z.string(),
+    message: z.string().optional(),
+  }),
+  triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
+    calendar_event_attribute: triggerCalendarEventAttributeSchema,
+    calendar_event_name_comparator: calendarComparatorSchema,
+    calendars: z.array(z.string()).min(1),
+    calendar_event_name: z.string().optional(),
+    duration: z.number().optional(),
+  }),
+  ]);
+
+  return z.object({
+    name: z.string().min(1).describe('Scene name.'),
+    icon: z.enum(iconList).describe('Scene icon.'),
+    description: z.string().optional().describe('Optional scene description.'),
+    active: z.boolean().optional().describe('Optional scene active flag.'),
+    selector: z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .optional()
+      .describe('Optional scene selector, kebab-case.'),
+    triggers: z.array(sceneTriggerSchema).default([]).describe('Scene triggers.'),
+    actions: z
+      .union([z.array(z.array(sceneActionSchema)).min(1), z.array(sceneActionSchema).min(1)])
+      .describe('Scene actions as nested groups.'),
+    tags: z
+      .array(
+        z.object({
+          name: z.string().min(1),
+        }),
+      )
+      .default([])
+      .describe('Optional scene tags.'),
+  });
+}
+
+function formatSceneCreateZodIssue(issue) {
+  const path = issue.path.join('.') || 'root';
+  let hint = '';
+
+  if (path === 'actions' && issue.code === 'invalid_union') {
+    hint =
+      ' Hint: actions must be either [[{type:"light.turn-on",...}], [{type:"time.delay",...}]] or [{type:"light.turn-on",...}].';
+  }
+  if (path.startsWith('triggers') && issue.code === 'invalid_union') {
+    hint = ' Hint: each trigger must include required fields for its type/scheduler_type (e.g. time + scheduler_type).';
+  }
+  if ((path.endsWith('.time') || path === 'time') && issue.code === 'invalid_format') {
+    hint = ' Hint: time must use HH:mm format, for example "09:30".';
+  }
+
+  return `${path}: ${issue.message}${hint}`;
+}
 
 /**
  * @description Get all resources (room and devices) available for the MCP service.
@@ -129,6 +469,8 @@ async function getAllTools() {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
 
   const allDevices = await this.gladys.device.get();
   const sensorDevices = allDevices
@@ -168,6 +510,14 @@ async function getAllTools() {
         .flat(),
     ),
   ];
+  const lightDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'light' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const sceneCreateInputSchema = createSceneCreateInputSchema(
+    users.map(({ selector }) => selector),
+    houses.map(({ selector }) => selector),
+    lightDeviceSelectors,
+  );
 
   const historyDevices = allDevices
     .filter((device) => {
@@ -210,6 +560,50 @@ async function getAllTools() {
             mimeType: 'image/jpeg',
           })),
         };
+      },
+    },
+    {
+      intent: 'scene.create',
+      config: {
+        title: 'Create scene',
+        description:
+          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds.',
+        inputSchema: sceneCreateInputSchema.shape,
+      },
+      cb: async (scene) => {
+        try {
+          const parsedScene = sceneCreateInputSchema.parse(scene);
+          const normalizedActions = Array.isArray(parsedScene.actions?.[0])
+            ? parsedScene.actions
+            : parsedScene.actions.map((action) => [action]);
+          const createdScene = await this.gladys.scene.create({
+            ...parsedScene,
+            actions: normalizedActions,
+          });
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: this.toon({
+                  id: createdScene.id,
+                  name: createdScene.name,
+                  selector: createdScene.selector,
+                }),
+              },
+            ],
+          };
+        } catch (e) {
+          if (e?.name === 'ZodError') {
+            const details = e.issues.map(formatSceneCreateZodIssue).join('; ');
+            throw new Error(`scene.create validation failed (422): ${details}`);
+          }
+          if (e?.name === 'SequelizeValidationError') {
+            const details = (e.errors || []).map((error) => error.message).join('; ');
+            throw new Error(`scene.create failed (422): ${details || e.message}`);
+          }
+          throw e;
+        }
       },
     },
     {
