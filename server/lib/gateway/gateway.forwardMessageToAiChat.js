@@ -13,21 +13,7 @@ const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
 
 const promptPath = path.join(__dirname, '../../config/prompts/aiChat.prompt.txt');
-let cachedPrompt = null;
-
-/**
- * @description Load and cache AI system prompt from disk.
- * @returns {string} Prompt text.
- * @example
- * const prompt = loadPrompt();
- */
-function loadPrompt() {
-  if (cachedPrompt) {
-    return cachedPrompt;
-  }
-  cachedPrompt = fs.readFileSync(promptPath, 'utf8');
-  return cachedPrompt;
-}
+const SYSTEM_PROMPT = fs.readFileSync(promptPath, 'utf8');
 
 /**
  * @description Return MCP handler from service manager.
@@ -261,10 +247,8 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
 
-    const systemPrompt = loadPrompt();
-
     // Build a compact conversation for the model.
-    const messagesForApi = [{ role: 'system', content: systemPrompt }];
+    const messagesForApi = [{ role: 'system', content: SYSTEM_PROMPT }];
 
     (previousQuestions ?? []).forEach((exchange) => {
       if (!exchange) {
