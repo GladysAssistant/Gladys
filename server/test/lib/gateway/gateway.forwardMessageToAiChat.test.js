@@ -707,11 +707,39 @@ describe('gateway.forwardMessageToAiChat', () => {
       choices: [{ message: { content: ''.padStart(3001, 'y') } }],
     });
     const reply = fake.resolves(null);
+    const message = {
+      id: 'message-id',
+      text: 'run many tools',
+      created_at: new Date(),
+      source: 'api',
+      user_id: 'user-id',
+    };
     await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }), {
-      message: { text: 'run many tools', user: { id: 'user-id' } },
+      message,
       previousQuestions: [],
       context: {},
     });
+
+    assert.calledOnce(nullTool);
+    assert.calledOnce(stringTool);
+    assert.calledOnce(objectTool);
+    assert.calledOnce(unknownContentTool);
+    assert.calledOnce(undefinedContentTool);
+    assert.calledOnce(circularTool);
+    assert.calledOnce(longTextTool);
+
+    const secondCallBody = aiChat.getCall(1).args[0];
+    const toolMessages = secondCallBody.messages.filter((m) => m.role === 'tool');
+    expect(toolMessages).to.have.length(7);
+    expect(toolMessages.find((m) => m.tool_call_id === 'a').content).to.equal('');
+    expect(toolMessages.find((m) => m.tool_call_id === 'b').content).to.equal('plain-string-result');
+    expect(toolMessages.find((m) => m.tool_call_id === 'c').content).to.equal('{"hello":"world"}');
+    expect(toolMessages.find((m) => m.tool_call_id === 'd').content).to.equal('{"type":"unknown-type","nested":true}');
+    expect(toolMessages.find((m) => m.tool_call_id === 'e').content).to.equal('');
+    expect(toolMessages.find((m) => m.tool_call_id === 'f').content).to.equal('[unserializable tool result]');
+    expect(toolMessages.find((m) => m.tool_call_id === 'g').content).to.contain('... (truncated)');
+
+    assert.calledWith(reply, message, match.string);
   });
 });
 
