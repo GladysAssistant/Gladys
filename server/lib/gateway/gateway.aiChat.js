@@ -3,15 +3,14 @@ const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
- * @description Ask OpenAI a question.
- * @param {object} body - The query to ask.
- * @returns {Promise} Resolve with OpenAI response.
+ * @public
+ * @description Ask the Gladys Gateway AI endpoint.
+ * @param {object} body - OpenAI-compatible chat request body.
+ * @returns {Promise<object>} Chat completion-like response.
  * @example
- * openAIAsk({
- *    question
- * })
+ * aiChat({ messages: [{ role: 'user', content: 'Hello' }] });
  */
-async function openAIAsk(body) {
+async function aiChat(body) {
   try {
     const response = await this.gladysGatewayClient.openAIAsk(body);
     return response;
@@ -30,5 +29,5 @@ async function openAIAsk(body) {
 }
 
 module.exports = {
-  openAIAsk,
+  aiChat,
 };

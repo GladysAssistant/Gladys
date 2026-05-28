@@ -4302,6 +4302,12 @@
       "upsellFeature1": "Ask open-ended questions to your home",
       "upsellFeature2": "Analyse what your cameras see",
       "upsellFeature3": "Mistral AI · no data resold"
+    },
+    "toolCall": {
+      "statusUsed": "Used",
+      "statusError": "Error",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details"
     }
   },
   "header": {

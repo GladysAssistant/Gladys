@@ -8,17 +8,25 @@ const db = require('../../models');
  * @param {string} text - The answer to send.
  * @param {object} context - Contain the context, and sometimes additionnal data.
  * @param {string} [file] - An optional file sent with the message.
+ * @param {object} [options] - Extra message options.
+ * @param {string} [options.messageType='chat'] - Message display type.
+ * @param {string} [options.toolName] - Optional tool name for tool_call messages.
+ * @param {string} [options.toolStatus] - Optional status ('success' | 'error').
  * @example
  * reply(originalMessage, 'thanks!');
  */
-async function reply(originalMessage, text, context, file = null) {
+async function reply(originalMessage, text, context, file = null, options = {}) {
   try {
+    const { messageType = 'chat', toolName = null, toolStatus = null } = options;
     // first, we insert the message in database
     const messageToInsert = {
       text,
       file,
       sender_id: null, // message sent by gladys
       receiver_id: originalMessage.user.id,
+      message_type: messageType,
+      tool_name: toolName,
+      tool_status: toolStatus,
     };
     const messageCreated = (await db.Message.create(messageToInsert)).get({ plain: true });
     // send the message through websocket
@@ -27,6 +35,11 @@ async function reply(originalMessage, text, context, file = null) {
       userId: originalMessage.user.id,
       payload: messageCreated,
     });
+
+    // Tool call trace messages are displayed in chat only.
+    if (messageType === 'tool_call') {
+      return;
+    }
 
     // If the source is Gladys AI, then we should answer by all means available
     if (originalMessage.source === 'AI') {

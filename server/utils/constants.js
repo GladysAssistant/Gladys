@@ -1309,6 +1309,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',
+    AI_THINKING: 'message.ai-thinking',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
