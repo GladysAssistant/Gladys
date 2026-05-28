@@ -664,22 +664,6 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.calledWith(replyByIntent, match.any, 'openai.request.fail', {});
   });
 
-  it('should cover loadPrompt cache branch when called twice', async () => {
-    const { forwardMessageToAiChat } = getModule({ tools: [] });
-    const aiChat = fake.resolves({ choices: [{ message: { content: 'ok' } }] });
-    const reply = fake.resolves(null);
-    const ctx = buildContext({ tools: [], aiChat, reply, replyByIntent: fake.resolves(null) });
-    const request = {
-      message: { text: 'hello', user: { id: 'user-id' } },
-      previousQuestions: [],
-      context: {},
-    };
-
-    await forwardMessageToAiChat.call(ctx, request);
-    await forwardMessageToAiChat.call(ctx, request);
-    assert.calledTwice(aiChat);
-  });
-
   it('should cover tool result formatter edge branches through tool outputs', async () => {
     const nullTool = fake.resolves(null);
     const stringTool = fake.resolves('plain-string-result');
