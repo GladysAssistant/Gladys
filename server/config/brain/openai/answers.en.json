@@ -1,10 +1,10 @@
 [
   {
     "label": "openai.request.fail",
-    "answers": ["The request to OpenAI failed, please try again!"]
+    "answers": ["The request to the Artificial Intelligence API failed, please try again!"]
   },
   {
     "label": "openai.request.tooManyRequests",
-    "answers": ["You have made too many requests this month to OpenAI!"]
+    "answers": ["You have made too many requests this month to the Artificial Intelligence API!"]
   }
 ]
