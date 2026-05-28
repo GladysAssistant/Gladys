@@ -298,6 +298,15 @@
   box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
 }
 
+.chatCardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.chatMessagesArea {
+  min-height: 0;
+}
+
 .chatLayout {
   position: relative;
 }
@@ -306,6 +315,7 @@
   background: #fff;
   border-top: 1px solid #edf1f5;
   padding: 12px;
+  flex-shrink: 0;
 }
 
 .composerInputWrap {
@@ -316,6 +326,7 @@
   min-height: 52px;
   max-height: 264px;
   resize: none;
+  box-sizing: border-box;
   border-radius: 14px;
   padding: 12px 52px 12px 14px;
   font-size: 15px;
@@ -392,23 +403,92 @@
     display: none;
   }
 
+  .chatPage {
+    height: calc(100dvh - 64px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chatPageMain,
+  .chatPageContent,
+  .chatPageContainer,
+  .chatLayout,
+  .chatMainColumn,
+  .chatCard,
+  .chatDimmer,
+  .chatCardBody {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chatPageContent {
+    margin: 0 !important;
+  }
+
+  .chatPageContainer {
+    padding: 0 8px;
+    max-width: 100%;
+  }
+
+  .chatPageContainer .page-header {
+    display: none;
+  }
+
+  .chatLayout {
+    margin: 0;
+  }
+
   .chatMainColumn {
     max-width: 100%;
-    flex: 0 0 100%;
+    flex: 1 1 auto;
+    padding: 0;
   }
 
   .chatCard {
-    border-radius: 14px;
-    margin-bottom: calc(88px + env(safe-area-inset-bottom));
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
   }
 
-  .mesgs {
+  .chatMessagesArea {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chatMessagesArea .messaging,
+  .chatMessagesArea .inbox_msg,
+  .chatMessagesArea .mesgs {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .chatMessagesArea .inbox_msg {
+    overflow: hidden;
+  }
+
+  .chatMessagesArea .mesgs {
     padding: 14px 10px 0;
   }
 
-  .msg_history {
-    height: calc(100vh - 280px);
-    min-height: 300px;
+  .chatMessagesArea .msg_history {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chatMessagesArea .emptyChatState {
+    margin: auto;
   }
 
   .incoming_msg {
@@ -429,13 +509,9 @@
   }
 
   .chatComposer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1030;
+    position: static;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.12);
+    box-shadow: none;
   }
 
   .chatInput {

@@ -30,12 +30,18 @@ const IntegrationPage = connect(
       if (!textareaRef.current) {
         return;
       }
-      textareaRef.current.style.height = 'auto';
-      const lineHeight = 24;
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      const computed = window.getComputedStyle(textarea);
+      const lineHeight = parseFloat(computed.lineHeight) || 24;
+      const verticalPadding =
+        (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+      const verticalBorder =
+        (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
       const maxLines = 11;
-      const maxHeight = lineHeight * maxLines;
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, maxHeight)}px`;
-      textareaRef.current.style.overflowY = textareaRef.current.scrollHeight > maxHeight ? 'auto' : 'hidden';
+      const maxHeight = lineHeight * maxLines + verticalPadding + verticalBorder;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+      textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
     };
 
     const onComposerInput = e => {
@@ -48,26 +54,28 @@ const IntegrationPage = connect(
     }, [currentMessageTextInput]);
 
     return (
-      <div class="page">
-        <div class="page-main">
-          <div class="my-3 my-md-5">
-            <div class="container">
+      <div class={cx('page', style.chatPage)}>
+        <div class={cx('page-main', style.chatPageMain)}>
+          <div class={cx('my-3 my-md-5', style.chatPageContent)}>
+            <div class={cx('container', style.chatPageContainer)}>
               <div class="page-header" />
               <div class={cx('row', style.chatLayout)}>
                 <div class={cx('col-lg-8', style.chatMainColumn)}>
                   <div class={cx('card', style.chatCard)}>
                     <div
-                      class={cx('dimmer', {
+                      class={cx('dimmer', style.chatDimmer, {
                         active: MessageGetStatus === RequestStatus.Getting
                       })}
                     >
                       <div class="loader" />
-                      <div class="dimmer-content">
-                        {messages && messages.length ? (
-                          <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
-                        ) : (
-                          <EmptyChat />
-                        )}
+                      <div class={cx('dimmer-content', style.chatCardBody)}>
+                        <div class={style.chatMessagesArea}>
+                          {messages && messages.length ? (
+                            <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
+                          ) : (
+                            <EmptyChat />
+                          )}
+                        </div>
                         <div class={cx('card-footer', style.chatComposer)}>
                           <div class={style.composerInputWrap}>
                             <Localizer>
