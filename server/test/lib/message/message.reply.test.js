@@ -126,4 +126,29 @@ describe('message.reply', () => {
     );
     assert.notCalled(nextCloudTalkService.message.send);
   });
+
+  it('should persist tool_call but not forward externally', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'AI',
+        source_user_id: 'XXXX',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'device_get_state()',
+      {},
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'device_get_state',
+        toolStatus: 'success',
+      },
+    );
+    assert.notCalled(telegramService.message.send);
+    assert.notCalled(nextCloudTalkService.message.send);
+    assert.notCalled(callmebotService.message.send);
+  });
 });

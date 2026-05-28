@@ -836,4 +836,109 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.setValue.args[0][0].room).to.eq(null);
     expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Light Without Room');
   });
+
+  it('should return detailed scene.create errors for SequelizeValidationError and unknown errors', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: {
+          getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]),
+        },
+        user: {
+          get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]),
+        },
+        house: {
+          get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        scene: {
+          get: stub().resolves([]),
+          create: stub(),
+        },
+        device: {
+          get: stub().resolves([
+            {
+              selector: 'device-light-1',
+              name: 'Living Room Light',
+              room: { selector: 'salon', name: 'Living Room' },
+              features: [
+                {
+                  id: 1,
+                  selector: 'device-light-1-binary',
+                  name: 'On/Off',
+                  category: 'light',
+                  type: 'binary',
+                },
+                {
+                  id: 2,
+                  selector: 'device-light-1-brightness',
+                  name: 'Brightness',
+                  category: 'light',
+                  type: 'integer',
+                },
+              ],
+            },
+          ]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: {
+          emit: fake(),
+        },
+      },
+      levenshtein: {
+        distance: stub().returns(0),
+      },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+
+    const sequelizeValidationError = new Error('Validation error');
+    sequelizeValidationError.name = 'SequelizeValidationError';
+    sequelizeValidationError.errors = [{ message: 'text is required' }, { message: 'user is required' }];
+    mcpHandler.gladys.scene.create.rejects(sequelizeValidationError);
+
+    let thrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene with invalid action payload',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown).to.be.an('error');
+    expect(thrown.message).to.contain('scene.create failed (422): text is required; user is required');
+
+    mcpHandler.gladys.scene.create.rejects(new Error('db down'));
+    let unknownThrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene unknown error',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      unknownThrown = e;
+    }
+    expect(unknownThrown).to.be.an('error');
+    expect(unknownThrown.message).to.eq('db down');
+  });
 });
