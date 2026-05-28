@@ -469,7 +469,7 @@ describe('build schemas', () => {
     expect(tools[1].intent).to.eq('scene.create');
     expect(tools[1].config.title).to.eq('Create scene');
     expect(tools[1].config.description).to.eq(
-      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds.',
+      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action.',
     );
     const sceneCreatedResult = await tools[1].cb({
       name: 'MCP Generated Scene',
@@ -502,6 +502,30 @@ describe('build schemas', () => {
       tags: [],
     });
     expect(sceneCreatedWithUserAction.content[0].text).to.eq('toonmockdata');
+
+    const sceneCreatedWithDeviceFeatureSelector = await tools[1].cb({
+      name: 'Get device value scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [[{ type: 'device.get-value', device_feature: 'device-temp-1-temp' }]],
+      tags: [],
+    });
+    expect(sceneCreatedWithDeviceFeatureSelector.content[0].text).to.eq('toonmockdata');
+
+    let invalidDeviceFeatureSelectorError = null;
+    try {
+      await tools[1].cb({
+        name: 'Get invalid device value scene',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'device.get-value', device_feature: 'unknown-feature' }]],
+        tags: [],
+      });
+    } catch (e) {
+      invalidDeviceFeatureSelectorError = e;
+    }
+    expect(invalidDeviceFeatureSelectorError).to.be.an('error');
+    expect(invalidDeviceFeatureSelectorError.message).to.contain('scene.create validation failed (422)');
 
     const sunriseSceneResult = await tools[1].cb({
       name: 'Sunrise scene',

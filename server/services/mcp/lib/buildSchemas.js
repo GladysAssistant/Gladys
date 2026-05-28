@@ -58,10 +58,16 @@ const triggerSchemaByType = (type, specificShape) =>
     })
     .strict();
 
-function createSceneCreateInputSchema(userSelectors = [], houseSelectors = [], lightDeviceSelectors = []) {
+function createSceneCreateInputSchema(
+  userSelectors = [],
+  houseSelectors = [],
+  lightDeviceSelectors = [],
+  deviceFeatureSelectors = [],
+) {
   const userSelectorSchema = userSelectors.length > 0 ? z.enum(userSelectors) : z.string();
   const houseSelectorSchema = houseSelectors.length > 0 ? z.enum(houseSelectors) : z.string();
   const lightDevicesSchema = lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
+  const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   let sceneActionSchema;
   sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
@@ -115,11 +121,15 @@ function createSceneCreateInputSchema(userSelectors = [], houseSelectors = [], l
       }),
       actionSchemaByType(ACTIONS.AI.ASK, {
         user: userSelectorSchema,
-        text: z.string(),
+        text: z
+          .string()
+          .describe(
+            'Prompt text for AI. To inject values from previous "device.get-value" actions, use Handlebars variables like {{0.0.last_value}} or {{0.0.last_value_string}}.',
+          ),
         camera: z.string().optional(),
       }),
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
-        device_feature: z.string(),
+        device_feature: deviceFeatureSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
         conditions: z.array(sceneConditionSchema).min(1),
@@ -346,13 +356,28 @@ function createSceneCreateInputSchema(userSelectors = [], houseSelectors = [], l
   });
 }
 
-function formatSceneCreateZodIssue(issue) {
+function extractProvidedActionTypes(rawScene) {
+  if (!rawScene || !Array.isArray(rawScene.actions)) return [];
+  const flatten = (arr) =>
+    arr.flatMap((item) => {
+      if (Array.isArray(item)) return flatten(item);
+      if (item && typeof item === 'object') return [item];
+      return [];
+    });
+  return [...new Set(flatten(rawScene.actions).map((action) => action.type).filter(Boolean))];
+}
+
+function formatSceneCreateZodIssue(issue, rawScene) {
   const path = issue.path.join('.') || 'root';
   let hint = '';
 
   if (path === 'actions' && issue.code === 'invalid_union') {
+    const providedTypes = extractProvidedActionTypes(rawScene);
+    const providedTypesHint =
+      providedTypes.length > 0 ? ` Provided action types: ${providedTypes.join(', ')}.` : '';
     hint =
-      ' Hint: actions must be either [[{type:"light.turn-on",...}], [{type:"time.delay",...}]] or [{type:"light.turn-on",...}].';
+      ' Hint: actions must be either [[{type:"..."}, ...], [...]] or [{type:"..."}, ...]. Use scene action types (e.g. device.get-value, ai.ask, message.send, time.delay, condition.if-then-else), not MCP tool intents like device.get-state.' +
+      providedTypesHint;
   }
   if (path.startsWith('triggers') && issue.code === 'invalid_union') {
     hint = ' Hint: each trigger must include required fields for its type/scheduler_type (e.g. time + scheduler_type).';
@@ -510,6 +535,10 @@ async function getAllTools() {
         .flat(),
     ),
   ];
+  const deviceFeatureSelectors = allDevices
+    .map((device) => device.features.map((feature) => feature.selector))
+    .flat()
+    .filter(Boolean);
   const lightDeviceSelectors = switchableDevices
     .filter((device) => device.features.some((feature) => feature.category === 'light' && feature.type === 'binary'))
     .map((device) => device.selector);
@@ -517,6 +546,7 @@ async function getAllTools() {
     users.map(({ selector }) => selector),
     houses.map(({ selector }) => selector),
     lightDeviceSelectors,
+    deviceFeatureSelectors,
   );
 
   const historyDevices = allDevices
@@ -567,7 +597,7 @@ async function getAllTools() {
       config: {
         title: 'Create scene',
         description:
-          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds.',
+          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action.',
         inputSchema: sceneCreateInputSchema.shape,
       },
       cb: async (scene) => {
@@ -595,7 +625,7 @@ async function getAllTools() {
           };
         } catch (e) {
           if (e?.name === 'ZodError') {
-            const details = e.issues.map(formatSceneCreateZodIssue).join('; ');
+            const details = e.issues.map((issue) => formatSceneCreateZodIssue(issue, scene)).join('; ');
             throw new Error(`scene.create validation failed (422): ${details}`);
           }
           if (e?.name === 'SequelizeValidationError') {
