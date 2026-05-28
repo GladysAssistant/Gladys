@@ -44,12 +44,7 @@ describe('gateway.aiChat', () => {
     const data = await gateway.aiChat(body);
 
     expect(data).to.deep.equal({ answer: 'this is the answer' });
-    sinonAssert.calledWith(
-      postMock,
-      'https://api.gladysgateway.com/aichat/chat',
-      body,
-      gateway.gladysGatewayClient,
-    );
+    sinonAssert.calledWith(postMock, 'https://api.gladysgateway.com/aichat/chat', body, gateway.gladysGatewayClient);
   });
 
   it('should throw Error403 on forbidden', async () => {
@@ -87,4 +82,3 @@ describe('gateway.aiChat', () => {
     await assert.isRejected(promise, Error);
   });
 });
-

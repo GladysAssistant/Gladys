@@ -3,10 +3,7 @@ import style from './style.css';
 
 const Messages = ({}) => (
   <div class={style.emptyChatState}>
-    <img
-      src="/assets/images/undraw_typing.svg"
-      class={style.emptyChatImage}
-    />
+    <img src="/assets/images/undraw_typing.svg" class={style.emptyChatImage} />
     <p class={style.emptyChatText}>
       <Text id="chat.emptyStateMessage" />
     </p>

@@ -52,7 +52,10 @@ const ToolCallMessage = ({ children, ...props }) => {
             </div>
           )}
         </div>
-        <span class={isError ? style.toolCallStatusError : style.toolCallStatusSuccess} title={isError ? 'error' : 'used'}>
+        <span
+          class={isError ? style.toolCallStatusError : style.toolCallStatusSuccess}
+          title={isError ? 'error' : 'used'}
+        >
           {isError ? <Text id="chat.toolCall.statusError" /> : <Text id="chat.toolCall.statusUsed" />}
         </span>
         <button

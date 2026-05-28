@@ -109,18 +109,11 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.calledWith(toolCb, { action: 'on', room: 'living room' });
     assert.calledTwice(reply);
     assert.calledWith(reply, message, 'Done, lights are now on.');
-    assert.calledWith(
-      reply,
-      message,
-      'device_turn_on_off({"action":"on","room":"living room"})',
-      {},
-      null,
-      {
-        messageType: 'tool_call',
-        toolName: 'device_turn_on_off',
-        toolStatus: 'success',
-      },
-    );
+    assert.calledWith(reply, message, 'device_turn_on_off({"action":"on","room":"living room"})', {}, null, {
+      messageType: 'tool_call',
+      toolName: 'device_turn_on_off',
+      toolStatus: 'success',
+    });
     assert.notCalled(replyByIntent);
 
     const firstCallBody = aiChat.getCall(0).args[0];
@@ -199,11 +192,14 @@ describe('gateway.forwardMessageToAiChat', () => {
 
     const reply = fake.resolves(null);
     const message = { text: 'Turn on the light', user: { id: 'user-id' } };
-    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }), {
-      message,
-      previousQuestions: [],
-      context: {},
-    });
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message,
+        previousQuestions: [],
+        context: {},
+      },
+    );
 
     expect(result).to.deep.equal({ answer: 'Sorry, the device is unreachable.', imagesSent: 0 });
     const secondCallBody = aiChat.getCall(1).args[0];
@@ -236,11 +232,14 @@ describe('gateway.forwardMessageToAiChat', () => {
 
     const reply = fake.resolves(null);
     const message = { text: 'do something', user: { id: 'user-id' } };
-    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent: fake.resolves(null) }), {
-      message,
-      previousQuestions: [],
-      context: {},
-    });
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools: [], aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message,
+        previousQuestions: [],
+        context: {},
+      },
+    );
 
     expect(result).to.deep.equal({ answer: 'I could not run that command.', imagesSent: 0 });
     const secondCallBody = aiChat.getCall(1).args[0];
@@ -281,11 +280,14 @@ describe('gateway.forwardMessageToAiChat', () => {
 
     const reply = fake.resolves(null);
     const message = { text: 'state?', user: { id: 'user-id' } };
-    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }), {
-      message,
-      previousQuestions: [],
-      context: {},
-    });
+    const result = await forwardMessageToAiChat.call(
+      buildContext({ tools, aiChat, reply, replyByIntent: fake.resolves(null) }),
+      {
+        message,
+        previousQuestions: [],
+        context: {},
+      },
+    );
 
     expect(result).to.deep.equal({ answer: 'fallback content', imagesSent: 0 });
     assert.callCount(reply, 6);
@@ -357,18 +359,11 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.calledOnce(toolCb);
     assert.calledWith(replyByIntent, message, 'camera.get-image.success', context, cameraImageFile);
     assert.calledOnce(reply);
-    assert.calledWith(
-      reply,
-      message,
-      'camera_get_image({"room":"salon"})',
-      context,
-      null,
-      {
-        messageType: 'tool_call',
-        toolName: 'camera_get_image',
-        toolStatus: 'success',
-      },
-    );
+    assert.calledWith(reply, message, 'camera_get_image({"room":"salon"})', context, null, {
+      messageType: 'tool_call',
+      toolName: 'camera_get_image',
+      toolStatus: 'success',
+    });
 
     const secondCallBody = aiChat.getCall(1).args[0];
     const toolMessage = secondCallBody.messages.find((m) => m.role === 'tool' && m.tool_call_id === 'call_cam');
@@ -471,4 +466,3 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.calledWith(replyByIntent, message, 'openai.request.tooManyRequests', context);
   });
 });
-

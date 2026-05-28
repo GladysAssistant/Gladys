@@ -66,7 +66,8 @@ function createSceneCreateInputSchema(
 ) {
   const userSelectorSchema = userSelectors.length > 0 ? z.enum(userSelectors) : z.string();
   const houseSelectorSchema = houseSelectors.length > 0 ? z.enum(houseSelectors) : z.string();
-  const lightDevicesSchema = lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
+  const lightDevicesSchema =
+    lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   let sceneActionSchema;
   sceneActionSchema = z.lazy(() =>
@@ -135,8 +136,14 @@ function createSceneCreateInputSchema(
         conditions: z.array(sceneConditionSchema).min(1),
       }),
       actionSchemaByType(ACTIONS.CONDITION.CHECK_TIME, {
-        before: z.string().regex(hhmmPattern).optional(),
-        after: z.string().regex(hhmmPattern).optional(),
+        before: z
+          .string()
+          .regex(hhmmPattern)
+          .optional(),
+        after: z
+          .string()
+          .regex(hhmmPattern)
+          .optional(),
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
       actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
@@ -200,7 +207,12 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
         device: z.string(),
         text: z.string(),
-        volume: z.number().int().min(0).max(100).optional(),
+        volume: z
+          .number()
+          .int()
+          .min(0)
+          .max(100)
+          .optional(),
       }),
       actionSchemaByType(ACTIONS.SMS.SEND, {
         text: z.string(),
@@ -214,134 +226,178 @@ function createSceneCreateInputSchema(
   );
 
   const sceneTriggerSchema = z.union([
-  triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
-    device_feature: z.string(),
-    operator: comparisonOperatorSchema,
-    value: z.union([z.number(), z.string()]),
-    threshold_only: z.boolean().optional(),
-    for_duration: z.number().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.CHANGED, {
-    scheduler_type: z.literal('every-month'),
-    day_of_the_month: z.number().min(1).max(31),
-    time: z.string().regex(hhmmPattern),
-    date: z.string().optional(),
-    interval: z.number().optional(),
-    unit: z.string().optional(),
-    days_of_the_week: z.array(weekDaysSchema).optional(),
-    key: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.CHANGED, {
-    scheduler_type: z.literal('every-week'),
-    days_of_the_week: z.array(weekDaysSchema).optional(),
-    time: z.string().regex(hhmmPattern),
-    date: z.string().optional(),
-    interval: z.number().optional(),
-    unit: z.string().optional(),
-    day_of_the_month: z.number().min(1).max(31).optional(),
-    key: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.CHANGED, {
-    scheduler_type: z.literal('every-day'),
-    time: z.string().regex(hhmmPattern),
-    date: z.string().optional(),
-    interval: z.number().optional(),
-    unit: z.string().optional(),
-    days_of_the_week: z.array(weekDaysSchema).optional(),
-    day_of_the_month: z.number().min(1).max(31).optional(),
-    key: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.CHANGED, {
-    scheduler_type: z.literal('custom-time'),
-    date: z.string(),
-    time: z.string().regex(hhmmPattern),
-    interval: z.number().optional(),
-    unit: z.string().optional(),
-    days_of_the_week: z.array(weekDaysSchema).optional(),
-    day_of_the_month: z.number().min(1).max(31).optional(),
-    key: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.CHANGED, {
-    scheduler_type: z.literal('interval'),
-    interval: z.number(),
-    unit: z.enum(['second', 'minute', 'hour']),
-    date: z.string().optional(),
-    time: z.string().regex(hhmmPattern).optional(),
-    days_of_the_week: z.array(weekDaysSchema).optional(),
-    day_of_the_month: z.number().min(1).max(31).optional(),
-    key: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.SUNRISE, {
-    house: houseSelectorSchema,
-    offset: z.number().int().min(-1440).max(1440).optional(),
-  }),
-  triggerSchemaByType(EVENTS.TIME.SUNSET, {
-    house: houseSelectorSchema,
-    offset: z.number().int().min(-1440).max(1440).optional(),
-  }),
-  triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
-    user: userSelectorSchema,
-  }),
-  triggerSchemaByType(EVENTS.USER_PRESENCE.LEFT_HOME, {
-    user: userSelectorSchema,
-  }),
-  triggerSchemaByType(EVENTS.HOUSE.EMPTY, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.HOUSE.NO_LONGER_EMPTY, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.AREA.USER_ENTERED, {
-    user: userSelectorSchema,
-    area: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.AREA.USER_LEFT, {
-    user: userSelectorSchema,
-    area: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.ARM, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.ARMING, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.DISARM, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.PARTIAL_ARM, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.PANIC, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.ALARM.TOO_MANY_CODES_TESTS, {
-    house: z.string(),
-  }),
-  triggerSchemaByType(EVENTS.SYSTEM.START, {}),
-  triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
-    topic: z.string(),
-    message: z.string().optional(),
-  }),
-  triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
-    calendar_event_attribute: triggerCalendarEventAttributeSchema,
-    calendar_event_name_comparator: calendarComparatorSchema,
-    calendars: z.array(z.string()).min(1),
-    calendar_event_name: z.string().optional(),
-    duration: z.number().optional(),
-  }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_feature: z.string(),
+      operator: comparisonOperatorSchema,
+      value: z.union([z.number(), z.string()]),
+      threshold_only: z.boolean().optional(),
+      for_duration: z.number().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('every-month'),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31),
+      time: z.string().regex(hhmmPattern),
+      date: z.string().optional(),
+      interval: z.number().optional(),
+      unit: z.string().optional(),
+      days_of_the_week: z.array(weekDaysSchema).optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('every-week'),
+      days_of_the_week: z.array(weekDaysSchema).optional(),
+      time: z.string().regex(hhmmPattern),
+      date: z.string().optional(),
+      interval: z.number().optional(),
+      unit: z.string().optional(),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31)
+        .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('every-day'),
+      time: z.string().regex(hhmmPattern),
+      date: z.string().optional(),
+      interval: z.number().optional(),
+      unit: z.string().optional(),
+      days_of_the_week: z.array(weekDaysSchema).optional(),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31)
+        .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('custom-time'),
+      date: z.string(),
+      time: z.string().regex(hhmmPattern),
+      interval: z.number().optional(),
+      unit: z.string().optional(),
+      days_of_the_week: z.array(weekDaysSchema).optional(),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31)
+        .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.CHANGED, {
+      scheduler_type: z.literal('interval'),
+      interval: z.number(),
+      unit: z.enum(['second', 'minute', 'hour']),
+      date: z.string().optional(),
+      time: z
+        .string()
+        .regex(hhmmPattern)
+        .optional(),
+      days_of_the_week: z.array(weekDaysSchema).optional(),
+      day_of_the_month: z
+        .number()
+        .min(1)
+        .max(31)
+        .optional(),
+      key: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.SUNRISE, {
+      house: houseSelectorSchema,
+      offset: z
+        .number()
+        .int()
+        .min(-1440)
+        .max(1440)
+        .optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.SUNSET, {
+      house: houseSelectorSchema,
+      offset: z
+        .number()
+        .int()
+        .min(-1440)
+        .max(1440)
+        .optional(),
+    }),
+    triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
+      user: userSelectorSchema,
+    }),
+    triggerSchemaByType(EVENTS.USER_PRESENCE.LEFT_HOME, {
+      user: userSelectorSchema,
+    }),
+    triggerSchemaByType(EVENTS.HOUSE.EMPTY, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.HOUSE.NO_LONGER_EMPTY, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.AREA.USER_ENTERED, {
+      user: userSelectorSchema,
+      area: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.AREA.USER_LEFT, {
+      user: userSelectorSchema,
+      area: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.ARM, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.ARMING, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.DISARM, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.PARTIAL_ARM, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.PANIC, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.ALARM.TOO_MANY_CODES_TESTS, {
+      house: z.string(),
+    }),
+    triggerSchemaByType(EVENTS.SYSTEM.START, {}),
+    triggerSchemaByType(EVENTS.MQTT.RECEIVED, {
+      topic: z.string(),
+      message: z.string().optional(),
+    }),
+    triggerSchemaByType(EVENTS.CALENDAR.EVENT_IS_COMING, {
+      calendar_event_attribute: triggerCalendarEventAttributeSchema,
+      calendar_event_name_comparator: calendarComparatorSchema,
+      calendars: z.array(z.string()).min(1),
+      calendar_event_name: z.string().optional(),
+      duration: z.number().optional(),
+    }),
   ]);
 
   return z.object({
-    name: z.string().min(1).describe('Scene name.'),
+    name: z
+      .string()
+      .min(1)
+      .describe('Scene name.'),
     icon: z.enum(iconList).describe('Scene icon.'),
-    description: z.string().optional().describe('Optional scene description.'),
-    active: z.boolean().optional().describe('Optional scene active flag.'),
+    description: z
+      .string()
+      .optional()
+      .describe('Optional scene description.'),
+    active: z
+      .boolean()
+      .optional()
+      .describe('Optional scene active flag.'),
     selector: z
       .string()
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       .optional()
       .describe('Optional scene selector, kebab-case.'),
-    triggers: z.array(sceneTriggerSchema).default([]).describe('Scene triggers.'),
+    triggers: z
+      .array(sceneTriggerSchema)
+      .default([])
+      .describe('Scene triggers.'),
     actions: z
       .union([z.array(z.array(sceneActionSchema)).min(1), z.array(sceneActionSchema).min(1)])
       .describe('Scene actions as nested groups.'),
@@ -364,7 +420,13 @@ function extractProvidedActionTypes(rawScene) {
       if (item && typeof item === 'object') return [item];
       return [];
     });
-  return [...new Set(flatten(rawScene.actions).map((action) => action.type).filter(Boolean))];
+  return [
+    ...new Set(
+      flatten(rawScene.actions)
+        .map((action) => action.type)
+        .filter(Boolean),
+    ),
+  ];
 }
 
 function flattenUnionIssues(issue, parentPath = []) {

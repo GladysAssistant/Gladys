@@ -4,10 +4,7 @@ const path = require('path');
 const logger = require('../../utils/logger');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
-const {
-  mcpToolsToChatApiFormat,
-  toolNameFromIntent,
-} = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
+const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const DEFAULT_MAX_TOKENS_PER_TURN = 512;
@@ -102,7 +99,10 @@ function shouldSendAssistantTextReply(text, sentImagesToUser) {
 
 function isNoResponseSentinel(text) {
   if (!text || typeof text !== 'string') return false;
-  const normalized = text.trim().replace(/[\s_-]+/g, '_').toUpperCase();
+  const normalized = text
+    .trim()
+    .replace(/[\s_-]+/g, '_')
+    .toUpperCase();
   return normalized === 'NO_RESPONSE';
 }
 
@@ -135,9 +135,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     const mcpTools = await mcpHandler.getAllTools();
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
-    const toolCallbacksByName = new Map(
-      mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]),
-    );
+    const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
 
     const systemPrompt = loadPrompt();
 
@@ -191,7 +189,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       const toolCalls = assistantMessage?.tool_calls ?? [];
 
       logger.debug(
-        `AI assistant turn: content=${assistantMessage?.content === null ? 'null' : 'set'}, tool_calls=${toolCalls.length}`,
+        `AI assistant turn: content=${assistantMessage?.content === null ? 'null' : 'set'}, tool_calls=${
+          toolCalls.length
+        }`,
       );
 
       if (!toolCalls || toolCalls.length === 0) {
@@ -331,4 +331,3 @@ module.exports = {
   isNoResponseSentinel,
   isToolExecutionErrorText,
 };
-
