@@ -178,4 +178,15 @@
 
 .msg_txt_wrap {
   white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.received_withd_msg .msg_txt_wrap a {
+  color: #467fcf;
+  text-decoration: underline;
+}
+
+.sent_msg .msg_txt_wrap a {
+  color: #fff;
+  text-decoration: underline;
 }

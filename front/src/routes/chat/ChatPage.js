@@ -5,6 +5,7 @@ import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
+import ChatSidebar from './ChatSidebar';
 
 const IntegrationPage = connect(
   'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus',
@@ -69,39 +70,7 @@ const IntegrationPage = connect(
                 </div>
               </div>
               <div class="col-lg-4">
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">
-                      <Text id="chat.whatCanYouAsk" />
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <ul>
-                      <li>
-                        <Text id="chat.examples.whatsTheWeatherLike" />
-                      </li>
-                      <li>
-                        <Text id="chat.examples.showCameraImage" />
-                      </li>
-                      <li>
-                        <Text id="chat.examples.whatsTheTemperatureKitchen" />
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">
-                      <Text id="chat.gpt3Integration" />
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <Text id="chat.gpt3IntegrationExplanation" />{' '}
-                    <a href="/dashboard/integration/communication/openai">
-                      <Text id="chat.gpt3ClickHere" />
-                    </a>
-                  </div>
-                </div>
+                <ChatSidebar />
               </div>
             </div>
           </div>
