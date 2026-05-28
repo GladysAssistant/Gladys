@@ -222,3 +222,5 @@ module.exports = (sequelize, DataTypes) => {
 
   return scene;
 };
+
+module.exports.formatJoiValidationError = formatJoiValidationError;
