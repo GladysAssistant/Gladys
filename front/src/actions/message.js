@@ -58,6 +58,11 @@ function createActions(store) {
       });
       actions.scrollToBottom();
     },
+    setGladysTypingStatus(state, payload) {
+      store.setState({
+        gladysIsTyping: Boolean(payload && payload.thinking)
+      });
+    },
     pushMessage(state, message) {
       store.setState({
         gladysIsTyping: true

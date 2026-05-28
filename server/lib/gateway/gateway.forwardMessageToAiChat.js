@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const logger = require('../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
@@ -237,13 +238,20 @@ function formatToolCallTraceText(functionName, toolArgs) {
  * forwardMessageToAiChat({ message, image, previousQuestions: [], context: {} });
  */
 async function forwardMessageToAiChat({ message, image, previousQuestions, context }) {
+  const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
+  if (userId && this.event?.emit) {
+    this.event.emit(EVENTS.WEBSOCKET.SEND, {
+      type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+      userId,
+      payload: { thinking: true },
+    });
+  }
   try {
     // Resize image to reduce API costs (security cameras).
     const resizedImage = image ? await resizeImage(image) : undefined;
 
     const mcpHandler = getMcpHandler(this.serviceManager);
 
-    const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
     const mcpTools = await mcpHandler.getAllTools(userId);
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
@@ -432,6 +440,14 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       await this.message.replyByIntent(message, 'openai.request.fail', context);
     }
     return null;
+  } finally {
+    if (userId && this.event?.emit) {
+      this.event.emit(EVENTS.WEBSOCKET.SEND, {
+        type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+        userId,
+        payload: { thinking: false },
+      });
+    }
   }
 }
 

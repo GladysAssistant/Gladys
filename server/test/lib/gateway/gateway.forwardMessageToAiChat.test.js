@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { Error429 } = require('../../../utils/httpErrors');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const z = require('../../../services/mcp/node_modules/zod/v4');
 
 const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
@@ -37,8 +38,11 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
  */
-function buildContext({ tools, aiChat, reply, replyByIntent }) {
+function buildContext({ tools, aiChat, reply, replyByIntent, eventEmit = fake.returns(null) }) {
   return {
+    event: {
+      emit: eventEmit,
+    },
     serviceManager: {
       getService: fake.returns({
         mcpHandler: {
@@ -110,8 +114,9 @@ describe('gateway.forwardMessageToAiChat', () => {
 
     const reply = fake.resolves(null);
     const replyByIntent = fake.resolves(null);
+    const eventEmit = fake.returns(null);
 
-    const ctx = buildContext({ tools, aiChat, reply, replyByIntent });
+    const ctx = buildContext({ tools, aiChat, reply, replyByIntent, eventEmit });
 
     const message = {
       text: 'Turn on the living room light',
@@ -145,6 +150,16 @@ describe('gateway.forwardMessageToAiChat', () => {
     const toolMessage = secondCallBody.messages.find((m) => m.role === 'tool' && m.tool_call_id === 'call_1');
     expect(toolMessage).to.not.equal(undefined);
     expect(toolMessage.content).to.equal('tool-result: done');
+    assert.calledWith(eventEmit, EVENTS.WEBSOCKET.SEND, {
+      type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+      userId: 'user-id',
+      payload: { thinking: true },
+    });
+    assert.calledWith(eventEmit, EVENTS.WEBSOCKET.SEND, {
+      type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+      userId: 'user-id',
+      payload: { thinking: false },
+    });
   });
 
   it('should resize image and send multimodal user content', async () => {
