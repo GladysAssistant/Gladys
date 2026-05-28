@@ -11,13 +11,6 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
 async function aiChat(body) {
   try {
     const response = await this.gladysGatewayClient.openAIAsk(body);
-    // return await requestApi.post(`${this.gladysGatewayClient.serverUrl}${AI_CHAT_PATH}`, body, this.gladysGatewayClient);
-    /* const { data } =  await axios.post('http://0.0.0.0:8787', body, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer test`,
-      },
-    }); */
     return response;
   } catch (e) {
     logger.debug(e);

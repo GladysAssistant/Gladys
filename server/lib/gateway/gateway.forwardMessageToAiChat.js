@@ -100,6 +100,12 @@ function shouldSendAssistantTextReply(text, sentImagesToUser) {
   return true;
 }
 
+function isNoResponseSentinel(text) {
+  if (!text || typeof text !== 'string') return false;
+  const normalized = text.trim().replace(/[\s_-]+/g, '_').toUpperCase();
+  return normalized === 'NO_RESPONSE';
+}
+
 /**
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
@@ -239,6 +245,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     const assistantContent = assistantMessage?.content;
     let finalAnswer = typeof assistantContent === 'string' ? assistantContent.trim() : '';
+    if (isNoResponseSentinel(finalAnswer)) {
+      finalAnswer = '';
+    }
 
     // If we hit the iteration cap and the model never produced a final user-facing answer,
     // fall back to the last tool result to avoid total silence.
@@ -283,5 +292,6 @@ module.exports = {
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
   shouldSendAssistantTextReply,
+  isNoResponseSentinel,
 };
 

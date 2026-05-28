@@ -350,6 +350,26 @@ describe('gateway.forwardMessageToAiChat', () => {
     expect(toolMessage.content).to.contain('sent to the user in the chat');
   });
 
+  it('should treat NO_RESPONSE as silence and not send a reply', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: 'NO_RESPONSE' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'Do nothing', user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({ answer: '', imagesSent: 0 });
+    assert.notCalled(reply);
+    assert.notCalled(replyByIntent);
+  });
+
   it('should reply with too many requests message on Error429', async () => {
     const { forwardMessageToAiChat } = getModule({ tools: [] });
     const aiChat = fake.rejects(new Error429('rate limit'));
