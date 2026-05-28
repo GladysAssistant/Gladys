@@ -123,6 +123,13 @@ const triggersSchema = Joi.array().items(
   }),
 );
 
+function formatJoiValidationError(error) {
+  if (!error || !Array.isArray(error.details) || error.details.length === 0) {
+    return error?.message || 'Invalid schema';
+  }
+  return error.details.map((detail) => detail.message).join('; ');
+}
+
 module.exports = (sequelize, DataTypes) => {
   const scene = sequelize.define(
     't_scene',
@@ -162,9 +169,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = actionsSchema.validate(value);
+            const result = actionsSchema.validate(value, { abortEarly: false });
             if (result.error) {
-              throw new Error(result.error.details[0].message);
+              throw new Error(formatJoiValidationError(result.error));
             }
           },
         },
@@ -173,9 +180,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = triggersSchema.validate(value);
+            const result = triggersSchema.validate(value, { abortEarly: false });
             if (result.error) {
-              throw new Error(result.error.details[0].message);
+              throw new Error(formatJoiValidationError(result.error));
             }
           },
         },

@@ -469,7 +469,7 @@ describe('build schemas', () => {
     expect(tools[1].intent).to.eq('scene.create');
     expect(tools[1].config.title).to.eq('Create scene');
     expect(tools[1].config.description).to.eq(
-      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action.',
+      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
     );
     const sceneCreatedResult = await tools[1].cb({
       name: 'MCP Generated Scene',

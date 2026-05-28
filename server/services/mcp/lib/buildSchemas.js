@@ -124,7 +124,7 @@ function createSceneCreateInputSchema(
         text: z
           .string()
           .describe(
-            'Prompt text for AI. To inject values from previous "device.get-value" actions, use Handlebars variables like {{0.0.last_value}} or {{0.0.last_value_string}}.',
+            'Prompt text for AI (required). To inject values from previous "device.get-value" actions, use Handlebars variables with action coordinates, for example {{1.1.last_value}} (or {{0.0.last_value}}) and {{1.1.last_value_string}}.',
           ),
         camera: z.string().optional(),
       }),
@@ -367,26 +367,50 @@ function extractProvidedActionTypes(rawScene) {
   return [...new Set(flatten(rawScene.actions).map((action) => action.type).filter(Boolean))];
 }
 
+function flattenUnionIssues(issue, parentPath = []) {
+  if (!issue || typeof issue !== 'object') return [];
+  const currentPath = Array.isArray(issue.path) ? [...parentPath, ...issue.path] : parentPath;
+
+  if (Array.isArray(issue.errors)) {
+    return issue.errors.flatMap((nested) => {
+      if (Array.isArray(nested)) {
+        return nested.flatMap((nestedIssue) => flattenUnionIssues(nestedIssue, currentPath));
+      }
+      return flattenUnionIssues(nested, currentPath);
+    });
+  }
+
+  if (Array.isArray(issue.issues)) {
+    return issue.issues.flatMap((nestedIssue) => flattenUnionIssues(nestedIssue, currentPath));
+  }
+
+  if (typeof issue.message === 'string') {
+    return [
+      {
+        path: currentPath.join('.') || 'root',
+        message: issue.message,
+      },
+    ];
+  }
+  return [];
+}
+
 function formatSceneCreateZodIssue(issue, rawScene) {
   const path = issue.path.join('.') || 'root';
-  let hint = '';
-
-  if (path === 'actions' && issue.code === 'invalid_union') {
+  if (issue.code === 'invalid_union') {
+    const unionDetails = flattenUnionIssues(issue)
+      .map((d) => `${d.path}: ${d.message}`)
+      .filter(Boolean);
     const providedTypes = extractProvidedActionTypes(rawScene);
     const providedTypesHint =
-      providedTypes.length > 0 ? ` Provided action types: ${providedTypes.join(', ')}.` : '';
-    hint =
-      ' Hint: actions must be either [[{type:"..."}, ...], [...]] or [{type:"..."}, ...]. Use scene action types (e.g. device.get-value, ai.ask, message.send, time.delay, condition.if-then-else), not MCP tool intents like device.get-state.' +
-      providedTypesHint;
-  }
-  if (path.startsWith('triggers') && issue.code === 'invalid_union') {
-    hint = ' Hint: each trigger must include required fields for its type/scheduler_type (e.g. time + scheduler_type).';
-  }
-  if ((path.endsWith('.time') || path === 'time') && issue.code === 'invalid_format') {
-    hint = ' Hint: time must use HH:mm format, for example "09:30".';
+      path === 'actions' && providedTypes.length > 0 ? ` Provided action types: ${providedTypes.join(', ')}.` : '';
+
+    if (unionDetails.length > 0) {
+      return `${path}: ${issue.message}. Details: ${unionDetails.join(' | ')}${providedTypesHint}`;
+    }
   }
 
-  return `${path}: ${issue.message}${hint}`;
+  return `${path}: ${issue.message}`;
 }
 
 /**
@@ -597,7 +621,7 @@ async function getAllTools() {
       config: {
         title: 'Create scene',
         description:
-          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action.',
+          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
         inputSchema: sceneCreateInputSchema.shape,
       },
       cb: async (scene) => {

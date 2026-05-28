@@ -254,6 +254,8 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           // conversation. The model can then report the error to the user or retry.
           logger.warn(`Tool "${functionName}" failed:`, toolError);
           toolResultText = `Error while running tool "${functionName}": ${toolError?.message ?? 'unknown error'}`;
+          // Dedicated single-line log containing the exact payload sent back to the model.
+          logger.warn(`[AI_TOOL_ERROR_FULL] ${toolResultText}`);
           if (functionName === 'scene_create') {
             lastSceneCreateErrorText = toolResultText;
           }
