@@ -5,11 +5,6 @@ const logger = require('../../utils/logger');
 const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
-// `@gladysassistant/gladys-gateway-js` expects `{ debug, info, warn, error }`.
-// The runtime logger comes from `tracer`; it's compatible, but the type-checker is picky.
-// We intentionally cast to `any` to avoid type mismatch noise.
-const gatewayJsLogger = /** @type {any} */ (logger);
-
 const { backup } = require('./gateway.backup');
 const { forwardDeviceStateToAlexa } = require('./gateway.forwardDeviceStateToAlexa');
 const { forwardDeviceStateToGoogleHome } = require('./gateway.forwardDeviceStateToGoogleHome');
@@ -86,7 +81,7 @@ const Gateway = function Gateway(
   this.gladysGatewayClient = new GladysGatewayClient({
     cryptoLib: webcrypto,
     serverUrl: config.gladysGatewayServerUrl,
-    logger: gatewayJsLogger,
+    logger,
   });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
 
