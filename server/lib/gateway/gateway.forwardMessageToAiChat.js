@@ -110,6 +110,12 @@ function isToolExecutionErrorText(text) {
   return typeof text === 'string' && text.startsWith('Error while running tool');
 }
 
+function formatToolCallTraceText(functionName, toolArgs) {
+  if (!functionName) return 'tool_call';
+  if (!toolArgs || Object.keys(toolArgs).length === 0) return `${functionName}()`;
+  return `${functionName}(${safeStringify(toolArgs, 300)})`;
+}
+
 /**
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
@@ -231,6 +237,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         }
 
         let toolResultText;
+        let toolStatus = 'success';
         try {
           if (functionName === 'scene_create') {
             sceneCreateToolCallCount += 1;
@@ -250,7 +257,14 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           if (functionName === 'scene_create') {
             lastSceneCreateErrorText = toolResultText;
           }
+          toolStatus = 'error';
         }
+
+        await this.message.reply(message, formatToolCallTraceText(functionName, toolArgs), context, null, {
+          messageType: 'tool_call',
+          toolName: functionName,
+          toolStatus,
+        });
 
         messagesForApi.push({
           role: 'tool',

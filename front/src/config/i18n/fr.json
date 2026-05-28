@@ -4302,6 +4302,12 @@
       "upsellFeature1": "Pose des questions ouvertes à ta maison",
       "upsellFeature2": "Analyse ce que voient tes caméras",
       "upsellFeature3": "Modèles Mistral hébergés en France"
+    },
+    "toolCall": {
+      "statusUsed": "Utilisé",
+      "statusError": "Erreur",
+      "showDetails": "Afficher les détails",
+      "hideDetails": "Masquer les détails"
     }
   },
   "header": {

@@ -107,8 +107,20 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.calledTwice(aiChat);
     assert.calledOnce(toolCb);
     assert.calledWith(toolCb, { action: 'on', room: 'living room' });
-    assert.calledOnce(reply);
+    assert.calledTwice(reply);
     assert.calledWith(reply, message, 'Done, lights are now on.');
+    assert.calledWith(
+      reply,
+      message,
+      'device_turn_on_off({"action":"on","room":"living room"})',
+      {},
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'device_turn_on_off',
+        toolStatus: 'success',
+      },
+    );
     assert.notCalled(replyByIntent);
 
     const firstCallBody = aiChat.getCall(0).args[0];
@@ -276,6 +288,7 @@ describe('gateway.forwardMessageToAiChat', () => {
     });
 
     expect(result).to.deep.equal({ answer: 'fallback content', imagesSent: 0 });
+    assert.callCount(reply, 6);
     assert.calledWith(reply, message, 'fallback content');
   });
 
@@ -343,7 +356,19 @@ describe('gateway.forwardMessageToAiChat', () => {
     });
     assert.calledOnce(toolCb);
     assert.calledWith(replyByIntent, message, 'camera.get-image.success', context, cameraImageFile);
-    assert.notCalled(reply);
+    assert.calledOnce(reply);
+    assert.calledWith(
+      reply,
+      message,
+      'camera_get_image({"room":"salon"})',
+      context,
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'camera_get_image',
+        toolStatus: 'success',
+      },
+    );
 
     const secondCallBody = aiChat.getCall(1).args[0];
     const toolMessage = secondCallBody.messages.find((m) => m.role === 'tool' && m.tool_call_id === 'call_cam');
@@ -419,7 +444,7 @@ describe('gateway.forwardMessageToAiChat', () => {
       answer: 'Error while running tool "scene_create": scene.create validation failed (422): actions: Invalid input',
       imagesSent: 0,
     });
-    assert.calledOnce(reply);
+    assert.calledTwice(reply);
     assert.calledWith(
       reply,
       message,

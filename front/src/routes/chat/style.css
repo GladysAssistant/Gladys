@@ -142,6 +142,95 @@
   width: min(90%, 760px);
 }
 
+.toolCallRow {
+  width: min(90%, 760px);
+  margin: 0 auto 10px;
+}
+
+.toolCallCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7faff;
+  border: 1px solid #d8e5ff;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.toolCallContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.toolCallMainLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toolCallToolName {
+  font-size: 12px;
+  color: #2f4e8f;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.toolCallText {
+  font-size: 12px;
+  color: #52627a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 4px;
+}
+
+.toolCallStatusSuccess,
+.toolCallStatusError {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 1px 6px;
+  margin-top: 1px;
+}
+
+.toolCallIconButton {
+  border: none;
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: #6a7da3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.toolCallIconButton:hover,
+.toolCallIconButton:focus {
+  color: #4f6592;
+  background: rgba(106, 125, 163, 0.12);
+}
+
+.toolCallStatusSuccess {
+  color: #1d5f35;
+  background: #d9f4e3;
+}
+
+.toolCallStatusError {
+  color: #8b1d28;
+  background: #fde2e5;
+}
+
 .input_msg_write input {
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
   border: medium none;
@@ -169,10 +258,6 @@
   right: 0;
   top: 11px;
   width: 33px;
-}
-
-.messaging {
-  /*padding: 0 0 50px 0;*/
 }
 
 .msg_history {
@@ -332,7 +417,8 @@
   }
 
   .received_withd_msg,
-  .sent_msg {
+  .sent_msg,
+  .toolCallRow {
     width: 100%;
   }
 

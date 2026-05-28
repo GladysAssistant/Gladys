@@ -10,6 +10,8 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
  */
 async function aiChat(body) {
   try {
+    console.log('body');
+    console.log(JSON.stringify(body));
     const response = await this.gladysGatewayClient.openAIAsk(body);
     return response;
   } catch (e) {
