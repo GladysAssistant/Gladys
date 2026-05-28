@@ -52,9 +52,7 @@ function createSceneCreateInputSchema(
   const switchDevicesSchema =
     switchDeviceSelectors.length > 0 ? z.array(z.enum(switchDeviceSelectors)) : z.array(z.string());
   const musicNotificationDevicesSchema =
-    musicNotificationDeviceSelectors.length > 0
-      ? z.enum(musicNotificationDeviceSelectors)
-      : z.string();
+    musicNotificationDeviceSelectors.length > 0 ? z.enum(musicNotificationDeviceSelectors) : z.string();
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
   const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
