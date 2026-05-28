@@ -243,7 +243,8 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     const mcpHandler = getMcpHandler(this.serviceManager);
 
-    const mcpTools = await mcpHandler.getAllTools();
+    const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
+    const mcpTools = await mcpHandler.getAllTools(userId);
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
 

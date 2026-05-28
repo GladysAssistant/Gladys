@@ -131,13 +131,15 @@ async function getAllResources() {
  * @example
  * getAllTools()
  */
-async function getAllTools() {
+async function getAllTools(userId) {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const calendars = (await this.gladys.calendar.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const calendars = userId
+    ? (await this.gladys.calendar.get(userId)).map(({ id, name, selector }) => ({ id, name, selector }))
+    : [];
   const areas = (await this.gladys.area.get()).map(({ id, name, selector }) => ({ id, name, selector }));
 
   const allDevices = await this.gladys.device.get();
