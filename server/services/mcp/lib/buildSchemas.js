@@ -64,6 +64,8 @@ const triggerSchemaByType = (type, specificShape) =>
  * @param {Array<string>} lightDeviceSelectors - Allowed light device selectors.
  * @param {Array<string>} deviceFeatureSelectors - Allowed device feature selectors.
  * @returns {object} Scene creation Zod schema.
+ * @example
+ * createSceneCreateInputSchema(['john'], ['main-house'], ['light-1'], ['sensor-1']);
  */
 function createSceneCreateInputSchema(
   userSelectors = [],
@@ -422,6 +424,8 @@ function createSceneCreateInputSchema(
  * @description Extract all declared action types from raw scene payload.
  * @param {object} rawScene - Raw scene payload.
  * @returns {Array<string>} Distinct action types.
+ * @example
+ * extractProvidedActionTypes({ actions: [[{ type: 'ai.ask' }]] });
  */
 function extractProvidedActionTypes(rawScene) {
   if (!rawScene || !Array.isArray(rawScene.actions)) {
@@ -429,8 +433,12 @@ function extractProvidedActionTypes(rawScene) {
   }
   const flatten = (arr) =>
     arr.flatMap((item) => {
-      if (Array.isArray(item)) return flatten(item);
-      if (item && typeof item === 'object') return [item];
+      if (Array.isArray(item)) {
+        return flatten(item);
+      }
+      if (item && typeof item === 'object') {
+        return [item];
+      }
       return [];
     });
   return [
@@ -447,6 +455,8 @@ function extractProvidedActionTypes(rawScene) {
  * @param {object} issue - Zod issue object.
  * @param {Array<string|number>} parentPath - Parent path segments.
  * @returns {Array<{path: string, message: string}>} Flat issues list.
+ * @example
+ * flattenUnionIssues({ path: ['actions'], message: 'Invalid input' });
  */
 function flattenUnionIssues(issue, parentPath = []) {
   if (!issue || typeof issue !== 'object') {
@@ -483,6 +493,8 @@ function flattenUnionIssues(issue, parentPath = []) {
  * @param {object} issue - Zod issue.
  * @param {object} rawScene - Raw scene payload submitted by model.
  * @returns {string} Human-readable issue string.
+ * @example
+ * formatSceneCreateZodIssue({ path: ['actions'], code: 'invalid_union', message: 'Invalid input' }, {});
  */
 function formatSceneCreateZodIssue(issue, rawScene) {
   const path = issue.path.join('.') || 'root';

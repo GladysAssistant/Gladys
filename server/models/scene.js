@@ -127,6 +127,8 @@ const triggersSchema = Joi.array().items(
  * @description Build a flat validation message from Joi details.
  * @param {object} error - Joi validation error.
  * @returns {string} Flattened validation message.
+ * @example
+ * formatJoiValidationError({ details: [{ message: '"actions" must be an array' }] });
  */
 function formatJoiValidationError(error) {
   if (!error || !Array.isArray(error.details) || error.details.length === 0) {
@@ -140,6 +142,8 @@ function formatJoiValidationError(error) {
  * @param {object} sequelize - Sequelize instance.
  * @param {object} DataTypes - Sequelize data types.
  * @returns {object} Scene model.
+ * @example
+ * module.exports(sequelize, Sequelize.DataTypes);
  */
 module.exports = (sequelize, DataTypes) => {
   const scene = sequelize.define(

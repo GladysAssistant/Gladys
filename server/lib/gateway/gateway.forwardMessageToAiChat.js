@@ -18,6 +18,8 @@ let cachedPrompt = null;
 /**
  * @description Load and cache AI system prompt from disk.
  * @returns {string} Prompt text.
+ * @example
+ * const prompt = loadPrompt();
  */
 function loadPrompt() {
   if (cachedPrompt) {
@@ -31,6 +33,8 @@ function loadPrompt() {
  * @description Return MCP handler from service manager.
  * @param {object} serviceManager - Service manager instance.
  * @returns {object} MCP handler.
+ * @example
+ * const mcpHandler = getMcpHandler(this.serviceManager);
  */
 function getMcpHandler(serviceManager) {
   const mcpService = serviceManager.getService('mcp');
@@ -44,11 +48,15 @@ function getMcpHandler(serviceManager) {
  * @description Extract assistant message payload from gateway response.
  * @param {object} apiResponse - Chat API response.
  * @returns {object|null} Assistant message object.
+ * @example
+ * const assistant = extractAssistantMessage(response);
  */
 function extractAssistantMessage(apiResponse) {
   // Expected shape: OpenAI compatible chat completion response.
   const choiceMessage = apiResponse?.choices?.[0]?.message;
-  if (choiceMessage) return choiceMessage;
+  if (choiceMessage) {
+    return choiceMessage;
+  }
   return apiResponse?.message ?? apiResponse?.assistant ?? null;
 }
 
@@ -57,6 +65,8 @@ function extractAssistantMessage(apiResponse) {
  * @param {string} str - Input string.
  * @param {number} limitChars - Maximum number of characters.
  * @returns {string} Truncated or original string.
+ * @example
+ * truncate('abcdef', 3);
  */
 function truncate(str, limitChars) {
   if (!str) {
@@ -73,6 +83,8 @@ function truncate(str, limitChars) {
  * @param {any} value - Value to stringify.
  * @param {number} limitChars - Output max length.
  * @returns {string} Safe serialized value.
+ * @example
+ * safeStringify({ ok: true }, 100);
  */
 function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
   try {
@@ -90,6 +102,8 @@ const CAMERA_IMAGE_SENT_TO_USER_HINT =
  * @description Convert MCP image content object to message file format.
  * @param {object} imageContent - Image content from tool output.
  * @returns {string|null} Formatted file payload or null.
+ * @example
+ * imageContentToMessageFile({ mimeType: 'image/jpeg', data: 'abc' });
  */
 function imageContentToMessageFile(imageContent) {
   const { data, mimeType } = imageContent ?? {};
@@ -106,6 +120,8 @@ function imageContentToMessageFile(imageContent) {
  * @description Extract image files from tool result payload.
  * @param {object} toolResult - Tool result object.
  * @returns {Array<string>} List of message file payloads.
+ * @example
+ * extractMessageFilesFromToolResult({ content: [{ type: 'image', data: 'abc' }] });
  */
 function extractMessageFilesFromToolResult(toolResult) {
   if (!Array.isArray(toolResult?.content)) {
@@ -121,6 +137,8 @@ function extractMessageFilesFromToolResult(toolResult) {
  * @description Format tool result into compact text for model context.
  * @param {object|string} toolResult - Tool output.
  * @returns {string} Formatted text.
+ * @example
+ * formatToolResultForChat({ content: [{ type: 'text', text: 'ok' }] });
  */
 function formatToolResultForChat(toolResult) {
   if (!toolResult) {
@@ -133,8 +151,12 @@ function formatToolResultForChat(toolResult) {
   if (Array.isArray(toolResult?.content)) {
     const textParts = toolResult.content
       .map((c) => {
-        if (c?.type === 'text') return truncate(c.text, MAX_TOOL_RESULT_CHARS);
-        if (c?.type === 'image') return CAMERA_IMAGE_SENT_TO_USER_HINT;
+        if (c?.type === 'text') {
+          return truncate(c.text, MAX_TOOL_RESULT_CHARS);
+        }
+        if (c?.type === 'image') {
+          return CAMERA_IMAGE_SENT_TO_USER_HINT;
+        }
         return safeStringify(c, MAX_NESTED_VALUE_CHARS);
       })
       .filter(Boolean);
@@ -149,6 +171,8 @@ function formatToolResultForChat(toolResult) {
  * @param {string} text - Assistant text.
  * @param {boolean} sentImagesToUser - Whether camera images were sent.
  * @returns {boolean} True if text should be sent.
+ * @example
+ * shouldSendAssistantTextReply('hello', false);
  */
 function shouldSendAssistantTextReply(text, sentImagesToUser) {
   if (!text?.trim()) {
@@ -170,9 +194,13 @@ function shouldSendAssistantTextReply(text, sentImagesToUser) {
  * @description Detect explicit no-response sentinel from assistant.
  * @param {string} text - Assistant text.
  * @returns {boolean} True if sentinel was found.
+ * @example
+ * isNoResponseSentinel('NO_RESPONSE');
  */
 function isNoResponseSentinel(text) {
-  if (!text || typeof text !== 'string') return false;
+  if (!text || typeof text !== 'string') {
+    return false;
+  }
   const normalized = text
     .trim()
     .replace(/[\s_-]+/g, '_')
@@ -184,6 +212,8 @@ function isNoResponseSentinel(text) {
  * @description Detect normalized tool execution error strings.
  * @param {string} text - Tool result text.
  * @returns {boolean} True when text is a tool execution error.
+ * @example
+ * isToolExecutionErrorText('Error while running tool "x": boom');
  */
 function isToolExecutionErrorText(text) {
   return typeof text === 'string' && text.startsWith('Error while running tool');
@@ -194,6 +224,8 @@ function isToolExecutionErrorText(text) {
  * @param {string} functionName - Tool function name.
  * @param {object} toolArgs - Parsed tool arguments.
  * @returns {string} Human-readable tool trace.
+ * @example
+ * formatToolCallTraceText('device_get_state', { room: 'salon' });
  */
 function formatToolCallTraceText(functionName, toolArgs) {
   if (!functionName) {

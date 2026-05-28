@@ -14,6 +14,8 @@ const promptMock = 'You are Gladys AI.';
  * @param {Array<object>} options.tools - MCP tools.
  * @param {string} options.prompt - Prompt override.
  * @returns {object} Proxied module.
+ * @example
+ * const mod = getModule({ tools: [] });
  */
 function getModule({ tools = [], prompt = promptMock } = {}) {
   return proxyquire('../../../lib/gateway/gateway.forwardMessageToAiChat', {
@@ -32,6 +34,8 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @param {Function} options.reply - Message reply mock.
  * @param {Function} options.replyByIntent - Message replyByIntent mock.
  * @returns {object} Bound context object.
+ * @example
+ * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
  */
 function buildContext({ tools, aiChat, reply, replyByIntent }) {
   return {
