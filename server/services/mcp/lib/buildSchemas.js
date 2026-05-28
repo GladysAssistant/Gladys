@@ -137,10 +137,8 @@ async function getAllTools() {
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const calendarsRaw = this.gladys.calendar?.get ? await this.gladys.calendar.get() : [];
-  const calendars = (calendarsRaw || []).map(({ id, name, selector }) => ({ id, name, selector }));
-  const areasRaw = this.gladys.area?.get ? await this.gladys.area.get() : [];
-  const areas = (areasRaw || []).map(({ id, name, selector }) => ({ id, name, selector }));
+  const calendars = (await this.gladys.calendar.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const areas = (await this.gladys.area.get()).map(({ id, name, selector }) => ({ id, name, selector }));
 
   const allDevices = await this.gladys.device.get();
   const sensorDevices = allDevices

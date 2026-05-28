@@ -390,6 +390,12 @@ describe('build schemas', () => {
         house: {
           get: stub().resolves(houses),
         },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
+        },
         scene: {
           get: stub().resolves(scenes),
           create: stub().resolves({
@@ -797,6 +803,12 @@ describe('build schemas', () => {
         house: {
           get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
         },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
+        },
         scene: {
           get: stub().resolves(scenes),
           create: stub().resolves({
@@ -863,6 +875,12 @@ describe('build schemas', () => {
         },
         house: {
           get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
         },
         scene: {
           get: stub().resolves([]),
@@ -963,6 +981,8 @@ describe('build schemas', () => {
         room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
         user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
         house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
         scene: {
           get: stub().resolves([]),
           create: stub().resolves({ id: 'scene-id' }),
@@ -1048,6 +1068,8 @@ describe('build schemas', () => {
         room: { getAll: stub().resolves(rooms) },
         user: { get: stub().resolves([{ id: 'u1', name: 'John', selector: 'john' }]) },
         house: { get: stub().resolves([{ id: 'h1', name: 'House', selector: 'house' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
         scene: { get: stub().resolves([]), create: stub().resolves({}) },
         device: {
           get: stub().resolves(devices),
