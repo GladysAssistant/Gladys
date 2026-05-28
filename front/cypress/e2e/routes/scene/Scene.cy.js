@@ -4,21 +4,27 @@ describe('Scene view', () => {
   });
   it('Should create new scene', () => {
     cy.visit('/dashboard/scene');
-    cy.contains('scene.newButton').should('have.class', 'btn-outline-primary').click();
+    cy.contains('scene.newButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/new`);
 
-    cy.get('input').first().as('sceneInput');
+    cy.get('input')
+      .first()
+      .as('sceneInput');
     cy.get('@sceneInput').clear();
     cy.get('@sceneInput').type('My Scene');
 
     cy.get('.fe-activity').click();
 
-    cy.contains('newScene.createSceneButton').should('have.class', 'btn-primary').click();
+    cy.contains('newScene.createSceneButton')
+      .should('have.class', 'btn-primary')
+      .click();
 
     cy.url().should('include', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
 
-    cy.url().then((url) => {
+    cy.url().then(url => {
       const relativeUrl = url.replace(Cypress.config().baseUrl, '');
       Cypress.env('sceneUrl', relativeUrl);
     });
@@ -28,14 +34,21 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('div[class*="card-header"]').contains('editScene.settings').should('have.class', 'card-title').click();
+    cy.get('div[class*="card-header"]')
+      .contains('editScene.settings')
+      .should('have.class', 'card-title')
+      .click();
 
-    cy.get('div[class*="form-group"]').then((inputs) => {
-      cy.wrap(inputs[0]).find('input').as('sceneNameInput');
+    cy.get('div[class*="form-group"]').then(inputs => {
+      cy.wrap(inputs[0])
+        .find('input')
+        .as('sceneNameInput');
       cy.get('@sceneNameInput').clear();
       cy.get('@sceneNameInput').type('My scene name');
 
-      cy.wrap(inputs[1]).find('input').as('sceneDescriptionInput');
+      cy.wrap(inputs[1])
+        .find('input')
+        .as('sceneDescriptionInput');
 
       cy.get('@sceneDescriptionInput').type('My scene description');
       cy.wrap(inputs[2]).type('My tag 1{enter}{enter}');
@@ -43,7 +56,7 @@ describe('Scene view', () => {
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
-    cy.get('.btn-success').then((buttons) => {
+    cy.get('.btn-success').then(buttons => {
       cy.wrap(buttons[0]).click();
     });
   });
@@ -52,11 +65,13 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton').should('have.class', 'btn-outline-primary').click();
+    cy.contains('editScene.addActionButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]').then((inputs) => {
+    cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('houseControl');
 
       cy.get('@houseControl').click(0, 0, { force: true });
@@ -68,11 +83,14 @@ describe('Scene view', () => {
         .click(0, 0, { force: true });
     });
 
-    cy.get('div[class*="-control"]').then((inputs) => {
+    cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('houseControl');
       cy.get('@houseControl').click(0, 0, { force: true });
 
-      cy.get('@houseControl').get('[class*="-menu"]').filter(`:contains("My House")`).click(0, 0, { force: true });
+      cy.get('@houseControl')
+        .get('[class*="-menu"]')
+        .filter(`:contains("My House")`)
+        .click(0, 0, { force: true });
     });
   });
 
@@ -81,7 +99,7 @@ describe('Scene view', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/room?expand=devices`,
+        url: `${serverUrl}/api/v1/room?expand=devices`
       },
       [
         {
@@ -106,24 +124,26 @@ describe('Scene view', () => {
                   min: 0,
                   max: 1,
                   last_value: null,
-                  last_value_changed: null,
-                },
+                  last_value_changed: null
+                }
               ],
-              service: { id: '123d4d56-6cbd-4020-991f-2a0a8e0ac3e0', name: 'mqtt' },
-            },
-          ],
-        },
-      ],
+              service: { id: '123d4d56-6cbd-4020-991f-2a0a8e0ac3e0', name: 'mqtt' }
+            }
+          ]
+        }
+      ]
     ).as('loadDevices');
 
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addActionButton').should('have.class', 'btn-outline-primary').click();
+    cy.contains('editScene.addActionButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]').then((inputs) => {
+    cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('deviceControl');
       cy.get('@deviceControl').click(0, 0, { force: true });
 
@@ -138,7 +158,7 @@ describe('Scene view', () => {
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
 
-    cy.get('div[class*="-control"]').then((inputs) => {
+    cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('deviceControl');
       cy.get('@deviceControl').click(0, 0, { force: true });
 
@@ -155,11 +175,13 @@ describe('Scene view', () => {
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
-    cy.contains('editScene.addNewTriggerButton').should('have.class', 'btn-outline-primary').click();
+    cy.contains('editScene.addNewTriggerButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]').then((inputs) => {
+    cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1]).as('calendarControl');
       cy.get('@calendarControl').click(0, 0, { force: true });
 
@@ -170,7 +192,7 @@ describe('Scene view', () => {
         .click(0, 0, { force: true });
     });
 
-    cy.get('select').then((selects) => {
+    cy.get('select').then(selects => {
       cy.wrap(selects[0]).select('contains');
       cy.wrap(selects[1]).select('start');
       cy.wrap(selects[2]).select('minute');
@@ -189,17 +211,23 @@ describe('Scene view', () => {
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
     cy.visit(sceneUrl);
 
-    cy.get('.custom-switch-input').first().should('not.be.checked');
+    cy.get('.custom-switch-input')
+      .first()
+      .should('not.be.checked');
 
     cy.visit('/dashboard/scene');
 
-    cy.get('.custom-switch-input').first().should('not.be.checked');
+    cy.get('.custom-switch-input')
+      .first()
+      .should('not.be.checked');
 
     cy.get('.custom-switch-indicator').click();
 
     cy.visit('/dashboard/scene');
 
-    cy.get('.custom-switch-input').first().should('be.checked');
+    cy.get('.custom-switch-input')
+      .first()
+      .should('be.checked');
   });
   it('Should duplicate existing scene', () => {
     cy.login();
@@ -211,16 +239,21 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}${sceneUrl}/duplicate`);
 
-    cy.get('input').first().as('sceneInput');
+    cy.get('input')
+      .first()
+      .as('sceneInput');
     cy.get('@sceneInput').clear();
     cy.get('@sceneInput').type('My Duplicated scene');
 
     cy.get('.fe-activity').click();
 
-    cy.get('.form-footer').contains('duplicateScene.duplicateSceneButton').should('have.class', 'btn-primary').click();
+    cy.get('.form-footer')
+      .contains('duplicateScene.duplicateSceneButton')
+      .should('have.class', 'btn-primary')
+      .click();
 
     cy.url().should('include', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
-    cy.url().then((url) => {
+    cy.url().then(url => {
       const relativeUrl = url.replace(Cypress.config().baseUrl, '');
       Cypress.env('duplicatedSceneUrl', relativeUrl);
     });
