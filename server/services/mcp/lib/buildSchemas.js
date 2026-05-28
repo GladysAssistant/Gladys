@@ -171,7 +171,7 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.HTTP.REQUEST, {
         method: z.enum(['get', 'post', 'patch', 'put', 'delete']),
         url: z.string(),
-        headers: z.array(z.object({ key: z.string(), value: z.string() }).strict()).optional(),
+        headers: z.array(z.object({ key: z.string(), value: z.string() }).strict()),
         body: z.string().optional(),
         request_response_keys: z.array(z.string()).optional(),
       }),

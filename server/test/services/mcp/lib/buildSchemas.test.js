@@ -947,6 +947,59 @@ describe('build schemas', () => {
     expect(unknownThrown.message).to.eq('db down');
   });
 
+  it('should reject scene.create when http.request action misses headers', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        scene: {
+          get: stub().resolves([]),
+          create: stub().resolves({ id: 'scene-id' }),
+        },
+        device: {
+          get: stub().resolves([]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+    let thrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene invalid http headers',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'http.request', method: 'post', url: 'https://example.com/hook' }]],
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown).to.be.an('error');
+    expect(thrown.message).to.contain('scene.create validation failed (422)');
+    expect(mcpHandler.gladys.scene.create.called).to.equal(false);
+  });
+
   it('should cover helper branches for action type extraction and union flattening', () => {
     expect(extractProvidedActionTypes(null)).to.deep.equal([]);
     expect(extractProvidedActionTypes({ actions: [1, { type: 'a' }, ['x', { type: 'b' }]] })).to.deep.equal(['a', 'b']);

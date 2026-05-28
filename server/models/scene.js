@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -45,12 +45,18 @@ const actionSchema = Joi.object()
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
-    headers: Joi.array().items(
-      Joi.object().keys({
-        key: Joi.string(),
-        value: Joi.string(),
-      }),
-    ),
+    headers: Joi.alternatives().conditional('type', {
+      is: ACTIONS.HTTP.REQUEST,
+      then: Joi.array()
+        .items(
+          Joi.object().keys({
+            key: Joi.string(),
+            value: Joi.string(),
+          }),
+        )
+        .required(),
+      otherwise: Joi.forbidden(),
+    }),
     conditions: Joi.array().items({
       variable: Joi.string().required(),
       operator: Joi.string()

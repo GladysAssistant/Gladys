@@ -88,6 +88,25 @@ describe('SceneManager', () => {
     await assert.isRejected(promise);
   });
 
+  it('should return validation error when http.request action has no headers', async () => {
+    const promise = sceneManager.create({
+      name: 'Invalid http request scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.HTTP.REQUEST,
+            method: 'post',
+            url: 'https://example.com/hook',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise);
+  });
+
   it('should format joi error fallback when details are absent', () => {
     expect(sceneModel.formatJoiValidationError()).to.equal('Invalid schema');
     expect(sceneModel.formatJoiValidationError({ message: 'Validation failed' })).to.equal('Validation failed');
