@@ -14,9 +14,5 @@ module.exports = {
       type: Sequelize.STRING,
     });
   },
-  down: async (queryInterface) => {
-    await queryInterface.removeColumn('t_message', 'tool_status');
-    await queryInterface.removeColumn('t_message', 'tool_name');
-    await queryInterface.removeColumn('t_message', 'message_type');
-  },
+  down: async () => {},
 };

@@ -123,6 +123,11 @@ const triggersSchema = Joi.array().items(
   }),
 );
 
+/**
+ * @description Build a flat validation message from Joi details.
+ * @param {object} error - Joi validation error.
+ * @returns {string} Flattened validation message.
+ */
 function formatJoiValidationError(error) {
   if (!error || !Array.isArray(error.details) || error.details.length === 0) {
     return error?.message || 'Invalid schema';
@@ -130,6 +135,12 @@ function formatJoiValidationError(error) {
   return error.details.map((detail) => detail.message).join('; ');
 }
 
+/**
+ * @description Scene database model definition.
+ * @param {object} sequelize - Sequelize instance.
+ * @param {object} DataTypes - Sequelize data types.
+ * @returns {object} Scene model.
+ */
 module.exports = (sequelize, DataTypes) => {
   const scene = sequelize.define(
     't_scene',

@@ -15,12 +15,23 @@ const MAX_NESTED_VALUE_CHARS = 2000;
 const promptPath = path.join(__dirname, '../../config/prompts/aiChat.prompt.txt');
 let cachedPrompt = null;
 
+/**
+ * @description Load and cache AI system prompt from disk.
+ * @returns {string} Prompt text.
+ */
 function loadPrompt() {
-  if (cachedPrompt) return cachedPrompt;
+  if (cachedPrompt) {
+    return cachedPrompt;
+  }
   cachedPrompt = fs.readFileSync(promptPath, 'utf8');
   return cachedPrompt;
 }
 
+/**
+ * @description Return MCP handler from service manager.
+ * @param {object} serviceManager - Service manager instance.
+ * @returns {object} MCP handler.
+ */
 function getMcpHandler(serviceManager) {
   const mcpService = serviceManager.getService('mcp');
   if (!mcpService?.mcpHandler) {
@@ -29,6 +40,11 @@ function getMcpHandler(serviceManager) {
   return mcpService.mcpHandler;
 }
 
+/**
+ * @description Extract assistant message payload from gateway response.
+ * @param {object} apiResponse - Chat API response.
+ * @returns {object|null} Assistant message object.
+ */
 function extractAssistantMessage(apiResponse) {
   // Expected shape: OpenAI compatible chat completion response.
   const choiceMessage = apiResponse?.choices?.[0]?.message;
@@ -36,12 +52,28 @@ function extractAssistantMessage(apiResponse) {
   return apiResponse?.message ?? apiResponse?.assistant ?? null;
 }
 
+/**
+ * @description Truncate a string to a max length.
+ * @param {string} str - Input string.
+ * @param {number} limitChars - Maximum number of characters.
+ * @returns {string} Truncated or original string.
+ */
 function truncate(str, limitChars) {
-  if (!str) return '';
-  if (str.length <= limitChars) return str;
+  if (!str) {
+    return '';
+  }
+  if (str.length <= limitChars) {
+    return str;
+  }
   return `${str.slice(0, limitChars)}... (truncated)`;
 }
 
+/**
+ * @description Safely stringify any value for model context.
+ * @param {any} value - Value to stringify.
+ * @param {number} limitChars - Output max length.
+ * @returns {string} Safe serialized value.
+ */
 function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
   try {
     const str = typeof value === 'string' ? value : JSON.stringify(value);
@@ -54,26 +86,49 @@ function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
 const CAMERA_IMAGE_SENT_TO_USER_HINT =
   'Camera image(s) were sent to the user in the chat. Reply briefly without image URLs or markdown images.';
 
+/**
+ * @description Convert MCP image content object to message file format.
+ * @param {object} imageContent - Image content from tool output.
+ * @returns {string|null} Formatted file payload or null.
+ */
 function imageContentToMessageFile(imageContent) {
   const { data, mimeType } = imageContent ?? {};
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
   if (typeof data === 'string' && data.includes(';base64,')) {
     return data.replace(/^data:/, '');
   }
   return `${mimeType || 'image/jpeg'};base64,${data}`;
 }
 
+/**
+ * @description Extract image files from tool result payload.
+ * @param {object} toolResult - Tool result object.
+ * @returns {Array<string>} List of message file payloads.
+ */
 function extractMessageFilesFromToolResult(toolResult) {
-  if (!Array.isArray(toolResult?.content)) return [];
+  if (!Array.isArray(toolResult?.content)) {
+    return [];
+  }
   return toolResult.content
     .filter((c) => c?.type === 'image')
     .map(imageContentToMessageFile)
     .filter(Boolean);
 }
 
+/**
+ * @description Format tool result into compact text for model context.
+ * @param {object|string} toolResult - Tool output.
+ * @returns {string} Formatted text.
+ */
 function formatToolResultForChat(toolResult) {
-  if (!toolResult) return '';
-  if (typeof toolResult === 'string') return toolResult;
+  if (!toolResult) {
+    return '';
+  }
+  if (typeof toolResult === 'string') {
+    return toolResult;
+  }
 
   if (Array.isArray(toolResult?.content)) {
     const textParts = toolResult.content
@@ -89,14 +144,33 @@ function formatToolResultForChat(toolResult) {
   return safeStringify(toolResult);
 }
 
+/**
+ * @description Decide whether assistant text should be forwarded to user.
+ * @param {string} text - Assistant text.
+ * @param {boolean} sentImagesToUser - Whether camera images were sent.
+ * @returns {boolean} True if text should be sent.
+ */
 function shouldSendAssistantTextReply(text, sentImagesToUser) {
-  if (!text?.trim()) return false;
-  if (!sentImagesToUser) return true;
-  if (/!\[[^\]]*\]\([^)]+\)/.test(text)) return false;
-  if (/https?:\/\//i.test(text)) return false;
+  if (!text?.trim()) {
+    return false;
+  }
+  if (!sentImagesToUser) {
+    return true;
+  }
+  if (/!\[[^\]]*\]\([^)]+\)/.test(text)) {
+    return false;
+  }
+  if (/https?:\/\//i.test(text)) {
+    return false;
+  }
   return true;
 }
 
+/**
+ * @description Detect explicit no-response sentinel from assistant.
+ * @param {string} text - Assistant text.
+ * @returns {boolean} True if sentinel was found.
+ */
 function isNoResponseSentinel(text) {
   if (!text || typeof text !== 'string') return false;
   const normalized = text
@@ -106,13 +180,28 @@ function isNoResponseSentinel(text) {
   return normalized === 'NO_RESPONSE';
 }
 
+/**
+ * @description Detect normalized tool execution error strings.
+ * @param {string} text - Tool result text.
+ * @returns {boolean} True when text is a tool execution error.
+ */
 function isToolExecutionErrorText(text) {
   return typeof text === 'string' && text.startsWith('Error while running tool');
 }
 
+/**
+ * @description Render a tool-call trace text for UI timeline.
+ * @param {string} functionName - Tool function name.
+ * @param {object} toolArgs - Parsed tool arguments.
+ * @returns {string} Human-readable tool trace.
+ */
 function formatToolCallTraceText(functionName, toolArgs) {
-  if (!functionName) return 'tool_call';
-  if (!toolArgs || Object.keys(toolArgs).length === 0) return `${functionName}()`;
+  if (!functionName) {
+    return 'tool_call';
+  }
+  if (!toolArgs || Object.keys(toolArgs).length === 0) {
+    return `${functionName}()`;
+  }
   return `${functionName}(${safeStringify(toolArgs, 300)})`;
 }
 
@@ -120,11 +209,14 @@ function formatToolCallTraceText(functionName, toolArgs) {
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
  * Tool calling loop is executed on the Gladys instance using MCP callbacks.
- * @param {object} request
- * @param {object} request.message
- * @param {string} request.image
- * @param {Array<{question:string|null,answer:string|null}>} request.previousQuestions
- * @param {object} request.context
+ * @param {object} request - Request payload.
+ * @param {object} request.message - Incoming user message.
+ * @param {string} request.image - Optional base64 image.
+ * @param {Array<{question:string|null,answer:string|null}>} request.previousQuestions - Previous chat exchanges.
+ * @param {object} request.context - Message context.
+ * @returns {Promise<{answer: string, imagesSent: number} | null>} Chat processing result or null on failure.
+ * @example
+ * forwardMessageToAiChat({ message, image, previousQuestions: [], context: {} });
  */
 async function forwardMessageToAiChat({ message, image, previousQuestions, context }) {
   try {
@@ -143,7 +235,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const messagesForApi = [{ role: 'system', content: systemPrompt }];
 
     (previousQuestions ?? []).forEach((exchange) => {
-      if (!exchange) return;
+      if (!exchange) {
+        return;
+      }
       if (exchange.question) {
         messagesForApi.push({
           role: 'user',
@@ -175,9 +269,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const imagesSentToUser = [];
     let lastSceneCreateErrorText = null;
     let sceneCreateSuccessCount = 0;
-    let sceneCreateToolCallCount = 0;
-
+    // eslint-disable-next-line no-restricted-syntax
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
+      // eslint-disable-next-line no-await-in-loop
       const apiResponse = await this.aiChat({
         messages: messagesForApi,
         tools: toolsForApi,
@@ -239,9 +333,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         let toolResultText;
         let toolStatus = 'success';
         try {
-          if (functionName === 'scene_create') {
-            sceneCreateToolCallCount += 1;
-          }
+          // eslint-disable-next-line no-await-in-loop
           const toolResult = await cb(toolArgs);
           if (functionName === 'scene_create') {
             sceneCreateSuccessCount += 1;
@@ -262,6 +354,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           toolStatus = 'error';
         }
 
+        // eslint-disable-next-line no-await-in-loop
         await this.message.reply(message, formatToolCallTraceText(functionName, toolArgs), context, null, {
           messageType: 'tool_call',
           toolName: functionName,
@@ -300,8 +393,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     if (imagesSentToUser.length > 0) {
       for (let i = 0; i < imagesSentToUser.length; i += 1) {
         if (i === 0) {
+          // eslint-disable-next-line no-await-in-loop
           await this.message.replyByIntent(message, 'camera.get-image.success', context, imagesSentToUser[i]);
         } else {
+          // eslint-disable-next-line no-await-in-loop
           await this.message.reply(message, '', context, imagesSentToUser[i]);
         }
       }

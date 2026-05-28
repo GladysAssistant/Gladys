@@ -1,6 +1,6 @@
 const z = require('zod/v4');
 const iconList = require('../../../config/icons.json');
-const { ACTIONS, EVENTS, ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../../../utils/constants');
+const { ACTIONS, EVENTS, ALARM_MODES_LIST } = require('../../../utils/constants');
 
 const noRoom = {
   id: null,
@@ -30,7 +30,6 @@ const hhmmPattern = /^([0-9]{2}):([0-9]{2})$/;
 const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
 const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
-const triggerSchedulerTypeSchema = z.enum(['every-month', 'every-week', 'every-day', 'interval', 'custom-time']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 
 const sceneConditionSchema = z
@@ -58,6 +57,14 @@ const triggerSchemaByType = (type, specificShape) =>
     })
     .strict();
 
+/**
+ * @description Build Zod input schema for scene.create tool.
+ * @param {Array<string>} userSelectors - Allowed user selectors.
+ * @param {Array<string>} houseSelectors - Allowed house selectors.
+ * @param {Array<string>} lightDeviceSelectors - Allowed light device selectors.
+ * @param {Array<string>} deviceFeatureSelectors - Allowed device feature selectors.
+ * @returns {object} Scene creation Zod schema.
+ */
 function createSceneCreateInputSchema(
   userSelectors = [],
   houseSelectors = [],
@@ -69,8 +76,7 @@ function createSceneCreateInputSchema(
   const lightDevicesSchema =
     lightDeviceSelectors.length > 0 ? z.array(z.enum(lightDeviceSelectors)) : z.array(z.string());
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
-  let sceneActionSchema;
-  sceneActionSchema = z.lazy(() =>
+  const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
       actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
         device_feature: z.string().optional(),
@@ -412,8 +418,15 @@ function createSceneCreateInputSchema(
   });
 }
 
+/**
+ * @description Extract all declared action types from raw scene payload.
+ * @param {object} rawScene - Raw scene payload.
+ * @returns {Array<string>} Distinct action types.
+ */
 function extractProvidedActionTypes(rawScene) {
-  if (!rawScene || !Array.isArray(rawScene.actions)) return [];
+  if (!rawScene || !Array.isArray(rawScene.actions)) {
+    return [];
+  }
   const flatten = (arr) =>
     arr.flatMap((item) => {
       if (Array.isArray(item)) return flatten(item);
@@ -429,8 +442,16 @@ function extractProvidedActionTypes(rawScene) {
   ];
 }
 
+/**
+ * @description Recursively flatten nested union issues from Zod.
+ * @param {object} issue - Zod issue object.
+ * @param {Array<string|number>} parentPath - Parent path segments.
+ * @returns {Array<{path: string, message: string}>} Flat issues list.
+ */
 function flattenUnionIssues(issue, parentPath = []) {
-  if (!issue || typeof issue !== 'object') return [];
+  if (!issue || typeof issue !== 'object') {
+    return [];
+  }
   const currentPath = Array.isArray(issue.path) ? [...parentPath, ...issue.path] : parentPath;
 
   if (Array.isArray(issue.errors)) {
@@ -457,6 +478,12 @@ function flattenUnionIssues(issue, parentPath = []) {
   return [];
 }
 
+/**
+ * @description Format one Zod issue into actionable validation text.
+ * @param {object} issue - Zod issue.
+ * @param {object} rawScene - Raw scene payload submitted by model.
+ * @returns {string} Human-readable issue string.
+ */
 function formatSceneCreateZodIssue(issue, rawScene) {
   const path = issue.path.join('.') || 'root';
   if (issue.code === 'invalid_union') {

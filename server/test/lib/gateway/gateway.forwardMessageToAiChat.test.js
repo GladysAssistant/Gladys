@@ -8,6 +8,13 @@ const z = require('../../../services/mcp/node_modules/zod/v4');
 const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
 const promptMock = 'You are Gladys AI.';
 
+/**
+ * @description Load module under test with mocked dependencies.
+ * @param {object} options - Options.
+ * @param {Array<object>} options.tools - MCP tools.
+ * @param {string} options.prompt - Prompt override.
+ * @returns {object} Proxied module.
+ */
 function getModule({ tools = [], prompt = promptMock } = {}) {
   return proxyquire('../../../lib/gateway/gateway.forwardMessageToAiChat', {
     '../../utils/resizeImage': { resizeImage: resizeImageMock },
@@ -17,6 +24,15 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
   });
 }
 
+/**
+ * @description Build execution context for gateway.forwardMessageToAiChat.
+ * @param {object} options - Context dependencies.
+ * @param {Array<object>} options.tools - MCP tools.
+ * @param {Function} options.aiChat - aiChat mock.
+ * @param {Function} options.reply - Message reply mock.
+ * @param {Function} options.replyByIntent - Message replyByIntent mock.
+ * @returns {object} Bound context object.
+ */
 function buildContext({ tools, aiChat, reply, replyByIntent }) {
   return {
     serviceManager: {
@@ -123,7 +139,7 @@ describe('gateway.forwardMessageToAiChat', () => {
 
     const secondCallBody = aiChat.getCall(1).args[0];
     const toolMessage = secondCallBody.messages.find((m) => m.role === 'tool' && m.tool_call_id === 'call_1');
-    expect(toolMessage).to.exist;
+    expect(toolMessage).to.not.equal(undefined);
     expect(toolMessage.content).to.equal('tool-result: done');
   });
 

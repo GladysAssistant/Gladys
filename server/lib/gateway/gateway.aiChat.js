@@ -5,13 +5,13 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
 /**
  * @public
  * @description Ask the Gladys Gateway AI endpoint.
- * @param {object} body
+ * @param {object} body - OpenAI-compatible chat request body.
  * @returns {Promise<object>} Chat completion-like response.
+ * @example
+ * aiChat({ messages: [{ role: 'user', content: 'Hello' }] });
  */
 async function aiChat(body) {
   try {
-    console.log('body');
-    console.log(JSON.stringify(body));
     const response = await this.gladysGatewayClient.openAIAsk(body);
     return response;
   } catch (e) {
