@@ -59,6 +59,29 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
 }
 
 /**
+ * @description Read LevelControl min/max attributes with safe fallbacks.
+ * @param {object} clusterClient - The LevelControl cluster client.
+ * @param {number} defaultMin - Fallback min level.
+ * @param {number} defaultMax - Fallback max level.
+ * @returns {Promise<{ minLevel: number, maxLevel: number }>} The min and max levels.
+ */
+async function getLevelControlMinMax(clusterClient, defaultMin = 0, defaultMax = 254) {
+  let minLevel = defaultMin;
+  let maxLevel = defaultMax;
+  try {
+    minLevel = (await clusterClient.getMinLevelAttribute()) ?? defaultMin;
+  } catch (error) {
+    // Keep default when attribute is unavailable
+  }
+  try {
+    maxLevel = (await clusterClient.getMaxLevelAttribute()) ?? defaultMax;
+  } catch (error) {
+    // Keep default when attribute is unavailable
+  }
+  return { minLevel, maxLevel };
+}
+
+/**
  * @description Convert a Matter device to a Gladys device.
  * @param {string} serviceId - The service ID.
  * @param {bigint} nodeId - The node ID of the device.
@@ -207,8 +230,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
       } else if (clusterIndex === LevelControl.Complete.id) {
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.lighting) {
-          const minLevel = await clusterClient.getMinLevelAttribute();
-          const maxLevel = await clusterClient.getMaxLevelAttribute();
+          const { minLevel, maxLevel } = await getLevelControlMinMax(clusterClient);
           gladysDevice.features.push({
             ...commonNewFeature,
             category: DEVICE_FEATURE_CATEGORIES.LIGHT,
@@ -220,8 +242,7 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: maxLevel,
           });
         } else {
-          const minLevel = await clusterClient.getMinLevelAttribute();
-          const maxLevel = await clusterClient.getMaxLevelAttribute();
+          const { minLevel, maxLevel } = await getLevelControlMinMax(clusterClient);
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Volume)`,
             selector: slugify(`matter-${device.name}-${clusterClient.name}-volume`, true),

@@ -248,8 +248,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
       [DEVICE_FEATURE_TYPES.TELEVISION.DOWN]: 2,
       [DEVICE_FEATURE_TYPES.TELEVISION.LEFT]: 3,
       [DEVICE_FEATURE_TYPES.TELEVISION.RIGHT]: 4,
-      [DEVICE_FEATURE_TYPES.TELEVISION.ENTER]: 5,
-      [DEVICE_FEATURE_TYPES.TELEVISION.RETURN]: 6,
+      [DEVICE_FEATURE_TYPES.TELEVISION.ENTER]: 43,
+      [DEVICE_FEATURE_TYPES.TELEVISION.RETURN]: 13,
     };
     const keyCode = keypadInputKeyByFeatureType[gladysFeature.type];
 
