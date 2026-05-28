@@ -25,7 +25,7 @@ const intervalByName = {
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES,
 };
-const hhmmPattern = /^([0-9]{2}):([0-9]{2})$/;
+const hhmmPattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 const weekDaysSchema = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
 const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
