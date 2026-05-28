@@ -77,7 +77,8 @@ function createActions(store) {
       }, randomWait);
     },
     onKeyPress(state, e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         actions.sendMessage(state);
       }
     },
