@@ -1,3 +1,54 @@
+/** Target bitrate for voice upload (STT does not need hi-fi). */
+const SPEECH_RECORDER_BITRATE = 24000;
+
+/** Microphone constraints tuned for speech, not music. */
+const SPEECH_AUDIO_CONSTRAINTS = {
+  channelCount: 1,
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+  sampleRate: { ideal: 16000 }
+};
+
+const SPEECH_MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+
+/**
+ * @description Pick a MediaRecorder mime type supported by the browser.
+ * @returns {string|undefined} Mime type or undefined if none supported.
+ */
+function pickSpeechMimeType() {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) {
+    return undefined;
+  }
+  return SPEECH_MIME_CANDIDATES.find(type => MediaRecorder.isTypeSupported(type));
+}
+
+/**
+ * @description Create a MediaRecorder with low-bitrate speech settings when supported.
+ * @param {MediaStream} stream - Microphone stream.
+ * @returns {MediaRecorder} Recorder instance.
+ */
+function createSpeechMediaRecorder(stream) {
+  const mimeType = pickSpeechMimeType();
+  const options = { audioBitsPerSecond: SPEECH_RECORDER_BITRATE };
+  if (mimeType) {
+    options.mimeType = mimeType;
+  }
+
+  try {
+    return new MediaRecorder(stream, options);
+  } catch (e) {
+    if (mimeType) {
+      try {
+        return new MediaRecorder(stream, { mimeType });
+      } catch (e2) {
+        return new MediaRecorder(stream);
+      }
+    }
+    return new MediaRecorder(stream);
+  }
+}
+
 /**
  * @description Record audio from the microphone until silence is detected.
  * @param {object} options - Recording options.
@@ -13,14 +64,14 @@ export async function recordUntilSilence({
   maxDurationMs = 30000,
   minRecordingMs = 500
 } = {}) {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const mediaRecorder = new MediaRecorder(stream);
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+  const mediaRecorder = createSpeechMediaRecorder(stream);
   const chunks = [];
 
   const audioContext = new AudioContext();
   const source = audioContext.createMediaStreamSource(stream);
   const analyser = audioContext.createAnalyser();
-  analyser.fftSize = 2048;
+  analyser.fftSize = 1024;
   source.connect(analyser);
   const dataArray = new Uint8Array(analyser.fftSize);
 
@@ -46,7 +97,7 @@ export async function recordUntilSilence({
       reject(new Error('MEDIA_RECORDER_ERROR'));
     };
 
-    mediaRecorder.start(100);
+    mediaRecorder.start(250);
 
     const checkSilence = () => {
       if (mediaRecorder.state !== 'recording') {
