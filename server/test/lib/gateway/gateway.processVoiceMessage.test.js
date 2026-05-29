@@ -1,5 +1,6 @@
 const { expect, assert } = require('chai');
 const sinon = require('sinon');
+
 const { fake, assert: sinonAssert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -30,6 +31,8 @@ const user = {
  * @description Build gateway-like context for processVoiceMessage.
  * @param {object} overrides - Method overrides.
  * @returns {object} Context.
+ * @example
+ * buildContext({ stt: fake.resolves({ text: 'bonjour' }) });
  */
 function buildContext(overrides = {}) {
   return {

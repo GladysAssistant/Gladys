@@ -9,6 +9,8 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
  * @description Extract transcription text from Gladys Plus STT response.
  * @param {object|string} sttResponse - STT API response.
  * @returns {string} Transcription text.
+ * @example
+ * extractTranscriptionFromSttResponse({ text: 'bonjour' });
  */
 function extractTranscriptionFromSttResponse(sttResponse) {
   if (!sttResponse) {
@@ -25,6 +27,8 @@ function extractTranscriptionFromSttResponse(sttResponse) {
  * @description Build previous chat exchanges for AI context.
  * @param {string} userId - Gladys user id.
  * @returns {Promise<Array<{question: string|null, answer: string|null}>>} Previous exchanges.
+ * @example
+ * getPreviousQuestionsForUser('user-uuid');
  */
 async function getPreviousQuestionsForUser(userId) {
   const previousMessages = await db.Message.findAll({
