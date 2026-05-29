@@ -5,6 +5,7 @@ import cx from 'classnames';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import GladysPlusUpsellCard from '../../gateway/GladysPlusUpsellCard';
+import { normalizeSpeechBlobForStt } from '../../../utils/speechAudioForStt';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import style from './style.css';
 
@@ -42,6 +43,9 @@ function isAbortError(error) {
     return true;
   }
   if (error && error.code === 'ERR_CANCELED') {
+    return true;
+  }
+  if (error && error.name === 'CanceledError') {
     return true;
   }
   return Boolean(error && error.name === 'AbortError');
@@ -280,7 +284,12 @@ class VoiceAssistantBox extends Component {
     );
 
     try {
-      const audioBlob = await recordUntilSilence({ signal: abortController.signal });
+      const recordedBlob = await recordUntilSilence({ signal: abortController.signal });
+      if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
+      }
+
+      const audioBlob = await normalizeSpeechBlobForStt(recordedBlob);
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
         return;
       }
@@ -290,7 +299,7 @@ class VoiceAssistantBox extends Component {
       const result = await this.props.httpClient.postBinary(
         '/api/v1/gateway/voice',
         audioBlob,
-        audioBlob.type || 'application/octet-stream',
+        audioBlob.type || 'audio/wav',
         { signal: abortController.signal }
       );
 
