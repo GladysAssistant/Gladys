@@ -4,14 +4,15 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
  * @description Transcribe audio via Gladys Plus STT API.
- * @param {Buffer} audio - Raw audio buffer (application/octet-stream).
+ * @param {Buffer} audio - Raw audio buffer.
+ * @param {string} [contentType='application/octet-stream'] - Audio MIME type from the client.
  * @returns {Promise<object>} STT API response.
  * @example
- * stt(audioBuffer);
+ * stt(audioBuffer, 'audio/wav');
  */
-async function stt(audio) {
+async function stt(audio, contentType = 'application/octet-stream') {
   try {
-    const response = await this.gladysGatewayClient.stt(audio);
+    const response = await this.gladysGatewayClient.stt(audio, contentType);
     return response;
   } catch (e) {
     logger.warn(e);

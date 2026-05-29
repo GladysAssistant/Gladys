@@ -1,6 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
-const { getAudioBufferFromRequest } = require('../utils/getAudioBufferFromRequest');
+const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
   /**
@@ -144,7 +144,8 @@ module.exports = function GatewayController(gladys) {
    */
   async function stt(req, res) {
     const audioBuffer = getAudioBufferFromRequest(req);
-    const response = await gladys.gateway.stt(audioBuffer);
+    const contentType = getAudioContentTypeFromRequest(req);
+    const response = await gladys.gateway.stt(audioBuffer, contentType);
     res.json(response);
   }
 
@@ -156,8 +157,10 @@ module.exports = function GatewayController(gladys) {
    */
   async function processVoice(req, res) {
     const audioBuffer = getAudioBufferFromRequest(req);
+    const contentType = getAudioContentTypeFromRequest(req);
     const response = await gladys.gateway.processVoiceMessage({
       audio: audioBuffer,
+      contentType,
       user: req.user,
     });
     res.json(response);

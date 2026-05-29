@@ -24,16 +24,27 @@ describe('gateway.controller voice endpoints', () => {
     };
   });
 
+  it('should call gateway stt with default content type when header is missing', async () => {
+    const controller = GatewayController(gladys);
+    const audioBuffer = Buffer.from('fake-audio');
+
+    await controller.stt({ body: audioBuffer, headers: {} }, res);
+
+    sinonAssert.calledWith(gladys.gateway.stt, audioBuffer, 'application/octet-stream');
+  });
+
   it('should call gateway stt with raw audio buffer', async () => {
     const controller = GatewayController(gladys);
     const audioBuffer = Buffer.from('fake-audio');
 
-    await controller.stt({ body: audioBuffer }, res);
+    await controller.stt({ body: audioBuffer, headers: { 'content-type': 'audio/wav' } }, res);
 
     sinonAssert.calledOnce(gladys.gateway.stt);
     const audioArg = gladys.gateway.stt.firstCall.args[0];
+    const contentTypeArg = gladys.gateway.stt.firstCall.args[1];
     expect(Buffer.isBuffer(audioArg)).to.equal(true);
     expect(audioArg.toString()).to.equal('fake-audio');
+    expect(contentTypeArg).to.equal('audio/wav');
     sinonAssert.calledOnce(res.json);
     expect(res.json.firstCall.args[0]).to.deep.equal({ text: 'bonjour' });
   });
@@ -43,11 +54,15 @@ describe('gateway.controller voice endpoints', () => {
     const reqUser = { id: 'user-42', language: 'fr' };
     const audioBuffer = Buffer.from('voice');
 
-    await controller.processVoice({ body: audioBuffer, user: reqUser }, res);
+    await controller.processVoice(
+      { body: audioBuffer, headers: { 'content-type': 'audio/webm' }, user: reqUser },
+      res,
+    );
 
     sinonAssert.calledOnce(gladys.gateway.processVoiceMessage);
     expect(gladys.gateway.processVoiceMessage.firstCall.args[0]).to.deep.equal({
       audio: Buffer.from('voice'),
+      contentType: 'audio/webm',
       user: reqUser,
     });
     sinonAssert.calledOnce(res.json);

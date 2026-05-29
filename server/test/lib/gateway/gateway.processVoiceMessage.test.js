@@ -99,7 +99,11 @@ describe('gateway.processVoiceMessage', () => {
     const eventEmit = fake();
     const ctx = buildContext({ event: { emit: eventEmit } });
 
-    const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+    const result = await processVoiceMessage.call(ctx, {
+      audio: Buffer.from('audio'),
+      contentType: 'audio/wav',
+      user,
+    });
 
     expect(result).to.deep.equal({
       transcription: 'allume la lumière',
@@ -107,6 +111,7 @@ describe('gateway.processVoiceMessage', () => {
       ttsUrl: 'http://tts.test/audio.mp3',
     });
     sinonAssert.calledOnce(ctx.stt);
+    sinonAssert.calledWith(ctx.stt, Buffer.from('audio'), 'audio/wav');
     sinonAssert.calledOnce(ctx.message.getPreviousQuestionsForUser);
     sinonAssert.calledWith(ctx.message.getPreviousQuestionsForUser, user.id);
     sinonAssert.calledOnce(messageCreate);

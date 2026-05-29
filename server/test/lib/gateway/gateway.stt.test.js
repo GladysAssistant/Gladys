@@ -1,5 +1,5 @@
 const { expect, assert } = require('chai');
-const { fake } = require('sinon');
+const { fake, assert: sinonAssert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
@@ -50,6 +50,20 @@ describe('gateway.stt', () => {
     const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
     const data = await gateway.stt(Buffer.from('audio'));
     expect(data).to.deep.equal({ text: 'hello world' });
+  });
+
+  it('should forward content type to gladys gateway client', async () => {
+    const stt = fake.resolves({ text: 'hello world' });
+    const gladysGatewayJsMock = function gladysGatewayJsMock() {
+      return { stt };
+    };
+    const Gateway = proxyquire('../../../lib/gateway', {
+      '@gladysassistant/gladys-gateway-js': gladysGatewayJsMock,
+    });
+    const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
+    await gateway.stt(Buffer.from('audio'), 'audio/wav');
+    sinonAssert.calledOnce(stt);
+    sinonAssert.calledWith(stt, Buffer.from('audio'), 'audio/wav');
   });
 
   it('should return 429', async () => {

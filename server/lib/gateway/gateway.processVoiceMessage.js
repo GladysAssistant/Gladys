@@ -26,12 +26,13 @@ function extractTranscriptionFromSttResponse(sttResponse) {
  * @description Process a voice message: STT, AI reply, websocket updates and TTS URL.
  * @param {object} options - Request options.
  * @param {Buffer} options.audio - Raw audio buffer.
+ * @param {string} [options.contentType='application/octet-stream'] - Audio MIME type from the client.
  * @param {object} options.user - Authenticated Gladys user.
  * @returns {Promise<{transcription: string, answer: string, ttsUrl: string|null}>} Voice processing result.
  * @example
- * processVoiceMessage({ audio: buffer, user });
+ * processVoiceMessage({ audio: buffer, contentType: 'audio/wav', user });
  */
-async function processVoiceMessage({ audio, user }) {
+async function processVoiceMessage({ audio, contentType = 'application/octet-stream', user }) {
   const userId = user.id;
 
   const emitVoiceWebsocket = (type, payload) => {
@@ -47,7 +48,7 @@ async function processVoiceMessage({ audio, user }) {
   emitVoiceWebsocket(WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING, { processing: true });
 
   try {
-    const sttResponse = await this.stt(audio);
+    const sttResponse = await this.stt(audio, contentType);
     const transcription = extractTranscriptionFromSttResponse(sttResponse);
 
     if (!transcription) {
