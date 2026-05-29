@@ -94,19 +94,35 @@ export async function recordUntilSilence({
 
   const stream = await navigator.mediaDevices.getUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
 
-  if (signal && signal.aborted) {
+  const stopStream = () => {
     stream.getTracks().forEach(track => track.stop());
+  };
+
+  if (signal && signal.aborted) {
+    stopStream();
     throw createAbortError();
   }
 
-  const mediaRecorder = createSpeechMediaRecorder(stream);
   const chunks = [];
+  let mediaRecorder;
+  let audioContext;
+  let analyser;
 
-  const audioContext = new AudioContext();
-  const source = audioContext.createMediaStreamSource(stream);
-  const analyser = audioContext.createAnalyser();
-  analyser.fftSize = 1024;
-  source.connect(analyser);
+  try {
+    mediaRecorder = createSpeechMediaRecorder(stream);
+    audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 1024;
+    source.connect(analyser);
+  } catch (e) {
+    stopStream();
+    if (audioContext && audioContext.state !== 'closed') {
+      audioContext.close();
+    }
+    throw e;
+  }
+
   const dataArray = new Uint8Array(analyser.fftSize);
 
   return new Promise((resolve, reject) => {
@@ -116,7 +132,7 @@ export async function recordUntilSilence({
     let aborted = false;
 
     const releaseResources = () => {
-      stream.getTracks().forEach(track => track.stop());
+      stopStream();
       if (audioContext.state !== 'closed') {
         audioContext.close();
       }
