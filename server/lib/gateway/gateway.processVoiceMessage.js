@@ -65,14 +65,14 @@ async function processVoiceMessage({ audio, user }) {
       created_at: new Date(),
     };
 
+    const previousQuestions = await this.message.getPreviousQuestionsForUser(userId);
+
     await db.Message.create({
       text: transcription,
       sender_id: userId,
       receiver_id: null,
       is_read: true,
     });
-
-    const previousQuestions = await this.message.getPreviousQuestionsForUser(userId);
     const aiResult = await this.forwardMessageToAiChat({
       message,
       previousQuestions,

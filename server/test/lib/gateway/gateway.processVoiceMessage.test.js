@@ -107,9 +107,10 @@ describe('gateway.processVoiceMessage', () => {
       ttsUrl: 'http://tts.test/audio.mp3',
     });
     sinonAssert.calledOnce(ctx.stt);
-    sinonAssert.calledOnce(messageCreate);
     sinonAssert.calledOnce(ctx.message.getPreviousQuestionsForUser);
     sinonAssert.calledWith(ctx.message.getPreviousQuestionsForUser, user.id);
+    sinonAssert.calledOnce(messageCreate);
+    sinonAssert.callOrder(ctx.message.getPreviousQuestionsForUser, messageCreate);
     sinonAssert.calledOnce(ctx.forwardMessageToAiChat);
     sinonAssert.calledOnce(ctx.getTTSApiUrl);
 
@@ -133,6 +134,14 @@ describe('gateway.processVoiceMessage', () => {
       payload: { text: 'La lumière est allumée.' },
     });
     expect(payloads.filter((p) => p.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING)).to.have.lengthOf(2);
+  });
+
+  it('should fetch previous questions before persisting the transcription', async () => {
+    const ctx = buildContext();
+
+    await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+
+    sinonAssert.callOrder(ctx.message.getPreviousQuestionsForUser, messageCreate);
   });
 
   it('should skip response websocket and tts when answer is empty', async () => {
