@@ -143,7 +143,9 @@ describe('POST /api/v1/gateway/aichat/chat', () => {
 
 describe('POST /api/v1/gateway/stt', () => {
   it('should return stt response', async () => {
-    nock(config.gladysGatewayServerUrl).post('/stt').reply(200, { text: 'bonjour gladys' });
+    nock(config.gladysGatewayServerUrl)
+      .post('/stt')
+      .reply(200, { text: 'bonjour gladys' });
     const response = await authenticatedRequest
       .post('/api/v1/gateway/stt')
       .send({ audio: Buffer.from('fake-audio').toString('base64') })

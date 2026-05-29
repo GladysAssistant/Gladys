@@ -66,10 +66,7 @@ class VoiceAssistantBox extends Component {
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING,
       this.onProcessingWebsocket
     );
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR,
-      this.onErrorWebsocket
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR, this.onErrorWebsocket);
   }
 
   componentWillUnmount() {
@@ -85,10 +82,7 @@ class VoiceAssistantBox extends Component {
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING,
       this.onProcessingWebsocket
     );
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR,
-      this.onErrorWebsocket
-    );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR, this.onErrorWebsocket);
     if (this.audioPlayer) {
       this.audioPlayer.pause();
       this.audioPlayer = null;

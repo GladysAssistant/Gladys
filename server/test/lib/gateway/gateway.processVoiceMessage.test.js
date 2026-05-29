@@ -9,18 +9,17 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const messageCreate = sinon.stub().resolves({});
 const messageFindAll = sinon.stub().resolves([]);
 
-const {
-  processVoiceMessage,
-  extractTranscriptionFromSttResponse,
-  getPreviousQuestionsForUser,
-} = proxyquire('../../../lib/gateway/gateway.processVoiceMessage', {
-  '../../models': {
-    Message: {
-      create: messageCreate,
-      findAll: messageFindAll,
+const { processVoiceMessage, extractTranscriptionFromSttResponse, getPreviousQuestionsForUser } = proxyquire(
+  '../../../lib/gateway/gateway.processVoiceMessage',
+  {
+    '../../models': {
+      Message: {
+        create: messageCreate,
+        findAll: messageFindAll,
+      },
     },
   },
-});
+);
 
 const user = {
   id: 'user-1',
@@ -35,8 +34,7 @@ const user = {
 function buildContext(overrides = {}) {
   return {
     stt: overrides.stt || fake.resolves({ text: 'allume la lumière' }),
-    forwardMessageToAiChat:
-      overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
+    forwardMessageToAiChat: overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
     getTTSApiUrl: overrides.getTTSApiUrl || fake.resolves({ url: 'http://tts.test/audio.mp3' }),
     event: overrides.event === null ? null : overrides.event || { emit: fake() },
   };
@@ -64,12 +62,8 @@ describe('gateway.processVoiceMessage helpers', () => {
     });
 
     it('should read transcription field', () => {
-      expect(extractTranscriptionFromSttResponse({ transcription: 'via transcription' })).to.equal(
-        'via transcription',
-      );
-      expect(extractTranscriptionFromSttResponse({ text: undefined, transcription: 'fallback' })).to.equal(
-        'fallback',
-      );
+      expect(extractTranscriptionFromSttResponse({ transcription: 'via transcription' })).to.equal('via transcription');
+      expect(extractTranscriptionFromSttResponse({ text: undefined, transcription: 'fallback' })).to.equal('fallback');
     });
 
     it('should read transcript field', () => {
@@ -179,9 +173,7 @@ describe('gateway.processVoiceMessage', () => {
       userId: user.id,
       payload: { text: 'La lumière est allumée.' },
     });
-    expect(payloads.filter((p) => p.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING)).to.have.lengthOf(
-      2,
-    );
+    expect(payloads.filter((p) => p.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING)).to.have.lengthOf(2);
   });
 
   it('should skip response websocket and tts when answer is empty', async () => {
