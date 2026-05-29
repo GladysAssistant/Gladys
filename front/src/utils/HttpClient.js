@@ -104,10 +104,13 @@ export class HttpClient {
    * @param {string} url - API path.
    * @param {Blob|ArrayBuffer|Uint8Array} body - Raw request body.
    * @param {string} [contentType='application/octet-stream'] - Content-Type header.
-   * @param {number} [retryCount=0] - Internal retry counter.
+   * @param {object} [options={}] - Request options.
+   * @param {AbortSignal} [options.signal] - Abort signal to cancel the request.
+   * @param {number} [options.retryCount=0] - Internal retry counter.
    * @returns {Promise<object>} Parsed JSON response.
    */
-  async postBinary(url, body, contentType = 'application/octet-stream', retryCount = 0) {
+  async postBinary(url, body, contentType = 'application/octet-stream', options = {}) {
+    const { signal, retryCount = 0 } = options;
     if (retryCount > MAX_RETRY) {
       this.session.reset();
       throw new Error('MAX_RETRY_EXCEEDED');
@@ -118,6 +121,7 @@ export class HttpClient {
         url,
         method: 'post',
         data: body,
+        signal,
         headers: {
           ...this.getAxiosHeaders(),
           'Content-Type': contentType
@@ -127,7 +131,7 @@ export class HttpClient {
     } catch (e) {
       if (e.response && e.response.status === 401 && e.response.data.message !== 'TABLET_IS_LOCKED') {
         await this.refreshAccessToken();
-        return this.postBinary(url, body, contentType, retryCount + 1);
+        return this.postBinary(url, body, contentType, { signal, retryCount: retryCount + 1 });
       }
       throw e;
     }

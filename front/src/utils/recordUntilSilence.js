@@ -13,6 +13,28 @@ const SPEECH_AUDIO_CONSTRAINTS = {
 const SPEECH_MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
 
 /**
+ * @description Create an AbortError-compatible error.
+ * @returns {Error} Abort error.
+ */
+function createAbortError() {
+  if (typeof DOMException !== 'undefined') {
+    return new DOMException('Aborted', 'AbortError');
+  }
+  const error = new Error('Aborted');
+  error.name = 'AbortError';
+  return error;
+}
+
+/**
+ * @description Returns true when the error is an abort/cancel error.
+ * @param {Error} error - Error to check.
+ * @returns {boolean} Whether the error is an abort error.
+ */
+export function isRecordUntilSilenceAbortError(error) {
+  return Boolean(error && (error.name === 'AbortError' || error.message === 'Aborted'));
+}
+
+/**
  * @description Pick a MediaRecorder mime type supported by the browser.
  * @returns {string|undefined} Mime type or undefined if none supported.
  */
@@ -52,6 +74,7 @@ function createSpeechMediaRecorder(stream) {
 /**
  * @description Record audio from the microphone until silence is detected.
  * @param {object} options - Recording options.
+ * @param {AbortSignal} [options.signal] - Abort signal to cancel recording.
  * @param {number} [options.silenceThreshold=0.02] - RMS threshold below which audio is considered silent.
  * @param {number} [options.silenceDurationMs=1500] - Duration of silence before stopping (ms).
  * @param {number} [options.maxDurationMs=30000] - Maximum recording duration (ms).
@@ -59,12 +82,23 @@ function createSpeechMediaRecorder(stream) {
  * @returns {Promise<Blob>} Recorded audio blob.
  */
 export async function recordUntilSilence({
+  signal,
   silenceThreshold = 0.02,
   silenceDurationMs = 1500,
   maxDurationMs = 30000,
   minRecordingMs = 500
 } = {}) {
+  if (signal && signal.aborted) {
+    throw createAbortError();
+  }
+
   const stream = await navigator.mediaDevices.getUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+
+  if (signal && signal.aborted) {
+    stream.getTracks().forEach(track => track.stop());
+    throw createAbortError();
+  }
+
   const mediaRecorder = createSpeechMediaRecorder(stream);
   const chunks = [];
 
@@ -78,6 +112,40 @@ export async function recordUntilSilence({
   return new Promise((resolve, reject) => {
     let silenceStart = null;
     const recordingStart = Date.now();
+    let rafId = null;
+    let aborted = false;
+
+    const releaseResources = () => {
+      stream.getTracks().forEach(track => track.stop());
+      if (audioContext.state !== 'closed') {
+        audioContext.close();
+      }
+    };
+
+    const rejectAbort = () => {
+      if (aborted) {
+        return;
+      }
+      aborted = true;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      releaseResources();
+      reject(createAbortError());
+    };
+
+    const onAbort = () => {
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        return;
+      }
+      rejectAbort();
+    };
+
+    if (signal) {
+      signal.addEventListener('abort', onAbort);
+    }
 
     mediaRecorder.ondataavailable = event => {
       if (event.data.size > 0) {
@@ -86,20 +154,45 @@ export async function recordUntilSilence({
     };
 
     mediaRecorder.onstop = () => {
-      stream.getTracks().forEach(track => track.stop());
-      audioContext.close();
+      if (signal) {
+        signal.removeEventListener('abort', onAbort);
+      }
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      releaseResources();
+      if (aborted) {
+        reject(createAbortError());
+        return;
+      }
       resolve(new Blob(chunks, { type: mediaRecorder.mimeType || 'audio/webm' }));
     };
 
     mediaRecorder.onerror = () => {
-      stream.getTracks().forEach(track => track.stop());
-      audioContext.close();
+      if (signal) {
+        signal.removeEventListener('abort', onAbort);
+      }
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      releaseResources();
       reject(new Error('MEDIA_RECORDER_ERROR'));
     };
 
     mediaRecorder.start(250);
 
     const checkSilence = () => {
+      if (aborted || (signal && signal.aborted)) {
+        if (mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        } else {
+          rejectAbort();
+        }
+        return;
+      }
+
       if (mediaRecorder.state !== 'recording') {
         return;
       }
@@ -129,9 +222,9 @@ export async function recordUntilSilence({
         return;
       }
 
-      requestAnimationFrame(checkSilence);
+      rafId = requestAnimationFrame(checkSilence);
     };
 
-    requestAnimationFrame(checkSilence);
+    rafId = requestAnimationFrame(checkSilence);
   });
 }

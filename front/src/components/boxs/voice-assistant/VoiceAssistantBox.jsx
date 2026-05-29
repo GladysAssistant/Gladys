@@ -5,7 +5,7 @@ import cx from 'classnames';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import GladysPlusUpsell from '../../gateway/GladysPlusUpsell';
-import { recordUntilSilence } from '../../../utils/recordUntilSilence';
+import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import style from './style.css';
 
 const STATE = {
@@ -24,6 +24,21 @@ const MESSAGES_CLEAR_DELAY_MS = 6000;
  * @param {Error} error - Axios or generic error.
  * @returns {string} Error message.
  */
+/**
+ * @description Returns true when the error is from an aborted fetch/recording.
+ * @param {Error} error - Error to check.
+ * @returns {boolean} Whether the error is an abort error.
+ */
+function isAbortError(error) {
+  if (isRecordUntilSilenceAbortError(error)) {
+    return true;
+  }
+  if (error && error.code === 'ERR_CANCELED') {
+    return true;
+  }
+  return Boolean(error && error.name === 'AbortError');
+}
+
 function getHttpErrorMessage(error) {
   if (error && error.response && error.response.data) {
     if (error.response.data.message) {
@@ -52,7 +67,14 @@ class VoiceAssistantBox extends Component {
 
   messagesClearTimeout = null;
 
+  _isMounted = false;
+
+  voiceSessionGeneration = 0;
+
+  activeVoiceAbortController = null;
+
   componentDidMount() {
+    this._isMounted = true;
     this.fetchGatewayStatus();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.TRANSCRIPTION,
@@ -70,6 +92,8 @@ class VoiceAssistantBox extends Component {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
+    this.cancelActiveVoiceSession();
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.TRANSCRIPTION,
       this.onTranscriptionWebsocket
@@ -88,7 +112,32 @@ class VoiceAssistantBox extends Component {
       this.audioPlayer = null;
     }
     this.clearMessagesClearTimeout();
-  }
+  };
+
+  isVoiceSessionActive = generation => generation === this.voiceSessionGeneration;
+
+  cancelActiveVoiceSession = () => {
+    this.voiceSessionGeneration += 1;
+    if (this.activeVoiceAbortController) {
+      this.activeVoiceAbortController.abort();
+      this.activeVoiceAbortController = null;
+    }
+    if (this.audioPlayer) {
+      this.audioPlayer.onended = null;
+      this.audioPlayer.pause();
+      this.audioPlayer = null;
+    }
+  };
+
+  safeSetState = (stateOrUpdater, voiceSessionGeneration) => {
+    if (!this._isMounted) {
+      return;
+    }
+    if (voiceSessionGeneration !== undefined && !this.isVoiceSessionActive(voiceSessionGeneration)) {
+      return;
+    }
+    this.setState(stateOrUpdater);
+  };
 
   clearMessagesClearTimeout = () => {
     if (this.messagesClearTimeout) {
@@ -101,33 +150,41 @@ class VoiceAssistantBox extends Component {
     this.clearMessagesClearTimeout();
     this.messagesClearTimeout = setTimeout(() => {
       this.messagesClearTimeout = null;
-      this.setState({ transcription: '', response: '' });
+      if (this._isMounted) {
+        this.setState({ transcription: '', response: '' });
+      }
     }, MESSAGES_CLEAR_DELAY_MS);
   };
 
   fetchGatewayStatus = async () => {
     try {
       const status = await this.props.httpClient.get('/api/v1/gateway/status');
-      this.setState({ gatewayConnected: status.configured === true });
+      if (this._isMounted) {
+        this.setState({ gatewayConnected: status.configured === true });
+      }
     } catch (e) {
-      this.setState({ gatewayConnected: false });
+      if (this._isMounted) {
+        this.setState({ gatewayConnected: false });
+      }
     }
   };
 
   onTranscriptionWebsocket = payload => {
-    if (payload && payload.text) {
-      this.setState({ transcription: payload.text });
+    if (!this._isMounted || !payload || !payload.text) {
+      return;
     }
+    this.setState({ transcription: payload.text });
   };
 
   onResponseWebsocket = payload => {
-    if (payload && payload.text) {
-      this.setState({ response: payload.text });
+    if (!this._isMounted || !payload || !payload.text) {
+      return;
     }
+    this.setState({ response: payload.text });
   };
 
   onProcessingWebsocket = payload => {
-    if (!payload) {
+    if (!this._isMounted || !payload) {
       return;
     }
     if (payload.processing) {
@@ -148,6 +205,9 @@ class VoiceAssistantBox extends Component {
   };
 
   onErrorWebsocket = payload => {
+    if (!this._isMounted) {
+      return;
+    }
     this.clearMessagesClearTimeout();
     this.setState({
       uiState: STATE.ERROR,
@@ -155,26 +215,36 @@ class VoiceAssistantBox extends Component {
     });
   };
 
-  playTts = async ttsUrl => {
+  playTts = async (ttsUrl, voiceSessionGeneration) => {
+    if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+      return;
+    }
     if (!ttsUrl) {
-      this.setState({ uiState: STATE.IDLE });
+      this.safeSetState({ uiState: STATE.IDLE }, voiceSessionGeneration);
       this.scheduleMessagesClear();
       return;
     }
-    this.setState({ uiState: STATE.SPEAKING });
+    this.safeSetState({ uiState: STATE.SPEAKING }, voiceSessionGeneration);
     try {
       if (this.audioPlayer) {
+        this.audioPlayer.onended = null;
         this.audioPlayer.pause();
       }
       this.audioPlayer = new Audio(ttsUrl);
       this.audioPlayer.onended = () => {
-        this.setState({ uiState: STATE.IDLE });
+        if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+          return;
+        }
+        this.safeSetState({ uiState: STATE.IDLE }, voiceSessionGeneration);
         this.scheduleMessagesClear();
       };
       await this.audioPlayer.play();
     } catch (e) {
+      if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
+      }
       console.error(e);
-      this.setState({ uiState: STATE.IDLE });
+      this.safeSetState({ uiState: STATE.IDLE }, voiceSessionGeneration);
       this.scheduleMessagesClear();
     }
   };
@@ -185,39 +255,66 @@ class VoiceAssistantBox extends Component {
       return;
     }
 
+    this.cancelActiveVoiceSession();
+    const voiceSessionGeneration = this.voiceSessionGeneration;
+    const abortController = new AbortController();
+    this.activeVoiceAbortController = abortController;
+
     this.clearMessagesClearTimeout();
-    this.setState({
-      uiState: STATE.LISTENING,
-      transcription: '',
-      response: '',
-      error: null
-    });
+    this.safeSetState(
+      {
+        uiState: STATE.LISTENING,
+        transcription: '',
+        response: '',
+        error: null
+      },
+      voiceSessionGeneration
+    );
 
     try {
-      const audioBlob = await recordUntilSilence();
-      this.setState({ uiState: STATE.PROCESSING });
+      const audioBlob = await recordUntilSilence({ signal: abortController.signal });
+      if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
+      }
+
+      this.safeSetState({ uiState: STATE.PROCESSING }, voiceSessionGeneration);
 
       const result = await this.props.httpClient.postBinary(
         '/api/v1/gateway/voice',
         audioBlob,
-        audioBlob.type || 'application/octet-stream'
+        audioBlob.type || 'application/octet-stream',
+        { signal: abortController.signal }
       );
 
-      if (result.transcription) {
-        this.setState({ transcription: result.transcription });
-      }
-      if (result.answer) {
-        this.setState({ response: result.answer });
+      if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
       }
 
-      await this.playTts(result.ttsUrl);
+      if (result.transcription) {
+        this.safeSetState({ transcription: result.transcription }, voiceSessionGeneration);
+      }
+      if (result.answer) {
+        this.safeSetState({ response: result.answer }, voiceSessionGeneration);
+      }
+
+      await this.playTts(result.ttsUrl, voiceSessionGeneration);
     } catch (e) {
+      if (isAbortError(e) || !this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
+      }
       console.error(e);
       this.clearMessagesClearTimeout();
-      this.setState({
-        uiState: STATE.ERROR,
-        error: getHttpErrorMessage(e)
-      });
+      this.safeSetState(
+        {
+          uiState: STATE.ERROR,
+          error: getHttpErrorMessage(e)
+        },
+        voiceSessionGeneration
+      );
+    } finally {
+      if (this.activeVoiceAbortController === abortController) {
+        this.activeVoiceAbortController = null;
+      }
     }
   };
 
