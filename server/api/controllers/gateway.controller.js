@@ -136,6 +136,44 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/gateway/stt
+   * @apiName stt
+   * @apiGroup Gateway
+   * @apiParam {string} audio Base64-encoded audio data.
+   */
+  async function stt(req, res) {
+    const audioBuffer = Buffer.from(req.body.audio, 'base64');
+    const response = await gladys.gateway.stt(audioBuffer);
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/voice
+   * @apiName processVoice
+   * @apiGroup Gateway
+   * @apiParam {string} audio Base64-encoded audio data.
+   */
+  async function processVoice(req, res) {
+    const audioBuffer = Buffer.from(req.body.audio, 'base64');
+    const response = await gladys.gateway.processVoiceMessage({
+      audio: audioBuffer,
+      user: req.user,
+    });
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/tts
+   * @apiName getTtsUrl
+   * @apiGroup Gateway
+   * @apiParam {string} text Text to synthesize.
+   */
+  async function getTtsUrl(req, res) {
+    const response = await gladys.gateway.getTTSApiUrl(req.body);
+    res.json(response);
+  }
+
+  /**
    * @api {post} /api/v1/gateway/refresh-latest-gladys-version
    * @apiName refreshLatestGladysVersion
    * @apiGroup Gateway
@@ -158,6 +196,9 @@ module.exports = function GatewayController(gladys) {
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
     aiChat: asyncMiddleware(aiChat),
+    stt: asyncMiddleware(stt),
+    processVoice: asyncMiddleware(processVoice),
+    getTtsUrl: asyncMiddleware(getTtsUrl),
     refreshLatestGladysVersion: asyncMiddleware(refreshLatestGladysVersion),
   });
 };

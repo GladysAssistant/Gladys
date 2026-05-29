@@ -32,6 +32,8 @@ const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { getEdfTempo } = require('./gateway.getEdfTempo');
 const { getEdfTempoHistorical } = require('./gateway.getEdfTempoHistorical');
 const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
+const { stt } = require('./gateway.stt');
+const { processVoiceMessage } = require('./gateway.processVoiceMessage');
 const { aiChat } = require('./gateway.aiChat');
 const { forwardMessageToAiChat } = require('./gateway.forwardMessageToAiChat');
 
@@ -133,5 +135,9 @@ Gateway.prototype.enedisGetDailyConsumptionMaxPower = enedisGetDailyConsumptionM
 
 // TTS API
 Gateway.prototype.getTTSApiUrl = getTTSApiUrl;
+
+// STT API
+Gateway.prototype.stt = stt;
+Gateway.prototype.processVoiceMessage = processVoiceMessage;
 
 module.exports = Gateway;

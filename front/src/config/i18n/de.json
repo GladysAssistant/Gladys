@@ -285,7 +285,8 @@
       "scene": "Szene",
       "music": "Musik",
       "gauge": "Messanzeige",
-      "energy-consumption": "Energieverbrauch"
+      "energy-consumption": "Energieverbrauch",
+      "voice-assistant": "Sprachassistent"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -492,6 +493,21 @@
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
         "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
+      },
+      "voice-assistant": {
+        "speak": "Sprechen",
+        "listening": "Ich höre zu...",
+        "listeningHint": "Sprechen Sie. Die Aufnahme stoppt bei Stille.",
+        "processing": "Verarbeitung...",
+        "speaking": "Antwort...",
+        "transcriptionLabel": "Sie sagten",
+        "responseLabel": "Antwort",
+        "error": "Ein Fehler ist aufgetreten. Prüfen Sie, ob Gladys Plus verbunden ist.",
+        "upsellTitle": "Sprachassistent mit Gladys Plus",
+        "upsellDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
+        "upsellFeature1": "Sprechen Sie mit Gladys vom Dashboard",
+        "upsellFeature2": "Live-Transkription und Antwort",
+        "upsellFeature3": "Antwort wird auf Ihrem Gerät vorgelesen"
       }
     }
   },

@@ -141,6 +141,18 @@ describe('POST /api/v1/gateway/aichat/chat', () => {
   });
 });
 
+describe('POST /api/v1/gateway/stt', () => {
+  it('should return stt response', async () => {
+    nock(config.gladysGatewayServerUrl).post('/stt').reply(200, { text: 'bonjour gladys' });
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/stt')
+      .send({ audio: Buffer.from('fake-audio').toString('base64') })
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.deep.equal({ text: 'bonjour gladys' });
+  });
+});
+
 describe('POST /api/v1/gateway/refresh-latest-gladys-version', () => {
   it('should refresh latest gladys version', async () => {
     nock(config.gladysGatewayServerUrl)

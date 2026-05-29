@@ -285,7 +285,8 @@
       "scene": "Scène",
       "music": "Musique",
       "gauge": "Jauge",
-      "energy-consumption": "Consommation Énergétique"
+      "energy-consumption": "Consommation Énergétique",
+      "voice-assistant": "Assistant vocal"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -492,6 +493,21 @@
         "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
         "showSubscriptionPrices": "Afficher les prix d'abonnement",
         "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
+      },
+      "voice-assistant": {
+        "speak": "Parler",
+        "listening": "J'écoute...",
+        "listeningHint": "Parlez, j'arrête d'enregistrer quand vous vous taisez.",
+        "processing": "Traitement...",
+        "speaking": "Réponse...",
+        "transcriptionLabel": "Vous avez dit",
+        "responseLabel": "Réponse",
+        "error": "Une erreur est survenue. Vérifiez que Gladys Plus est connecté.",
+        "upsellTitle": "Assistant vocal avec Gladys Plus",
+        "upsellDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
+        "upsellFeature1": "Parlez à Gladys depuis le tableau de bord",
+        "upsellFeature2": "Transcription et réponse en temps réel",
+        "upsellFeature3": "Réponse lue à voix haute sur votre appareil"
       }
     }
   },

@@ -1311,6 +1311,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     SENT: 'message.sent',
     AI_THINKING: 'message.ai-thinking',
   },
+  VOICE_ASSISTANT: {
+    TRANSCRIPTION: 'voice-assistant.transcription',
+    RESPONSE: 'voice-assistant.response',
+    PROCESSING: 'voice-assistant.processing',
+    ERROR: 'voice-assistant.error',
+  },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
     CONNECTED: 'authentication.connected',
@@ -1432,6 +1438,7 @@ const DASHBOARD_BOX_TYPE = {
   MUSIC: 'music',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
+  VOICE_ASSISTANT: 'voice-assistant',
 };
 
 const ERROR_MESSAGES = {

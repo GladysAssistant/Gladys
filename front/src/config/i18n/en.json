@@ -285,7 +285,8 @@
       "scene": "Scene",
       "music": "Music",
       "gauge": "Gauge",
-      "energy-consumption": "Energy Consumption"
+      "energy-consumption": "Energy Consumption",
+      "voice-assistant": "Voice assistant"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -492,6 +493,21 @@
       },
       "music": {
         "selectDeviceLabel": "Select device to control"
+      },
+      "voice-assistant": {
+        "speak": "Speak",
+        "listening": "Listening...",
+        "listeningHint": "Speak now. Recording stops when you are silent.",
+        "processing": "Processing...",
+        "speaking": "Speaking...",
+        "transcriptionLabel": "You said",
+        "responseLabel": "Response",
+        "error": "Something went wrong. Make sure Gladys Plus is connected.",
+        "upsellTitle": "Voice assistant with Gladys Plus",
+        "upsellDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
+        "upsellFeature1": "Talk to Gladys from your dashboard",
+        "upsellFeature2": "Live transcription and response",
+        "upsellFeature3": "Answer read aloud on your device"
       }
     }
   },
