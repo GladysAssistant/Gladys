@@ -503,11 +503,8 @@
         "transcriptionLabel": "Sie sagten",
         "responseLabel": "Antwort",
         "error": "Ein Fehler ist aufgetreten. Prüfen Sie, ob Gladys Plus verbunden ist.",
-        "upsellTitle": "Sprachassistent mit Gladys Plus",
-        "upsellDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
-        "upsellFeature1": "Sprechen Sie mit Gladys vom Dashboard",
-        "upsellFeature2": "Live-Transkription und Antwort",
-        "upsellFeature3": "Antwort wird auf Ihrem Gerät vorgelesen"
+        "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
+        "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       }
     }
   },
@@ -3269,6 +3266,14 @@
       "feature1": "Licht an, durch Sprache",
       "feature2": "Funktioniert mit Google Nest, Google Home und der Google-Assistant-App",
       "feature3": "Keine Portfreigabe, alles läuft über das verschlüsselte Gladys Plus"
+    },
+    "voiceAssistant": {
+      "title": "Gladys-Sprachassistent mit Gladys Plus",
+      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Mistral-KI-Antworten und Sprachausgabe.",
+      "compactDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
+      "feature1": "Sprich mit Gladys vom Dashboard",
+      "feature2": "Live-Transkription und Antwort",
+      "feature3": "Antwort wird auf deinem Gerät vorgelesen"
     },
     "askAi": {
       "title": "Diese Aktion erfordert Gladys Plus",

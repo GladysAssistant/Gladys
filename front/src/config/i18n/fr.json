@@ -503,11 +503,8 @@
         "transcriptionLabel": "Vous avez dit",
         "responseLabel": "Réponse",
         "error": "Une erreur est survenue. Vérifiez que Gladys Plus est connecté.",
-        "upsellTitle": "Assistant vocal avec Gladys Plus",
-        "upsellDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
-        "upsellFeature1": "Parlez à Gladys depuis le tableau de bord",
-        "upsellFeature2": "Transcription et réponse en temps réel",
-        "upsellFeature3": "Réponse lue à voix haute sur votre appareil"
+        "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
+        "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
       }
     }
   },
@@ -3269,6 +3266,14 @@
       "feature1": "Allume la lumière à la voix",
       "feature2": "Compatible avec Google Nest, Google Home et l'app Google Assistant",
       "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "voiceAssistant": {
+      "title": "Assistant vocal Gladys avec Gladys Plus",
+      "description": "Gladys Plus alimente l'assistant vocal du tableau de bord : transcription de ta voix, réponse par l'IA Mistral et lecture à voix haute.",
+      "compactDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
+      "feature1": "Parle à Gladys depuis le tableau de bord",
+      "feature2": "Transcription et réponse en temps réel",
+      "feature3": "Réponse lue à voix haute sur ton appareil"
     },
     "askAi": {
       "title": "Cette action nécessite Gladys Plus",

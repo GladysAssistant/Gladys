@@ -503,11 +503,8 @@
         "transcriptionLabel": "You said",
         "responseLabel": "Response",
         "error": "Something went wrong. Make sure Gladys Plus is connected.",
-        "upsellTitle": "Voice assistant with Gladys Plus",
-        "upsellDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
-        "upsellFeature1": "Talk to Gladys from your dashboard",
-        "upsellFeature2": "Live transcription and response",
-        "upsellFeature3": "Answer read aloud on your device"
+        "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
+        "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       }
     }
   },
@@ -3269,6 +3266,14 @@
       "feature1": "Turn lights on by voice",
       "feature2": "Works with Google Nest, Google Home and the Google Assistant app",
       "feature3": "No port forwarding, everything goes through encrypted Gladys Plus"
+    },
+    "voiceAssistant": {
+      "title": "Gladys voice assistant with Gladys Plus",
+      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, Mistral AI replies and text-to-speech playback.",
+      "compactDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
+      "feature1": "Talk to Gladys from your dashboard",
+      "feature2": "Live transcription and response",
+      "feature3": "Answer read aloud on your device"
     },
     "askAi": {
       "title": "This action requires Gladys Plus",

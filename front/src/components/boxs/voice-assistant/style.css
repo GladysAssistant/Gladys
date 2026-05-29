@@ -141,6 +141,11 @@
 .cardHeader {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   background: transparent !important;
   border-bottom: 1px solid var(--va-header-border);
 }
@@ -439,10 +444,27 @@
   color: var(--va-label-violet);
 }
 
+.plusBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.boxDisabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.plusRequiredHint {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--va-status);
+  text-align: center;
+}
+
 .upsellWrap {
   position: relative;
   z-index: 1;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
 }
 
 @keyframes vaRingSpin {

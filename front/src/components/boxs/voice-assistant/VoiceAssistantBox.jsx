@@ -4,7 +4,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
-import GladysPlusUpsell from '../../gateway/GladysPlusUpsell';
+import GladysPlusUpsellCard from '../../gateway/GladysPlusUpsellCard';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import style from './style.css';
 
@@ -18,6 +18,14 @@ const STATE = {
 
 /** Delay after a completed turn before hiding transcription and response. */
 const MESSAGES_CLEAR_DELAY_MS = 6000;
+
+const VOICE_ASSISTANT_UPSELL_PROPS = {
+  compact: true,
+  icon: 'fe-mic',
+  utmCampaign: 'dashboard_voice_assistant',
+  titleKey: 'gladysPlusUpsell.voiceAssistant.title',
+  descriptionKey: 'gladysPlusUpsell.voiceAssistant.compactDescription'
+};
 
 /**
  * @description Extract a readable error message from an HTTP client error.
@@ -344,6 +352,7 @@ class VoiceAssistantBox extends Component {
     const boxTitle = props.box.name;
     const isBusy = uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING;
     const isDark = this.isDarkTheme();
+    const needsGladysPlus = gatewayConnected !== true;
 
     return (
       <div
@@ -358,26 +367,22 @@ class VoiceAssistantBox extends Component {
         {boxTitle && (
           <div class={cx('card-header', style.cardHeader)}>
             <h3 class={cx('card-title', style.cardTitle)}>{boxTitle}</h3>
+            {gatewayConnected === true && (
+              <span class={cx('badge badge-info', style.plusBadge)}>
+                <i class="fe fe-zap mr-1" />
+                <Text id="integration.tags.gladysPlus" />
+              </span>
+            )}
           </div>
         )}
         <div class={cx('card-body', style.cardBody)}>
           {gatewayConnected === false && (
             <div class={style.upsellWrap}>
-              <GladysPlusUpsell
-                httpClient={props.httpClient}
-                utmCampaign="dashboard_voice_assistant"
-                titleKey="dashboard.boxes.voice-assistant.upsellTitle"
-                descriptionKey="dashboard.boxes.voice-assistant.upsellDescription"
-                featureKeys={[
-                  'dashboard.boxes.voice-assistant.upsellFeature1',
-                  'dashboard.boxes.voice-assistant.upsellFeature2',
-                  'dashboard.boxes.voice-assistant.upsellFeature3'
-                ]}
-              />
+              <GladysPlusUpsellCard {...VOICE_ASSISTANT_UPSELL_PROPS} />
             </div>
           )}
 
-          <div class={style.box}>
+          <div class={cx(style.box, needsGladysPlus && style.boxDisabled)}>
             <div class={style.orbStage}>
               <div
                 class={cx(style.orb, {
@@ -394,7 +399,7 @@ class VoiceAssistantBox extends Component {
                   type="button"
                   class={style.orbButton}
                   onClick={this.handleSpeakClick}
-                  disabled={isBusy || gatewayConnected === false}
+                  disabled={isBusy || needsGladysPlus}
                   aria-live="polite"
                 >
                   {uiState === STATE.LISTENING && (
@@ -419,6 +424,11 @@ class VoiceAssistantBox extends Component {
               {uiState === STATE.LISTENING && (
                 <p class={style.status}>
                   <Text id="dashboard.boxes.voice-assistant.listeningHint" />
+                </p>
+              )}
+              {gatewayConnected === false && (
+                <p class={style.plusRequiredHint}>
+                  <Text id="dashboard.boxes.voice-assistant.plusRequiredHint" />
                 </p>
               )}
             </div>
