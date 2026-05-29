@@ -112,7 +112,7 @@ class VoiceAssistantBox extends Component {
       this.audioPlayer = null;
     }
     this.clearMessagesClearTimeout();
-  };
+  }
 
   isVoiceSessionActive = generation => generation === this.voiceSessionGeneration;
 
