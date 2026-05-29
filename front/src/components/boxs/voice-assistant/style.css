@@ -171,7 +171,8 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 1.5rem 0 0.5rem;
+  padding: 1.5rem 1rem 1rem;
+  gap: 1.25rem;
 }
 
 .orb {
@@ -229,6 +230,11 @@
 .orbListening .ring2 {
   border-color: rgba(0, 82, 212, 0.35);
   animation: vaRingSpin 6s linear infinite;
+}
+
+/* Rings extend below the orb box; reserve space so the hint text does not overlap */
+.orbListening {
+  margin-bottom: 2rem;
 }
 
 .orbProcessing .ring1,
@@ -368,10 +374,12 @@
 }
 
 .status {
-  margin: 1rem 0 0;
+  margin: 0;
   padding: 0 0.5rem;
+  max-width: 18rem;
   font-size: 0.8rem;
   font-weight: 500;
+  line-height: 1.45;
   letter-spacing: 0.02em;
   color: var(--va-status);
   text-align: center;
