@@ -371,10 +371,12 @@ function getRoutes(gladys) {
     },
     'post /api/v1/gateway/stt': {
       authenticated: true,
+      audioRawBody: true,
       controller: gatewayController.stt,
     },
     'post /api/v1/gateway/voice': {
       authenticated: true,
+      audioRawBody: true,
       controller: gatewayController.processVoice,
     },
     'post /api/v1/gateway/tts': {

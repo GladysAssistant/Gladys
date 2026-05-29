@@ -24,11 +24,11 @@ describe('gateway.controller voice endpoints', () => {
     };
   });
 
-  it('should call gateway stt with decoded audio buffer', async () => {
+  it('should call gateway stt with raw audio buffer', async () => {
     const controller = GatewayController(gladys);
-    const audioBase64 = Buffer.from('fake-audio').toString('base64');
+    const audioBuffer = Buffer.from('fake-audio');
 
-    await controller.stt({ body: { audio: audioBase64 } }, res);
+    await controller.stt({ body: audioBuffer }, res);
 
     sinonAssert.calledOnce(gladys.gateway.stt);
     const audioArg = gladys.gateway.stt.firstCall.args[0];
@@ -41,9 +41,9 @@ describe('gateway.controller voice endpoints', () => {
   it('should call gateway processVoiceMessage with user and audio', async () => {
     const controller = GatewayController(gladys);
     const reqUser = { id: 'user-42', language: 'fr' };
-    const audioBase64 = Buffer.from('voice').toString('base64');
+    const audioBuffer = Buffer.from('voice');
 
-    await controller.processVoice({ body: { audio: audioBase64 }, user: reqUser }, res);
+    await controller.processVoice({ body: audioBuffer, user: reqUser }, res);
 
     sinonAssert.calledOnce(gladys.gateway.processVoiceMessage);
     expect(gladys.gateway.processVoiceMessage.firstCall.args[0]).to.deep.equal({

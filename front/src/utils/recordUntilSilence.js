@@ -135,25 +135,3 @@ export async function recordUntilSilence({
     requestAnimationFrame(checkSilence);
   });
 }
-
-/**
- * @description Convert a Blob to a base64 string (without data URL prefix).
- * @param {Blob} blob - Audio blob.
- * @returns {Promise<string>} Base64-encoded data.
- */
-export function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result;
-      if (typeof result === 'string') {
-        const base64 = result.split(',')[1];
-        resolve(base64);
-      } else {
-        reject(new Error('INVALID_BLOB_READ'));
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}

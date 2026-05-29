@@ -99,6 +99,40 @@ export class HttpClient {
     return this.executeQuery('post', url, {}, body);
   }
 
+  /**
+   * @description POST binary data (e.g. audio/webm).
+   * @param {string} url - API path.
+   * @param {Blob|ArrayBuffer|Uint8Array} body - Raw request body.
+   * @param {string} [contentType='application/octet-stream'] - Content-Type header.
+   * @param {number} [retryCount=0] - Internal retry counter.
+   * @returns {Promise<object>} Parsed JSON response.
+   */
+  async postBinary(url, body, contentType = 'application/octet-stream', retryCount = 0) {
+    if (retryCount > MAX_RETRY) {
+      this.session.reset();
+      throw new Error('MAX_RETRY_EXCEEDED');
+    }
+    try {
+      const { data } = await axios({
+        baseURL: this.localApiUrl,
+        url,
+        method: 'post',
+        data: body,
+        headers: {
+          ...this.getAxiosHeaders(),
+          'Content-Type': contentType
+        }
+      });
+      return data;
+    } catch (e) {
+      if (e.response && e.response.status === 401 && e.response.data.message !== 'TABLET_IS_LOCKED') {
+        await this.refreshAccessToken();
+        return this.postBinary(url, body, contentType, retryCount + 1);
+      }
+      throw e;
+    }
+  }
+
   async patch(url, body) {
     return this.executeQuery('patch', url, {}, body);
   }

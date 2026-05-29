@@ -148,10 +148,29 @@ describe('POST /api/v1/gateway/stt', () => {
       .reply(200, { text: 'bonjour gladys' });
     const response = await authenticatedRequest
       .post('/api/v1/gateway/stt')
-      .send({ audio: Buffer.from('fake-audio').toString('base64') })
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.from('fake-audio'))
       .expect('Content-Type', /json/)
       .expect(200);
     expect(response.body).to.deep.equal({ text: 'bonjour gladys' });
+  });
+
+  it('should return 400 when audio body is empty', async () => {
+    await authenticatedRequest
+      .post('/api/v1/gateway/stt')
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.alloc(0))
+      .expect(400);
+  });
+});
+
+describe('POST /api/v1/gateway/voice', () => {
+  it('should return 400 when audio body is empty', async () => {
+    await authenticatedRequest
+      .post('/api/v1/gateway/voice')
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.alloc(0))
+      .expect(400);
   });
 });
 

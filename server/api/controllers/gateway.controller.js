@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
+const { getAudioBufferFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
   /**
@@ -139,10 +140,10 @@ module.exports = function GatewayController(gladys) {
    * @api {post} /api/v1/gateway/stt
    * @apiName stt
    * @apiGroup Gateway
-   * @apiParam {string} audio Base64-encoded audio data.
+   * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
    */
   async function stt(req, res) {
-    const audioBuffer = Buffer.from(req.body.audio, 'base64');
+    const audioBuffer = getAudioBufferFromRequest(req);
     const response = await gladys.gateway.stt(audioBuffer);
     res.json(response);
   }
@@ -151,10 +152,10 @@ module.exports = function GatewayController(gladys) {
    * @api {post} /api/v1/gateway/voice
    * @apiName processVoice
    * @apiGroup Gateway
-   * @apiParam {string} audio Base64-encoded audio data.
+   * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
    */
   async function processVoice(req, res) {
-    const audioBuffer = Buffer.from(req.body.audio, 'base64');
+    const audioBuffer = getAudioBufferFromRequest(req);
     const response = await gladys.gateway.processVoiceMessage({
       audio: audioBuffer,
       user: req.user,

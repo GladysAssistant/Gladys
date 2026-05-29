@@ -5,7 +5,7 @@ import cx from 'classnames';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import GladysPlusUpsell from '../../gateway/GladysPlusUpsell';
-import { recordUntilSilence, blobToBase64 } from '../../../utils/recordUntilSilence';
+import { recordUntilSilence } from '../../../utils/recordUntilSilence';
 import style from './style.css';
 
 const STATE = {
@@ -196,11 +196,12 @@ class VoiceAssistantBox extends Component {
     try {
       const audioBlob = await recordUntilSilence();
       this.setState({ uiState: STATE.PROCESSING });
-      const audioBase64 = await blobToBase64(audioBlob);
 
-      const result = await this.props.httpClient.post('/api/v1/gateway/voice', {
-        audio: audioBase64
-      });
+      const result = await this.props.httpClient.postBinary(
+        '/api/v1/gateway/voice',
+        audioBlob,
+        audioBlob.type || 'application/octet-stream'
+      );
 
       if (result.transcription) {
         this.setState({ transcription: result.transcription });
