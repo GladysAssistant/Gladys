@@ -8,15 +8,14 @@ const { Error403, Error429 } = require('../../../utils/httpErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const messageCreate = sinon.stub().resolves({});
-const messageFindAll = sinon.stub().resolves([]);
+const getPreviousQuestionsForUserStub = sinon.stub().resolves([]);
 
-const { processVoiceMessage, extractTranscriptionFromSttResponse, getPreviousQuestionsForUser } = proxyquire(
+const { processVoiceMessage, extractTranscriptionFromSttResponse } = proxyquire(
   '../../../lib/gateway/gateway.processVoiceMessage',
   {
     '../../models': {
       Message: {
         create: messageCreate,
-        findAll: messageFindAll,
       },
     },
   },
@@ -40,14 +39,17 @@ function buildContext(overrides = {}) {
     forwardMessageToAiChat: overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
     getTTSApiUrl: overrides.getTTSApiUrl || fake.resolves({ url: 'http://tts.test/audio.mp3' }),
     event: overrides.event === null ? null : overrides.event || { emit: fake() },
+    message: overrides.message || {
+      getPreviousQuestionsForUser: getPreviousQuestionsForUserStub,
+    },
   };
 }
 
 describe('gateway.processVoiceMessage helpers', () => {
   beforeEach(() => {
     messageCreate.resetHistory();
-    messageFindAll.resetHistory();
-    messageFindAll.resolves([]);
+    getPreviousQuestionsForUserStub.resetHistory();
+    getPreviousQuestionsForUserStub.resolves([]);
   });
 
   describe('extractTranscriptionFromSttResponse', () => {
@@ -84,61 +86,13 @@ describe('gateway.processVoiceMessage helpers', () => {
       expect(extractTranscriptionFromSttResponse({})).to.equal('');
     });
   });
-
-  describe('getPreviousQuestionsForUser', () => {
-    it('should pair user questions with assistant answers', async () => {
-      messageFindAll.resolves([
-        { sender_id: null, text: 'answer two' },
-        { sender_id: 'user-1', text: 'question two' },
-        { sender_id: null, text: 'answer one' },
-        { sender_id: 'user-1', text: 'question one' },
-      ]);
-
-      const exchanges = await getPreviousQuestionsForUser('user-1');
-
-      expect(exchanges).to.deep.equal([
-        { question: 'question one', answer: 'answer one' },
-        { question: 'question two', answer: 'answer two' },
-      ]);
-    });
-
-    it('should include orphan assistant messages', async () => {
-      messageFindAll.resolves([{ sender_id: null, text: 'proactive message' }]);
-
-      const exchanges = await getPreviousQuestionsForUser('user-1');
-
-      expect(exchanges).to.deep.equal([{ question: null, answer: 'proactive message' }]);
-    });
-
-    it('should return orphan assistant message before any user question', async () => {
-      messageFindAll.resolves([
-        { sender_id: 'user-1', text: 'unanswered question' },
-        { sender_id: null, text: 'orphan assistant' },
-      ]);
-
-      const exchanges = await getPreviousQuestionsForUser('user-1');
-
-      expect(exchanges).to.deep.equal([{ question: null, answer: 'orphan assistant' }]);
-    });
-
-    it('should treat assistant reply as orphan when user question text is empty', async () => {
-      messageFindAll.resolves([
-        { sender_id: null, text: 'assistant reply' },
-        { sender_id: 'user-1', text: '' },
-      ]);
-
-      const exchanges = await getPreviousQuestionsForUser('user-1');
-
-      expect(exchanges).to.deep.equal([{ question: null, answer: 'assistant reply' }]);
-    });
-  });
 });
 
 describe('gateway.processVoiceMessage', () => {
   beforeEach(() => {
     messageCreate.resetHistory();
-    messageFindAll.resetHistory();
-    messageFindAll.resolves([]);
+    getPreviousQuestionsForUserStub.resetHistory();
+    getPreviousQuestionsForUserStub.resolves([]);
   });
 
   it('should process voice end-to-end with websocket events', async () => {
@@ -154,6 +108,8 @@ describe('gateway.processVoiceMessage', () => {
     });
     sinonAssert.calledOnce(ctx.stt);
     sinonAssert.calledOnce(messageCreate);
+    sinonAssert.calledOnce(ctx.message.getPreviousQuestionsForUser);
+    sinonAssert.calledWith(ctx.message.getPreviousQuestionsForUser, user.id);
     sinonAssert.calledOnce(ctx.forwardMessageToAiChat);
     sinonAssert.calledOnce(ctx.getTTSApiUrl);
 

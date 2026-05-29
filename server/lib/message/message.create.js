@@ -1,8 +1,7 @@
-const { Op } = require('sequelize');
-
 const logger = require('../../utils/logger');
 const db = require('../../models');
 const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { getPreviousQuestionsForUser } = require('./message.getPreviousQuestionsForUser');
 
 /**
  * @public
@@ -38,38 +37,7 @@ async function create(message) {
     context = {
       user: message.user,
     };
-    const previousMessages = await db.Message.findAll({
-      where: {
-        [Op.or]: [{ sender_id: message.user.id }, { receiver_id: message.user.id }],
-      },
-      order: [['created_at', 'desc']],
-      limit: 8,
-    });
-
-    const previousQuestions = [];
-    let currentExchange = null;
-
-    // Process messages in chronological order to group exchanges
-    previousMessages.reverse().forEach((msg) => {
-      if (msg.sender_id !== null) {
-        // This is a user question
-        currentExchange = {
-          question: msg.text,
-          answer: null,
-        };
-      } else if (msg.sender_id === null && currentExchange && currentExchange.question && !currentExchange.answer) {
-        // This is an AI answer to the current question
-        currentExchange.answer = msg.text;
-        // Add the complete exchange to our list
-        previousQuestions.push({ ...currentExchange });
-        currentExchange = null;
-      } else if (msg.sender_id === null) {
-        previousQuestions.push({
-          question: null,
-          answer: msg.text,
-        });
-      }
-    });
+    const previousQuestions = await getPreviousQuestionsForUser(message.user.id);
 
     this.event.emit(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, { message, previousQuestions, context });
   }

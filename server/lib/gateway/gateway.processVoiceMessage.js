@@ -1,5 +1,3 @@
-const { Op } = require('sequelize');
-
 const logger = require('../../utils/logger');
 const db = require('../../models');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
@@ -21,46 +19,6 @@ function extractTranscriptionFromSttResponse(sttResponse) {
   }
   const text = sttResponse.text ?? sttResponse.transcription ?? sttResponse.transcript ?? '';
   return typeof text === 'string' ? text.trim() : '';
-}
-
-/**
- * @description Build previous chat exchanges for AI context.
- * @param {string} userId - Gladys user id.
- * @returns {Promise<Array<{question: string|null, answer: string|null}>>} Previous exchanges.
- * @example
- * getPreviousQuestionsForUser('user-uuid');
- */
-async function getPreviousQuestionsForUser(userId) {
-  const previousMessages = await db.Message.findAll({
-    where: {
-      [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
-    },
-    order: [['created_at', 'desc']],
-    limit: 8,
-  });
-
-  const previousQuestions = [];
-  let currentExchange = null;
-
-  previousMessages.reverse().forEach((msg) => {
-    if (msg.sender_id !== null) {
-      currentExchange = {
-        question: msg.text,
-        answer: null,
-      };
-    } else if (currentExchange && currentExchange.question && !currentExchange.answer) {
-      currentExchange.answer = msg.text;
-      previousQuestions.push({ ...currentExchange });
-      currentExchange = null;
-    } else {
-      previousQuestions.push({
-        question: null,
-        answer: msg.text,
-      });
-    }
-  });
-
-  return previousQuestions;
 }
 
 /**
@@ -114,7 +72,7 @@ async function processVoiceMessage({ audio, user }) {
       is_read: true,
     });
 
-    const previousQuestions = await getPreviousQuestionsForUser(userId);
+    const previousQuestions = await this.message.getPreviousQuestionsForUser(userId);
     const aiResult = await this.forwardMessageToAiChat({
       message,
       previousQuestions,
@@ -166,5 +124,4 @@ async function processVoiceMessage({ audio, user }) {
 module.exports = {
   processVoiceMessage,
   extractTranscriptionFromSttResponse,
-  getPreviousQuestionsForUser,
 };
