@@ -54,10 +54,7 @@ describe('gateway.controller voice endpoints', () => {
     const reqUser = { id: 'user-42', language: 'fr' };
     const audioBuffer = Buffer.from('voice');
 
-    await controller.processVoice(
-      { body: audioBuffer, headers: { 'content-type': 'audio/webm' }, user: reqUser },
-      res,
-    );
+    await controller.processVoice({ body: audioBuffer, headers: { 'content-type': 'audio/webm' }, user: reqUser }, res);
 
     sinonAssert.calledOnce(gladys.gateway.processVoiceMessage);
     expect(gladys.gateway.processVoiceMessage.firstCall.args[0]).to.deep.equal({
