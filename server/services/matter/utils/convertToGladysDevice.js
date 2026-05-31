@@ -63,6 +63,7 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
  * @param {object} clusterClient - The LevelControl cluster client.
  * @param {number} defaultMin - Fallback min level.
  * @param {number} defaultMax - Fallback max level.
+ * @example const { minLevel, maxLevel } = await getLevelControlMinMax(clusterClient);
  * @returns {Promise<{ minLevel: number, maxLevel: number }>} The min and max levels.
  */
 async function getLevelControlMinMax(clusterClient, defaultMin = 0, defaultMax = 254) {
