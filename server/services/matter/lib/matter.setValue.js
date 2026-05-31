@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const {
   OnOff,
   WindowCovering,
@@ -8,7 +9,8 @@ const {
   RvcOperationalState,
   RvcRunMode,
   RvcCleanMode,
-  // eslint-disable-next-line import/no-unresolved
+  MediaPlayback,
+  KeypadInput,
 } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
@@ -302,6 +304,75 @@ async function setValue(gladysDevice, gladysFeature, value) {
     const matterMode = convertGladysCleanModeToMatter(Number(value), supportedModesData);
     logger.debug(`Matter: Setting RvcCleanMode to ${matterMode} (Gladys value: ${value})`);
     await rvcCleanMode.changeToMode({ newMode: matterMode });
+  }
+
+  // Handle television media playback
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.TELEVISION &&
+    (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PLAY ||
+      gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PAUSE ||
+      gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.STOP)
+  ) {
+    const mediaPlayback = targetDevice.getClusterClientById(MediaPlayback.Complete.id);
+
+    if (!mediaPlayback) {
+      throw new Error('Device does not support MediaPlayback cluster');
+    }
+
+    if (value === 1) {
+      if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PLAY) {
+        await mediaPlayback.play();
+      } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.PAUSE) {
+        await mediaPlayback.pause();
+      } else if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.STOP) {
+        await mediaPlayback.stop();
+      }
+    }
+  }
+
+  // Handle television volume
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.TELEVISION &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.VOLUME
+  ) {
+    const levelControl = targetDevice.getClusterClientById(LevelControl.Complete.id);
+
+    if (!levelControl) {
+      throw new Error('Device does not support LevelControl cluster');
+    }
+
+    await levelControl.moveToLevel({
+      level: value,
+      transitionTime: null,
+      optionsMask: {
+        coupleColorTempToLevel: false,
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
+  }
+
+  // Handle television keypad input
+  if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
+    const keypadInputKeyByFeatureType = {
+      [DEVICE_FEATURE_TYPES.TELEVISION.UP]: 1,
+      [DEVICE_FEATURE_TYPES.TELEVISION.DOWN]: 2,
+      [DEVICE_FEATURE_TYPES.TELEVISION.LEFT]: 3,
+      [DEVICE_FEATURE_TYPES.TELEVISION.RIGHT]: 4,
+      [DEVICE_FEATURE_TYPES.TELEVISION.ENTER]: 43,
+      [DEVICE_FEATURE_TYPES.TELEVISION.RETURN]: 13,
+    };
+    const keyCode = keypadInputKeyByFeatureType[gladysFeature.type];
+
+    if (keyCode !== undefined) {
+      const keypadInput = targetDevice.getClusterClientById(KeypadInput.Complete.id);
+
+      if (!keypadInput) {
+        throw new Error('Device does not support KeypadInput cluster');
+      }
+
+      await keypadInput.sendKey({ keyCode });
+    }
   }
 }
 
