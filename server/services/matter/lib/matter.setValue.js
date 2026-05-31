@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 const {
   OnOff,
   WindowCovering,
@@ -11,6 +10,7 @@ const {
   RvcCleanMode,
   MediaPlayback,
   KeypadInput,
+  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
