@@ -76,6 +76,71 @@ describe('Matter.convertToGladysDevice', () => {
     });
   });
 
+  it('should create a light brightness feature for LevelControl lighting cluster', async () => {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
+      name: 'LevelControl',
+      endpointId: 3,
+      supportedFeatures: {
+        lighting: true,
+      },
+      getMinLevelAttribute: fake.resolves(10),
+      getMaxLevelAttribute: fake.resolves(200),
+    };
+
+    const device = {
+      name: 'Test Device',
+      number: 3,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '3');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'LevelControl - 3',
+      selector: gladysDevice.features[0].selector,
+      category: 'light',
+      type: 'brightness',
+      read_only: false,
+      has_feedback: true,
+      external_id: `matter:12345:3:${LevelControl.Complete.id}`,
+      min: 10,
+      max: 200,
+    });
+  });
+
+  it('should fallback to default min/max for LevelControl when attributes throw', async () => {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
+      name: 'LevelControl',
+      endpointId: 4,
+      supportedFeatures: {
+        lighting: true,
+      },
+      getMinLevelAttribute: async () => {
+        throw new Error('not supported');
+      },
+      getMaxLevelAttribute: async () => {
+        throw new Error('not supported');
+      },
+    };
+
+    const device = {
+      name: 'Test Device',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '4');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0].min).to.equal(0);
+    expect(gladysDevice.features[0].max).to.equal(254);
+  });
+
   it('should create television features for MediaPlayback cluster', async () => {
     const clusterClient = {
       id: MediaPlayback.Complete.id,
