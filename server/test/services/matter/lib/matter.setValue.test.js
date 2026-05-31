@@ -565,4 +565,575 @@ describe('Matter.setValue', () => {
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device not found for path 1:child_endpoint:2');
   });
+  it('should control television media playback (play)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const mediaPlayback = {
+      play: fake.resolves(null),
+      pause: fake.resolves(null),
+      stop: fake.resolves(null),
+    };
+    clusterClients.set(1286, mediaPlayback);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(mediaPlayback.play);
+    assert.notCalled(mediaPlayback.pause);
+    assert.notCalled(mediaPlayback.stop);
+  });
+
+  it('should control television media playback (pause)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.PAUSE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const mediaPlayback = {
+      play: fake.resolves(null),
+      pause: fake.resolves(null),
+      stop: fake.resolves(null),
+    };
+    clusterClients.set(1286, mediaPlayback);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(mediaPlayback.pause);
+    assert.notCalled(mediaPlayback.play);
+    assert.notCalled(mediaPlayback.stop);
+  });
+
+  it('should control television media playback (stop)', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.STOP,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const mediaPlayback = {
+      play: fake.resolves(null),
+      pause: fake.resolves(null),
+      stop: fake.resolves(null),
+    };
+    clusterClients.set(1286, mediaPlayback);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(mediaPlayback.stop);
+    assert.notCalled(mediaPlayback.play);
+    assert.notCalled(mediaPlayback.pause);
+  });
+
+  it('should control television volume', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+    };
+
+    const value = 42;
+
+    const clusterClients = new Map();
+
+    const levelControl = {
+      moveToLevel: fake.resolves(null),
+    };
+    clusterClients.set(8, levelControl);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(levelControl.moveToLevel);
+    assert.calledWith(levelControl.moveToLevel, {
+      level: value,
+      transitionTime: null,
+      optionsMask: {
+        coupleColorTempToLevel: false,
+        executeIfOff: true,
+      },
+      optionsOverride: {},
+    });
+  });
+
+  it('should send television keypad UP key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.UP,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 1 });
+  });
+
+  it('should send television keypad DOWN key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.DOWN,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 2 });
+  });
+
+  it('should send television keypad LEFT key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.LEFT,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 3 });
+  });
+
+  it('should send television keypad RIGHT key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.RIGHT,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 4 });
+  });
+
+  it('should send television keypad ENTER key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.ENTER,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 43 });
+  });
+
+  it('should send television keypad RETURN key', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.RETURN,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const keypadInput = {
+      sendKey: fake.resolves(null),
+    };
+    clusterClients.set(1289, keypadInput);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(keypadInput.sendKey);
+    assert.calledWith(keypadInput.sendKey, { keyCode: 13 });
+  });
+
+  it('should return an error if television media playback cluster is missing', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+    };
+
+    const value = 1;
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support MediaPlayback cluster');
+  });
+
+  it('should not call media playback commands when value is not 1', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+    };
+
+    const value = 0;
+    const clusterClients = new Map();
+
+    const mediaPlayback = {
+      play: fake.resolves(null),
+      pause: fake.resolves(null),
+      stop: fake.resolves(null),
+    };
+    clusterClients.set(1286, mediaPlayback);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.notCalled(mediaPlayback.play);
+    assert.notCalled(mediaPlayback.pause);
+    assert.notCalled(mediaPlayback.stop);
+  });
+
+  it('should return an error if television volume cluster is missing', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+    };
+
+    const value = 42;
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support LevelControl cluster');
+  });
+
+  it('should return an error if television keypad cluster is missing', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.UP,
+    };
+
+    const value = 1;
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: false,
+      connect: fake.resolves(null),
+      events: {
+        initialized: new Promise((resolve) => {
+          resolve();
+        }),
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support KeypadInput cluster');
+  });
 });
