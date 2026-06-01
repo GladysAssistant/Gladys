@@ -18,7 +18,11 @@ describe('getFanFeatureOptions', () => {
 
   it('should return all wind setting options when device supports them', () => {
     expect(
-      getFanFeatureOptions(DEVICE_FEATURE_TYPES.FAN.WIND_SETTING, FAN_WIND_SETTING.OFF, FAN_WIND_SETTING.SLEEP_AND_NATURAL),
+      getFanFeatureOptions(
+        DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+        FAN_WIND_SETTING.OFF,
+        FAN_WIND_SETTING.SLEEP_AND_NATURAL,
+      ),
     ).to.deep.equal([
       FAN_WIND_SETTING.OFF,
       FAN_WIND_SETTING.SLEEP,

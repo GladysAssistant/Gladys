@@ -164,7 +164,7 @@ class DeviceSetValue extends Component {
       [
         DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
         DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
-        DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+        DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
       ].includes(this.state.deviceFeature.type)
     ) {
       return (

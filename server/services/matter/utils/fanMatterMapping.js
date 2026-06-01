@@ -33,6 +33,8 @@ const GLADYS_FAN_MODE_TO_MATTER = {
  * @description Convert Matter FanMode attribute value to Gladys fan mode.
  * @param {number} matterFanMode - FanMode value from Matter device.
  * @returns {number} Gladys FAN_MODE value.
+ * @example
+ * const gladysMode = matterFanModeToGladys(5);
  */
 function matterFanModeToGladys(matterFanMode) {
   if (Object.prototype.hasOwnProperty.call(MATTER_FAN_MODE_TO_GLADYS, matterFanMode)) {
@@ -45,6 +47,8 @@ function matterFanModeToGladys(matterFanMode) {
  * @description Convert Gladys fan mode to Matter FanMode attribute value.
  * @param {number} gladysFanMode - Gladys FAN_MODE value.
  * @returns {number} Matter FanMode value.
+ * @example
+ * const matterMode = gladysFanModeToMatter(4);
  */
 function gladysFanModeToMatter(gladysFanMode) {
   if (Object.prototype.hasOwnProperty.call(GLADYS_FAN_MODE_TO_MATTER, gladysFanMode)) {

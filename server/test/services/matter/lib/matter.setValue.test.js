@@ -3,6 +3,7 @@ const { assert: chaiAssert } = require('chai');
 
 const { fake, assert } = sinon;
 
+// eslint-disable-next-line import/no-unresolved
 const { FanControl } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');

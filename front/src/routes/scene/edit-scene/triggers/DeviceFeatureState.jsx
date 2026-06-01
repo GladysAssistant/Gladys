@@ -64,14 +64,13 @@ class TurnOnLight extends Component {
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
-      fanModeDevice =
-        category === DEVICE_FEATURE_CATEGORIES.FAN && type === DEVICE_FEATURE_TYPES.FAN.MODE;
+      fanModeDevice = category === DEVICE_FEATURE_CATEGORIES.FAN && type === DEVICE_FEATURE_TYPES.FAN.MODE;
       fanLabeledDevice =
         category === DEVICE_FEATURE_CATEGORIES.FAN &&
         [
           DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
           DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
-          DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+          DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
         ].includes(type);
       levelSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;

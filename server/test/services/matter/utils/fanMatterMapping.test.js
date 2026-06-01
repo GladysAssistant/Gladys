@@ -1,10 +1,7 @@
 const { expect } = require('chai');
 
 const { FAN_MODE } = require('../../../../utils/constants');
-const {
-  matterFanModeToGladys,
-  gladysFanModeToMatter,
-} = require('../../../../services/matter/utils/fanMatterMapping');
+const { matterFanModeToGladys, gladysFanModeToMatter } = require('../../../../services/matter/utils/fanMatterMapping');
 
 describe('Matter fanMatterMapping', () => {
   it('should convert Matter fan modes to Gladys fan modes', () => {

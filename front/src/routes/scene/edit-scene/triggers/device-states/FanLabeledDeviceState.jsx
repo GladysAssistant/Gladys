@@ -16,9 +16,9 @@ class FanLabeledDeviceState extends Component {
 
     const options = getFanFeatureOptions(type, min, max).map(value => ({
       label: get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}.${value}`, {
-        default: value,
+        default: value
       }),
-      value,
+      value
     }));
 
     this.setState({ options });

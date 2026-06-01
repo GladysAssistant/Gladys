@@ -993,6 +993,8 @@ const FAN_SETTING_ENUM_BY_FEATURE_TYPE = {
  * @param {number} min - Minimum value supported by the device.
  * @param {number} max - Maximum value supported by the device.
  * @returns {number[]} List of option values.
+ * @example
+ * const options = getFanFeatureOptions('rock-setting', 0, 3);
  */
 function getFanFeatureOptions(featureType, min, max) {
   const minValue = typeof min === 'number' ? min : 0;
@@ -1000,7 +1002,7 @@ function getFanFeatureOptions(featureType, min, max) {
   const fanEnum = FAN_SETTING_ENUM_BY_FEATURE_TYPE[featureType];
 
   if (fanEnum) {
-    return Object.values(fanEnum).filter(value => value >= minValue && value <= maxValue);
+    return Object.values(fanEnum).filter((value) => value >= minValue && value <= maxValue);
   }
 
   const options = [];
