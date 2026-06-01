@@ -98,7 +98,6 @@ const SystemPage = ({ children, ...props }) => (
         <SettingsSystemDuckDbMigration />
         <SettingsSystemKeepDeviceHistory />
         <SettingsSystemTimeExpiryState />
-       
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
