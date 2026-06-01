@@ -30,11 +30,11 @@ function getAudioBufferFromRequest(req) {
 const DEFAULT_AUDIO_CONTENT_TYPE = 'application/octet-stream';
 
 /**
- * @description Read audio Content-Type from the request (forwarded to Gladys Plus STT).
- * @param {object} req - Express request.
+ * @description Normalize a Content-Type header value for audio STT.
+ * @param {string} [raw] - Raw Content-Type header or body field.
  * @returns {string} MIME type for the audio body.
  * @example
- * getAudioContentTypeFromRequest(req);
+ * normalizeAudioContentType('audio/wav; charset=binary');
  */
 function normalizeAudioContentType(raw) {
   if (!raw || typeof raw !== 'string') {
@@ -52,6 +52,13 @@ function normalizeAudioContentType(raw) {
   return DEFAULT_AUDIO_CONTENT_TYPE;
 }
 
+/**
+ * @description Read audio Content-Type from the request (forwarded to Gladys Plus STT).
+ * @param {object} req - Express request.
+ * @returns {string} MIME type for the audio body.
+ * @example
+ * getAudioContentTypeFromRequest(req);
+ */
 function getAudioContentTypeFromRequest(req) {
   if (req.body && req.body[GLADYS_GATEWAY_BINARY_BODY] === true && req.body.content_type) {
     return normalizeAudioContentType(req.body.content_type);
