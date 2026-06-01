@@ -11,7 +11,7 @@ import {
   isSpeechRecordingError,
   isSpeechRecordingSupported
 } from '../../../utils/speechMicrophoneAccess';
-import { preloadSpeechCommandRecorder } from '../../../utils/speechCommandRecorder';
+import { prepareSpeechCommandRecording, preloadSpeechCommandRecorder } from '../../../utils/speechCommandRecorder';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import { playSpeechTtsUrl, unlockSpeechTtsPlayback } from '../../../utils/speechTtsPlayback';
 import style from './style.css';
@@ -135,6 +135,19 @@ class VoiceAssistantBox extends Component {
   preloadVoiceRecorder = async () => {
     try {
       await preloadSpeechCommandRecorder();
+    } catch (e) {}
+  };
+
+  prepareVoiceRecording = async () => {
+    const { uiState } = this.state;
+    if (uiState !== STATE.IDLE && uiState !== STATE.ERROR) {
+      return;
+    }
+    if (!isSpeechRecordingSupported()) {
+      return;
+    }
+    try {
+      await prepareSpeechCommandRecording();
     } catch (e) {}
   };
 
@@ -501,6 +514,7 @@ class VoiceAssistantBox extends Component {
                 <button
                   type="button"
                   class={style.orbButton}
+                  onPointerDown={this.prepareVoiceRecording}
                   onClick={this.handleSpeakClick}
                   disabled={isBusy || needsGladysPlus || micBlocked}
                   aria-live="polite"

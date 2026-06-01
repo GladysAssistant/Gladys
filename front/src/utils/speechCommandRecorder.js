@@ -132,6 +132,9 @@ let workletUrl = null;
 let preloadedAudioContext = null;
 let preloadPromise = null;
 const loadedAudioContexts = new WeakSet();
+let preparedStream = null;
+let preparedStreamPromise = null;
+let preparedStreamCleanupTimeout = null;
 
 /**
  * @description Create an AbortError-compatible error.
@@ -171,6 +174,67 @@ function createAudioContext() {
  */
 function isAbortError(error) {
   return Boolean(error && (error.name === 'AbortError' || error.message === 'Aborted'));
+}
+
+/**
+ * @description Stop all tracks in a media stream.
+ * @param {MediaStream} stream - Media stream to stop.
+ * @returns {void}
+ * @example
+ * stopStream(stream);
+ */
+function stopStream(stream) {
+  stream.getTracks().forEach(track => track.stop());
+}
+
+/**
+ * @description Clear the prepared stream cleanup timer.
+ * @returns {void}
+ * @example
+ * clearPreparedStreamCleanup();
+ */
+function clearPreparedStreamCleanup() {
+  if (preparedStreamCleanupTimeout) {
+    clearTimeout(preparedStreamCleanupTimeout);
+    preparedStreamCleanupTimeout = null;
+  }
+}
+
+/**
+ * @description Schedule cleanup for a prepared stream if it is not consumed soon.
+ * @returns {void}
+ * @example
+ * schedulePreparedStreamCleanup();
+ */
+function schedulePreparedStreamCleanup() {
+  clearPreparedStreamCleanup();
+  preparedStreamCleanupTimeout = setTimeout(() => {
+    if (preparedStream) {
+      stopStream(preparedStream);
+      preparedStream = null;
+    }
+    preparedStreamPromise = null;
+    preparedStreamCleanupTimeout = null;
+  }, 5000);
+}
+
+/**
+ * @description Return true only when the browser reports an already-granted microphone permission.
+ * @returns {Promise<boolean>} Whether getUserMedia can be called without opening a permission prompt.
+ * @example
+ * isMicrophonePermissionAlreadyGranted();
+ */
+async function isMicrophonePermissionAlreadyGranted() {
+  if (typeof navigator === 'undefined' || !navigator.permissions || typeof navigator.permissions.query !== 'function') {
+    return false;
+  }
+
+  try {
+    const status = await navigator.permissions.query({ name: 'microphone' });
+    return status && status.state === 'granted';
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -273,6 +337,63 @@ export function preloadSpeechCommandRecorder() {
     preloadedAudioContext = null;
     return Promise.reject(e);
   }
+}
+
+/**
+ * @description Prepare microphone access before the click handler consumes it.
+ * @returns {Promise<void>} Resolves once the microphone stream is ready.
+ * @example
+ * prepareSpeechCommandRecording();
+ */
+export async function prepareSpeechCommandRecording() {
+  if (!(await isMicrophonePermissionAlreadyGranted())) {
+    return;
+  }
+  await preloadSpeechCommandRecorder();
+  if (preparedStream && preparedStream.active) {
+    schedulePreparedStreamCleanup();
+    return;
+  }
+  if (!preparedStreamPromise) {
+    const openPreparedStream = async () => {
+      try {
+        const stream = await getSpeechUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+        preparedStream = stream;
+        schedulePreparedStreamCleanup();
+        return stream;
+      } catch (e) {
+        preparedStream = null;
+        preparedStreamPromise = null;
+        throw e;
+      }
+    };
+    preparedStreamPromise = openPreparedStream();
+  }
+  await preparedStreamPromise;
+}
+
+/**
+ * @description Consume a previously prepared stream, or open one now.
+ * @returns {Promise<MediaStream>} Microphone stream.
+ * @example
+ * consumePreparedStream();
+ */
+async function consumePreparedStream() {
+  if (preparedStream && preparedStream.active) {
+    const stream = preparedStream;
+    preparedStream = null;
+    preparedStreamPromise = null;
+    clearPreparedStreamCleanup();
+    return stream;
+  }
+  if (preparedStreamPromise) {
+    const stream = await preparedStreamPromise;
+    preparedStream = null;
+    preparedStreamPromise = null;
+    clearPreparedStreamCleanup();
+    return stream;
+  }
+  return getSpeechUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
 }
 
 /**
@@ -560,7 +681,7 @@ export async function recordSpeechCommandUntilSilence(options = {}) {
   if (mergedOptions.signal && mergedOptions.signal.aborted) {
     throw createAbortError();
   }
-  const stream = await getSpeechUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+  const stream = await consumePreparedStream();
   try {
     try {
       return await recordWithAudioWorklet(stream, mergedOptions);
@@ -571,6 +692,6 @@ export async function recordSpeechCommandUntilSilence(options = {}) {
       return await recordWithScriptProcessor(stream, mergedOptions);
     }
   } finally {
-    stream.getTracks().forEach(track => track.stop());
+    stopStream(stream);
   }
 }
