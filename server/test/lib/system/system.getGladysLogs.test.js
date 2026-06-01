@@ -76,10 +76,7 @@ describe('system.getGladysLogs', () => {
   });
 
   it('demuxDockerLogs should stop on truncated frame', () => {
-    const buffer = Buffer.concat([
-      buildFrame(1, 'ok'),
-      Buffer.from([1, 0, 0, 0, 0, 0, 0, 100]),
-    ]);
+    const buffer = Buffer.concat([buildFrame(1, 'ok'), Buffer.from([1, 0, 0, 0, 0, 0, 0, 100])]);
     const result = demuxDockerLogs(buffer);
     expect(result.toString('utf8')).to.equal('ok');
   });
