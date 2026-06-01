@@ -104,6 +104,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {
@@ -111,6 +112,96 @@ describe('TuyaHandler.setValue', () => {
         { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
         { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
         { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should call local tuyapi-newgen for protocol 3.5', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.5');
+    }
+    function TuyAPINewGenStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
+        { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+    expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should call local tuyapi-newgen for protocol 3.4', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.4');
+    }
+    function TuyAPINewGenStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.4' },
         { name: DEVICE_PARAM_NAME.CLOUD_IP, value: '1.1.1.1' },
         { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
       ],
@@ -145,6 +236,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {
@@ -186,6 +278,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {
@@ -225,6 +318,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {
@@ -264,6 +358,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {
@@ -291,7 +386,7 @@ describe('TuyaHandler.setValue', () => {
     expect(ctx.connector.request.calledOnce).to.equal(true);
   });
 
-  it('should fallback to cloud when command is empty', async () => {
+  it('should throw when command is empty', async () => {
     const device = {
       params: [
         { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
@@ -311,9 +406,8 @@ describe('TuyaHandler.setValue', () => {
       gladys: {},
     };
 
-    await tuyaHandler.setValue.call(ctx, device, deviceFeature, 1);
-
-    expect(ctx.connector.request.calledOnce).to.equal(true);
+    await expect(tuyaHandler.setValue.call(ctx, device, deviceFeature, 1)).to.be.rejectedWith('have no command');
+    expect(ctx.connector.request.called).to.equal(false);
   });
 
   it('should log disconnect failures and still return on local success', async () => {
@@ -327,6 +421,7 @@ describe('TuyaHandler.setValue', () => {
     }
     const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     const device = {

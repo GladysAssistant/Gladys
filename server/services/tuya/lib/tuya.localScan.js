@@ -1,6 +1,6 @@
 const dgram = require('dgram');
-const { UDP_KEY } = require('tuyapi/lib/config');
-const { MessageParser } = require('tuyapi/lib/message-parser');
+const { UDP_KEY } = require('@demirdeniz/tuyapi-newgen/lib/config');
+const { MessageParser } = require('@demirdeniz/tuyapi-newgen/lib/message-parser');
 const logger = require('../../../utils/logger');
 const { mergeDevices } = require('../../../utils/device');
 const { convertDevice } = require('./device/tuya.convertDevice');
@@ -13,45 +13,61 @@ const {
 const DEFAULT_PORTS = [6666, 6667, 7000];
 /**
  * @description Scan local network for Tuya devices (UDP broadcast).
- * @param {object} options - Scan options.
- * @param {number} [options.timeoutSeconds=10] - Scan duration in seconds.
+ * @param {number|object} input - Scan duration in seconds or options.
  * @returns {Promise<object>} Map of deviceId -> { ip, version, productKey }.
  * @example
  * await localScan({ timeoutSeconds: 10 });
  */
-async function localScan(options = {}) {
-  const timeoutSeconds = options.timeoutSeconds || 10;
+async function localScan(input = 10) {
+  const options = typeof input === 'object' ? input || {} : { timeoutSeconds: input };
+  const parsedTimeout = Number(options.timeoutSeconds);
+  const timeoutSeconds = Number.isFinite(parsedTimeout) ? Math.min(Math.max(parsedTimeout, 1), 30) : 10;
   const devices = {};
   const portErrors = {};
   const sockets = [];
-  const parser = new MessageParser({ key: UDP_KEY, version: 3.1 });
+  const parsers = [
+    new MessageParser({ key: UDP_KEY, version: 3.1 }),
+    new MessageParser({ key: UDP_KEY, version: 3.4 }),
+    new MessageParser({ key: UDP_KEY, version: 3.5 }),
+  ];
 
   logger.info(`[Tuya][localScan] Starting udp scan for ${timeoutSeconds}s on ports ${DEFAULT_PORTS.join(', ')}`);
 
   const onMessage = (message, rinfo) => {
-    let payload;
     const byteLen = message ? message.length : 0;
     const remote = rinfo ? `${rinfo.address}:${rinfo.port}` : 'unknown';
     const source = rinfo && rinfo.source ? rinfo.source : 'udp';
     logger.debug(`[Tuya][localScan] Packet received (${source}) from ${remote} len=${byteLen}`);
-    try {
-      const parsed = parser.parse(message);
-      const safePayload =
-        parsed && parsed[0] && parsed[0].payload
-          ? {
-              gwId: parsed[0].payload.gwId,
-              devId: parsed[0].payload.devId,
-              id: parsed[0].payload.id,
-              version: parsed[0].payload.version,
-              hasIp: !!parsed[0].payload.ip,
-            }
-          : null;
-      logger.debug(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(safePayload)}`);
-      payload = parsed && parsed[0] && parsed[0].payload;
-    } catch (e) {
-      logger.info(`[Tuya][localScan] Unable to parse payload from ${remote} (len=${byteLen}): ${e.message}`);
+    let parsed = null;
+    let lastError = null;
+    for (let i = 0; i < parsers.length; i += 1) {
+      try {
+        parsed = parsers[i].parse(message);
+        break;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (!parsed) {
+      logger.info(
+        `[Tuya][localScan] Unable to parse payload from ${remote} (len=${byteLen}): ${
+          lastError ? lastError.message : 'unknown'
+        }`,
+      );
       return;
     }
+    const safePayload =
+      parsed && parsed[0] && parsed[0].payload
+        ? {
+            gwId: parsed[0].payload.gwId,
+            devId: parsed[0].payload.devId,
+            id: parsed[0].payload.id,
+            version: parsed[0].payload.version,
+            hasIp: !!parsed[0].payload.ip,
+          }
+        : null;
+    logger.debug(`[Tuya][localScan] Parsed packet from ${remote}: ${JSON.stringify(safePayload)}`);
+    const payload = parsed && parsed[0] && parsed[0].payload;
 
     if (!payload || typeof payload !== 'object') {
       logger.info(`[Tuya][localScan] Ignoring payload from ${remote} (len=${byteLen}): invalid payload`);
@@ -173,6 +189,7 @@ function buildLocalScanResponse(tuyaManager, localScanResult) {
     const localDiscoveredDevices = Object.entries(localDevicesById)
       .map(([deviceId, localInfo]) => buildLocalDiscoveredDevice(deviceId, localInfo))
       .map((device) => mergeWithExisting(device));
+    tuyaManager.discoveredDevices = localDiscoveredDevices;
     return {
       devices: localDiscoveredDevices,
       local_devices: localDevicesById,

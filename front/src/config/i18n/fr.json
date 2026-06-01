@@ -1391,8 +1391,6 @@
         "idLabel": "Identifiant de l'appareil",
         "localKeyLabel": "Clé locale",
         "protocolVersionLabel": "Version du protocole",
-        "protocol35OptionUnsupported": "3.5 (Non supporté)",
-        "protocolVersionRequired": "Le protocole 3.5 n'est pas encore supporté mais le sera prochainement.",
         "ipAddressLabel": "Adresse IP",
         "ipModeLocal": "Local",
         "ipModeCloud": "Cloud",

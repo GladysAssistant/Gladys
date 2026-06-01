@@ -16,6 +16,7 @@ describe('TuyaHandler.localPoll', () => {
   it('should throw if missing parameters', async () => {
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: function TuyAPIStub() {},
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({});
@@ -39,6 +40,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     const result = await localPoll({
       deviceId: 'device',
@@ -64,6 +66,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({
@@ -90,6 +93,9 @@ describe('TuyaHandler.localPoll', () => {
       .resolves({ dps: { 1: true } });
     const disconnect = sinon.stub().resolves();
     function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.5');
+    }
+    function TuyAPINewGenStub() {
       this.connect = connect;
       this.get = get;
       this.disconnect = disconnect;
@@ -97,6 +103,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
     });
     const result = await localPoll({
       deviceId: 'device',
@@ -107,6 +114,36 @@ describe('TuyaHandler.localPoll', () => {
     });
     expect(result).to.deep.equal({ dps: { 1: true } });
     expect(get.calledTwice).to.equal(true);
+  });
+
+  it('should route protocol 3.4 to tuyapi-newgen with a single schema attempt', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().resolves({ dps: { 1: true } });
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.4');
+    }
+    function TuyAPINewGenStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      attachEventHandlers(this);
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
+    });
+    const result = await localPoll({
+      deviceId: 'device',
+      ip: '1.1.1.1',
+      localKey: 'key',
+      protocolVersion: '3.4',
+    });
+    expect(result).to.deep.equal({ dps: { 1: true } });
+    expect(connect.calledOnce).to.equal(true);
+    expect(get.calledOnce).to.equal(true);
+    expect(get.firstCall.args[0]).to.deep.equal({ schema: true });
+    expect(disconnect.calledOnce).to.equal(true);
   });
 
   it('should throw on object without dps', async () => {
@@ -121,6 +158,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
     try {
       await localPoll({
@@ -151,6 +189,7 @@ describe('TuyaHandler.localPoll', () => {
       };
       const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
         tuyapi: TuyAPIStub,
+        '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
       });
       const promise = localPoll({
         deviceId: 'device',
@@ -177,6 +216,48 @@ describe('TuyaHandler.localPoll', () => {
     }
   });
 
+  it('should sanitize too-low timeoutMs before timing out', async () => {
+    const clock = sinon.useFakeTimers();
+    try {
+      const connect = sinon.stub().resolves();
+      const get = sinon.stub().returns(new Promise(() => {}));
+      const disconnect = sinon.stub().resolves();
+      const TuyAPIStub = function TuyAPIStub() {
+        this.connect = connect;
+        this.get = get;
+        this.disconnect = disconnect;
+        attachEventHandlers(this);
+      };
+      const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+        tuyapi: TuyAPIStub,
+        '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+      });
+      const promise = localPoll({
+        deviceId: 'device',
+        ip: '1.1.1.1',
+        localKey: 'key',
+        protocolVersion: '3.3',
+        timeoutMs: 10,
+      });
+      const errorPromise = (async () => {
+        try {
+          await promise;
+          return null;
+        } catch (error) {
+          return error;
+        }
+      })();
+      await clock.tickAsync(400);
+      expect(await Promise.race([errorPromise, Promise.resolve('pending')])).to.equal('pending');
+      await clock.tickAsync(100);
+      const error = await errorPromise;
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('Local poll timeout');
+    } finally {
+      clock.restore();
+    }
+  });
+
   it('should reject on socket error listener', async () => {
     const connect = sinon.stub().resolves();
     const get = sinon.stub().returns(new Promise(() => {}));
@@ -195,6 +276,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {
@@ -230,6 +312,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {
@@ -260,6 +343,7 @@ describe('TuyaHandler.localPoll', () => {
     }
     const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
       tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
     });
 
     try {

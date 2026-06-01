@@ -47,12 +47,12 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan({ timeoutSeconds: 1 });
+    const promise = localScan(1);
 
     // Trigger message on all sockets
     sockets.forEach((socket) => {
@@ -113,12 +113,12 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan({ timeoutSeconds: 1 });
+    const promise = localScan(1);
 
     sockets.forEach((socket) => {
       if (socket.handlers.message) {
@@ -143,6 +143,86 @@ describe('TuyaHandler.localScan', () => {
         7000: 'boom',
       },
     });
+  });
+
+  it('should skip message when all parsers fail', async () => {
+    const sockets = [];
+    const dgramStub = {
+      createSocket: () => {
+        const handlers = {};
+        const socket = {
+          on: (event, cb) => {
+            handlers[event] = cb;
+          },
+          bind: () => {},
+          close: () => {},
+          handlers,
+        };
+        sockets.push(socket);
+        return socket;
+      },
+    };
+
+    class MessageParserStub {
+      parse() {
+        throw new Error('invalid packet');
+      }
+    }
+
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+
+    sockets.forEach((socket) => {
+      if (socket.handlers.message) {
+        socket.handlers.message(Buffer.from('bad'));
+      }
+    });
+
+    await clock.tickAsync(1100);
+    const result = await promise;
+    clock.restore();
+
+    expect(result).to.deep.equal({
+      devices: {},
+      portErrors: {},
+    });
+  });
+
+  it('should instantiate parsers for protocols 3.1, 3.4 and 3.5', async () => {
+    const instances = [];
+    class MessageParserStub {
+      constructor(options) {
+        instances.push(options.version);
+      }
+
+      parse() {
+        return null;
+      }
+    }
+    const dgramStub = {
+      createSocket: () => ({
+        on: () => {},
+        bind: () => {},
+        close: () => {},
+      }),
+    };
+    const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      dgram: dgramStub,
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
+    });
+    const clock = sinon.useFakeTimers();
+    const promise = localScan(1);
+    await clock.tickAsync(1100);
+    await promise;
+    clock.restore();
+    expect(instances).to.deep.equal([3.1, 3.4, 3.5]);
   });
 
   it('should handle socket address errors on bind', async () => {
@@ -185,12 +265,12 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan({ timeoutSeconds: 1 });
+    const promise = localScan(1);
     await clock.tickAsync(1100);
     const result = await promise;
     clock.restore();
@@ -232,12 +312,12 @@ describe('TuyaHandler.localScan', () => {
 
     const { localScan } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
       dgram: dgramStub,
-      'tuyapi/lib/message-parser': { MessageParser: MessageParserStub },
-      'tuyapi/lib/config': { UDP_KEY: 'key' },
+      '@demirdeniz/tuyapi-newgen/lib/message-parser': { MessageParser: MessageParserStub },
+      '@demirdeniz/tuyapi-newgen/lib/config': { UDP_KEY: 'key' },
     });
 
     const clock = sinon.useFakeTimers();
-    const promise = localScan({ timeoutSeconds: 1 });
+    const promise = localScan(1);
     await clock.tickAsync(1100);
     await promise;
     clock.restore();
@@ -320,5 +400,33 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
     expect(response.devices).to.have.length(1);
     expect(response.devices[0].external_id).to.equal('tuya:device2');
     expect(response.local_devices).to.deep.equal({ device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } });
+  });
+
+  it('should persist local-only devices when discoveredDevices is not an array', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      './device/tuya.convertDevice': {
+        convertDevice: sinon.stub().callsFake((device) => ({
+          external_id: `tuya:${device.id}`,
+          params: [{ name: 'IP_ADDRESS', value: device.ip }],
+        })),
+      },
+    });
+    const tuyaManager = {
+      discoveredDevices: null,
+      gladys: {
+        stateManager: {
+          get: sinon.stub().returns(null),
+        },
+      },
+    };
+
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } },
+      portErrors: {},
+    });
+
+    expect(response.devices).to.have.length(1);
+    expect(tuyaManager.discoveredDevices).to.have.length(1);
+    expect(tuyaManager.discoveredDevices[0].external_id).to.equal('tuya:device2');
   });
 });

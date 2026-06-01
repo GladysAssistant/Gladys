@@ -1153,8 +1153,6 @@
         "idLabel": "Device ID",
         "localKeyLabel": "Local Key",
         "protocolVersionLabel": "Protocol Version",
-        "protocol35OptionUnsupported": "3.5 (Not supported)",
-        "protocolVersionRequired": "Protocol 3.5 is not yet supported but will be available soon.",
         "ipAddressLabel": "IP Address",
         "ipModeLocal": "Local",
         "ipModeCloud": "Cloud",
