@@ -3,8 +3,16 @@ const { assert: chaiAssert } = require('chai');
 
 const { fake, assert } = sinon;
 
+const { FanControl } = require('@matter/main/clusters');
+
 const MatterHandler = require('../../../../services/matter/lib');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  COVER_STATE,
+  FAN_MODE,
+  FAN_AIRFLOW_DIRECTION,
+} = require('../../../../utils/constants');
 
 describe('Matter.setValue', () => {
   let matterHandler;
@@ -564,5 +572,104 @@ describe('Matter.setValue', () => {
 
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device not found for path 1:child_endpoint:2');
+  });
+  it('should set fan mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:mode`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+      setPercentSettingAttribute: fake.resolves(null),
+      setSpeedSettingAttribute: fake.resolves(null),
+      setRockSettingAttribute: fake.resolves(null),
+      setWindSettingAttribute: fake.resolves(null),
+      setAirflowDirectionAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, FAN_MODE.AUTO);
+    assert.calledOnceWithExactly(clusterClient.setFanModeAttribute, 5);
+  });
+  it('should set fan percent speed', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:percent`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+      setPercentSettingAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 75);
+    assert.calledOnceWithExactly(clusterClient.setPercentSettingAttribute, 75);
+  });
+  it('should set fan airflow direction', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:airflow-direction`,
+    };
+
+    const clusterClient = {
+      setAirflowDirectionAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, FAN_AIRFLOW_DIRECTION.REVERSE);
+    assert.calledOnceWithExactly(clusterClient.setAirflowDirectionAttribute, FAN_AIRFLOW_DIRECTION.REVERSE);
   });
 });

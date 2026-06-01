@@ -17,10 +17,12 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  FanControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
+const { matterFanModeToGladys } = require('../utils/fanMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 
@@ -407,6 +409,89 @@ async function listenToStateChange(nodeId, devicePath, device) {
         state: value,
       });
     });
+  }
+
+  const fanControl = device.getClusterClientById(FanControl.Complete.id);
+  if (fanControl && !this.stateChangeListeners.has(fanControl)) {
+    logger.debug(`Matter: Adding state change listener for FanControl cluster ${fanControl.name}`);
+    this.stateChangeListeners.add(fanControl);
+    const fanBaseExternalId = `matter:${nodeId}:${devicePath}:${FanControl.Complete.id}`;
+
+    fanControl.addFanModeAttributeListener((value) => {
+      logger.debug(`Matter: FanControl FanMode attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${fanBaseExternalId}:mode`,
+        state: matterFanModeToGladys(value),
+      });
+    });
+
+    fanControl.addPercentSettingAttributeListener((value) => {
+      logger.debug(`Matter: FanControl PercentSetting attribute changed to ${value}`);
+      if (value !== null) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:percent`,
+          state: value,
+        });
+      }
+    });
+
+    fanControl.addPercentCurrentAttributeListener((value) => {
+      logger.debug(`Matter: FanControl PercentCurrent attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${fanBaseExternalId}:percent-current`,
+        state: value,
+      });
+    });
+
+    if (fanControl.supportedFeatures.multiSpeed) {
+      fanControl.addSpeedSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl SpeedSetting attribute changed to ${value}`);
+        if (value !== null) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `${fanBaseExternalId}:speed`,
+            state: value,
+          });
+        }
+      });
+
+      fanControl.addSpeedCurrentAttributeListener((value) => {
+        logger.debug(`Matter: FanControl SpeedCurrent attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:speed-current`,
+          state: value,
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.rocking) {
+      fanControl.addRockSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl RockSetting attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:rock`,
+          state: value,
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.wind) {
+      fanControl.addWindSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl WindSetting attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:wind`,
+          state: value,
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.airflowDirection) {
+      fanControl.addAirflowDirectionAttributeListener((value) => {
+        logger.debug(`Matter: FanControl AirflowDirection attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,
+          state: value,
+        });
+      });
+    }
   }
 }
 

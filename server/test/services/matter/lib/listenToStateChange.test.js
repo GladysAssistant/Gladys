@@ -17,6 +17,7 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  FanControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -24,7 +25,7 @@ const sinon = require('sinon');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE, BUTTON_STATUS } = require('../../../../utils/constants');
+const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE } = require('../../../../utils/constants');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -529,6 +530,59 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:113',
       state: 75,
+    });
+  });
+  it('should listen to state change (FanControl)', async () => {
+    const clusterClient = {
+      id: FanControl.Complete.id,
+      supportedFeatures: {
+        multiSpeed: true,
+        rocking: true,
+        wind: true,
+        airflowDirection: true,
+      },
+      addFanModeAttributeListener: (callback) => {
+        callback(5);
+      },
+      addPercentSettingAttributeListener: (callback) => {
+        callback(50);
+      },
+      addPercentCurrentAttributeListener: (callback) => {
+        callback(48);
+      },
+      addSpeedSettingAttributeListener: (callback) => {
+        callback(5);
+      },
+      addSpeedCurrentAttributeListener: (callback) => {
+        callback(5);
+      },
+      addRockSettingAttributeListener: (callback) => {
+        callback(1);
+      },
+      addWindSettingAttributeListener: (callback) => {
+        callback(1);
+      },
+      addAirflowDirectionAttributeListener: (callback) => {
+        callback(0);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    const fanBaseExternalId = `matter:1234:1:${FanControl.Complete.id}`;
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:mode`,
+      state: FAN_MODE.AUTO,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:percent`,
+      state: 50,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,
+      state: 0,
     });
   });
 });

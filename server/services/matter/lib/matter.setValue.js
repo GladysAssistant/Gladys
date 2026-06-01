@@ -1,8 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
-const { OnOff, WindowCovering, LevelControl, ColorControl, Thermostat } = require('@matter/main/clusters');
+const { OnOff, WindowCovering, LevelControl, ColorControl, Thermostat, FanControl } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
+const { gladysFanModeToMatter } = require('../utils/fanMatterMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -185,6 +186,40 @@ async function setValue(gladysDevice, gladysFeature, value) {
   ) {
     const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
+  }
+
+  // Handle fan control (Matter FanControl cluster)
+  if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.FAN) {
+    const fanControl = targetDevice.getClusterClientById(FanControl.Complete.id);
+    if (!fanControl) {
+      throw new Error('Device does not support FanControl cluster');
+    }
+
+    const externalIdParts = gladysFeature.external_id.split(':');
+    const fanFeatureSuffix = externalIdParts[externalIdParts.length - 1];
+
+    switch (fanFeatureSuffix) {
+      case 'mode':
+        await fanControl.setFanModeAttribute(gladysFanModeToMatter(value));
+        break;
+      case 'percent':
+        await fanControl.setPercentSettingAttribute(value);
+        break;
+      case 'speed':
+        await fanControl.setSpeedSettingAttribute(value);
+        break;
+      case 'rock':
+        await fanControl.setRockSettingAttribute(value);
+        break;
+      case 'wind':
+        await fanControl.setWindSettingAttribute(value);
+        break;
+      case 'airflow-direction':
+        await fanControl.setAirflowDirectionAttribute(value);
+        break;
+      default:
+        throw new Error(`Unsupported FanControl feature suffix: ${fanFeatureSuffix}`);
+    }
   }
 }
 

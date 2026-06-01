@@ -11,6 +11,8 @@ import ThresholdDeviceState from './device-states/ThresholdDeviceState';
 import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
 import PilotWireModeDeviceState from './device-states/PilotWireModeDeviceState';
+import FanModeDeviceState from './device-states/FanModeDeviceState';
+import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
 
@@ -50,6 +52,8 @@ class TurnOnLight extends Component {
     let presenceDevice = false;
     let buttonClickDevice = false;
     let pilotWireModeDevice = false;
+    let fanModeDevice = false;
+    let fanLabeledDevice = false;
     let levelSensorDevice = false;
     let levelMatterSensorDevice = false;
 
@@ -60,6 +64,15 @@ class TurnOnLight extends Component {
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
+      fanModeDevice =
+        category === DEVICE_FEATURE_CATEGORIES.FAN && type === DEVICE_FEATURE_TYPES.FAN.MODE;
+      fanLabeledDevice =
+        category === DEVICE_FEATURE_CATEGORIES.FAN &&
+        [
+          DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+          DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+          DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+        ].includes(type);
       levelSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;
       levelMatterSensorDevice = category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR;
@@ -71,6 +84,8 @@ class TurnOnLight extends Component {
       !presenceDevice &&
       !buttonClickDevice &&
       !pilotWireModeDevice &&
+      !fanModeDevice &&
+      !fanLabeledDevice &&
       !levelSensorDevice &&
       !levelMatterSensorDevice;
 
@@ -79,6 +94,8 @@ class TurnOnLight extends Component {
       !presenceDevice &&
       !buttonClickDevice &&
       !pilotWireModeDevice &&
+      !fanModeDevice &&
+      !fanLabeledDevice &&
       !levelSensorDevice &&
       !levelMatterSensorDevice;
 
@@ -97,6 +114,8 @@ class TurnOnLight extends Component {
           {presenceDevice && <PresenceSensorDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
           {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
+          {fanModeDevice && <FanModeDeviceState {...props} />}
+          {fanLabeledDevice && <FanLabeledDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
           {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}

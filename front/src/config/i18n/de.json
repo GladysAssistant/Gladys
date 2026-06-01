@@ -3725,6 +3725,37 @@
           "86": "Doppelt Aus"
         }
       },
+      "fan": {
+        "mode": {
+          "0": "Aus",
+          "1": "Niedrig",
+          "2": "Mittel",
+          "3": "Hoch",
+          "4": "Auto"
+        },
+        "percent": {},
+        "speed": {},
+        "airflow-direction": {
+          "0": "Vorwärts",
+          "1": "Rückwärts"
+        },
+        "rock-setting": {
+          "0": "Aus",
+          "1": "Links/Rechts",
+          "2": "Hoch/Runter",
+          "3": "Links/Rechts + Hoch/Runter",
+          "4": "Rund",
+          "5": "Links/Rechts + Rund",
+          "6": "Hoch/Runter + Rund",
+          "7": "Alle"
+        },
+        "wind-setting": {
+          "0": "Aus",
+          "1": "Schlafwind",
+          "2": "Naturwind",
+          "3": "Schlaf- + Naturwind"
+        }
+      },
       "heater": {
         "pilot-wire-mode": {
           "0": "Aus",
@@ -4200,6 +4231,15 @@
     "uv-sensor": {
       "shortCategoryName": "UV-Sensor",
       "integer": "UV-Index"
+    },
+    "fan": {
+      "shortCategoryName": "Ventilator",
+      "mode": "Ventilatormodus",
+      "percent": "Geschwindigkeit (%)",
+      "speed": "Geschwindigkeit (Stufe)",
+      "airflow-direction": "Luftstromrichtung",
+      "rock-setting": "Schwenken",
+      "wind-setting": "Windmodus"
     },
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA-Filterüberwachung",

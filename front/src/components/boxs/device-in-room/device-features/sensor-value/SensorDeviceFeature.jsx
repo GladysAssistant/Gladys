@@ -18,6 +18,7 @@ import NoRecentValueBadge from './NoRecentValueBadge';
 import TemperatureSensorDeviceValue from './TemperatureSensorDeviceValue';
 import LevelSensorDeviceValue from './LevelSensorDeviceValue';
 import PressureSensorDeviceValue from './PressureSensorDeviceValue';
+import FanSensorDeviceValue from './FanSensorDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
@@ -32,7 +33,8 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: PressureSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_DRIVE]: DistanceSensorDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: DistanceSensorDeviceValue
+  [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.FAN]: FanSensorDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {

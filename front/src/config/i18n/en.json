@@ -3725,6 +3725,37 @@
           "86": "Off double"
         }
       },
+      "fan": {
+        "mode": {
+          "0": "Off",
+          "1": "Low",
+          "2": "Medium",
+          "3": "High",
+          "4": "Auto"
+        },
+        "percent": {},
+        "speed": {},
+        "airflow-direction": {
+          "0": "Forward",
+          "1": "Reverse"
+        },
+        "rock-setting": {
+          "0": "Off",
+          "1": "Left/Right",
+          "2": "Up/Down",
+          "3": "Left/Right + Up/Down",
+          "4": "Round",
+          "5": "Left/Right + Round",
+          "6": "Up/Down + Round",
+          "7": "All"
+        },
+        "wind-setting": {
+          "0": "Off",
+          "1": "Sleep wind",
+          "2": "Natural wind",
+          "3": "Sleep + Natural wind"
+        }
+      },
       "heater": {
         "pilot-wire-mode": {
           "0": "Off",
@@ -4200,6 +4231,15 @@
     "uv-sensor": {
       "shortCategoryName": "UV Sensor",
       "integer": "UV Index"
+    },
+    "fan": {
+      "shortCategoryName": "Fan",
+      "mode": "Fan mode",
+      "percent": "Fan speed (%)",
+      "speed": "Fan speed (level)",
+      "airflow-direction": "Airflow direction",
+      "rock-setting": "Rocking",
+      "wind-setting": "Wind mode"
     },
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA filter monitoring",
