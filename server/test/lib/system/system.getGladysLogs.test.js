@@ -75,6 +75,15 @@ describe('system.getGladysLogs', () => {
     expect(result.length).to.equal(0);
   });
 
+  it('demuxDockerLogs should stop on truncated frame', () => {
+    const buffer = Buffer.concat([
+      buildFrame(1, 'ok'),
+      Buffer.from([1, 0, 0, 0, 0, 0, 0, 100]),
+    ]);
+    const result = demuxDockerLogs(buffer);
+    expect(result.toString('utf8')).to.equal('ok');
+  });
+
   it('should throw PlatformNotCompatible when not running in Docker', async () => {
     system.dockerode = undefined;
     try {
@@ -124,6 +133,13 @@ describe('system.getGladysLogs', () => {
     expect(result.size).to.equal(3);
     expect(result.length).to.equal(0);
     expect(result.content_base64).to.equal('');
+  });
+
+  it('should convert non-buffer container logs to a buffer', async () => {
+    system.getGladysContainerId = fake.resolves('abc123');
+    system.getContainerLogs = fake.resolves('plain logs\n');
+    const result = await system.getGladysLogs({ offset: 0, limit: 1024, refresh: true });
+    expect(Buffer.from(result.content_base64, 'base64').toString('utf8')).to.equal('plain logs\n');
   });
 
   it('should call getContainerLogs with a bounded tail line count', async () => {
