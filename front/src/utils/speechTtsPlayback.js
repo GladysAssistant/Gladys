@@ -1,6 +1,5 @@
 /** Minimal silent WAV — play() during a user gesture unlocks TTS on iOS / Safari. */
-const SILENT_WAV_DATA_URL =
-  'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+const SILENT_WAV_DATA_URL = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
 /**
  * @description Unlock HTMLAudioElement playback in the current user-gesture stack (call before any await).
@@ -17,7 +16,7 @@ export function unlockSpeechTtsPlayback(audio) {
     },
     () => {
       /* Strict autoplay policies: TTS may still fail later; response text remains visible. */
-    },
+    }
   );
 }
 
