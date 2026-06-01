@@ -11,6 +11,7 @@ import {
   isSpeechRecordingError,
   isSpeechRecordingSupported
 } from '../../../utils/speechMicrophoneAccess';
+import { preloadSpeechCommandRecorder } from '../../../utils/speechCommandRecorder';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import { playSpeechTtsUrl, unlockSpeechTtsPlayback } from '../../../utils/speechTtsPlayback';
 import style from './style.css';
@@ -33,6 +34,24 @@ const VOICE_ASSISTANT_UPSELL_PROPS = {
   titleKey: 'gladysPlusUpsell.voiceAssistant.title',
   descriptionKey: 'gladysPlusUpsell.voiceAssistant.compactDescription'
 };
+
+/** Download the audio instead of calling /api/v1/gateway/voice. */
+const DEBUG_DOWNLOAD_RECORDING = false;
+
+/**
+ * @description Trigger a browser download of a recorded audio blob (local debug).
+ * @param {Blob} blob - Audio blob to save.
+ */
+function downloadRecordedAudioForDebug(blob) {
+  const type = (blob.type || 'audio/wav').toLowerCase();
+  const extension = type.includes('wav') ? 'wav' : type.includes('webm') ? 'webm' : 'audio';
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `voice-assistant-debug-${Date.now()}.${extension}`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 /**
  * @description Extract a readable error message from an HTTP client error.
@@ -113,9 +132,18 @@ class VoiceAssistantBox extends Component {
 
   activeVoiceAbortController = null;
 
+  preloadVoiceRecorder = async () => {
+    try {
+      await preloadSpeechCommandRecorder();
+    } catch (e) {}
+  };
+
   componentDidMount() {
     this._isMounted = true;
     this.fetchGatewayStatus();
+    if (isSpeechRecordingSupported()) {
+      this.preloadVoiceRecorder();
+    }
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.TRANSCRIPTION,
       this.onTranscriptionWebsocket
@@ -320,7 +348,7 @@ class VoiceAssistantBox extends Component {
 
     this.safeSetState(
       {
-        uiState: STATE.LISTENING,
+        uiState: STATE.PROCESSING,
         transcription: '',
         response: '',
         errorType: null,
@@ -330,13 +358,30 @@ class VoiceAssistantBox extends Component {
     );
 
     try {
-      const recordedBlob = await recordUntilSilence({ signal: abortController.signal });
+      const recordedBlob = await recordUntilSilence({
+        signal: abortController.signal,
+        onReady: () => {
+          this.safeSetState({ uiState: STATE.LISTENING }, voiceSessionGeneration);
+        }
+      });
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
         return;
       }
 
       const audioBlob = await normalizeSpeechBlobForStt(recordedBlob);
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
+        return;
+      }
+
+      if (DEBUG_DOWNLOAD_RECORDING) {
+        downloadRecordedAudioForDebug(audioBlob);
+        this.safeSetState(
+          {
+            uiState: STATE.IDLE,
+            transcription: `Debug: téléchargé (${audioBlob.size} octets, ${audioBlob.type || 'audio/wav'})`
+          },
+          voiceSessionGeneration
+        );
         return;
       }
 

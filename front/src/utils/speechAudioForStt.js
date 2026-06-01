@@ -152,9 +152,6 @@ export async function normalizeSpeechBlobForStt(blob) {
   if (isWavBlob(blob)) {
     return blob;
   }
-  if (isWebmOrOggBlob(blob)) {
-    return blob;
-  }
 
   try {
     return await convertBlobToWav(blob);
