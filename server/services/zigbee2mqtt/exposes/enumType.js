@@ -64,7 +64,9 @@ addMapping('action', BUTTON_STATUS.DROP, 'drop');
 addMapping('action', BUTTON_STATUS.EMERGENCY, 'emergency');
 addMapping('action', BUTTON_STATUS.DISARM, 'disarm');
 addMapping('action', BUTTON_STATUS.ARM_DAY_ZONES, 'arm_day_zones');
+addMapping('action', BUTTON_STATUS.ARM_NIGHT_ZONES, 'arm_night_zones');
 addMapping('action', BUTTON_STATUS.ARM_ALL_ZONES, 'arm_all_zones');
+addMapping('action', BUTTON_STATUS.EXIT_DELAY, 'exit_delay');
 
 addMapping('action', BUTTON_STATUS.ON_PRESS, 'on-press');
 addMapping('action', BUTTON_STATUS.ON_HOLD, 'on-hold');

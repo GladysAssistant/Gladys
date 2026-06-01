@@ -3689,7 +3689,9 @@
           "83": "Relâchement Centre",
           "84": "Relâchement Moins",
           "85": "On clic double",
-          "86": "Off clic double"
+          "86": "Off clic double",
+          "87": "Armer zones nuit",
+          "88": "Délai de sortie"
         }
       },
       "heater": {
