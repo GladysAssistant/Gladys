@@ -454,7 +454,13 @@
         "selectDeviceLabel": "Wählen Sie die Funktion aus, die angezeigt werden soll",
         "noDeviceFeatureSelector": "Keine Funktion ausgewählt",
         "errorLoadingDevice": "Ein Fehler ist aufgetreten, während das Gerät geladen wird",
-        "noDeviceFeatureLastValue": "Diese Funktion hat noch keinen Wert empfangen"
+        "noDeviceFeatureLastValue": "Diese Funktion hat noch keinen Wert empfangen",
+        "thresholdsLabel": "Benutzerdefinierte Schwellenwerte konfigurieren",
+        "thresholdsNoRange": "Für die ausgewählte Funktion ist kein Minimal- oder Maximalwert definiert, Schwellenwerte können nicht konfiguriert werden.",
+        "colorLowLabel": "Farbe unterhalb des unteren Schwellenwerts",
+        "colorInRangeLabel": "Farbe zwischen den Schwellenwerten",
+        "colorHighLabel": "Farbe oberhalb des oberen Schwellenwerts",
+        "thresholdsLegendLabel": "Schwellenwerte:"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
