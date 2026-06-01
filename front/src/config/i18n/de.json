@@ -285,7 +285,8 @@
       "scene": "Szene",
       "music": "Musik",
       "gauge": "Messanzeige",
-      "energy-consumption": "Energieverbrauch"
+      "energy-consumption": "Energieverbrauch",
+      "voice-assistant": "Sprachassistent"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -492,6 +493,21 @@
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
         "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
+      },
+      "voice-assistant": {
+        "speak": "Sprechen",
+        "listening": "Ich höre zu...",
+        "listeningHint": "Sprechen Sie. Die Aufnahme stoppt bei Stille.",
+        "processing": "Verarbeitung...",
+        "speaking": "Antwort...",
+        "transcriptionLabel": "Sie sagten",
+        "responseLabel": "Antwort",
+        "error": "Ein Fehler ist aufgetreten. Prüfen Sie, ob Gladys Plus verbunden ist.",
+        "errorInsecureContext": "Das Mikrofon erfordert eine sichere Verbindung. Öffnen Sie Gladys über Gladys Plus unter <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Erlauben Sie Safari den Mikrofonzugriff unter Einstellungen > Safari > Mikrofon.",
+        "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar.",
+        "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
+        "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       }
     }
   },
@@ -3253,6 +3269,14 @@
       "feature1": "Licht an, durch Sprache",
       "feature2": "Funktioniert mit Google Nest, Google Home und der Google-Assistant-App",
       "feature3": "Keine Portfreigabe, alles läuft über das verschlüsselte Gladys Plus"
+    },
+    "voiceAssistant": {
+      "title": "Gladys-Sprachassistent mit Gladys Plus",
+      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Mistral-KI-Antworten und Sprachausgabe.",
+      "compactDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
+      "feature1": "Sprich mit Gladys vom Dashboard",
+      "feature2": "Live-Transkription und Antwort",
+      "feature3": "Antwort wird auf deinem Gerät vorgelesen"
     },
     "askAi": {
       "title": "Diese Aktion erfordert Gladys Plus",

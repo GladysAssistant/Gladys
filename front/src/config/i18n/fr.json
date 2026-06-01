@@ -285,7 +285,8 @@
       "scene": "Scène",
       "music": "Musique",
       "gauge": "Jauge",
-      "energy-consumption": "Consommation Énergétique"
+      "energy-consumption": "Consommation Énergétique",
+      "voice-assistant": "Assistant vocal"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -492,6 +493,21 @@
         "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
         "showSubscriptionPrices": "Afficher les prix d'abonnement",
         "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
+      },
+      "voice-assistant": {
+        "speak": "Parler",
+        "listening": "J'écoute...",
+        "listeningHint": "Parlez, j'arrête d'enregistrer quand vous vous taisez.",
+        "processing": "Traitement...",
+        "speaking": "Réponse...",
+        "transcriptionLabel": "Vous avez dit",
+        "responseLabel": "Réponse",
+        "error": "Une erreur est survenue. Vérifiez que Gladys Plus est connecté.",
+        "errorInsecureContext": "Le micro nécessite une connexion sécurisée. Ouvrez Gladys sur Gladys Plus à <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Autorisez l'accès au micro pour Safari dans Réglages > Safari > Microphone.",
+        "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur.",
+        "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
+        "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
       }
     }
   },
@@ -3253,6 +3269,14 @@
       "feature1": "Allume la lumière à la voix",
       "feature2": "Compatible avec Google Nest, Google Home et l'app Google Assistant",
       "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "voiceAssistant": {
+      "title": "Assistant vocal Gladys avec Gladys Plus",
+      "description": "Gladys Plus alimente l'assistant vocal du tableau de bord : transcription de ta voix, réponse par l'IA Mistral et lecture à voix haute.",
+      "compactDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
+      "feature1": "Parle à Gladys depuis le tableau de bord",
+      "feature2": "Transcription et réponse en temps réel",
+      "feature3": "Réponse lue à voix haute sur ton appareil"
     },
     "askAi": {
       "title": "Cette action nécessite Gladys Plus",

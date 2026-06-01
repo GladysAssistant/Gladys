@@ -285,7 +285,8 @@
       "scene": "Scene",
       "music": "Music",
       "gauge": "Gauge",
-      "energy-consumption": "Energy Consumption"
+      "energy-consumption": "Energy Consumption",
+      "voice-assistant": "Voice assistant"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -492,6 +493,21 @@
       },
       "music": {
         "selectDeviceLabel": "Select device to control"
+      },
+      "voice-assistant": {
+        "speak": "Speak",
+        "listening": "Listening...",
+        "listeningHint": "Speak now. Recording stops when you are silent.",
+        "processing": "Processing...",
+        "speaking": "Speaking...",
+        "transcriptionLabel": "You said",
+        "responseLabel": "Response",
+        "error": "Something went wrong. Make sure Gladys Plus is connected.",
+        "errorInsecureContext": "The microphone requires a secure connection. Open Gladys on Gladys Plus at <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Allow microphone access for Safari in Settings > Safari > Microphone.",
+        "errorNotSupported": "Voice recording is not available in this browser.",
+        "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
+        "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       }
     }
   },
@@ -3253,6 +3269,14 @@
       "feature1": "Turn lights on by voice",
       "feature2": "Works with Google Nest, Google Home and the Google Assistant app",
       "feature3": "No port forwarding, everything goes through encrypted Gladys Plus"
+    },
+    "voiceAssistant": {
+      "title": "Gladys voice assistant with Gladys Plus",
+      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, Mistral AI replies and text-to-speech playback.",
+      "compactDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
+      "feature1": "Talk to Gladys from your dashboard",
+      "feature2": "Live transcription and response",
+      "feature3": "Answer read aloud on your device"
     },
     "askAi": {
       "title": "This action requires Gladys Plus",

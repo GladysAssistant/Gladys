@@ -369,6 +369,20 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.aiChat,
     },
+    'post /api/v1/gateway/stt': {
+      authenticated: true,
+      audioRawBody: true,
+      controller: gatewayController.stt,
+    },
+    'post /api/v1/gateway/voice': {
+      authenticated: true,
+      audioRawBody: true,
+      controller: gatewayController.processVoice,
+    },
+    'post /api/v1/gateway/tts': {
+      authenticated: true,
+      controller: gatewayController.getTtsUrl,
+    },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,
       admin: true,
