@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
+const { getAudioBufferFromRequest, getAudioContentTypeFromRequest } = require('../utils/getAudioBufferFromRequest');
 
 module.exports = function GatewayController(gladys) {
   /**
@@ -126,12 +127,53 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/gateway/openai/ask
-   * @apiName askOpenAI
+   * @api {post} /api/v1/gateway/aichat/chat
+   * @apiName aiChat
    * @apiGroup Gateway
    */
-  async function openAIAsk(req, res) {
-    const response = await gladys.gateway.openAIAsk(req.body);
+  async function aiChat(req, res) {
+    const response = await gladys.gateway.aiChat(req.body);
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/stt
+   * @apiName stt
+   * @apiGroup Gateway
+   * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
+   */
+  async function stt(req, res) {
+    const audioBuffer = getAudioBufferFromRequest(req);
+    const contentType = getAudioContentTypeFromRequest(req);
+    const response = await gladys.gateway.stt(audioBuffer, contentType);
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/voice
+   * @apiName processVoice
+   * @apiGroup Gateway
+   * @apiParam {Binary} body Raw audio (application/octet-stream or audio/*).
+   */
+  async function processVoice(req, res) {
+    const audioBuffer = getAudioBufferFromRequest(req);
+    const contentType = getAudioContentTypeFromRequest(req);
+    const response = await gladys.gateway.processVoiceMessage({
+      audio: audioBuffer,
+      contentType,
+      user: req.user,
+    });
+    res.json(response);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/tts
+   * @apiName getTtsUrl
+   * @apiGroup Gateway
+   * @apiParam {string} text Text to synthesize.
+   */
+  async function getTtsUrl(req, res) {
+    const response = await gladys.gateway.getTTSApiUrl(req.body);
     res.json(response);
   }
 
@@ -157,7 +199,10 @@ module.exports = function GatewayController(gladys) {
     restoreBackup: asyncMiddleware(restoreBackup),
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
-    openAIAsk: asyncMiddleware(openAIAsk),
+    aiChat: asyncMiddleware(aiChat),
+    stt: asyncMiddleware(stt),
+    processVoice: asyncMiddleware(processVoice),
+    getTtsUrl: asyncMiddleware(getTtsUrl),
     refreshLatestGladysVersion: asyncMiddleware(refreshLatestGladysVersion),
   });
 };

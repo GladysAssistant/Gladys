@@ -1,0 +1,462 @@
+const fs = require('fs');
+const path = require('path');
+
+const logger = require('../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { Error429 } = require('../../utils/httpErrors');
+const { resizeImage } = require('../../utils/resizeImage');
+const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
+
+const MAX_TOOL_CALL_ITERATIONS = 5;
+const DEFAULT_MAX_TOKENS_PER_TURN = 512;
+const MAX_TOOL_RESULT_CHARS = 4000;
+const MAX_FALLBACK_ANSWER_CHARS = 2000;
+const MAX_NESTED_VALUE_CHARS = 2000;
+
+const promptPath = path.join(__dirname, '../../config/prompts/aiChat.prompt.txt');
+const SYSTEM_PROMPT = fs.readFileSync(promptPath, 'utf8');
+
+/**
+ * @description Return MCP handler from service manager.
+ * @param {object} serviceManager - Service manager instance.
+ * @returns {object} MCP handler.
+ * @example
+ * const mcpHandler = getMcpHandler(this.serviceManager);
+ */
+function getMcpHandler(serviceManager) {
+  const mcpService = serviceManager.getService('mcp');
+  if (!mcpService?.mcpHandler) {
+    throw new Error('MCP service is not running. Start the MCP integration before using AI chat.');
+  }
+  return mcpService.mcpHandler;
+}
+
+/**
+ * @description Extract assistant message payload from gateway response.
+ * @param {object} apiResponse - Chat API response.
+ * @returns {object|null} Assistant message object.
+ * @example
+ * const assistant = extractAssistantMessage(response);
+ */
+function extractAssistantMessage(apiResponse) {
+  // Expected shape: OpenAI compatible chat completion response.
+  const choiceMessage = apiResponse?.choices?.[0]?.message;
+  if (choiceMessage) {
+    return choiceMessage;
+  }
+  return apiResponse?.message ?? apiResponse?.assistant ?? null;
+}
+
+/**
+ * @description Truncate a string to a max length.
+ * @param {string} str - Input string.
+ * @param {number} limitChars - Maximum number of characters.
+ * @returns {string} Truncated or original string.
+ * @example
+ * truncate('abcdef', 3);
+ */
+function truncate(str, limitChars) {
+  if (!str) {
+    return '';
+  }
+  if (str.length <= limitChars) {
+    return str;
+  }
+  return `${str.slice(0, limitChars)}... (truncated)`;
+}
+
+/**
+ * @description Safely stringify any value for model context.
+ * @param {any} value - Value to stringify.
+ * @param {number} limitChars - Output max length.
+ * @returns {string} Safe serialized value.
+ * @example
+ * safeStringify({ ok: true }, 100);
+ */
+function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
+  try {
+    const str = typeof value === 'string' ? value : JSON.stringify(value);
+    return truncate(str, limitChars);
+  } catch (e) {
+    return '[unserializable tool result]';
+  }
+}
+
+const CAMERA_IMAGE_SENT_TO_USER_HINT =
+  'Camera image(s) were sent to the user in the chat. Reply briefly without image URLs or markdown images.';
+
+/**
+ * @description Convert MCP image content object to message file format.
+ * @param {object} imageContent - Image content from tool output.
+ * @returns {string|null} Formatted file payload or null.
+ * @example
+ * imageContentToMessageFile({ mimeType: 'image/jpeg', data: 'abc' });
+ */
+function imageContentToMessageFile(imageContent) {
+  const { data, mimeType } = imageContent ?? {};
+  if (!data) {
+    return null;
+  }
+  if (typeof data === 'string' && data.includes(';base64,')) {
+    return data.replace(/^data:/, '');
+  }
+  return `${mimeType || 'image/jpeg'};base64,${data}`;
+}
+
+/**
+ * @description Extract image files from tool result payload.
+ * @param {object} toolResult - Tool result object.
+ * @returns {Array<string>} List of message file payloads.
+ * @example
+ * extractMessageFilesFromToolResult({ content: [{ type: 'image', data: 'abc' }] });
+ */
+function extractMessageFilesFromToolResult(toolResult) {
+  if (!Array.isArray(toolResult?.content)) {
+    return [];
+  }
+  return toolResult.content
+    .filter((c) => c?.type === 'image')
+    .map(imageContentToMessageFile)
+    .filter(Boolean);
+}
+
+/**
+ * @description Format tool result into compact text for model context.
+ * @param {object|string} toolResult - Tool output.
+ * @returns {string} Formatted text.
+ * @example
+ * formatToolResultForChat({ content: [{ type: 'text', text: 'ok' }] });
+ */
+function formatToolResultForChat(toolResult) {
+  if (!toolResult) {
+    return '';
+  }
+  if (typeof toolResult === 'string') {
+    return toolResult;
+  }
+
+  if (Array.isArray(toolResult?.content)) {
+    const textParts = toolResult.content
+      .map((c) => {
+        if (c?.type === 'text') {
+          return truncate(c.text, MAX_TOOL_RESULT_CHARS);
+        }
+        if (c?.type === 'image') {
+          return CAMERA_IMAGE_SENT_TO_USER_HINT;
+        }
+        return safeStringify(c, MAX_NESTED_VALUE_CHARS);
+      })
+      .filter(Boolean);
+    return textParts.join('\n');
+  }
+
+  return safeStringify(toolResult);
+}
+
+/**
+ * @description Decide whether assistant text should be forwarded to user.
+ * @param {string} text - Assistant text.
+ * @param {boolean} sentImagesToUser - Whether camera images were sent.
+ * @returns {boolean} True if text should be sent.
+ * @example
+ * shouldSendAssistantTextReply('hello', false);
+ */
+function shouldSendAssistantTextReply(text, sentImagesToUser) {
+  if (!text?.trim()) {
+    return false;
+  }
+  if (!sentImagesToUser) {
+    return true;
+  }
+  if (/!\[[^\]]*\]\([^)]+\)/.test(text)) {
+    return false;
+  }
+  if (/https?:\/\//i.test(text)) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * @description Detect explicit no-response sentinel from assistant.
+ * @param {string} text - Assistant text.
+ * @returns {boolean} True if sentinel was found.
+ * @example
+ * isNoResponseSentinel('NO_RESPONSE');
+ */
+function isNoResponseSentinel(text) {
+  if (!text || typeof text !== 'string') {
+    return false;
+  }
+  const normalized = text
+    .trim()
+    .replace(/[\s_-]+/g, '_')
+    .toUpperCase();
+  return normalized === 'NO_RESPONSE';
+}
+
+/**
+ * @description Detect normalized tool execution error strings.
+ * @param {string} text - Tool result text.
+ * @returns {boolean} True when text is a tool execution error.
+ * @example
+ * isToolExecutionErrorText('Error while running tool "x": boom');
+ */
+function isToolExecutionErrorText(text) {
+  return typeof text === 'string' && text.startsWith('Error while running tool');
+}
+
+/**
+ * @description Render a tool-call trace text for UI timeline.
+ * @param {string} functionName - Tool function name.
+ * @param {object} toolArgs - Parsed tool arguments.
+ * @returns {string} Human-readable tool trace.
+ * @example
+ * formatToolCallTraceText('device_get_state', { room: 'salon' });
+ */
+function formatToolCallTraceText(functionName, toolArgs) {
+  if (!functionName) {
+    return 'tool_call';
+  }
+  if (!toolArgs || Object.keys(toolArgs).length === 0) {
+    return `${functionName}()`;
+  }
+  return `${functionName}(${safeStringify(toolArgs, 300)})`;
+}
+
+/**
+ * @public
+ * @description Handle a new chat message sent by a user to Gladys Plus.
+ * Tool calling loop is executed on the Gladys instance using MCP callbacks.
+ * @param {object} request - Request payload.
+ * @param {object} request.message - Incoming user message.
+ * @param {string} request.image - Optional base64 image.
+ * @param {Array<{question:string|null,answer:string|null}>} request.previousQuestions - Previous chat exchanges.
+ * @param {object} request.context - Message context.
+ * @returns {Promise<{answer: string, imagesSent: number} | null>} Chat processing result or null on failure.
+ * @example
+ * forwardMessageToAiChat({ message, image, previousQuestions: [], context: {} });
+ */
+async function forwardMessageToAiChat({ message, image, previousQuestions, context }) {
+  const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
+  if (userId && this.event?.emit) {
+    this.event.emit(EVENTS.WEBSOCKET.SEND, {
+      type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+      userId,
+      payload: { thinking: true },
+    });
+  }
+  try {
+    // Resize image to reduce API costs (security cameras).
+    const resizedImage = image ? await resizeImage(image) : undefined;
+
+    const mcpHandler = getMcpHandler(this.serviceManager);
+
+    const mcpTools = await mcpHandler.getAllTools(userId);
+    const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
+    const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
+
+    // Build a compact conversation for the model.
+    const messagesForApi = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+    (previousQuestions ?? []).forEach((exchange) => {
+      if (!exchange) {
+        return;
+      }
+      if (exchange.question) {
+        messagesForApi.push({
+          role: 'user',
+          content: exchange.question,
+        });
+      }
+      if (exchange.answer) {
+        messagesForApi.push({
+          role: 'assistant',
+          content: exchange.answer,
+        });
+      }
+    });
+
+    const userContent = [];
+    if (message.text) {
+      userContent.push({ type: 'text', text: message.text });
+    }
+    if (resizedImage) {
+      userContent.push({ type: 'image_url', image_url: { url: resizedImage } });
+    }
+
+    messagesForApi.push({
+      role: 'user',
+      content: userContent.length > 0 ? userContent : message.text,
+    });
+
+    let assistantMessage = null;
+    const imagesSentToUser = [];
+    let lastSceneCreateErrorText = null;
+    let sceneCreateSuccessCount = 0;
+    // eslint-disable-next-line no-restricted-syntax
+    for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const apiResponse = await this.aiChat({
+        messages: messagesForApi,
+        tools: toolsForApi,
+        tool_choice: 'auto',
+        max_tokens: DEFAULT_MAX_TOKENS_PER_TURN,
+      });
+
+      assistantMessage = extractAssistantMessage(apiResponse);
+      const toolCalls = assistantMessage?.tool_calls ?? [];
+
+      logger.debug(
+        `AI assistant turn: content=${assistantMessage?.content === null ? 'null' : 'set'}, tool_calls=${
+          toolCalls.length
+        }`,
+      );
+
+      if (!toolCalls || toolCalls.length === 0) {
+        break;
+      }
+
+      // Add the assistant tool call message context.
+      messagesForApi.push({
+        role: 'assistant',
+        content: assistantMessage?.content ?? null,
+        tool_calls: toolCalls,
+      });
+
+      // Execute tools locally using MCP callbacks.
+      // We support multiple tool calls in one model turn.
+      // eslint-disable-next-line no-restricted-syntax
+      for (const toolCall of toolCalls) {
+        const toolCallId = toolCall?.id ?? undefined;
+        const functionName = toolCall?.function?.name;
+        const argumentsRaw = toolCall?.function?.arguments;
+
+        const cb = functionName ? toolCallbacksByName.get(functionName) : undefined;
+        if (!cb) {
+          logger.warn(`Unknown tool "${functionName}" requested by model.`);
+          messagesForApi.push({
+            role: 'tool',
+            tool_call_id: toolCallId ?? 'unknown',
+            content: `Unknown tool: ${functionName}`,
+          });
+          // Continue execution: the model may provide follow-up instructions.
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        let toolArgs = {};
+        if (argumentsRaw) {
+          try {
+            toolArgs = typeof argumentsRaw === 'string' ? JSON.parse(argumentsRaw) : argumentsRaw;
+          } catch (e) {
+            logger.warn(`Invalid JSON arguments for tool "${functionName}": ${e.message}`);
+            toolArgs = {};
+          }
+        }
+
+        let toolResultText;
+        let toolStatus = 'success';
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const toolResult = await cb(toolArgs);
+          if (functionName === 'scene_create') {
+            sceneCreateSuccessCount += 1;
+            lastSceneCreateErrorText = null;
+          }
+          imagesSentToUser.push(...extractMessageFilesFromToolResult(toolResult));
+          toolResultText = formatToolResultForChat(toolResult);
+        } catch (toolError) {
+          // We surface tool errors back to the model instead of aborting the whole
+          // conversation. The model can then report the error to the user or retry.
+          logger.warn(`Tool "${functionName}" failed:`, toolError);
+          toolResultText = `Error while running tool "${functionName}": ${toolError?.message ?? 'unknown error'}`;
+          // Dedicated single-line log containing the exact payload sent back to the model.
+          logger.warn(`[AI_TOOL_ERROR_FULL] ${toolResultText}`);
+          if (functionName === 'scene_create') {
+            lastSceneCreateErrorText = toolResultText;
+          }
+          toolStatus = 'error';
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        await this.message.reply(message, formatToolCallTraceText(functionName, toolArgs), context, null, {
+          messageType: 'tool_call',
+          toolName: functionName,
+          toolStatus,
+        });
+
+        messagesForApi.push({
+          role: 'tool',
+          tool_call_id: toolCallId ?? 'tool_call_unknown',
+          content: toolResultText,
+        });
+      }
+    }
+
+    const assistantContent = assistantMessage?.content;
+    let finalAnswer = typeof assistantContent === 'string' ? assistantContent.trim() : '';
+    if (isNoResponseSentinel(finalAnswer)) {
+      finalAnswer = '';
+    }
+
+    // If we hit the iteration cap and the model never produced a final user-facing answer,
+    // fall back to the last tool result to avoid total silence.
+    const hadToolCallsInLastTurn = (assistantMessage?.tool_calls ?? []).length > 0;
+    if (!finalAnswer && hadToolCallsInLastTurn) {
+      const lastToolMessage = [...messagesForApi]
+        .reverse()
+        .find((m) => m?.role === 'tool' && typeof m?.content === 'string' && m.content.trim().length > 0);
+      if (lastToolMessage) {
+        finalAnswer = truncate(lastToolMessage.content.trim(), MAX_FALLBACK_ANSWER_CHARS);
+      }
+    }
+    if (sceneCreateSuccessCount === 0 && isToolExecutionErrorText(lastSceneCreateErrorText)) {
+      finalAnswer = lastSceneCreateErrorText;
+    }
+
+    if (imagesSentToUser.length > 0) {
+      for (let i = 0; i < imagesSentToUser.length; i += 1) {
+        if (i === 0) {
+          // eslint-disable-next-line no-await-in-loop
+          await this.message.replyByIntent(message, 'camera.get-image.success', context, imagesSentToUser[i]);
+        } else {
+          // eslint-disable-next-line no-await-in-loop
+          await this.message.reply(message, '', context, imagesSentToUser[i]);
+        }
+      }
+    }
+
+    if (finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0)) {
+      await this.message.reply(message, finalAnswer);
+    }
+
+    return { answer: finalAnswer || '', imagesSent: imagesSentToUser.length };
+  } catch (e) {
+    logger.warn(e);
+    if (e instanceof Error429) {
+      await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
+    } else {
+      await this.message.replyByIntent(message, 'openai.request.fail', context);
+    }
+    return null;
+  } finally {
+    if (userId && this.event?.emit) {
+      this.event.emit(EVENTS.WEBSOCKET.SEND, {
+        type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
+        userId,
+        payload: { thinking: false },
+      });
+    }
+  }
+}
+
+module.exports = {
+  forwardMessageToAiChat,
+  extractMessageFilesFromToolResult,
+  imageContentToMessageFile,
+  formatToolCallTraceText,
+  shouldSendAssistantTextReply,
+  isNoResponseSentinel,
+  isToolExecutionErrorText,
+};

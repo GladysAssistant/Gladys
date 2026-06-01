@@ -562,6 +562,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  ORP_SENSOR: 'orp-sensor',
+  PH_SENSOR: 'ph-sensor',
   PM25_SENSOR: 'pm25-sensor',
   PM10_SENSOR: 'pm10-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
@@ -860,6 +862,12 @@ const DEVICE_FEATURE_TYPES = {
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
   },
+  PH_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  ORP_SENSOR: {
+    DECIMAL: 'decimal',
+  },
   TEXT: {
     TEXT: 'text',
   },
@@ -1038,6 +1046,8 @@ const DEVICE_FEATURE_UNITS = {
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
   // Airquality Index
   AQI: 'aqi',
+  // Water quality
+  PH: 'ph',
   // For air quality (pm2.5, pm10, formaldehyd)
   MILLIGRAM_PER_CUBIC_METER: 'milligram-per-cubic-meter',
   MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
@@ -1226,6 +1236,8 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
+  [DEVICE_FEATURE_CATEGORIES.PH_SENSOR]: [DEVICE_FEATURE_UNITS.PH],
+  [DEVICE_FEATURE_CATEGORIES.ORP_SENSOR]: [DEVICE_FEATURE_UNITS.MILLI_VOLT],
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [
     [DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER],
     [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
@@ -1297,6 +1309,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',
+    AI_THINKING: 'message.ai-thinking',
+  },
+  VOICE_ASSISTANT: {
+    TRANSCRIPTION: 'voice-assistant.transcription',
+    RESPONSE: 'voice-assistant.response',
+    PROCESSING: 'voice-assistant.processing',
+    ERROR: 'voice-assistant.error',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
@@ -1419,6 +1438,7 @@ const DASHBOARD_BOX_TYPE = {
   MUSIC: 'music',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
+  VOICE_ASSISTANT: 'voice-assistant',
 };
 
 const ERROR_MESSAGES = {

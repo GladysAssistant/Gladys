@@ -135,7 +135,7 @@ import NukiSetupPage from '../routes/integration/all/nuki/setup-page';
 import NukiMqttDiscoverPage from '../routes/integration/all/nuki/discover-mqtt';
 import NukiHttpDiscoverPage from '../routes/integration/all/nuki/discover-http';
 
-// OpenAI integration
+// AI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
 
 // Tuya integration

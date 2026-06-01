@@ -3,12 +3,12 @@ const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
- * @description Ask OpenAI a question.
+ * @description Get TTS token from Gateway.
  * @param {object} body - The query to ask.
- * @returns {Promise} Resolve with OpenAI response.
+ * @returns {Promise} Resolve with TTS token response.
  * @example
- * openAIAsk({
- *    question
+ * getTTSApiUrl({
+ *   text: 'Hello world',
  * })
  */
 async function getTTSApiUrl(body) {

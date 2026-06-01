@@ -3,6 +3,7 @@ const { fake, assert: assertSinon } = require('sinon');
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
+const sceneModel = require('../../../models/scene');
 
 const event = new EventEmitter();
 
@@ -63,6 +64,51 @@ describe('SceneManager', () => {
       ],
       tags: [],
     });
-    return assert.isRejected(promise);
+    await assert.isRejected(promise);
+  });
+
+  it('should return validation error, invalid triggers', async () => {
+    const promise = sceneManager.create({
+      name: 'Invalid trigger scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: 'invalid-trigger-type',
+        },
+      ],
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise);
+  });
+
+  it('should return validation error when http.request action has no headers', async () => {
+    const promise = sceneManager.create({
+      name: 'Invalid http request scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.HTTP.REQUEST,
+            method: 'post',
+            url: 'https://example.com/hook',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise);
+  });
+
+  it('should format joi error fallback when details are absent', () => {
+    expect(sceneModel.formatJoiValidationError()).to.equal('Invalid schema');
+    expect(sceneModel.formatJoiValidationError({ message: 'Validation failed' })).to.equal('Validation failed');
   });
 });

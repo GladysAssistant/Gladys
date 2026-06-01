@@ -1,4 +1,10 @@
 const z = require('zod/v4');
+const {
+  createSceneCreateInputSchema,
+  formatSceneCreateZodIssue,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
+} = require('./sceneSchemas');
 
 const noRoom = {
   id: null,
@@ -121,14 +127,21 @@ async function getAllResources() {
 
 /**
  * @description Get all tools available in the MCP service.
+ * @param {string} [userId] - Optional user id used to scope private calendars.
  * @returns {Promise<Array>} Array of tools with their intent and configuration.
  * @example
- * getAllTools()
+ * getAllTools('0cd30aef-9c4e-4a23-88e3-3547971296e5')
  */
-async function getAllTools() {
+async function getAllTools(userId) {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const calendars = userId
+    ? (await this.gladys.calendar.get(userId)).map(({ id, name, selector }) => ({ id, name, selector }))
+    : [];
+  const areas = (await this.gladys.area.get()).map(({ id, name, selector }) => ({ id, name, selector }));
 
   const allDevices = await this.gladys.device.get();
   const sensorDevices = allDevices
@@ -168,6 +181,32 @@ async function getAllTools() {
         .flat(),
     ),
   ];
+  const deviceFeatureSelectors = allDevices
+    .map((device) => device.features.map((feature) => feature.selector))
+    .flat()
+    .filter(Boolean);
+  const lightDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'light' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const switchDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'switch' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const musicNotificationDeviceSelectors = allDevices
+    .filter((device) =>
+      device.features.some((feature) => feature.category === 'music' && feature.type === 'play_notification'),
+    )
+    .map((device) => device.selector);
+  const sceneCreateInputSchema = createSceneCreateInputSchema(
+    scenes.map(({ selector }) => selector),
+    users.map(({ selector }) => selector),
+    houses.map(({ selector }) => selector),
+    lightDeviceSelectors,
+    switchDeviceSelectors,
+    musicNotificationDeviceSelectors,
+    deviceFeatureSelectors,
+    calendars.map(({ selector }) => selector),
+    areas.map(({ selector }) => selector),
+  );
 
   const historyDevices = allDevices
     .filter((device) => {
@@ -210,6 +249,50 @@ async function getAllTools() {
             mimeType: 'image/jpeg',
           })),
         };
+      },
+    },
+    {
+      intent: 'scene.create',
+      config: {
+        title: 'Create scene',
+        description:
+          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
+        inputSchema: sceneCreateInputSchema.shape,
+      },
+      cb: async (scene) => {
+        try {
+          const parsedScene = sceneCreateInputSchema.parse(scene);
+          const normalizedActions = Array.isArray(parsedScene.actions?.[0])
+            ? parsedScene.actions
+            : parsedScene.actions.map((action) => [action]);
+          const createdScene = await this.gladys.scene.create({
+            ...parsedScene,
+            actions: normalizedActions,
+          });
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: this.toon({
+                  id: createdScene.id,
+                  name: createdScene.name,
+                  selector: createdScene.selector,
+                }),
+              },
+            ],
+          };
+        } catch (e) {
+          if (e?.name === 'ZodError') {
+            const details = e.issues.map((issue) => formatSceneCreateZodIssue(issue, scene)).join('; ');
+            throw new Error(`scene.create validation failed (422): ${details}`);
+          }
+          if (e?.name === 'SequelizeValidationError') {
+            const details = (e.errors || []).map((error) => error.message).join('; ');
+            throw new Error(`scene.create failed (422): ${details || e.message}`);
+          }
+          throw e;
+        }
       },
     },
     {
@@ -495,4 +578,6 @@ async function getAllTools() {
 module.exports = {
   getAllResources,
   getAllTools,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
 };

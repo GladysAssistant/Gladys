@@ -294,13 +294,16 @@ describe('Matter.init', () => {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -346,6 +349,8 @@ describe('Matter.init', () => {
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
+    // Wait for background refreshDevices() to complete
+    await matterHandler.refreshDevicesPromise;
     expect(matterHandler.devices).to.have.lengthOf(2);
     // Device selector should be a slug of the name with 4 random characters at the end
     expect(matterHandler.devices[0].selector).to.satisfy(
@@ -890,6 +895,14 @@ describe('Matter.init', () => {
     assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+
+  it('should log error when refreshDevices fails in background', async () => {
+    const error = new Error('Test error');
+    matterHandler.refreshDevices = fake.rejects(error);
+    await matterHandler.init();
+    // Wait for background promise to complete - error should be caught and logged, not thrown
+    await matterHandler.refreshDevicesPromise;
   });
 
   it('should return PPM for 0', () => {

@@ -292,7 +292,7 @@ const actionsFunc = {
       language: user.language,
       text: textWithVariables,
     };
-    const { answer } = await self.gateway.forwardMessageToOpenAI({
+    const { answer } = await self.gateway.forwardMessageToAiChat({
       message,
       image,
       context: {},

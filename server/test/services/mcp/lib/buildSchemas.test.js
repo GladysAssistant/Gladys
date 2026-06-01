@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 const { stub, fake } = require('sinon');
-const { getAllResources, getAllTools } = require('../../../../services/mcp/lib/buildSchemas');
+const {
+  getAllResources,
+  getAllTools,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
+} = require('../../../../services/mcp/lib/buildSchemas');
 const {
   isSensorFeature,
   isSwitchableFeature,
@@ -303,6 +308,13 @@ describe('build schemas', () => {
         selector: 'scene-night',
       },
     ];
+    const houses = [
+      {
+        id: 'house-1',
+        name: 'Main house',
+        selector: 'main-house',
+      },
+    ];
 
     const devices = [
       {
@@ -369,8 +381,28 @@ describe('build schemas', () => {
         room: {
           getAll: stub().resolves(rooms),
         },
+        user: {
+          get: stub().resolves([
+            { id: 'user-1', name: 'John', selector: 'john' },
+            { id: 'user-2', name: 'Pepper', selector: 'pepper' },
+          ]),
+        },
+        house: {
+          get: stub().resolves(houses),
+        },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
+        },
         scene: {
           get: stub().resolves(scenes),
+          create: stub().resolves({
+            id: 'scene-created-id',
+            name: 'MCP Generated Scene',
+            selector: 'mcp-generated-scene',
+          }),
         },
         device: {
           get: stub().resolves(devices),
@@ -444,35 +476,168 @@ describe('build schemas', () => {
       mimeType: 'image/jpeg',
     });
 
-    // Tool: scene.start
-    expect(tools[1].intent).to.eq('scene.start');
-    expect(tools[1].config.title).to.eq('Start scene');
-    expect(tools[1].config.description).to.eq('Start a home automation scene.');
+    // Tool: scene.create
+    expect(tools[1].intent).to.eq('scene.create');
+    expect(tools[1].config.title).to.eq('Create scene');
+    expect(tools[1].config.description).to.eq(
+      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
+    );
+    const sceneCreatedResult = await tools[1].cb({
+      name: 'MCP Generated Scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      tags: [{ name: 'ai-generated' }],
+    });
+    expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
+    expect(sceneCreatedResult.content[0].text).to.eq('toonmockdata');
 
-    const sceneResult = await tools[1].cb({ scene: 'scene-morning' });
+    const sceneCreatedResultFromFlatActions = await tools[1].cb({
+      name: 'MCP Generated Scene 2',
+      icon: 'bell',
+      triggers: [],
+      actions: [{ type: 'light.turn-on', devices: ['device-light-1'] }],
+      tags: [{ name: 'ai-generated' }],
+    });
+    expect(sceneCreatedResultFromFlatActions.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.gladys.scene.create.callCount).to.eq(2);
+    expect(mcpHandler.gladys.scene.create.secondCall.args[0].actions).to.deep.equal([
+      [{ type: 'light.turn-on', devices: ['device-light-1'] }],
+    ]);
+
+    const sceneCreatedWithUserAction = await tools[1].cb({
+      name: 'Notify user scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [[{ type: 'message.send', user: 'john', text: 'Hello John' }]],
+      tags: [],
+    });
+    expect(sceneCreatedWithUserAction.content[0].text).to.eq('toonmockdata');
+
+    const sceneCreatedWithDeviceFeatureSelector = await tools[1].cb({
+      name: 'Get device value scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [[{ type: 'device.get-value', device_feature: 'device-temp-1-temp' }]],
+      tags: [],
+    });
+    expect(sceneCreatedWithDeviceFeatureSelector.content[0].text).to.eq('toonmockdata');
+
+    let invalidDeviceFeatureSelectorError = null;
+    try {
+      await tools[1].cb({
+        name: 'Get invalid device value scene',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'device.get-value', device_feature: 'unknown-feature' }]],
+        tags: [],
+      });
+    } catch (e) {
+      invalidDeviceFeatureSelectorError = e;
+    }
+    expect(invalidDeviceFeatureSelectorError).to.be.an('error');
+    expect(invalidDeviceFeatureSelectorError.message).to.contain('scene.create validation failed (422)');
+
+    const sunriseSceneResult = await tools[1].cb({
+      name: 'Sunrise scene',
+      icon: 'bell',
+      triggers: [{ type: 'time.sunrise', house: 'main-house' }],
+      actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      tags: [],
+    });
+    expect(sunriseSceneResult.content[0].text).to.eq('toonmockdata');
+
+    let invalidUserError = null;
+    try {
+      await tools[1].cb({
+        name: 'Notify invalid user scene',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'message.send', user: 'unknown-user', text: 'Hello' }]],
+        tags: [],
+      });
+    } catch (e) {
+      invalidUserError = e;
+    }
+    expect(invalidUserError).to.be.an('error');
+    expect(invalidUserError.message).to.contain('scene.create validation failed (422)');
+
+    let sceneCreateError = null;
+    try {
+      await tools[1].cb({
+        icon: 'bell',
+        triggers: [],
+        actions: [],
+      });
+    } catch (e) {
+      sceneCreateError = e;
+    }
+    expect(sceneCreateError).to.be.an('error');
+    expect(sceneCreateError.message).to.contain('scene.create validation failed (422)');
+
+    let missingTimeTriggerError = null;
+    try {
+      await tools[1].cb({
+        name: 'Scene with invalid time trigger',
+        icon: 'bell',
+        triggers: [
+          {
+            type: 'time.changed',
+            scheduler_type: 'every-day',
+          },
+        ],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      missingTimeTriggerError = e;
+    }
+    expect(missingTimeTriggerError).to.be.an('error');
+    expect(missingTimeTriggerError.message).to.contain('scene.create validation failed (422)');
+    expect(missingTimeTriggerError.message).to.contain('triggers');
+
+    let missingSunriseHouseError = null;
+    try {
+      await tools[1].cb({
+        name: 'Sunrise without house',
+        icon: 'bell',
+        triggers: [{ type: 'time.sunrise' }],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      missingSunriseHouseError = e;
+    }
+    expect(missingSunriseHouseError).to.be.an('error');
+    expect(missingSunriseHouseError.message).to.contain('scene.create validation failed (422)');
+
+    // Tool: scene.start
+    expect(tools[2].intent).to.eq('scene.start');
+    expect(tools[2].config.title).to.eq('Start scene');
+    expect(tools[2].config.description).to.eq('Start a home automation scene.');
+
+    const sceneResult = await tools[2].cb({ scene: 'scene-morning' });
     expect(mcpHandler.gladys.event.emit.callCount).to.eq(1);
     expect(mcpHandler.gladys.event.emit.firstCall.args[0]).to.eq('intent.scene.start');
     expect(sceneResult.content).to.deep.equal([{ type: 'text', text: 'scene.start command sent' }]);
 
     // Tool: device.get-state
-    expect(tools[2].intent).to.eq('device.get-state');
-    expect(tools[2].config.title).to.eq('Get states from devices');
-    expect(tools[2].config.description).to.eq('Get last state of specific device type or in a specific room.');
+    expect(tools[3].intent).to.eq('device.get-state');
+    expect(tools[3].config.title).to.eq('Get states from devices');
+    expect(tools[3].config.description).to.eq('Get last state of specific device type or in a specific room.');
 
-    const stateResultAll = await tools[2].cb({ room: undefined, device_type: undefined });
+    const stateResultAll = await tools[3].cb({ room: undefined, device_type: undefined });
     expect(stateResultAll.content.length).to.eq(1);
 
-    const stateResultRoom = await tools[2].cb({ room: 'salon', device_type: undefined });
+    const stateResultRoom = await tools[3].cb({ room: 'salon', device_type: undefined });
     expect(stateResultRoom.content.length).to.eq(1);
 
-    const stateResultType = await tools[2].cb({ room: undefined, device_type: 'light' });
+    const stateResultType = await tools[3].cb({ room: undefined, device_type: 'light' });
     expect(stateResultType.content.length).to.eq(1);
 
     // Tool: device.turn-on-off by device
-    expect(tools[3].intent).to.eq('device.turn-on-off');
-    expect(tools[3].config.title).to.eq('Turn on/off devices');
+    expect(tools[4].intent).to.eq('device.turn-on-off');
+    expect(tools[4].config.title).to.eq('Turn on/off devices');
 
-    const turnOnResult = await tools[3].cb({ action: 'on', device: 'Living Room Light' });
+    const turnOnResult = await tools[4].cb({ action: 'on', device: 'Living Room Light' });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(1);
     expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Living Room Light');
@@ -481,7 +646,7 @@ describe('build schemas', () => {
 
     // Tool: device.turn-on-off by device with similarity
     mcpHandler.levenshtein.distance.returns(2);
-    const turnOnResultSimilar = await tools[3].cb({ action: 'on', device: 'A Living Room Light' });
+    const turnOnResultSimilar = await tools[4].cb({ action: 'on', device: 'A Living Room Light' });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(1);
     expect(turnOnResultSimilar.content[0].text).to.eq('device.turn-on command sent for Living Room Light');
@@ -490,7 +655,7 @@ describe('build schemas', () => {
 
     // Test device.turn-on-off by room and category
     mcpHandler.levenshtein.distance.returns(4);
-    const turnOffResult = await tools[3].cb({
+    const turnOffResult = await tools[4].cb({
       action: 'off',
       room: 'chambre',
       device_category: 'switch',
@@ -503,7 +668,7 @@ describe('build schemas', () => {
 
     mcpHandler.gladys.device.setValue.resetHistory();
 
-    const noDeviceResult = await tools[3].cb({
+    const noDeviceResult = await tools[4].cb({
       action: 'on',
       device: 'non-existent-device',
     });
@@ -511,7 +676,7 @@ describe('build schemas', () => {
     expect(noDeviceResult.content[0].text).to.eq('device.turn-on command not sent, no device found');
 
     // Test device.get-history
-    const getHistoryResult = await tools[4].cb({
+    const getHistoryResult = await tools[5].cb({
       room: 'salon',
       device: 'temperature sensor',
       feature: 'temperature-sensor:decimal',
@@ -525,7 +690,7 @@ describe('build schemas', () => {
 
     mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
 
-    const getHistoryDefaultFeatureResult = await tools[4].cb({
+    const getHistoryDefaultFeatureResult = await tools[5].cb({
       room: 'salon',
       device: 'temperature sensor',
       period: 'last-month',
@@ -538,7 +703,7 @@ describe('build schemas', () => {
 
     mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
 
-    const historyDisabledResult = await tools[4].cb({
+    const historyDisabledResult = await tools[5].cb({
       room: 'salon',
       feature: 'humidity-sensor:decimal',
       period: 'last-month',
@@ -632,8 +797,25 @@ describe('build schemas', () => {
         room: {
           getAll: stub().resolves(rooms),
         },
+        user: {
+          get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]),
+        },
+        house: {
+          get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
+        },
         scene: {
           get: stub().resolves(scenes),
+          create: stub().resolves({
+            id: 'scene-created-id',
+            name: 'MCP Generated Scene',
+            selector: 'mcp-generated-scene',
+          }),
         },
         device: {
           get: stub().resolves(devices),
@@ -660,15 +842,251 @@ describe('build schemas', () => {
 
     // Verify tools are created successfully
     expect(tools).to.be.an('array');
-    expect(tools.length).to.eq(5);
+    expect(tools.length).to.eq(6);
 
     // Test device.get-state - should return all devices with and without room
-    const stateResult = await tools[2].cb({ room: undefined, device_type: undefined });
+    const stateResult = await tools[3].cb({ room: undefined, device_type: undefined });
     expect(stateResult.content.length).to.eq(1);
 
     // Test device.turn-on-off - for device without room
-    const turnOnResult = await tools[3].cb({ action: 'on', device: 'Light Without Room' });
+    const turnOnResult = await tools[4].cb({ action: 'on', device: 'Light Without Room' });
     expect(mcpHandler.gladys.device.setValue.args[0][0].room).to.eq(null);
     expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Light Without Room');
+  });
+
+  it('should return detailed scene.create errors for SequelizeValidationError and unknown errors', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: {
+          getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]),
+        },
+        user: {
+          get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]),
+        },
+        house: {
+          get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        calendar: {
+          get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]),
+        },
+        area: {
+          get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]),
+        },
+        scene: {
+          get: stub().resolves([]),
+          create: stub(),
+        },
+        device: {
+          get: stub().resolves([
+            {
+              selector: 'device-light-1',
+              name: 'Living Room Light',
+              room: { selector: 'salon', name: 'Living Room' },
+              features: [
+                {
+                  id: 1,
+                  selector: 'device-light-1-binary',
+                  name: 'On/Off',
+                  category: 'light',
+                  type: 'binary',
+                },
+                {
+                  id: 2,
+                  selector: 'device-light-1-brightness',
+                  name: 'Brightness',
+                  category: 'light',
+                  type: 'integer',
+                },
+              ],
+            },
+          ]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: {
+          emit: fake(),
+        },
+      },
+      levenshtein: {
+        distance: stub().returns(0),
+      },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+
+    const sequelizeValidationError = new Error('Validation error');
+    sequelizeValidationError.name = 'SequelizeValidationError';
+    sequelizeValidationError.errors = [{ message: 'text is required' }, { message: 'user is required' }];
+    mcpHandler.gladys.scene.create.rejects(sequelizeValidationError);
+
+    let thrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene with invalid action payload',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown).to.be.an('error');
+    expect(thrown.message).to.contain('scene.create failed (422): text is required; user is required');
+
+    mcpHandler.gladys.scene.create.rejects(new Error('db down'));
+    let unknownThrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene unknown error',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
+      });
+    } catch (e) {
+      unknownThrown = e;
+    }
+    expect(unknownThrown).to.be.an('error');
+    expect(unknownThrown.message).to.eq('db down');
+  });
+
+  it('should reject scene.create when http.request action misses headers', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
+        scene: {
+          get: stub().resolves([]),
+          create: stub().resolves({ id: 'scene-id' }),
+        },
+        device: {
+          get: stub().resolves([]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sceneCreateTool = tools.find((tool) => tool.intent === 'scene.create');
+    let thrown = null;
+    try {
+      await sceneCreateTool.cb({
+        name: 'Scene invalid http headers',
+        icon: 'bell',
+        triggers: [],
+        actions: [[{ type: 'http.request', method: 'post', url: 'https://example.com/hook' }]],
+      });
+    } catch (e) {
+      thrown = e;
+    }
+    expect(thrown).to.be.an('error');
+    expect(thrown.message).to.contain('scene.create validation failed (422)');
+    expect(mcpHandler.gladys.scene.create.called).to.equal(false);
+  });
+
+  it('should cover helper branches for action type extraction and union flattening', () => {
+    expect(extractProvidedActionTypes(null)).to.deep.equal([]);
+    expect(extractProvidedActionTypes({ actions: [1, { type: 'a' }, ['x', { type: 'b' }]] })).to.deep.equal(['a', 'b']);
+
+    expect(flattenUnionIssues(null)).to.deep.equal([]);
+    expect(
+      flattenUnionIssues({
+        path: ['actions'],
+        errors: [[{ path: ['0'], message: 'invalid 0' }], { path: ['1'], message: 'invalid 1' }],
+      }),
+    ).to.deep.equal([
+      { path: 'actions.0', message: 'invalid 0' },
+      { path: 'actions.1', message: 'invalid 1' },
+    ]);
+    expect(
+      flattenUnionIssues({
+        path: ['actions'],
+        issues: [{ path: ['2'], message: 'invalid 2' }],
+      }),
+    ).to.deep.equal([{ path: 'actions.2', message: 'invalid 2' }]);
+    expect(flattenUnionIssues({ path: ['actions'] })).to.deep.equal([]);
+  });
+
+  it('should cover filtered-out feature branches in device state and turn-on-off tools', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const devices = [
+      {
+        selector: 'device-mixed-1',
+        name: 'Mixed Device',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          { id: 1, selector: 'f-light', name: 'Light', category: 'light', type: 'binary', last_value: 1 },
+          { id: 2, selector: 'f-switch', name: 'Switch', category: 'switch', type: 'binary', last_value: 0 },
+        ],
+      },
+    ];
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([{ id: 'u1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'h1', name: 'House', selector: 'house' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().resolves(devices[0]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    await tools[3].cb({ room: 'salon', device_type: 'light' });
+    await tools[4].cb({ action: 'off', room: 'salon', device_category: 'switch' });
+    expect(mcpHandler.gladys.device.setValue.calledOnce).to.equal(true);
   });
 });

@@ -285,7 +285,8 @@
       "scene": "Scene",
       "music": "Music",
       "gauge": "Gauge",
-      "energy-consumption": "Energy Consumption"
+      "energy-consumption": "Energy Consumption",
+      "voice-assistant": "Voice assistant"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -453,7 +454,13 @@
         "selectDeviceLabel": "Select feature to display",
         "noDeviceFeatureSelector": "No feature selected",
         "errorLoadingDevice": "An error occurred while loading the device",
-        "noDeviceFeatureLastValue": "This feature has not received any value yet"
+        "noDeviceFeatureLastValue": "This feature has not received any value yet",
+        "thresholdsLabel": "Configure custom thresholds",
+        "thresholdsNoRange": "The selected feature has no minimum or maximum value defined, thresholds cannot be configured.",
+        "colorLowLabel": "Color below the low threshold",
+        "colorInRangeLabel": "Color between the thresholds",
+        "colorHighLabel": "Color above the high threshold",
+        "thresholdsLegendLabel": "Thresholds:"
       },
       "energyConsumption": {
         "editName": "Widget Name (optional)",
@@ -492,6 +499,21 @@
       },
       "music": {
         "selectDeviceLabel": "Select device to control"
+      },
+      "voice-assistant": {
+        "speak": "Speak",
+        "listening": "Listening...",
+        "listeningHint": "Speak now. Recording stops when you are silent.",
+        "processing": "Processing...",
+        "speaking": "Speaking...",
+        "transcriptionLabel": "You said",
+        "responseLabel": "Response",
+        "error": "Something went wrong. Make sure Gladys Plus is connected.",
+        "errorInsecureContext": "The microphone requires a secure connection. Open Gladys on Gladys Plus at <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Allow microphone access for Safari in Settings > Safari > Microphone.",
+        "errorNotSupported": "Voice recording is not available in this browser.",
+        "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
+        "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       }
     }
   },
@@ -2120,18 +2142,25 @@
       }
     },
     "openai": {
-      "title": "OpenAI ChatGPT",
-      "documentation": "ChatGPT documentation",
-      "description": "Give Gladys the power of artifical intelligence",
-      "firstExplanation": "Gladys can use OpenAI ChatGPT artificial intelligence to help you communicate with your connected home.",
-      "aFewExamples": "A few examples of things you can ask: ",
-      "turnOnTheLight": "Turn on the light in the kitchen",
-      "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
-      "eggDuration": "How do you make hard boiled eggs ?",
-      "showMeTheCameraInTheKitchen": "Show me the camera in the kitchen",
-      "activateOpenAiChat": "Activate ChatGPT in Gladys chat",
-      "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
-      "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
+      "title": "Artificial Intelligence",
+      "documentation": "AI documentation",
+      "description": "Give Gladys the power of artificial intelligence.",
+      "firstExplanation": "Gladys can use artificial intelligence (Mistral models via Gladys Plus) to help you communicate with your connected home.",
+      "examplesIntro": "Here's what you can do with AI:",
+      "examplesChatTitle": "In the Gladys chat",
+      "examplesChatHint": "Available actions: lights and switches by room, cameras, scenes, temperature and humidity.",
+      "exampleChat1": "\"Turn on the living room light.\"",
+      "exampleChat2": "\"Show me the garage camera.\"",
+      "exampleChat3": "\"Start the \"Good night\" scene.\"",
+      "exampleChat4": "\"What's the temperature in the bedroom?\"",
+      "examplesSceneTitle": "In your scenes (proactive AI)",
+      "examplesSceneIntro": "The \"Ask AI\" action can run on a schedule to watch your home and react automatically.",
+      "exampleScene1": "Every 30 minutes: analyse the front door camera and check whether the car parked outside matches my licence plate.",
+      "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
+      "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
+      "activateOpenAiChat": "Activate AI in Gladys chat",
+      "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
+      "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
     },
     "callmebot": {
@@ -2192,7 +2221,16 @@
         "disabledWarningSettings": "Matter is not activated, please click on the button below to activate it.",
         "enableButton": "Enable Matter",
         "disableButton": "Disable Matter",
-        "downloadNodesJson": "Download Nodes JSON"
+        "downloadNodesJson": "Download Nodes JSON",
+        "reset": {
+          "title": "Reset Integration",
+          "description": "Use this option if you want to start from scratch with Matter. This will delete all controller data, backup, and Matter folder.",
+          "button": "Reset",
+          "confirmMessage": "Warning, resetting the integration will delete all Matter controller data, backup, and Matter folder. All Matter devices currently paired will need to be re-paired.",
+          "confirmButton": "Yes, reset everything",
+          "cancelButton": "Cancel",
+          "error": "An error occurred while resetting the integration."
+        }
       },
       "device": {
         "title": "Matter Devices",
@@ -2304,7 +2342,7 @@
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "askAi": {
-        "description": "This action will send a message to the AI (ChatGPT) via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
+        "description": "This action will send a message to the AI via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
         "userLabel": "Gladys will respond to",
         "cameraLabel": "Attach a camera image (optional)",
         "textLabel": "My question for the AI",
@@ -2498,7 +2536,6 @@
       },
       "playNotification": {
         "description": "This action will make Gladys speak on the selected speaker.",
-        "needGladysPlus": "Requires Gladys Plus as Text-To-Speech APIs are paid.",
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
         "textLabel": "Message to speak on the speaker",
@@ -2683,6 +2720,13 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
+      },
+      "sunriseSunsetTrigger": {
+        "offsetLabel": "When",
+        "atExactTime": "At exact time",
+        "before": "Before",
+        "after": "After",
+        "minutes": "minutes"
       },
       "userPresence": {
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
@@ -3103,11 +3147,164 @@
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
     "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features like end-to-end encrypted remote access, automatic backups and access to a REST API accessible from anywhere in the world.",
+    "heroTitle": "Control your home from anywhere, securely",
+    "heroSubtitle": "Gladys Plus unlocks encrypted remote access, automatic backups and advanced integrations for your Gladys instance.",
+    "heroReassurance": "1-month free trial · No credit card · No commitment",
+    "startFreeTrialButton": "Start my free trial",
+    "alreadySubscriberButton": "I already have an account",
+    "featuresTitle": "Everything that's included",
+    "featuresSubtitle": "A complete suite to make your smart home truly useful, every day.",
+    "features": {
+      "remoteAccess": {
+        "title": "Encrypted remote access",
+        "description": "Control your home from anywhere, end-to-end encrypted, without opening any port."
+      },
+      "backups": {
+        "title": "Daily backups",
+        "description": "Encrypted daily backups, one-click restore on any installation."
+      },
+      "voiceAssistants": {
+        "title": "Google Home & Alexa",
+        "description": "Control Gladys with your voice using Google Home and Amazon Alexa."
+      },
+      "ai": {
+        "title": "Mistral AI",
+        "description": "Talk to your home using Mistral AI models, included with Gladys Plus."
+      },
+      "cameraStreaming": {
+        "title": "Camera streaming",
+        "description": "Watch your cameras remotely, live, end-to-end encrypted."
+      },
+      "enedis": {
+        "title": "Enedis integration",
+        "description": "Track your electric consumption directly from Gladys."
+      },
+      "mcp": {
+        "title": "MCP server",
+        "description": "Plug your favourite AIs (Claude, Mistral…) into Gladys with the MCP protocol."
+      },
+      "openApi": {
+        "title": "Open REST API",
+        "description": "Integrate Gladys with your own tools through a documented open API."
+      }
+    },
+    "plansTitle": "Two plans, no surprise",
+    "plansSubtitle": "Lite for the essentials, Plus for the full experience. You can switch between plans anytime.",
+    "perMonth": "/ month",
+    "litePlan": {
+      "name": "Lite",
+      "tagline": "The essentials for remote access",
+      "price": "€5.83",
+      "priceDetail": "Billed €69.99 per year (save 17%)",
+      "features": {
+        "remoteAccess": "End-to-end encrypted remote access",
+        "voiceAssistants": "Google Home & Amazon Alexa",
+        "openApi": "Open REST API",
+        "familyAccounts": "Accounts for the whole family"
+      }
+    },
+    "plusPlan": {
+      "name": "Plus",
+      "tagline": "All advanced integrations",
+      "price": "€8.33",
+      "priceDetail": "Billed €99.99 per year (save 17%)",
+      "popularBadge": "Most popular",
+      "features": {
+        "everythingInLite": "Everything in Lite, plus:",
+        "backups": "Encrypted daily backups",
+        "cameraStreaming": "Remote camera streaming",
+        "ai": "AI integration (Mistral)",
+        "enedis": "Enedis integration (electric consumption)",
+        "mcp": "MCP server to plug your favourite AIs"
+      }
+    },
+    "reassuranceBar": "1-month free trial · no credit card · money-back guarantee · cancel anytime",
+    "privacyTitle": "Privacy-first, hosted in Europe",
+    "privacySubtitle": "Your data stays yours. We take this very seriously.",
+    "privacy": {
+      "aiTitle": "Privacy-friendly AI",
+      "aiDescription": "Gladys Plus uses Mistral models for AI features. Your data is not resold or used for advertising.",
+      "infraTitle": "Infrastructure in Europe",
+      "infraDescription": "The Gladys Plus infrastructure (API, backups, relays) runs in European data centers, GDPR compliant.",
+      "e2eTitle": "End-to-end encryption",
+      "e2eDescription": "Your commands and backups are encrypted with keys that only your local Gladys instance owns."
+    },
     "whyIsGladysPlusPaid": "Why is Gladys Plus paid and not free like Gladys?",
-    "whyIsGladysPlusPaidAnswer": "Gladys Plus is an online service that has cost: hosting, bandwidth, storage, development and maintenance. To support those costs, we prefer asking for a monthly fee rather than adding ads or selling users data: it's not the philosophy of the project. We respect our users privacy, and want them to own their data at home.",
+    "whyIsGladysPlusPaidAnswer": "Gladys and its source code are free and open-source forever. But open-source doesn't mean free to run: servers, bandwidth, storage, community, hardware, and most of all the time spent on the project. Rather than adding ads or selling your data, we prefer a small monthly fee. No investors, no ads, no data resold.",
     "supportOpenSource": "By subscribing to Gladys Plus, you are supporting the development of a privacy-friendly & open-source alternative. Thanks for your support ! 🙂",
     "knowMoreButton": "Read more about Gladys Plus",
     "alreadyGladysPlusSubscriber": "Already a Gladys Plus Subscriber? Click here to login!"
+  },
+  "gladysPlusUpsell": {
+    "freeTrialNotice": "1-month free trial, no credit card required, cancel anytime.",
+    "tryFreeButton": "Start my free trial",
+    "upgradeButton": "Upgrade my subscription",
+    "learnMoreButton": "Learn more",
+    "backup": {
+      "subscribeTitle": "Enable automatic backups with Gladys Plus",
+      "subscribeDescription": "Back up your Gladys instance every day, end-to-end encrypted, and restore it in one click from anywhere.",
+      "feature1": "End-to-end encrypted daily backups",
+      "feature2": "One-click restore on any installation",
+      "feature3": "Secure remote access included",
+      "upgradeTitle": "Upgrade to the Plus plan to enable backups",
+      "upgradeDescription": "Encrypted backups are part of the Plus plan. You can switch plans in one click from the billing page."
+    },
+    "openai": {
+      "title": "Talk to your home with Mistral AI",
+      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat.",
+      "feature1": "Turn the lights on, turn the fan off, by sending a message in the chat",
+      "feature2": "Proactive AI in scenes: run home automation questions on a schedule (read a licence plate, check CO₂ levels, monitor a camera…)",
+      "feature3": "Mistral AI · no data resold"
+    },
+    "enedis": {
+      "title": "Track your electric consumption with Enedis",
+      "description": "Gladys Plus includes the official Enedis integration to fetch your electric consumption, show it on your dashboards and trigger scenes based on it.",
+      "feature1": "Official Enedis (data hub) connection",
+      "feature2": "Automatic history, updated every day",
+      "feature3": "Scenes based on your consumption"
+    },
+    "camera": {
+      "upgradeTitle": "Enable remote camera streaming",
+      "upgradeDescription": "Remote camera streaming is part of the Plus plan. You can switch plans in one click from the billing page."
+    },
+    "alexa": {
+      "title": "Connect Amazon Alexa to Gladys with Gladys Plus",
+      "description": "Gladys Plus includes the official Amazon Alexa integration to control your Gladys devices by voice from any Alexa speaker.",
+      "feature1": "Turn lights on by voice",
+      "feature2": "Works with all Echo speakers and Alexa devices",
+      "feature3": "No port forwarding, everything goes through encrypted Gladys Plus"
+    },
+    "googleHome": {
+      "title": "Connect Google Home to Gladys with Gladys Plus",
+      "description": "Gladys Plus includes the official Google Home integration to control your Gladys devices by voice from Google Assistant.",
+      "feature1": "Turn lights on by voice",
+      "feature2": "Works with Google Nest, Google Home and the Google Assistant app",
+      "feature3": "No port forwarding, everything goes through encrypted Gladys Plus"
+    },
+    "voiceAssistant": {
+      "title": "Gladys voice assistant with Gladys Plus",
+      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, Mistral AI replies and text-to-speech playback.",
+      "compactDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
+      "feature1": "Talk to Gladys from your dashboard",
+      "feature2": "Live transcription and response",
+      "feature3": "Answer read aloud on your device"
+    },
+    "askAi": {
+      "title": "This action requires Gladys Plus",
+      "description": "The \"Ask AI\" action uses Mistral AI via Gladys Plus to answer questions and analyse camera images inside your scenes.",
+      "compactDescription": "This action uses Mistral AI via Gladys Plus.",
+      "feature1": "Ask an open question to the AI inside a scene",
+      "feature2": "Attach a camera image and the AI can describe what it sees",
+      "feature3": "Mistral AI · no data resold"
+    },
+    "tts": {
+      "title": "This action requires Gladys Plus",
+      "description": "The \"Play on a speaker\" action uses Text-to-Speech APIs via Gladys Plus to make Gladys talk on your speakers (Sonos, Google Cast, etc.) with a natural voice.",
+      "compactDescription": "This action uses the Text-to-Speech APIs via Gladys Plus.",
+      "feature1": "Natural, multilingual voices",
+      "feature2": "Works with Sonos, Google Cast, Chromecast…",
+      "feature3": "Usable in any Gladys scene"
+    }
   },
   "gatewayLogin": {
     "cardTitle": "Login to your Gladys Plus account",
@@ -3237,6 +3434,7 @@
     "megabytes-per-second": "Megabytes per second (MB/s)",
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
     "aqi": "Air Quality Index",
+    "ph": "pH",
     "milligram-per-cubic-meter": "Milligram per cubic meter (mg/m³)",
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
     "nanogram-per-cubic-meter": "Nanogram per cubic meter (ng/m³)",
@@ -3332,6 +3530,7 @@
     "megabytes-per-second": "MB/s",
     "gigabytes-per-second": "GB/s",
     "aqi": "AQI",
+    "ph": "pH",
     "milligram-per-cubic-meter": "mg/m³",
     "microgram-per-cubic-meter": "µg/m³",
     "nanogram-per-cubic-meter": "ng/m³",
@@ -4051,6 +4250,14 @@
       "shortCategoryName": "Air Quality",
       "aqi": "Air Quality Index"
     },
+    "ph-sensor": {
+      "shortCategoryName": "pH Sensor",
+      "decimal": "pH (Decimal)"
+    },
+    "orp-sensor": {
+      "shortCategoryName": "ORP Sensor (Redox)",
+      "decimal": "ORP / Redox (Decimal)"
+    },
     "text": {
       "shortCategoryName": "Text",
       "text": "Text"
@@ -4102,19 +4309,40 @@
     "goBack": "Go Back"
   },
   "chat": {
-    "whatCanYouAsk": "What can I ask?",
     "emptyStateMessage": "Send me a message!",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
-    "gpt3Integration": "ChatGPT integration",
-    "gpt3IntegrationExplanation": "Gladys is now compatible with ChatGPT, which gives her an over-sized intelligence! For more information,",
-    "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
-    "examples": {
-      "whatsTheWeatherLike": "\"What's the weather like?\"",
-      "whatsTheTemperatureKitchen": "\"What's the temperature in the kitchen?\"",
-      "showCameraImage": "\"Show me camera image in the kitchen\""
+    "sidebar": {
+      "title": "How does the chat work?",
+      "intro": "Gladys answers your messages in two different ways, depending on whether you have Gladys Plus.",
+      "localBadge": "Local",
+      "localTitle": "Local model (default)",
+      "localDescription": "Without Gladys Plus, Gladys uses a very limited local model: it only understands a few simple commands, one action at a time, and cannot answer open-ended questions.",
+      "localHint": "Examples that work (one command at a time):",
+      "localExample1": "\"Turn on the living room light.\"",
+      "localExample2": "\"Show me the garage camera.\"",
+      "localExample3": "\"Start the \"Good night\" scene.\"",
+      "localExample4": "\"What's the temperature in the bedroom?\"",
+      "plusTitle": "Advanced AI (Gladys Plus)",
+      "plusDescription": "With Gladys Plus, you unlock much more capable Mistral models: open questions, contextual answers, camera image analysis, and more.",
+      "plusNotConfigured": "Connect Gladys Plus to enable advanced AI in this chat.",
+      "plusConfiguredNotEnabled": "Gladys Plus is connected, but AI is not enabled in the chat yet.",
+      "plusConfigureLink": "Enable AI →",
+      "plusActive": "Advanced AI is enabled in this chat.",
+      "upsellTitle": "Unlock advanced AI",
+      "upsellCompactDescription": "Gladys Plus enables Mistral models in this chat: open questions, camera analysis, and more.",
+      "upsellDescription": "Go from basic commands to real artificial intelligence in your Gladys chat.",
+      "upsellFeature1": "Ask open-ended questions to your home",
+      "upsellFeature2": "Analyse what your cameras see",
+      "upsellFeature3": "Mistral AI · no data resold"
+    },
+    "toolCall": {
+      "statusUsed": "Used",
+      "statusError": "Error",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details"
     }
   },
   "header": {
