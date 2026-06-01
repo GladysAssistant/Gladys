@@ -29,6 +29,6 @@ export async function encodeGatewayBinaryBody(body, contentType) {
   return {
     [GLADYS_GATEWAY_BINARY_BODY]: true,
     content_type: contentType,
-    data: btoa(binary),
+    data: btoa(binary)
   };
 }

@@ -400,8 +400,7 @@ class VoiceAssistantBox extends Component {
   };
 
   render(props, state) {
-    const { uiState, transcription, response, errorType, errorMessage, gatewayConnected, microphoneAvailable } =
-      state;
+    const { uiState, transcription, response, errorType, errorMessage, gatewayConnected, microphoneAvailable } = state;
     const boxTitle = props.box.name;
     const isBusy = uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING;
     const isDark = this.isDarkTheme();

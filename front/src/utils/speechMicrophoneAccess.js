@@ -31,8 +31,7 @@ function resolveGetUserMedia() {
     return constraints => navigator.mediaDevices.getUserMedia(constraints);
   }
 
-  const legacyGetUserMedia =
-    navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  const legacyGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
   if (typeof legacyGetUserMedia === 'function') {
     return constraints =>
