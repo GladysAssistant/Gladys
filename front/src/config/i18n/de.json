@@ -3062,7 +3062,12 @@
     "confirm": "Bestätigen",
     "cancel": "Abbrechen",
     "purgeSQliteTitle": "SQLite-Zustände löschen",
-    "purgeSQliteDescription": "Sobald alle Zustände aus SQLite gelöscht wurden, müssen Sie auf der rechten Registerkarte eine \"Datenbankbereinigung\" durchführen, um Speicherplatz freizugeben. Dieser Schritt kann einige Zeit in Anspruch nehmen."
+    "purgeSQliteDescription": "Sobald alle Zustände aus SQLite gelöscht wurden, müssen Sie auf der rechten Registerkarte eine \"Datenbankbereinigung\" durchführen, um Speicherplatz freizugeben. Dieser Schritt kann einige Zeit in Anspruch nehmen.",
+    "downloadLogsTitle": "Logs herunterladen",
+    "downloadLogsDescription": "Lade eine Datei mit den letzten Logs des Gladys-Containers herunter. Um sehr große Downloads zu vermeiden, werden nur die letzten 20 MB exportiert.",
+    "downloadLogsButton": "Logs herunterladen",
+    "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
+    "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut."
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
