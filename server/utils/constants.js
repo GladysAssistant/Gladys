@@ -92,6 +92,10 @@ const BUTTON_STATUS = {
   OFF_DOUBLE: 86,
 };
 
+const BUTTON_PUSH = {
+  PRESSED: 1,
+};
+
 const COVER_STATE = {
   STOP: 0,
   OPEN: 1,
@@ -1562,6 +1566,7 @@ const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
