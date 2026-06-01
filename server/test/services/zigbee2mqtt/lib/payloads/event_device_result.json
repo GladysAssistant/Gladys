@@ -268,5 +268,38 @@
     ],
     "should_poll": false,
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+  },
+  {
+    "name": "bosch-outdoor-siren",
+    "model": "BSIR-EZ",
+    "external_id": "zigbee2mqtt:bosch-outdoor-siren",
+    "features": [
+      {
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "button",
+        "type": "push",
+        "unit": null,
+        "name": "Trigger alarm",
+        "external_id": "zigbee2mqtt:bosch-outdoor-siren:button:push:trigger_alarm",
+        "selector": "zigbee2mqtt-bosch-outdoor-siren-button-push-trigger-alarm"
+      },
+      {
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "button",
+        "type": "push",
+        "unit": null,
+        "name": "Stop alarm",
+        "external_id": "zigbee2mqtt:bosch-outdoor-siren:button:push:stop_alarm",
+        "selector": "zigbee2mqtt-bosch-outdoor-siren-button-push-stop-alarm"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
   }
 ]
