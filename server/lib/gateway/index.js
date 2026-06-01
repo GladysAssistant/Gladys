@@ -31,9 +31,11 @@ const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { getEdfTempo } = require('./gateway.getEdfTempo');
 const { getEdfTempoHistorical } = require('./gateway.getEdfTempoHistorical');
-const { openAIAsk } = require('./gateway.openAIAsk');
 const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
-const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
+const { stt } = require('./gateway.stt');
+const { processVoiceMessage } = require('./gateway.processVoiceMessage');
+const { aiChat } = require('./gateway.aiChat');
+const { forwardMessageToAiChat } = require('./gateway.forwardMessageToAiChat');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -94,7 +96,7 @@ const Gateway = function Gateway(
   this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
-  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToOpenAI.bind(this)));
+  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToAiChat.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -123,8 +125,8 @@ Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.getEdfTempo = getEdfTempo;
 Gateway.prototype.getEdfTempoHistorical = getEdfTempoHistorical;
-Gateway.prototype.openAIAsk = openAIAsk;
-Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
+Gateway.prototype.aiChat = aiChat;
+Gateway.prototype.forwardMessageToAiChat = forwardMessageToAiChat;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;
@@ -133,5 +135,9 @@ Gateway.prototype.enedisGetDailyConsumptionMaxPower = enedisGetDailyConsumptionM
 
 // TTS API
 Gateway.prototype.getTTSApiUrl = getTTSApiUrl;
+
+// STT API
+Gateway.prototype.stt = stt;
+Gateway.prototype.processVoiceMessage = processVoiceMessage;
 
 module.exports = Gateway;

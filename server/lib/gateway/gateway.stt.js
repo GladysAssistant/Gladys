@@ -3,20 +3,19 @@ const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
- * @description Ask OpenAI a question.
- * @param {object} body - The query to ask.
- * @returns {Promise} Resolve with OpenAI response.
+ * @description Transcribe audio via Gladys Plus STT API.
+ * @param {Buffer} audio - Raw audio buffer.
+ * @param {string} [contentType='application/octet-stream'] - Audio MIME type from the client.
+ * @returns {Promise<object>} STT API response.
  * @example
- * openAIAsk({
- *    question
- * })
+ * stt(audioBuffer, 'audio/wav');
  */
-async function openAIAsk(body) {
+async function stt(audio, contentType = 'application/octet-stream') {
   try {
-    const response = await this.gladysGatewayClient.openAIAsk(body);
+    const response = await this.gladysGatewayClient.stt(audio, contentType);
     return response;
   } catch (e) {
-    logger.debug(e);
+    logger.warn(e);
     const status = get(e, 'response.status');
     const message = get(e, 'response.data.error_message');
     if (status === 403) {
@@ -30,5 +29,5 @@ async function openAIAsk(body) {
 }
 
 module.exports = {
-  openAIAsk,
+  stt,
 };

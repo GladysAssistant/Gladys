@@ -1,30 +1,10 @@
 import { Text } from 'preact-i18n';
+import style from './style.css';
 
 const Messages = ({}) => (
-  <div
-    style={{
-      width: '40%',
-      maxWidth: '200px',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      marginTop: '60px',
-      marginBottom: '60px',
-      textAlign: 'center'
-    }}
-  >
-    <img
-      src="/assets/images/undraw_typing.svg"
-      style={{
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        display: 'block'
-      }}
-    />
-    <p
-      style={{
-        marginTop: '20px'
-      }}
-    >
+  <div class={style.emptyChatState}>
+    <img src="/assets/images/undraw_typing.svg" class={style.emptyChatImage} />
+    <p class={style.emptyChatText}>
       <Text id="chat.emptyStateMessage" />
     </p>
   </div>

@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -45,12 +45,18 @@ const actionSchema = Joi.object()
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
-    headers: Joi.array().items(
-      Joi.object().keys({
-        key: Joi.string(),
-        value: Joi.string(),
-      }),
-    ),
+    headers: Joi.alternatives().conditional('type', {
+      is: ACTIONS.HTTP.REQUEST,
+      then: Joi.array()
+        .items(
+          Joi.object().keys({
+            key: Joi.string(),
+            value: Joi.string(),
+          }),
+        )
+        .required(),
+      otherwise: Joi.forbidden(),
+    }),
     conditions: Joi.array().items({
       variable: Joi.string().required(),
       operator: Joi.string()
@@ -123,6 +129,28 @@ const triggersSchema = Joi.array().items(
   }),
 );
 
+/**
+ * @description Build a flat validation message from Joi details.
+ * @param {object} error - Joi validation error.
+ * @returns {string} Flattened validation message.
+ * @example
+ * formatJoiValidationError({ details: [{ message: '"actions" must be an array' }] });
+ */
+function formatJoiValidationError(error) {
+  if (!error || !Array.isArray(error.details) || error.details.length === 0) {
+    return error?.message || 'Invalid schema';
+  }
+  return error.details.map((detail) => detail.message).join('; ');
+}
+
+/**
+ * @description Scene database model definition.
+ * @param {object} sequelize - Sequelize instance.
+ * @param {object} DataTypes - Sequelize data types.
+ * @returns {object} Scene model.
+ * @example
+ * module.exports(sequelize, Sequelize.DataTypes);
+ */
 module.exports = (sequelize, DataTypes) => {
   const scene = sequelize.define(
     't_scene',
@@ -162,9 +190,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = actionsSchema.validate(value);
+            const result = actionsSchema.validate(value, { abortEarly: false });
             if (result.error) {
-              throw new Error(result.error.details[0].message);
+              throw new Error(formatJoiValidationError(result.error));
             }
           },
         },
@@ -173,9 +201,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = triggersSchema.validate(value);
+            const result = triggersSchema.validate(value, { abortEarly: false });
             if (result.error) {
-              throw new Error(result.error.details[0].message);
+              throw new Error(formatJoiValidationError(result.error));
             }
           },
         },
@@ -200,3 +228,5 @@ module.exports = (sequelize, DataTypes) => {
 
   return scene;
 };
+
+module.exports.formatJoiValidationError = formatJoiValidationError;
