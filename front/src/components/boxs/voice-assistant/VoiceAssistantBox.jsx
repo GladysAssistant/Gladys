@@ -12,6 +12,7 @@ import {
   isSpeechRecordingSupported
 } from '../../../utils/speechMicrophoneAccess';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
+import { playSpeechTtsUrl, unlockSpeechTtsPlayback } from '../../../utils/speechTtsPlayback';
 import style from './style.css';
 
 const STATE = {
@@ -265,19 +266,18 @@ class VoiceAssistantBox extends Component {
     }
     this.safeSetState({ uiState: STATE.SPEAKING }, voiceSessionGeneration);
     try {
-      if (this.audioPlayer) {
-        this.audioPlayer.onended = null;
-        this.audioPlayer.pause();
+      if (!this.audioPlayer) {
+        this.audioPlayer = new Audio();
       }
-      this.audioPlayer = new Audio(ttsUrl);
-      this.audioPlayer.onended = () => {
+      this.audioPlayer.onended = null;
+      this.audioPlayer.pause();
+      await playSpeechTtsUrl(this.audioPlayer, ttsUrl, () => {
         if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
           return;
         }
         this.safeSetState({ uiState: STATE.IDLE }, voiceSessionGeneration);
         this.scheduleMessagesClear();
-      };
-      await this.audioPlayer.play();
+      });
     } catch (e) {
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
         return;
@@ -312,6 +312,11 @@ class VoiceAssistantBox extends Component {
       );
       return;
     }
+
+    if (!this.audioPlayer) {
+      this.audioPlayer = new Audio();
+    }
+    unlockSpeechTtsPlayback(this.audioPlayer);
 
     this.safeSetState(
       {
