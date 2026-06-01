@@ -1,5 +1,8 @@
 const { Error400 } = require('../../utils/httpErrors');
 
+/** @description JSON body flag when audio is sent through the Gladys Gateway WebSocket. */
+const GLADYS_GATEWAY_BINARY_BODY = 'gladys_binary_body';
+
 /**
  * @description Read raw audio from the request body.
  * @param {object} req - Express request.
@@ -11,6 +14,16 @@ function getAudioBufferFromRequest(req) {
   if (Buffer.isBuffer(req.body) && req.body.length > 0) {
     return req.body;
   }
+
+  if (
+    req.body &&
+    req.body[GLADYS_GATEWAY_BINARY_BODY] === true &&
+    typeof req.body.data === 'string' &&
+    req.body.data.length > 0
+  ) {
+    return Buffer.from(req.body.data, 'base64');
+  }
+
   throw new Error400('Missing audio body');
 }
 
@@ -23,8 +36,7 @@ const DEFAULT_AUDIO_CONTENT_TYPE = 'application/octet-stream';
  * @example
  * getAudioContentTypeFromRequest(req);
  */
-function getAudioContentTypeFromRequest(req) {
-  const raw = req.headers && req.headers['content-type'];
+function normalizeAudioContentType(raw) {
   if (!raw || typeof raw !== 'string') {
     return DEFAULT_AUDIO_CONTENT_TYPE;
   }
@@ -40,8 +52,18 @@ function getAudioContentTypeFromRequest(req) {
   return DEFAULT_AUDIO_CONTENT_TYPE;
 }
 
+function getAudioContentTypeFromRequest(req) {
+  if (req.body && req.body[GLADYS_GATEWAY_BINARY_BODY] === true && req.body.content_type) {
+    return normalizeAudioContentType(req.body.content_type);
+  }
+
+  const raw = req.headers && req.headers['content-type'];
+  return normalizeAudioContentType(raw);
+}
+
 module.exports = {
   getAudioBufferFromRequest,
   getAudioContentTypeFromRequest,
   DEFAULT_AUDIO_CONTENT_TYPE,
+  GLADYS_GATEWAY_BINARY_BODY,
 };

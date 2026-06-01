@@ -1,4 +1,5 @@
 import pLimit from 'p-limit';
+import { encodeGatewayBinaryBody } from './gatewayBinaryBody';
 
 export class GatewayHttpClient {
   constructor(session) {
@@ -83,6 +84,19 @@ export class GatewayHttpClient {
 
   async post(url, body) {
     return this.callApiWhenReady('sendRequestPost', url, body);
+  }
+
+  /**
+   * @description POST binary data to the local Gladys instance via the gateway WebSocket.
+   * @param {string} url - API path.
+   * @param {Blob|ArrayBuffer|Uint8Array} body - Raw request body.
+   * @param {string} [contentType='application/octet-stream'] - Content-Type header.
+   * @param {object} [_options={}] - Reserved for API parity with HttpClient (e.g. signal; not supported here).
+   * @returns {Promise<object>} Parsed JSON response.
+   */
+  async postBinary(url, body, contentType = 'application/octet-stream', _options = {}) {
+    const gatewayBody = await encodeGatewayBinaryBody(body, contentType);
+    return this.callApiWhenReady('sendRequestPost', url, gatewayBody);
   }
 
   async patch(url, body) {

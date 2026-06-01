@@ -25,6 +25,19 @@ describe('getAudioBufferFromRequest', () => {
   it('should reject a non-buffer body', () => {
     assert.throws(() => getAudioBufferFromRequest({ body: { audio: 'test' } }), Error400, 'Missing audio body');
   });
+
+  it('should decode gateway binary JSON body', () => {
+    const audio = Buffer.from('audio-data');
+    const result = getAudioBufferFromRequest({
+      body: {
+        gladys_binary_body: true,
+        content_type: 'audio/wav',
+        data: audio.toString('base64'),
+      },
+    });
+
+    expect(result).to.deep.equal(audio);
+  });
 });
 
 describe('getAudioContentTypeFromRequest', () => {
@@ -40,5 +53,17 @@ describe('getAudioContentTypeFromRequest', () => {
     expect(getAudioContentTypeFromRequest({ headers: { 'content-type': 'text/plain' } })).to.equal(
       'application/octet-stream',
     );
+  });
+
+  it('should read content type from gateway binary JSON body', () => {
+    expect(
+      getAudioContentTypeFromRequest({
+        body: {
+          gladys_binary_body: true,
+          content_type: 'audio/webm',
+          data: Buffer.from('x').toString('base64'),
+        },
+      }),
+    ).to.equal('audio/webm');
   });
 });
