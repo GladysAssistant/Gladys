@@ -62,7 +62,9 @@ class TurnOnLight extends Component {
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
       levelSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;
-      levelMatterSensorDevice = category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR;
+      levelMatterSensorDevice =
+        category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR ||
+        category === DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR;
     }
 
     const defaultDevice =

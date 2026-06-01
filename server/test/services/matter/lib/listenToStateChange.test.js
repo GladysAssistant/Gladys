@@ -13,6 +13,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
@@ -288,6 +289,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1070',
       state: 3,
+    });
+  });
+  it('should listen to state change (NitrogenDioxideConcentrationMeasurement)', async () => {
+    const clusterClient = {
+      id: NitrogenDioxideConcentrationMeasurement.Complete.id,
+      addLevelValueAttributeListener: (callback) => {
+        callback(2);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:1043',
+      state: 2,
     });
   });
   it('should listen to state change (FormaldehydeConcentrationMeasurement)', async () => {
