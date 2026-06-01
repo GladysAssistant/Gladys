@@ -503,6 +503,9 @@
         "transcriptionLabel": "Sie sagten",
         "responseLabel": "Antwort",
         "error": "Ein Fehler ist aufgetreten. Prüfen Sie, ob Gladys Plus verbunden ist.",
+        "errorInsecureContext": "Das Mikrofon erfordert eine sichere Verbindung. Öffnen Sie Gladys über Gladys Plus unter <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Erlauben Sie Safari den Mikrofonzugriff unter Einstellungen > Safari > Mikrofon.",
+        "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       }

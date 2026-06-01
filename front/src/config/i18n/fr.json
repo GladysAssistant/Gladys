@@ -503,6 +503,9 @@
         "transcriptionLabel": "Vous avez dit",
         "responseLabel": "Réponse",
         "error": "Une erreur est survenue. Vérifiez que Gladys Plus est connecté.",
+        "errorInsecureContext": "Le micro nécessite une connexion sécurisée. Ouvrez Gladys sur Gladys Plus à <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Autorisez l'accès au micro pour Safari dans Réglages > Safari > Microphone.",
+        "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur.",
         "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
         "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
       }

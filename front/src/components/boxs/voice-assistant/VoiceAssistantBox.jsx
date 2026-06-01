@@ -1,11 +1,16 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import GladysPlusUpsellCard from '../../gateway/GladysPlusUpsellCard';
 import { normalizeSpeechBlobForStt } from '../../../utils/speechAudioForStt';
+import {
+  getSpeechRecordingUnavailableReason,
+  isSpeechRecordingError,
+  isSpeechRecordingSupported
+} from '../../../utils/speechMicrophoneAccess';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
 import style from './style.css';
 
@@ -66,13 +71,35 @@ function getHttpErrorMessage(error) {
   return 'unknown';
 }
 
+/**
+ * @description Map recording / HTTP errors to UI error state.
+ * @param {Error} error - Caught error.
+ * @returns {{ errorType: string, errorMessage: string|null }} UI error fields.
+ */
+function getVoiceErrorState(error) {
+  if (isSpeechRecordingError(error)) {
+    if (error.code === 'INSECURE_CONTEXT') {
+      return { errorType: 'insecure', errorMessage: null };
+    }
+    if (error.code === 'PERMISSION_DENIED') {
+      return { errorType: 'permission', errorMessage: null };
+    }
+    if (error.code === 'NOT_SUPPORTED') {
+      return { errorType: 'unsupported', errorMessage: null };
+    }
+  }
+  return { errorType: 'http', errorMessage: getHttpErrorMessage(error) };
+}
+
 class VoiceAssistantBox extends Component {
   state = {
     uiState: STATE.IDLE,
     transcription: '',
     response: '',
-    error: null,
-    gatewayConnected: null
+    errorType: null,
+    errorMessage: null,
+    gatewayConnected: null,
+    microphoneAvailable: typeof window !== 'undefined' ? isSpeechRecordingSupported() : true
   };
 
   audioPlayer = null;
@@ -273,12 +300,26 @@ class VoiceAssistantBox extends Component {
     this.activeVoiceAbortController = abortController;
 
     this.clearMessagesClearTimeout();
+    if (!isSpeechRecordingSupported()) {
+      const reason = getSpeechRecordingUnavailableReason();
+      this.safeSetState(
+        {
+          uiState: STATE.ERROR,
+          errorType: reason === 'INSECURE_CONTEXT' ? 'insecure' : 'unsupported',
+          errorMessage: null
+        },
+        voiceSessionGeneration
+      );
+      return;
+    }
+
     this.safeSetState(
       {
         uiState: STATE.LISTENING,
         transcription: '',
         response: '',
-        error: null
+        errorType: null,
+        errorMessage: null
       },
       voiceSessionGeneration
     );
@@ -321,10 +362,12 @@ class VoiceAssistantBox extends Component {
       }
       console.error(e);
       this.clearMessagesClearTimeout();
+      const { errorType, errorMessage } = getVoiceErrorState(e);
       this.safeSetState(
         {
           uiState: STATE.ERROR,
-          error: getHttpErrorMessage(e)
+          errorType,
+          errorMessage
         },
         voiceSessionGeneration
       );
@@ -357,11 +400,13 @@ class VoiceAssistantBox extends Component {
   };
 
   render(props, state) {
-    const { uiState, transcription, response, error, gatewayConnected } = state;
+    const { uiState, transcription, response, errorType, errorMessage, gatewayConnected, microphoneAvailable } =
+      state;
     const boxTitle = props.box.name;
     const isBusy = uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING;
     const isDark = this.isDarkTheme();
     const needsGladysPlus = gatewayConnected !== true;
+    const micBlocked = microphoneAvailable === false;
 
     return (
       <div
@@ -391,8 +436,8 @@ class VoiceAssistantBox extends Component {
             </div>
           )}
 
-          <div class={cx(style.box, needsGladysPlus && style.boxDisabled)}>
-            <div class={style.orbStage}>
+          <div class={style.box}>
+            <div class={cx(style.orbStage, (needsGladysPlus || micBlocked) && style.orbStageMuted)}>
               <div
                 class={cx(style.orb, {
                   [style.orbIdle]: uiState === STATE.IDLE || uiState === STATE.ERROR,
@@ -408,7 +453,7 @@ class VoiceAssistantBox extends Component {
                   type="button"
                   class={style.orbButton}
                   onClick={this.handleSpeakClick}
-                  disabled={isBusy || needsGladysPlus}
+                  disabled={isBusy || needsGladysPlus || micBlocked}
                   aria-live="polite"
                 >
                   {uiState === STATE.LISTENING && (
@@ -435,14 +480,40 @@ class VoiceAssistantBox extends Component {
                   <Text id="dashboard.boxes.voice-assistant.listeningHint" />
                 </p>
               )}
-              {gatewayConnected === false && (
-                <p class={style.plusRequiredHint}>
-                  <Text id="dashboard.boxes.voice-assistant.plusRequiredHint" />
-                </p>
-              )}
             </div>
+            {gatewayConnected === false && (
+              <p class={style.plusRequiredHint}>
+                <Text id="dashboard.boxes.voice-assistant.plusRequiredHint" />
+              </p>
+            )}
+            {micBlocked &&
+              (getSpeechRecordingUnavailableReason() === 'INSECURE_CONTEXT' ? (
+                <p class={style.plusRequiredHint}>
+                  <MarkupText id="dashboard.boxes.voice-assistant.errorInsecureContext" />
+                </p>
+              ) : (
+                <p class={style.plusRequiredHint}>
+                  <Text id="dashboard.boxes.voice-assistant.errorNotSupported" />
+                </p>
+              ))}
 
-            {error && (
+            {errorType === 'insecure' && (
+              <p class={style.error}>
+                <MarkupText id="dashboard.boxes.voice-assistant.errorInsecureContext" />
+              </p>
+            )}
+            {errorType === 'permission' && (
+              <p class={style.error}>
+                <Text id="dashboard.boxes.voice-assistant.errorPermissionDenied" />
+              </p>
+            )}
+            {errorType === 'unsupported' && (
+              <p class={style.error}>
+                <Text id="dashboard.boxes.voice-assistant.errorNotSupported" />
+              </p>
+            )}
+            {errorType === 'http' && errorMessage && <p class={style.error}>{errorMessage}</p>}
+            {errorType === 'http' && !errorMessage && (
               <p class={style.error}>
                 <Text id="dashboard.boxes.voice-assistant.error" />
               </p>

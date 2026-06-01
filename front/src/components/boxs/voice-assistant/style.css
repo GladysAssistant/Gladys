@@ -449,9 +449,8 @@
   font-weight: 600;
 }
 
-.boxDisabled {
+.orbStageMuted {
   opacity: 0.55;
-  pointer-events: none;
 }
 
 .plusRequiredHint {
@@ -459,6 +458,18 @@
   font-size: 0.875rem;
   color: var(--va-status);
   text-align: center;
+}
+
+.plusRequiredHint a,
+.error a {
+  color: var(--va-blue-deep);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cardDark .plusRequiredHint a,
+.cardDark .error a {
+  color: var(--va-blue-light);
 }
 
 .upsellWrap {

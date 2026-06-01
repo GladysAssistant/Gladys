@@ -1,3 +1,4 @@
+import { getSpeechUserMedia } from './speechMicrophoneAccess';
 import { STT_SAMPLE_RATE, float32SamplesToSttWav } from './speechAudioForStt';
 
 /** Target bitrate for voice upload (STT does not need hi-fi). */
@@ -207,7 +208,7 @@ async function recordUntilSilenceWithPcm({
   maxDurationMs = 30000,
   minRecordingMs = 500
 } = {}) {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+  const stream = await getSpeechUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
 
   const stopStream = () => {
     stream.getTracks().forEach(track => track.stop());
@@ -373,7 +374,7 @@ async function recordUntilSilenceWithMediaRecorder({
   maxDurationMs = 30000,
   minRecordingMs = 500
 } = {}) {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
+  const stream = await getSpeechUserMedia({ audio: SPEECH_AUDIO_CONSTRAINTS });
 
   const stopStream = () => {
     stream.getTracks().forEach(track => track.stop());

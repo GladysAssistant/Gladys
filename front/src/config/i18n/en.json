@@ -503,6 +503,9 @@
         "transcriptionLabel": "You said",
         "responseLabel": "Response",
         "error": "Something went wrong. Make sure Gladys Plus is connected.",
+        "errorInsecureContext": "The microphone requires a secure connection. Open Gladys on Gladys Plus at <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Allow microphone access for Safari in Settings > Safari > Microphone.",
+        "errorNotSupported": "Voice recording is not available in this browser.",
         "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
         "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       }
