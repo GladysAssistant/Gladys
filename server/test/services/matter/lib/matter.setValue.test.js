@@ -673,4 +673,120 @@ describe('Matter.setValue', () => {
     await matterHandler.setValue(gladysDevice, gladysFeature, FAN_AIRFLOW_DIRECTION.REVERSE);
     assert.calledOnceWithExactly(clusterClient.setAirflowDirectionAttribute, FAN_AIRFLOW_DIRECTION.REVERSE);
   });
+
+  it('should set fan speed, rock and wind settings', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const clusterClient = {
+      setSpeedSettingAttribute: fake.resolves(null),
+      setRockSettingAttribute: fake.resolves(null),
+      setWindSettingAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:speed`,
+      },
+      5,
+    );
+    assert.calledOnceWithExactly(clusterClient.setSpeedSettingAttribute, 5);
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:rock`,
+      },
+      1,
+    );
+    assert.calledOnceWithExactly(clusterClient.setRockSettingAttribute, 1);
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:wind`,
+      },
+      2,
+    );
+    assert.calledOnceWithExactly(clusterClient.setWindSettingAttribute, 2);
+  });
+
+  it('should return an error when fan control cluster is missing', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:mode`,
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => null,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, FAN_MODE.LOW);
+    await chaiAssert.isRejected(promise, 'Device does not support FanControl cluster');
+  });
+
+  it('should return an error for unsupported fan feature suffix', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:invalid`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, 0);
+    await chaiAssert.isRejected(promise, 'Unsupported FanControl feature suffix: invalid');
+  });
 });

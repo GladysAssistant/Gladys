@@ -40,4 +40,12 @@ describe('getFanFeatureOptions', () => {
       ),
     ).to.deep.equal([FAN_AIRFLOW_DIRECTION.FORWARD, FAN_AIRFLOW_DIRECTION.REVERSE]);
   });
+
+  it('should return a numeric range for unknown fan feature types', () => {
+    expect(getFanFeatureOptions('unknown-type', 2, 4)).to.deep.equal([2, 3, 4]);
+  });
+
+  it('should use default min and max when not provided', () => {
+    expect(getFanFeatureOptions('unknown-type')).to.deep.equal([0]);
+  });
 });

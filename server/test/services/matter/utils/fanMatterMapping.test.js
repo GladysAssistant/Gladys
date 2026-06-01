@@ -21,4 +21,9 @@ describe('Matter fanMatterMapping', () => {
     expect(gladysFanModeToMatter(FAN_MODE.HIGH)).to.eq(3);
     expect(gladysFanModeToMatter(FAN_MODE.AUTO)).to.eq(5);
   });
+
+  it('should return unknown values unchanged', () => {
+    expect(matterFanModeToGladys(99)).to.eq(99);
+    expect(gladysFanModeToMatter(99)).to.eq(99);
+  });
 });
