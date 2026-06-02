@@ -43,11 +43,8 @@ function createActions(store) {
 
         const [zigbee2mqttsReceived, discoveredDevices] = await Promise.all([
           state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options),
-          state.httpClient
-            .get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false })
-            .catch(() => [])
+          state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false }).catch(() => [])
         ]);
-
 
         const discoveredMap = {};
         discoveredDevices.forEach(d => {
