@@ -1170,7 +1170,7 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
         "z2mFrontendUrlLabel": "URL de l'interface Zigbee2mqtt",
         "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {

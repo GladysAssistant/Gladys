@@ -139,7 +139,7 @@ class DiscoveredBox extends Component {
                         <input type="text" class="form-control" value={ieee_address} disabled />
                         {z2mUrl && (
                           <a
-                            href={`${z2mUrl}/#/device/0/${ieee_address}`}
+                            href={`${z2mUrl}/#/device/0/${ieee_address}/info`}
                             target="_blank"
                             rel="noopener noreferrer"
                             class={`${style.z2mDeviceLink} mt-2 text-muted`}

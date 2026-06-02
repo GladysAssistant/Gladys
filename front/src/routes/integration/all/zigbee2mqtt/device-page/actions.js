@@ -11,6 +11,7 @@ function createActions(store) {
   const houseActions = createActionsHouse(store);
   const actions = {
     async getZ2mUrl(state) {
+      store.setState({ z2mUrl: undefined });
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
         if (configuration.Z2M_MQTT_MODE === 'local') {
@@ -42,8 +43,11 @@ function createActions(store) {
 
         const [zigbee2mqttsReceived, discoveredDevices] = await Promise.all([
           state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options),
-          state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false })
+          state.httpClient
+            .get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false })
+            .catch(() => [])
         ]);
+
 
         const discoveredMap = {};
         discoveredDevices.forEach(d => {

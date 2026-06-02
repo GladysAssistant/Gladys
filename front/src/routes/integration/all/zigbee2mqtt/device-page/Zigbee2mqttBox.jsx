@@ -167,13 +167,19 @@ class Zigbee2mqttBox extends Component {
 
                 {props.device.ieee_address && (
                   <div class="form-group">
-                    <label class="form-label">
+                    <label class="form-label" for={`ieee_${props.deviceIndex}`}>
                       <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
                     </label>
-                    <input type="text" class="form-control" value={props.device.ieee_address} disabled />
+                    <input
+                      id={`ieee_${props.deviceIndex}`}
+                      type="text"
+                      class="form-control"
+                      value={props.device.ieee_address}
+                      readOnly
+                    />
                     {props.z2mUrl && (
                       <a
-                        href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}`}
+                        href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}/info`}
                         target="_blank"
                         rel="noopener noreferrer"
                         class={`${style.z2mDeviceLink} mt-2 text-muted`}
