@@ -537,6 +537,12 @@
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
+      "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
+      "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
+      "gatewayBanner": {
+        "title": "Can't find your device?",
+        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol) or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Once connected, they can be controlled in Gladys like any other device."
+      },
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",

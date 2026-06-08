@@ -537,6 +537,12 @@
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
+      "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
+      "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "gatewayBanner": {
+        "title": "Dein Gerät ist nicht in der Liste?",
+        "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin …) verbunden werden. Nach der Verbindung lassen sie sich in Gladys wie jedes andere Gerät steuern."
+      },
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
