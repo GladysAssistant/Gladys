@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
@@ -40,7 +40,15 @@ const XiaomiLayout = ({ children, user }) => (
               </div>
             </div>
 
-            <div class="col-lg-9">{children}</div>
+            <div class="col-lg-9">
+              <div class="alert alert-warning mb-4">
+                <h4 class="alert-title">
+                  <Text id="integration.xiaomi.deprecatedWarning.title" />
+                </h4>
+                <MarkupText id="integration.xiaomi.deprecatedWarning.description" />
+              </div>
+              {children}
+            </div>
           </div>
         </div>
       </div>

@@ -1937,6 +1937,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
+      "deprecatedWarning": {
+        "title": "Intégration obsolète",
+        "description": "Cette intégration repose sur le mode développeur des anciennes passerelles Xiaomi/Aqara, qui n'est plus accessible sur les modèles et applications récents. Elle n'est plus maintenue pour les nouveaux équipements. Les produits Xiaomi compatibles seront pris en charge via <a href=\"/dashboard/integration/device/matter\">Matter</a>. Si vous possédez déjà une passerelle configurée en mode développeur, elle peut continuer à fonctionner."
+      },
       "deviceTab": "Appareils",
       "documentation": "Documentation Xiaomi",
       "device": {

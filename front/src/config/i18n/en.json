@@ -1748,6 +1748,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Control Xiaomi home devices with the official hub",
+      "deprecatedWarning": {
+        "title": "Deprecated integration",
+        "description": "This integration relies on developer mode on legacy Xiaomi/Aqara gateways, which is no longer available on recent models and app versions. It is no longer maintained for new hardware. Compatible Xiaomi products will be supported via <a href=\"/dashboard/integration/device/matter\">Matter</a>. If you already have a gateway configured in developer mode, it may continue to work."
+      },
       "deviceTab": "Devices",
       "documentation": "Xiaomi documentation",
       "device": {
