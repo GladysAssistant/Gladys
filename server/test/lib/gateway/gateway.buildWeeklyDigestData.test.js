@@ -77,6 +77,42 @@ describe('gateway.buildWeeklyDigestData', () => {
     expect(data.recent_scenes).to.have.lengthOf(1);
   });
 
+  it('should sort recent scenes by last execution date', async () => {
+    const gateway = {
+      device: {
+        get: fake.resolves([]),
+        energySensorManager: {
+          getConsumptionByDates: fake.resolves([]),
+        },
+      },
+      scene: {
+        get: fake.resolves([
+          {
+            name: 'Older scene',
+            active: true,
+            last_executed: '2026-06-01T10:00:00.000Z',
+          },
+          {
+            name: 'Newer scene',
+            active: false,
+            last_executed: '2026-06-07T10:00:00.000Z',
+          },
+        ]),
+      },
+      variable: {
+        getValue: fake.resolves('10'),
+      },
+      energyPrice: {
+        getDefaultElectricMeterFeatureId: fake.resolves(null),
+      },
+    };
+
+    const data = await buildWeeklyDigestData.call(gateway);
+
+    expect(data.recent_scenes[0].name).to.equal('Newer scene');
+    expect(data.period.from_date).to.be.a('string');
+  });
+
   it('should include all consumption features with hierarchy metadata', async () => {
     const devices = [
       {
@@ -868,6 +904,47 @@ describe('belongsToMainMeterBranch', () => {
 
     expect(belongsToMainMeterBranch(devices, devices[1].features[0], 'enedis-device')).to.equal(true);
     expect(findDeviceFeatureById(devices, 'enedis-index').device.id).to.equal('enedis-device');
+    expect(findDeviceFeatureById(devices, 'missing-feature')).to.equal(null);
+  });
+
+  it('should walk multi-level parent chains', () => {
+    const devices = [
+      {
+        id: 'main-meter',
+        features: [{ id: 'main-index' }],
+      },
+      {
+        id: 'middle-device',
+        features: [{ id: 'middle-index', energy_parent_id: 'main-index' }],
+      },
+      {
+        id: 'leaf-device',
+        features: [{ id: 'leaf-consumption', energy_parent_id: 'middle-index' }],
+      },
+    ];
+
+    expect(belongsToMainMeterBranch(devices, devices[2].features[0], 'main-meter')).to.equal(true);
+  });
+
+  it('should return false when parent feature is missing or branch differs', () => {
+    expect(belongsToMainMeterBranch([], { energy_parent_id: 'parent-id' }, null)).to.equal(false);
+    expect(belongsToMainMeterBranch([], {}, 'main-meter')).to.equal(false);
+    expect(
+      belongsToMainMeterBranch([{ id: 'device-1', features: [] }], { energy_parent_id: 'missing' }, 'main-meter'),
+    ).to.equal(false);
+
+    const devices = [
+      {
+        id: 'other-meter',
+        features: [{ id: 'other-index' }],
+      },
+      {
+        id: 'leaf-device',
+        features: [{ id: 'leaf-consumption', energy_parent_id: 'other-index' }],
+      },
+    ];
+
+    expect(belongsToMainMeterBranch(devices, devices[1].features[0], 'main-meter')).to.equal(false);
   });
 });
 
