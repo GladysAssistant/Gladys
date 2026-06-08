@@ -453,6 +453,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
 module.exports = {
   forwardMessageToAiChat,
+  extractAssistantMessage,
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
   formatToolCallTraceText,

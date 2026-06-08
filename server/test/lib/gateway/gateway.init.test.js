@@ -43,6 +43,15 @@ describe('gateway.init', () => {
       if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
         return 'Europe/Paris';
       }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_ENABLED) {
+        return '0';
+      }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_DAY) {
+        return '0';
+      }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR) {
+        return '18';
+      }
       return JSON.stringify(userKeys);
     };
     variable.setValue = fake.resolves(null);
@@ -73,7 +82,7 @@ describe('gateway.init', () => {
   });
 
   it('check constructor event subscription', () => {
-    assert.callCount(event.on, 10);
+    assert.callCount(event.on, 11);
   });
 
   it('check init well connected', async () => {
