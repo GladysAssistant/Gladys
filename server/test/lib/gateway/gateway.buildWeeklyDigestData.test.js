@@ -4,9 +4,14 @@ const { fake } = require('sinon');
 const {
   buildWeeklyDigestData,
   sumConsumptionValues,
+  isConsumptionFeature,
+  pickConsumptionFeatureOnDevice,
   getLeafConsumptionCandidates,
   selectEnergyFeaturesForDigest,
   dedupeConsumptionCandidatesByDevice,
+  splitMainMeterAndOtherCandidates,
+  getMainMeterDeviceId,
+  fetchEnergyConsumptionForCandidate,
 } = require('../../../lib/gateway/gateway.buildWeeklyDigestData');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
@@ -188,6 +193,193 @@ describe('gateway.buildWeeklyDigestData', () => {
 });
 
 describe('energy digest helpers', () => {
+  it('should detect consumption features', () => {
+    expect(
+      isConsumptionFeature({
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DAILY_CONSUMPTION,
+      }),
+    ).to.equal(true);
+    expect(
+      isConsumptionFeature({
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DAILY_CONSUMPTION,
+      }),
+    ).to.equal(false);
+  });
+
+  it('should return null when device has no consumption feature', () => {
+    expect(pickConsumptionFeatureOnDevice([])).to.equal(undefined);
+    expect(
+      pickConsumptionFeatureOnDevice([
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        },
+      ]),
+    ).to.equal(undefined);
+  });
+
+  it('should keep main meter consumption when it is a parent feature', () => {
+    const devices = [
+      {
+        id: 'meter-device',
+        name: 'Main meter',
+        features: [
+          {
+            id: 'meter-feature',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DAILY_CONSUMPTION,
+          },
+        ],
+      },
+      {
+        id: 'leaf-device',
+        name: 'Plug',
+        features: [
+          {
+            id: 'leaf-feature',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DAILY_CONSUMPTION,
+            energy_parent_id: 'meter-feature',
+          },
+        ],
+      },
+    ];
+
+    const candidates = getLeafConsumptionCandidates(devices, 'meter-device');
+
+    expect(candidates).to.have.lengthOf(2);
+    expect(candidates.map((candidate) => candidate.device.name)).to.include.members(['Main meter', 'Plug']);
+  });
+
+  it('should put all candidates in others when main meter is unknown', () => {
+    const candidates = [{ device: { id: 'plug-1' } }, { device: { id: 'plug-2' } }];
+    const split = splitMainMeterAndOtherCandidates(candidates, null);
+
+    expect(split.mainMeterCandidates).to.deep.equal([]);
+    expect(split.otherCandidates).to.deep.equal(candidates);
+  });
+
+  it('should resolve main meter device id from energy price configuration', async () => {
+    const deviceId = await getMainMeterDeviceId(
+      {
+        energyPrice: {
+          getDefaultElectricMeterFeatureId: async () => 'meter-feature',
+        },
+      },
+      [
+        {
+          id: 'meter-device',
+          features: [{ id: 'meter-feature' }],
+        },
+      ],
+    );
+
+    expect(deviceId).to.equal('meter-device');
+  });
+
+  it('should return null when energy price is not configured', async () => {
+    await expect(getMainMeterDeviceId({}, [])).to.eventually.equal(null);
+    await expect(
+      getMainMeterDeviceId(
+        {
+          energyPrice: {
+            getDefaultElectricMeterFeatureId: async () => null,
+          },
+        },
+        [],
+      ),
+    ).to.eventually.equal(null);
+    await expect(
+      getMainMeterDeviceId(
+        {
+          energyPrice: {
+            getDefaultElectricMeterFeatureId: async () => 'missing-feature',
+          },
+        },
+        [{ id: 'device-1', features: [] }],
+      ),
+    ).to.eventually.equal(null);
+  });
+
+  it('should fetch energy consumption for one candidate', async () => {
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake(async () => [{ values: [{ sum_value: 8 }] }]),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForCandidate(
+      context,
+      {
+        device: { name: 'Plug' },
+        feature: { name: 'Consumption', selector: 'plug-consumption' },
+        role: 'top_consumer_candidate',
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+    );
+
+    expect(result).to.deep.include({
+      device: 'Plug',
+      feature: 'Consumption',
+      role: 'top_consumer_candidate',
+      current_week_total: 8,
+      previous_week_total: 8,
+    });
+  });
+
+  it('should return null when consumption fetch fails', async () => {
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake.rejects(new Error('db error')),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForCandidate(
+      context,
+      {
+        device: { name: 'Plug' },
+        feature: { name: 'Consumption', selector: 'plug-consumption' },
+        role: 'top_consumer_candidate',
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+    );
+
+    expect(result).to.equal(null);
+  });
+
+  it('should return null when both weekly totals are empty', async () => {
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake.resolves([]),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForCandidate(
+      context,
+      {
+        device: { name: 'Plug' },
+        feature: { name: 'Consumption', selector: 'plug-consumption' },
+        role: 'top_consumer_candidate',
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+    );
+
+    expect(result).to.equal(null);
+  });
   it('should exclude intermediate consumption parents', () => {
     const devices = [
       {
@@ -299,5 +491,67 @@ describe('sumConsumptionValues', () => {
     ]);
 
     expect(total).to.equal(20);
+  });
+
+  it('should return null for empty or invalid results', () => {
+    expect(sumConsumptionValues([])).to.equal(null);
+    expect(sumConsumptionValues(null)).to.equal(null);
+    expect(sumConsumptionValues([{ deviceFeature: { is_subscription: true }, values: [{ value: 1 }] }])).to.equal(null);
+    expect(sumConsumptionValues([{ deviceFeature: { name: 'Consumption' }, values: [] }])).to.equal(null);
+  });
+
+  it('should fallback to value when sum_value is missing', () => {
+    expect(
+      sumConsumptionValues([
+        {
+          deviceFeature: { name: 'Consumption' },
+          values: [{ value: 4 }, { value: 6 }],
+        },
+      ]),
+    ).to.equal(10);
+  });
+});
+
+describe('buildWeeklyDigestData additional sensors', () => {
+  it('should include humidity and stale sensors', async () => {
+    const oldDate = new Date(Date.now() - 100 * 60 * 60 * 1000).toISOString();
+    const gateway = {
+      device: {
+        get: fake.resolves([
+          {
+            name: 'Humidity sensor',
+            room: null,
+            features: [
+              {
+                name: 'Humidity',
+                category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
+                last_value: 55,
+                unit: 'percent',
+                last_value_changed: oldDate,
+              },
+            ],
+          },
+        ]),
+        energySensorManager: {
+          getConsumptionByDates: fake.resolves([]),
+        },
+      },
+      scene: {
+        get: fake.resolves([]),
+      },
+      variable: {
+        getValue: fake.resolves('10'),
+      },
+      energyPrice: {
+        getDefaultElectricMeterFeatureId: fake.resolves(null),
+      },
+    };
+
+    const data = await buildWeeklyDigestData.call(gateway);
+
+    expect(data.humidities).to.have.lengthOf(1);
+    expect(data.humidities[0].room).to.equal('Unknown room');
+    expect(data.stale_sensors).to.have.lengthOf(1);
+    expect(data.stale_sensors[0].hours_since_update).to.be.greaterThan(48);
   });
 });

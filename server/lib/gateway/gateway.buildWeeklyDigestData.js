@@ -20,8 +20,7 @@ const CONSUMPTION_FEATURE_TYPES = [
  */
 function isConsumptionFeature(feature) {
   return (
-    feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
-    CONSUMPTION_FEATURE_TYPES.includes(feature.type)
+    feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR && CONSUMPTION_FEATURE_TYPES.includes(feature.type)
   );
 }
 
@@ -41,9 +40,7 @@ function pickConsumptionFeatureOnDevice(features) {
     return thirtyMinutesFeature;
   }
 
-  return consumptionFeatures.find(
-    (feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-  );
+  return consumptionFeatures.find((feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION);
 }
 
 /**
@@ -61,9 +58,7 @@ function getLeafConsumptionCandidates(devices, mainMeterDeviceId = null) {
 
   const intermediateParentIds = new Set(
     consumptionFeatures
-      .filter(({ feature }) =>
-        consumptionFeatures.some((other) => other.feature.energy_parent_id === feature.id),
-      )
+      .filter(({ feature }) => consumptionFeatures.some((other) => other.feature.energy_parent_id === feature.id))
       .filter(({ device }) => device.id !== mainMeterDeviceId)
       .map(({ feature }) => feature.id),
   );
@@ -83,9 +78,7 @@ function dedupeConsumptionCandidatesByDevice(candidates) {
 
   candidates.forEach((candidate) => {
     const selectedFeature = pickConsumptionFeatureOnDevice(
-      candidates
-        .filter((other) => other.device.id === candidate.device.id)
-        .map((other) => other.feature),
+      candidates.filter((other) => other.device.id === candidate.device.id).map((other) => other.feature),
     );
 
     if (!selectedFeature) {
@@ -132,13 +125,8 @@ function splitMainMeterAndOtherCandidates(candidates, mainMeterDeviceId) {
  * selectEnergyFeaturesForDigest([], null);
  */
 function selectEnergyFeaturesForDigest(devices, mainMeterDeviceId) {
-  const leafCandidates = dedupeConsumptionCandidatesByDevice(
-    getLeafConsumptionCandidates(devices, mainMeterDeviceId),
-  );
-  const { mainMeterCandidates, otherCandidates } = splitMainMeterAndOtherCandidates(
-    leafCandidates,
-    mainMeterDeviceId,
-  );
+  const leafCandidates = dedupeConsumptionCandidatesByDevice(getLeafConsumptionCandidates(devices, mainMeterDeviceId));
+  const { mainMeterCandidates, otherCandidates } = splitMainMeterAndOtherCandidates(leafCandidates, mainMeterDeviceId);
 
   const selected = [];
 
@@ -248,9 +236,7 @@ async function getMainMeterDeviceId(context, devices) {
     return null;
   }
 
-  const meterDevice = devices.find((device) =>
-    device.features.some((feature) => feature.id === defaultMeterFeatureId),
-  );
+  const meterDevice = devices.find((device) => device.features.some((feature) => feature.id === defaultMeterFeatureId));
 
   return meterDevice?.id ?? null;
 }
