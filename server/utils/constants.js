@@ -1439,6 +1439,7 @@ const DASHBOARD_BOX_TYPE = {
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
+  LINK: 'link',
 };
 
 const ERROR_MESSAGES = {

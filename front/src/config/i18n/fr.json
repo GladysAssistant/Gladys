@@ -286,7 +286,8 @@
       "music": "Musique",
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
-      "voice-assistant": "Assistant vocal"
+      "voice-assistant": "Assistant vocal",
+      "link": "Lien"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -453,6 +454,24 @@
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+      },
+      "link": {
+        "editTitleLabel": "Titre",
+        "editTitlePlaceholder": "Ex : Tasmota - Prise salon",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Icône",
+        "emptyUrl": "Aucune URL configurée.",
+        "icons": {
+          "link": "Lien",
+          "globe": "Site web",
+          "server": "Serveur",
+          "hard-drive": "Stockage (NAS)",
+          "wifi": "Réseau Wi-Fi",
+          "monitor": "Interface web",
+          "cpu": "Appareil connecté",
+          "home": "Maison"
+        }
       },
       "alarm": {
         "armButton": "Armer",

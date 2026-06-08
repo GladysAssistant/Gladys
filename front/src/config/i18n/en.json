@@ -286,7 +286,8 @@
       "music": "Music",
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
-      "voice-assistant": "Voice assistant"
+      "voice-assistant": "Voice assistant",
+      "link": "Link"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -483,6 +484,24 @@
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
         "editSceneLabel": "Select the scene you want to display here."
+      },
+      "link": {
+        "editTitleLabel": "Title",
+        "editTitlePlaceholder": "E.g. Tasmota - Living room plug",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Icon",
+        "emptyUrl": "No URL configured.",
+        "icons": {
+          "link": "Link",
+          "globe": "Website",
+          "server": "Server",
+          "hard-drive": "Storage (NAS)",
+          "wifi": "Wi-Fi network",
+          "monitor": "Web interface",
+          "cpu": "Connected device",
+          "home": "Home"
+        }
       },
       "alarm": {
         "armButton": "Arm",
