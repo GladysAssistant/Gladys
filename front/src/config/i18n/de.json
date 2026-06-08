@@ -64,6 +64,7 @@
   },
   "device": {
     "searchPlaceHolder": "Gerät suchen",
+    "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",
     "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Um zu verhindern, dass deine Gladys-Instanz langsam wird, während sie gelöscht werden, haben wir begonnen, diese Zustände langsam im Hintergrund zu löschen. Du kannst zurückkommen, um dieses Gerät zu löschen, wenn es keine Zustände mehr hat. Um den Löschvorgang zu überwachen, <a href=\"/dashboard/settings/jobs\">klicke hier</a>."
   },
