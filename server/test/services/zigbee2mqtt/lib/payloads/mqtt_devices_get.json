@@ -350,5 +350,37 @@
     "software_build_id": "3000-0001",
     "supported": false,
     "type": "EndDevice"
+  },
+  {
+    "definition": {
+      "description": "Outdoor siren",
+      "exposes": [
+        {
+          "access": 2,
+          "description": "Trigger an alarm on the device",
+          "name": "trigger_alarm",
+          "property": "trigger_alarm",
+          "type": "enum",
+          "values": ["trigger"]
+        },
+        {
+          "access": 2,
+          "description": "Stop an active alarm on the device",
+          "name": "stop_alarm",
+          "property": "stop_alarm",
+          "type": "enum",
+          "values": ["stop"]
+        }
+      ],
+      "model": "BSIR-EZ",
+      "supports_ota": true,
+      "vendor": "Bosch"
+    },
+    "friendly_name": "bosch-outdoor-siren",
+    "ieee_address": "0x00124b0023a1b2c3",
+    "interview_completed": true,
+    "interviewing": false,
+    "supported": true,
+    "type": "Router"
   }
 ]

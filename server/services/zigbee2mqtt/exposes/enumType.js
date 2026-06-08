@@ -2,6 +2,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   BUTTON_STATUS,
+  BUTTON_PUSH,
   COVER_STATE,
   SIREN_LMH_VOLUME,
   PILOT_WIRE_MODE,
@@ -151,6 +152,11 @@ addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
+// Bosch BSIR-EZ outdoor siren
+// https://www.zigbee2mqtt.io/devices/BSIR-EZ.html
+addMapping('trigger_alarm', BUTTON_PUSH.PRESSED, 'trigger');
+addMapping('stop_alarm', BUTTON_PUSH.PRESSED, 'stop');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -219,6 +225,18 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE,
+      },
+    },
+    trigger_alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
+      },
+    },
+    stop_alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
       },
     },
   },
