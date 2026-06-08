@@ -1,31 +1,24 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import { Link } from 'preact-router/match';
 
 import GladysPlusUpsell from '../../components/gateway/GladysPlusUpsell';
 
 class ChatSidebar extends Component {
   state = {
-    gladysPlusConfigured: null,
-    openAiEnabled: null
+    gladysPlusConfigured: null
   };
 
   fetchStatus = async () => {
     try {
-      const [gatewayStatus, openAiVariable] = await Promise.all([
-        this.props.httpClient.get('/api/v1/gateway/status'),
-        this.props.httpClient.get('/api/v1/variable/GLADYS_GATEWAY_OPEN_AI_ENABLED').catch(() => ({ value: 'false' }))
-      ]);
+      const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({
-        gladysPlusConfigured: gatewayStatus.configured === true,
-        openAiEnabled: openAiVariable.value === 'true'
+        gladysPlusConfigured: gatewayStatus.configured === true
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        gladysPlusConfigured: false,
-        openAiEnabled: false
+        gladysPlusConfigured: false
       });
     }
   };
@@ -34,9 +27,7 @@ class ChatSidebar extends Component {
     this.fetchStatus();
   }
 
-  render({}, { gladysPlusConfigured, openAiEnabled }) {
-    const plusAiActive = gladysPlusConfigured && openAiEnabled;
-
+  render({}, { gladysPlusConfigured }) {
     return (
       <div>
         <div class="card mb-3">
@@ -50,51 +41,10 @@ class ChatSidebar extends Component {
               <Text id="chat.sidebar.intro" />
             </p>
 
-            <h4 class="mb-2">
-              <span class="badge badge-secondary mr-2">
-                <Text id="chat.sidebar.localBadge" />
-              </span>
-              <Text id="chat.sidebar.localTitle" />
-            </h4>
-            <p class="small mb-2">
-              <Text id="chat.sidebar.localDescription" />
-            </p>
-            <p class="small text-muted mb-1">
-              <Text id="chat.sidebar.localHint" />
-            </p>
-            <ul class="small mb-4 pl-3">
-              <li>
-                <Text id="chat.sidebar.localExample1" />
-              </li>
-              <li>
-                <Text id="chat.sidebar.localExample2" />
-              </li>
-              <li>
-                <Text id="chat.sidebar.localExample3" />
-              </li>
-              <li>
-                <Text id="chat.sidebar.localExample4" />
-              </li>
-            </ul>
-
-            <h4 class="mb-2">
-              <span class="badge badge-info mr-2">Plus</span>
-              <Text id="chat.sidebar.plusTitle" />
-            </h4>
-            <p class="small mb-2">
-              <Text id="chat.sidebar.plusDescription" />
-            </p>
-            {plusAiActive ? (
+            {gladysPlusConfigured ? (
               <p class="small mb-0">
                 <i class="fe fe-check text-success mr-1" />
                 <Text id="chat.sidebar.plusActive" />
-              </p>
-            ) : gladysPlusConfigured ? (
-              <p class="small mb-0">
-                <Text id="chat.sidebar.plusConfiguredNotEnabled" />{' '}
-                <Link href="/dashboard/integration/communication/openai">
-                  <Text id="chat.sidebar.plusConfigureLink" />
-                </Link>
               </p>
             ) : (
               <p class="small mb-0 text-muted">

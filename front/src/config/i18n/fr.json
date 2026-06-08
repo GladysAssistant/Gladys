@@ -2143,7 +2143,7 @@
       "title": "Intelligence Artificielle",
       "documentation": "Documentation IA",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles Mistral, hébergés en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
+      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles IA open-weight, hébergés en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
       "examplesIntro": "Voici ce que tu peux faire avec l'IA :",
       "examplesChatTitle": "Dans le chat Gladys",
       "examplesChatHint": "Actions disponibles : lumières et prises par pièce, caméras, scènes, température et humidité.",
@@ -2156,7 +2156,7 @@
       "exampleScene1": "Toutes les 30 minutes : analyse la caméra de l'entrée et vérifie si la voiture garée devant correspond bien à ma plaque d'immatriculation.",
       "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
       "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
-      "activateOpenAiChat": "Activer l'IA dans le chat Gladys",
+      "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
       "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
       "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
@@ -3166,8 +3166,8 @@
         "description": "Pilote Gladys à la voix avec Google Home et Amazon Alexa."
       },
       "ai": {
-        "title": "IA Mistral (France)",
-        "description": "Parle à ta maison avec une IA hébergée en France chez Scaleway."
+        "title": "IA open-weight (France)",
+        "description": "Parle à ta maison avec des modèles IA open-weight hébergés en France chez Scaleway."
       },
       "cameraStreaming": {
         "title": "Streaming caméra",
@@ -3211,7 +3211,7 @@
         "everythingInLite": "Tout ce qui est dans Lite, et en plus :",
         "backups": "Sauvegardes quotidiennes chiffrées",
         "cameraStreaming": "Streaming caméra à distance",
-        "ai": "Intégration IA (Mistral, hébergés en France)",
+        "ai": "Intégration IA (modèles open-weight, hébergés en France)",
         "enedis": "Intégration Enedis (consommation électrique)",
         "mcp": "Serveur MCP pour brancher tes IA préférées"
       }
@@ -3221,7 +3221,7 @@
     "privacySubtitle": "Tes données restent les tiennes, on est très sérieux là-dessus.",
     "privacy": {
       "aiTitle": "IA hébergée en France",
-      "aiDescription": "Les modèles Mistral utilisés par Gladys Plus tournent chez Scaleway, en France. Rien ne sort du pays pour l'inférence IA.",
+      "aiDescription": "Les modèles IA open-weight utilisés par Gladys Plus tournent chez Scaleway, en France. Rien ne sort du pays pour l'inférence IA.",
       "infraTitle": "Infrastructure en Europe",
       "infraDescription": "L'infrastructure Gladys Plus (API, sauvegardes, relais) est hébergée en France et en Allemagne, sous RGPD.",
       "e2eTitle": "Chiffrement de bout en bout",
@@ -3248,11 +3248,11 @@
       "upgradeDescription": "Les sauvegardes chiffrées sont incluses dans la formule Plus. Tu peux changer de formule depuis la facturation, en un clic."
     },
     "openai": {
-      "title": "Discute avec ta maison grâce à l'IA Mistral",
-      "description": "Gladys Plus inclut une IA conversationnelle pour discuter avec ta maison par message dans le chat Gladys. Modèles Mistral hébergés en France chez Scaleway, rien ne sort du pays.",
+      "title": "Discute avec ta maison grâce à l'IA open-weight",
+      "description": "Gladys Plus inclut une IA conversationnelle pour discuter avec ta maison par message dans le chat Gladys. Modèles IA open-weight hébergés en France, rien ne sort du pays pour l'inférence.",
       "feature1": "Allume la lumière, éteins le ventilateur, par message dans le chat",
       "feature2": "IA proactive dans les scènes : exécute des questions domotiques à intervalle régulier (lire une plaque d'immatriculation, vérifier le niveau de CO₂, surveiller une caméra…)",
-      "feature3": "Modèles Mistral hébergés en France · pas de données revendues"
+      "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
     },
     "enedis": {
       "title": "Suis ta consommation électrique avec Enedis",
@@ -3281,7 +3281,7 @@
     },
     "voiceAssistant": {
       "title": "Assistant vocal Gladys avec Gladys Plus",
-      "description": "Gladys Plus alimente l'assistant vocal du tableau de bord : transcription de ta voix, réponse par l'IA Mistral et lecture à voix haute.",
+      "description": "Gladys Plus alimente l'assistant vocal du tableau de bord : transcription de ta voix, réponse par des modèles IA open-weight et lecture à voix haute.",
       "compactDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
       "feature1": "Parle à Gladys depuis le tableau de bord",
       "feature2": "Transcription et réponse en temps réel",
@@ -3289,11 +3289,11 @@
     },
     "askAi": {
       "title": "Cette action nécessite Gladys Plus",
-      "description": "L'action « Demander à l'IA » utilise les modèles Mistral hébergés en France via Gladys Plus pour répondre à des questions et analyser des images de caméra dans tes scènes.",
-      "compactDescription": "Cette action utilise l'IA Mistral hébergée en France via Gladys Plus.",
+      "description": "L'action « Demander à l'IA » utilise des modèles IA open-weight hébergés en France via Gladys Plus pour répondre à des questions et analyser des images de caméra dans tes scènes.",
+      "compactDescription": "Cette action utilise des modèles IA open-weight hébergés en France via Gladys Plus.",
       "feature1": "Pose une question ouverte à l'IA dans une scène",
       "feature2": "Joins une image de caméra et l'IA peut décrire ce qu'elle voit",
-      "feature3": "Modèles Mistral hébergés en France · pas de données revendues"
+      "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
     },
     "tts": {
       "title": "Cette action nécessite Gladys Plus",
@@ -4308,33 +4308,22 @@
   },
   "chat": {
     "emptyStateMessage": "Envoie-moi un message !",
+    "emptyStateMessageNoPlus": "Le chat Gladys utilise l'IA Gladys Plus. Connecte ton instance à Gladys Plus pour discuter avec ta maison.",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
     "sidebar": {
       "title": "Comment fonctionne le chat ?",
-      "intro": "Gladys répond à tes messages de deux façons selon que tu es abonné à Gladys Plus ou non.",
-      "localBadge": "Local",
-      "localTitle": "Modèle local (par défaut)",
-      "localDescription": "Sans Gladys Plus, Gladys utilise un modèle local ultra limité : il ne comprend que quelques commandes simples, une action à la fois, et ne sait pas répondre aux questions ouvertes.",
-      "localHint": "Exemples de commandes qui fonctionnent (une seule à la fois) :",
-      "localExample1": "« Allume la lumière du salon. »",
-      "localExample2": "« Montre-moi la caméra du garage. »",
-      "localExample3": "« Lance la scène « Bonne nuit ». »",
-      "localExample4": "« Quelle température fait-il dans la chambre ? »",
-      "plusTitle": "IA avancée (Gladys Plus)",
-      "plusDescription": "Avec Gladys Plus, tu débloques des modèles Mistral bien plus puissants : questions ouvertes, réponses contextuelles, analyse d'images de caméra, et bien plus.",
-      "plusNotConfigured": "Connecte Gladys Plus pour activer l'IA avancée dans ce chat.",
-      "plusConfiguredNotEnabled": "Gladys Plus est connecté, mais l'IA n'est pas encore activée dans le chat.",
-      "plusConfigureLink": "Activer l'IA →",
-      "plusActive": "L'IA avancée est activée dans ce chat.",
+      "intro": "Le chat Gladys utilise l'intelligence artificielle Gladys Plus pour te permettre de communiquer naturellement avec ta maison connectée.",
+      "plusNotConfigured": "Connecte Gladys Plus pour utiliser le chat IA.",
+      "plusActive": "L'IA Gladys Plus est active dans ce chat.",
       "upsellTitle": "Débloque l'IA avancée",
-      "upsellCompactDescription": "Gladys Plus active les modèles Mistral dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
-      "upsellDescription": "Passe des commandes basiques à une vraie intelligence artificielle dans ton chat Gladys.",
+      "upsellCompactDescription": "Gladys Plus donne accès à des modèles IA open-weight dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
+      "upsellDescription": "Discute naturellement avec ta maison connectée grâce à l'intelligence artificielle Gladys Plus.",
       "upsellFeature1": "Pose des questions ouvertes à ta maison",
       "upsellFeature2": "Analyse ce que voient tes caméras",
-      "upsellFeature3": "Modèles Mistral hébergés en France"
+      "upsellFeature3": "Modèles IA open-weight hébergés en France"
     },
     "toolCall": {
       "statusUsed": "Utilisé",

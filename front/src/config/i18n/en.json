@@ -2143,7 +2143,7 @@
       "title": "Artificial Intelligence",
       "documentation": "AI documentation",
       "description": "Give Gladys the power of artificial intelligence.",
-      "firstExplanation": "Gladys can use artificial intelligence (Mistral models via Gladys Plus) to help you communicate with your connected home.",
+      "firstExplanation": "Gladys can use artificial intelligence (open-weight AI models via Gladys Plus) to help you communicate with your connected home.",
       "examplesIntro": "Here's what you can do with AI:",
       "examplesChatTitle": "In the Gladys chat",
       "examplesChatHint": "Available actions: lights and switches by room, cameras, scenes, temperature and humidity.",
@@ -2156,7 +2156,7 @@
       "exampleScene1": "Every 30 minutes: analyse the front door camera and check whether the car parked outside matches my licence plate.",
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
-      "activateOpenAiChat": "Activate AI in Gladys chat",
+      "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
@@ -3166,8 +3166,8 @@
         "description": "Control Gladys with your voice using Google Home and Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral AI",
-        "description": "Talk to your home using Mistral AI models, included with Gladys Plus."
+        "title": "Open-weight AI",
+        "description": "Talk to your home using open-weight AI models, included with Gladys Plus."
       },
       "cameraStreaming": {
         "title": "Camera streaming",
@@ -3211,7 +3211,7 @@
         "everythingInLite": "Everything in Lite, plus:",
         "backups": "Encrypted daily backups",
         "cameraStreaming": "Remote camera streaming",
-        "ai": "AI integration (Mistral)",
+        "ai": "AI integration (open-weight models)",
         "enedis": "Enedis integration (electric consumption)",
         "mcp": "MCP server to plug your favourite AIs"
       }
@@ -3221,7 +3221,7 @@
     "privacySubtitle": "Your data stays yours. We take this very seriously.",
     "privacy": {
       "aiTitle": "Privacy-friendly AI",
-      "aiDescription": "Gladys Plus uses Mistral models for AI features. Your data is not resold or used for advertising.",
+      "aiDescription": "Gladys Plus uses open-weight AI models for AI features. Your data is not resold or used for advertising.",
       "infraTitle": "Infrastructure in Europe",
       "infraDescription": "The Gladys Plus infrastructure (API, backups, relays) runs in European data centers, GDPR compliant.",
       "e2eTitle": "End-to-end encryption",
@@ -3248,11 +3248,11 @@
       "upgradeDescription": "Encrypted backups are part of the Plus plan. You can switch plans in one click from the billing page."
     },
     "openai": {
-      "title": "Talk to your home with Mistral AI",
-      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat.",
+      "title": "Talk to your home with open-weight AI",
+      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat. Open-weight AI models hosted in France.",
       "feature1": "Turn the lights on, turn the fan off, by sending a message in the chat",
       "feature2": "Proactive AI in scenes: run home automation questions on a schedule (read a licence plate, check CO₂ levels, monitor a camera…)",
-      "feature3": "Mistral AI · no data resold"
+      "feature3": "Open-weight AI models · no data resold"
     },
     "enedis": {
       "title": "Track your electric consumption with Enedis",
@@ -3281,7 +3281,7 @@
     },
     "voiceAssistant": {
       "title": "Gladys voice assistant with Gladys Plus",
-      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, Mistral AI replies and text-to-speech playback.",
+      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, open-weight AI replies and text-to-speech playback.",
       "compactDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
       "feature1": "Talk to Gladys from your dashboard",
       "feature2": "Live transcription and response",
@@ -3289,11 +3289,11 @@
     },
     "askAi": {
       "title": "This action requires Gladys Plus",
-      "description": "The \"Ask AI\" action uses Mistral AI via Gladys Plus to answer questions and analyse camera images inside your scenes.",
-      "compactDescription": "This action uses Mistral AI via Gladys Plus.",
+      "description": "The \"Ask AI\" action uses open-weight AI models via Gladys Plus to answer questions and analyse camera images inside your scenes.",
+      "compactDescription": "This action uses open-weight AI models via Gladys Plus.",
       "feature1": "Ask an open question to the AI inside a scene",
       "feature2": "Attach a camera image and the AI can describe what it sees",
-      "feature3": "Mistral AI · no data resold"
+      "feature3": "Open-weight AI models · no data resold"
     },
     "tts": {
       "title": "This action requires Gladys Plus",
@@ -4308,33 +4308,22 @@
   },
   "chat": {
     "emptyStateMessage": "Send me a message!",
+    "emptyStateMessageNoPlus": "Gladys chat uses Gladys Plus AI. Connect your instance to Gladys Plus to chat with your home.",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
     "gladysAlt": "Gladys",
     "sidebar": {
       "title": "How does the chat work?",
-      "intro": "Gladys answers your messages in two different ways, depending on whether you have Gladys Plus.",
-      "localBadge": "Local",
-      "localTitle": "Local model (default)",
-      "localDescription": "Without Gladys Plus, Gladys uses a very limited local model: it only understands a few simple commands, one action at a time, and cannot answer open-ended questions.",
-      "localHint": "Examples that work (one command at a time):",
-      "localExample1": "\"Turn on the living room light.\"",
-      "localExample2": "\"Show me the garage camera.\"",
-      "localExample3": "\"Start the \"Good night\" scene.\"",
-      "localExample4": "\"What's the temperature in the bedroom?\"",
-      "plusTitle": "Advanced AI (Gladys Plus)",
-      "plusDescription": "With Gladys Plus, you unlock much more capable Mistral models: open questions, contextual answers, camera image analysis, and more.",
-      "plusNotConfigured": "Connect Gladys Plus to enable advanced AI in this chat.",
-      "plusConfiguredNotEnabled": "Gladys Plus is connected, but AI is not enabled in the chat yet.",
-      "plusConfigureLink": "Enable AI →",
-      "plusActive": "Advanced AI is enabled in this chat.",
+      "intro": "Gladys chat uses Gladys Plus artificial intelligence so you can communicate naturally with your connected home.",
+      "plusNotConfigured": "Connect Gladys Plus to use AI chat.",
+      "plusActive": "Gladys Plus AI is active in this chat.",
       "upsellTitle": "Unlock advanced AI",
-      "upsellCompactDescription": "Gladys Plus enables Mistral models in this chat: open questions, camera analysis, and more.",
-      "upsellDescription": "Go from basic commands to real artificial intelligence in your Gladys chat.",
+      "upsellCompactDescription": "Gladys Plus gives you access to open-weight AI models in this chat: open questions, camera analysis, and more.",
+      "upsellDescription": "Chat naturally with your connected home using Gladys Plus artificial intelligence.",
       "upsellFeature1": "Ask open-ended questions to your home",
       "upsellFeature2": "Analyse what your cameras see",
-      "upsellFeature3": "Mistral AI · no data resold"
+      "upsellFeature3": "Open-weight AI models · no data resold"
     },
     "toolCall": {
       "statusUsed": "Used",
