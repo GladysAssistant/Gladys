@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const { fake, assert } = require('sinon');
-const EventEmitter = require('events');
 const db = require('../../../models');
 const MessageHandler = require('../../../lib/message');
 

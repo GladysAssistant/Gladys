@@ -5,6 +5,8 @@ const { getPreviousQuestionsForUser } = require('./message.getPreviousQuestionsF
 /**
  * @description Check if Gladys Plus gateway is configured on this instance.
  * @returns {Promise<boolean>} True when gateway credentials are present.
+ * @example
+ * const configured = await isGladysPlusConfigured.call(messageHandler);
  */
 async function isGladysPlusConfigured() {
   const gladysGatewayRefreshToken = await this.variable.getValue('GLADYS_GATEWAY_REFRESH_TOKEN');
@@ -12,9 +14,7 @@ async function isGladysPlusConfigured() {
   const gladysGatewayEcdsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
 
   return (
-    gladysGatewayRefreshToken !== null &&
-    gladysGatewayRsaPrivateKey !== null &&
-    gladysGatewayEcdsaPrivateKey !== null
+    gladysGatewayRefreshToken !== null && gladysGatewayRsaPrivateKey !== null && gladysGatewayEcdsaPrivateKey !== null
   );
 }
 

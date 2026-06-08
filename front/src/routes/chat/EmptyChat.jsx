@@ -27,8 +27,7 @@ class EmptyChat extends Component {
   }
 
   render({}, { gladysPlusConfigured }) {
-    const messageKey =
-      gladysPlusConfigured === false ? 'chat.emptyStateMessageNoPlus' : 'chat.emptyStateMessage';
+    const messageKey = gladysPlusConfigured === false ? 'chat.emptyStateMessageNoPlus' : 'chat.emptyStateMessage';
 
     return (
       <div class={style.emptyChatState}>

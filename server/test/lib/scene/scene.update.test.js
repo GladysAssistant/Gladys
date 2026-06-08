@@ -1,5 +1,5 @@
 const { assert, expect } = require('chai');
-const { fake, assert: assertSinon } = require('sinon');
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
 
