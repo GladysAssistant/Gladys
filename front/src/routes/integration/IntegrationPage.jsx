@@ -5,10 +5,8 @@ import IntegrationPageHeader from './IntegrationPageHeader';
 import style from './style.css';
 
 const IntegrationPage = ({
-  category,
   integrations,
   totalSize,
-  currentUrl,
   searchKeyword,
   user,
   orderDir,
