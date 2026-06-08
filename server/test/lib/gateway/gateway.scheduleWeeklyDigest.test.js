@@ -66,8 +66,28 @@ describe('gateway.scheduleWeeklyDigest', () => {
     });
 
     const scheduledCallback = gateway.scheduler.scheduleJob.firstCall.args[1];
-    scheduledCallback();
+    await scheduledCallback();
     assert.calledOnce(gateway.sendWeeklyDigest);
+  });
+
+  it('should catch errors from sendWeeklyDigest in scheduled callback', async () => {
+    gateway.sendWeeklyDigest = fake.rejects(new Error('boom'));
+
+    await scheduleWeeklyDigest.call(gateway);
+
+    const scheduledCallback = gateway.scheduler.scheduleJob.firstCall.args[1];
+    await scheduledCallback();
+
+    assert.calledOnce(gateway.sendWeeklyDigest);
+  });
+
+  it('should not throw when scheduling fails', async () => {
+    gateway.variable.getValue = fake.rejects(new Error('db unavailable'));
+
+    const result = await scheduleWeeklyDigest.call(gateway);
+
+    expect(result).to.equal(null);
+    assert.notCalled(gateway.scheduler.scheduleJob);
   });
 
   it('should cancel previous schedule before creating a new one', async () => {

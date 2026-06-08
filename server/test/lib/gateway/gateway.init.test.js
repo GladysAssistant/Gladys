@@ -114,6 +114,17 @@ describe('gateway.init', () => {
     });
   });
 
+  it('should continue init when weekly digest scheduling fails', async () => {
+    gateway.scheduleWeeklyDigest = fake.rejects(new Error('scheduling failed'));
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
+    expect(gateway.backupSchedule).to.deep.contains({
+      rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
+    });
+  });
+
   it('check init cancel pending job', async () => {
     // Store job
     const cancel = fake.returns(null);

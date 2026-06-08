@@ -18,7 +18,9 @@ class WeeklyDigestSettings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      weeklyDigestEnabled: true,
+      settingsLoaded: false,
+      loadError: false,
+      weeklyDigestEnabled: false,
       weeklyDigestDay: '0',
       weeklyDigestHour: '18',
       saving: false,
@@ -27,6 +29,7 @@ class WeeklyDigestSettings extends Component {
   }
 
   getSettings = async () => {
+    this.setState({ settingsLoaded: false, loadError: false });
     try {
       const [{ value: enabled }, { value: day }, { value: hour }] = await Promise.all([
         this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_ENABLED}`),
@@ -35,16 +38,22 @@ class WeeklyDigestSettings extends Component {
       ]);
 
       this.setState({
+        settingsLoaded: true,
+        loadError: false,
         weeklyDigestEnabled: enabled === '1' || enabled === true || enabled === 'true',
         weeklyDigestDay: day != null ? day : '0',
         weeklyDigestHour: hour != null ? hour : '18'
       });
     } catch (e) {
       console.error(e);
+      this.setState({ settingsLoaded: false, loadError: true });
     }
   };
 
   saveAndReschedule = async updates => {
+    if (!this.state.settingsLoaded || this.state.loadError) {
+      return;
+    }
     this.setState({ saving: true, ...updates });
     try {
       const state = { ...this.state, ...updates };
@@ -57,9 +66,9 @@ class WeeklyDigestSettings extends Component {
         }),
         this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR}`, {
           value: state.weeklyDigestHour
-        }),
-        this.props.httpClient.post('/api/v1/gateway/weekly-digest/reschedule')
+        })
       ]);
+      await this.props.httpClient.post('/api/v1/gateway/weekly-digest/reschedule');
     } catch (e) {
       console.error(e);
     }
@@ -85,6 +94,9 @@ class WeeklyDigestSettings extends Component {
   };
 
   sendNow = async () => {
+    if (!this.state.settingsLoaded || this.state.loadError) {
+      return;
+    }
     this.setState({ sending: true });
     try {
       await this.props.httpClient.post('/api/v1/gateway/weekly-digest/send');
@@ -98,13 +110,15 @@ class WeeklyDigestSettings extends Component {
     this.getSettings();
   }
 
-  render({}, { weeklyDigestEnabled, weeklyDigestDay, weeklyDigestHour, saving, sending }) {
+  render({}, { settingsLoaded, loadError, weeklyDigestEnabled, weeklyDigestDay, weeklyDigestHour, saving, sending }) {
+    const formDisabled = !settingsLoaded || loadError || saving;
+
     return (
       <div class="card mt-4">
         <h4 class="card-header d-flex flex-row justify-content-between">
           <label
             className={cx('mb-0', {
-              'text-muted': !weeklyDigestEnabled
+              'text-muted': settingsLoaded && !weeklyDigestEnabled
             })}
           >
             <Text id="integration.openai.weeklyDigest.title" />
@@ -117,19 +131,34 @@ class WeeklyDigestSettings extends Component {
               className="custom-switch-input"
               checked={weeklyDigestEnabled}
               onClick={this.updateEnabled}
-              disabled={saving}
+              disabled={formDisabled}
             />
             <span class="custom-switch-indicator" />
           </label>
         </h4>
         <div class="card-body">
-          <p
-            class={cx('mb-3', {
-              'text-muted': !weeklyDigestEnabled
-            })}
-          >
-            <Text id="integration.openai.weeklyDigest.description" />
-          </p>
+          {!settingsLoaded && !loadError && (
+            <p class="text-muted mb-0">
+              <Text id="integration.openai.weeklyDigest.loading" />
+            </p>
+          )}
+          {loadError && (
+            <div class="alert alert-danger mb-3" role="alert">
+              <Text id="integration.openai.weeklyDigest.loadError" />
+              <button type="button" class="btn btn-sm btn-outline-danger ml-3" onClick={this.getSettings}>
+                <Text id="integration.openai.weeklyDigest.retry" />
+              </button>
+            </div>
+          )}
+          {settingsLoaded && (
+            <p
+              class={cx('mb-3', {
+                'text-muted': !weeklyDigestEnabled
+              })}
+            >
+              <Text id="integration.openai.weeklyDigest.description" />
+            </p>
+          )}
           <div class="form-row">
             <div class="form-group col-md-6">
               <label class="form-label">
@@ -139,7 +168,7 @@ class WeeklyDigestSettings extends Component {
                 class="form-control"
                 value={weeklyDigestDay}
                 onChange={this.updateDay}
-                disabled={!weeklyDigestEnabled || saving}
+                disabled={formDisabled || !weeklyDigestEnabled}
               >
                 {WEEK_DAYS.map(day => (
                   <option value={day.value}>
@@ -156,7 +185,7 @@ class WeeklyDigestSettings extends Component {
                 class="form-control"
                 value={weeklyDigestHour}
                 onChange={this.updateHour}
-                disabled={!weeklyDigestEnabled || saving}
+                disabled={formDisabled || !weeklyDigestEnabled}
               >
                 {Array.from({ length: 24 }, (_, hour) => (
                   <option value={String(hour)}>{`${String(hour).padStart(2, '0')}:00`}</option>
@@ -164,7 +193,12 @@ class WeeklyDigestSettings extends Component {
               </select>
             </div>
           </div>
-          <button type="button" class="btn btn-outline-primary" onClick={this.sendNow} disabled={sending}>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            onClick={this.sendNow}
+            disabled={formDisabled || sending}
+          >
             <Text id="integration.openai.weeklyDigest.sendNow" />
           </button>
         </div>
