@@ -537,6 +537,12 @@
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
+      "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
+      "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
+      "gatewayBanner": {
+        "title": "Votre appareil n'est pas dans la liste ?",
+        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel) ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Une fois connectés, ils sont contrôlables dans Gladys comme n'importe quel autre appareil."
+      },
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
@@ -1931,6 +1937,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
+      "deprecatedWarning": {
+        "title": "Intégration obsolète",
+        "description": "Cette intégration repose sur le mode développeur des anciennes passerelles Xiaomi/Aqara, qui n'est plus accessible sur les modèles et applications récents. Elle n'est plus maintenue pour les nouveaux équipements. Les produits Xiaomi compatibles seront pris en charge via <a href=\"/dashboard/integration/device/matter\">Matter</a>. Si vous possédez déjà une passerelle configurée en mode développeur, elle peut continuer à fonctionner."
+      },
       "deviceTab": "Appareils",
       "documentation": "Documentation Xiaomi",
       "device": {
