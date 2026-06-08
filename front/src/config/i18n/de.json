@@ -2143,7 +2143,7 @@
       "title": "Künstliche Intelligenz",
       "documentation": "KI-Dokumentation",
       "description": "Gib Gladys die Kraft der künstlichen Intelligenz.",
-      "firstExplanation": "Gladys kann künstliche Intelligenz (Mistral-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
+      "firstExplanation": "Gladys kann künstliche Intelligenz (Open-Weight-KI-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
       "examplesIntro": "Das kannst du mit der KI machen:",
       "examplesChatTitle": "Im Gladys-Chat",
       "examplesChatHint": "Verfügbare Aktionen: Licht und Steckdosen pro Raum, Kameras, Szenen, Temperatur und Luftfeuchtigkeit.",
@@ -2156,7 +2156,7 @@
       "exampleScene1": "Alle 30 Minuten: analysiere die Eingangskamera und prüfe, ob das Auto vor dem Haus zu meinem Kennzeichen passt.",
       "exampleScene2": "Jeden Morgen um 7 Uhr: wenn der CO₂-Sensor im Wohnzimmer 1.000 ppm überschreitet, schicke mir eine Nachricht und schalte die Lüftung ein.",
       "exampleScene3": "Wenn der Alarm auslöst: bitte die KI, das Bild der Außenkamera zu analysieren und mir eine Zusammenfassung der Situation zu senden.",
-      "activateOpenAiChat": "Aktiviere die KI im Gladys-Chat",
+      "chatEnabledByDefault": "Die KI ist im Gladys-Chat standardmäßig aktiviert.",
       "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
@@ -3166,8 +3166,8 @@
         "description": "Steuere Gladys per Sprache mit Google Home und Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral KI",
-        "description": "Sprich mit deinem Zuhause dank Mistral-KI-Modellen, in Gladys Plus enthalten."
+        "title": "Open-Weight-KI",
+        "description": "Sprich mit deinem Zuhause dank Open-Weight-KI-Modellen, in Gladys Plus enthalten."
       },
       "cameraStreaming": {
         "title": "Kamera-Streaming",
@@ -3211,7 +3211,7 @@
         "everythingInLite": "Alles aus Lite, und zusätzlich:",
         "backups": "Verschlüsselte tägliche Backups",
         "cameraStreaming": "Kamera-Streaming aus der Ferne",
-        "ai": "KI-Integration (Mistral)",
+        "ai": "KI-Integration (Open-Weight-Modelle)",
         "enedis": "Enedis-Integration (Stromverbrauch)",
         "mcp": "MCP-Server für deine bevorzugten KIs"
       }
@@ -3221,7 +3221,7 @@
     "privacySubtitle": "Deine Daten bleiben deine. Das nehmen wir sehr ernst.",
     "privacy": {
       "aiTitle": "Datenschutzfreundliche KI",
-      "aiDescription": "Gladys Plus nutzt Mistral-Modelle für KI-Funktionen. Deine Daten werden nicht weiterverkauft oder für Werbung genutzt.",
+      "aiDescription": "Gladys Plus nutzt Open-Weight-KI-Modelle für KI-Funktionen. Deine Daten werden nicht weiterverkauft oder für Werbung genutzt.",
       "infraTitle": "Infrastruktur in Europa",
       "infraDescription": "Die Gladys-Plus-Infrastruktur (API, Backups, Relays) läuft in europäischen Rechenzentren, DSGVO-konform.",
       "e2eTitle": "Ende-zu-Ende-Verschlüsselung",
@@ -3248,11 +3248,11 @@
       "upgradeDescription": "Verschlüsselte Backups sind im Plus-Tarif enthalten. Du kannst den Tarif mit einem Klick in der Abrechnung wechseln."
     },
     "openai": {
-      "title": "Sprich mit deinem Zuhause dank Mistral KI",
-      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren.",
+      "title": "Sprich mit deinem Zuhause dank Open-Weight-KI",
+      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren. Open-Weight-KI-Modelle in Frankreich gehostet.",
       "feature1": "Licht an, Ventilator aus, per Nachricht im Chat",
       "feature2": "Proaktive KI in Szenen: führt regelmäßig Smart-Home-Abfragen aus (Kennzeichen lesen, CO₂-Wert prüfen, eine Kamera überwachen…)",
-      "feature3": "Mistral KI · keine weiterverkauften Daten"
+      "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
     "enedis": {
       "title": "Verfolge deinen Stromverbrauch mit Enedis",
@@ -3281,7 +3281,7 @@
     },
     "voiceAssistant": {
       "title": "Gladys-Sprachassistent mit Gladys Plus",
-      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Mistral-KI-Antworten und Sprachausgabe.",
+      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Open-Weight-KI-Antworten und Sprachausgabe.",
       "compactDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
       "feature1": "Sprich mit Gladys vom Dashboard",
       "feature2": "Live-Transkription und Antwort",
@@ -3289,11 +3289,11 @@
     },
     "askAi": {
       "title": "Diese Aktion erfordert Gladys Plus",
-      "description": "Die Aktion „KI fragen“ nutzt Mistral-KI über Gladys Plus, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
-      "compactDescription": "Diese Aktion nutzt Mistral-KI über Gladys Plus.",
+      "description": "Die Aktion „KI fragen“ nutzt Open-Weight-KI-Modelle über Gladys Plus, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
+      "compactDescription": "Diese Aktion nutzt Open-Weight-KI-Modelle über Gladys Plus.",
       "feature1": "Stelle der KI in einer Szene eine offene Frage",
       "feature2": "Hänge ein Kamerabild an und die KI kann beschreiben, was sie sieht",
-      "feature3": "Mistral KI · keine weiterverkauften Daten"
+      "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
     "tts": {
       "title": "Diese Aktion erfordert Gladys Plus",
@@ -4308,6 +4308,7 @@
   },
   "chat": {
     "emptyStateMessage": "Schick mir eine Nachricht!",
+    "emptyStateMessageNoPlus": "Der Gladys-Chat nutzt Gladys-Plus-KI. Verbinde deine Instanz mit Gladys Plus, um mit deinem Zuhause zu chatten.",
     "messagePlaceholder": "Tippe deine Nachricht …",
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
@@ -4320,27 +4321,15 @@
     },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
-      "intro": "Gladys antwortet auf deine Nachrichten auf zwei Arten — je nachdem, ob du Gladys Plus hast.",
-      "localBadge": "Lokal",
-      "localTitle": "Lokales Modell (Standard)",
-      "localDescription": "Ohne Gladys Plus nutzt Gladys ein sehr begrenztes lokales Modell: Es versteht nur wenige einfache Befehle, jeweils eine Aktion, und kann keine offenen Fragen beantworten.",
-      "localHint": "Beispiele, die funktionieren (ein Befehl pro Nachricht):",
-      "localExample1": "„Schalte das Licht im Wohnzimmer ein.“",
-      "localExample2": "„Zeige mir die Garagenkamera.“",
-      "localExample3": "„Starte die Szene ‚Gute Nacht‘.“",
-      "localExample4": "„Wie warm ist es im Schlafzimmer?“",
-      "plusTitle": "Erweiterte KI (Gladys Plus)",
-      "plusDescription": "Mit Gladys Plus schaltest du deutlich leistungsfähigere Mistral-Modelle frei: offene Fragen, kontextuelle Antworten, Kamerabildanalyse und mehr.",
-      "plusNotConfigured": "Verbinde Gladys Plus, um die erweiterte KI in diesem Chat zu aktivieren.",
-      "plusConfiguredNotEnabled": "Gladys Plus ist verbunden, aber die KI ist im Chat noch nicht aktiviert.",
-      "plusConfigureLink": "KI aktivieren →",
-      "plusActive": "Die erweiterte KI ist in diesem Chat aktiviert.",
+      "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
+      "plusNotConfigured": "Verbinde Gladys Plus, um den KI-Chat zu nutzen.",
+      "plusActive": "Gladys-Plus-KI ist in diesem Chat aktiv.",
       "upsellTitle": "Erweiterte KI freischalten",
-      "upsellCompactDescription": "Gladys Plus aktiviert Mistral-Modelle in diesem Chat: offene Fragen, Kameranalyse und mehr.",
-      "upsellDescription": "Von einfachen Befehlen zu echter künstlicher Intelligenz in deinem Gladys-Chat.",
+      "upsellCompactDescription": "Gladys Plus gibt dir Zugang zu Open-Weight-KI-Modellen in diesem Chat: offene Fragen, Kameranalyse und mehr.",
+      "upsellDescription": "Chatte natürlich mit deinem vernetzten Zuhause dank Gladys-Plus-Künstlicher Intelligenz.",
       "upsellFeature1": "Stelle deinem Zuhause offene Fragen",
       "upsellFeature2": "Analysiere, was deine Kameras sehen",
-      "upsellFeature3": "Mistral KI · keine weiterverkauften Daten"
+      "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
   "header": {
