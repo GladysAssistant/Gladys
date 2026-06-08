@@ -435,6 +435,74 @@ describe('energy digest helpers', () => {
     expect(result).to.equal(null);
   });
 
+  it('should include cost when currency fetch succeeds', async () => {
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake(async (selectors, options) => {
+            if (options.display_mode === 'currency') {
+              return [{ values: [{ sum_value: 12.5 }], deviceFeature: { currency_unit: 'EUR' } }];
+            }
+            return [{ values: [{ sum_value: 8 }] }];
+          }),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: { id: 'meter-1', name: 'Main meter' },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'meter-consumption', type: DAILY_CONSUMPTION },
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      'meter-1',
+    );
+
+    expect(result).to.deep.include({
+      is_on_configured_main_meter_device: true,
+      current_week_kwh: 8,
+      current_week_cost: 12.5,
+      previous_week_cost: 12.5,
+      cost_unit: 'EUR',
+    });
+  });
+
+  it('should still return kwh when currency fetch fails', async () => {
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake(async (selectors, options) => {
+            if (options.display_mode === 'currency') {
+              throw new Error('no cost configured');
+            }
+            return [{ values: [{ sum_value: 8 }] }];
+          }),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: { id: 'plug-1', name: 'Plug' },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      null,
+    );
+
+    expect(result).to.deep.include({
+      current_week_kwh: 8,
+      previous_week_kwh: 8,
+    });
+    expect(result).to.not.have.property('current_week_cost');
+  });
+
   it('should exclude intermediate consumption parents', () => {
     const devices = [
       {
@@ -625,6 +693,10 @@ describe('buildWeeklyDigestData additional sensors', () => {
 });
 
 describe('formatSilentDuration', () => {
+  it('should format short silences in hours', () => {
+    expect(formatSilentDuration(12)).to.deep.equal({ silent_for_hours: 12 });
+  });
+
   it('should format long silences in weeks or months', () => {
     expect(formatSilentDuration(1700)).to.deep.equal({ silent_for_months: 2 });
     expect(formatSilentDuration(100)).to.deep.equal({ silent_for_days: 4 });
