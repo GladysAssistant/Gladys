@@ -287,7 +287,8 @@
       "music": "Musik",
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
-      "voice-assistant": "Sprachassistent"
+      "voice-assistant": "Sprachassistent",
+      "link": "Link"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -467,6 +468,24 @@
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
+      },
+      "link": {
+        "editTitleLabel": "Titel",
+        "editTitlePlaceholder": "z. B. Tasmota - Steckdose Wohnzimmer",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Symbol",
+        "emptyUrl": "Keine URL konfiguriert.",
+        "icons": {
+          "link": "Link",
+          "globe": "Webseite",
+          "server": "Server",
+          "hard-drive": "Speicher (NAS)",
+          "wifi": "WLAN-Netzwerk",
+          "monitor": "Weboberfläche",
+          "cpu": "Verbundenes Gerät",
+          "home": "Zuhause"
+        }
       },
       "alarm": {
         "armButton": "Einschalten",
