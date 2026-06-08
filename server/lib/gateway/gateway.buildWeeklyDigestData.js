@@ -69,6 +69,31 @@ function isConsumptionFeature(feature) {
   );
 }
 
+const COST_FEATURE_TYPES = [
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+  DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+];
+
+/**
+ * @description Find the cost feature linked to a consumption feature on the same device.
+ * @param {object} device - Device with features.
+ * @param {object} consumptionFeature - Consumption feature.
+ * @returns {object|null} Linked cost feature.
+ * @example
+ * findCostFeatureForConsumption({ features: [] }, { id: 'consumption-id' });
+ */
+function findCostFeatureForConsumption(device, consumptionFeature) {
+  if (!device?.features?.length) {
+    return null;
+  }
+
+  return (
+    device.features.find(
+      (feature) => COST_FEATURE_TYPES.includes(feature.type) && feature.energy_parent_id === consumptionFeature.id,
+    ) ?? null
+  );
+}
+
 /**
  * @description Get leaf consumption features, excluding empty intermediate parents.
  * @param {Array<object>} devices - Devices with features.
@@ -180,18 +205,21 @@ async function fetchEnergyConsumptionForFeature(
       'kwh',
     );
 
+    const costFeature = findCostFeatureForConsumption(candidate.device, candidate.feature);
     let costTotals = null;
-    try {
-      costTotals = await fetchConsumptionTotals(
-        context,
-        candidate.feature.selector,
-        periodStart,
-        periodEnd,
-        previousPeriodStart,
-        'currency',
-      );
-    } catch (e) {
-      costTotals = null;
+    if (costFeature?.selector) {
+      try {
+        costTotals = await fetchConsumptionTotals(
+          context,
+          costFeature.selector,
+          periodStart,
+          periodEnd,
+          previousPeriodStart,
+          'currency',
+        );
+      } catch (e) {
+        costTotals = null;
+      }
     }
 
     const hasKwhData = kwhTotals.current !== null || kwhTotals.previous !== null;
@@ -218,7 +246,7 @@ async function fetchEnergyConsumptionForFeature(
         ? {
             current_week_cost: costTotals.current,
             previous_week_cost: costTotals.previous,
-            cost_unit: costTotals.currencyUnit,
+            cost_unit: costTotals.currencyUnit ?? costFeature?.unit ?? null,
           }
         : {}),
     };
@@ -354,6 +382,8 @@ async function buildWeeklyDigestData() {
     period: {
       from: periodStart.toISOString(),
       to: periodEnd.toISOString(),
+      aggregation: 'sum_of_daily_buckets',
+      comparison_window: 'previous_7_calendar_days',
     },
     summary: {
       device_count: devices.length,
@@ -369,7 +399,7 @@ async function buildWeeklyDigestData() {
       configured_main_meter_device_id: mainMeterDeviceId,
       feature_count: energy.length,
       note:
-        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. Do not sum parent and child values. is_on_configured_main_meter_device marks the device linked to the energy price contract.',
+        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. Do not sum parent and child values. is_on_configured_main_meter_device marks the device linked to the energy price contract. current_week_kwh and current_week_cost are sums of daily buckets over period.from to period.to (not a rolling 168h window). current_week_cost comes from linked daily-consumption-cost features only, excludes subscription charges, and may be absent.',
     },
     recent_scenes: recentlyExecutedScenes,
   };
@@ -382,6 +412,7 @@ module.exports = {
   shouldCheckFeatureForStale,
   formatSilentDuration,
   getConsumptionFeaturesForDigest,
+  findCostFeatureForConsumption,
   getMainMeterDeviceId,
   fetchConsumptionTotals,
   fetchEnergyConsumptionForFeature,

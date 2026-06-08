@@ -6,6 +6,7 @@ const {
   sumConsumptionValues,
   isConsumptionFeature,
   getConsumptionFeaturesForDigest,
+  findCostFeatureForConsumption,
   getMainMeterDeviceId,
   fetchEnergyConsumptionForFeature,
   shouldCheckFeatureForStale,
@@ -435,16 +436,19 @@ describe('energy digest helpers', () => {
     expect(result).to.equal(null);
   });
 
-  it('should include cost when currency fetch succeeds', async () => {
+  it('should include cost when linked cost feature fetch succeeds', async () => {
+    const getConsumptionByDates = fake(async (selectors, options) => {
+      if (options.display_mode === 'currency') {
+        expect(selectors).to.deep.equal(['meter-consumption-cost']);
+        return [{ values: [{ sum_value: 12.5 }], deviceFeature: { currency_unit: 'euro' } }];
+      }
+      expect(selectors).to.deep.equal(['meter-consumption']);
+      return [{ values: [{ sum_value: 8 }] }];
+    });
     const context = {
       device: {
         energySensorManager: {
-          getConsumptionByDates: fake(async (selectors, options) => {
-            if (options.display_mode === 'currency') {
-              return [{ values: [{ sum_value: 12.5 }], deviceFeature: { currency_unit: 'EUR' } }];
-            }
-            return [{ values: [{ sum_value: 8 }] }];
-          }),
+          getConsumptionByDates,
         },
       },
     };
@@ -452,8 +456,26 @@ describe('energy digest helpers', () => {
     const result = await fetchEnergyConsumptionForFeature(
       context,
       {
-        device: { id: 'meter-1', name: 'Main meter' },
-        feature: { id: 'feature-1', name: 'Consumption', selector: 'meter-consumption', type: DAILY_CONSUMPTION },
+        device: {
+          id: 'meter-1',
+          name: 'Main meter',
+          features: [
+            {
+              id: 'feature-1',
+              name: 'Consumption cost',
+              selector: 'meter-consumption-cost',
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+              energy_parent_id: 'consumption-feature-1',
+              unit: 'euro',
+            },
+          ],
+        },
+        feature: {
+          id: 'consumption-feature-1',
+          name: 'Consumption',
+          selector: 'meter-consumption',
+          type: DAILY_CONSUMPTION,
+        },
       },
       new Date('2026-06-01'),
       new Date('2026-06-08'),
@@ -466,11 +488,43 @@ describe('energy digest helpers', () => {
       current_week_kwh: 8,
       current_week_cost: 12.5,
       previous_week_cost: 12.5,
-      cost_unit: 'EUR',
+      cost_unit: 'euro',
     });
   });
 
-  it('should still return kwh when currency fetch fails', async () => {
+  it('should skip cost when no linked cost feature exists', async () => {
+    const getConsumptionByDates = fake(async () => [{ values: [{ sum_value: 8 }] }]);
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates,
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: { id: 'plug-1', name: 'Plug', features: [] },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      null,
+    );
+
+    expect(result).to.deep.include({
+      current_week_kwh: 8,
+      previous_week_kwh: 8,
+    });
+    expect(result).to.not.have.property('current_week_cost');
+    expect(getConsumptionByDates.callCount).to.equal(2);
+    expect(getConsumptionByDates.getCall(0).args[1].display_mode).to.equal('kwh');
+    expect(getConsumptionByDates.getCall(1).args[1].display_mode).to.equal('kwh');
+  });
+
+  it('should still return kwh when linked cost feature fetch fails', async () => {
     const context = {
       device: {
         energySensorManager: {
@@ -487,7 +541,18 @@ describe('energy digest helpers', () => {
     const result = await fetchEnergyConsumptionForFeature(
       context,
       {
-        device: { id: 'plug-1', name: 'Plug' },
+        device: {
+          id: 'plug-1',
+          name: 'Plug',
+          features: [
+            {
+              id: 'cost-feature-1',
+              selector: 'plug-consumption-cost',
+              type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+              energy_parent_id: 'feature-1',
+            },
+          ],
+        },
         feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
       },
       new Date('2026-06-01'),
@@ -501,6 +566,25 @@ describe('energy digest helpers', () => {
       previous_week_kwh: 8,
     });
     expect(result).to.not.have.property('current_week_cost');
+  });
+
+  it('should find linked cost feature on device', () => {
+    const consumptionFeature = { id: 'consumption-feature-1' };
+    const costFeature = findCostFeatureForConsumption(
+      {
+        features: [
+          {
+            id: 'cost-feature-1',
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
+            energy_parent_id: 'consumption-feature-1',
+          },
+        ],
+      },
+      consumptionFeature,
+    );
+
+    expect(costFeature.id).to.equal('cost-feature-1');
+    expect(findCostFeatureForConsumption({ features: [] }, consumptionFeature)).to.equal(null);
   });
 
   it('should exclude intermediate consumption parents', () => {

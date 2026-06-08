@@ -15,7 +15,9 @@ Energy data:
 - Siblings sharing the same energy_parent_feature_id are often tariff bands (e.g. Tempo HP/HC/blue-white-red on a Linky/Lixee meter), not independent appliances. Describe them as a breakdown of the same meter, never as separate top household drivers.
 - Never sum parent and child consumption values. Children under a plug or sub-meter are partial views of the same branch.
 - Smart plugs and sub-meters outside the main meter branch are individually monitored devices only. They do not represent total household consumption.
-- For household totals, prefer features on the configured main meter device or an aggregated view of its tariff bands. Prefer stating cost in euros when current_week_cost is available, with kWh as secondary detail.
+- For household totals, prefer features on the configured main meter device or an aggregated view of its tariff bands.
+- current_week_kwh is the sum of daily consumption buckets between period.from and period.to (calendar days, not a rolling 168-hour window).
+- Mention current_week_cost only when present on the relevant entry. It is the sum of daily cost buckets from energy monitoring, excludes subscription fees, and must not be confused with kWh values. If cost is missing, report kWh only.
 - Compare week-over-week trends when both current and previous values exist.
 - Synthesize: do not list every device. Mention the main meter total and at most two or three notable individually monitored devices.
 
