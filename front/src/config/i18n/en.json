@@ -3769,7 +3769,9 @@
           "83": "Release Center (Aqara W100)",
           "84": "Release Minus (Aqara W100)",
           "85": "On double",
-          "86": "Off double"
+          "86": "Off double",
+          "87": "Arm night zones",
+          "88": "Exit delay"
         }
       },
       "heater": {
