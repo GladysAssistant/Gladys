@@ -1,11 +1,9 @@
 const { assert, fake } = require('sinon');
 const { expect } = require('chai');
-const Brain = require('../../../lib/brain');
 const MessageHandler = require('../../../lib/message');
 const { EVENTS } = require('../../../utils/constants');
 
 describe('message.create end-to-end tests', () => {
-  const brain = new Brain();
   const event = {
     emit: fake.returns(null),
     on: fake.returns(null),
@@ -16,12 +14,10 @@ describe('message.create end-to-end tests', () => {
   const variable = {
     getValue: fake.resolves('configured-value'),
   };
+  const brain = {
+    getReply: () => 'Gladys Plus required',
+  };
   const messageHandler = new MessageHandler(event, brain, service, {}, variable);
-
-  before('should train brain & add room', async () => {
-    await brain.train();
-    await brain.addNamedEntity('room', '39332b3e-2e4a-465c-b049-b20cafb592ae', 'kitchen');
-  });
 
   it('should forward message to Gladys Plus AI when gateway is configured', async () => {
     await messageHandler.create({

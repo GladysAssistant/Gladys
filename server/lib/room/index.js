@@ -6,9 +6,7 @@ const { init } = require('./room.init');
 const { update } = require('./room.update');
 const { destroy } = require('./room.destroy');
 
-const Room = function Room(brain) {
-  this.brain = brain;
-};
+const Room = function Room() {};
 
 Room.prototype.create = create;
 Room.prototype.get = get;

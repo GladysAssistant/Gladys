@@ -4,11 +4,7 @@
  * room.init();
  */
 async function init() {
-  const rooms = await this.getAll();
-
-  rooms.forEach((room) => {
-    this.brain.addNamedEntity('room', room.id, room.name);
-  });
+  await this.getAll();
 }
 
 module.exports = {
