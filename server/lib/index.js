@@ -86,6 +86,7 @@ function Gladys(params = {}) {
     scheduler,
     message,
     brain,
+    device,
   );
   const scene = new Scene(
     stateManager,
@@ -101,6 +102,8 @@ function Gladys(params = {}) {
     brain,
     service,
   );
+  gateway.scene = scene;
+  gateway.energyPrice = energyPrice;
 
   const gladys = {
     version: '0.1.0', // todo, read package.json

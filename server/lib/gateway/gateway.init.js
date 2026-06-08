@@ -47,6 +47,12 @@ async function init() {
   const rule = { tz: timezone, hour: 2, minute: 0, second: 0 };
   this.backupSchedule = this.scheduler.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
 
+  try {
+    await this.scheduleWeeklyDigest();
+  } catch (e) {
+    logger.warn('Weekly digest scheduling failed during init', e);
+  }
+
   // Get latest Gladys version in 5 minutes
   // To let the system initialize
   setTimeout(async () => {

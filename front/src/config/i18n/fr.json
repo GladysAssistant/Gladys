@@ -2168,6 +2168,23 @@
       "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
       "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
       "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
+      "weeklyDigest": {
+        "title": "Bilan hebdomadaire de la maison",
+        "description": "Gladys t'envoie chaque semaine un résumé de ta maison connectée : confort, énergie, maintenance et conseils utiles.",
+        "dayLabel": "Jour",
+        "hourLabel": "Heure",
+        "sendNow": "Envoyer le bilan maintenant",
+        "loading": "Chargement des paramètres...",
+        "loadError": "Impossible de charger les paramètres du bilan hebdomadaire.",
+        "retry": "Réessayer",
+        "daySunday": "Dimanche",
+        "dayMonday": "Lundi",
+        "dayTuesday": "Mardi",
+        "dayWednesday": "Mercredi",
+        "dayThursday": "Jeudi",
+        "dayFriday": "Vendredi",
+        "daySaturday": "Samedi"
+      },
       "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
       "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."

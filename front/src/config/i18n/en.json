@@ -2168,6 +2168,23 @@
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
       "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
+      "weeklyDigest": {
+        "title": "Weekly home digest",
+        "description": "Gladys sends you a weekly summary of your connected home: comfort, energy, maintenance, and useful tips.",
+        "dayLabel": "Day",
+        "hourLabel": "Time",
+        "sendNow": "Send digest now",
+        "loading": "Loading settings...",
+        "loadError": "Unable to load weekly digest settings.",
+        "retry": "Retry",
+        "daySunday": "Sunday",
+        "dayMonday": "Monday",
+        "dayTuesday": "Tuesday",
+        "dayWednesday": "Wednesday",
+        "dayThursday": "Thursday",
+        "dayFriday": "Friday",
+        "daySaturday": "Saturday"
+      },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."

@@ -388,6 +388,16 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.refreshLatestGladysVersion,
     },
+    'post /api/v1/gateway/weekly-digest/send': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.sendWeeklyDigest,
+    },
+    'post /api/v1/gateway/weekly-digest/reschedule': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.rescheduleWeeklyDigest,
+    },
     // room
     'get /api/v1/room': {
       authenticated: true,

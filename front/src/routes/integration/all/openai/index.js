@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
+import WeeklyDigestSettings from './WeeklyDigestSettings';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -114,6 +115,7 @@ class OpenAIGateway extends Component {
             </p>
           </div>
         </div>
+        {gladysPlusConnected === true && <WeeklyDigestSettings />}
       </Layout>
     );
   }
