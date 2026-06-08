@@ -1,15 +1,60 @@
 const dayjs = require('dayjs');
 
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { isSensorFeature } = require('../../services/mcp/lib/selectFeature');
 
 const DEFAULT_DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED = 48;
-const TOP_CONSUMERS_COUNT = 3;
-const MAX_OTHER_ENERGY_CANDIDATES = 15;
 
 const CONSUMPTION_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
 ];
+
+/**
+ * @description Check if a feature should be monitored for stale sensor reporting.
+ * @param {object} feature - Device feature.
+ * @returns {boolean} True when stale checks apply.
+ * @example
+ * shouldCheckFeatureForStale({ category: 'co2-sensor' });
+ */
+function shouldCheckFeatureForStale(feature) {
+  return isSensorFeature(feature);
+}
+
+/**
+ * @description Build human-friendly silent durations for stale sensors.
+ * @param {number} hours - Hours since last update.
+ * @returns {object} Structured silent duration.
+ * @example
+ * formatSilentDuration(1700);
+ */
+function formatSilentDuration(hours) {
+  const roundedHours = Math.round(hours);
+
+  if (roundedHours < 48) {
+    return {
+      silent_for_hours: roundedHours,
+    };
+  }
+
+  const days = Math.round(roundedHours / 24);
+  if (days < 14) {
+    return {
+      silent_for_days: days,
+    };
+  }
+
+  const weeks = Math.round(days / 7);
+  if (weeks < 8) {
+    return {
+      silent_for_weeks: weeks,
+    };
+  }
+
+  return {
+    silent_for_months: Math.round(days / 30),
+  };
+}
 
 /**
  * @description Check if a device feature reports energy consumption history.
@@ -25,33 +70,14 @@ function isConsumptionFeature(feature) {
 }
 
 /**
- * @description Pick the best consumption feature on a device.
- * @param {Array<object>} features - Device features.
- * @returns {object|null} Selected consumption feature.
- * @example
- * pickConsumptionFeatureOnDevice([{ type: 'thirty-minutes-consumption' }]);
- */
-function pickConsumptionFeatureOnDevice(features) {
-  const consumptionFeatures = features.filter(isConsumptionFeature);
-  const thirtyMinutesFeature = consumptionFeatures.find(
-    (feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
-  );
-  if (thirtyMinutesFeature) {
-    return thirtyMinutesFeature;
-  }
-
-  return consumptionFeatures.find((feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION);
-}
-
-/**
  * @description Get leaf consumption features, excluding empty intermediate parents.
  * @param {Array<object>} devices - Devices with features.
  * @param {string|null} [mainMeterDeviceId] - Main electric meter device id.
  * @returns {Array<object>} Leaf consumption candidates.
  * @example
- * getLeafConsumptionCandidates([{ id: 'd1', name: 'Plug', features: [] }]);
+ * getConsumptionFeaturesForDigest([{ id: 'd1', name: 'Plug', features: [] }]);
  */
-function getLeafConsumptionCandidates(devices, mainMeterDeviceId = null) {
+function getConsumptionFeaturesForDigest(devices, mainMeterDeviceId = null) {
   const consumptionFeatures = devices.flatMap((device) =>
     device.features.filter(isConsumptionFeature).map((feature) => ({ device, feature })),
   );
@@ -64,87 +90,6 @@ function getLeafConsumptionCandidates(devices, mainMeterDeviceId = null) {
   );
 
   return consumptionFeatures.filter(({ feature }) => !intermediateParentIds.has(feature.id));
-}
-
-/**
- * @description Keep one consumption feature per device.
- * @param {Array<object>} candidates - Leaf consumption candidates.
- * @returns {Array<object>} Deduplicated candidates.
- * @example
- * dedupeConsumptionCandidatesByDevice([{ device: { id: 'd1' }, feature: {} }]);
- */
-function dedupeConsumptionCandidatesByDevice(candidates) {
-  const byDeviceId = new Map();
-
-  candidates.forEach((candidate) => {
-    const selectedFeature = pickConsumptionFeatureOnDevice(
-      candidates.filter((other) => other.device.id === candidate.device.id).map((other) => other.feature),
-    );
-
-    if (!selectedFeature) {
-      return;
-    }
-
-    byDeviceId.set(candidate.device.id, {
-      device: candidate.device,
-      feature: selectedFeature,
-    });
-  });
-
-  return Array.from(byDeviceId.values());
-}
-
-/**
- * @description Split main meter and other consumption candidates.
- * @param {Array<object>} candidates - Consumption candidates.
- * @param {string|null} mainMeterDeviceId - Main electric meter device id.
- * @returns {{ mainMeterCandidates: Array<object>, otherCandidates: Array<object> }} Split candidates.
- * @example
- * splitMainMeterAndOtherCandidates([], null);
- */
-function splitMainMeterAndOtherCandidates(candidates, mainMeterDeviceId) {
-  if (!mainMeterDeviceId) {
-    return {
-      mainMeterCandidates: [],
-      otherCandidates: candidates,
-    };
-  }
-
-  return {
-    mainMeterCandidates: candidates.filter((candidate) => candidate.device.id === mainMeterDeviceId),
-    otherCandidates: candidates.filter((candidate) => candidate.device.id !== mainMeterDeviceId),
-  };
-}
-
-/**
- * @description Select consumption features to query for the weekly digest.
- * @param {Array<object>} devices - Devices with features.
- * @param {string|null} mainMeterDeviceId - Main electric meter device id.
- * @returns {Array<object>} Selected candidates with role metadata.
- * @example
- * selectEnergyFeaturesForDigest([], null);
- */
-function selectEnergyFeaturesForDigest(devices, mainMeterDeviceId) {
-  const leafCandidates = dedupeConsumptionCandidatesByDevice(getLeafConsumptionCandidates(devices, mainMeterDeviceId));
-  const { mainMeterCandidates, otherCandidates } = splitMainMeterAndOtherCandidates(leafCandidates, mainMeterDeviceId);
-
-  const selected = [];
-
-  if (mainMeterCandidates.length > 0) {
-    selected.push({
-      ...mainMeterCandidates[0],
-      role: 'main_meter',
-    });
-  }
-
-  otherCandidates.slice(0, MAX_OTHER_ENERGY_CANDIDATES).forEach((candidate) => {
-    selected.push({
-      ...candidate,
-      role: 'top_consumer_candidate',
-    });
-  });
-
-  return selected;
 }
 
 /**
@@ -171,47 +116,111 @@ function sumConsumptionValues(consumptionResults) {
 }
 
 /**
- * @description Fetch weekly consumption totals for one feature.
+ * @description Fetch consumption totals for a period comparison.
  * @param {object} context - Gateway context with device manager.
- * @param {object} candidate - Consumption candidate.
+ * @param {string} selector - Device feature selector.
  * @param {Date} periodStart - Current period start.
  * @param {Date} periodEnd - Current period end.
  * @param {Date} previousPeriodStart - Previous period start.
+ * @param {string} displayMode - Consumption display mode.
+ * @returns {Promise<object>} Current and previous totals.
+ * @example
+ * fetchConsumptionTotals(context, 'meter', new Date(), new Date(), new Date(), 'kwh');
+ */
+async function fetchConsumptionTotals(context, selector, periodStart, periodEnd, previousPeriodStart, displayMode) {
+  const [currentWeekResults, previousWeekResults] = await Promise.all([
+    context.device.energySensorManager.getConsumptionByDates([selector], {
+      from: periodStart,
+      to: periodEnd,
+      group_by: 'day',
+      display_mode: displayMode,
+    }),
+    context.device.energySensorManager.getConsumptionByDates([selector], {
+      from: previousPeriodStart,
+      to: periodStart,
+      group_by: 'day',
+      display_mode: displayMode,
+    }),
+  ]);
+
+  return {
+    current: sumConsumptionValues(currentWeekResults),
+    previous: sumConsumptionValues(previousWeekResults),
+    currencyUnit: currentWeekResults?.[0]?.deviceFeature?.currency_unit,
+  };
+}
+
+/**
+ * @description Fetch weekly consumption totals for one feature.
+ * @param {object} context - Gateway context with device manager.
+ * @param {object} candidate - Consumption candidate with device and feature.
+ * @param {Date} periodStart - Current period start.
+ * @param {Date} periodEnd - Current period end.
+ * @param {Date} previousPeriodStart - Previous period start.
+ * @param {string|null} mainMeterDeviceId - Configured main meter device id.
  * @returns {Promise<object|null>} Consumption entry or null.
  * @example
- * fetchEnergyConsumptionForCandidate(context, candidate, new Date(), new Date(), new Date());
+ * fetchEnergyConsumptionForFeature(context, candidate, new Date(), new Date(), new Date(), 'meter-id');
  */
-async function fetchEnergyConsumptionForCandidate(context, candidate, periodStart, periodEnd, previousPeriodStart) {
+async function fetchEnergyConsumptionForFeature(
+  context,
+  candidate,
+  periodStart,
+  periodEnd,
+  previousPeriodStart,
+  mainMeterDeviceId,
+) {
   try {
-    const [currentWeekResults, previousWeekResults] = await Promise.all([
-      context.device.energySensorManager.getConsumptionByDates([candidate.feature.selector], {
-        from: periodStart,
-        to: periodEnd,
-        group_by: 'day',
-        display_mode: 'kwh',
-      }),
-      context.device.energySensorManager.getConsumptionByDates([candidate.feature.selector], {
-        from: previousPeriodStart,
-        to: periodStart,
-        group_by: 'day',
-        display_mode: 'kwh',
-      }),
-    ]);
+    const kwhTotals = await fetchConsumptionTotals(
+      context,
+      candidate.feature.selector,
+      periodStart,
+      periodEnd,
+      previousPeriodStart,
+      'kwh',
+    );
 
-    const currentWeekTotal = sumConsumptionValues(currentWeekResults);
-    const previousWeekTotal = sumConsumptionValues(previousWeekResults);
+    let costTotals = null;
+    try {
+      costTotals = await fetchConsumptionTotals(
+        context,
+        candidate.feature.selector,
+        periodStart,
+        periodEnd,
+        previousPeriodStart,
+        'currency',
+      );
+    } catch (e) {
+      costTotals = null;
+    }
 
-    if (currentWeekTotal === null && previousWeekTotal === null) {
+    const hasKwhData = kwhTotals.current !== null || kwhTotals.previous !== null;
+    const hasCostData = costTotals && (costTotals.current !== null || costTotals.previous !== null);
+
+    if (!hasKwhData && !hasCostData) {
       return null;
     }
 
+    const roomName = candidate.device.room?.name ?? 'Unknown room';
+
     return {
-      device: candidate.device.name,
-      feature: candidate.feature.name,
-      role: candidate.role,
-      unit: 'kWh',
-      current_week_total: currentWeekTotal,
-      previous_week_total: previousWeekTotal,
+      device_id: candidate.device.id,
+      device_name: candidate.device.name,
+      room: roomName,
+      feature_id: candidate.feature.id,
+      feature_name: candidate.feature.name,
+      feature_type: candidate.feature.type,
+      energy_parent_feature_id: candidate.feature.energy_parent_id ?? null,
+      is_on_configured_main_meter_device: mainMeterDeviceId !== null && candidate.device.id === mainMeterDeviceId,
+      current_week_kwh: kwhTotals.current,
+      previous_week_kwh: kwhTotals.previous,
+      ...(hasCostData
+        ? {
+            current_week_cost: costTotals.current,
+            previous_week_cost: costTotals.previous,
+            cost_unit: costTotals.currencyUnit,
+          }
+        : {}),
     };
   } catch (e) {
     return null;
@@ -308,48 +317,28 @@ async function buildWeeklyDigestData() {
         });
       }
 
-      if (feature.last_value_changed) {
+      if (shouldCheckFeatureForStale(feature) && feature.last_value_changed) {
         const hoursSinceUpdate = (now.getTime() - new Date(feature.last_value_changed).getTime()) / (1000 * 60 * 60);
         if (hoursSinceUpdate > outdatedHours) {
           staleSensors.push({
             device: device.name,
             feature: feature.name,
             room: roomName,
-            hours_since_update: Math.round(hoursSinceUpdate),
+            last_update: feature.last_value_changed,
+            ...formatSilentDuration(hoursSinceUpdate),
           });
         }
       }
     });
   });
 
-  const energyCandidates = selectEnergyFeaturesForDigest(devices, mainMeterDeviceId);
-  const mainMeterCandidate = energyCandidates.find((candidate) => candidate.role === 'main_meter');
-  const otherCandidates = energyCandidates.filter((candidate) => candidate.role === 'top_consumer_candidate');
-
-  const [mainMeterEnergy, ...topConsumerEnergies] = await Promise.all([
-    mainMeterCandidate
-      ? fetchEnergyConsumptionForCandidate(this, mainMeterCandidate, periodStart, periodEnd, previousPeriodStart)
-      : Promise.resolve(null),
-    ...otherCandidates.map((candidate) =>
-      fetchEnergyConsumptionForCandidate(this, candidate, periodStart, periodEnd, previousPeriodStart),
+  const energyCandidates = getConsumptionFeaturesForDigest(devices, mainMeterDeviceId);
+  const energyResults = await Promise.all(
+    energyCandidates.map((candidate) =>
+      fetchEnergyConsumptionForFeature(this, candidate, periodStart, periodEnd, previousPeriodStart, mainMeterDeviceId),
     ),
-  ]);
-
-  const energy = [];
-  if (mainMeterEnergy) {
-    energy.push(mainMeterEnergy);
-  }
-
-  topConsumerEnergies
-    .filter((entry) => entry !== null)
-    .sort((a, b) => (b.current_week_total ?? 0) - (a.current_week_total ?? 0))
-    .slice(0, TOP_CONSUMERS_COUNT)
-    .forEach((entry) => {
-      energy.push({
-        ...entry,
-        role: 'top_consumer',
-      });
-    });
+  );
+  const energy = energyResults.filter((entry) => entry !== null);
 
   const recentlyExecutedScenes = scenes
     .filter((scene) => scene.last_executed)
@@ -376,6 +365,12 @@ async function buildWeeklyDigestData() {
     low_batteries: lowBatteries,
     stale_sensors: staleSensors.slice(0, 10),
     energy,
+    energy_context: {
+      configured_main_meter_device_id: mainMeterDeviceId,
+      feature_count: energy.length,
+      note:
+        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. Do not sum parent and child values. is_on_configured_main_meter_device marks the device linked to the energy price contract.',
+    },
     recent_scenes: recentlyExecutedScenes,
   };
 }
@@ -384,12 +379,10 @@ module.exports = {
   buildWeeklyDigestData,
   sumConsumptionValues,
   isConsumptionFeature,
-  pickConsumptionFeatureOnDevice,
-  getLeafConsumptionCandidates,
-  dedupeConsumptionCandidatesByDevice,
-  splitMainMeterAndOtherCandidates,
-  selectEnergyFeaturesForDigest,
+  shouldCheckFeatureForStale,
+  formatSilentDuration,
+  getConsumptionFeaturesForDigest,
   getMainMeterDeviceId,
-  fetchEnergyConsumptionForCandidate,
-  TOP_CONSUMERS_COUNT,
+  fetchConsumptionTotals,
+  fetchEnergyConsumptionForFeature,
 };

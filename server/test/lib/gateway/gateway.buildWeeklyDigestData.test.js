@@ -5,13 +5,11 @@ const {
   buildWeeklyDigestData,
   sumConsumptionValues,
   isConsumptionFeature,
-  pickConsumptionFeatureOnDevice,
-  getLeafConsumptionCandidates,
-  selectEnergyFeaturesForDigest,
-  dedupeConsumptionCandidatesByDevice,
-  splitMainMeterAndOtherCandidates,
+  getConsumptionFeaturesForDigest,
   getMainMeterDeviceId,
-  fetchEnergyConsumptionForCandidate,
+  fetchEnergyConsumptionForFeature,
+  shouldCheckFeatureForStale,
+  formatSilentDuration,
 } = require('../../../lib/gateway/gateway.buildWeeklyDigestData');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
@@ -75,11 +73,12 @@ describe('gateway.buildWeeklyDigestData', () => {
     expect(data.recent_scenes).to.have.lengthOf(1);
   });
 
-  it('should prioritize main meter and top consumers by volume', async () => {
+  it('should include all consumption features with hierarchy metadata', async () => {
     const devices = [
       {
         id: 'meter-device',
         name: 'Main meter',
+        room: { name: 'Panel' },
         features: [
           {
             id: 'meter-index-feature',
@@ -100,6 +99,7 @@ describe('gateway.buildWeeklyDigestData', () => {
       {
         id: 'plug-a',
         name: 'Plug A',
+        room: { name: 'Kitchen' },
         features: [
           {
             id: 'plug-a-feature',
@@ -169,26 +169,89 @@ describe('gateway.buildWeeklyDigestData', () => {
     const data = await buildWeeklyDigestData.call(gateway);
 
     expect(data.energy).to.have.lengthOf(4);
-    expect(data.energy[0]).to.include({
-      device: 'Main meter',
-      role: 'main_meter',
-      current_week_total: 120,
+    expect(data.energy_context.configured_main_meter_device_id).to.equal('meter-device');
+    expect(data.energy_context.feature_count).to.equal(4);
+
+    const meter = data.energy.find((entry) => entry.device_name === 'Main meter');
+    expect(meter).to.deep.include({
+      device_id: 'meter-device',
+      feature_id: 'meter-feature',
+      room: 'Panel',
+      is_on_configured_main_meter_device: true,
+      current_week_kwh: 120,
+      energy_parent_feature_id: null,
     });
-    expect(data.energy[1]).to.include({
-      device: 'Plug B',
-      role: 'top_consumer',
-      current_week_total: 30,
+
+    const plugB = data.energy.find((entry) => entry.device_name === 'Plug B');
+    expect(plugB).to.deep.include({
+      is_on_configured_main_meter_device: false,
+      current_week_kwh: 30,
+      energy_parent_feature_id: 'meter-index-feature',
     });
-    expect(data.energy[2]).to.include({
-      device: 'Plug C',
-      role: 'top_consumer',
-      current_week_total: 15,
-    });
-    expect(data.energy[3]).to.include({
-      device: 'Plug A',
-      role: 'top_consumer',
-      current_week_total: 5,
-    });
+  });
+
+  it('should include multiple consumption features on the same device', async () => {
+    const devices = [
+      {
+        id: 'lixee-device',
+        name: 'Lixee TIC',
+        features: [
+          {
+            id: 'index-feature',
+            name: 'Total index',
+            selector: 'lixee-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+          },
+          {
+            id: 'hp-feature',
+            name: 'HP (consumption)',
+            selector: 'lixee-hp',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'index-feature',
+          },
+          {
+            id: 'hc-feature',
+            name: 'HC (consumption)',
+            selector: 'lixee-hc',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'index-feature',
+          },
+        ],
+      },
+    ];
+
+    const consumptionBySelector = {
+      'lixee-hp': [{ values: [{ sum_value: 40 }] }],
+      'lixee-hc': [{ values: [{ sum_value: 19 }] }],
+    };
+
+    const gateway = {
+      device: {
+        get: fake.resolves(devices),
+        energySensorManager: {
+          getConsumptionByDates: fake(async ([selector]) => consumptionBySelector[selector] ?? []),
+        },
+      },
+      scene: {
+        get: fake.resolves([]),
+      },
+      variable: {
+        getValue: fake.resolves('10'),
+      },
+      energyPrice: {
+        getDefaultElectricMeterFeatureId: fake.resolves('index-feature'),
+      },
+    };
+
+    const data = await buildWeeklyDigestData.call(gateway);
+
+    expect(data.energy).to.have.lengthOf(2);
+    expect(data.energy.map((entry) => entry.feature_name)).to.include.members(['HP (consumption)', 'HC (consumption)']);
+    expect(data.energy.every((entry) => entry.energy_parent_feature_id === 'index-feature')).to.equal(true);
+    expect(data.energy.every((entry) => entry.is_on_configured_main_meter_device)).to.equal(true);
   });
 });
 
@@ -206,18 +269,6 @@ describe('energy digest helpers', () => {
         type: DAILY_CONSUMPTION,
       }),
     ).to.equal(false);
-  });
-
-  it('should return null when device has no consumption feature', () => {
-    expect(pickConsumptionFeatureOnDevice([])).to.equal(undefined);
-    expect(
-      pickConsumptionFeatureOnDevice([
-        {
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
-        },
-      ]),
-    ).to.equal(undefined);
   });
 
   it('should keep main meter consumption when it is a parent feature', () => {
@@ -247,18 +298,10 @@ describe('energy digest helpers', () => {
       },
     ];
 
-    const candidates = getLeafConsumptionCandidates(devices, 'meter-device');
+    const candidates = getConsumptionFeaturesForDigest(devices, 'meter-device');
 
     expect(candidates).to.have.lengthOf(2);
     expect(candidates.map((candidate) => candidate.device.name)).to.include.members(['Main meter', 'Plug']);
-  });
-
-  it('should put all candidates in others when main meter is unknown', () => {
-    const candidates = [{ device: { id: 'plug-1' } }, { device: { id: 'plug-2' } }];
-    const split = splitMainMeterAndOtherCandidates(candidates, null);
-
-    expect(split.mainMeterCandidates).to.deep.equal([]);
-    expect(split.otherCandidates).to.deep.equal(candidates);
   });
 
   it('should resolve main meter device id from energy price configuration', async () => {
@@ -303,7 +346,7 @@ describe('energy digest helpers', () => {
     ).to.eventually.equal(null);
   });
 
-  it('should fetch energy consumption for one candidate', async () => {
+  it('should fetch energy consumption for one feature', async () => {
     const context = {
       device: {
         energySensorManager: {
@@ -312,24 +355,35 @@ describe('energy digest helpers', () => {
       },
     };
 
-    const result = await fetchEnergyConsumptionForCandidate(
+    const result = await fetchEnergyConsumptionForFeature(
       context,
       {
-        device: { name: 'Plug' },
-        feature: { name: 'Consumption', selector: 'plug-consumption' },
-        role: 'top_consumer_candidate',
+        device: { id: 'plug-1', name: 'Plug', room: { name: 'Kitchen' } },
+        feature: {
+          id: 'feature-1',
+          name: 'Consumption',
+          selector: 'plug-consumption',
+          type: DAILY_CONSUMPTION,
+          energy_parent_id: 'parent-feature',
+        },
       },
       new Date('2026-06-01'),
       new Date('2026-06-08'),
       new Date('2026-05-25'),
+      null,
     );
 
     expect(result).to.deep.include({
-      device: 'Plug',
-      feature: 'Consumption',
-      role: 'top_consumer_candidate',
-      current_week_total: 8,
-      previous_week_total: 8,
+      device_id: 'plug-1',
+      device_name: 'Plug',
+      feature_id: 'feature-1',
+      feature_name: 'Consumption',
+      feature_type: DAILY_CONSUMPTION,
+      room: 'Kitchen',
+      energy_parent_feature_id: 'parent-feature',
+      is_on_configured_main_meter_device: false,
+      current_week_kwh: 8,
+      previous_week_kwh: 8,
     });
   });
 
@@ -342,16 +396,16 @@ describe('energy digest helpers', () => {
       },
     };
 
-    const result = await fetchEnergyConsumptionForCandidate(
+    const result = await fetchEnergyConsumptionForFeature(
       context,
       {
-        device: { name: 'Plug' },
-        feature: { name: 'Consumption', selector: 'plug-consumption' },
-        role: 'top_consumer_candidate',
+        device: { id: 'plug-1', name: 'Plug' },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
       },
       new Date('2026-06-01'),
       new Date('2026-06-08'),
       new Date('2026-05-25'),
+      null,
     );
 
     expect(result).to.equal(null);
@@ -366,20 +420,21 @@ describe('energy digest helpers', () => {
       },
     };
 
-    const result = await fetchEnergyConsumptionForCandidate(
+    const result = await fetchEnergyConsumptionForFeature(
       context,
       {
-        device: { name: 'Plug' },
-        feature: { name: 'Consumption', selector: 'plug-consumption' },
-        role: 'top_consumer_candidate',
+        device: { id: 'plug-1', name: 'Plug' },
+        feature: { id: 'feature-1', name: 'Consumption', selector: 'plug-consumption', type: DAILY_CONSUMPTION },
       },
       new Date('2026-06-01'),
       new Date('2026-06-08'),
       new Date('2026-05-25'),
+      null,
     );
 
     expect(result).to.equal(null);
   });
+
   it('should exclude intermediate consumption parents', () => {
     const devices = [
       {
@@ -409,71 +464,46 @@ describe('energy digest helpers', () => {
       },
     ];
 
-    const candidates = getLeafConsumptionCandidates(devices);
+    const candidates = getConsumptionFeaturesForDigest(devices);
 
     expect(candidates).to.have.lengthOf(1);
     expect(candidates[0].device.name).to.equal('Lixee TIC');
   });
 
-  it('should keep one consumption feature per device', () => {
-    const candidates = dedupeConsumptionCandidatesByDevice([
+  it('should keep all consumption features on the same device', () => {
+    const candidates = getConsumptionFeaturesForDigest([
       {
-        device: { id: 'device-1', name: 'Plug' },
-        feature: {
-          id: 'daily',
-          type: DAILY_CONSUMPTION,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        },
-      },
-      {
-        device: { id: 'device-1', name: 'Plug' },
-        feature: {
-          id: 'thirty',
-          type: THIRTY_MINUTES_CONSUMPTION,
-          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-        },
+        id: 'lixee-device',
+        name: 'Lixee TIC',
+        features: [
+          {
+            id: 'hp-feature',
+            type: THIRTY_MINUTES_CONSUMPTION,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            energy_parent_id: 'index-feature',
+          },
+          {
+            id: 'hc-feature',
+            type: THIRTY_MINUTES_CONSUMPTION,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            energy_parent_id: 'index-feature',
+          },
+          {
+            id: 'daily-feature',
+            type: DAILY_CONSUMPTION,
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            energy_parent_id: 'index-feature',
+          },
+        ],
       },
     ]);
 
-    expect(candidates).to.have.lengthOf(1);
-    expect(candidates[0].feature.id).to.equal('thirty');
-  });
-
-  it('should always include main meter before top consumer candidates', () => {
-    const selected = selectEnergyFeaturesForDigest(
-      [
-        {
-          id: 'plug-1',
-          name: 'Plug 1',
-          features: [
-            {
-              id: 'plug-feature',
-              selector: 'plug-1',
-              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-              type: DAILY_CONSUMPTION,
-            },
-          ],
-        },
-        {
-          id: 'meter-1',
-          name: 'Meter',
-          features: [
-            {
-              id: 'meter-feature',
-              selector: 'meter-1',
-              category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-              type: DAILY_CONSUMPTION,
-            },
-          ],
-        },
-      ],
-      'meter-1',
-    );
-
-    expect(selected[0].role).to.equal('main_meter');
-    expect(selected[0].device.name).to.equal('Meter');
-    expect(selected[1].role).to.equal('top_consumer_candidate');
-    expect(selected[1].device.name).to.equal('Plug 1');
+    expect(candidates).to.have.lengthOf(3);
+    expect(candidates.map((candidate) => candidate.feature.id)).to.include.members([
+      'hp-feature',
+      'hc-feature',
+      'daily-feature',
+    ]);
   });
 });
 
@@ -552,6 +582,76 @@ describe('buildWeeklyDigestData additional sensors', () => {
     expect(data.humidities).to.have.lengthOf(1);
     expect(data.humidities[0].room).to.equal('Unknown room');
     expect(data.stale_sensors).to.have.lengthOf(1);
-    expect(data.stale_sensors[0].hours_since_update).to.be.greaterThan(48);
+    expect(data.stale_sensors[0].silent_for_days).to.be.at.least(4);
+  });
+
+  it('should not flag lights as stale sensors', async () => {
+    const oldDate = new Date(Date.now() - 100 * 60 * 60 * 1000).toISOString();
+    const gateway = {
+      device: {
+        get: fake.resolves([
+          {
+            name: 'TV LED strip',
+            room: { name: 'Living room' },
+            features: [
+              {
+                name: 'Brightness',
+                category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+                last_value: 50,
+                last_value_changed: oldDate,
+              },
+            ],
+          },
+        ]),
+        energySensorManager: {
+          getConsumptionByDates: fake.resolves([]),
+        },
+      },
+      scene: {
+        get: fake.resolves([]),
+      },
+      variable: {
+        getValue: fake.resolves('10'),
+      },
+      energyPrice: {
+        getDefaultElectricMeterFeatureId: fake.resolves(null),
+      },
+    };
+
+    const data = await buildWeeklyDigestData.call(gateway);
+
+    expect(data.stale_sensors).to.have.lengthOf(0);
+  });
+});
+
+describe('formatSilentDuration', () => {
+  it('should format long silences in weeks or months', () => {
+    expect(formatSilentDuration(1700)).to.deep.equal({ silent_for_months: 2 });
+    expect(formatSilentDuration(100)).to.deep.equal({ silent_for_days: 4 });
+    expect(formatSilentDuration(400)).to.deep.equal({ silent_for_weeks: 2 });
+  });
+});
+
+describe('shouldCheckFeatureForStale', () => {
+  it('should reuse MCP sensor feature detection', () => {
+    expect(shouldCheckFeatureForStale({ category: DEVICE_FEATURE_CATEGORIES.LIGHT, type: 'binary' })).to.equal(false);
+    expect(
+      shouldCheckFeatureForStale({
+        category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      }),
+    ).to.equal(true);
+    expect(
+      shouldCheckFeatureForStale({
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+      }),
+    ).to.equal(true);
+    expect(
+      shouldCheckFeatureForStale({
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
+      }),
+    ).to.equal(false);
   });
 });

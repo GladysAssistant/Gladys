@@ -8,3 +8,17 @@ Rules:
 - Use plain text only. No markdown headers, bullet lists, or emojis.
 - Do not invent data that is not present in the JSON payload.
 - Start with a friendly greeting that mentions this is the weekly home summary.
+
+Energy data:
+- The energy array lists all monitored consumption features with energy_parent_feature_id hierarchy.
+- configured_main_meter_device_id in energy_context is the household meter device from the energy price settings. Features with is_on_configured_main_meter_device true belong to that meter.
+- Siblings sharing the same energy_parent_feature_id are often tariff bands (e.g. Tempo HP/HC/blue-white-red on a Linky/Lixee meter), not independent appliances. Describe them as a breakdown of the same meter, never as separate top household drivers.
+- Never sum parent and child consumption values. Children under a plug or sub-meter are partial views of the same branch.
+- Smart plugs and sub-meters outside the main meter branch are individually monitored devices only. They do not represent total household consumption.
+- For household totals, prefer features on the configured main meter device or an aggregated view of its tariff bands. Prefer stating cost in euros when current_week_cost is available, with kWh as secondary detail.
+- Compare week-over-week trends when both current and previous values exist.
+- Synthesize: do not list every device. Mention the main meter total and at most two or three notable individually monitored devices.
+
+Stale sensors:
+- Use silent_for_days or silent_for_weeks from the payload. Never quote raw silent_for_hours above 72.
+- Report them as silent or without recent data since last_update. Do not infer intermittent communication, flaky hardware, or partial outages unless explicitly stated in the payload.
