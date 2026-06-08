@@ -7,6 +7,9 @@ const {
   isConsumptionFeature,
   getConsumptionFeaturesForDigest,
   findCostFeatureForConsumption,
+  findDeviceFeatureById,
+  belongsToMainMeterBranch,
+  buildDigestPeriods,
   getMainMeterDeviceId,
   fetchEnergyConsumptionForFeature,
   shouldCheckFeatureForStale,
@@ -372,6 +375,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       null,
+      [],
     );
 
     expect(result).to.deep.include({
@@ -407,6 +411,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       null,
+      [],
     );
 
     expect(result).to.equal(null);
@@ -431,6 +436,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       null,
+      [],
     );
 
     expect(result).to.equal(null);
@@ -481,6 +487,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       'meter-1',
+      [],
     );
 
     expect(result).to.deep.include({
@@ -512,6 +519,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       null,
+      [],
     );
 
     expect(result).to.deep.include({
@@ -559,6 +567,7 @@ describe('energy digest helpers', () => {
       new Date('2026-06-08'),
       new Date('2026-05-25'),
       null,
+      [],
     );
 
     expect(result).to.deep.include({
@@ -566,6 +575,52 @@ describe('energy digest helpers', () => {
       previous_week_kwh: 8,
     });
     expect(result).to.not.have.property('current_week_cost');
+  });
+
+  it('should flag alternate main meter sources in the energy branch', async () => {
+    const devices = [
+      {
+        id: 'enedis-device',
+        name: 'Enedis',
+        features: [{ id: 'enedis-index', name: 'Index' }],
+      },
+      {
+        id: 'lixee-device',
+        name: 'Lixee TIC',
+        features: [
+          {
+            id: 'lixee-consumption',
+            name: 'Daily consumption',
+            selector: 'lixee-consumption',
+            type: DAILY_CONSUMPTION,
+            energy_parent_id: 'enedis-index',
+          },
+        ],
+      },
+    ];
+    const context = {
+      device: {
+        energySensorManager: {
+          getConsumptionByDates: fake(async () => [{ values: [{ sum_value: 3 }] }]),
+        },
+      },
+    };
+
+    const result = await fetchEnergyConsumptionForFeature(
+      context,
+      {
+        device: devices[1],
+        feature: devices[1].features[0],
+      },
+      new Date('2026-06-01'),
+      new Date('2026-06-08'),
+      new Date('2026-05-25'),
+      'enedis-device',
+      devices,
+    );
+
+    expect(result.is_alternate_main_meter_source).to.equal(true);
+    expect(result.is_on_configured_main_meter_device).to.equal(false);
   });
 
   it('should find linked cost feature on device', () => {
@@ -788,9 +843,43 @@ describe('formatSilentDuration', () => {
   });
 });
 
+describe('buildDigestPeriods', () => {
+  it('should use calendar day boundaries for seven days including today', () => {
+    const periods = buildDigestPeriods(new Date('2026-06-08T15:30:00'));
+
+    expect(periods.metadata.from_date).to.equal('2026-06-02');
+    expect(periods.metadata.to_date).to.equal('2026-06-08');
+    expect(periods.metadata.days_count).to.equal(7);
+  });
+});
+
+describe('belongsToMainMeterBranch', () => {
+  it('should detect features parented to the configured main meter', () => {
+    const devices = [
+      {
+        id: 'enedis-device',
+        features: [{ id: 'enedis-index' }],
+      },
+      {
+        id: 'lixee-device',
+        features: [{ id: 'lixee-consumption', energy_parent_id: 'enedis-index' }],
+      },
+    ];
+
+    expect(belongsToMainMeterBranch(devices, devices[1].features[0], 'enedis-device')).to.equal(true);
+    expect(findDeviceFeatureById(devices, 'enedis-index').device.id).to.equal('enedis-device');
+  });
+});
+
 describe('shouldCheckFeatureForStale', () => {
   it('should reuse MCP sensor feature detection', () => {
     expect(shouldCheckFeatureForStale({ category: DEVICE_FEATURE_CATEGORIES.LIGHT, type: 'binary' })).to.equal(false);
+    expect(
+      shouldCheckFeatureForStale({
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DAILY_CONSUMPTION,
+      }),
+    ).to.equal(false);
     expect(
       shouldCheckFeatureForStale({
         category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,

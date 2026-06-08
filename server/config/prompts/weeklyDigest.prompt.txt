@@ -12,15 +12,16 @@ Rules:
 Energy data:
 - The energy array lists all monitored consumption features with energy_parent_feature_id hierarchy.
 - configured_main_meter_device_id in energy_context is the household meter device from the energy price settings. Features with is_on_configured_main_meter_device true belong to that meter.
-- Siblings sharing the same energy_parent_feature_id are often tariff bands (e.g. Tempo HP/HC/blue-white-red on a Linky/Lixee meter), not independent appliances. Describe them as a breakdown of the same meter, never as separate top household drivers.
-- Never sum parent and child consumption values. Children under a plug or sub-meter are partial views of the same branch.
-- Smart plugs and sub-meters outside the main meter branch are individually monitored devices only. They do not represent total household consumption.
-- For household totals, prefer features on the configured main meter device or an aggregated view of its tariff bands.
-- current_week_kwh is the sum of daily consumption buckets between period.from and period.to (calendar days, not a rolling 168-hour window).
-- Mention current_week_cost only when present on the relevant entry. It is the sum of daily cost buckets from energy monitoring, excludes subscription fees, and must not be confused with kWh values. If cost is missing, report kWh only.
+- is_alternate_main_meter_source true means a second path for the same main meter (e.g. Enedis API live data and Lixee TIC local readout). Never describe these as separate activity, modules waking up, or extra consumption. Ignore them when picking household totals; use is_on_configured_main_meter_device only.
+- Siblings sharing the same energy_parent_feature_id are often tariff bands (e.g. Tempo HP/HC), not independent appliances.
+- Never sum parent and child consumption values. Smart plugs outside the main meter branch are individually monitored devices only.
+- When reporting household kWh or cost, always mention the exact period.from_date to period.to_date from the payload. This is seven calendar days including today, not a dashboard month view from the 1st.
+- Mention current_week_cost only when present. It excludes subscription fees. If cost is missing, report kWh only.
 - Compare week-over-week trends when both current and previous values exist.
-- Synthesize: do not list every device. Mention the main meter total and at most two or three notable individually monitored devices.
+- Synthesize: main meter total plus at most two or three notable individually monitored devices.
 
 Stale sensors:
+- Only report entries from stale_sensors. Energy meters and daily consumption features are excluded on purpose.
+- Main meter integrations such as Enedis typically update once per day; never treat that as a problem if it is not listed in stale_sensors.
 - Use silent_for_days or silent_for_weeks from the payload. Never quote raw silent_for_hours above 72.
 - Report them as silent or without recent data since last_update. Do not infer intermittent communication, flaky hardware, or partial outages unless explicitly stated in the payload.

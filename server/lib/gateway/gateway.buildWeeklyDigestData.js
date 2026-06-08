@@ -18,6 +18,10 @@ const CONSUMPTION_FEATURE_TYPES = [
  * shouldCheckFeatureForStale({ category: 'co2-sensor' });
  */
 function shouldCheckFeatureForStale(feature) {
+  if (feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
+    return false;
+  }
+
   return isSensorFeature(feature);
 }
 
@@ -73,6 +77,93 @@ const COST_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
 ];
+
+/**
+ * @description Find a device feature by id across all devices.
+ * @param {Array<object>} devices - Devices with features.
+ * @param {string} featureId - Feature id.
+ * @returns {{ device: object, feature: object }|null} Device feature match.
+ * @example
+ * findDeviceFeatureById([], 'feature-id');
+ */
+function findDeviceFeatureById(devices, featureId) {
+  const match = devices
+    .map((device) => {
+      const feature = device.features.find((entry) => entry.id === featureId);
+      return feature ? { device, feature } : null;
+    })
+    .find((entry) => entry !== null);
+
+  return match ?? null;
+}
+
+/**
+ * @description Check if a feature belongs to the configured main meter energy branch.
+ * @param {Array<object>} devices - Devices with features.
+ * @param {object} feature - Consumption feature.
+ * @param {string|null} mainMeterDeviceId - Configured main meter device id.
+ * @returns {boolean} True when feature is under the main meter hierarchy.
+ * @example
+ * belongsToMainMeterBranch([], { energy_parent_id: 'parent-id' }, 'meter-id');
+ */
+function belongsToMainMeterBranch(devices, feature, mainMeterDeviceId) {
+  if (!mainMeterDeviceId || !feature.energy_parent_id) {
+    return false;
+  }
+
+  let parentId = feature.energy_parent_id;
+  const visited = new Set();
+
+  while (parentId && !visited.has(parentId)) {
+    visited.add(parentId);
+    const parent = findDeviceFeatureById(devices, parentId);
+    if (!parent) {
+      return false;
+    }
+
+    if (parent.device.id === mainMeterDeviceId) {
+      return true;
+    }
+
+    parentId = parent.feature.energy_parent_id;
+  }
+
+  return false;
+}
+
+/**
+ * @description Build calendar-aligned digest periods for energy comparisons.
+ * @param {Date} [now] - Reference date.
+ * @returns {object} Period boundaries and metadata.
+ * @example
+ * buildDigestPeriods(new Date('2026-06-08T15:30:00'));
+ */
+function buildDigestPeriods(now = new Date()) {
+  const periodStart = dayjs(now)
+    .startOf('day')
+    .subtract(6, 'day');
+  const periodEnd = dayjs(now)
+    .startOf('day')
+    .add(1, 'day');
+  const previousPeriodStart = periodStart.subtract(7, 'day');
+
+  return {
+    periodStart: periodStart.toDate(),
+    periodEnd: periodEnd.toDate(),
+    previousPeriodStart: previousPeriodStart.toDate(),
+    metadata: {
+      from: periodStart.toDate().toISOString(),
+      to: periodEnd.toDate().toISOString(),
+      from_date: periodStart.format('YYYY-MM-DD'),
+      to_date: periodStart.add(6, 'day').format('YYYY-MM-DD'),
+      days_count: 7,
+      aggregation: 'sum_of_daily_buckets',
+      comparison_window: 'previous_7_calendar_days',
+      note:
+        'Seven calendar days including today, using local midnight boundaries like the energy dashboard day view. This is not the same as a dashboard month view from the 1st of the month.',
+    },
+  };
+}
 
 /**
  * @description Find the cost feature linked to a consumption feature on the same device.
@@ -183,9 +274,10 @@ async function fetchConsumptionTotals(context, selector, periodStart, periodEnd,
  * @param {Date} periodEnd - Current period end.
  * @param {Date} previousPeriodStart - Previous period start.
  * @param {string|null} mainMeterDeviceId - Configured main meter device id.
+ * @param {Array<object>} devices - All devices with features.
  * @returns {Promise<object|null>} Consumption entry or null.
  * @example
- * fetchEnergyConsumptionForFeature(context, candidate, new Date(), new Date(), new Date(), 'meter-id');
+ * fetchEnergyConsumptionForFeature(context, candidate, new Date(), new Date(), new Date(), 'meter-id', []);
  */
 async function fetchEnergyConsumptionForFeature(
   context,
@@ -194,6 +286,7 @@ async function fetchEnergyConsumptionForFeature(
   periodEnd,
   previousPeriodStart,
   mainMeterDeviceId,
+  devices,
 ) {
   try {
     const kwhTotals = await fetchConsumptionTotals(
@@ -240,6 +333,10 @@ async function fetchEnergyConsumptionForFeature(
       feature_type: candidate.feature.type,
       energy_parent_feature_id: candidate.feature.energy_parent_id ?? null,
       is_on_configured_main_meter_device: mainMeterDeviceId !== null && candidate.device.id === mainMeterDeviceId,
+      is_alternate_main_meter_source:
+        mainMeterDeviceId !== null &&
+        candidate.device.id !== mainMeterDeviceId &&
+        belongsToMainMeterBranch(devices, candidate.feature, mainMeterDeviceId),
       current_week_kwh: kwhTotals.current,
       previous_week_kwh: kwhTotals.previous,
       ...(hasCostData
@@ -286,13 +383,7 @@ async function getMainMeterDeviceId(context, devices) {
  */
 async function buildWeeklyDigestData() {
   const now = new Date();
-  const periodEnd = now;
-  const periodStart = dayjs(now)
-    .subtract(7, 'day')
-    .toDate();
-  const previousPeriodStart = dayjs(now)
-    .subtract(14, 'day')
-    .toDate();
+  const { periodStart, periodEnd, previousPeriodStart, metadata: periodMetadata } = buildDigestPeriods(now);
 
   const [devices, scenes, batteryThresholdRaw, outdatedHoursRaw] = await Promise.all([
     this.device.get(),
@@ -363,7 +454,15 @@ async function buildWeeklyDigestData() {
   const energyCandidates = getConsumptionFeaturesForDigest(devices, mainMeterDeviceId);
   const energyResults = await Promise.all(
     energyCandidates.map((candidate) =>
-      fetchEnergyConsumptionForFeature(this, candidate, periodStart, periodEnd, previousPeriodStart, mainMeterDeviceId),
+      fetchEnergyConsumptionForFeature(
+        this,
+        candidate,
+        periodStart,
+        periodEnd,
+        previousPeriodStart,
+        mainMeterDeviceId,
+        devices,
+      ),
     ),
   );
   const energy = energyResults.filter((entry) => entry !== null);
@@ -379,12 +478,7 @@ async function buildWeeklyDigestData() {
     }));
 
   return {
-    period: {
-      from: periodStart.toISOString(),
-      to: periodEnd.toISOString(),
-      aggregation: 'sum_of_daily_buckets',
-      comparison_window: 'previous_7_calendar_days',
-    },
+    period: periodMetadata,
     summary: {
       device_count: devices.length,
       scene_count: scenes.length,
@@ -399,7 +493,7 @@ async function buildWeeklyDigestData() {
       configured_main_meter_device_id: mainMeterDeviceId,
       feature_count: energy.length,
       note:
-        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. Do not sum parent and child values. is_on_configured_main_meter_device marks the device linked to the energy price contract. current_week_kwh and current_week_cost are sums of daily buckets over period.from to period.to (not a rolling 168h window). current_week_cost comes from linked daily-consumption-cost features only, excludes subscription charges, and may be absent.',
+        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. is_alternate_main_meter_source true means another view of the same main meter (e.g. Enedis API vs local Lixee TIC), not a separate load or activity trend. Do not sum parent and child values or duplicate main-meter sources. is_on_configured_main_meter_device marks the device linked to the energy price contract. Use period.from_date and period.to_date when stating totals. current_week_cost comes from linked daily-consumption-cost features only and excludes subscription charges.',
     },
     recent_scenes: recentlyExecutedScenes,
   };
@@ -412,6 +506,9 @@ module.exports = {
   shouldCheckFeatureForStale,
   formatSilentDuration,
   getConsumptionFeaturesForDigest,
+  findDeviceFeatureById,
+  belongsToMainMeterBranch,
+  buildDigestPeriods,
   findCostFeatureForConsumption,
   getMainMeterDeviceId,
   fetchConsumptionTotals,
