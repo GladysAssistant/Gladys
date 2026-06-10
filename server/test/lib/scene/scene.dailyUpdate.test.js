@@ -80,7 +80,7 @@ describe('SceneManager.dailyUpdate', () => {
     assert.called(event.emit);
   });
 
-  it('should not scheduleJob for sunrise/sunset, sunset/sunrise is in the past', async () => {
+  it('should not push job when scheduler returns null (time effectively in the past)', async () => {
     scheduler.scheduleJob = () => {
       return null;
     };
@@ -95,9 +95,34 @@ describe('SceneManager.dailyUpdate', () => {
       {},
       {},
       scheduler,
+      brain,
     );
     await sceneManagerPast.dailyUpdate();
     expect(sceneManagerPast.jobs).to.deep.equal([]);
+  });
+
+  it("should schedule sunrise/sunset for the next day when today's occurrence is already in the past", async () => {
+    const sceneManagerPast = new SceneManagerWithPastSunriseSunset(
+      {},
+      event,
+      {},
+      {},
+      variable,
+      house,
+      {},
+      {},
+      {},
+      scheduler,
+      brain,
+    );
+    await sceneManagerPast.dailyUpdate();
+    // Past occurrences must be rolled to the next day, not dropped:
+    // offset=0 sunrise + offset=0 sunset = 2 jobs
+    expect(sceneManagerPast.jobs).to.have.lengthOf(2);
+    // The scheduled dates must be in the future (tomorrow)
+    sceneManagerPast.jobs.forEach((job) => {
+      expect(job.date.getTime()).to.be.greaterThan(Date.now());
+    });
   });
 
   it("shouldn't scheduleJob for sunrise/sunset when house doesn't have location", async () => {

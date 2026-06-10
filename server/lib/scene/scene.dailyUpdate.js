@@ -60,19 +60,25 @@ async function dailyUpdate() {
       // Schedule one job per distinct (house, type, offset) combination
       const scheduleForOffsets = (offsets, baseTime, eventType, label) => {
         offsets.forEach((offset) => {
-          const time = baseTime.add(offset, 'minute').toDate();
+          let occurrence = baseTime.add(offset, 'minute');
+          // If today's occurrence already passed, schedule the next day's occurrence so the
+          // trigger isn't silently dropped until the next midnight reschedule.
+          if (occurrence.toDate().getTime() < Date.now()) {
+            occurrence = occurrence.add(1, 'day');
+          }
+          const time = occurrence.toDate();
           const job = this.scheduler.scheduleJob(time, () =>
             this.event.emit(EVENTS.TRIGGERS.CHECK, { type: eventType, house, offset }),
           );
           if (job) {
             logger.info(
-              `${label} (offset ${offset}min) is scheduled at ${dayjs(time)
+              `${label} (offset ${offset}min) is scheduled at ${occurrence
                 .tz(this.timezone)
-                .format('HH:mm')}, ${dayjs(time).fromNow()}.`,
+                .format('YYYY-MM-DD HH:mm')}, ${occurrence.fromNow()}.`,
             );
             this.jobs.push(job);
           } else {
-            logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling for today.`);
+            logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling.`);
           }
         });
       };
