@@ -63,7 +63,7 @@ async function dailyUpdate() {
           let occurrence = baseTime.add(offset, 'minute');
           // If today's occurrence already passed, schedule the next day's occurrence so the
           // trigger isn't silently dropped until the next midnight reschedule.
-          if (occurrence.toDate().getTime() < Date.now()) {
+          if (occurrence.toDate().getTime() <= Date.now()) {
             occurrence = occurrence.add(1, 'day');
           }
           const time = occurrence.toDate();
