@@ -82,7 +82,7 @@ const UpdateDevice = ({ children, ...props }) => (
               <div class="row">
                 {props.device &&
                   props.device.features.map((feature, index) => (
-                    <UpdateDeviceFeature {...props} feature={feature} featureIndex={index} />
+                    <UpdateDeviceFeature {...props} feature={feature} featureIndex={index} device={props.device} />
                   ))}
               </div>
 
