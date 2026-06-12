@@ -1,7 +1,8 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, NODE_RED_MAJOR_VERSIONS } = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { isExistingNodeRedUser, resolveNodeRedMajorVersion } = require('./nodeRedVersion');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
@@ -29,6 +30,22 @@ async function init() {
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
+  const existingUserBeforeInit = isExistingNodeRedUser(configuration);
+
+  const storedMajorVersion = await this.gladys.variable.getValue(
+    CONFIGURATION.DOCKER_NODE_RED_VERSION,
+    this.serviceId,
+  );
+
+  if (!storedMajorVersion || !NODE_RED_MAJOR_VERSIONS.includes(storedMajorVersion)) {
+    configuration.dockerNodeRedVersion = resolveNodeRedMajorVersion({
+      nodeRedUsername: existingUserBeforeInit ? configuration.nodeRedUsername : null,
+      nodeRedPassword: existingUserBeforeInit ? configuration.nodeRedPassword : null,
+      dockerNodeRedVersion: storedMajorVersion,
+    });
+  } else {
+    configuration.dockerNodeRedVersion = storedMajorVersion;
+  }
 
   if (!configuration.nodeRedPassword) {
     configuration.nodeRedUsername = CONFIGURATION.NODE_RED_USERNAME_VALUE;
@@ -38,6 +55,7 @@ async function init() {
       uppercase: true,
     });
   }
+
   await this.saveConfiguration(configuration);
 
   logger.debug('Node-RED: installing and starting required docker containers...');

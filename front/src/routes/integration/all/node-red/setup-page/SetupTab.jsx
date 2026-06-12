@@ -17,6 +17,17 @@ class SetupTab extends Component {
   };
 
   getConfiguration = async () => {
+    const stateUpdate = {};
+
+    try {
+      const nodeRedConfiguration = await this.props.httpClient.get('/api/v1/service/node-red/configuration');
+      stateUpdate.dockerNodeRedVersion = nodeRedConfiguration.dockerNodeRedVersion;
+      stateUpdate.availableMajorVersions = nodeRedConfiguration.availableMajorVersions;
+      stateUpdate.selectedMajorVersion = nodeRedConfiguration.dockerNodeRedVersion;
+    } catch (e) {
+      // Configuration not available yet
+    }
+
     try {
       const nodeRedUsernameVariable = await this.props.httpClient.get(
         '/api/v1/service/node-red/variable/NODE_RED_USERNAME'
@@ -35,13 +46,15 @@ class SetupTab extends Component {
         nodeRedUrl = `${url.protocol}//${url.hostname}:${nodeRedPortVariable.value}`;
       }
 
-      this.setState({
-        nodeRedUsername: nodeRedUsernameVariable.value,
-        nodeRedPassword: nodeRedPasswordVariable.value,
-        nodeRedUrl
-      });
+      stateUpdate.nodeRedUsername = nodeRedUsernameVariable.value;
+      stateUpdate.nodeRedPassword = nodeRedPasswordVariable.value;
+      stateUpdate.nodeRedUrl = nodeRedUrl;
     } catch (e) {
       // Variable is not set yet
+    }
+
+    if (Object.keys(stateUpdate).length > 0) {
+      this.setState(stateUpdate);
     }
   };
 
@@ -70,10 +83,28 @@ class SetupTab extends Component {
 
   startContainer = async () => {
     let error = false;
+    const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
 
     this.setState({
       nodeRedStatus: RequestStatus.Getting
     });
+
+    if (selectedMajorVersion) {
+      try {
+        const nodeRedConfiguration = await this.props.httpClient.post('/api/v1/service/node-red/configuration', {
+          dockerNodeRedVersion: selectedMajorVersion
+        });
+        this.setState({
+          dockerNodeRedVersion: nodeRedConfiguration.dockerNodeRedVersion,
+          selectedMajorVersion: nodeRedConfiguration.dockerNodeRedVersion
+        });
+      } catch (e) {
+        this.setState({
+          nodeRedStatus: RequestStatus.Error
+        });
+        return;
+      }
+    }
 
     await this.props.httpClient.post('/api/v1/service/node-red/variable/NODERED_ENABLED', {
       value: true
@@ -168,6 +199,40 @@ class SetupTab extends Component {
     this.setState({ showConfirmDelete: false });
   };
 
+  onMajorVersionChange = event => {
+    this.setState({ selectedMajorVersion: event.target.value });
+  };
+
+  saveMajorVersion = async () => {
+    const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
+
+    if (selectedMajorVersion === dockerNodeRedVersion) {
+      return;
+    }
+
+    this.setState({
+      nodeRedStatus: RequestStatus.Getting
+    });
+
+    try {
+      const nodeRedConfiguration = await this.props.httpClient.post('/api/v1/service/node-red/configuration', {
+        dockerNodeRedVersion: selectedMajorVersion
+      });
+
+      this.setState({
+        dockerNodeRedVersion: nodeRedConfiguration.dockerNodeRedVersion,
+        selectedMajorVersion: nodeRedConfiguration.dockerNodeRedVersion,
+        nodeRedStatus: RequestStatus.Success
+      });
+      await this.checkStatus();
+    } catch (e) {
+      this.setState({
+        nodeRedStatus: RequestStatus.Error,
+        selectedMajorVersion: dockerNodeRedVersion
+      });
+    }
+  };
+
   render(
     props,
     {
@@ -181,9 +246,14 @@ class SetupTab extends Component {
       nodeRedUrl,
       nodeRedStatus,
       showPassword,
-      showConfirmDelete
+      showConfirmDelete,
+      dockerNodeRedVersion,
+      availableMajorVersions,
+      selectedMajorVersion
     }
   ) {
+    const hasMajorVersionChanged =
+      selectedMajorVersion && dockerNodeRedVersion && selectedMajorVersion !== dockerNodeRedVersion;
     return (
       <div class="card">
         <div class="card-header">
@@ -212,6 +282,45 @@ class SetupTab extends Component {
             networkModeValid={networkModeValid}
             nodeRedStatus={nodeRedStatus}
           />
+
+          {dockerBased && networkModeValid && availableMajorVersions && (
+            <div class="form-group">
+              <label htmlFor="nodeRedMajorVersion" className="form-label">
+                <Text id="integration.nodeRed.setup.majorVersionLabel" />
+              </label>
+              <select
+                id="nodeRedMajorVersion"
+                name="nodeRedMajorVersion"
+                class="form-control"
+                value={selectedMajorVersion || dockerNodeRedVersion}
+                onChange={this.onMajorVersionChange}
+                disabled={nodeRedStatus === RequestStatus.Getting}
+              >
+                {availableMajorVersions.map(majorVersion => (
+                  <option key={majorVersion} value={majorVersion}>
+                    {majorVersion}
+                  </option>
+                ))}
+              </select>
+              <div class="help-block">
+                <Text id="integration.nodeRed.setup.majorVersionHelp" />
+              </div>
+              {hasMajorVersionChanged && (
+                <div class="mt-3">
+                  <div class="alert alert-warning">
+                    <Text id="integration.nodeRed.setup.majorVersionUpdateWarning" />
+                  </div>
+                  <button
+                    onClick={this.saveMajorVersion}
+                    class="btn btn-primary"
+                    disabled={nodeRedStatus === RequestStatus.Getting}
+                  >
+                    <Text id="integration.nodeRed.setup.majorVersionUpdateButton" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {nodeRedRunning && (
             <div>

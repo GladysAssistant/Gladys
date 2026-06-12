@@ -1235,7 +1235,11 @@
         "gladys": "Gladys",
         "usernameLabel": "Nom d'utilisateur",
         "passwordLabel": "Mot de passe",
-        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)",
+        "majorVersionLabel": "Version majeure de Node-RED",
+        "majorVersionHelp": "Sélectionnez la version majeure de Node-RED à utiliser. Les installations existantes restent en version 3 par défaut. Les nouvelles installations utilisent la version 5.",
+        "majorVersionUpdateWarning": "Le changement de version va recréer le conteneur Node-RED. Vos flows et votre configuration seront conservés, mais pensez à faire une sauvegarde avant la mise à jour.",
+        "majorVersionUpdateButton": "Mettre à jour la version de Node-RED"
       }
     },
     "matterbridge": {

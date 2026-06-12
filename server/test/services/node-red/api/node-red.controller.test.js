@@ -15,6 +15,14 @@ const NodeRedManager = {
   init: fake.returns(true),
   installContainer: fake.returns(true),
   disconnect: fake.returns(true),
+  getConfiguration: fake.resolves({
+    dockerNodeRedVersion: '3',
+    availableMajorVersions: ['3', '4', '5'],
+  }),
+  updateMajorVersion: fake.resolves({
+    dockerNodeRedVersion: '5',
+    availableMajorVersions: ['3', '4', '5'],
+  }),
 };
 
 describe('NodeRed API', () => {
@@ -67,5 +75,37 @@ describe('NodeRed API', () => {
     await controller['post /api/v1/service/node-red/disconnect'].controller(req, res);
     assert.calledOnce(NodeRedManager.disconnect);
     assert.calledWith(res.json, { success: true });
+  });
+
+  it('get /api/v1/service/node-red/configuration', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/node-red/configuration'].controller(req, res);
+    assert.calledOnce(NodeRedManager.getConfiguration);
+    assert.calledWith(res.json, {
+      dockerNodeRedVersion: '3',
+      availableMajorVersions: ['3', '4', '5'],
+    });
+  });
+
+  it('post /api/v1/service/node-red/configuration', async () => {
+    const req = {
+      body: {
+        dockerNodeRedVersion: '5',
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/node-red/configuration'].controller(req, res);
+    assert.calledOnceWithExactly(NodeRedManager.updateMajorVersion, '5');
+    assert.calledWith(res.json, {
+      dockerNodeRedVersion: '5',
+      availableMajorVersions: ['3', '4', '5'],
+    });
   });
 });
