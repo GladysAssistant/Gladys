@@ -35,8 +35,13 @@ describe('NodeRed nodeRedVersion', () => {
     expect(getNodeRedDockerImage('5')).to.equal('nodered/node-red:5.0');
   });
 
+  it('should reject invalid major versions', () => {
+    expect(() => getNodeRedDockerImage('99')).to.throw('NODE_RED_INVALID_MAJOR_VERSION: 99');
+  });
+
   it('should match container image with selected major version', () => {
     expect(containerMatchesMajorVersion('nodered/node-red:3.1', '3')).to.equal(true);
+    expect(containerMatchesMajorVersion('registry.io/nodered/node-red:3.1', '3')).to.equal(true);
     expect(containerMatchesMajorVersion('nodered/node-red:5.0', '3')).to.equal(false);
   });
 });

@@ -10,6 +10,14 @@ import config from '../../../../../config';
 
 let cx = classNames.bind(style);
 
+const normalizeMajorVersion = value => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  return String(value);
+};
+
 class SetupTab extends Component {
   componentDidMount = () => {
     this.checkStatus();
@@ -21,9 +29,9 @@ class SetupTab extends Component {
 
     try {
       const nodeRedConfiguration = await this.props.httpClient.get('/api/v1/service/node-red/configuration');
-      stateUpdate.dockerNodeRedVersion = nodeRedConfiguration.dockerNodeRedVersion;
+      stateUpdate.dockerNodeRedVersion = normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion);
       stateUpdate.availableMajorVersions = nodeRedConfiguration.availableMajorVersions;
-      stateUpdate.selectedMajorVersion = nodeRedConfiguration.dockerNodeRedVersion;
+      stateUpdate.selectedMajorVersion = normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion);
     } catch (e) {
       // Configuration not available yet
     }
@@ -83,20 +91,20 @@ class SetupTab extends Component {
 
   startContainer = async () => {
     let error = false;
-    const { selectedMajorVersion } = this.state;
+    const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
 
     this.setState({
       nodeRedStatus: RequestStatus.Getting
     });
 
-    if (selectedMajorVersion) {
+    if (selectedMajorVersion && selectedMajorVersion !== dockerNodeRedVersion) {
       try {
         const nodeRedConfiguration = await this.props.httpClient.post('/api/v1/service/node-red/configuration', {
           dockerNodeRedVersion: selectedMajorVersion
         });
         this.setState({
-          dockerNodeRedVersion: nodeRedConfiguration.dockerNodeRedVersion,
-          selectedMajorVersion: nodeRedConfiguration.dockerNodeRedVersion
+          dockerNodeRedVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
+          selectedMajorVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion)
         });
       } catch (e) {
         this.setState({
@@ -200,7 +208,7 @@ class SetupTab extends Component {
   };
 
   onMajorVersionChange = event => {
-    this.setState({ selectedMajorVersion: event.target.value });
+    this.setState({ selectedMajorVersion: normalizeMajorVersion(event.target.value) });
   };
 
   saveMajorVersion = async () => {
@@ -220,15 +228,15 @@ class SetupTab extends Component {
       });
 
       this.setState({
-        dockerNodeRedVersion: nodeRedConfiguration.dockerNodeRedVersion,
-        selectedMajorVersion: nodeRedConfiguration.dockerNodeRedVersion,
+        dockerNodeRedVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
+        selectedMajorVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
         nodeRedStatus: RequestStatus.Success
       });
       await this.checkStatus();
     } catch (e) {
       this.setState({
         nodeRedStatus: RequestStatus.Error,
-        selectedMajorVersion: dockerNodeRedVersion
+        selectedMajorVersion: normalizeMajorVersion(dockerNodeRedVersion)
       });
     }
   };

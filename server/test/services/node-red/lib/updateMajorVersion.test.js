@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
@@ -51,5 +52,30 @@ describe('NodeRed updateMajorVersion', () => {
     assert.calledOnce(nodeRedManager.saveConfiguration);
     assert.calledOnce(nodeRedManager.checkForContainerUpdates);
     assert.calledOnce(nodeRedManager.installContainer);
+  });
+
+  it('should return current configuration when stored version already matches', async () => {
+    gladys.variable.getValue = fake.resolves('5');
+
+    const configuration = await nodeRedManager.updateMajorVersion('5');
+
+    assert.notCalled(nodeRedManager.saveConfiguration);
+    assert.notCalled(nodeRedManager.checkForContainerUpdates);
+    assert.notCalled(nodeRedManager.installContainer);
+    expect(configuration).to.deep.equal({
+      dockerNodeRedVersion: '5',
+      availableMajorVersions: ['3', '4', '5'],
+    });
+  });
+
+  it('should reject invalid major versions', async () => {
+    try {
+      await nodeRedManager.updateMajorVersion('99');
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('NODE_RED_INVALID_MAJOR_VERSION');
+    }
+
+    assert.notCalled(nodeRedManager.saveConfiguration);
   });
 });

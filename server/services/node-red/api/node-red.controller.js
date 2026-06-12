@@ -73,7 +73,8 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
    */
   async function updateConfiguration(req, res) {
     logger.debug('Update Node-RED configuration');
-    const configuration = await nodeRedManager.updateMajorVersion(req.body.dockerNodeRedVersion);
+    const { dockerNodeRedVersion } = req.body || {};
+    const configuration = await nodeRedManager.updateMajorVersion(dockerNodeRedVersion);
     res.json({
       dockerNodeRedVersion: configuration.dockerNodeRedVersion,
       availableMajorVersions: configuration.availableMajorVersions,

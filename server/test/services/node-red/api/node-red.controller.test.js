@@ -108,4 +108,14 @@ describe('NodeRed API', () => {
       availableMajorVersions: ['3', '4', '5'],
     });
   });
+
+  it('post /api/v1/service/node-red/configuration without body', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/node-red/configuration'].controller(req, res);
+    assert.calledOnceWithExactly(NodeRedManager.updateMajorVersion, undefined);
+  });
 });
