@@ -4,6 +4,8 @@ const { DEFAULT, NODE_RED_IMAGE_TAGS, NODE_RED_MAJOR_VERSIONS } = require('./con
  * @description Check if a user already had Node-RED configured before.
  * @param {object} config - Node-RED configuration.
  * @returns {boolean} True when existing Node-RED data is present.
+ * @example
+ * isExistingNodeRedUser({ nodeRedUsername: 'admin' });
  */
 function isExistingNodeRedUser(config) {
   return Boolean(config.nodeRedUsername || config.nodeRedPassword);
@@ -13,6 +15,8 @@ function isExistingNodeRedUser(config) {
  * @description Resolve the Node-RED major version to use.
  * @param {object} config - Node-RED configuration.
  * @returns {string} Node-RED major version.
+ * @example
+ * resolveNodeRedMajorVersion({ dockerNodeRedVersion: '5' });
  */
 function resolveNodeRedMajorVersion(config) {
   const { dockerNodeRedVersion } = config;
@@ -32,6 +36,8 @@ function resolveNodeRedMajorVersion(config) {
  * @description Get Docker image for a Node-RED major version.
  * @param {string} majorVersion - Node-RED major version.
  * @returns {string} Docker image reference.
+ * @example
+ * getNodeRedDockerImage('5');
  */
 function getNodeRedDockerImage(majorVersion) {
   const imageTag = NODE_RED_IMAGE_TAGS[majorVersion];
@@ -48,6 +54,8 @@ function getNodeRedDockerImage(majorVersion) {
  * @param {string} containerImage - Container image reference.
  * @param {string} majorVersion - Node-RED major version.
  * @returns {boolean} True when the container image matches the major version.
+ * @example
+ * containerMatchesMajorVersion('nodered/node-red:5.0', '5');
  */
 function containerMatchesMajorVersion(containerImage, majorVersion) {
   const expectedImage = getNodeRedDockerImage(majorVersion);

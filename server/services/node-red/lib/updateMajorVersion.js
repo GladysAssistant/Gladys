@@ -14,10 +14,7 @@ async function updateMajorVersion(majorVersion) {
     throw new NotFoundError('NODE_RED_INVALID_MAJOR_VERSION');
   }
 
-  const storedMajorVersion = await this.gladys.variable.getValue(
-    CONFIGURATION.DOCKER_NODE_RED_VERSION,
-    this.serviceId,
-  );
+  const storedMajorVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_NODE_RED_VERSION, this.serviceId);
 
   if (storedMajorVersion === majorVersion) {
     return this.getConfiguration();
@@ -26,7 +23,8 @@ async function updateMajorVersion(majorVersion) {
   const configuration = await this.getConfiguration();
 
   logger.info(
-    `Node-RED: updating major version from ${storedMajorVersion || configuration.dockerNodeRedVersion} to ${majorVersion}...`,
+    `Node-RED: updating major version from ${storedMajorVersion ||
+      configuration.dockerNodeRedVersion} to ${majorVersion}...`,
   );
 
   configuration.dockerNodeRedVersion = majorVersion;

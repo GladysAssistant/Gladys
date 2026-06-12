@@ -83,7 +83,7 @@ class SetupTab extends Component {
 
   startContainer = async () => {
     let error = false;
-    const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
+    const { selectedMajorVersion } = this.state;
 
     this.setState({
       nodeRedStatus: RequestStatus.Getting

@@ -32,10 +32,7 @@ async function init() {
   const configuration = await this.getConfiguration();
   const existingUserBeforeInit = isExistingNodeRedUser(configuration);
 
-  const storedMajorVersion = await this.gladys.variable.getValue(
-    CONFIGURATION.DOCKER_NODE_RED_VERSION,
-    this.serviceId,
-  );
+  const storedMajorVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_NODE_RED_VERSION, this.serviceId);
 
   if (!storedMajorVersion || !NODE_RED_MAJOR_VERSIONS.includes(storedMajorVersion)) {
     configuration.dockerNodeRedVersion = resolveNodeRedMajorVersion({
