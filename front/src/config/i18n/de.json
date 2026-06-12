@@ -317,7 +317,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Bewegung erkannt",
-        "pushButton": "Schieben"
+        "pushButton": "Schieben",
+        "vacuumDock": "Zurück zur Ladestation"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
@@ -3669,6 +3670,22 @@
           "medium": "Mittel",
           "high": "Hoch"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Leerlauf",
+          "cleaning": "Reinigen",
+          "mapping": "Kartieren"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Schnell",
+          "quiet": "Leise",
+          "low-noise": "Geräuscharm",
+          "deep-clean": "Tiefenreinigung",
+          "vacuum": "Saugen",
+          "mop": "Wischen"
+        }
       }
     }
   },
@@ -3874,6 +3891,18 @@
           "2": "Mittel",
           "3": "Hoch",
           "4": "Netz kritisch"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Gestoppt",
+          "1": "Läuft",
+          "2": "Pausiert",
+          "3": "Fehler",
+          "4": "Kehrt zur Ladestation zurück",
+          "5": "Lädt",
+          "6": "Angedockt"
         }
       }
     }
@@ -4348,6 +4377,13 @@
     "unknown": {
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Saugroboter",
+      "state": "Betriebszustand",
+      "run-mode": "Betriebsmodus",
+      "clean-mode": "Reinigungsmodus",
+      "dock": "Zurück zur Ladestation"
     }
   },
   "errorPage": {

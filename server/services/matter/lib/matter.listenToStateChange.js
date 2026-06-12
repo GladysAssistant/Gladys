@@ -17,12 +17,21 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
+const {
+  convertMatterOperationalStateToGladys,
+  convertMatterRunModeToGladys,
+  convertMatterCleanModeToGladys,
+} = require('../utils/vacuumCleanerStateMapping');
 
 /**
  * @description Listen to state changes of a device.
@@ -407,6 +416,98 @@ async function listenToStateChange(nodeId, devicePath, device) {
         state: value,
       });
     });
+  }
+
+  const rvcOperationalState = device.getClusterClientById(RvcOperationalState.Complete.id);
+  if (rvcOperationalState && !this.stateChangeListeners.has(rvcOperationalState)) {
+    logger.debug(`Matter: Adding state change listener for RvcOperationalState cluster ${rvcOperationalState.name}`);
+    this.stateChangeListeners.add(rvcOperationalState);
+    // Subscribe to RvcOperationalState attribute changes
+    rvcOperationalState.addOperationalStateAttributeListener((value) => {
+      logger.debug(`Matter: RvcOperationalState attribute changed to ${value}`);
+      // Convert Matter state to Gladys standard state
+      const gladysState = convertMatterOperationalStateToGladys(value);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${RvcOperationalState.Complete.id}:state`,
+        state: gladysState,
+      });
+    });
+  }
+
+  const rvcRunMode = device.getClusterClientById(RvcRunMode.Complete.id);
+  if (rvcRunMode && !this.stateChangeListeners.has(rvcRunMode)) {
+    logger.debug(`Matter: Adding state change listener for RvcRunMode cluster ${rvcRunMode.name}`);
+    this.stateChangeListeners.add(rvcRunMode);
+
+    // Read and store supportedModes for this cluster
+    const externalId = `matter:${nodeId}:${devicePath}:${RvcRunMode.Complete.id}`;
+    try {
+      if (rvcRunMode.attributes && rvcRunMode.attributes.supportedModes) {
+        const supportedModes = await rvcRunMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcRunMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(externalId, { supportedModes, clusterType: 'RvcRunMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcRunMode supportedModes: ${err.message}`);
+    }
+
+    // Subscribe to RvcRunMode attribute changes
+    rvcRunMode.addCurrentModeAttributeListener((value) => {
+      logger.debug(`Matter: RvcRunMode currentMode attribute changed to ${value}`);
+      // Convert Matter mode to Gladys standard mode using stored supportedModes or fallback
+      const gladysMode = convertMatterRunModeToGladys(value, this.supportedModesMap.get(externalId));
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: externalId,
+        state: gladysMode,
+      });
+    });
+  }
+
+  const rvcCleanMode = device.getClusterClientById(RvcCleanMode.Complete.id);
+  if (rvcCleanMode && !this.stateChangeListeners.has(rvcCleanMode)) {
+    logger.debug(`Matter: Adding state change listener for RvcCleanMode cluster ${rvcCleanMode.name}`);
+    this.stateChangeListeners.add(rvcCleanMode);
+
+    // Read and store supportedModes for this cluster
+    const cleanModeExternalId = `matter:${nodeId}:${devicePath}:${RvcCleanMode.Complete.id}`;
+    try {
+      if (rvcCleanMode.attributes && rvcCleanMode.attributes.supportedModes) {
+        const supportedModes = await rvcCleanMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcCleanMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(cleanModeExternalId, { supportedModes, clusterType: 'RvcCleanMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcCleanMode supportedModes: ${err.message}`);
+    }
+
+    // Subscribe to RvcCleanMode attribute changes
+    rvcCleanMode.addCurrentModeAttributeListener((value) => {
+      logger.debug(`Matter: RvcCleanMode currentMode attribute changed to ${value}`);
+      // Convert Matter clean mode to Gladys standard clean mode using stored supportedModes or fallback
+      const gladysMode = convertMatterCleanModeToGladys(value, this.supportedModesMap.get(cleanModeExternalId));
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: cleanModeExternalId,
+        state: gladysMode,
+      });
+    });
+  }
+
+  const powerSource = device.getClusterClientById(PowerSource.Complete.id);
+  if (powerSource && !this.stateChangeListeners.has(powerSource)) {
+    logger.debug(`Matter: Adding state change listener for PowerSource cluster ${powerSource.name}`);
+    this.stateChangeListeners.add(powerSource);
+    // Subscribe to PowerSource battery percentage attribute changes
+    if (powerSource.addBatPercentRemainingAttributeListener) {
+      powerSource.addBatPercentRemainingAttributeListener((value) => {
+        logger.debug(`Matter: PowerSource batPercentRemaining attribute changed to ${value}`);
+        // Value is in half-percent units (0-200), convert to percent (0-100)
+        const batteryPercent = value !== null ? Math.round(value / 2) : null;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${PowerSource.Complete.id}:battery`,
+          state: batteryPercent,
+        });
+      });
+    }
   }
 }
 
