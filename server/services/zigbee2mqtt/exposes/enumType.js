@@ -133,6 +133,25 @@ addMapping('action', BUTTON_STATUS.RELEASE_PLUS, 'release_plus');
 addMapping('action', BUTTON_STATUS.RELEASE_CENTER, 'release_center');
 addMapping('action', BUTTON_STATUS.RELEASE_MINUS, 'release_minus');
 
+// SONOFF SNZB-01M 4-button remote
+// https://www.zigbee2mqtt.io/devices/SNZB-01M.html
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_1, 'single_button_1');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_1, 'double_button_1');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_1, 'long_button_1');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_1, 'triple_button_1');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_2, 'single_button_2');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_2, 'double_button_2');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_2, 'long_button_2');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_2, 'triple_button_2');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_3, 'single_button_3');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_3, 'double_button_3');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_3, 'long_button_3');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_3, 'triple_button_3');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_4, 'single_button_4');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_4, 'double_button_4');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_4, 'long_button_4');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_4, 'triple_button_4');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
