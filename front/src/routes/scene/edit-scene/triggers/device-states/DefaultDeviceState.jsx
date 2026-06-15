@@ -33,7 +33,7 @@ class DefaultDeviceState extends Component {
 
     return (
       <Fragment>
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
           <div class="form-group">
             <select class="form-control" onChange={this.handleOperatorChange} value={trigger.operator}>
               <option value="">
@@ -68,7 +68,7 @@ class DefaultDeviceState extends Component {
             </select>
           </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-12 col-md-4">
           <div class="form-group">
             <div class="input-group">
               <Localizer>
