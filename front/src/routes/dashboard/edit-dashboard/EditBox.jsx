@@ -18,6 +18,7 @@ import EditEdfTempoBox from '../../../components/boxs/edf-tempo/EditEdfTempo';
 import EditGaugeBox from '../../../components/boxs/gauge/EditGaugeBox';
 import EditEnergyConsumptionBox from '../../../components/boxs/energy-consumption/EditEnergyConsumption';
 import EditVoiceAssistantBox from '../../../components/boxs/voice-assistant/EditVoiceAssistantBox';
+import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -55,6 +56,8 @@ const Box = ({ children, ...props }) => {
       return <EditEnergyConsumptionBox {...props} />;
     case 'voice-assistant':
       return <EditVoiceAssistantBox {...props} />;
+    case 'link':
+      return <EditLinkBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

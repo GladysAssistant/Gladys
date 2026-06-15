@@ -1,6 +1,0 @@
-[
-  {
-    "label": "scene.start",
-    "questions": ["Lance la scène %scene%", "Lance %scene%", "Exécute la scène %scene%", "Exécute %scene%"]
-  }
-]

@@ -36,6 +36,9 @@ const { stt } = require('./gateway.stt');
 const { processVoiceMessage } = require('./gateway.processVoiceMessage');
 const { aiChat } = require('./gateway.aiChat');
 const { forwardMessageToAiChat } = require('./gateway.forwardMessageToAiChat');
+const { buildWeeklyDigestData } = require('./gateway.buildWeeklyDigestData');
+const { sendWeeklyDigest } = require('./gateway.sendWeeklyDigest');
+const { scheduleWeeklyDigest } = require('./gateway.scheduleWeeklyDigest');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -55,6 +58,7 @@ const Gateway = function Gateway(
   scheduler,
   message,
   brain,
+  device = null,
 ) {
   this.variable = variable;
   this.event = event;
@@ -68,6 +72,8 @@ const Gateway = function Gateway(
   this.job = job;
   this.message = message;
   this.brain = brain;
+  this.device = device;
+  this.scene = null;
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
@@ -97,6 +103,7 @@ const Gateway = function Gateway(
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
   this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToAiChat.bind(this)));
+  this.event.on(EVENTS.GATEWAY.SEND_WEEKLY_DIGEST, eventFunctionWrapper(this.sendWeeklyDigest.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -127,6 +134,9 @@ Gateway.prototype.getEdfTempo = getEdfTempo;
 Gateway.prototype.getEdfTempoHistorical = getEdfTempoHistorical;
 Gateway.prototype.aiChat = aiChat;
 Gateway.prototype.forwardMessageToAiChat = forwardMessageToAiChat;
+Gateway.prototype.buildWeeklyDigestData = buildWeeklyDigestData;
+Gateway.prototype.sendWeeklyDigest = sendWeeklyDigest;
+Gateway.prototype.scheduleWeeklyDigest = scheduleWeeklyDigest;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;

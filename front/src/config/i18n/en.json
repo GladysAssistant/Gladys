@@ -64,6 +64,7 @@
   },
   "device": {
     "searchPlaceHolder": "Search devices",
+    "noRoom": "No room",
     "noFeatures": "No features",
     "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
@@ -286,7 +287,8 @@
       "music": "Music",
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
-      "voice-assistant": "Voice assistant"
+      "voice-assistant": "Voice assistant",
+      "link": "Link"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -315,7 +317,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Motion detected",
-        "pushButton": "Push"
+        "pushButton": "Push",
+        "vacuumDock": "Return to Dock"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",
@@ -484,6 +487,24 @@
         "editNamePlaceholder": "Name displayed on the dashboard",
         "editSceneLabel": "Select the scene you want to display here."
       },
+      "link": {
+        "editTitleLabel": "Title",
+        "editTitlePlaceholder": "E.g. Tasmota - Living room plug",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Icon",
+        "emptyUrl": "No URL configured.",
+        "icons": {
+          "link": "Link",
+          "globe": "Website",
+          "server": "Server",
+          "hard-drive": "Storage (NAS)",
+          "wifi": "Wi-Fi network",
+          "monitor": "Web interface",
+          "cpu": "Connected device",
+          "home": "Home"
+        }
+      },
       "alarm": {
         "armButton": "Arm",
         "disarmButton": "Disarm",
@@ -537,6 +558,12 @@
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
+      "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
+      "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
+      "gatewayBanner": {
+        "title": "Can't find your device?",
+        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol) or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Once connected, they can be controlled in Gladys like any other device."
+      },
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
@@ -971,7 +998,11 @@
         "gladys": "Gladys",
         "usernameLabel": "Username",
         "passwordLabel": "Password",
-        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
+        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)",
+        "majorVersionLabel": "Node-RED major version",
+        "majorVersionHelp": "Select the major version of Node-RED to run. Existing installations default to version 3. New installations use version 5.",
+        "majorVersionUpdateWarning": "Changing the Node-RED version will recreate the container. Your flows and configuration will be kept, but make sure you have a backup before upgrading.",
+        "majorVersionUpdateButton": "Update Node-RED version"
       }
     },
     "matterbridge": {
@@ -1742,6 +1773,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Control Xiaomi home devices with the official hub",
+      "deprecatedWarning": {
+        "title": "Deprecated integration",
+        "description": "This integration relies on developer mode on legacy Xiaomi/Aqara gateways, which is no longer available on recent models and app versions. It is no longer maintained for new hardware. Compatible Xiaomi products will be supported via <a href=\"/dashboard/integration/device/matter\">Matter</a>. If you already have a gateway configured in developer mode, it may continue to work."
+      },
       "deviceTab": "Devices",
       "documentation": "Xiaomi documentation",
       "device": {
@@ -2143,7 +2178,7 @@
       "title": "Artificial Intelligence",
       "documentation": "AI documentation",
       "description": "Give Gladys the power of artificial intelligence.",
-      "firstExplanation": "Gladys can use artificial intelligence (Mistral models via Gladys Plus) to help you communicate with your connected home.",
+      "firstExplanation": "Gladys can use artificial intelligence (open-weight AI models via Gladys Plus) to help you communicate with your connected home.",
       "examplesIntro": "Here's what you can do with AI:",
       "examplesChatTitle": "In the Gladys chat",
       "examplesChatHint": "Available actions: lights and switches by room, cameras, scenes, temperature and humidity.",
@@ -2156,7 +2191,24 @@
       "exampleScene1": "Every 30 minutes: analyse the front door camera and check whether the car parked outside matches my licence plate.",
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
-      "activateOpenAiChat": "Activate AI in Gladys chat",
+      "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
+      "weeklyDigest": {
+        "title": "Weekly home digest",
+        "description": "Gladys sends you a weekly summary of your connected home: comfort, energy, maintenance, and useful tips.",
+        "dayLabel": "Day",
+        "hourLabel": "Time",
+        "sendNow": "Send digest now",
+        "loading": "Loading settings...",
+        "loadError": "Unable to load weekly digest settings.",
+        "retry": "Retry",
+        "daySunday": "Sunday",
+        "dayMonday": "Monday",
+        "dayTuesday": "Tuesday",
+        "dayWednesday": "Wednesday",
+        "dayThursday": "Thursday",
+        "dayFriday": "Friday",
+        "daySaturday": "Saturday"
+      },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
@@ -3166,8 +3218,8 @@
         "description": "Control Gladys with your voice using Google Home and Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral AI",
-        "description": "Talk to your home using Mistral AI models, included with Gladys Plus."
+        "title": "Open-weight AI",
+        "description": "Talk to your home using open-weight AI models, included with Gladys Plus."
       },
       "cameraStreaming": {
         "title": "Camera streaming",
@@ -3211,7 +3263,7 @@
         "everythingInLite": "Everything in Lite, plus:",
         "backups": "Encrypted daily backups",
         "cameraStreaming": "Remote camera streaming",
-        "ai": "AI integration (Mistral)",
+        "ai": "AI integration (open-weight models)",
         "enedis": "Enedis integration (electric consumption)",
         "mcp": "MCP server to plug your favourite AIs"
       }
@@ -3221,7 +3273,7 @@
     "privacySubtitle": "Your data stays yours. We take this very seriously.",
     "privacy": {
       "aiTitle": "Privacy-friendly AI",
-      "aiDescription": "Gladys Plus uses Mistral models for AI features. Your data is not resold or used for advertising.",
+      "aiDescription": "Gladys Plus uses open-weight AI models for AI features. Your data is not resold or used for advertising.",
       "infraTitle": "Infrastructure in Europe",
       "infraDescription": "The Gladys Plus infrastructure (API, backups, relays) runs in European data centers, GDPR compliant.",
       "e2eTitle": "End-to-end encryption",
@@ -3248,11 +3300,11 @@
       "upgradeDescription": "Encrypted backups are part of the Plus plan. You can switch plans in one click from the billing page."
     },
     "openai": {
-      "title": "Talk to your home with Mistral AI",
-      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat.",
+      "title": "Talk to your home with open-weight AI",
+      "description": "Gladys Plus includes a conversational AI to chat with your home via messages in the Gladys chat. Open-weight AI models hosted in France.",
       "feature1": "Turn the lights on, turn the fan off, by sending a message in the chat",
       "feature2": "Proactive AI in scenes: run home automation questions on a schedule (read a licence plate, check CO₂ levels, monitor a camera…)",
-      "feature3": "Mistral AI · no data resold"
+      "feature3": "Open-weight AI models · no data resold"
     },
     "enedis": {
       "title": "Track your electric consumption with Enedis",
@@ -3281,7 +3333,7 @@
     },
     "voiceAssistant": {
       "title": "Gladys voice assistant with Gladys Plus",
-      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, Mistral AI replies and text-to-speech playback.",
+      "description": "Gladys Plus powers the dashboard voice assistant: speech-to-text, open-weight AI replies and text-to-speech playback.",
       "compactDescription": "Speech recognition, AI and text-to-speech are powered by Gladys Plus.",
       "feature1": "Talk to Gladys from your dashboard",
       "feature2": "Live transcription and response",
@@ -3289,11 +3341,11 @@
     },
     "askAi": {
       "title": "This action requires Gladys Plus",
-      "description": "The \"Ask AI\" action uses Mistral AI via Gladys Plus to answer questions and analyse camera images inside your scenes.",
-      "compactDescription": "This action uses Mistral AI via Gladys Plus.",
+      "description": "The \"Ask AI\" action uses open-weight AI models via Gladys Plus to answer questions and analyse camera images inside your scenes.",
+      "compactDescription": "This action uses open-weight AI models via Gladys Plus.",
       "feature1": "Ask an open question to the AI inside a scene",
       "feature2": "Attach a camera image and the AI can describe what it sees",
-      "feature3": "Mistral AI · no data resold"
+      "feature3": "Open-weight AI models · no data resold"
     },
     "tts": {
       "title": "This action requires Gladys Plus",
@@ -3622,6 +3674,22 @@
           "medium": "Medium",
           "high": "High"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Idle",
+          "cleaning": "Clean",
+          "mapping": "Map"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Quick",
+          "quiet": "Quiet",
+          "low-noise": "Low Noise",
+          "deep-clean": "Deep Clean",
+          "vacuum": "Vacuum",
+          "mop": "Mop"
+        }
       }
     }
   },
@@ -3722,7 +3790,25 @@
           "83": "Release Center (Aqara W100)",
           "84": "Release Minus (Aqara W100)",
           "85": "On double",
-          "86": "Off double"
+          "86": "Off double",
+          "87": "Arm night zones",
+          "88": "Exit delay",
+          "89": "Button 1 single click",
+          "90": "Button 1 double click",
+          "91": "Button 1 long click",
+          "92": "Button 1 triple click",
+          "93": "Button 2 single click",
+          "94": "Button 2 double click",
+          "95": "Button 2 long click",
+          "96": "Button 2 triple click",
+          "97": "Button 3 single click",
+          "98": "Button 3 double click",
+          "99": "Button 3 long click",
+          "100": "Button 3 triple click",
+          "101": "Button 4 single click",
+          "102": "Button 4 double click",
+          "103": "Button 4 long click",
+          "104": "Button 4 triple click"
         }
       },
       "fan": {
@@ -3856,6 +3942,18 @@
           "2": "Medium",
           "3": "High",
           "4": "Critical"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Stopped",
+          "1": "Running",
+          "2": "Paused",
+          "3": "Error",
+          "4": "Returning to Dock",
+          "5": "Charging",
+          "6": "Docked"
         }
       }
     }
@@ -4339,6 +4437,13 @@
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Vacuum Cleaner",
+      "state": "Operational State",
+      "run-mode": "Run Mode",
+      "clean-mode": "Clean Mode",
+      "dock": "Return to Dock"
     }
   },
   "errorPage": {
@@ -4348,33 +4453,22 @@
   },
   "chat": {
     "emptyStateMessage": "Send me a message!",
+    "emptyStateMessageNoPlus": "Gladys chat uses Gladys Plus AI. Connect your instance to Gladys Plus to chat with your home.",
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
     "gladysAlt": "Gladys",
     "sidebar": {
       "title": "How does the chat work?",
-      "intro": "Gladys answers your messages in two different ways, depending on whether you have Gladys Plus.",
-      "localBadge": "Local",
-      "localTitle": "Local model (default)",
-      "localDescription": "Without Gladys Plus, Gladys uses a very limited local model: it only understands a few simple commands, one action at a time, and cannot answer open-ended questions.",
-      "localHint": "Examples that work (one command at a time):",
-      "localExample1": "\"Turn on the living room light.\"",
-      "localExample2": "\"Show me the garage camera.\"",
-      "localExample3": "\"Start the \"Good night\" scene.\"",
-      "localExample4": "\"What's the temperature in the bedroom?\"",
-      "plusTitle": "Advanced AI (Gladys Plus)",
-      "plusDescription": "With Gladys Plus, you unlock much more capable Mistral models: open questions, contextual answers, camera image analysis, and more.",
-      "plusNotConfigured": "Connect Gladys Plus to enable advanced AI in this chat.",
-      "plusConfiguredNotEnabled": "Gladys Plus is connected, but AI is not enabled in the chat yet.",
-      "plusConfigureLink": "Enable AI →",
-      "plusActive": "Advanced AI is enabled in this chat.",
+      "intro": "Gladys chat uses Gladys Plus artificial intelligence so you can communicate naturally with your connected home.",
+      "plusNotConfigured": "Connect Gladys Plus to use AI chat.",
+      "plusActive": "Gladys Plus AI is active in this chat.",
       "upsellTitle": "Unlock advanced AI",
-      "upsellCompactDescription": "Gladys Plus enables Mistral models in this chat: open questions, camera analysis, and more.",
-      "upsellDescription": "Go from basic commands to real artificial intelligence in your Gladys chat.",
+      "upsellCompactDescription": "Gladys Plus gives you access to open-weight AI models in this chat: open questions, camera analysis, and more.",
+      "upsellDescription": "Chat naturally with your connected home using Gladys Plus artificial intelligence.",
       "upsellFeature1": "Ask open-ended questions to your home",
       "upsellFeature2": "Analyse what your cameras see",
-      "upsellFeature3": "Mistral AI · no data resold"
+      "upsellFeature3": "Open-weight AI models · no data resold"
     },
     "toolCall": {
       "statusUsed": "Used",

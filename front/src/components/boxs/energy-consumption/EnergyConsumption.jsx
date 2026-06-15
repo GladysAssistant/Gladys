@@ -31,6 +31,66 @@ const PERIOD_LABELS = {
 
 const SUBSCRIPTION_COLOR = '#b8c2cc';
 
+const findDeviceFeatureBySelector = (devices, selector) => {
+  if (!devices || !selector) {
+    return null;
+  }
+  for (const device of devices) {
+    const feature = (device.features || []).find(f => f.selector === selector);
+    if (feature) {
+      return { device, feature };
+    }
+  }
+  return null;
+};
+
+const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
+  if (deviceData.deviceFeature.is_subscription) {
+    return `${deviceData.device.name} - ${deviceData.deviceFeature.name}`;
+  }
+
+  const found = findDeviceFeatureBySelector(devices, selector);
+  if (found) {
+    const { device, feature } = found;
+    const featureById = new Map((device.features || []).map(f => [f.id, f]));
+    const pathNames = [];
+    let current = feature;
+    const visited = new Set();
+
+    while (current && !visited.has(current.id)) {
+      visited.add(current.id);
+      if (current.name) {
+        pathNames.unshift(current.name);
+      }
+      current = current.energy_parent_id ? featureById.get(current.energy_parent_id) : null;
+    }
+
+    if (pathNames.length > 0) {
+      return pathNames.join(' - ');
+    }
+  }
+
+  return deviceData.deviceFeature.name
+    ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
+    : deviceData.device.name;
+};
+
+const disambiguateDisplayNames = names => {
+  const nameCount = {};
+  names.forEach(name => {
+    nameCount[name] = (nameCount[name] || 0) + 1;
+  });
+
+  const nameIndex = {};
+  return names.map(name => {
+    if (nameCount[name] === 1) {
+      return name;
+    }
+    nameIndex[name] = (nameIndex[name] || 0) + 1;
+    return `${name} (${nameIndex[name]})`;
+  });
+};
+
 class EnergyConsumption extends Component {
   constructor(props) {
     super(props);
@@ -116,6 +176,8 @@ class EnergyConsumption extends Component {
       let colorIndex = 0;
       // Use widget configured colors if available, otherwise fall back to default colors
       const widgetColors = this.props.box.colors || DEFAULT_COLORS;
+      let consumptionSelectorIndex = 0;
+      const pendingSeries = [];
 
       data.forEach(deviceData => {
         const isSubscription = deviceData.deviceFeature.is_subscription === true;
@@ -125,9 +187,12 @@ class EnergyConsumption extends Component {
           return;
         }
 
-        const deviceFeatureName = deviceData.deviceFeature.name
-          ? `${deviceData.device.name} - ${deviceData.deviceFeature.name}`
-          : deviceData.device.name;
+        const selector = isSubscription
+          ? null
+          : deviceData.deviceFeature.selector || deviceFeatures[consumptionSelectorIndex];
+        if (!isSubscription) {
+          consumptionSelectorIndex += 1;
+        }
 
         // Create a map of timestamp -> value for this device feature
         const valueMap = new Map();
@@ -144,13 +209,23 @@ class EnergyConsumption extends Component {
           y: valueMap.get(timestamp) || 0
         }));
 
+        pendingSeries.push({
+          displayName: getEnergyFeatureDisplayName(this.props.devices, selector, deviceData),
+          seriesData,
+          isSubscription
+        });
+      });
+
+      const seriesNames = disambiguateDisplayNames(pendingSeries.map(item => item.displayName));
+
+      pendingSeries.forEach((item, index) => {
+        // ApexCharts requires unique series names for stacked bars to render correctly.
         series.push({
-          name: deviceFeatureName,
-          data: seriesData
+          name: seriesNames[index],
+          data: item.seriesData
         });
 
-        // Assign gray color for subscription, otherwise use widget configured colors
-        if (isSubscription) {
+        if (item.isSubscription) {
           seriesColors.push(SUBSCRIPTION_COLOR);
         } else {
           seriesColors.push(widgetColors[colorIndex % widgetColors.length]);

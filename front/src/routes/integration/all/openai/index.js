@@ -3,22 +3,9 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
+import WeeklyDigestSettings from './WeeklyDigestSettings';
 
 class OpenAIGateway extends Component {
-  getOpenAiEnabledStatus = async () => {
-    try {
-      const response = await this.props.httpClient.get('/api/v1/variable/GLADYS_GATEWAY_OPEN_AI_ENABLED');
-      this.setState({
-        openAIActiveInChat: response.value === 'true'
-      });
-    } catch (e) {
-      console.error(e);
-      this.setState({
-        openAIActiveInChat: false
-      });
-    }
-  };
-
   isGladysPlusConnected = async () => {
     try {
       const response = await this.props.httpClient.get('/api/v1/gateway/status');
@@ -33,23 +20,7 @@ class OpenAIGateway extends Component {
     }
   };
 
-  toggleOpenAI = async () => {
-    const { openAIActiveInChat } = this.state;
-    try {
-      const newOpenAIActiveInChat = !openAIActiveInChat;
-      await this.props.httpClient.post('/api/v1/variable/GLADYS_GATEWAY_OPEN_AI_ENABLED', {
-        value: newOpenAIActiveInChat.toString()
-      });
-      this.setState({
-        openAIActiveInChat: newOpenAIActiveInChat
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   componentDidMount() {
-    this.getOpenAiEnabledStatus();
     this.isGladysPlusConnected();
   }
 
@@ -57,12 +28,11 @@ class OpenAIGateway extends Component {
     super(props);
     this.props = props;
     this.state = {
-      openAIActiveInChat: null,
       gladysPlusConnected: null
     };
   }
 
-  render(props, { openAIActiveInChat, gladysPlusConnected }) {
+  render(props, { gladysPlusConnected }) {
     return (
       <Layout user={props.user}>
         <div class="card">
@@ -86,6 +56,12 @@ class OpenAIGateway extends Component {
                   ]}
                 />
               </div>
+            )}
+            {gladysPlusConnected === true && (
+              <p class="text-success mb-4">
+                <i class="fe fe-check mr-1" />
+                <Text id="integration.openai.chatEnabledByDefault" />
+              </p>
             )}
             <p>
               <Text id="integration.openai.firstExplanation" />{' '}
@@ -138,27 +114,8 @@ class OpenAIGateway extends Component {
               <Text id="integration.openai.rateLimit" />
             </p>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div>
-              <Text id="integration.openai.activateOpenAiChat" />
-            </div>
-
-            {openAIActiveInChat !== null && gladysPlusConnected === true && (
-              <label class="custom-switch">
-                <input
-                  type="radio"
-                  name="open-ai-on-off"
-                  value="1"
-                  class="custom-switch-input"
-                  checked={openAIActiveInChat}
-                  disabled={!gladysPlusConnected}
-                  onClick={this.toggleOpenAI}
-                />
-                <span class="custom-switch-indicator" />
-              </label>
-            )}
-          </div>
         </div>
+        {gladysPlusConnected === true && <WeeklyDigestSettings />}
       </Layout>
     );
   }

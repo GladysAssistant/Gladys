@@ -6,5 +6,11 @@
   {
     "label": "openai.request.tooManyRequests",
     "answers": ["Vous avez fait trop de requêtes ce mois-ci vers l'API d'Intelligence Artificielle !"]
+  },
+  {
+    "label": "openai.plus-required",
+    "answers": [
+      "Le chat utilise l'IA Gladys Plus et est disponible uniquement avec un abonnement Gladys Plus. [Abonnez-vous à Gladys Plus](https://gladysassistant.com/fr/plus/?utm_source=gladys_app&utm_medium=in_app&utm_campaign=chat_plus_required&utm_content=brain_reply)"
+    ]
   }
 ]

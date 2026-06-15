@@ -187,6 +187,26 @@ module.exports = function GatewayController(gladys) {
     res.json({ message: 'Refresh finished' });
   }
 
+  /**
+   * @api {post} /api/v1/gateway/weekly-digest/send
+   * @apiName sendWeeklyDigest
+   * @apiGroup Gateway
+   */
+  async function sendWeeklyDigest(req, res) {
+    const result = await gladys.gateway.sendWeeklyDigest({ force: true });
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/weekly-digest/reschedule
+   * @apiName rescheduleWeeklyDigest
+   * @apiGroup Gateway
+   */
+  async function rescheduleWeeklyDigest(req, res) {
+    await gladys.gateway.scheduleWeeklyDigest();
+    res.json({ success: true });
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     login: asyncMiddleware(login),
@@ -204,5 +224,7 @@ module.exports = function GatewayController(gladys) {
     processVoice: asyncMiddleware(processVoice),
     getTtsUrl: asyncMiddleware(getTtsUrl),
     refreshLatestGladysVersion: asyncMiddleware(refreshLatestGladysVersion),
+    sendWeeklyDigest: asyncMiddleware(sendWeeklyDigest),
+    rescheduleWeeklyDigest: asyncMiddleware(rescheduleWeeklyDigest),
   });
 };

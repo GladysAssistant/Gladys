@@ -18,10 +18,15 @@ const {
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
   FanControl,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const sinon = require('sinon');
+const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
@@ -583,6 +588,176 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,
       state: 0,
+    });
+  });
+
+  it('should listen to state change (RvcOperationalState)', async () => {
+    const clusterClient = {
+      id: RvcOperationalState.Complete.id,
+      addOperationalStateAttributeListener: (callback) => {
+        callback(66); // Matter DOCKED state (66) should be converted to Gladys DOCKED state (6)
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1:child_endpoint:2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:child_endpoint:2:97:state',
+      state: 6, // Gladys standard DOCKED state
+    });
+  });
+  it('should listen to state change (RvcRunMode)', async () => {
+    const clusterClient = {
+      id: RvcRunMode.Complete.id,
+      addCurrentModeAttributeListener: (callback) => {
+        callback(1); // Cleaning mode
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:84',
+      state: 1,
+    });
+  });
+  it('should listen to state change (RvcRunMode) with supportedModes', async () => {
+    const supportedModes = [
+      { mode: 1, label: 'Idle', modeTags: [{ value: 16384 }] },
+      { mode: 2, label: 'Cleaning', modeTags: [{ value: 16385 }] },
+    ];
+    const clusterClient = {
+      id: RvcRunMode.Complete.id,
+      attributes: {
+        supportedModes: {
+          get: fake.resolves(supportedModes),
+        },
+      },
+      addCurrentModeAttributeListener: (callback) => {
+        callback(2); // Matter mode 2 with ModeTag 16385 (Cleaning) -> Gladys CLEANING (1)
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:84',
+      state: 1, // Gladys CLEANING mode
+    });
+    // Verify supportedModes was stored
+    const storedData = matterHandler.supportedModesMap.get('matter:1234:2:84');
+    expect(storedData).to.deep.equal({ supportedModes, clusterType: 'RvcRunMode' });
+  });
+  it('should handle RvcRunMode supportedModes read failure gracefully', async () => {
+    const clusterClient = {
+      id: RvcRunMode.Complete.id,
+      attributes: {
+        supportedModes: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+      },
+      addCurrentModeAttributeListener: (callback) => {
+        callback(1);
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    // Should not throw, just log warning
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:84',
+      state: 1,
+    });
+  });
+  it('should listen to state change (RvcCleanMode)', async () => {
+    const clusterClient = {
+      id: RvcCleanMode.Complete.id,
+      addCurrentModeAttributeListener: (callback) => {
+        callback(16384); // Matter DEEP_CLEAN (16384) should be converted to Gladys DEEP_CLEAN (4)
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:85',
+      state: 4, // Gladys standard DEEP_CLEAN mode
+    });
+  });
+  it('should listen to state change (RvcCleanMode) with supportedModes', async () => {
+    const supportedModes = [{ mode: 1, label: 'Vacuum', modeTags: [{ value: 16385 }] }];
+    const clusterClient = {
+      id: RvcCleanMode.Complete.id,
+      attributes: {
+        supportedModes: {
+          get: fake.resolves(supportedModes),
+        },
+      },
+      addCurrentModeAttributeListener: (callback) => {
+        callback(1); // Matter mode 1 with ModeTag 16385 (Vacuum) -> Gladys VACUUM (5)
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:85',
+      state: 5, // Gladys VACUUM mode
+    });
+    // Verify supportedModes was stored
+    const storedData = matterHandler.supportedModesMap.get('matter:1234:2:85');
+    expect(storedData).to.deep.equal({ supportedModes, clusterType: 'RvcCleanMode' });
+  });
+  it('should handle RvcCleanMode supportedModes read failure gracefully', async () => {
+    const clusterClient = {
+      id: RvcCleanMode.Complete.id,
+      attributes: {
+        supportedModes: {
+          get: fake.rejects(new Error('Read failed')),
+        },
+      },
+      addCurrentModeAttributeListener: (callback) => {
+        callback(0);
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    // Should not throw, just log warning
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:85',
+      state: 0,
+    });
+  });
+  it('should listen to state change (PowerSource battery)', async () => {
+    const clusterClient = {
+      id: PowerSource.Complete.id,
+      addBatPercentRemainingAttributeListener: (callback) => {
+        callback(150); // 150 half-percent = 75%
+      },
+    };
+    const device = {
+      number: 2,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '2', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:2:47:battery',
+      state: 75,
     });
   });
 });

@@ -64,6 +64,7 @@
   },
   "device": {
     "searchPlaceHolder": "Gerät suchen",
+    "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",
     "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Um zu verhindern, dass deine Gladys-Instanz langsam wird, während sie gelöscht werden, haben wir begonnen, diese Zustände langsam im Hintergrund zu löschen. Du kannst zurückkommen, um dieses Gerät zu löschen, wenn es keine Zustände mehr hat. Um den Löschvorgang zu überwachen, <a href=\"/dashboard/settings/jobs\">klicke hier</a>."
   },
@@ -286,7 +287,8 @@
       "music": "Musik",
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
-      "voice-assistant": "Sprachassistent"
+      "voice-assistant": "Sprachassistent",
+      "link": "Link"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -315,7 +317,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Bewegung erkannt",
-        "pushButton": "Schieben"
+        "pushButton": "Schieben",
+        "vacuumDock": "Zurück zur Ladestation"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Wähle die Geräte aus, die du anzeigen möchtest:",
@@ -467,6 +470,24 @@
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
         "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
       },
+      "link": {
+        "editTitleLabel": "Titel",
+        "editTitlePlaceholder": "z. B. Tasmota - Steckdose Wohnzimmer",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Symbol",
+        "emptyUrl": "Keine URL konfiguriert.",
+        "icons": {
+          "link": "Link",
+          "globe": "Webseite",
+          "server": "Server",
+          "hard-drive": "Speicher (NAS)",
+          "wifi": "WLAN-Netzwerk",
+          "monitor": "Weboberfläche",
+          "cpu": "Verbundenes Gerät",
+          "home": "Zuhause"
+        }
+      },
       "alarm": {
         "armButton": "Einschalten",
         "disarmButton": "Ausschalten",
@@ -537,6 +558,12 @@
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
+      "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
+      "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "gatewayBanner": {
+        "title": "Dein Gerät ist nicht in der Liste?",
+        "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin …) verbunden werden. Nach der Verbindung lassen sie sich in Gladys wie jedes andere Gerät steuern."
+      },
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
@@ -1076,7 +1103,11 @@
         "gladys": "Gladys",
         "usernameLabel": "Benutzername",
         "passwordLabel": "Passwort",
-        "urlLabel": "URL der Node-RED-Oberfläche: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (nicht von Gladys Plus aus zugänglich)"
+        "urlLabel": "URL der Node-RED-Oberfläche: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (nicht von Gladys Plus aus zugänglich)",
+        "majorVersionLabel": "Node-RED-Hauptversion",
+        "majorVersionHelp": "Wähle die Hauptversion von Node-RED aus. Bestehende Installationen bleiben standardmäßig bei Version 3. Neue Installationen verwenden Version 5.",
+        "majorVersionUpdateWarning": "Das Ändern der Node-RED-Version erstellt den Container neu. Deine Flows und deine Konfiguration bleiben erhalten, aber erstelle vor dem Upgrade unbedingt ein Backup.",
+        "majorVersionUpdateButton": "Node-RED-Version aktualisieren"
       }
     },
     "matterbridge": {
@@ -1847,6 +1878,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Steuere deine Xiaomi-Heimgeräten mit dem offiziellen Hub.",
+      "deprecatedWarning": {
+        "title": "Veraltete Integration",
+        "description": "Diese Integration basiert auf dem Entwicklermodus älterer Xiaomi/Aqara-Gateways, der auf neueren Modellen und App-Versionen nicht mehr verfügbar ist. Sie wird für neue Geräte nicht mehr weiterentwickelt. Kompatible Xiaomi-Produkte werden über <a href=\"/dashboard/integration/device/matter\">Matter</a> unterstützt. Wenn du bereits ein Gateway im Entwicklermodus konfiguriert hast, kann es weiterhin funktionieren."
+      },
       "deviceTab": "Meine Geräte",
       "documentation": "Xiaomi-Dokumentation",
       "device": {
@@ -2143,7 +2178,7 @@
       "title": "Künstliche Intelligenz",
       "documentation": "KI-Dokumentation",
       "description": "Gib Gladys die Kraft der künstlichen Intelligenz.",
-      "firstExplanation": "Gladys kann künstliche Intelligenz (Mistral-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
+      "firstExplanation": "Gladys kann künstliche Intelligenz (Open-Weight-KI-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
       "examplesIntro": "Das kannst du mit der KI machen:",
       "examplesChatTitle": "Im Gladys-Chat",
       "examplesChatHint": "Verfügbare Aktionen: Licht und Steckdosen pro Raum, Kameras, Szenen, Temperatur und Luftfeuchtigkeit.",
@@ -2156,7 +2191,24 @@
       "exampleScene1": "Alle 30 Minuten: analysiere die Eingangskamera und prüfe, ob das Auto vor dem Haus zu meinem Kennzeichen passt.",
       "exampleScene2": "Jeden Morgen um 7 Uhr: wenn der CO₂-Sensor im Wohnzimmer 1.000 ppm überschreitet, schicke mir eine Nachricht und schalte die Lüftung ein.",
       "exampleScene3": "Wenn der Alarm auslöst: bitte die KI, das Bild der Außenkamera zu analysieren und mir eine Zusammenfassung der Situation zu senden.",
-      "activateOpenAiChat": "Aktiviere die KI im Gladys-Chat",
+      "chatEnabledByDefault": "Die KI ist im Gladys-Chat standardmäßig aktiviert.",
+      "weeklyDigest": {
+        "title": "Wöchentlicher Hausbericht",
+        "description": "Gladys sendet dir jede Woche eine Zusammenfassung deines vernetzten Zuhauses: Komfort, Energie, Wartung und nützliche Tipps.",
+        "dayLabel": "Tag",
+        "hourLabel": "Uhrzeit",
+        "sendNow": "Bericht jetzt senden",
+        "loading": "Einstellungen werden geladen...",
+        "loadError": "Die Einstellungen für den Wochenbericht konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "daySunday": "Sonntag",
+        "dayMonday": "Montag",
+        "dayTuesday": "Dienstag",
+        "dayWednesday": "Mittwoch",
+        "dayThursday": "Donnerstag",
+        "dayFriday": "Freitag",
+        "daySaturday": "Samstag"
+      },
       "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
@@ -3166,8 +3218,8 @@
         "description": "Steuere Gladys per Sprache mit Google Home und Amazon Alexa."
       },
       "ai": {
-        "title": "Mistral KI",
-        "description": "Sprich mit deinem Zuhause dank Mistral-KI-Modellen, in Gladys Plus enthalten."
+        "title": "Open-Weight-KI",
+        "description": "Sprich mit deinem Zuhause dank Open-Weight-KI-Modellen, in Gladys Plus enthalten."
       },
       "cameraStreaming": {
         "title": "Kamera-Streaming",
@@ -3211,7 +3263,7 @@
         "everythingInLite": "Alles aus Lite, und zusätzlich:",
         "backups": "Verschlüsselte tägliche Backups",
         "cameraStreaming": "Kamera-Streaming aus der Ferne",
-        "ai": "KI-Integration (Mistral)",
+        "ai": "KI-Integration (Open-Weight-Modelle)",
         "enedis": "Enedis-Integration (Stromverbrauch)",
         "mcp": "MCP-Server für deine bevorzugten KIs"
       }
@@ -3221,7 +3273,7 @@
     "privacySubtitle": "Deine Daten bleiben deine. Das nehmen wir sehr ernst.",
     "privacy": {
       "aiTitle": "Datenschutzfreundliche KI",
-      "aiDescription": "Gladys Plus nutzt Mistral-Modelle für KI-Funktionen. Deine Daten werden nicht weiterverkauft oder für Werbung genutzt.",
+      "aiDescription": "Gladys Plus nutzt Open-Weight-KI-Modelle für KI-Funktionen. Deine Daten werden nicht weiterverkauft oder für Werbung genutzt.",
       "infraTitle": "Infrastruktur in Europa",
       "infraDescription": "Die Gladys-Plus-Infrastruktur (API, Backups, Relays) läuft in europäischen Rechenzentren, DSGVO-konform.",
       "e2eTitle": "Ende-zu-Ende-Verschlüsselung",
@@ -3248,11 +3300,11 @@
       "upgradeDescription": "Verschlüsselte Backups sind im Plus-Tarif enthalten. Du kannst den Tarif mit einem Klick in der Abrechnung wechseln."
     },
     "openai": {
-      "title": "Sprich mit deinem Zuhause dank Mistral KI",
-      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren.",
+      "title": "Sprich mit deinem Zuhause dank Open-Weight-KI",
+      "description": "Gladys Plus enthält eine KI, um per Nachricht im Gladys-Chat mit deinem Zuhause zu kommunizieren. Open-Weight-KI-Modelle in Frankreich gehostet.",
       "feature1": "Licht an, Ventilator aus, per Nachricht im Chat",
       "feature2": "Proaktive KI in Szenen: führt regelmäßig Smart-Home-Abfragen aus (Kennzeichen lesen, CO₂-Wert prüfen, eine Kamera überwachen…)",
-      "feature3": "Mistral KI · keine weiterverkauften Daten"
+      "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
     "enedis": {
       "title": "Verfolge deinen Stromverbrauch mit Enedis",
@@ -3281,7 +3333,7 @@
     },
     "voiceAssistant": {
       "title": "Gladys-Sprachassistent mit Gladys Plus",
-      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Mistral-KI-Antworten und Sprachausgabe.",
+      "description": "Gladys Plus betreibt den Sprachassistenten im Dashboard: Spracherkennung, Open-Weight-KI-Antworten und Sprachausgabe.",
       "compactDescription": "Spracherkennung, KI und Sprachausgabe laufen über Gladys Plus.",
       "feature1": "Sprich mit Gladys vom Dashboard",
       "feature2": "Live-Transkription und Antwort",
@@ -3289,11 +3341,11 @@
     },
     "askAi": {
       "title": "Diese Aktion erfordert Gladys Plus",
-      "description": "Die Aktion „KI fragen“ nutzt Mistral-KI über Gladys Plus, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
-      "compactDescription": "Diese Aktion nutzt Mistral-KI über Gladys Plus.",
+      "description": "Die Aktion „KI fragen“ nutzt Open-Weight-KI-Modelle über Gladys Plus, um Fragen zu beantworten und Kamerabilder in deinen Szenen zu analysieren.",
+      "compactDescription": "Diese Aktion nutzt Open-Weight-KI-Modelle über Gladys Plus.",
       "feature1": "Stelle der KI in einer Szene eine offene Frage",
       "feature2": "Hänge ein Kamerabild an und die KI kann beschreiben, was sie sieht",
-      "feature3": "Mistral KI · keine weiterverkauften Daten"
+      "feature3": "Open-Weight-KI-Modelle · keine weiterverkauften Daten"
     },
     "tts": {
       "title": "Diese Aktion erfordert Gladys Plus",
@@ -3622,6 +3674,22 @@
           "medium": "Mittel",
           "high": "Hoch"
         }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Leerlauf",
+          "cleaning": "Reinigen",
+          "mapping": "Kartieren"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Schnell",
+          "quiet": "Leise",
+          "low-noise": "Geräuscharm",
+          "deep-clean": "Tiefenreinigung",
+          "vacuum": "Saugen",
+          "mop": "Wischen"
+        }
       }
     }
   },
@@ -3722,7 +3790,25 @@
           "83": "Loslassen Mitte",
           "84": "Loslassen Minus",
           "85": "Doppelt Ein",
-          "86": "Doppelt Aus"
+          "86": "Doppelt Aus",
+          "87": "Alarm für Nachtzonen scharf schalten",
+          "88": "Ausgangsverzögerung",
+          "89": "Taste 1 einfacher Klick",
+          "90": "Taste 1 doppelter Klick",
+          "91": "Taste 1 langer Klick",
+          "92": "Taste 1 dreifacher Klick",
+          "93": "Taste 2 einfacher Klick",
+          "94": "Taste 2 doppelter Klick",
+          "95": "Taste 2 langer Klick",
+          "96": "Taste 2 dreifacher Klick",
+          "97": "Taste 3 einfacher Klick",
+          "98": "Taste 3 doppelter Klick",
+          "99": "Taste 3 langer Klick",
+          "100": "Taste 3 dreifacher Klick",
+          "101": "Taste 4 einfacher Klick",
+          "102": "Taste 4 doppelter Klick",
+          "103": "Taste 4 langer Klick",
+          "104": "Taste 4 dreifacher Klick"
         }
       },
       "fan": {
@@ -3856,6 +3942,18 @@
           "2": "Mittel",
           "3": "Hoch",
           "4": "Netz kritisch"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Gestoppt",
+          "1": "Läuft",
+          "2": "Pausiert",
+          "3": "Fehler",
+          "4": "Kehrt zur Ladestation zurück",
+          "5": "Lädt",
+          "6": "Angedockt"
         }
       }
     }
@@ -4339,6 +4437,13 @@
     "unknown": {
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Saugroboter",
+      "state": "Betriebszustand",
+      "run-mode": "Betriebsmodus",
+      "clean-mode": "Reinigungsmodus",
+      "dock": "Zurück zur Ladestation"
     }
   },
   "errorPage": {
@@ -4348,6 +4453,7 @@
   },
   "chat": {
     "emptyStateMessage": "Schick mir eine Nachricht!",
+    "emptyStateMessageNoPlus": "Der Gladys-Chat nutzt Gladys-Plus-KI. Verbinde deine Instanz mit Gladys Plus, um mit deinem Zuhause zu chatten.",
     "messagePlaceholder": "Tippe deine Nachricht …",
     "sendingInProgress": "Senden …",
     "typingInProgress": "Tippt …",
@@ -4360,27 +4466,15 @@
     },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
-      "intro": "Gladys antwortet auf deine Nachrichten auf zwei Arten — je nachdem, ob du Gladys Plus hast.",
-      "localBadge": "Lokal",
-      "localTitle": "Lokales Modell (Standard)",
-      "localDescription": "Ohne Gladys Plus nutzt Gladys ein sehr begrenztes lokales Modell: Es versteht nur wenige einfache Befehle, jeweils eine Aktion, und kann keine offenen Fragen beantworten.",
-      "localHint": "Beispiele, die funktionieren (ein Befehl pro Nachricht):",
-      "localExample1": "„Schalte das Licht im Wohnzimmer ein.“",
-      "localExample2": "„Zeige mir die Garagenkamera.“",
-      "localExample3": "„Starte die Szene ‚Gute Nacht‘.“",
-      "localExample4": "„Wie warm ist es im Schlafzimmer?“",
-      "plusTitle": "Erweiterte KI (Gladys Plus)",
-      "plusDescription": "Mit Gladys Plus schaltest du deutlich leistungsfähigere Mistral-Modelle frei: offene Fragen, kontextuelle Antworten, Kamerabildanalyse und mehr.",
-      "plusNotConfigured": "Verbinde Gladys Plus, um die erweiterte KI in diesem Chat zu aktivieren.",
-      "plusConfiguredNotEnabled": "Gladys Plus ist verbunden, aber die KI ist im Chat noch nicht aktiviert.",
-      "plusConfigureLink": "KI aktivieren →",
-      "plusActive": "Die erweiterte KI ist in diesem Chat aktiviert.",
+      "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
+      "plusNotConfigured": "Verbinde Gladys Plus, um den KI-Chat zu nutzen.",
+      "plusActive": "Gladys-Plus-KI ist in diesem Chat aktiv.",
       "upsellTitle": "Erweiterte KI freischalten",
-      "upsellCompactDescription": "Gladys Plus aktiviert Mistral-Modelle in diesem Chat: offene Fragen, Kameranalyse und mehr.",
-      "upsellDescription": "Von einfachen Befehlen zu echter künstlicher Intelligenz in deinem Gladys-Chat.",
+      "upsellCompactDescription": "Gladys Plus gibt dir Zugang zu Open-Weight-KI-Modellen in diesem Chat: offene Fragen, Kameranalyse und mehr.",
+      "upsellDescription": "Chatte natürlich mit deinem vernetzten Zuhause dank Gladys-Plus-Künstlicher Intelligenz.",
       "upsellFeature1": "Stelle deinem Zuhause offene Fragen",
       "upsellFeature2": "Analysiere, was deine Kameras sehen",
-      "upsellFeature3": "Mistral KI · keine weiterverkauften Daten"
+      "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
   "header": {

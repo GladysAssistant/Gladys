@@ -22,18 +22,9 @@ async function update(selector, room) {
     throw new NotFoundError('Room not found');
   }
 
-  const oldName = existingRoom.name;
-
   await existingRoom.update(room);
 
-  const updatedRoomPlain = existingRoom.get({ plain: true });
-
-  if (oldName !== updatedRoomPlain.name) {
-    this.brain.removeNamedEntity('room', updatedRoomPlain.id, oldName);
-    this.brain.addNamedEntity('room', updatedRoomPlain.id, updatedRoomPlain.name);
-  }
-
-  return updatedRoomPlain;
+  return existingRoom.get({ plain: true });
 }
 
 module.exports = {

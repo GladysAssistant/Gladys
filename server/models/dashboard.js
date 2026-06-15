@@ -46,6 +46,8 @@ const boxesSchema = Joi.array().items(
       gauge_color_high: Joi.string(),
       colors: Joi.array().items(Joi.string()),
       show_subscription_prices: Joi.boolean(),
+      url: Joi.string().uri({ scheme: ['http', 'https'] }),
+      icon: Joi.string(),
     }),
   ),
 );

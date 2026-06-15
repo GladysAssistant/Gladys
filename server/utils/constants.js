@@ -90,6 +90,28 @@ const BUTTON_STATUS = {
   RELEASE_MINUS: 84,
   ON_DOUBLE: 85,
   OFF_DOUBLE: 86,
+  ARM_NIGHT_ZONES: 87,
+  EXIT_DELAY: 88,
+  SINGLE_BUTTON_1: 89,
+  DOUBLE_BUTTON_1: 90,
+  LONG_BUTTON_1: 91,
+  TRIPLE_BUTTON_1: 92,
+  SINGLE_BUTTON_2: 93,
+  DOUBLE_BUTTON_2: 94,
+  LONG_BUTTON_2: 95,
+  TRIPLE_BUTTON_2: 96,
+  SINGLE_BUTTON_3: 97,
+  DOUBLE_BUTTON_3: 98,
+  LONG_BUTTON_3: 99,
+  TRIPLE_BUTTON_3: 100,
+  SINGLE_BUTTON_4: 101,
+  DOUBLE_BUTTON_4: 102,
+  LONG_BUTTON_4: 103,
+  TRIPLE_BUTTON_4: 104,
+};
+
+const BUTTON_PUSH = {
+  PRESSED: 1,
 };
 
 const COVER_STATE = {
@@ -191,6 +213,32 @@ const LEVEL_MATTER_STATE = {
   CRITICAL: 4,
 };
 
+const VACUUM_CLEANER_STATE = {
+  STOPPED: 0,
+  RUNNING: 1,
+  PAUSED: 2,
+  ERROR: 3,
+  RETURNING_TO_DOCK: 4,
+  CHARGING: 5,
+  DOCKED: 6,
+};
+
+const VACUUM_CLEANER_MODE = {
+  IDLE: 0,
+  CLEANING: 1,
+  MAPPING: 2,
+};
+
+const VACUUM_CLEANER_CLEAN_MODE = {
+  AUTO: 0,
+  QUICK: 1,
+  QUIET: 2,
+  LOW_NOISE: 3,
+  DEEP_CLEAN: 4,
+  VACUUM: 5,
+  MOP: 6,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -231,10 +279,12 @@ const SYSTEM_VARIABLE_NAMES = {
   GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
     'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
-  GLADYS_GATEWAY_OPEN_AI_ENABLED: 'GLADYS_GATEWAY_OPEN_AI_ENABLED',
   TIMEZONE: 'TIMEZONE',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
+  AI_WEEKLY_DIGEST_ENABLED: 'AI_WEEKLY_DIGEST_ENABLED',
+  AI_WEEKLY_DIGEST_DAY: 'AI_WEEKLY_DIGEST_DAY',
+  AI_WEEKLY_DIGEST_HOUR: 'AI_WEEKLY_DIGEST_HOUR',
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   GLADYS_VERSION: 'GLADYS_VERSION',
 };
@@ -274,6 +324,7 @@ const EVENTS = {
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
+    SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
@@ -627,6 +678,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
 };
@@ -978,6 +1030,12 @@ const DEVICE_FEATURE_TYPES = {
   },
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
+  },
+  VACUUM_CLEANER: {
+    STATE: 'state', // Operational state of the vacuum (integer - sensor)
+    RUN_MODE: 'run-mode', // Run mode of the vacuum (integer - command)
+    CLEAN_MODE: 'clean-mode', // Clean mode of the vacuum (integer - command)
+    DOCK: 'dock', // Send vacuum to dock (binary - command)
   },
 };
 
@@ -1513,6 +1571,7 @@ const DASHBOARD_BOX_TYPE = {
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
+  LINK: 'link',
 };
 
 const ERROR_MESSAGES = {
@@ -1643,6 +1702,7 @@ const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
@@ -1653,6 +1713,9 @@ module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
 module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
 module.exports.getFanFeatureOptions = getFanFeatureOptions;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
+module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
+module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
+module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
