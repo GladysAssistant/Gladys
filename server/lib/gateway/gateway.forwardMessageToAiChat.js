@@ -206,6 +206,45 @@ function isToolExecutionErrorText(text) {
 }
 
 /**
+ * @description Detect assistant turns with no usable text and no tool calls.
+ * @param {object|null} assistantMessage - Assistant message from chat API.
+ * @returns {boolean} True when the turn is empty.
+ * @example
+ * isEmptyAssistantTurn({ content: null, tool_calls: [] });
+ */
+function isEmptyAssistantTurn(assistantMessage) {
+  if (!assistantMessage) {
+    return true;
+  }
+  const toolCalls = assistantMessage.tool_calls ?? [];
+  if (toolCalls.length > 0) {
+    return false;
+  }
+  const { content } = assistantMessage;
+  if (content === null || content === undefined) {
+    return true;
+  }
+  if (typeof content === 'string') {
+    if (isNoResponseSentinel(content.trim())) {
+      return false;
+    }
+    return content.trim() === '';
+  }
+  return false;
+}
+
+/**
+ * @description Check whether tool results were already added to model context.
+ * @param {Array<object>} messagesForApi - Messages sent to chat API.
+ * @returns {boolean} True when at least one tool result exists.
+ * @example
+ * hadToolResultsInConversation([{ role: 'tool', content: 'ok' }]);
+ */
+function hadToolResultsInConversation(messagesForApi) {
+  return messagesForApi.some((message) => message?.role === 'tool');
+}
+
+/**
  * @description Render a tool-call trace text for UI timeline.
  * @param {string} functionName - Tool function name.
  * @param {object} toolArgs - Parsed tool arguments.
@@ -413,6 +452,21 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       finalAnswer = lastSceneCreateErrorText;
     }
 
+    const rawAssistantContent = assistantMessage?.content;
+    const wasNoResponseSentinel =
+      typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
+
+    if (
+      !finalAnswer &&
+      imagesSentToUser.length === 0 &&
+      !wasNoResponseSentinel &&
+      sceneCreateSuccessCount === 0 &&
+      isEmptyAssistantTurn(assistantMessage)
+    ) {
+      await this.message.replyByIntent(message, 'openai.request.fail', context);
+      return null;
+    }
+
     if (imagesSentToUser.length > 0) {
       for (let i = 0; i < imagesSentToUser.length; i += 1) {
         if (i === 0) {
@@ -458,4 +512,6 @@ module.exports = {
   shouldSendAssistantTextReply,
   isNoResponseSentinel,
   isToolExecutionErrorText,
+  isEmptyAssistantTurn,
+  hadToolResultsInConversation,
 };
