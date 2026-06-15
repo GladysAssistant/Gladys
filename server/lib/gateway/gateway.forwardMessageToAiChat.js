@@ -263,6 +263,39 @@ function formatToolCallTraceText(functionName, toolArgs) {
 }
 
 /**
+ * @description Detect a tool invocation trace line echoed by the model in plain text.
+ * @param {string} line - Single line of assistant text.
+ * @returns {boolean} True when the line looks like a tool trace.
+ * @example
+ * isToolInvocationTraceLine('device_turn_on_off({"action":"off"})');
+ */
+function isToolInvocationTraceLine(line) {
+  if (!line || typeof line !== 'string') {
+    return false;
+  }
+  return /^[a-z][a-z0-9_]*(\(\)|\([^)]*\))$/.test(line.trim());
+}
+
+/**
+ * @description Remove tool invocation trace lines from the user-facing final answer.
+ * Tool traces are already displayed separately in chat as tool_call messages.
+ * @param {string} answer - Assistant final answer text.
+ * @returns {string} Cleaned answer without duplicated tool traces.
+ * @example
+ * stripToolTraceEchoFromAnswer('device_get_state()\n\nTemperature is 21°C');
+ */
+function stripToolTraceEchoFromAnswer(answer) {
+  if (!answer || typeof answer !== 'string') {
+    return '';
+  }
+  return answer
+    .split('\n')
+    .filter((line) => !isToolInvocationTraceLine(line))
+    .join('\n')
+    .trim();
+}
+
+/**
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
  * Tool calling loop is executed on the Gladys instance using MCP callbacks.
@@ -436,6 +469,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     if (isNoResponseSentinel(finalAnswer)) {
       finalAnswer = '';
     }
+    finalAnswer = stripToolTraceEchoFromAnswer(finalAnswer);
 
     // If we hit the iteration cap and the model never produced a final user-facing answer,
     // fall back to the last tool result to avoid total silence.
@@ -509,6 +543,8 @@ module.exports = {
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
   formatToolCallTraceText,
+  isToolInvocationTraceLine,
+  stripToolTraceEchoFromAnswer,
   shouldSendAssistantTextReply,
   isNoResponseSentinel,
   isToolExecutionErrorText,

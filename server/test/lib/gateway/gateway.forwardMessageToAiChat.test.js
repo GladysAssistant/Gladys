@@ -855,7 +855,71 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
   });
 
   it('should format tool call trace text fallback name', () => {
-    const { formatToolCallTraceText } = getModule();
+    const { formatToolCallTraceText, isToolInvocationTraceLine, stripToolTraceEchoFromAnswer } = getModule();
     expect(formatToolCallTraceText('', {})).to.equal('tool_call');
+    expect(isToolInvocationTraceLine('device_turn_on_off({"action":"off","device":"Lumière"})')).to.equal(true);
+    expect(isToolInvocationTraceLine('La lumière est éteinte.')).to.equal(false);
+    expect(
+      stripToolTraceEchoFromAnswer(
+        'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
+      ),
+    ).to.equal('La lumière est éteinte.');
+  });
+
+  it('should strip echoed tool traces from the final user-facing answer', async () => {
+    const toolCb = fake.resolves('done');
+    const tools = [
+      {
+        intent: 'device.turn-on-off',
+        cb: toolCb,
+        config: { inputSchema: {} },
+      },
+    ];
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [
+              {
+                id: 'call_1',
+                function: {
+                  name: 'device_turn_on_off',
+                  arguments: '{"action":"off","device":"Lumière"}',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [
+        {
+          message: {
+            content:
+              'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
+          },
+        },
+      ],
+    });
+
+    const reply = fake.resolves(null);
+    const { forwardMessageToAiChat } = getModule({ tools });
+    const message = { text: 'Éteins la lumière', user: { id: 'user-id' } };
+    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply }), {
+      message,
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({ answer: 'La lumière est éteinte.', imagesSent: 0 });
+    assert.calledWith(reply, message, 'La lumière est éteinte.');
+    assert.calledWith(reply, message, 'device_turn_on_off({"action":"off","device":"Lumière"})', {}, null, {
+      messageType: 'tool_call',
+      toolName: 'device_turn_on_off',
+      toolStatus: 'success',
+    });
   });
 });
