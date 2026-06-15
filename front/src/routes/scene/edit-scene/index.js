@@ -693,12 +693,16 @@ class EditScene extends Component {
     });
   };
 
+  goBack = () => {
+    route(`/dashboard/scene${window.location.search}`);
+  };
+
   deleteScene = async () => {
     this.setState({ saving: true });
     try {
       await this.props.httpClient.delete(`/api/v1/scene/${this.props.scene_selector}`);
       this.setState({ saving: false });
-      route(`/dashboard/scene${window.location.search}`);
+      this.goBack();
     } catch (e) {
       this.setState({ saving: false });
     }
@@ -1179,6 +1183,7 @@ class EditScene extends Component {
               askDeleteScene={askDeleteScene}
               askDeleteCurrentScene={this.askDeleteCurrentScene}
               cancelDeleteCurrentScene={this.cancelDeleteCurrentScene}
+              goBack={this.goBack}
             />
           </DndProvider>
         </div>
