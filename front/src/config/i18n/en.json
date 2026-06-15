@@ -523,6 +523,7 @@
       },
       "voice-assistant": {
         "speak": "Speak",
+        "stop": "Stop",
         "listening": "Listening...",
         "listeningHint": "Speak now. Recording stops when you are silent.",
         "processing": "Processing...",
@@ -533,6 +534,10 @@
         "errorInsecureContext": "The microphone requires a secure connection. Open Gladys on Gladys Plus at <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
         "errorPermissionDenied": "Allow microphone access for Safari in Settings > Safari > Microphone.",
         "errorNotSupported": "Voice recording is not available in this browser.",
+        "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
+        "errorMicrophoneUnavailable": "The microphone is unavailable. Check that it is not in use by another app.",
+        "errorNoSpeech": "No voice detected. Check that your microphone is enabled, then try again.",
+        "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
         "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
         "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
       }

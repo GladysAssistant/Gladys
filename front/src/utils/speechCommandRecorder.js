@@ -1,5 +1,5 @@
 import { float32SamplesToSttWav } from './speechAudioForStt';
-import { getSpeechUserMedia } from './speechMicrophoneAccess';
+import { getSpeechUserMedia, SpeechRecordingError } from './speechMicrophoneAccess';
 
 const DEFAULT_OPTIONS = {
   silenceThreshold: 0.01,
@@ -535,6 +535,10 @@ async function recordWithAudioWorklet(stream, options) {
         }
         const resolveRecording = async () => {
           await cleanup();
+          if (data.reason === 'no_speech') {
+            reject(new SpeechRecordingError('NO_SPEECH'));
+            return;
+          }
           const wavBlob = await float32SamplesToSttWav(data.samples, data.sampleRate);
           resolve(wavBlob);
         };
@@ -560,6 +564,7 @@ async function recordWithScriptProcessor(stream, options) {
   let silentGain;
   let finished = false;
   let speechDetected = false;
+  let stopReason = null;
   let silenceStartedAt = null;
   let noiseFloor = 0.003;
   let ready = false;
@@ -595,14 +600,21 @@ async function recordWithScriptProcessor(stream, options) {
   };
 
   return new Promise((resolve, reject) => {
-    const finish = () => {
+    const finish = reason => {
       if (finished) {
         return;
       }
       finished = true;
+      if (reason) {
+        stopReason = reason;
+      }
       const samples = mergeChunks(chunks);
       const resolveRecording = async () => {
         await cleanup();
+        if (stopReason === 'no_speech') {
+          reject(new SpeechRecordingError('NO_SPEECH'));
+          return;
+        }
         const wavBlob = await float32SamplesToSttWav(samples, audioContext.sampleRate);
         resolve(wavBlob);
       };
@@ -644,19 +656,19 @@ async function recordWithScriptProcessor(stream, options) {
         if (rms >= Math.max(options.speechThreshold, noiseFloor * 3)) {
           speechDetected = true;
         } else if (elapsed >= options.maxWaitForSpeechMs) {
-          finish();
+          finish('no_speech');
         }
       } else if (rms < Math.max(options.silenceThreshold, Math.min(0.03, noiseFloor * 2.5))) {
         if (!silenceStartedAt) {
           silenceStartedAt = Date.now();
         } else if (Date.now() - silenceStartedAt >= options.silenceDurationMs) {
-          finish();
+          finish('silence');
         }
       } else {
         silenceStartedAt = null;
       }
       if (elapsed >= options.maxDurationMs) {
-        finish();
+        finish('max_duration');
       }
     };
   });

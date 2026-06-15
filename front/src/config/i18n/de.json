@@ -523,6 +523,7 @@
       },
       "voice-assistant": {
         "speak": "Sprechen",
+        "stop": "Stoppen",
         "listening": "Ich höre zu...",
         "listeningHint": "Sprechen Sie. Die Aufnahme stoppt bei Stille.",
         "processing": "Verarbeitung...",
@@ -533,6 +534,10 @@
         "errorInsecureContext": "Das Mikrofon erfordert eine sichere Verbindung. Öffnen Sie Gladys über Gladys Plus unter <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
         "errorPermissionDenied": "Erlauben Sie Safari den Mikrofonzugriff unter Einstellungen > Safari > Mikrofon.",
         "errorNotSupported": "Sprachaufnahme ist in diesem Browser nicht verfügbar.",
+        "errorNoMicrophone": "Kein Mikrofon erkannt. Schließen Sie eines an oder aktivieren Sie es in den Systemeinstellungen.",
+        "errorMicrophoneUnavailable": "Das Mikrofon ist nicht verfügbar. Prüfen Sie, ob es von einer anderen App verwendet wird.",
+        "errorNoSpeech": "Keine Stimme erkannt. Prüfen Sie, ob Ihr Mikrofon aktiviert ist, und versuchen Sie es erneut.",
+        "errorNoTranscription": "Ich habe Ihre Nachricht nicht verstanden. Sprechen Sie näher ans Mikrofon und versuchen Sie es erneut.",
         "configDescription": "Dieses Widget nutzt Gladys Plus für Spracherkennung, KI und Sprachausgabe. Verbinden Sie Ihre Instanz mit Gladys Plus, um es zu nutzen.",
         "plusRequiredHint": "Gladys Plus verbinden, um das Mikrofon zu aktivieren."
       }
