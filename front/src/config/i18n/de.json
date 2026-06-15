@@ -1070,6 +1070,7 @@
       "roomLabel": "Zimmer",
       "ieeeAddressLabel": "IEEE-Adresse",
       "openInZ2mButton": "In Zigbee2mqtt öffnen",
+      "noZ2mUrlMessage": "Die URL der Zigbee2mqtt-Oberfläche ist nicht konfiguriert, direkte Links zu Geräten sind nicht verfügbar. Gehen Sie zur <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">Konfigurationsseite</a>, um sie einzurichten.",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% Zigbee2MQTT-MQTT-Wert",
       "featuresLabel": "Funktionen",
