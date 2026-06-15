@@ -1017,4 +1017,3 @@ describe('Matter.setValue', () => {
     await chaiAssert.isRejected(promise, 'Device does not support RvcCleanMode cluster');
   });
 });
-
