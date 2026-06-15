@@ -1,8 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
@@ -12,8 +15,25 @@ const MAX_TOOL_RESULT_CHARS = 4000;
 const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const DEFAULT_TIMEZONE = 'Europe/Paris';
 const promptPath = path.join(__dirname, '../../config/prompts/aiChat.prompt.txt');
 const SYSTEM_PROMPT = fs.readFileSync(promptPath, 'utf8');
+
+/**
+ * @description Build the system prompt with the current date and time.
+ * @param {string} timezoneName - IANA timezone used by the Gladys instance.
+ * @param {Date} [now] - Reference date, mainly for tests.
+ * @returns {string} System prompt with current datetime context.
+ * @example
+ * buildSystemPromptWithCurrentTime('Europe/Paris', new Date('2026-06-15T10:30:00Z'));
+ */
+function buildSystemPromptWithCurrentTime(timezoneName, now = new Date()) {
+  const formattedNow = dayjs(now).tz(timezoneName).format('dddd YYYY-MM-DD HH:mm');
+  return `${SYSTEM_PROMPT}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
+}
 
 /**
  * @description Return MCP handler from service manager.
@@ -327,8 +347,11 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
 
+    const configuredTimezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+    const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
     // Build a compact conversation for the model.
-    const messagesForApi = [{ role: 'system', content: SYSTEM_PROMPT }];
+    const messagesForApi = [{ role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) }];
 
     (previousQuestions ?? []).forEach((exchange) => {
       if (!exchange) {
@@ -539,6 +562,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
 module.exports = {
   forwardMessageToAiChat,
+  buildSystemPromptWithCurrentTime,
   extractAssistantMessage,
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,

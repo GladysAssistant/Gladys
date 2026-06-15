@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { Error429 } = require('../../../utils/httpErrors');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const z = require('../../../services/mcp/node_modules/zod/v4');
 
 const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
@@ -39,10 +39,25 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
  */
-function buildContext({ tools, aiChat, reply, replyByIntent, eventEmit = fake.returns(null) }) {
+function buildContext({
+  tools,
+  aiChat,
+  reply,
+  replyByIntent,
+  eventEmit = fake.returns(null),
+  timezone = 'Europe/Paris',
+}) {
   return {
     event: {
       emit: eventEmit,
+    },
+    variable: {
+      getValue: stub().callsFake((name) => {
+        if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+          return Promise.resolve(timezone);
+        }
+        return Promise.resolve(null);
+      }),
     },
     serviceManager: {
       getService: fake.returns({
@@ -62,6 +77,36 @@ function buildContext({ tools, aiChat, reply, replyByIntent, eventEmit = fake.re
 describe('gateway.forwardMessageToAiChat', () => {
   beforeEach(() => {
     resizeImageMock.resetHistory();
+  });
+
+  it('should build system prompt with current date and time in the configured timezone', () => {
+    const { buildSystemPromptWithCurrentTime } = getModule();
+    const prompt = buildSystemPromptWithCurrentTime('Europe/Paris', new Date('2026-06-15T10:30:00Z'));
+
+    expect(prompt).to.include('You are Gladys AI.');
+    expect(prompt).to.include('Current date and time (Europe/Paris): Monday 2026-06-15 12:30');
+  });
+
+  it('should include current date and time in the system message sent to the model', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: 'OK' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+
+    await forwardMessageToAiChat.call(
+      buildContext({ tools: [], aiChat, reply, replyByIntent, timezone: 'America/Toronto' }),
+      {
+        message: { text: 'Is the pool open now?' },
+        previousQuestions: [],
+        context: {},
+      },
+    );
+
+    const systemMessage = aiChat.getCall(0).args[0].messages[0];
+    expect(systemMessage.role).to.equal('system');
+    expect(systemMessage.content).to.include('Current date and time (America/Toronto):');
   });
 
   it('should execute tool calls locally and return final assistant answer', async () => {
