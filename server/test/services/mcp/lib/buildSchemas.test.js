@@ -12,6 +12,7 @@ const {
   isHistoryFeature,
 } = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
+const { SCENE_CREATE_TOOL_DESCRIPTION } = require('../../../../services/mcp/lib/sceneSchemas');
 
 describe('build schemas', () => {
   it('should build home structure resources schema', async () => {
@@ -479,36 +480,63 @@ describe('build schemas', () => {
     // Tool: scene.create
     expect(tools[1].intent).to.eq('scene.create');
     expect(tools[1].config.title).to.eq('Create scene');
-    expect(tools[1].config.description).to.eq(
-      'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
-    );
+    expect(tools[1].config.description).to.eq(SCENE_CREATE_TOOL_DESCRIPTION);
     const sceneCreatedResult = await tools[1].cb({
       name: 'MCP Generated Scene',
       icon: 'bell',
-      triggers: [],
+      triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
       tags: [{ name: 'ai-generated' }],
     });
     expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
     expect(sceneCreatedResult.content[0].text).to.eq('toonmockdata');
 
-    const sceneCreatedResultFromFlatActions = await tools[1].cb({
-      name: 'MCP Generated Scene 2',
-      icon: 'bell',
-      triggers: [],
-      actions: [{ type: 'light.turn-on', devices: ['device-light-1'] }],
-      tags: [{ name: 'ai-generated' }],
-    });
-    expect(sceneCreatedResultFromFlatActions.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.gladys.scene.create.callCount).to.eq(2);
-    expect(mcpHandler.gladys.scene.create.secondCall.args[0].actions).to.deep.equal([
-      [{ type: 'light.turn-on', devices: ['device-light-1'] }],
-    ]);
+    let flatActionsError = null;
+    try {
+      await tools[1].cb({
+        name: 'MCP Generated Scene 2',
+        icon: 'bell',
+        triggers: [{ type: 'system.start' }],
+        actions: [{ type: 'light.turn-on', devices: ['device-light-1'] }],
+        tags: [{ name: 'ai-generated' }],
+      });
+    } catch (e) {
+      flatActionsError = e;
+    }
+    expect(flatActionsError).to.be.an('error');
+    expect(flatActionsError.message).to.contain('scene.create validation failed (422)');
+    expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
+
+    let triggerInActionsError = null;
+    try {
+      await tools[1].cb({
+        name: 'Scene with trigger in actions',
+        icon: 'bell',
+        triggers: [{ type: 'system.start' }],
+        actions: [
+          [
+            {
+              type: 'device.new-state',
+              device_feature: 'mqtt-lumiere',
+              operator: '=',
+              value: 1,
+              threshold_only: true,
+            },
+          ],
+          [{ type: 'delay', unit: 'minutes', value: 45 }],
+        ],
+      });
+    } catch (e) {
+      triggerInActionsError = e;
+    }
+    expect(triggerInActionsError).to.be.an('error');
+    expect(triggerInActionsError.message).to.contain('must be in the top-level triggers array');
+    expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
 
     const sceneCreatedWithUserAction = await tools[1].cb({
       name: 'Notify user scene',
       icon: 'bell',
-      triggers: [],
+      triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'message.send', user: 'john', text: 'Hello John' }]],
       tags: [],
     });
@@ -517,7 +545,7 @@ describe('build schemas', () => {
     const sceneCreatedWithDeviceFeatureSelector = await tools[1].cb({
       name: 'Get device value scene',
       icon: 'bell',
-      triggers: [],
+      triggers: [{ type: 'system.start' }],
       actions: [[{ type: 'device.get-value', device_feature: 'device-temp-1-temp' }]],
       tags: [],
     });
@@ -528,7 +556,7 @@ describe('build schemas', () => {
       await tools[1].cb({
         name: 'Get invalid device value scene',
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [[{ type: 'device.get-value', device_feature: 'unknown-feature' }]],
         tags: [],
       });
@@ -552,7 +580,7 @@ describe('build schemas', () => {
       await tools[1].cb({
         name: 'Notify invalid user scene',
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [[{ type: 'message.send', user: 'unknown-user', text: 'Hello' }]],
         tags: [],
       });
@@ -566,7 +594,7 @@ describe('build schemas', () => {
     try {
       await tools[1].cb({
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [],
       });
     } catch (e) {
@@ -940,7 +968,7 @@ describe('build schemas', () => {
       await sceneCreateTool.cb({
         name: 'Scene with invalid action payload',
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
       });
     } catch (e) {
@@ -955,7 +983,7 @@ describe('build schemas', () => {
       await sceneCreateTool.cb({
         name: 'Scene unknown error',
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
       });
     } catch (e) {
@@ -1009,7 +1037,7 @@ describe('build schemas', () => {
       await sceneCreateTool.cb({
         name: 'Scene invalid http headers',
         icon: 'bell',
-        triggers: [],
+        triggers: [{ type: 'system.start' }],
         actions: [[{ type: 'http.request', method: 'post', url: 'https://example.com/hook' }]],
       });
     } catch (e) {

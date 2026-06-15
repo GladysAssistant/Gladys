@@ -4,6 +4,8 @@ const {
   formatSceneCreateZodIssue,
   extractProvidedActionTypes,
   flattenUnionIssues,
+  SCENE_CREATE_TOOL_DESCRIPTION,
+  assertTriggerTypesNotInActions,
 } = require('./sceneSchemas');
 
 const noRoom = {
@@ -255,19 +257,16 @@ async function getAllTools(userId) {
       intent: 'scene.create',
       config: {
         title: 'Create scene',
-        description:
-          'Create a new home automation scene with triggers and nested actions. Use this tool whenever the user asks to create a scene. A scene is created only if this tool succeeds. For monitoring use cases, build a periodic trigger and an ai.ask action. ai.ask requires both user and text, and text can inject previous action values like {{1.1.last_value}}. Actions inside the same group run in parallel: if one action depends on another output (for example ai.ask using device.get-value), put them in successive groups.',
+        description: SCENE_CREATE_TOOL_DESCRIPTION,
         inputSchema: sceneCreateInputSchema.shape,
       },
       cb: async (scene) => {
         try {
+          assertTriggerTypesNotInActions(scene);
           const parsedScene = sceneCreateInputSchema.parse(scene);
-          const normalizedActions = Array.isArray(parsedScene.actions?.[0])
-            ? parsedScene.actions
-            : parsedScene.actions.map((action) => [action]);
           const createdScene = await this.gladys.scene.create({
             ...parsedScene,
-            actions: normalizedActions,
+            actions: parsedScene.actions,
           });
 
           return {
