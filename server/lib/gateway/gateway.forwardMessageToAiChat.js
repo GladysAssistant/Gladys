@@ -31,7 +31,9 @@ const SYSTEM_PROMPT = fs.readFileSync(promptPath, 'utf8');
  * buildSystemPromptWithCurrentTime('Europe/Paris', new Date('2026-06-15T10:30:00Z'));
  */
 function buildSystemPromptWithCurrentTime(timezoneName, now = new Date()) {
-  const formattedNow = dayjs(now).tz(timezoneName).format('dddd YYYY-MM-DD HH:mm');
+  const formattedNow = dayjs(now)
+    .tz(timezoneName)
+    .format('dddd YYYY-MM-DD HH:mm');
   return `${SYSTEM_PROMPT}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
 }
 
@@ -351,14 +353,11 @@ function stripToolTraceEchoFromAnswer(answer) {
  */
 async function forwardMessageToAiChat({ message, image, previousQuestions, context }) {
   const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
+  const messagePreview = debugPreview(message ? message.text : undefined, 150);
   logger.info(
-    `[AI_CHAT] New request userId=${userId ?? 'unknown'} message=${debugPreview(message?.text, 150)} image=${
-      image ? 'yes' : 'no'
-    }`,
+    `[AI_CHAT] New request userId=${userId ?? 'unknown'} message=${messagePreview} image=${image ? 'yes' : 'no'}`,
   );
-  logger.debug(
-    `[AI_CHAT] Request context previousQuestions=${(previousQuestions ?? []).length}`,
-  );
+  logger.debug(`[AI_CHAT] Request context previousQuestions=${(previousQuestions ?? []).length}`);
   if (userId && this.event?.emit) {
     this.event.emit(EVENTS.WEBSOCKET.SEND, {
       type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
@@ -435,17 +434,18 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       assistantMessage = extractAssistantMessage(apiResponse);
       const toolCalls = assistantMessage?.tool_calls ?? [];
       const assistantContentType = assistantMessage?.content === null ? 'null' : typeof assistantMessage?.content;
+      const toolNamesSuffix =
+        toolCalls.length > 0 ? ` tools=[${toolCalls.map((toolCall) => toolCall.function.name).join(', ')}]` : '';
+      const assistantContentPreview = debugPreview(assistantMessage ? assistantMessage.content : undefined, 150);
 
       logger.info(
-        `[AI_CHAT] Assistant turn iteration=${iteration + 1} tool_calls=${toolCalls.length}${
-          toolCalls.length > 0 ? ` tools=[${toolCalls.map((toolCall) => toolCall?.function?.name).join(', ')}]` : ''
-        } content=${debugPreview(assistantMessage?.content, 150)}`,
+        `[AI_CHAT] Assistant turn iteration=${iteration + 1} tool_calls=${
+          toolCalls.length
+        }${toolNamesSuffix} content=${assistantContentPreview}`,
       );
       logger.debug(
-        `[AI_CHAT] Assistant turn details iteration=${iteration + 1} contentType=${assistantContentType} content=${debugPreview(
-          assistantMessage?.content,
-          400,
-        )}`,
+        `[AI_CHAT] Assistant turn details iteration=${iteration +
+          1} contentType=${assistantContentType} content=${debugPreview(assistantMessage?.content, 400)}`,
       );
 
       if (!toolCalls || toolCalls.length === 0) {
@@ -505,15 +505,15 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           }
           imagesSentToUser.push(...extractMessageFilesFromToolResult(toolResult));
           toolResultText = formatToolResultForChat(toolResult);
-          logger.info(
-            `[AI_CHAT] Tool finished tool=${functionName} status=success resultLength=${toolResultText?.length ?? 0}`,
-          );
+          const toolResultLength = toolResultText ? toolResultText.length : 0;
+          logger.info(`[AI_CHAT] Tool finished tool=${functionName} status=success resultLength=${toolResultLength}`);
           logger.debug(`[AI_CHAT] Tool result tool=${functionName} result=${debugPreview(toolResultText, 400)}`);
         } catch (toolError) {
           // We surface tool errors back to the model instead of aborting the whole
           // conversation. The model can then report the error to the user or retry.
           logger.warn(`Tool "${functionName}" failed:`, toolError);
-          toolResultText = `Error while running tool "${functionName}": ${toolError?.message ?? 'unknown error'}`;
+          const toolErrorMessage = toolError && toolError.message ? toolError.message : 'unknown error';
+          toolResultText = `Error while running tool "${functionName}": ${toolErrorMessage}`;
           // Dedicated single-line log containing the exact payload sent back to the model.
           logger.warn(`[AI_TOOL_ERROR_FULL] ${toolResultText}`);
           if (functionName === 'scene_create') {
@@ -581,9 +581,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         `shouldSendText=${shouldSendText} answerLength=${finalAnswer.length} ` +
         `wasNoResponseSentinel=${wasNoResponseSentinel} isEmptyTurn=${isEmptyTurn}`,
     );
-    logger.debug(
-      `[AI_CHAT] Outcome details finalAnswer=${debugPreview(finalAnswer, 400)}`,
-    );
+    logger.debug(`[AI_CHAT] Outcome details finalAnswer=${debugPreview(finalAnswer, 400)}`);
 
     if (
       !finalAnswer &&
@@ -597,15 +595,8 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       return null;
     }
 
-    if (
-      !finalAnswer &&
-      imagesSentToUser.length === 0 &&
-      !wasNoResponseSentinel &&
-      !shouldSendText
-    ) {
-      logger.info(
-        '[AI_CHAT] No reply sent to user: assistant had content but final answer is empty after processing',
-      );
+    if (!finalAnswer && imagesSentToUser.length === 0 && !wasNoResponseSentinel && !shouldSendText) {
+      logger.info('[AI_CHAT] No reply sent to user: assistant had content but final answer is empty after processing');
     }
 
     if (imagesSentToUser.length > 0) {
@@ -629,13 +620,12 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       );
     }
 
-    logger.info(
-      `[AI_CHAT] Completed answerLength=${finalAnswer.length} imagesSent=${imagesSentToUser.length}`,
-    );
+    logger.info(`[AI_CHAT] Completed answerLength=${finalAnswer.length} imagesSent=${imagesSentToUser.length}`);
 
     return { answer: finalAnswer || '', imagesSent: imagesSentToUser.length };
   } catch (e) {
-    logger.warn(`[AI_CHAT] Request failed: ${e?.message ?? e}`);
+    const requestErrorMessage = e && e.message ? e.message : e;
+    logger.warn(`[AI_CHAT] Request failed: ${requestErrorMessage}`);
     logger.warn(e);
     if (e instanceof Error429) {
       await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
