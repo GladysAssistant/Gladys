@@ -83,7 +83,10 @@ const sceneConditionSchema = z
         'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
       ),
     operator: comparisonOperatorSchema,
-    value: z.union([z.number(), z.string()]).optional().describe('Literal value to compare against.'),
+    value: z
+      .union([z.number(), z.string()])
+      .optional()
+      .describe('Literal value to compare against.'),
     evaluate_value: z
       .string()
       .optional()
