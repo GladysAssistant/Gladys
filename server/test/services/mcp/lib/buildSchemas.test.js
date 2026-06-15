@@ -1,5 +1,8 @@
 const { expect } = require('chai');
 const { stub, fake } = require('sinon');
+const nock = require('nock');
+const dns = require('dns');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../../utils/constants');
 const {
   getAllResources,
   getAllTools,
@@ -870,7 +873,7 @@ describe('build schemas', () => {
 
     // Verify tools are created successfully
     expect(tools).to.be.an('array');
-    expect(tools.length).to.eq(6);
+    expect(tools.length).to.eq(8);
 
     // Test device.get-state - should return all devices with and without room
     const stateResult = await tools[3].cb({ room: undefined, device_type: undefined });
@@ -1116,5 +1119,85 @@ describe('build schemas', () => {
     await tools[3].cb({ room: 'salon', device_type: 'light' });
     await tools[4].cb({ action: 'off', room: 'salon', device_category: 'switch' });
     expect(mcpHandler.gladys.device.setValue.calledOnce).to.equal(true);
+  });
+
+  it('should run web.fetch and time.compare-times tools', async () => {
+    const lookupStub = stub(dns.promises, 'lookup').resolves([{ address: '93.184.216.34', family: 4 }]);
+
+    nock('http://example.com')
+      .get('/hours')
+      .reply(200, 'open 09:00-18:00', { 'Content-Type': 'text/plain' });
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      formatValue: stub().returns({ value: 1 }),
+      findBySimilarity,
+      toon: stub().callsFake((value) => JSON.stringify(value)),
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
+        house: { get: stub().resolves([{ id: 'house-1', name: 'Home', selector: 'home' }]) },
+        calendar: { get: stub().resolves([{ id: 'calendar-1', name: 'Family', selector: 'family-calendar' }]) },
+        area: { get: stub().resolves([{ id: 'area-1', name: 'Home', selector: 'home-area' }]) },
+        variable: {
+          getValue: stub().callsFake((name) => {
+            if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+              return Promise.resolve('Europe/Paris');
+            }
+            return Promise.resolve(null);
+          }),
+        },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([
+            {
+              selector: 'speaker-1',
+              name: 'Speaker',
+              room: { selector: 'salon', name: 'Salon' },
+              features: [
+                {
+                  id: 1,
+                  selector: 'speaker-1-play',
+                  name: 'Play notification',
+                  category: 'music',
+                  type: 'play_notification',
+                },
+              ],
+            },
+          ]),
+          getBySelector: stub().resolves(null),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    try {
+      const tools = await mcpHandler.getAllTools('user-id');
+      const webFetchTool = tools.find((tool) => tool.intent === 'web.fetch');
+      const compareTimesTool = tools.find((tool) => tool.intent === 'time.compare-times');
+
+      const fetchResult = await webFetchTool.cb({ url: 'http://example.com/hours' });
+      expect(fetchResult.content[0].text).to.equal('open 09:00-18:00');
+
+      const compareResult = await compareTimesTool.cb({
+        operator: 'in_ranges',
+        reference_time: '14:22',
+        ranges: [{ start: '17:00', end: '22:00' }],
+      });
+      const parsedCompareResult = JSON.parse(compareResult.content[0].text);
+      expect(parsedCompareResult.result).to.equal(false);
+      expect(parsedCompareResult.next_range).to.deep.equal({ start: '17:00', end: '22:00' });
+    } finally {
+      lookupStub.restore();
+      nock.cleanAll();
+    }
   });
 });
