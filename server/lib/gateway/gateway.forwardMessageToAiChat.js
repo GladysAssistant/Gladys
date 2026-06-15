@@ -85,6 +85,27 @@ function truncate(str, limitChars) {
 }
 
 /**
+ * @description Format a value for concise debug logs.
+ * @param {any} value - Value to preview.
+ * @param {number} [limitChars=200] - Maximum preview length.
+ * @returns {string} Safe one-line preview.
+ * @example
+ * debugPreview('hello world', 5);
+ */
+function debugPreview(value, limitChars = 200) {
+  if (value === null) {
+    return 'null';
+  }
+  if (value === undefined) {
+    return 'undefined';
+  }
+  if (typeof value === 'string') {
+    return truncate(value.replace(/\s+/g, ' ').trim(), limitChars) || '(empty string)';
+  }
+  return truncate(safeStringify(value, limitChars), limitChars);
+}
+
+/**
  * @description Safely stringify any value for model context.
  * @param {any} value - Value to stringify.
  * @param {number} limitChars - Output max length.
@@ -330,6 +351,14 @@ function stripToolTraceEchoFromAnswer(answer) {
  */
 async function forwardMessageToAiChat({ message, image, previousQuestions, context }) {
   const userId = message?.user?.id ?? message?.user_id ?? message?.source_user_id;
+  logger.info(
+    `[AI_CHAT] New request userId=${userId ?? 'unknown'} message=${debugPreview(message?.text, 150)} image=${
+      image ? 'yes' : 'no'
+    }`,
+  );
+  logger.debug(
+    `[AI_CHAT] Request context previousQuestions=${(previousQuestions ?? []).length}`,
+  );
   if (userId && this.event?.emit) {
     this.event.emit(EVENTS.WEBSOCKET.SEND, {
       type: WEBSOCKET_MESSAGE_TYPES.MESSAGE.AI_THINKING,
@@ -346,9 +375,13 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const mcpTools = await mcpHandler.getAllTools(userId);
     const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
+    logger.debug(
+      `[AI_CHAT] Tools available (${toolsForApi.length}): ${toolsForApi.map((tool) => tool.function.name).join(', ')}`,
+    );
 
     const configuredTimezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
     const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+    logger.debug(`[AI_CHAT] Using timezone=${timezoneName}`);
 
     // Build a compact conversation for the model.
     const messagesForApi = [{ role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) }];
@@ -388,8 +421,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const imagesSentToUser = [];
     let lastSceneCreateErrorText = null;
     let sceneCreateSuccessCount = 0;
+    let toolIterations = 0;
     // eslint-disable-next-line no-restricted-syntax
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
+      logger.debug(`[AI_CHAT] API call iteration=${iteration + 1}/${MAX_TOOL_CALL_ITERATIONS}`);
       // eslint-disable-next-line no-await-in-loop
       const apiResponse = await this.aiChat({
         messages: messagesForApi,
@@ -399,16 +434,25 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
       assistantMessage = extractAssistantMessage(apiResponse);
       const toolCalls = assistantMessage?.tool_calls ?? [];
+      const assistantContentType = assistantMessage?.content === null ? 'null' : typeof assistantMessage?.content;
 
+      logger.info(
+        `[AI_CHAT] Assistant turn iteration=${iteration + 1} tool_calls=${toolCalls.length}${
+          toolCalls.length > 0 ? ` tools=[${toolCalls.map((toolCall) => toolCall?.function?.name).join(', ')}]` : ''
+        } content=${debugPreview(assistantMessage?.content, 150)}`,
+      );
       logger.debug(
-        `AI assistant turn: content=${assistantMessage?.content === null ? 'null' : 'set'}, tool_calls=${
-          toolCalls.length
-        }`,
+        `[AI_CHAT] Assistant turn details iteration=${iteration + 1} contentType=${assistantContentType} content=${debugPreview(
+          assistantMessage?.content,
+          400,
+        )}`,
       );
 
       if (!toolCalls || toolCalls.length === 0) {
         break;
       }
+
+      toolIterations += 1;
 
       // Add the assistant tool call message context.
       messagesForApi.push({
@@ -450,6 +494,8 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
         let toolResultText;
         let toolStatus = 'success';
+        logger.info(`[AI_CHAT] Running tool=${functionName}`);
+        logger.debug(`[AI_CHAT] Tool args tool=${functionName} args=${debugPreview(toolArgs, 300)}`);
         try {
           // eslint-disable-next-line no-await-in-loop
           const toolResult = await cb(toolArgs);
@@ -459,6 +505,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
           }
           imagesSentToUser.push(...extractMessageFilesFromToolResult(toolResult));
           toolResultText = formatToolResultForChat(toolResult);
+          logger.info(
+            `[AI_CHAT] Tool finished tool=${functionName} status=success resultLength=${toolResultText?.length ?? 0}`,
+          );
+          logger.debug(`[AI_CHAT] Tool result tool=${functionName} result=${debugPreview(toolResultText, 400)}`);
         } catch (toolError) {
           // We surface tool errors back to the model instead of aborting the whole
           // conversation. The model can then report the error to the user or retry.
@@ -489,10 +539,17 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     const assistantContent = assistantMessage?.content;
     let finalAnswer = typeof assistantContent === 'string' ? assistantContent.trim() : '';
+    const rawFinalAnswer = finalAnswer;
     if (isNoResponseSentinel(finalAnswer)) {
+      logger.info('[AI_CHAT] Assistant returned NO_RESPONSE sentinel');
       finalAnswer = '';
     }
     finalAnswer = stripToolTraceEchoFromAnswer(finalAnswer);
+    if (rawFinalAnswer && !finalAnswer) {
+      logger.info(
+        `[AI_CHAT] Final answer emptied after stripping tool traces. raw=${debugPreview(rawFinalAnswer, 150)}`,
+      );
+    }
 
     // If we hit the iteration cap and the model never produced a final user-facing answer,
     // fall back to the last tool result to avoid total silence.
@@ -503,25 +560,50 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         .find((m) => m?.role === 'tool' && typeof m?.content === 'string' && m.content.trim().length > 0);
       if (lastToolMessage) {
         finalAnswer = truncate(lastToolMessage.content.trim(), MAX_FALLBACK_ANSWER_CHARS);
+        logger.info(`[AI_CHAT] Using fallback answer from last tool result`);
       }
     }
     if (sceneCreateSuccessCount === 0 && isToolExecutionErrorText(lastSceneCreateErrorText)) {
       finalAnswer = lastSceneCreateErrorText;
+      logger.debug(`[AI_CHAT] Using scene_create error as final answer: ${debugPreview(finalAnswer, 400)}`);
     }
 
     const rawAssistantContent = assistantMessage?.content;
     const wasNoResponseSentinel =
       typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
+    const shouldSendText = Boolean(finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0));
+    const isEmptyTurn = isEmptyAssistantTurn(assistantMessage);
+
+    logger.info(
+      `[AI_CHAT] Outcome toolIterations=${toolIterations} imagesSent=${imagesSentToUser.length} ` +
+        `shouldSendText=${shouldSendText} answerLength=${finalAnswer.length} ` +
+        `wasNoResponseSentinel=${wasNoResponseSentinel} isEmptyTurn=${isEmptyTurn}`,
+    );
+    logger.debug(
+      `[AI_CHAT] Outcome details finalAnswer=${debugPreview(finalAnswer, 400)}`,
+    );
 
     if (
       !finalAnswer &&
       imagesSentToUser.length === 0 &&
       !wasNoResponseSentinel &&
       sceneCreateSuccessCount === 0 &&
-      isEmptyAssistantTurn(assistantMessage)
+      isEmptyTurn
     ) {
+      logger.info('[AI_CHAT] No user-facing answer produced, sending openai.request.fail');
       await this.message.replyByIntent(message, 'openai.request.fail', context);
       return null;
+    }
+
+    if (
+      !finalAnswer &&
+      imagesSentToUser.length === 0 &&
+      !wasNoResponseSentinel &&
+      !shouldSendText
+    ) {
+      logger.info(
+        '[AI_CHAT] No reply sent to user: assistant had content but final answer is empty after processing',
+      );
     }
 
     if (imagesSentToUser.length > 0) {
@@ -536,12 +618,22 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       }
     }
 
-    if (finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0)) {
+    if (shouldSendText) {
+      logger.info(`[AI_CHAT] Sending text reply to user: ${debugPreview(finalAnswer, 150)}`);
       await this.message.reply(message, finalAnswer);
+    } else if (finalAnswer) {
+      logger.info(
+        `[AI_CHAT] Final answer suppressed by shouldSendAssistantTextReply: ${debugPreview(finalAnswer, 150)}`,
+      );
     }
+
+    logger.info(
+      `[AI_CHAT] Completed answerLength=${finalAnswer.length} imagesSent=${imagesSentToUser.length}`,
+    );
 
     return { answer: finalAnswer || '', imagesSent: imagesSentToUser.length };
   } catch (e) {
+    logger.warn(`[AI_CHAT] Request failed: ${e?.message ?? e}`);
     logger.warn(e);
     if (e instanceof Error429) {
       await this.message.replyByIntent(message, 'openai.request.tooManyRequests', context);
@@ -563,6 +655,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 module.exports = {
   forwardMessageToAiChat,
   buildSystemPromptWithCurrentTime,
+  debugPreview,
   extractAssistantMessage,
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
