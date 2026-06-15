@@ -1,4 +1,4 @@
-/** @typedef {'INSECURE_CONTEXT'|'NOT_SUPPORTED'|'PERMISSION_DENIED'} SpeechRecordingErrorCode */
+/** @typedef {'INSECURE_CONTEXT'|'NOT_SUPPORTED'|'PERMISSION_DENIED'|'NO_MICROPHONE'|'MICROPHONE_UNAVAILABLE'|'NO_SPEECH'} SpeechRecordingErrorCode */
 
 /**
  * @description Error thrown when the microphone cannot be used for speech recording.
@@ -94,6 +94,64 @@ export function isSpeechRecordingError(error) {
 }
 
 /**
+ * @description Map a getUserMedia DOM error to a SpeechRecordingError when possible.
+ * @param {Error} error - DOM error from getUserMedia.
+ * @returns {SpeechRecordingError|Error} Mapped error.
+ */
+function mapGetUserMediaError(error) {
+  if (!error) {
+    return error;
+  }
+  if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+    return new SpeechRecordingError('PERMISSION_DENIED', error);
+  }
+  if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+    return new SpeechRecordingError('NO_MICROPHONE', error);
+  }
+  if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+    return new SpeechRecordingError('MICROPHONE_UNAVAILABLE', error);
+  }
+  if (error.name === 'OverconstrainedError') {
+    return new SpeechRecordingError('NO_MICROPHONE', error);
+  }
+  return error;
+}
+
+/**
+ * @description Probe whether an audio input device is available.
+ * Requires microphone permission for reliable device IDs on some browsers.
+ * @returns {Promise<SpeechRecordingErrorCode|null>} Error code or null when a mic may be available.
+ */
+export async function probeMicrophoneAvailability() {
+  const unavailableReason = getSpeechRecordingUnavailableReason();
+  if (unavailableReason) {
+    return unavailableReason;
+  }
+
+  if (!navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function') {
+    return null;
+  }
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const audioInputs = devices.filter(device => device.kind === 'audioinput');
+    if (audioInputs.length === 0) {
+      return 'NO_MICROPHONE';
+    }
+    const hasUsableInput = audioInputs.some(device => device.deviceId && device.deviceId !== 'default');
+    if (!hasUsableInput && audioInputs.every(device => !device.label)) {
+      return null;
+    }
+    if (!hasUsableInput && audioInputs.length > 0 && audioInputs.every(device => device.deviceId === '')) {
+      return null;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
  * @description Request microphone access for speech recording.
  * @param {MediaStreamConstraints} constraints - getUserMedia constraints.
  * @returns {Promise<MediaStream>} Media stream.
@@ -111,9 +169,6 @@ export async function getSpeechUserMedia(constraints) {
   try {
     return await getUserMedia(constraints);
   } catch (e) {
-    if (e && (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError')) {
-      throw new SpeechRecordingError('PERMISSION_DENIED', e);
-    }
-    throw e;
+    throw mapGetUserMediaError(e);
   }
 }
