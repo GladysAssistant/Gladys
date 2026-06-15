@@ -11,9 +11,9 @@ function createActions(store) {
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
         if (configuration.Z2M_MQTT_MODE === 'local') {
-          if (configuration.z2mTcpPort && state.session.gatewayClient === undefined) {
+          if (configuration.Z2M_TCP_PORT && state.session.gatewayClient === undefined) {
             const url = new URL(config.localApiUrl);
-            const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort}`;
+            const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.Z2M_TCP_PORT}`;
             store.setState({ z2mUrl });
           }
         } else if (configuration.Z2M_MQTT_MODE === 'external' && configuration.Z2M_FRONTEND_URL) {

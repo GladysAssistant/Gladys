@@ -85,7 +85,7 @@ class Zigbee2mqttBox extends Component {
 
   getDeviceProperty = () => {
     if (!this.props.device.features) {
-      return null;
+      return {};
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
