@@ -870,7 +870,7 @@ describe('build schemas', () => {
 
     // Verify tools are created successfully
     expect(tools).to.be.an('array');
-    expect(tools.length).to.eq(7);
+    expect(tools.length).to.eq(8);
 
     // Test device.get-state - should return all devices with and without room
     const stateResult = await tools[3].cb({ room: undefined, device_type: undefined });

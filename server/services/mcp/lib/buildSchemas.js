@@ -1,4 +1,5 @@
 const z = require('zod/v4');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -8,6 +9,7 @@ const {
   assertTriggerTypesNotInActions,
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
+const { compareTimes } = require('./compareTimes');
 
 const noRoom = {
   id: null,
@@ -590,6 +592,56 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text,
+            },
+          ],
+        };
+      },
+    },
+    {
+      intent: 'time.compare-times',
+      config: {
+        title: 'Compare times',
+        description:
+          'Compare times deterministically. Use operator in_ranges to check whether the current time (or reference_time) falls within one or more HH:mm ranges. Use before/after/same to compare two times. Prefer this tool over mental time reasoning for schedules and opening hours.',
+        inputSchema: {
+          operator: z
+            .enum(['in_ranges', 'before', 'after', 'same'])
+            .describe('Comparison to perform. Use in_ranges for opening hours.'),
+          ranges: z
+            .array(
+              z.object({
+                start: z.string().describe('Range start time in HH:mm or HHhmm.'),
+                end: z.string().describe('Range end time in HH:mm or HHhmm.'),
+              }),
+            )
+            .optional()
+            .describe('Time ranges to test with in_ranges.'),
+          reference_time: z
+            .string()
+            .optional()
+            .describe('Reference time in HH:mm or HHhmm. Defaults to current home time.'),
+          compare_to: z
+            .string()
+            .optional()
+            .describe('Second time in HH:mm or HHhmm for before/after/same operators.'),
+        },
+      },
+      cb: async ({ operator, ranges, reference_time: referenceTime, compare_to: compareTo }) => {
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || 'Europe/Paris';
+        const result = compareTimes({
+          timezone: timezoneName,
+          operator,
+          ranges,
+          reference_time: referenceTime,
+          compare_to: compareTo,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(result),
             },
           ],
         };
