@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const {
   BooleanState,
   Switch,
+  FanControl,
   RvcOperationalState,
   RvcRunMode,
   RvcCleanMode,
@@ -77,6 +78,55 @@ describe('Matter.convertToGladysDevice', () => {
       external_id: 'matter:12345:1:child_endpoint:2:59:click',
       min: 0,
       max: 84,
+    });
+  });
+
+  it('should create fan control features for FanControl cluster', async () => {
+    const clusterClient = {
+      id: FanControl.Complete.id,
+      name: 'FanControl',
+      endpointId: 1,
+      supportedFeatures: {
+        multiSpeed: true,
+        rocking: true,
+        wind: true,
+        airflowDirection: true,
+      },
+      getSpeedMaxAttribute: async () => 10,
+      getRockSupportAttribute: async () => 7,
+      getWindSupportAttribute: async () => 3,
+    };
+
+    const device = {
+      name: 'Fan Device',
+      number: 3,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '3');
+
+    expect(gladysDevice.features).to.have.lengthOf(8);
+
+    const externalIds = gladysDevice.features.map((feature) => feature.external_id);
+    expect(externalIds).to.include.members([
+      `matter:12345:3:${FanControl.Complete.id}:mode`,
+      `matter:12345:3:${FanControl.Complete.id}:percent`,
+      `matter:12345:3:${FanControl.Complete.id}:percent-current`,
+      `matter:12345:3:${FanControl.Complete.id}:speed`,
+      `matter:12345:3:${FanControl.Complete.id}:speed-current`,
+      `matter:12345:3:${FanControl.Complete.id}:rock`,
+      `matter:12345:3:${FanControl.Complete.id}:wind`,
+      `matter:12345:3:${FanControl.Complete.id}:airflow-direction`,
+    ]);
+
+    const speedFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':speed'));
+    expect(speedFeature).to.deep.include({
+      category: 'fan',
+      type: 'speed',
+      read_only: false,
+      max: 10,
+      min: 0,
     });
   });
 
