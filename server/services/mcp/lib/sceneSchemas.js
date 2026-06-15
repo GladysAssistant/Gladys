@@ -10,10 +10,17 @@ const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 
 const sceneConditionSchema = z
   .object({
-    variable: z.string(),
+    variable: z
+      .string()
+      .describe(
+        'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
+      ),
     operator: comparisonOperatorSchema,
-    value: z.union([z.number(), z.string()]).optional(),
-    evaluate_value: z.string().optional(),
+    value: z.union([z.number(), z.string()]).optional().describe('Literal value to compare against.'),
+    evaluate_value: z
+      .string()
+      .optional()
+      .describe('Optional Handlebars expression evaluated to a value before comparison.'),
   })
   .strict();
 
@@ -134,7 +141,12 @@ function createSceneCreateInputSchema(
         device_feature: deviceFeatureSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
-        conditions: z.array(sceneConditionSchema).min(1),
+        conditions: z
+          .array(sceneConditionSchema)
+          .min(1)
+          .describe(
+            'Conditions combined with OR logic: the scene continues if at least one condition is true. Use separate only-continue-if action groups in sequence for AND logic.',
+          ),
       }),
       actionSchemaByType(ACTIONS.CONDITION.CHECK_TIME, {
         before: z
@@ -231,8 +243,18 @@ function createSceneCreateInputSchema(
       device_feature: deviceFeatureSelectorSchema,
       operator: comparisonOperatorSchema,
       value: z.union([z.number(), z.string()]),
-      threshold_only: z.boolean().optional(),
-      for_duration: z.number().optional(),
+      threshold_only: z
+        .boolean()
+        .optional()
+        .describe(
+          'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
+        ),
+      for_duration: z
+        .number()
+        .optional()
+        .describe(
+          'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
+        ),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),
