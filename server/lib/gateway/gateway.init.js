@@ -14,24 +14,33 @@ async function init() {
     const gladysGatewayEcdsaPrivateKey = await this.variable.getValue('GLADYS_GATEWAY_ECDSA_PRIVATE_KEY');
 
     if (gladysGatewayRefreshToken && gladysGatewayRsaPrivateKey && gladysGatewayEcdsaPrivateKey) {
-      // refreshing local cache of user keys
-      this.refreshUserKeys();
-      // connecting instance
-      await this.gladysGatewayClient.instanceConnect(
-        gladysGatewayRefreshToken,
-        JSON.parse(gladysGatewayRsaPrivateKey),
-        JSON.parse(gladysGatewayEcdsaPrivateKey),
-        this.handleNewMessage.bind(this),
-      );
-      this.connected = true;
+      try {
+        await this.gladysGatewayClient.instanceConnect(
+          gladysGatewayRefreshToken,
+          JSON.parse(gladysGatewayRsaPrivateKey),
+          JSON.parse(gladysGatewayEcdsaPrivateKey),
+          this.handleNewMessage.bind(this),
+        );
+        this.connected = true;
 
-      // check if google home is connected
-      const value = await this.variable.getValue(
-        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY,
-      );
-      if (value !== null) {
-        this.googleHomeConnected = true;
+        try {
+          await this.getUsersKeys();
+        } catch (syncError) {
+          logger.debug(syncError);
+        }
+
+        const value = await this.variable.getValue(
+          SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY,
+        );
+        if (value !== null) {
+          this.googleHomeConnected = true;
+        }
+      } catch (e) {
+        logger.debug(e);
+        this.connected = false;
       }
+
+      await this.refreshUserKeys();
     }
   } catch (e) {
     logger.debug(e);

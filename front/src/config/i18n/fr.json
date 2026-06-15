@@ -3190,7 +3190,7 @@
     "statusColumn": "Etat",
     "userRsaKey": "Clé RSA",
     "userEcdsaKey": "Clé ECDSA",
-    "usersListDescription": "Pour garantir la sécurité de votre instance locale, vous devez accorder manuellement l'accès à chaque utilisateur de cette liste.",
+    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour garantir la sécurité de votre instance, vous devez accorder manuellement l'accès à chaque utilisateur. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
     "disconnectTitle": "Déconnectez votre compte Gladys Plus",
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
