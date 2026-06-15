@@ -848,8 +848,10 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     expect(isToolExecutionErrorText('Error while running tool "x": boom')).to.equal(true);
     expect(isEmptyAssistantTurn(null)).to.equal(true);
     expect(isEmptyAssistantTurn({ content: null, tool_calls: [] })).to.equal(true);
+    expect(isEmptyAssistantTurn({ content: '   ', tool_calls: [] })).to.equal(true);
     expect(isEmptyAssistantTurn({ content: 'NO_RESPONSE', tool_calls: [] })).to.equal(false);
     expect(isEmptyAssistantTurn({ content: null, tool_calls: [{ id: '1' }] })).to.equal(false);
+    expect(isEmptyAssistantTurn({ content: [{ type: 'text', text: 'hi' }], tool_calls: [] })).to.equal(false);
     expect(hadToolResultsInConversation([{ role: 'tool', content: 'ok' }])).to.equal(true);
     expect(hadToolResultsInConversation([{ role: 'user', content: 'hi' }])).to.equal(false);
   });
@@ -858,7 +860,12 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     const { formatToolCallTraceText, isToolInvocationTraceLine, stripToolTraceEchoFromAnswer } = getModule();
     expect(formatToolCallTraceText('', {})).to.equal('tool_call');
     expect(isToolInvocationTraceLine('device_turn_on_off({"action":"off","device":"Lumière"})')).to.equal(true);
+    expect(isToolInvocationTraceLine('device_get_state()')).to.equal(true);
     expect(isToolInvocationTraceLine('La lumière est éteinte.')).to.equal(false);
+    expect(isToolInvocationTraceLine(null)).to.equal(false);
+    expect(isToolInvocationTraceLine({})).to.equal(false);
+    expect(stripToolTraceEchoFromAnswer(null)).to.equal('');
+    expect(stripToolTraceEchoFromAnswer(undefined)).to.equal('');
     expect(
       stripToolTraceEchoFromAnswer(
         'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
@@ -898,8 +905,7 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       choices: [
         {
           message: {
-            content:
-              'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
+            content: 'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
           },
         },
       ],

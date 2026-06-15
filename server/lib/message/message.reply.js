@@ -10,6 +10,8 @@ const TOOL_CALL_EXTERNAL_SOURCES = new Set(['telegram', 'nextcloud-talk', 'callm
  * @param {string} source - Original message source.
  * @param {string} messageType - Message type.
  * @returns {boolean} True when the message should be forwarded externally.
+ * @example
+ * shouldForwardToolCallToExternalChannel('telegram', 'tool_call');
  */
 function shouldForwardToolCallToExternalChannel(source, messageType) {
   if (messageType !== 'tool_call') {
@@ -22,6 +24,8 @@ function shouldForwardToolCallToExternalChannel(source, messageType) {
  * @description Format a message payload for external messaging channels.
  * @param {object} message - Stored Gladys message.
  * @returns {object} Message payload to send externally.
+ * @example
+ * formatMessageForExternalChannel({ message_type: 'tool_call', tool_name: 'scene_create', tool_status: 'success' });
  */
 function formatMessageForExternalChannel(message) {
   if (message.message_type !== 'tool_call') {
