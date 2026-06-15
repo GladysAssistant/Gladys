@@ -3788,7 +3788,23 @@
           "85": "Doppelt Ein",
           "86": "Doppelt Aus",
           "87": "Alarm für Nachtzonen scharf schalten",
-          "88": "Ausgangsverzögerung"
+          "88": "Ausgangsverzögerung",
+          "89": "Taste 1 einfacher Klick",
+          "90": "Taste 1 doppelter Klick",
+          "91": "Taste 1 langer Klick",
+          "92": "Taste 1 dreifacher Klick",
+          "93": "Taste 2 einfacher Klick",
+          "94": "Taste 2 doppelter Klick",
+          "95": "Taste 2 langer Klick",
+          "96": "Taste 2 dreifacher Klick",
+          "97": "Taste 3 einfacher Klick",
+          "98": "Taste 3 doppelter Klick",
+          "99": "Taste 3 langer Klick",
+          "100": "Taste 3 dreifacher Klick",
+          "101": "Taste 4 einfacher Klick",
+          "102": "Taste 4 doppelter Klick",
+          "103": "Taste 4 langer Klick",
+          "104": "Taste 4 dreifacher Klick"
         }
       },
       "heater": {

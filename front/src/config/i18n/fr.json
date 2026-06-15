@@ -3788,7 +3788,23 @@
           "85": "On clic double",
           "86": "Off clic double",
           "87": "Armer zones nuit",
-          "88": "Délai de sortie"
+          "88": "Délai de sortie",
+          "89": "Bouton 1 clic simple",
+          "90": "Bouton 1 clic double",
+          "91": "Bouton 1 clic long",
+          "92": "Bouton 1 clic triple",
+          "93": "Bouton 2 clic simple",
+          "94": "Bouton 2 clic double",
+          "95": "Bouton 2 clic long",
+          "96": "Bouton 2 clic triple",
+          "97": "Bouton 3 clic simple",
+          "98": "Bouton 3 clic double",
+          "99": "Bouton 3 clic long",
+          "100": "Bouton 3 clic triple",
+          "101": "Bouton 4 clic simple",
+          "102": "Bouton 4 clic double",
+          "103": "Bouton 4 clic long",
+          "104": "Bouton 4 clic triple"
         }
       },
       "heater": {

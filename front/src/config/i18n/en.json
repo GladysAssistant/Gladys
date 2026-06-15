@@ -3788,7 +3788,23 @@
           "85": "On double",
           "86": "Off double",
           "87": "Arm night zones",
-          "88": "Exit delay"
+          "88": "Exit delay",
+          "89": "Button 1 single click",
+          "90": "Button 1 double click",
+          "91": "Button 1 long click",
+          "92": "Button 1 triple click",
+          "93": "Button 2 single click",
+          "94": "Button 2 double click",
+          "95": "Button 2 long click",
+          "96": "Button 2 triple click",
+          "97": "Button 3 single click",
+          "98": "Button 3 double click",
+          "99": "Button 3 long click",
+          "100": "Button 3 triple click",
+          "101": "Button 4 single click",
+          "102": "Button 4 double click",
+          "103": "Button 4 long click",
+          "104": "Button 4 triple click"
         }
       },
       "heater": {
