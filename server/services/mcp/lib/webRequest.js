@@ -146,8 +146,9 @@ async function assertPublicUrl(urlString) {
 async function fetchWebPage({ url }) {
   let currentUrl = await assertPublicUrl(url);
   let redirectCount = 0;
+  let keepFetching = true;
 
-  while (true) {
+  while (keepFetching) {
     let response;
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -175,7 +176,7 @@ async function fetchWebPage({ url }) {
     }
 
     if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.location;
+      const { location } = response.headers;
       if (!location) {
         throw new Error(`Redirect response without Location header (${response.status})`);
       }
@@ -205,8 +206,11 @@ async function fetchWebPage({ url }) {
       text = body.trim();
     }
 
+    keepFetching = false;
     return truncateText(text, MAX_TEXT_CHARS);
   }
+
+  throw new Error('Unable to fetch web page');
 }
 
 module.exports = {

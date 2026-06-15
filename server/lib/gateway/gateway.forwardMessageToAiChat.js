@@ -85,6 +85,23 @@ function truncate(str, limitChars) {
 }
 
 /**
+ * @description Safely stringify any value for model context.
+ * @param {any} value - Value to stringify.
+ * @param {number} limitChars - Output max length.
+ * @returns {string} Safe serialized value.
+ * @example
+ * safeStringify({ ok: true }, 100);
+ */
+function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
+  try {
+    const str = typeof value === 'string' ? value : JSON.stringify(value);
+    return truncate(str, limitChars);
+  } catch (e) {
+    return '[unserializable tool result]';
+  }
+}
+
+/**
  * @description Format a value for concise debug logs.
  * @param {any} value - Value to preview.
  * @param {number} [limitChars=200] - Maximum preview length.
@@ -103,23 +120,6 @@ function debugPreview(value, limitChars = 200) {
     return truncate(value.replace(/\s+/g, ' ').trim(), limitChars) || '(empty string)';
   }
   return truncate(safeStringify(value, limitChars), limitChars);
-}
-
-/**
- * @description Safely stringify any value for model context.
- * @param {any} value - Value to stringify.
- * @param {number} limitChars - Output max length.
- * @returns {string} Safe serialized value.
- * @example
- * safeStringify({ ok: true }, 100);
- */
-function safeStringify(value, limitChars = MAX_TOOL_RESULT_CHARS) {
-  try {
-    const str = typeof value === 'string' ? value : JSON.stringify(value);
-    return truncate(str, limitChars);
-  } catch (e) {
-    return '[unserializable tool result]';
-  }
 }
 
 const CAMERA_IMAGE_SENT_TO_USER_HINT =
@@ -571,7 +571,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const rawAssistantContent = assistantMessage?.content;
     const wasNoResponseSentinel =
       typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
-    const shouldSendText = Boolean(finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0));
+    const shouldSendText = Boolean(
+      finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0),
+    );
     const isEmptyTurn = isEmptyAssistantTurn(assistantMessage);
 
     logger.info(

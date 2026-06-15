@@ -31,10 +31,11 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @description Build execution context for gateway.forwardMessageToAiChat.
  * @param {object} options - Context dependencies.
  * @param {Array<object>} options.tools - MCP tools.
- * @param {Function} options.aiChat - aiChat mock.
+ * @param {Function} options.aiChat - AiChat mock.
  * @param {Function} options.reply - Message reply mock.
  * @param {Function} options.replyByIntent - Message replyByIntent mock.
  * @param {Function} [options.eventEmit] - Event emitter mock.
+ * @param {string} [options.timezone] - Timezone returned by variable.getValue.
  * @returns {object} Bound context object.
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
@@ -902,7 +903,12 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
   });
 
   it('should format tool call trace text fallback name', () => {
-    const { formatToolCallTraceText, isToolInvocationTraceLine, stripToolTraceEchoFromAnswer } = getModule();
+    const {
+      formatToolCallTraceText,
+      isToolInvocationTraceLine,
+      stripToolTraceEchoFromAnswer,
+      debugPreview,
+    } = getModule();
     expect(formatToolCallTraceText('', {})).to.equal('tool_call');
     expect(isToolInvocationTraceLine('device_turn_on_off({"action":"off","device":"Lumière"})')).to.equal(true);
     expect(isToolInvocationTraceLine('device_get_state()')).to.equal(true);
@@ -911,6 +917,10 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     expect(isToolInvocationTraceLine({})).to.equal(false);
     expect(stripToolTraceEchoFromAnswer(null)).to.equal('');
     expect(stripToolTraceEchoFromAnswer(undefined)).to.equal('');
+    expect(debugPreview(null)).to.equal('null');
+    expect(debugPreview(undefined)).to.equal('undefined');
+    expect(debugPreview('   ')).to.equal('(empty string)');
+    expect(debugPreview({ ok: true })).to.equal('{"ok":true}');
     expect(
       stripToolTraceEchoFromAnswer(
         'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
@@ -972,5 +982,30 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       toolName: 'device_turn_on_off',
       toolStatus: 'success',
     });
+  });
+
+  it('should not send a text reply when the final answer is only a tool trace echo', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [
+        {
+          message: {
+            content: 'web_fetch()',
+          },
+        },
+      ],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message: { text: 'La piscine est-elle ouverte ?', user: { id: 'user-id' } },
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({ answer: '', imagesSent: 0 });
+    assert.notCalled(reply);
+    assert.notCalled(replyByIntent);
   });
 });

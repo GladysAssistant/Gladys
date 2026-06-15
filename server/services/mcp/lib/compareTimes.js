@@ -86,7 +86,9 @@ function compareTimes({
   compare_to: compareTo,
 }) {
   const referenceDate = dayjs(now).tz(timezoneName);
-  const referenceMinutes = referenceTime ? parseTimeToMinutes(referenceTime) : referenceDate.hour() * 60 + referenceDate.minute();
+  const referenceMinutes = referenceTime
+    ? parseTimeToMinutes(referenceTime)
+    : referenceDate.hour() * 60 + referenceDate.minute();
 
   if (referenceMinutes === null) {
     throw new Error(`Invalid reference_time "${referenceTime}". Use HH:mm or HHhmm.`);
