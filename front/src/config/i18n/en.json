@@ -3905,6 +3905,15 @@
           "critical": "Critical"
         }
       },
+      "no2-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unknown",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        }
+      },
       "level-matter-index-sensor": {
         "level-state": {
           "1": "Low",
@@ -4319,6 +4328,10 @@
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
       "integer": "VOC Index (integer)"
+    },
+    "no2-matter-index-sensor": {
+      "shortCategoryName": "NO₂ Index",
+      "integer": "NO₂ Index (integer)"
     },
     "shutter": {
       "shortCategoryName": "Shutter",

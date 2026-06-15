@@ -14,6 +14,7 @@ const {
   Pm10ConcentrationMeasurement,
   ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
@@ -315,6 +316,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         gladysDevice.features.push({
           ...commonNewFeature,
           category: DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
+      } else if (clusterIndex === NitrogenDioxideConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
           read_only: true,
           has_feedback: true,

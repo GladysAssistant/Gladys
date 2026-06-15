@@ -643,6 +643,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_SENSOR: 'voc-sensor',
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
+  NO2_MATTER_INDEX_SENSOR: 'no2-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',

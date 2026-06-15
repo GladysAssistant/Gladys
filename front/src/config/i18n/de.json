@@ -3905,6 +3905,15 @@
           "critical": "Netz kritisch"
         }
       },
+      "no2-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unbekannt",
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "critical": "Netz kritisch"
+        }
+      },
       "level-matter-index-sensor": {
         "level-state": {
           "1": "Niedrig",
@@ -4319,6 +4328,10 @@
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
       "integer": "VOC Index (ganze Zahl)"
+    },
+    "no2-matter-index-sensor": {
+      "shortCategoryName": "NO₂-Index",
+      "integer": "NO₂-Index (ganze Zahl)"
     },
     "shutter": {
       "shortCategoryName": "Jalousie",

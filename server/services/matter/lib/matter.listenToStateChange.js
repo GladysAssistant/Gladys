@@ -13,6 +13,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
@@ -293,6 +294,26 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: TotalVolatileOrganicCompoundsConcentrationMeasurement attribute changed to ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const nitrogenDioxideConcentrationMeasurement = device.getClusterClientById(
+    NitrogenDioxideConcentrationMeasurement.Complete.id,
+  );
+  if (
+    nitrogenDioxideConcentrationMeasurement &&
+    !this.stateChangeListeners.has(nitrogenDioxideConcentrationMeasurement)
+  ) {
+    logger.debug(
+      `Matter: Adding state change listener for NitrogenDioxideConcentrationMeasurement cluster ${nitrogenDioxideConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(nitrogenDioxideConcentrationMeasurement);
+    nitrogenDioxideConcentrationMeasurement.addLevelValueAttributeListener((value) => {
+      logger.debug(`Matter: NitrogenDioxideConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${NitrogenDioxideConcentrationMeasurement.Complete.id}`,
         state: value,
       });
     });
