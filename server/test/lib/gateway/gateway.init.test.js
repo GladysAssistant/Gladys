@@ -114,6 +114,15 @@ describe('gateway.init', () => {
     });
   });
 
+  it('should continue init when user keys sync fails', async () => {
+    gateway.getUsersKeys = fake.rejects(new Error('sync failed'));
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
+    expect(gateway.usersKeys).to.deep.equal(userKeys);
+  });
+
   it('should continue init when weekly digest scheduling fails', async () => {
     gateway.scheduleWeeklyDigest = fake.rejects(new Error('scheduling failed'));
 
