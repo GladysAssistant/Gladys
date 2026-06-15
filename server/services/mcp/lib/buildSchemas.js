@@ -7,6 +7,7 @@ const {
   SCENE_CREATE_TOOL_DESCRIPTION,
   assertTriggerTypesNotInActions,
 } = require('./sceneSchemas');
+const { fetchWebPage } = require('./webRequest');
 
 const noRoom = {
   id: null,
@@ -568,6 +569,29 @@ async function getAllTools(userId) {
 
         return {
           content: [{ type: 'text', text: `device.get-history, no device or feature found` }],
+        };
+      },
+    },
+    {
+      intent: 'web.fetch',
+      config: {
+        title: 'Fetch web page',
+        description:
+          'Fetch a public web page and return its readable text content. Use this to read information from websites such as opening hours, schedules, or public announcements. Only HTTP/HTTPS public URLs are allowed.',
+        inputSchema: {
+          url: z.url().describe('Full public URL of the page to fetch (http or https).'),
+        },
+      },
+      cb: async ({ url }) => {
+        const text = await fetchWebPage({ url });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text,
+            },
+          ],
         };
       },
     },
