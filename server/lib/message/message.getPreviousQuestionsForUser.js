@@ -15,7 +15,7 @@ async function getPreviousQuestionsForUser(userId) {
       [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
     },
     order: [['created_at', 'desc']],
-    limit: 8,
+    limit: 4,
   });
 
   const previousQuestions = [];
