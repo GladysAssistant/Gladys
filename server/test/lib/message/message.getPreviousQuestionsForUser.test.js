@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+
+const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const messageFindAll = sinon.stub().resolves([]);
@@ -62,5 +64,14 @@ describe('message.getPreviousQuestionsForUser', () => {
     const exchanges = await getPreviousQuestionsForUser('user-1');
 
     expect(exchanges).to.deep.equal([{ question: null, answer: 'assistant reply' }]);
+  });
+
+  it('should fetch only the last four messages', async () => {
+    messageFindAll.resolves([]);
+
+    await getPreviousQuestionsForUser('user-1');
+
+    assert.calledOnce(messageFindAll);
+    expect(messageFindAll.firstCall.args[0].limit).to.equal(4);
   });
 });

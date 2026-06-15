@@ -426,6 +426,69 @@ describe('gateway.forwardMessageToAiChat', () => {
     assert.notCalled(replyByIntent);
   });
 
+  it('should reply with failure when assistant returns no content and no tool calls', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: null, tool_calls: [] } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'Crée une scène', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.equal(null);
+    assert.notCalled(reply);
+    assert.calledWith(replyByIntent, message, 'openai.request.fail', context);
+  });
+
+  it('should reply with failure when assistant ends with no content after tool calls', async () => {
+    const toolCb = fake.resolves({ content: [{ type: 'text', text: 'device state ok' }] });
+    const tools = [
+      {
+        intent: 'device.get-state',
+        config: { title: 'Get state', inputSchema: {} },
+        cb: toolCb,
+      },
+    ];
+    const { forwardMessageToAiChat } = getModule({ tools });
+
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [{ id: 'call_1', function: { name: 'device_get_state', arguments: '{}' } }],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [{ message: { content: null, tool_calls: [] } }],
+    });
+
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+    const message = { text: 'Crée une scène', user: { id: 'user-id' } };
+    const context = { user: { id: 'user-id' } };
+
+    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply, replyByIntent }), {
+      message,
+      previousQuestions: [],
+      context,
+    });
+
+    expect(result).to.equal(null);
+    assert.calledOnce(reply);
+    assert.calledWith(replyByIntent, message, 'openai.request.fail', context);
+  });
+
   it('should not confirm scene creation when scene_create tool keeps failing', async () => {
     const toolCb = fake.rejects(new Error('scene.create validation failed (422): actions: Invalid input'));
     const tools = [
@@ -767,6 +830,8 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       shouldSendAssistantTextReply,
       isNoResponseSentinel,
       isToolExecutionErrorText,
+      isEmptyAssistantTurn,
+      hadToolResultsInConversation,
     } = getModule();
 
     expect(imageContentToMessageFile(null)).to.equal(null);
@@ -781,10 +846,86 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
 
     expect(isNoResponseSentinel('NO_RESPONSE')).to.equal(true);
     expect(isToolExecutionErrorText('Error while running tool "x": boom')).to.equal(true);
+    expect(isEmptyAssistantTurn(null)).to.equal(true);
+    expect(isEmptyAssistantTurn({ content: null, tool_calls: [] })).to.equal(true);
+    expect(isEmptyAssistantTurn({ content: '   ', tool_calls: [] })).to.equal(true);
+    expect(isEmptyAssistantTurn({ content: 'NO_RESPONSE', tool_calls: [] })).to.equal(false);
+    expect(isEmptyAssistantTurn({ content: null, tool_calls: [{ id: '1' }] })).to.equal(false);
+    expect(isEmptyAssistantTurn({ content: [{ type: 'text', text: 'hi' }], tool_calls: [] })).to.equal(false);
+    expect(hadToolResultsInConversation([{ role: 'tool', content: 'ok' }])).to.equal(true);
+    expect(hadToolResultsInConversation([{ role: 'user', content: 'hi' }])).to.equal(false);
   });
 
   it('should format tool call trace text fallback name', () => {
-    const { formatToolCallTraceText } = getModule();
+    const { formatToolCallTraceText, isToolInvocationTraceLine, stripToolTraceEchoFromAnswer } = getModule();
     expect(formatToolCallTraceText('', {})).to.equal('tool_call');
+    expect(isToolInvocationTraceLine('device_turn_on_off({"action":"off","device":"Lumière"})')).to.equal(true);
+    expect(isToolInvocationTraceLine('device_get_state()')).to.equal(true);
+    expect(isToolInvocationTraceLine('La lumière est éteinte.')).to.equal(false);
+    expect(isToolInvocationTraceLine(null)).to.equal(false);
+    expect(isToolInvocationTraceLine({})).to.equal(false);
+    expect(stripToolTraceEchoFromAnswer(null)).to.equal('');
+    expect(stripToolTraceEchoFromAnswer(undefined)).to.equal('');
+    expect(
+      stripToolTraceEchoFromAnswer(
+        'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
+      ),
+    ).to.equal('La lumière est éteinte.');
+  });
+
+  it('should strip echoed tool traces from the final user-facing answer', async () => {
+    const toolCb = fake.resolves('done');
+    const tools = [
+      {
+        intent: 'device.turn-on-off',
+        cb: toolCb,
+        config: { inputSchema: {} },
+      },
+    ];
+    const aiChat = stub();
+    aiChat.onCall(0).resolves({
+      choices: [
+        {
+          message: {
+            content: null,
+            tool_calls: [
+              {
+                id: 'call_1',
+                function: {
+                  name: 'device_turn_on_off',
+                  arguments: '{"action":"off","device":"Lumière"}',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    aiChat.onCall(1).resolves({
+      choices: [
+        {
+          message: {
+            content: 'device_turn_on_off({"action":"off","device":"Lumière"})\n\nLa lumière est éteinte.',
+          },
+        },
+      ],
+    });
+
+    const reply = fake.resolves(null);
+    const { forwardMessageToAiChat } = getModule({ tools });
+    const message = { text: 'Éteins la lumière', user: { id: 'user-id' } };
+    const result = await forwardMessageToAiChat.call(buildContext({ tools, aiChat, reply }), {
+      message,
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(result).to.deep.equal({ answer: 'La lumière est éteinte.', imagesSent: 0 });
+    assert.calledWith(reply, message, 'La lumière est éteinte.');
+    assert.calledWith(reply, message, 'device_turn_on_off({"action":"off","device":"Lumière"})', {}, null, {
+      messageType: 'tool_call',
+      toolName: 'device_turn_on_off',
+      toolStatus: 'success',
+    });
   });
 });

@@ -8,12 +8,89 @@ const comparisonOperatorSchema = z.enum(['=', '!=', '>', '>=', '<', '<=']);
 const calendarComparatorSchema = z.enum(['is-exactly', 'contains', 'starts-with', 'ends-with', 'has-any-name']);
 const triggerCalendarEventAttributeSchema = z.enum(['start', 'end']);
 
+const SCENE_TRIGGER_TYPES = new Set([
+  EVENTS.DEVICE.NEW_STATE,
+  EVENTS.TIME.CHANGED,
+  EVENTS.TIME.SUNRISE,
+  EVENTS.TIME.SUNSET,
+  EVENTS.USER_PRESENCE.BACK_HOME,
+  EVENTS.USER_PRESENCE.LEFT_HOME,
+  EVENTS.HOUSE.EMPTY,
+  EVENTS.HOUSE.NO_LONGER_EMPTY,
+  EVENTS.AREA.USER_ENTERED,
+  EVENTS.AREA.USER_LEFT,
+  EVENTS.ALARM.ARM,
+  EVENTS.ALARM.ARMING,
+  EVENTS.ALARM.DISARM,
+  EVENTS.ALARM.PARTIAL_ARM,
+  EVENTS.ALARM.PANIC,
+  EVENTS.ALARM.TOO_MANY_CODES_TESTS,
+  EVENTS.SYSTEM.START,
+  EVENTS.MQTT.RECEIVED,
+  EVENTS.CALENDAR.EVENT_IS_COMING,
+]);
+
+/**
+ * @description Flatten nested scene actions into a single list.
+ * @param {Array} actions - Raw scene actions payload.
+ * @returns {Array<object>} Flattened action objects.
+ * @example
+ * flattenSceneActions([[{ type: 'delay', unit: 'minutes', value: 1 }]]);
+ */
+function flattenSceneActions(actions) {
+  if (!Array.isArray(actions)) {
+    return [];
+  }
+
+  return actions.flatMap((item) => {
+    if (Array.isArray(item)) {
+      return flattenSceneActions(item);
+    }
+    if (item && typeof item === 'object') {
+      return [item];
+    }
+    return [];
+  });
+}
+
+/**
+ * @description Reject trigger types mistakenly placed in actions.
+ * @param {object} scene - Raw scene payload from the model.
+ * @throws {Error} When trigger types are found in actions.
+ * @example
+ * assertTriggerTypesNotInActions({ actions: [[{ type: 'device.new-state' }]] });
+ */
+function assertTriggerTypesNotInActions(scene) {
+  const misplacedTriggers = flattenSceneActions(scene?.actions).filter((action) =>
+    SCENE_TRIGGER_TYPES.has(action?.type),
+  );
+
+  if (misplacedTriggers.length === 0) {
+    return;
+  }
+
+  const types = [...new Set(misplacedTriggers.map((action) => action.type))].join(', ');
+  throw new Error(
+    `scene.create validation failed (422): triggers: Trigger types (${types}) must be in the top-level triggers array, not in actions. Example triggers: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]`,
+  );
+}
+
 const sceneConditionSchema = z
   .object({
-    variable: z.string(),
+    variable: z
+      .string()
+      .describe(
+        'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
+      ),
     operator: comparisonOperatorSchema,
-    value: z.union([z.number(), z.string()]).optional(),
-    evaluate_value: z.string().optional(),
+    value: z
+      .union([z.number(), z.string()])
+      .optional()
+      .describe('Literal value to compare against.'),
+    evaluate_value: z
+      .string()
+      .optional()
+      .describe('Optional Handlebars expression evaluated to a value before comparison.'),
   })
   .strict();
 
@@ -134,7 +211,12 @@ function createSceneCreateInputSchema(
         device_feature: deviceFeatureSelectorSchema,
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
-        conditions: z.array(sceneConditionSchema).min(1),
+        conditions: z
+          .array(sceneConditionSchema)
+          .min(1)
+          .describe(
+            'Conditions combined with OR logic: the scene continues if at least one condition is true. Use separate only-continue-if action groups in sequence for AND logic.',
+          ),
       }),
       actionSchemaByType(ACTIONS.CONDITION.CHECK_TIME, {
         before: z
@@ -230,9 +312,23 @@ function createSceneCreateInputSchema(
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
       device_feature: deviceFeatureSelectorSchema,
       operator: comparisonOperatorSchema,
-      value: z.union([z.number(), z.string()]),
-      threshold_only: z.boolean().optional(),
-      for_duration: z.number().optional(),
+      value: z
+        .number()
+        .describe(
+          'Numeric device state to match. For binary features (lights, switches, buttons): use 1 for ON and 0 for OFF. Never use strings like "ON" or "OFF". For sensors, use the numeric threshold (for example 2400 for CO2 ppm).',
+        ),
+      threshold_only: z
+        .boolean()
+        .optional()
+        .describe(
+          'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
+        ),
+      for_duration: z
+        .number()
+        .optional()
+        .describe(
+          'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
+        ),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),
@@ -382,6 +478,18 @@ function createSceneCreateInputSchema(
       .min(1)
       .describe('Scene name.'),
     icon: z.enum(iconList).describe('Scene icon.'),
+    triggers: z
+      .array(sceneTriggerSchema)
+      .min(1)
+      .describe(
+        'Required. Top-level array of when the scene starts. Put device.new-state, time.changed, time.sunrise and all other trigger types here only. Example: [{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}]. Never put these types in actions.',
+      ),
+    actions: z
+      .array(z.array(sceneActionSchema))
+      .min(1)
+      .describe(
+        'Top-level array of action groups run sequentially after a trigger fires. Each inner array runs in parallel. Example: [[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}]]. Never put device.new-state, time.changed or other trigger types here.',
+      ),
     description: z
       .string()
       .optional()
@@ -395,13 +503,6 @@ function createSceneCreateInputSchema(
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       .optional()
       .describe('Optional scene selector, kebab-case.'),
-    triggers: z
-      .array(sceneTriggerSchema)
-      .default([])
-      .describe('Scene triggers.'),
-    actions: z
-      .union([z.array(z.array(sceneActionSchema)).min(1), z.array(sceneActionSchema).min(1)])
-      .describe('Scene actions as nested groups.'),
     tags: z
       .array(
         z.object({
@@ -507,9 +608,16 @@ function formatSceneCreateZodIssue(issue, rawScene) {
   return `${path}: ${issue.message}`;
 }
 
+const SCENE_CREATE_TOOL_DESCRIPTION =
+  'Create a new home automation scene. The payload MUST have two separate top-level arrays: triggers (when the scene starts) and actions (what the scene does). NEVER put device.new-state, time.changed, time.sunrise or any trigger type inside actions. device.new-state belongs in triggers with numeric value (1=ON, 0=OFF). actions is nested groups only: [[group1],[group2]]. Example: {"name":"Switchbeau de ville","icon":"droplet","triggers":[{"type":"device.new-state","device_feature":"mqtt-lumiere","operator":"=","value":1,"threshold_only":true,"for_duration":2700000}],"actions":[[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}],[{"type":"condition.only-continue-if","conditions":[{"variable":"1.0.last_value","operator":">","value":2400}]}],[{"type":"light.turn-off","devices":["mqtt-lumiere"]}]]}';
+
 module.exports = {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
   extractProvidedActionTypes,
   flattenUnionIssues,
+  SCENE_CREATE_TOOL_DESCRIPTION,
+  SCENE_TRIGGER_TYPES,
+  flattenSceneActions,
+  assertTriggerTypesNotInActions,
 };

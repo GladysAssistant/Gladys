@@ -8,7 +8,6 @@ const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
-const DEFAULT_MAX_TOKENS_PER_TURN = 512;
 const MAX_TOOL_RESULT_CHARS = 4000;
 const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
@@ -207,6 +206,45 @@ function isToolExecutionErrorText(text) {
 }
 
 /**
+ * @description Detect assistant turns with no usable text and no tool calls.
+ * @param {object|null} assistantMessage - Assistant message from chat API.
+ * @returns {boolean} True when the turn is empty.
+ * @example
+ * isEmptyAssistantTurn({ content: null, tool_calls: [] });
+ */
+function isEmptyAssistantTurn(assistantMessage) {
+  if (!assistantMessage) {
+    return true;
+  }
+  const toolCalls = assistantMessage.tool_calls ?? [];
+  if (toolCalls.length > 0) {
+    return false;
+  }
+  const { content } = assistantMessage;
+  if (content === null || content === undefined) {
+    return true;
+  }
+  if (typeof content === 'string') {
+    if (isNoResponseSentinel(content.trim())) {
+      return false;
+    }
+    return content.trim() === '';
+  }
+  return false;
+}
+
+/**
+ * @description Check whether tool results were already added to model context.
+ * @param {Array<object>} messagesForApi - Messages sent to chat API.
+ * @returns {boolean} True when at least one tool result exists.
+ * @example
+ * hadToolResultsInConversation([{ role: 'tool', content: 'ok' }]);
+ */
+function hadToolResultsInConversation(messagesForApi) {
+  return messagesForApi.some((message) => message?.role === 'tool');
+}
+
+/**
  * @description Render a tool-call trace text for UI timeline.
  * @param {string} functionName - Tool function name.
  * @param {object} toolArgs - Parsed tool arguments.
@@ -222,6 +260,39 @@ function formatToolCallTraceText(functionName, toolArgs) {
     return `${functionName}()`;
   }
   return `${functionName}(${safeStringify(toolArgs, 300)})`;
+}
+
+/**
+ * @description Detect a tool invocation trace line echoed by the model in plain text.
+ * @param {string} line - Single line of assistant text.
+ * @returns {boolean} True when the line looks like a tool trace.
+ * @example
+ * isToolInvocationTraceLine('device_turn_on_off({"action":"off"})');
+ */
+function isToolInvocationTraceLine(line) {
+  if (!line || typeof line !== 'string') {
+    return false;
+  }
+  return /^[a-z][a-z0-9_]*(\(\)|\([^)]*\))$/.test(line.trim());
+}
+
+/**
+ * @description Remove tool invocation trace lines from the user-facing final answer.
+ * Tool traces are already displayed separately in chat as tool_call messages.
+ * @param {string} answer - Assistant final answer text.
+ * @returns {string} Cleaned answer without duplicated tool traces.
+ * @example
+ * stripToolTraceEchoFromAnswer('device_get_state()\n\nTemperature is 21°C');
+ */
+function stripToolTraceEchoFromAnswer(answer) {
+  if (!answer || typeof answer !== 'string') {
+    return '';
+  }
+  return answer
+    .split('\n')
+    .filter((line) => !isToolInvocationTraceLine(line))
+    .join('\n')
+    .trim();
 }
 
 /**
@@ -301,7 +372,6 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         messages: messagesForApi,
         tools: toolsForApi,
         tool_choice: 'auto',
-        max_tokens: DEFAULT_MAX_TOKENS_PER_TURN,
       });
 
       assistantMessage = extractAssistantMessage(apiResponse);
@@ -399,6 +469,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     if (isNoResponseSentinel(finalAnswer)) {
       finalAnswer = '';
     }
+    finalAnswer = stripToolTraceEchoFromAnswer(finalAnswer);
 
     // If we hit the iteration cap and the model never produced a final user-facing answer,
     // fall back to the last tool result to avoid total silence.
@@ -413,6 +484,21 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     }
     if (sceneCreateSuccessCount === 0 && isToolExecutionErrorText(lastSceneCreateErrorText)) {
       finalAnswer = lastSceneCreateErrorText;
+    }
+
+    const rawAssistantContent = assistantMessage?.content;
+    const wasNoResponseSentinel =
+      typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
+
+    if (
+      !finalAnswer &&
+      imagesSentToUser.length === 0 &&
+      !wasNoResponseSentinel &&
+      sceneCreateSuccessCount === 0 &&
+      isEmptyAssistantTurn(assistantMessage)
+    ) {
+      await this.message.replyByIntent(message, 'openai.request.fail', context);
+      return null;
     }
 
     if (imagesSentToUser.length > 0) {
@@ -457,7 +543,11 @@ module.exports = {
   extractMessageFilesFromToolResult,
   imageContentToMessageFile,
   formatToolCallTraceText,
+  isToolInvocationTraceLine,
+  stripToolTraceEchoFromAnswer,
   shouldSendAssistantTextReply,
   isNoResponseSentinel,
   isToolExecutionErrorText,
+  isEmptyAssistantTurn,
+  hadToolResultsInConversation,
 };
