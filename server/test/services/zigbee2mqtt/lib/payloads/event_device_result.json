@@ -276,6 +276,7 @@
   {
     "name": "bosch-outdoor-siren",
     "model": "BSIR-EZ",
+    "ieee_address": "0x00124b0023a1b2c3",
     "external_id": "zigbee2mqtt:bosch-outdoor-siren",
     "features": [
       {
