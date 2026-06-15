@@ -8,7 +8,6 @@ const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
-const DEFAULT_MAX_TOKENS_PER_TURN = 512;
 const MAX_TOOL_RESULT_CHARS = 4000;
 const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
@@ -301,7 +300,6 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         messages: messagesForApi,
         tools: toolsForApi,
         tool_choice: 'auto',
-        max_tokens: DEFAULT_MAX_TOKENS_PER_TURN,
       });
 
       assistantMessage = extractAssistantMessage(apiResponse);
