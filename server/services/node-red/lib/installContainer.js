@@ -8,6 +8,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { DEFAULT } = require('./constants');
+const { getNodeRedDockerImage, resolveNodeRedMajorVersion } = require('./nodeRedVersion');
 
 const sleep = promisify(setTimeout);
 
@@ -17,7 +18,7 @@ const sleep = promisify(setTimeout);
  * @example
  * await nodeRed.installContainer(config);
  */
-async function installContainer(config) {
+async function installContainer(config = {}) {
   if (!(await this.isEnabled())) {
     logger.info('Nodered: is not enabled, skipping...');
     return;
@@ -43,11 +44,14 @@ async function installContainer(config) {
   });
   let [container] = dockerContainers;
 
+  const majorVersion = resolveNodeRedMajorVersion(config);
+  const nodeRedDockerImage = getNodeRedDockerImage(majorVersion);
+
   if (dockerContainers.length === 0) {
     try {
       logger.info('Nodered: is being installed as Docker container...');
-      logger.info(`Pulling ${containerDescriptor.Image} image...`);
-      await this.gladys.system.pull(containerDescriptor.Image);
+      logger.info(`Pulling ${nodeRedDockerImage} image...`);
+      await this.gladys.system.pull(nodeRedDockerImage);
 
       // Prepare broker env
       logger.info(`Nodered: Preparing environment...`);
@@ -55,6 +59,7 @@ async function installContainer(config) {
 
       logger.info(`Creation of container...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.Image = nodeRedDockerImage;
 
       const configFilepath = path.join(basePathOnHost, path.dirname(DEFAULT.CONFIGURATION_PATH));
 

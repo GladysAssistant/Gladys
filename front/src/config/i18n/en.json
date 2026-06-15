@@ -998,7 +998,11 @@
         "gladys": "Gladys",
         "usernameLabel": "Username",
         "passwordLabel": "Password",
-        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
+        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)",
+        "majorVersionLabel": "Node-RED major version",
+        "majorVersionHelp": "Select the major version of Node-RED to run. Existing installations default to version 3. New installations use version 5.",
+        "majorVersionUpdateWarning": "Changing the Node-RED version will recreate the container. Your flows and configuration will be kept, but make sure you have a backup before upgrading.",
+        "majorVersionUpdateButton": "Update Node-RED version"
       }
     },
     "matterbridge": {
