@@ -26,9 +26,10 @@ async function dailyUpdate() {
   houses.forEach((house) => {
     if (house.latitude !== null && house.longitude !== null) {
       const todayAt12InMyTimeZone = dayjs()
+        .tz(this.timezone)
         .hour(12)
         .minute(0)
-        .tz(this.timezone)
+        .second(0)
         .toDate();
       const times = this.sunCalc.getTimes(todayAt12InMyTimeZone, house.latitude, house.longitude);
       // Sunrise and Sunset base times
@@ -60,25 +61,19 @@ async function dailyUpdate() {
       // Schedule one job per distinct (house, type, offset) combination
       const scheduleForOffsets = (offsets, baseTime, eventType, label) => {
         offsets.forEach((offset) => {
-          let occurrence = baseTime.add(offset, 'minute');
-          // If today's occurrence already passed, schedule the next day's occurrence so the
-          // trigger isn't silently dropped until the next midnight reschedule.
-          if (occurrence.toDate().getTime() <= Date.now()) {
-            occurrence = occurrence.add(1, 'day');
-          }
-          const time = occurrence.toDate();
+          const time = baseTime.add(offset, 'minute').toDate();
           const job = this.scheduler.scheduleJob(time, () =>
             this.event.emit(EVENTS.TRIGGERS.CHECK, { type: eventType, house, offset }),
           );
           if (job) {
             logger.info(
-              `${label} (offset ${offset}min) is scheduled at ${occurrence
+              `${label} (offset ${offset}min) is scheduled at ${dayjs(time)
                 .tz(this.timezone)
-                .format('YYYY-MM-DD HH:mm')}, ${occurrence.fromNow()}.`,
+                .format('HH:mm')}, ${dayjs(time).fromNow()}.`,
             );
             this.jobs.push(job);
           } else {
-            logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling.`);
+            logger.info(`${label} (offset ${offset}min): time is in the past, not scheduling for today.`);
           }
         });
       };
