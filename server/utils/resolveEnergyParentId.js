@@ -6,6 +6,8 @@ const db = require('../models');
  * @param {object} [options] - Query options.
  * @param {object} [options.transaction] - Sequelize transaction.
  * @returns {Promise<string|null>} Valid parent id or null.
+ * @example
+ * await resolveEnergyParentId('uuid-of-parent-feature', { transaction });
  */
 async function resolveEnergyParentId(energyParentId, { transaction } = {}) {
   if (!energyParentId) {
