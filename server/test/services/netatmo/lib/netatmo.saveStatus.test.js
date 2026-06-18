@@ -144,20 +144,26 @@ describe('Netatmo saveStatus', () => {
   });
 
   it('should clear the reconnect timeout when transitioning to DISCONNECTED', () => {
-    netatmoHandler.reconnectTimeout = setTimeout(() => {}, 100000);
+    const clearTimeoutSpy = sinon.spy(clock, 'clearTimeout');
+    const timeoutHandle = setTimeout(() => {}, 100000);
+    netatmoHandler.reconnectTimeout = timeoutHandle;
     netatmoHandler.reconnectAttempt = 2;
 
     netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
 
+    sinon.assert.calledWith(clearTimeoutSpy, timeoutHandle);
     expect(netatmoHandler.reconnectAttempt).to.equal(0);
   });
 
   it('should clear the reconnect timeout when transitioning to NOT_INITIALIZED', () => {
-    netatmoHandler.reconnectTimeout = setTimeout(() => {}, 100000);
+    const clearTimeoutSpy = sinon.spy(clock, 'clearTimeout');
+    const timeoutHandle = setTimeout(() => {}, 100000);
+    netatmoHandler.reconnectTimeout = timeoutHandle;
     netatmoHandler.reconnectAttempt = 3;
 
     netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
 
+    sinon.assert.calledWith(clearTimeoutSpy, timeoutHandle);
     expect(netatmoHandler.reconnectAttempt).to.equal(0);
   });
 
