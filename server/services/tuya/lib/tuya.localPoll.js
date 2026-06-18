@@ -5,6 +5,7 @@ const { BadParameters } = require('../../../utils/coreErrors');
 const { mergeDevices } = require('../../../utils/device');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.deviceParams');
+const { addFallbackBinaryFeature } = require('./device/tuya.localMapping');
 
 /**
  * @description Poll a Tuya device locally to retrieve DPS map.
@@ -14,7 +15,7 @@ const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.devicePar
  * await localPoll({ deviceId: 'id', ip: '1.1.1.1', localKey: 'key', protocolVersion: '3.3' });
  */
 async function localPoll(payload) {
-  const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false } = payload || {};
+  const { deviceId, ip, localKey, protocolVersion, timeoutMs = 3000, fastScan = false, logDps = true } = payload || {};
   const isProtocol34 = protocolVersion === '3.4';
   const isProtocol35 = protocolVersion === '3.5';
   const isNewGenProtocol = isProtocol34 || isProtocol35;
@@ -119,15 +120,26 @@ async function localPoll(payload) {
         typeof data === 'string' ? `Invalid local poll response: ${data}` : 'Invalid local poll response';
       throw new BadParameters(errorMessage);
     }
-    logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
-    tuyaLocal.removeListener('error', onError);
+    if (logDps) {
+      logger.debug(`[Tuya][localPoll] device=${deviceId} dps=${JSON.stringify(data)}`);
+    }
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
       logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
-    tuyaLocal.removeListener('error', onError);
+    // Close the socket on failure: leaving it half-open made the device refuse
+    // subsequent local connections (cascading ECONNRESET observed in runtime).
+    // Keep the `'error'` listener registered until the TuyaDevice instance is
+    // garbage-collected — removing it before late socket events arrive caused
+    // those events to bubble up as uncaughtException. Ported from PR7 commit
+    // 547f05c1.
+    try {
+      await tuyaLocal.disconnect();
+    } catch (err) {
+      // ignore
+    }
     throw e;
   }
 }
@@ -141,7 +153,7 @@ async function localPoll(payload) {
  * updateDiscoveredDeviceAfterLocalPoll(tuyaManager, { deviceId: 'id', ip: '1.1.1.1', protocolVersion: '3.3' });
  */
 function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
-  const { deviceId, ip, protocolVersion, localKey } = payload || {};
+  const { deviceId, ip, protocolVersion, localKey, dps } = payload || {};
   if (!deviceId || !tuyaManager || !Array.isArray(tuyaManager.discoveredDevices)) {
     return null;
   }
@@ -161,10 +173,14 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   device.params = Array.isArray(device.params) ? [...device.params] : [];
   upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
   upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
-  upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
+  if (localKey) {
+    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
+  }
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
   upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
+
+  device = addFallbackBinaryFeature(device, dps);
 
   if (tuyaManager.gladys && tuyaManager.gladys.stateManager) {
     const existing = normalizeExistingDevice(

@@ -178,9 +178,6 @@ class DiscoverTab extends Component {
         </div>
         <div class="card-body">
           <div class="alert alert-info">
-            <Text id="integration.tuya.localModeLimitInfo" />
-          </div>
-          <div class="alert alert-info">
             <MarkupText id="integration.tuya.discover.localDiscoveryInfo" />
           </div>
           <div class="alert alert-secondary">

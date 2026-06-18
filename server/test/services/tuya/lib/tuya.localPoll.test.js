@@ -294,7 +294,7 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should log last socket error when different from thrown error', async () => {
+  it('should keep the original connect error when a socket error also occurs', async () => {
     const connect = sinon.stub().rejects(new Error('connect failed'));
     const get = sinon.stub();
     const disconnect = sinon.stub().resolves();
@@ -329,7 +329,7 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should stop cleanup when already resolved', async () => {
+  it('should propagate cleanup errors after a successful poll', async () => {
     const connect = sinon.stub().resolves();
     const get = sinon.stub().resolves({ dps: { 1: true } });
     const disconnect = sinon.stub().resolves();
@@ -437,5 +437,27 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
 
     expect(updated).to.have.property('updatable');
     expect(updated.local_override).to.equal(true);
+  });
+
+  it('should add fallback binary feature when dps includes key 1', () => {
+    const tuyaManager = {
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          params: [],
+          features: [],
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.3',
+      dps: { 1: true },
+    });
+
+    expect(updated.features).to.have.length(1);
+    expect(updated.features[0].external_id).to.equal('tuya:device1:switch_1');
   });
 });

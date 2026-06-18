@@ -165,6 +165,7 @@ describe('TuyaHandler.discoverDevices', () => {
             type: 'binary',
           },
         ],
+        device_type: 'smart-socket',
         model: 'model',
         name: 'name',
         poll_frequency: 30000,
@@ -214,6 +215,10 @@ describe('TuyaHandler.discoverDevices', () => {
         should_poll: true,
         thing_model: {
           services: [],
+        },
+        tuya_mapping: {
+          ignored_cloud_codes: ['countdown', 'countdown_1'],
+          ignored_local_dps: ['11'],
         },
         online: true,
       },

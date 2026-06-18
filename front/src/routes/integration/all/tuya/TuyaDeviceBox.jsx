@@ -10,6 +10,8 @@ import { RequestStatus } from '../../../../utils/consts';
 const normalizeBoolean = value =>
   value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
 const ONLINE_RECENT_MINUTES = 5;
+const LOCAL_POLL_FREQUENCY = 10 * 1000;
+const CLOUD_POLL_FREQUENCY = 30 * 1000;
 
 const parseDate = dateValue => {
   if (!dateValue) {
@@ -241,7 +243,12 @@ class TuyaDeviceBox extends Component {
       const found = params.find(param => param.name === name);
       return found ? found.value : undefined;
     };
-    const tryProtocols = ['3.5', '3.4', '3.3', '3.1'];
+    // Probe legacy protocols (3.3 / 3.1) first, newgen protocols (3.5 / 3.4) last:
+    // newgen attempts on a 3.3 device produce HMAC mismatch errors that put the
+    // device into a short-lived protective state and cause subsequent local
+    // connections to fail with ECONNRESET. Most Tuya consumer devices speak 3.3,
+    // so this order also returns faster in the common case.
+    const tryProtocols = ['3.3', '3.1', '3.5', '3.4'];
     const selectedProtocol = getParam('PROTOCOL_VERSION') || currentDevice.protocol_version;
     const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
     try {
@@ -339,7 +346,11 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      const payload = {
+        ...this.state.device,
+        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+      };
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
         baselineDevice: savedDevice
