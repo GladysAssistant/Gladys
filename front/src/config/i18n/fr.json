@@ -937,6 +937,7 @@
         "connect": "Gladys est connectée à Netatmo",
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
+        "reconnecting": "Connexion à Netatmo temporairement perdue. Tentative de reconnexion automatique en cours...",
         "getDevicesValues": "Récupération des données en cours...",
         "dicoveringDevices": "Récupération des appareils en cours...",
         "errorConnecting": {
