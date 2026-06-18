@@ -155,6 +155,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
       emitTemperatureState(this.gladys.event, temperatureMeasurementExternalId, value);
     };
+    temperatureSensor.addMeasuredValueAttributeListener(emitTemperatureMeasurementState);
     await readAndEmitInitialTemperature(
       () => temperatureSensor.getMeasuredValueAttribute(),
       this.gladys.event,
@@ -162,7 +163,6 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger,
       'TemperatureMeasurement value',
     );
-    temperatureSensor.addMeasuredValueAttributeListener(emitTemperatureMeasurementState);
   }
 
   const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
@@ -354,6 +354,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
       emitTemperatureState(this.gladys.event, localTemperatureExternalId, value);
     };
+    thermostat.addLocalTemperatureAttributeListener(emitLocalTemperatureState);
     await readAndEmitInitialTemperature(
       () => thermostat.getLocalTemperatureAttribute(),
       this.gladys.event,
@@ -361,7 +362,6 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger,
       'Thermostat localTemperature',
     );
-    thermostat.addLocalTemperatureAttributeListener(emitLocalTemperatureState);
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
