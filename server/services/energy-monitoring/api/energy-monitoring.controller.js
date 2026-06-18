@@ -32,10 +32,9 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    */
   async function calculateCostFromBeginning(req, res) {
     const featureSelectors = getFeatureSelectors(req.body);
-    const job = await energyMonitoringHandler.calculateCostFromBeginning(featureSelectors);
+    energyMonitoringHandler.calculateCostFromBeginning(featureSelectors);
     res.json({
       success: true,
-      job_id: job && job.id,
     });
   }
 
@@ -47,10 +46,9 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
     const featureSelectors = getFeatureSelectors(req.body);
-    const job = await energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(featureSelectors);
+    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(featureSelectors);
     res.json({
       success: true,
-      job_id: job && job.id,
     });
   }
 

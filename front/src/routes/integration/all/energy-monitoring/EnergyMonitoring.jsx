@@ -301,7 +301,7 @@ class EnergyMonitoringPage extends Component {
       const costResponse = await this.props.httpClient.post(url, {
         feature_selectors: costSelectors
       });
-      if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
+      if (!costResponse || costResponse.success !== true) {
         throw new Error('job_not_created');
       }
       if (fromSelection) {
@@ -348,13 +348,13 @@ class EnergyMonitoringPage extends Component {
       const consumptionResponse = await this.props.httpClient.post(consumptionUrl, {
         feature_selectors: consumptionSelectors
       });
-      if (!consumptionResponse || consumptionResponse.success !== true || !consumptionResponse.job_id) {
+      if (!consumptionResponse || consumptionResponse.success !== true) {
         throw new Error('job_not_created');
       }
       const costResponse = await this.props.httpClient.post(costUrl, {
         feature_selectors: costSelectors
       });
-      if (!costResponse || costResponse.success !== true || !costResponse.job_id) {
+      if (!costResponse || costResponse.success !== true) {
         throw new Error('job_not_created');
       }
       if (fromSelection) {

@@ -89,7 +89,6 @@ describe('EnergyMonitoringController', () => {
       assert.calledOnce(energyMonitoringHandler.calculateCostFromBeginning);
       assert.calledOnceWithExactly(res.json, {
         success: true,
-        job_id: 'job-id',
       });
     });
 
@@ -125,7 +124,6 @@ describe('EnergyMonitoringController', () => {
       assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning);
       assert.calledOnceWithExactly(res.json, {
         success: true,
-        job_id: 'job-id',
       });
     });
 
