@@ -42,7 +42,6 @@ async function retrieveTokens(body) {
     const response = await fetch(API.TOKEN, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': API.HEADER.CONTENT_TYPE,
         Host: API.HEADER.HOST,
       },

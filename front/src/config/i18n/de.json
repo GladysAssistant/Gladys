@@ -804,6 +804,7 @@
         "connect": "Gladys ist mit Netatmo verbunden",
         "connecting": "Konfiguration gespeichert. Verbindung zu Ihrem Netatmo-Konto wird hergestellt...",
         "processingToken": "Verbindung zu Ihrem Netatmo-Konto... Zugriffstoken wird abgerufen.",
+        "reconnecting": "Verbindung zu Netatmo vorübergehend verloren. Automatische Wiederverbindung läuft...",
         "getDevicesValues": "Datenwiederherstellung läuft...",
         "dicoveringDevices": "Gerätewiederherstellung läuft...",
         "errorConnecting": {
