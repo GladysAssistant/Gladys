@@ -445,79 +445,79 @@ class MatterDevices extends Component {
                         const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
 
                         return (
-                        <div class="col-md-6">
-                          <div class="card">
-                            <div class="card-header">
-                              {device.name || device.model}
-                              {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                                <div class="page-options d-flex">
-                                  <div class="tag tag-danger">
-                                    <Text id="integration.matter.device.nodeDisconnected" />
-                                    <span class="tag-addon">
-                                      <i class="fe fe-wifi-off" />
-                                    </span>
+                          <div class="col-md-6">
+                            <div class="card">
+                              <div class="card-header">
+                                {device.name || device.model}
+                                {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                                  <div class="page-options d-flex">
+                                    <div class="tag tag-danger">
+                                      <Text id="integration.matter.device.nodeDisconnected" />
+                                      <span class="tag-addon">
+                                        <i class="fe fe-wifi-off" />
+                                      </span>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                            <div
-                              class={cx('dimmer', {
-                                active: isPairedDeviceLoading
-                              })}
-                            >
-                              <div class="loader" />
-                              <div class="dimmer-content">
-                                <div class="card-body">
-                                  {pairedError && (
-                                    <div class="alert alert-danger">
-                                      <Text id={pairedError.errorMessage} />
-                                      {pairedError.errorDetail && <div>{pairedError.errorDetail}</div>}
-                                    </div>
-                                  )}
-                                  {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                    <div class="alert alert-info">
-                                      <Text id="integration.matter.device.deviceAlreadyExist" />
-                                    </div>
-                                  )}
-                                  {device.features && device.features.length > 0 && (
-                                    <div class="form-group">
-                                      <label class="form-label">
-                                        <Text id="integration.matter.featuresLabel" />
-                                      </label>
-                                      <DeviceFeatures features={device.features} />
-                                    </div>
-                                  )}
-                                  {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                    <div class="form-group">
-                                      <button
-                                        onClick={() => this.replaceGladysDevice(device)}
-                                        class={cx('btn btn-info', {
-                                          loading: isPairedDeviceLoading
-                                        })}
-                                        disabled={isPairedDeviceLoading}
-                                      >
-                                        <Text id="integration.matter.device.replaceExisting" />
-                                      </button>
-                                    </div>
-                                  )}
-                                  {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                    <div class="form-group">
-                                      <button
-                                        onClick={() => this.addDeviceToGladys(device)}
-                                        class={cx('btn btn-success', {
-                                          loading: isPairedDeviceLoading
-                                        })}
-                                        disabled={isPairedDeviceLoading}
-                                      >
-                                        <Text id="integration.matter.device.addToGladys" />
-                                      </button>
-                                    </div>
-                                  )}
+                                )}
+                              </div>
+                              <div
+                                class={cx('dimmer', {
+                                  active: isPairedDeviceLoading
+                                })}
+                              >
+                                <div class="loader" />
+                                <div class="dimmer-content">
+                                  <div class="card-body">
+                                    {pairedError && (
+                                      <div class="alert alert-danger">
+                                        <Text id={pairedError.errorMessage} />
+                                        {pairedError.errorDetail && <div>{pairedError.errorDetail}</div>}
+                                      </div>
+                                    )}
+                                    {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                      <div class="alert alert-info">
+                                        <Text id="integration.matter.device.deviceAlreadyExist" />
+                                      </div>
+                                    )}
+                                    {device.features && device.features.length > 0 && (
+                                      <div class="form-group">
+                                        <label class="form-label">
+                                          <Text id="integration.matter.featuresLabel" />
+                                        </label>
+                                        <DeviceFeatures features={device.features} />
+                                      </div>
+                                    )}
+                                    {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                      <div class="form-group">
+                                        <button
+                                          onClick={() => this.replaceGladysDevice(device)}
+                                          class={cx('btn btn-info', {
+                                            loading: isPairedDeviceLoading
+                                          })}
+                                          disabled={isPairedDeviceLoading}
+                                        >
+                                          <Text id="integration.matter.device.replaceExisting" />
+                                        </button>
+                                      </div>
+                                    )}
+                                    {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                      <div class="form-group">
+                                        <button
+                                          onClick={() => this.addDeviceToGladys(device)}
+                                          class={cx('btn btn-success', {
+                                            loading: isPairedDeviceLoading
+                                          })}
+                                          disabled={isPairedDeviceLoading}
+                                        >
+                                          <Text id="integration.matter.device.addToGladys" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
                         );
                       })}
                     </div>
