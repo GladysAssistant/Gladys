@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import debounce from 'debounce';
+import get from 'get-value';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
@@ -56,6 +57,15 @@ const compareDevices = (deviceA, deviceB) => {
   return true;
 };
 
+const getMatterSaveError = e => {
+  let errorMessage = 'integration.matter.error.defaultError';
+  if (e.response && e.response.status === 409) {
+    errorMessage = 'integration.matter.error.conflictError';
+  }
+  const errorDetail = get(e, 'response.data.message') || get(e, 'response.data.error') || null;
+  return { errorMessage, errorDetail };
+};
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -69,7 +79,9 @@ class MatterDevices extends Component {
       error: null,
       matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
-      nodesIsConnected: new Map()
+      nodesIsConnected: new Map(),
+      pairedDeviceErrors: new Map(),
+      pairedDeviceLoading: new Map()
     };
     this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
   }
@@ -207,23 +219,57 @@ class MatterDevices extends Component {
     }
   };
 
+  setPairedDeviceLoading = (externalId, loading) => {
+    const pairedDeviceLoading = new Map(this.state.pairedDeviceLoading);
+    if (loading) {
+      pairedDeviceLoading.set(externalId, true);
+    } else {
+      pairedDeviceLoading.delete(externalId);
+    }
+    this.setState({ pairedDeviceLoading });
+  };
+
+  setPairedDeviceError = (externalId, error) => {
+    const pairedDeviceErrors = new Map(this.state.pairedDeviceErrors);
+    if (error) {
+      pairedDeviceErrors.set(externalId, error);
+    } else {
+      pairedDeviceErrors.delete(externalId);
+    }
+    this.setState({ pairedDeviceErrors });
+  };
+
   addDeviceToGladys = async device => {
+    const { external_id: externalId } = device;
+    this.setPairedDeviceLoading(externalId, true);
+    this.setPairedDeviceError(externalId, null);
     try {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
+      this.setPairedDeviceError(externalId, getMatterSaveError(e));
+    } finally {
+      this.setPairedDeviceLoading(externalId, false);
     }
   };
 
   replaceGladysDevice = async device => {
+    const { external_id: externalId } = device;
+    this.setPairedDeviceLoading(externalId, true);
+    this.setPairedDeviceError(externalId, null);
     try {
       const gladysDevice = this.state.matterDevices.find(gladysDevice => {
         return (
           gladysDevice.external_id === this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(device.external_id)
         );
       });
+
+      if (!gladysDevice) {
+        this.setPairedDeviceError(externalId, getMatterSaveError({}));
+        return;
+      }
 
       // We'll update the external_id of the existing device
       const newExternalId = device.external_id;
@@ -252,6 +298,9 @@ class MatterDevices extends Component {
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
+      this.setPairedDeviceError(externalId, getMatterSaveError(e));
+    } finally {
+      this.setPairedDeviceLoading(externalId, false);
     }
   };
 
@@ -304,7 +353,9 @@ class MatterDevices extends Component {
       housesWithRooms,
       devicesThatAlreadyExistButWithDifferentNodeId,
       matterEnabled,
-      nodesIsConnected
+      nodesIsConnected,
+      pairedDeviceErrors,
+      pairedDeviceLoading
     }
   ) {
     // Apply client-side filtering to paired devices
@@ -389,7 +440,11 @@ class MatterDevices extends Component {
                       <Text id="integration.matter.device.pairedDevicesTitle" />
                     </h4>
                     <div class="row mt-4">
-                      {sortedPairedDevices.map(device => (
+                      {sortedPairedDevices.map(device => {
+                        const pairedError = pairedDeviceErrors.get(device.external_id);
+                        const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
+
+                        return (
                         <div class="col-md-6">
                           <div class="card">
                             <div class="card-header">
@@ -405,38 +460,66 @@ class MatterDevices extends Component {
                                 </div>
                               )}
                             </div>
-                            <div class="card-body">
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="alert alert-info">
-                                  <Text id="integration.matter.device.deviceAlreadyExist" />
+                            <div
+                              class={cx('dimmer', {
+                                active: isPairedDeviceLoading
+                              })}
+                            >
+                              <div class="loader" />
+                              <div class="dimmer-content">
+                                <div class="card-body">
+                                  {pairedError && (
+                                    <div class="alert alert-danger">
+                                      <Text id={pairedError.errorMessage} />
+                                      {pairedError.errorDetail && <div>{pairedError.errorDetail}</div>}
+                                    </div>
+                                  )}
+                                  {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    <div class="alert alert-info">
+                                      <Text id="integration.matter.device.deviceAlreadyExist" />
+                                    </div>
+                                  )}
+                                  {device.features && device.features.length > 0 && (
+                                    <div class="form-group">
+                                      <label class="form-label">
+                                        <Text id="integration.matter.featuresLabel" />
+                                      </label>
+                                      <DeviceFeatures features={device.features} />
+                                    </div>
+                                  )}
+                                  {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    <div class="form-group">
+                                      <button
+                                        onClick={() => this.replaceGladysDevice(device)}
+                                        class={cx('btn btn-info', {
+                                          loading: isPairedDeviceLoading
+                                        })}
+                                        disabled={isPairedDeviceLoading}
+                                      >
+                                        <Text id="integration.matter.device.replaceExisting" />
+                                      </button>
+                                    </div>
+                                  )}
+                                  {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    <div class="form-group">
+                                      <button
+                                        onClick={() => this.addDeviceToGladys(device)}
+                                        class={cx('btn btn-success', {
+                                          loading: isPairedDeviceLoading
+                                        })}
+                                        disabled={isPairedDeviceLoading}
+                                      >
+                                        <Text id="integration.matter.device.addToGladys" />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                              {device.features && device.features.length > 0 && (
-                                <div class="form-group">
-                                  <label class="form-label">
-                                    <Text id="integration.matter.featuresLabel" />
-                                  </label>
-                                  <DeviceFeatures features={device.features} />
-                                </div>
-                              )}
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
-                                    <Text id="integration.matter.device.replaceExisting" />
-                                  </button>
-                                </div>
-                              )}
-                              {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
-                                    <Text id="integration.matter.device.addToGladys" />
-                                  </button>
-                                </div>
-                              )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
