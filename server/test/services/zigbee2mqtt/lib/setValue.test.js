@@ -2,6 +2,7 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const { expect } = require('chai');
+const { BUTTON_PUSH } = require('../../../../utils/constants');
 
 const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
 
@@ -39,6 +40,16 @@ const featureBinary = {
 const featureColor = {
   external_id: 'zigbee2mqtt:0x00158d00045b2740:light:color:color',
   type: 'color',
+};
+
+const featureTriggerAlarm = {
+  external_id: 'zigbee2mqtt:bosch-outdoor-siren:button:push:trigger_alarm',
+  type: 'push',
+};
+
+const featureStopAlarm = {
+  external_id: 'zigbee2mqtt:bosch-outdoor-siren:button:push:stop_alarm',
+  type: 'push',
 };
 
 describe('zigbee2mqtt setValue', () => {
@@ -129,6 +140,24 @@ describe('zigbee2mqtt setValue', () => {
       mqttClient.publish,
       `zigbee2mqtt/0x00158d00045b2740/set`,
       JSON.stringify({ alarm: false }),
+    );
+  });
+
+  it('set Bosch siren trigger_alarm', async () => {
+    await zigbee2MqttManager.setValue(null, featureTriggerAlarm, BUTTON_PUSH.PRESSED);
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bosch-outdoor-siren/set',
+      JSON.stringify({ trigger_alarm: 'trigger' }),
+    );
+  });
+
+  it('set Bosch siren stop_alarm', async () => {
+    await zigbee2MqttManager.setValue(null, featureStopAlarm, BUTTON_PUSH.PRESSED);
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/bosch-outdoor-siren/set',
+      JSON.stringify({ stop_alarm: 'stop' }),
     );
   });
 });

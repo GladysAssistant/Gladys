@@ -2,6 +2,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   BUTTON_STATUS,
+  BUTTON_PUSH,
   COVER_STATE,
   SIREN_LMH_VOLUME,
   PILOT_WIRE_MODE,
@@ -64,7 +65,9 @@ addMapping('action', BUTTON_STATUS.DROP, 'drop');
 addMapping('action', BUTTON_STATUS.EMERGENCY, 'emergency');
 addMapping('action', BUTTON_STATUS.DISARM, 'disarm');
 addMapping('action', BUTTON_STATUS.ARM_DAY_ZONES, 'arm_day_zones');
+addMapping('action', BUTTON_STATUS.ARM_NIGHT_ZONES, 'arm_night_zones');
 addMapping('action', BUTTON_STATUS.ARM_ALL_ZONES, 'arm_all_zones');
+addMapping('action', BUTTON_STATUS.EXIT_DELAY, 'exit_delay');
 
 addMapping('action', BUTTON_STATUS.ON_PRESS, 'on-press');
 addMapping('action', BUTTON_STATUS.ON_HOLD, 'on-hold');
@@ -130,6 +133,25 @@ addMapping('action', BUTTON_STATUS.RELEASE_PLUS, 'release_plus');
 addMapping('action', BUTTON_STATUS.RELEASE_CENTER, 'release_center');
 addMapping('action', BUTTON_STATUS.RELEASE_MINUS, 'release_minus');
 
+// SONOFF SNZB-01M 4-button remote
+// https://www.zigbee2mqtt.io/devices/SNZB-01M.html
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_1, 'single_button_1');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_1, 'double_button_1');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_1, 'long_button_1');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_1, 'triple_button_1');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_2, 'single_button_2');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_2, 'double_button_2');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_2, 'long_button_2');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_2, 'triple_button_2');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_3, 'single_button_3');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_3, 'double_button_3');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_3, 'long_button_3');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_3, 'triple_button_3');
+addMapping('action', BUTTON_STATUS.SINGLE_BUTTON_4, 'single_button_4');
+addMapping('action', BUTTON_STATUS.DOUBLE_BUTTON_4, 'double_button_4');
+addMapping('action', BUTTON_STATUS.LONG_BUTTON_4, 'long_button_4');
+addMapping('action', BUTTON_STATUS.TRIPLE_BUTTON_4, 'triple_button_4');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
@@ -148,6 +170,11 @@ addMapping('pilot_wire_mode', PILOT_WIRE_MODE.COMFORT_2, 'comfort_-2');
 addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
+
+// Bosch BSIR-EZ outdoor siren
+// https://www.zigbee2mqtt.io/devices/BSIR-EZ.html
+addMapping('trigger_alarm', BUTTON_PUSH.PRESSED, 'trigger');
+addMapping('stop_alarm', BUTTON_PUSH.PRESSED, 'stop');
 
 module.exports = {
   type: 'enum',
@@ -217,6 +244,18 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE,
+      },
+    },
+    trigger_alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
+      },
+    },
+    stop_alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
       },
     },
   },

@@ -12,9 +12,14 @@ import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
+import FanModeDeviceFeature from './device-features/FanModeDeviceFeature';
+import FanLabeledSelectDeviceFeature from './device-features/FanLabeledSelectDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
+import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
+import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
+import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -31,6 +36,12 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: SetpointDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: SetpointDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.PERCENT]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.SPEED]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING]: FanLabeledSelectDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.WIND_SETTING]: FanLabeledSelectDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION]: FanLabeledSelectDeviceFeature,
   [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: PilotWireModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.LOCK.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
@@ -44,7 +55,10 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.CLIMATE_ON]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.TARGET_TEMPERATURE]: SetpointDeviceFeature,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.ALARM]: BinaryDeviceFeature,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK]: BinaryDeviceFeature
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK]: VacuumCleanerDockDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE]: VacuumCleanerModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE]: VacuumCleanerCleanModeDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {

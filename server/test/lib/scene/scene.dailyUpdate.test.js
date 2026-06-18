@@ -1,6 +1,12 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { fake, assert } = sinon;
 const { EVENTS } = require('../../../utils/constants');
@@ -16,12 +22,27 @@ const SceneManager = proxyquire('../../../lib/scene', {
   },
 });
 
+// SceneManager whose suncalc always returns past times (scheduler returns null = no job)
 const SceneManagerWithPastSunriseSunset = proxyquire('../../../lib/scene', {
   suncalc: {
     getTimes: () => {
       return {
         sunrise: new Date(Date.now() - 60 * 60 * 1000),
         sunset: new Date(Date.now() - 60 * 60 * 1000),
+      };
+    },
+  },
+});
+
+// SceneManager whose suncalc records the date argument passed to getTimes
+let capturedTodayAt12 = null;
+const SceneManagerCaptureTodayAt12 = proxyquire('../../../lib/scene', {
+  suncalc: {
+    getTimes: (date) => {
+      capturedTodayAt12 = date;
+      return {
+        sunrise: new Date(Date.now() + 60 * 60 * 1000),
+        sunset: new Date(Date.now() + 60 * 60 * 1000),
       };
     },
   },
@@ -95,9 +116,50 @@ describe('SceneManager.dailyUpdate', () => {
       {},
       {},
       scheduler,
+      brain,
     );
     await sceneManagerPast.dailyUpdate();
     expect(sceneManagerPast.jobs).to.deep.equal([]);
+  });
+
+  it('should compute todayAt12 in the user timezone, not in server UTC', async () => {
+    // Root-cause regression test: when the server clock is UTC and the user timezone
+    // is Europe/Paris (UTC+2), dailyUpdate used to call dayjs().hour(12).tz(tz) which
+    // only converts the display zone *after* setting hours in UTC — yielding the wrong
+    // calendar day at midnight Paris time (= 22:00 UTC of the previous day).
+    // The correct form is dayjs().tz(tz).hour(12) which first converts to Paris time
+    // then sets the hour, so getTimes() always receives noon of the current Paris day.
+    capturedTodayAt12 = null;
+    const sceneManagerCapture = new SceneManagerCaptureTodayAt12(
+      {},
+      event,
+      {},
+      {},
+      variable,
+      house,
+      {},
+      {},
+      {},
+      scheduler,
+      brain,
+    );
+    // Force timezone to Europe/Paris to reproduce the UTC+2 mismatch
+    sceneManagerCapture.timezone = 'Europe/Paris';
+
+    // Simulate the server clock at midnight Paris = 22:00 UTC the day before
+    const clock = sinon.useFakeTimers(new Date('2026-06-10T22:00:00Z').getTime());
+    try {
+      await sceneManagerCapture.dailyUpdate();
+    } finally {
+      clock.restore();
+    }
+
+    // todayAt12 must fall on 2026-06-11 in Paris (the actual "today" for the user),
+    // not 2026-06-10 (yesterday in Paris, which is what the old buggy code produced).
+    const parisDate = dayjs(capturedTodayAt12).tz('Europe/Paris');
+    expect(parisDate.date()).to.equal(11);
+    expect(parisDate.month()).to.equal(5); // June = month 5 (0-indexed)
+    expect(parisDate.hour()).to.equal(12);
   });
 
   it("shouldn't scheduleJob for sunrise/sunset when house doesn't have location", async () => {

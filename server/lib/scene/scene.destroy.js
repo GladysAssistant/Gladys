@@ -26,9 +26,6 @@ async function destroy(selector) {
     throw new NotFoundError('Scene not found');
   }
 
-  // Remove scene from brain
-  this.brain.removeNamedEntity('scene', existingScene.selector, existingScene.name);
-
   await db.TagScene.destroy({
     where: {
       scene_id: existingScene.id,

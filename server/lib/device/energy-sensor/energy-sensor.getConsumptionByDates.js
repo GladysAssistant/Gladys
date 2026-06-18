@@ -242,6 +242,7 @@ async function getConsumptionByDates(selectors, options = {}) {
         },
         deviceFeature: {
           name: deviceFeature.name,
+          selector,
           currency_unit: currencyUnit,
         },
         values,

@@ -6,15 +6,26 @@ const CONFIGURATION = {
   NODE_RED_PASSWORD: 'NODE_RED_PASSWORD',
   NODE_RED_PORT: 'NODE_RED_PORT',
 
-  DOCKER_NODE_RED_VERSION: 'DOCKER_NODE_RED_VERSION', // Variable to identify last version of NodeRed docker file is installed
+  DOCKER_NODE_RED_VERSION: 'DOCKER_NODE_RED_VERSION',
+};
+
+const NODE_RED_MAJOR_VERSIONS = ['3', '4', '5'];
+
+const NODE_RED_IMAGE_TAGS = {
+  3: '3.1',
+  4: '4.1',
+  5: '5.0',
 };
 
 const DEFAULT = {
-  DOCKER_NODE_RED_VERSION: '3', // Last version of NodeRed docker file,
+  NODE_RED_MAJOR_VERSION_EXISTING: '3',
+  NODE_RED_MAJOR_VERSION_NEW: '5',
   CONFIGURATION_PATH: 'node-red/settings.js',
 };
 
 module.exports = {
   CONFIGURATION,
+  NODE_RED_MAJOR_VERSIONS,
+  NODE_RED_IMAGE_TAGS,
   DEFAULT,
 };

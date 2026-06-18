@@ -8,6 +8,7 @@ const CorsMiddleware = require('./middlewares/corsMiddleware');
 // Simple middleware
 const adminMiddleware = require('./middlewares/adminMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
+const audioRawBodyMiddleware = require('./middlewares/audioRawBodyMiddleware');
 
 // routes
 const getRoutes = require('./routes');
@@ -65,6 +66,9 @@ function setupRoutes(gladys) {
     // if the route need authentication for alarm
     if (routes[routeKey].alarmAuth) {
       routerParams.push(alarmMiddleware);
+    }
+    if (routes[routeKey].audioRawBody) {
+      routerParams.push(audioRawBodyMiddleware);
     }
     // add the controller at the end of the array
     routerParams.push(routes[routeKey].controller);

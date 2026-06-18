@@ -35,7 +35,8 @@ describe('NodeRed getConfiguration', () => {
     assert.calledWithExactly(gladys.variable.getValue, 'TIMEZONE');
 
     expect(result).to.deep.equal({
-      dockerNodeRedVersion: 'fake',
+      dockerNodeRedVersion: '3',
+      availableMajorVersions: ['3', '4', '5'],
       nodeRedPassword: 'fake',
       nodeRedUsername: 'fake',
       timezone: 'fake',

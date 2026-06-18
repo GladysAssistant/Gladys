@@ -26,9 +26,10 @@ async function dailyUpdate() {
   houses.forEach((house) => {
     if (house.latitude !== null && house.longitude !== null) {
       const todayAt12InMyTimeZone = dayjs()
+        .tz(this.timezone)
         .hour(12)
         .minute(0)
-        .tz(this.timezone)
+        .second(0)
         .toDate();
       const times = this.sunCalc.getTimes(todayAt12InMyTimeZone, house.latitude, house.longitude);
       // Sunrise and Sunset base times
