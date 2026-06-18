@@ -2,6 +2,8 @@ const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
+const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
+const logger = require('../../utils/logger');
 
 const getById = async (id) => {
   return db.Device.findOne({
@@ -163,8 +165,18 @@ async function create(device) {
     deviceToReturn.features = deviceToReturn.features || [];
     deviceToReturn.params = deviceToReturn.params || [];
 
-    // if we need to create features
-    const newFeatures = await Promise.map(features, async (feature) => {
+    const energyParentIdByExternalId = new Map();
+    const featuresToSave = features.map((feature) => {
+      if (Object.prototype.hasOwnProperty.call(feature, 'energy_parent_id')) {
+        energyParentIdByExternalId.set(feature.external_id, feature.energy_parent_id);
+      }
+      const featureToSave = { ...feature };
+      delete featureToSave.energy_parent_id;
+      return featureToSave;
+    });
+
+    // Save features first without energy_parent_id, then resolve parent links in a second pass
+    const newFeatures = await Promise.map(featuresToSave, async (feature) => {
       // if the device feature already exist
       const matchedFeature = matchFeatureInList(feature, deviceToReturn.features);
       if (matchedFeature) {
@@ -184,6 +196,32 @@ async function create(device) {
       const featureCreated = await db.DeviceFeature.create(feature, { transaction });
       return featureCreated.get({ plain: true });
     });
+
+    await Promise.map(newFeatures, async (savedFeature) => {
+      if (!energyParentIdByExternalId.has(savedFeature.external_id)) {
+        return;
+      }
+
+      const requestedParentId = energyParentIdByExternalId.get(savedFeature.external_id);
+      const validParentId = await resolveEnergyParentId(requestedParentId, { transaction });
+
+      if (requestedParentId && !validParentId) {
+        logger.warn(
+          `Invalid energy_parent_id "${requestedParentId}" for feature "${savedFeature.selector}", clearing parent link`,
+        );
+      }
+
+      if (savedFeature.energy_parent_id === validParentId) {
+        return;
+      }
+
+      await db.DeviceFeature.update(
+        { energy_parent_id: validParentId },
+        { where: { id: savedFeature.id }, transaction },
+      );
+      savedFeature.energy_parent_id = validParentId;
+    });
+
     deviceToReturn.features = newFeatures;
 
     const newParams = await Promise.map(params, async (param) => {
