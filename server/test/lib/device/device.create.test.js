@@ -3,6 +3,8 @@ const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');
+const { BadParameters } = require('../../../utils/coreErrors');
+const { getStandardDeviceIncludes } = require('../../../utils/deviceQueryIncludes');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
@@ -246,6 +248,7 @@ describe('Device', () => {
         last_value_changed: null,
         last_value_string: null,
         unit: null,
+        supported_options: [],
         created_at: newDevice.features[0] && newDevice.features[0].created_at,
         updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
       },
@@ -320,6 +323,7 @@ describe('Device', () => {
         last_value_changed: null,
         last_value_string: null,
         unit: null,
+        supported_options: [],
         created_at: newDevice.features[0] && newDevice.features[0].created_at,
         updated_at: newDevice.features[0] && newDevice.features[0].updated_at,
       },
@@ -721,5 +725,266 @@ describe('Device', () => {
     });
 
     expect(updated.features[0].energy_parent_id).to.equal(null);
+  });
+  it('should create and sync supported_options on device features', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Vacuum device',
+      external_id: 'vacuum-supported-options',
+      features: [
+        {
+          name: 'Run mode',
+          external_id: 'vacuum:run-mode',
+          category: 'vacuum-cleaner',
+          type: 'mode',
+          read_only: false,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 5,
+          supported_options: [
+            { value: 0, label: 'Idle', sort_order: 0 },
+            { value: 1, label: 'Cleaning', sort_order: 1 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(created.features).to.have.lengthOf(1);
+    expect(created.features[0].supported_options).to.have.lengthOf(2);
+    expect(created.features[0].supported_options[0]).to.include({
+      value: 0,
+      label: 'Idle',
+      sort_order: 0,
+    });
+    expect(created.features[0].supported_options[1]).to.include({
+      value: 1,
+      label: 'Cleaning',
+      sort_order: 1,
+    });
+
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...created.features[0],
+          supported_options: [
+            { id: created.features[0].supported_options[0].id, value: 0, label: 'Idle updated', sort_order: 0 },
+            { value: 2, label: 'Mapping', sort_order: 2 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.have.lengthOf(2);
+    expect(updated.features[0].supported_options[0]).to.include({
+      value: 0,
+      label: 'Idle updated',
+    });
+    expect(updated.features[0].supported_options[1]).to.include({
+      value: 2,
+      label: 'Mapping',
+    });
+
+    const storedDevice = (
+      await db.Device.findOne({
+        where: { external_id: 'vacuum-supported-options' },
+        include: getStandardDeviceIncludes(),
+      })
+    ).get({ plain: true });
+    expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
+  });
+  it('should reject invalid supported_options during device create', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Invalid options device',
+        external_id: 'invalid-supported-options',
+        features: [
+          {
+            name: 'Run mode',
+            external_id: 'invalid:run-mode',
+            category: 'vacuum-cleaner',
+            type: 'mode',
+            read_only: false,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 5,
+            supported_options: [{ value: 1, label: '' }],
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BadParameters);
+    }
+  });
+  it('should reject device create without external_id', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Missing external id',
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BadParameters);
+      expect(error.message).to.equal('A device must have an external_id.');
+    }
+  });
+  it('should preserve supported_options when feature payload omits them', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Preserve options device',
+      external_id: 'preserve-supported-options',
+      features: [
+        {
+          name: 'Run mode',
+          external_id: 'preserve:run-mode',
+          category: 'vacuum-cleaner',
+          type: 'mode',
+          read_only: false,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 5,
+          supported_options: [{ value: 0, label: 'Idle', sort_order: 0 }],
+        },
+      ],
+      params: [],
+    });
+
+    const { supported_options, ...featureWithoutOptions } = created.features[0];
+    expect(supported_options).to.have.lengthOf(1);
+
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...featureWithoutOptions,
+          id: '00000000-0000-0000-0000-000000000099',
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.have.lengthOf(1);
+    expect(updated.features[0].supported_options[0]).to.include({
+      value: 0,
+      label: 'Idle',
+    });
+  });
+  it('should clear supported_options when feature payload sends an empty array', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Clear options device',
+      external_id: 'clear-supported-options',
+      features: [
+        {
+          name: 'Run mode',
+          external_id: 'clear:run-mode',
+          category: 'vacuum-cleaner',
+          type: 'mode',
+          read_only: false,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 5,
+          supported_options: [{ value: 0, label: 'Idle', sort_order: 0 }],
+        },
+      ],
+      params: [],
+    });
+
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...created.features[0],
+          supported_options: [],
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.deep.equal([]);
+  });
+  it('should create feature without supported_options payload', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Feature without options',
+      external_id: 'feature-without-options',
+      features: [
+        {
+          name: 'Temperature',
+          external_id: 'feature-without-options:temperature',
+          category: 'temperature',
+          type: 'decimal',
+          read_only: true,
+          keep_history: true,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+      params: [],
+    });
+
+    expect(created.features[0].supported_options).to.deep.equal([]);
+  });
+  it('should find device by external_id when id is unknown', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const updated = await device.create({
+      id: '00000000-0000-0000-0000-000000000099',
+      name: 'RENAMED_DEVICE',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      params: [
+        {
+          id: 'c24b1f96-69d7-4e6e-aa44-f14406694c59',
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        },
+      ],
+    });
+
+    expect(updated).to.have.property('name', 'RENAMED_DEVICE');
+    expect(updated).to.have.property('selector', 'test-device');
   });
 });

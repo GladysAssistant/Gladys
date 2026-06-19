@@ -3,31 +3,16 @@ const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
+const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
+const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
 
 const getById = async (id) => {
   return db.Device.findOne({
     where: {
       id,
     },
-    include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.Room,
-        as: 'room',
-      },
-      {
-        model: db.Service,
-        as: 'service',
-      },
-    ],
+    include: getStandardDeviceIncludes(),
   });
 };
 
@@ -36,24 +21,7 @@ const getByExternalId = async (externalId) => {
     where: {
       external_id: externalId,
     },
-    include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.Room,
-        as: 'room',
-      },
-      {
-        model: db.Service,
-        as: 'service',
-      },
-    ],
+    include: getStandardDeviceIncludes(),
   });
 };
 
@@ -166,12 +134,17 @@ async function create(device) {
     deviceToReturn.params = deviceToReturn.params || [];
 
     const energyParentIdByExternalId = new Map();
+    const supportedOptionsByExternalId = new Map();
     const featuresToSave = features.map((feature) => {
       if (Object.prototype.hasOwnProperty.call(feature, 'energy_parent_id')) {
         energyParentIdByExternalId.set(feature.external_id, feature.energy_parent_id);
       }
+      if (Object.prototype.hasOwnProperty.call(feature, 'supported_options')) {
+        supportedOptionsByExternalId.set(feature.external_id, feature.supported_options);
+      }
       const featureToSave = { ...feature };
       delete featureToSave.energy_parent_id;
+      delete featureToSave.supported_options;
       return featureToSave;
     });
 
@@ -222,7 +195,20 @@ async function create(device) {
       savedFeature.energy_parent_id = validParentId;
     });
 
-    deviceToReturn.features = newFeatures;
+    deviceToReturn.features = await Promise.map(newFeatures, async (savedFeature) => {
+      if (!supportedOptionsByExternalId.has(savedFeature.external_id)) {
+        const existingFeature = matchFeatureInList(savedFeature, deviceToReturn.features);
+        savedFeature.supported_options = existingFeature?.supported_options ?? [];
+        return savedFeature;
+      }
+
+      savedFeature.supported_options = await syncFeatureSupportedOptions(
+        savedFeature.id,
+        supportedOptionsByExternalId.get(savedFeature.external_id),
+        transaction,
+      );
+      return savedFeature;
+    });
 
     const newParams = await Promise.map(params, async (param) => {
       // if the param already already exist
