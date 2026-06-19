@@ -22,21 +22,41 @@ const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDay
 const isNullOrEmpty = (value) => value === null || value === undefined || value === '';
 
 /**
- * @description Calculate energy monitoring cost from a specific date.
- * @param {Date} startAt - The start date.
+ * @description Calculate energy monitoring cost from a specific date, optionally bounded by an end date.
+ * @param {Date|string} startAt - The start date (Date or YYYY-MM-DD string).
  * @param {Array<string>} featureSelectors - Optional whitelist of cost feature selectors to process.
  * @param {string} jobId - The job id.
+ * @param {Date|string|null} [endAt] - Optional end date (Date or YYYY-MM-DD string). Defaults to now,
+ *   preserving the original "calculate cost from `startAt` onwards" behavior for existing callers.
  * @returns {Promise<null>} Return null when finished.
  * @example
  * calculateCostFrom(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
+ * calculateCostFrom('2025-01-01', [], '12345678-1234-1234-1234-1234567890ab', '2025-06-01');
  */
-async function calculateCostFrom(startAt, featureSelectors, jobId) {
+async function calculateCostFrom(startAt, featureSelectors, jobId, endAt) {
   const selectors = Array.isArray(featureSelectors)
     ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
     : [];
   const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
+  const parseDateWithBoundary = (value, boundary) => {
+    if (value instanceof Date) {
+      return value;
+    }
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const suffix = boundary === 'end' ? '23:59:59' : '00:00:00';
+    const parsed = dayjs.tz(`${value} ${suffix}`, systemTimezone);
+    return parsed.isValid() ? parsed.toDate() : null;
+  };
+  const parsedStartAt = parseDateWithBoundary(startAt, 'start');
+  const resolvedEndAt = parseDateWithBoundary(endAt, 'end') || new Date();
+  if (endAt && parsedStartAt && parsedStartAt > resolvedEndAt) {
+    logger.info('Start date is after end date, nothing to process');
+    return null;
+  }
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
@@ -124,8 +144,10 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
             return;
           }
           // First, clean the cost feature states
-          logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
-          await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
+          logger.debug(
+            `Destroying states from ${ecf.consumptionCostFeature.selector} from ${parsedStartAt} to ${resolvedEndAt}`,
+          );
+          await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, parsedStartAt, resolvedEndAt);
           // Get the energy prices from this electrical meter device
           const energyPrices = await this.gladys.energyPrice.get({
             electric_meter_device_id: electricMeterFeature.device_id,
@@ -137,7 +159,7 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
             );
             // Subtract 1 day to ensure we have tempo data for hours before 6AM that use previous day's color
             const startDateAsDayString = dayjs
-              .tz(startAt, systemTimezone)
+              .tz(parsedStartAt, systemTimezone)
               .subtract(1, 'day')
               .format('YYYY-MM-DD');
             edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
@@ -146,8 +168,8 @@ async function calculateCostFrom(startAt, featureSelectors, jobId) {
           // We get all the states of the consumption feature in the time range
           const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
             ecf.consumptionFeature.selector,
-            startAt,
-            new Date(),
+            parsedStartAt,
+            resolvedEndAt,
           );
           const deviceFeatureCostStatesToInsert = [];
           logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);

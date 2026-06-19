@@ -15,6 +15,8 @@ describe('EnergyMonitoringController', () => {
     energyMonitoringHandler = {
       calculateCostFromBeginning: fake.resolves({ id: 'job-id' }),
       calculateConsumptionFromIndexFromBeginning: fake.resolves({ id: 'job-id' }),
+      calculateCostRange: fake.resolves({ id: 'job-id' }),
+      calculateConsumptionFromIndexRange: fake.resolves({ id: 'job-id' }),
       getContracts: fake.resolves({
         'edf-base': {
           '3': [
@@ -149,6 +151,131 @@ describe('EnergyMonitoringController', () => {
     });
   });
 
+  describe('POST /api/v1/service/energy-monitoring/calculate-cost-range', () => {
+    it('should calculate cost range successfully with start and end dates', async () => {
+      req.body = { feature_selectors: ['feature-1'], start_date: '2025-01-01', end_date: '2025-06-01' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res);
+
+      assert.calledOnce(energyMonitoringHandler.calculateCostRange);
+      assert.calledWithExactly(energyMonitoringHandler.calculateCostRange, '2025-01-01', ['feature-1'], '2025-06-01');
+      assert.calledOnceWithExactly(res.json, {
+        success: true,
+      });
+    });
+
+    it('should default to null dates when not provided', async () => {
+      req.body = { feature_selectors: [] };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res);
+
+      assert.calledOnce(energyMonitoringHandler.calculateCostRange);
+      assert.calledWithExactly(energyMonitoringHandler.calculateCostRange, null, [], null);
+      assert.calledOnceWithExactly(res.json, {
+        success: true,
+      });
+    });
+
+    it('should reject invalid start_date format', async () => {
+      req.body = { feature_selectors: [], start_date: 'not-a-date' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res, next);
+
+      assert.notCalled(energyMonitoringHandler.calculateCostRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
+    });
+
+    it('should reject invalid end_date format', async () => {
+      req.body = { feature_selectors: [], end_date: '2025-13-01' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res, next);
+
+      assert.notCalled(energyMonitoringHandler.calculateCostRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
+    });
+
+    it('should reject non-string start_date', async () => {
+      req.body = { feature_selectors: [], start_date: 12345 };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-cost-range'].controller(req, res, next);
+
+      assert.notCalled(energyMonitoringHandler.calculateCostRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
+    });
+
+    it('should have correct route configuration', () => {
+      const route = controller['post /api/v1/service/energy-monitoring/calculate-cost-range'];
+      expect(route).to.have.property('authenticated', true);
+      expect(route).to.have.property('controller');
+      expect(typeof route.controller).to.equal('function');
+    });
+  });
+
+  describe('POST /api/v1/service/energy-monitoring/calculate-consumption-from-index-range', () => {
+    it('should calculate consumption from index range successfully with start and end dates', async () => {
+      req.body = { feature_selectors: ['feature-1'], start_date: '2025-01-01', end_date: '2025-06-01' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range'].controller(
+        req,
+        res,
+      );
+
+      assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexRange);
+      assert.calledWithExactly(
+        energyMonitoringHandler.calculateConsumptionFromIndexRange,
+        '2025-01-01',
+        ['feature-1'],
+        '2025-06-01',
+      );
+      assert.calledOnceWithExactly(res.json, {
+        success: true,
+      });
+    });
+
+    it('should treat empty-string dates as null', async () => {
+      req.body = { feature_selectors: [], start_date: '', end_date: '' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range'].controller(
+        req,
+        res,
+      );
+
+      assert.calledOnce(energyMonitoringHandler.calculateConsumptionFromIndexRange);
+      assert.calledWithExactly(energyMonitoringHandler.calculateConsumptionFromIndexRange, null, [], null);
+      assert.calledOnceWithExactly(res.json, {
+        success: true,
+      });
+    });
+
+    it('should reject invalid end_date format', async () => {
+      req.body = { feature_selectors: [], end_date: '2025/06/01' };
+
+      await controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range'].controller(
+        req,
+        res,
+        next,
+      );
+
+      assert.notCalled(energyMonitoringHandler.calculateConsumptionFromIndexRange);
+      assert.notCalled(res.json);
+      assert.calledOnce(next);
+      expect(next.firstCall.args[0]).to.be.instanceOf(BadParameters);
+    });
+
+    it('should have correct route configuration', () => {
+      const route = controller['post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range'];
+      expect(route).to.have.property('authenticated', true);
+      expect(route).to.have.property('controller');
+      expect(typeof route.controller).to.equal('function');
+    });
+  });
+
   describe('GET /api/v1/service/energy-monitoring/contracts', () => {
     it('should get contracts successfully', async () => {
       const expectedContracts = {
@@ -213,16 +340,22 @@ describe('EnergyMonitoringController', () => {
       expect(controller).to.have.property(
         'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
       );
+      expect(controller).to.have.property('post /api/v1/service/energy-monitoring/calculate-cost-range');
+      expect(controller).to.have.property(
+        'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range',
+      );
       expect(controller).to.have.property('get /api/v1/service/energy-monitoring/contracts');
     });
 
     it('should have only the expected routes', () => {
       const routes = Object.keys(controller);
-      expect(routes).to.have.lengthOf(3);
+      expect(routes).to.have.lengthOf(5);
       expect(routes).to.include('post /api/v1/service/energy-monitoring/calculate-cost-from-beginning');
       expect(routes).to.include(
         'post /api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
       );
+      expect(routes).to.include('post /api/v1/service/energy-monitoring/calculate-cost-range');
+      expect(routes).to.include('post /api/v1/service/energy-monitoring/calculate-consumption-from-index-range');
       expect(routes).to.include('get /api/v1/service/energy-monitoring/contracts');
     });
 

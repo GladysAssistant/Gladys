@@ -753,4 +753,21 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       errorStub.restore();
     }
   });
+
+  it('should return null when startAt is after endAt in range mode', async () => {
+    const deviceGetStub = stub(device, 'get');
+    try {
+      const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+      const result = await energyMonitoring.calculateCostFrom(
+        new Date('2025-12-01T00:00:00.000Z'),
+        [],
+        'job-id-after',
+        '2025-06-01',
+      );
+      expect(result).to.equal(null);
+      expect(deviceGetStub.called).to.equal(false);
+    } finally {
+      deviceGetStub.restore();
+    }
+  });
 });
