@@ -1524,7 +1524,20 @@ describe('build schemas', () => {
       invalidValueError = e;
     }
     expect(invalidValueError).to.be.an('error');
-    expect(invalidValueError.message).to.contain('value must be a number or string');
+    expect(invalidValueError.message).to.contain('value must be a number for numeric sensors');
+
+    let nonNumericStringError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual Multi Sensor',
+        feature: 'pH',
+        value: 'abc',
+      });
+    } catch (e) {
+      nonNumericStringError = e;
+    }
+    expect(nonNumericStringError).to.be.an('error');
+    expect(nonNumericStringError.message).to.contain('value must be a number for numeric sensors');
 
     const explicitFeatureResult = await sensorSetStateTool.cb({
       device: 'Virtual Multi Sensor',
@@ -1590,6 +1603,82 @@ describe('build schemas', () => {
 
     expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('EF-456-GH');
+  });
+
+  it('should reject feature names that belong to another device', async () => {
+    const phSensorDevice = {
+      selector: 'virtual-ph-sensor',
+      name: 'Virtual pH Sensor',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 20,
+          selector: 'virtual-ph-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+    const plateSensorDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 21,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([phSensorDevice, plateSensorDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(4) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    let crossDeviceFeatureError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual pH Sensor',
+        feature: 'Plate',
+        value: 7.2,
+      });
+    } catch (e) {
+      crossDeviceFeatureError = e;
+    }
+
+    expect(crossDeviceFeatureError).to.be.an('error');
+    expect(crossDeviceFeatureError.message).to.contain('feature "Plate" is not available on device Virtual pH Sensor');
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
   });
 
   it('should not expose sensor.set-state for actuators (read_only false)', async () => {

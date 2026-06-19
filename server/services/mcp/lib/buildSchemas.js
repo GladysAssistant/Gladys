@@ -268,9 +268,6 @@ async function getAllTools(userId) {
       ...device,
       features: device.features.filter((feature) => this.isWritableSensorFeature(feature)),
     }));
-  const writableSensorFeatureNames = [
-    ...new Set(writableSensorDevices.map((device) => device.features.map((feature) => feature.name)).flat()),
-  ];
 
   const tools = [
     {
@@ -628,9 +625,13 @@ async function getAllTools(userId) {
             .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
             .describe('Virtual sensor device name (read-only sensor).'),
           feature: z
-            .enum(writableSensorFeatureNames)
+            .string()
             .optional()
-            .describe('Sensor feature name. Required when the device has multiple writable features.'),
+            .describe(
+              `Sensor feature name on the selected device. Required when the device has multiple features. Available: ${writableSensorDevices
+                .map((d) => `${d.name}: [${d.features.map((f) => f.name).join(', ')}]`)
+                .join('; ')}`,
+            ),
           value: z
             .union([z.number(), z.string()])
             .describe('Value to write. Use a number for numeric sensors and a string for text sensors.'),
@@ -643,6 +644,11 @@ async function getAllTools(userId) {
         let selectedFeature;
         if (feature) {
           selectedFeature = this.findBySimilarity(writableFeatures, feature);
+          if (!writableFeatures.some((writableFeature) => writableFeature.id === selectedFeature.id)) {
+            throw new Error(
+              `sensor.set-state validation failed (422): feature "${feature}" is not available on device ${selectedDevice.name}`,
+            );
+          }
         } else if (writableFeatures.length === 1) {
           [selectedFeature] = writableFeatures;
         } else {
@@ -652,11 +658,23 @@ async function getAllTools(userId) {
         }
 
         const isTextFeature = selectedFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
-        const useStringValue = isTextFeature || (typeof value === 'string' && Number.isNaN(Number(value)));
-        const parsedValue = useStringValue ? String(value) : Number(value);
+        let parsedValue;
+        let useStringValue;
 
-        if (!useStringValue && Number.isNaN(parsedValue)) {
-          throw new Error('sensor.set-state validation failed (422): value must be a number or string');
+        if (isTextFeature) {
+          useStringValue = true;
+          parsedValue = String(value);
+        } else {
+          if (typeof value === 'string' && Number.isNaN(Number(value))) {
+            throw new Error('sensor.set-state validation failed (422): value must be a number for numeric sensors');
+          }
+
+          parsedValue = Number(value);
+          useStringValue = false;
+
+          if (Number.isNaN(parsedValue)) {
+            throw new Error('sensor.set-state validation failed (422): value must be a number for numeric sensors');
+          }
         }
 
         try {
