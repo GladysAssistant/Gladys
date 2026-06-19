@@ -875,8 +875,8 @@ describe('Device', () => {
       params: [],
     });
 
-    const { supported_options, ...featureWithoutOptions } = created.features[0];
-    expect(supported_options).to.have.lengthOf(1);
+    const { supported_options: supportedOptions, ...featureWithoutOptions } = created.features[0];
+    expect(supportedOptions).to.have.lengthOf(1);
 
     const updated = await device.create({
       id: created.id,
