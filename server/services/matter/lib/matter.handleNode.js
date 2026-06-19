@@ -4,6 +4,7 @@ const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
 const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
+const { ensureNodeConnected } = require('../utils/ensureNodeConnected');
 
 const handleDevice = async (
   nodeId,
@@ -78,7 +79,7 @@ const handleDevice = async (
   // If the device has features that Gladys can handle, we add it to Gladys, otherwise we don't add it
   // to avoid bloating Gladys
   if (gladysDevice.features.length > 0) {
-    listenToStateChange(nodeId, newDevicePath, device);
+    await listenToStateChange(nodeId, newDevicePath, device);
     devices.push(gladysDevice);
   }
 
@@ -112,6 +113,10 @@ async function handleNode(nodeDetail) {
     return;
   }
   const node = await this.commissioningController.getNode(nodeDetail.nodeId);
+  const isConnected = await ensureNodeConnected(node);
+  if (!isConnected) {
+    logger.warn(`Matter: Node ${nodeDetail.nodeId} is unreachable, device discovery will continue without live state`);
+  }
   this.nodesMap.set(nodeDetail.nodeId, node);
   const devices = node.getDevices();
   const boundListenToStateChange = this.listenToStateChange.bind(this);

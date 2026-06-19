@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 
 const logger = require('../../../utils/logger');
+const { MATTER_NODE_REFRESH_CONCURRENCY } = require('../utils/constants');
 
 /**
  * @description Refresh the devices.
@@ -11,14 +12,18 @@ async function refreshDevices() {
   this.devices = [];
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
 
-  await Promise.each(nodeDetails, async (nodeDetail) => {
-    try {
-      await this.handleNode(nodeDetail);
-    } catch (err) {
-      // Log error but continue with other devices - one unreachable device shouldn't break the others
-      logger.warn(`Matter: Error handling node ${nodeDetail.nodeId}: ${err.message}`);
-    }
-  });
+  await Promise.map(
+    nodeDetails,
+    async (nodeDetail) => {
+      try {
+        await this.handleNode(nodeDetail);
+      } catch (err) {
+        // Log error but continue with other devices - one unreachable device shouldn't break the others
+        logger.warn(`Matter: Error handling node ${nodeDetail.nodeId}: ${err.message}`);
+      }
+    },
+    { concurrency: MATTER_NODE_REFRESH_CONCURRENCY },
+  );
 }
 
 module.exports = {

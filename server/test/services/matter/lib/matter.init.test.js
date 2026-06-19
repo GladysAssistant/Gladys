@@ -138,6 +138,7 @@ describe('Matter.init', () => {
       },
       getMinLevelAttribute: fake.resolves(0),
       getMaxLevelAttribute: fake.resolves(100),
+      addCurrentLevelAttributeListener: fake.returns(null),
     });
 
     // Relative humidity measurement
@@ -306,6 +307,7 @@ describe('Matter.init', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([
           {
             id: 'device-1',
@@ -924,6 +926,7 @@ describe('Matter.init', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };
@@ -940,6 +943,7 @@ describe('Matter.init', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };
