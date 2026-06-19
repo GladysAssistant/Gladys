@@ -1222,7 +1222,7 @@ describe('build schemas', () => {
           name: 'pH',
           category: 'level-sensor',
           type: 'decimal',
-          read_only: false,
+          read_only: true,
           last_value: 7.2,
         },
       ],
@@ -1238,7 +1238,7 @@ describe('build schemas', () => {
           name: 'Plate',
           category: 'text',
           type: 'text',
-          read_only: false,
+          read_only: true,
         },
       ],
     };
@@ -1308,7 +1308,7 @@ describe('build schemas', () => {
           name: 'Value',
           category: 'temperature-sensor',
           type: 'decimal',
-          read_only: false,
+          read_only: true,
         },
       ],
     };
@@ -1362,7 +1362,7 @@ describe('build schemas', () => {
           name: 'pH',
           category: 'level-sensor',
           type: 'decimal',
-          read_only: false,
+          read_only: true,
         },
         {
           id: 14,
@@ -1370,7 +1370,7 @@ describe('build schemas', () => {
           name: 'Temperature',
           category: 'temperature-sensor',
           type: 'decimal',
-          read_only: false,
+          read_only: true,
         },
       ],
     };
@@ -1454,7 +1454,7 @@ describe('build schemas', () => {
           name: 'Plate',
           category: 'text',
           type: 'text',
-          read_only: false,
+          read_only: true,
         },
       ],
     };
@@ -1494,5 +1494,126 @@ describe('build schemas', () => {
 
     expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('EF-456-GH');
+  });
+
+  it('should not expose sensor.set-state for actuators (read_only false)', async () => {
+    const devices = [
+      {
+        selector: 'virtual-ph-sensor',
+        name: 'Virtual pH Sensor',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 10,
+            selector: 'virtual-ph-sensor-ph',
+            name: 'pH',
+            category: 'level-sensor',
+            type: 'decimal',
+            read_only: true,
+          },
+        ],
+      },
+      {
+        selector: 'actuator-valve',
+        name: 'Pool Valve',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 17,
+            selector: 'actuator-valve-switch',
+            name: 'Valve',
+            category: 'switch',
+            type: 'binary',
+            read_only: false,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(devices),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+    expect(sensorSetStateTool.config.inputSchema.device.options).to.deep.equal(['Virtual pH Sensor']);
+  });
+
+  it('should expose sensor.set-state for read-only virtual sensors', async () => {
+    const writableTextDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 16,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableTextDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+
+    await sensorSetStateTool.cb({
+      device: 'License Plate Sensor',
+      value: 'AB-123-CD',
+    });
+
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
   });
 });

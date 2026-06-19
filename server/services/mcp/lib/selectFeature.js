@@ -81,7 +81,7 @@ const isHistoryFeature = (deviceFeature) => {
 };
 
 const isWritableSensorFeature = (deviceFeature) => {
-  if (deviceFeature.read_only !== false) {
+  if (deviceFeature.read_only !== true) {
     return false;
   }
 

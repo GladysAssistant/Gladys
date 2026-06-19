@@ -71,9 +71,40 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: feature.read_only === false ? ['write', 'read'] : ['read'],
+        access: this.isWritableSensorFeature(feature) ? ['write', 'read'] : ['read'],
       })),
     };
+
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
+  });
+
+  const textDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.TEXT);
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.TEXT),
+    }));
+
+  textDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: this.isWritableSensorFeature(feature) ? ['write', 'read'] : ['read'],
+      })),
+    };
+
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
 
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
@@ -591,11 +622,11 @@ async function getAllTools(userId) {
       config: {
         title: 'Set sensor state',
         description:
-          'Write a value to a writable virtual sensor (for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates.',
+          'Write a value to a virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates.',
         inputSchema: {
           device: z
             .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
-            .describe('Writable virtual sensor device name.'),
+            .describe('Virtual sensor device name (read-only sensor).'),
           feature: z
             .enum(writableSensorFeatureNames)
             .optional()
