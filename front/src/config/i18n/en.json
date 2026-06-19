@@ -2217,6 +2217,12 @@
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
       "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
+      "debugContext": {
+        "title": "AI debug",
+        "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 10 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
+        "downloadButton": "Download JSON context for debug",
+        "error": "Unable to generate debug context. Make sure the MCP service is running."
+      },
       "weeklyDigest": {
         "title": "Weekly home digest",
         "description": "Gladys sends you a weekly summary of your connected home: comfort, energy, maintenance, and useful tips.",

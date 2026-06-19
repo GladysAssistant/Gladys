@@ -137,6 +137,16 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/gateway/aichat/debug-context
+   * @apiName getAiChatDebugContext
+   * @apiGroup Gateway
+   */
+  async function getAiChatDebugContext(req, res) {
+    const context = await gladys.gateway.getAiChatDebugContext(req.user.id);
+    res.json(context);
+  }
+
+  /**
    * @api {post} /api/v1/gateway/stt
    * @apiName stt
    * @apiGroup Gateway
@@ -220,6 +230,7 @@ module.exports = function GatewayController(gladys) {
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
     aiChat: asyncMiddleware(aiChat),
+    getAiChatDebugContext: asyncMiddleware(getAiChatDebugContext),
     stt: asyncMiddleware(stt),
     processVoice: asyncMiddleware(processVoice),
     getTtsUrl: asyncMiddleware(getTtsUrl),

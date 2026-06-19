@@ -369,6 +369,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.aiChat,
     },
+    'get /api/v1/gateway/aichat/debug-context': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.getAiChatDebugContext,
+    },
     'post /api/v1/gateway/stt': {
       authenticated: true,
       audioRawBody: true,
