@@ -206,6 +206,102 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.get.callCount).to.eq(1);
   });
 
+  it('should include text virtual sensors in home structure resources schema', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const devices = [
+      {
+        selector: 'device-sensor-text',
+        name: 'Mixed Sensor',
+        room: { selector: 'salon' },
+        features: [
+          {
+            id: 1,
+            selector: 'device-sensor-text-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+          },
+          {
+            id: 2,
+            selector: 'device-sensor-text-plate',
+            name: 'Plate',
+            category: 'text',
+            type: 'text',
+            read_only: true,
+          },
+        ],
+      },
+      {
+        selector: 'device-text-only',
+        name: 'License Plate Sensor',
+        room: { selector: 'salon' },
+        features: [
+          {
+            id: 3,
+            selector: 'device-text-only-value',
+            name: 'Plate',
+            category: 'text',
+            type: 'text',
+            read_only: true,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllResources,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        device: { get: stub().resolves(devices) },
+      },
+    };
+
+    const resources = await mcpHandler.getAllResources();
+    const result = await resources[0].cb({ href: 'schema://home' });
+    const homeSchema = JSON.parse(result.contents[0].text);
+
+    expect(homeSchema.salon.devices['device-sensor-text']).to.deep.equal({
+      name: 'Mixed Sensor',
+      selector: 'device-sensor-text',
+      features: [
+        {
+          name: 'Temperature',
+          selector: 'device-sensor-text-temp',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          access: ['write', 'read'],
+        },
+        {
+          name: 'Plate',
+          selector: 'device-sensor-text-plate',
+          category: 'text',
+          type: 'text',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+
+    expect(homeSchema.salon.devices['device-text-only']).to.deep.equal({
+      name: 'License Plate Sensor',
+      selector: 'device-text-only',
+      features: [
+        {
+          name: 'Plate',
+          selector: 'device-text-only-value',
+          category: 'text',
+          type: 'text',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+  });
+
   it('should handle devices without room assignment in getAllResources', async () => {
     const rooms = [
       {
