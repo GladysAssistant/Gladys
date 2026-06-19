@@ -1,5 +1,5 @@
 const z = require('zod/v4');
-const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -71,7 +71,7 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: ['read'],
+        access: feature.read_only === false ? ['write', 'read'] : ['read'],
       })),
     };
 
@@ -231,8 +231,17 @@ async function getAllTools(userId) {
         .flat(),
     ),
   ];
+  const writableSensorDevices = allDevices
+    .filter((device) => device.features.some((feature) => this.isWritableSensorFeature(feature)))
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isWritableSensorFeature(feature)),
+    }));
+  const writableSensorFeatureNames = [
+    ...new Set(writableSensorDevices.map((device) => device.features.map((feature) => feature.name)).flat()),
+  ];
 
-  return [
+  const tools = [
     {
       intent: 'camera.get-image',
       config: {
@@ -574,6 +583,87 @@ async function getAllTools(userId) {
         };
       },
     },
+  ];
+
+  if (writableSensorDevices.length > 0) {
+    tools.push({
+      intent: 'sensor.set-state',
+      config: {
+        title: 'Set sensor state',
+        description:
+          'Write a value to a writable virtual sensor (for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates.',
+        inputSchema: {
+          device: z
+            .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
+            .describe('Writable virtual sensor device name.'),
+          feature: z
+            .enum(writableSensorFeatureNames)
+            .optional()
+            .describe('Sensor feature name. Required when the device has multiple writable features.'),
+          value: z
+            .union([z.number(), z.string()])
+            .describe('Value to write. Use a number for numeric sensors and a string for text sensors.'),
+        },
+      },
+      cb: async ({ device, feature, value }) => {
+        const selectedDevice = this.findBySimilarity(writableSensorDevices, device);
+        const writableFeatures = selectedDevice.features;
+
+        let selectedFeature;
+        if (feature) {
+          selectedFeature = this.findBySimilarity(writableFeatures, feature);
+        } else if (writableFeatures.length === 1) {
+          [selectedFeature] = writableFeatures;
+        } else {
+          throw new Error(
+            'sensor.set-state validation failed (422): feature is required when device has multiple writable sensor features',
+          );
+        }
+
+        const isTextFeature = selectedFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+        const useStringValue = isTextFeature || (typeof value === 'string' && Number.isNaN(Number(value)));
+        const parsedValue = useStringValue ? String(value) : Number(value);
+
+        if (!useStringValue && Number.isNaN(parsedValue)) {
+          throw new Error('sensor.set-state validation failed (422): value must be a number or string');
+        }
+
+        try {
+          await this.gladys.device.setValue(selectedDevice, selectedFeature, parsedValue);
+        } catch (e) {
+          if (useStringValue) {
+            await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
+          } else {
+            await this.gladys.device.saveState(selectedFeature, parsedValue);
+          }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+              },
+            ],
+          };
+        }
+
+        if (useStringValue) {
+          await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  tools.push(
     {
       intent: 'web.fetch',
       config: {
@@ -647,7 +737,9 @@ async function getAllTools(userId) {
         };
       },
     },
-  ];
+  );
+
+  return tools;
 }
 
 module.exports = {

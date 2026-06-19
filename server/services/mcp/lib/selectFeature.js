@@ -80,8 +80,17 @@ const isHistoryFeature = (deviceFeature) => {
   );
 };
 
+const isWritableSensorFeature = (deviceFeature) => {
+  if (deviceFeature.read_only !== false) {
+    return false;
+  }
+
+  return isSensorFeature(deviceFeature) || deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+};
+
 module.exports = {
   isSensorFeature,
   isSwitchableFeature,
   isHistoryFeature,
+  isWritableSensorFeature,
 };
