@@ -5,7 +5,9 @@ const supportedOptionSchema = Joi.object({
   id: Joi.string()
     .uuid()
     .optional(),
-  value: Joi.number().required(),
+  value: Joi.number()
+    .integer()
+    .required(),
   label: Joi.string()
     .trim()
     .min(1)

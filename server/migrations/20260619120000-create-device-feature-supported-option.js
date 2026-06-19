@@ -18,7 +18,7 @@ module.exports = {
       },
       value: {
         allowNull: false,
-        type: Sequelize.DOUBLE,
+        type: Sequelize.INTEGER,
       },
       label: {
         allowNull: false,

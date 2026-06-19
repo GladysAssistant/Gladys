@@ -134,13 +134,9 @@ async function create(device) {
     deviceToReturn.params = deviceToReturn.params || [];
 
     const energyParentIdByExternalId = new Map();
-    const supportedOptionsByExternalId = new Map();
     const featuresToSave = features.map((feature) => {
       if (Object.prototype.hasOwnProperty.call(feature, 'energy_parent_id')) {
         energyParentIdByExternalId.set(feature.external_id, feature.energy_parent_id);
-      }
-      if (Object.prototype.hasOwnProperty.call(feature, 'supported_options')) {
-        supportedOptionsByExternalId.set(feature.external_id, feature.supported_options);
       }
       const featureToSave = { ...feature };
       delete featureToSave.energy_parent_id;
@@ -196,7 +192,8 @@ async function create(device) {
     });
 
     deviceToReturn.features = await Promise.map(newFeatures, async (savedFeature) => {
-      if (!supportedOptionsByExternalId.has(savedFeature.external_id)) {
+      const payloadFeature = matchFeatureInList(savedFeature, features);
+      if (!payloadFeature || !Object.prototype.hasOwnProperty.call(payloadFeature, 'supported_options')) {
         const existingFeature = matchFeatureInList(savedFeature, deviceToReturn.features);
         savedFeature.supported_options = existingFeature?.supported_options ?? [];
         return savedFeature;
@@ -204,7 +201,7 @@ async function create(device) {
 
       savedFeature.supported_options = await syncFeatureSupportedOptions(
         savedFeature.id,
-        supportedOptionsByExternalId.get(savedFeature.external_id),
+        payloadFeature.supported_options,
         transaction,
       );
       return savedFeature;

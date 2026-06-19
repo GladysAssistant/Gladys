@@ -42,6 +42,10 @@ describe('normalizeSupportedOptions', () => {
     expect(() => normalizeSupportedOptions([{ value: '1', label: 'On' }])).to.throw(BadParameters);
   });
 
+  it('should reject decimal values', () => {
+    expect(() => normalizeSupportedOptions([{ value: 1.5, label: 'On' }])).to.throw(BadParameters);
+  });
+
   it('should accept an empty array', () => {
     expect(normalizeSupportedOptions([])).to.deep.equal([]);
   });

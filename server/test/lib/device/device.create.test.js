@@ -802,6 +802,60 @@ describe('Device', () => {
     ).get({ plain: true });
     expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
   });
+  it('should sync supported_options when feature payload only has id', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Vacuum device by id',
+      external_id: 'vacuum-supported-options-by-id',
+      features: [
+        {
+          name: 'Run mode',
+          external_id: 'vacuum-by-id:run-mode',
+          category: 'vacuum-cleaner',
+          type: 'mode',
+          read_only: false,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 5,
+          supported_options: [{ value: 0, label: 'Idle', sort_order: 0 }],
+        },
+      ],
+      params: [],
+    });
+
+    const feature = created.features[0];
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          id: feature.id,
+          name: feature.name,
+          category: feature.category,
+          type: feature.type,
+          read_only: feature.read_only,
+          keep_history: feature.keep_history,
+          has_feedback: feature.has_feedback,
+          min: feature.min,
+          max: feature.max,
+          supported_options: [{ value: 3, label: 'Paused', sort_order: 0 }],
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.have.lengthOf(1);
+    expect(updated.features[0].supported_options[0]).to.include({
+      value: 3,
+      label: 'Paused',
+    });
+  });
   it('should reject invalid supported_options during device create', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);

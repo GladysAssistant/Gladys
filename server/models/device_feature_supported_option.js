@@ -19,9 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       value: {
         allowNull: false,
-        type: DataTypes.DOUBLE,
+        type: DataTypes.INTEGER,
         validate: {
-          isFloat: true,
+          isInt: true,
         },
       },
       label: {
