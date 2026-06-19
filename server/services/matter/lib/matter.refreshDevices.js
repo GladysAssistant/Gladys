@@ -12,6 +12,8 @@ async function refreshDevices() {
   this.devices = [];
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
 
+  logger.info(`Matter: Refreshing ${nodeDetails.length} commissioned node(s)...`);
+
   await Promise.map(
     nodeDetails,
     async (nodeDetail) => {
@@ -24,6 +26,8 @@ async function refreshDevices() {
     },
     { concurrency: MATTER_NODE_REFRESH_CONCURRENCY },
   );
+
+  logger.info(`Matter: Refresh complete, ${this.devices.length} device(s) with features discovered`);
 }
 
 module.exports = {

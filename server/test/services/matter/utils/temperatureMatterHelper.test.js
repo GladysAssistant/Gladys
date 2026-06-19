@@ -17,7 +17,8 @@ describe('Matter.temperatureMatterHelper', () => {
       emit: fake(),
     };
     matterLogger = {
-      debug: fake(),
+      info: fake(),
+      warn: fake(),
     };
   });
 
@@ -58,6 +59,28 @@ describe('Matter.temperatureMatterHelper', () => {
       device_feature_external_id: 'matter:1:4:513:local-temperature',
       state: 55,
     });
+    assert.calledOnceWithExactly(
+      matterLogger.info,
+      'Matter: Initial Thermostat localTemperature for matter:1:4:513:local-temperature: 55°C',
+    );
+  });
+
+  it('should log when initial temperature is empty', async () => {
+    const getValue = fake.resolves(null);
+
+    await readAndEmitInitialTemperature(
+      getValue,
+      gladysEvent,
+      'matter:1:4:1026',
+      matterLogger,
+      'TemperatureMeasurement value',
+    );
+
+    assert.notCalled(gladysEvent.emit);
+    assert.calledOnceWithExactly(
+      matterLogger.info,
+      'Matter: Initial TemperatureMeasurement value is empty for matter:1:4:1026',
+    );
   });
 
   it('should log and ignore initial temperature read failures', async () => {
@@ -73,8 +96,8 @@ describe('Matter.temperatureMatterHelper', () => {
 
     assert.notCalled(gladysEvent.emit);
     assert.calledOnceWithExactly(
-      matterLogger.debug,
-      'Matter: Failed to read initial TemperatureMeasurement value: Read failed',
+      matterLogger.warn,
+      'Matter: Failed to read initial TemperatureMeasurement value for matter:1:4:1026: Read failed',
     );
   });
 });

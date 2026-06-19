@@ -31,7 +31,7 @@ describe('Matter.ensureNodeConnected', () => {
       },
     };
 
-    const connectPromise = ensureNodeConnected(node);
+    const connectPromise = ensureNodeConnected(node, { nodeId: 12345n });
     await Promise.resolve();
     assert.calledOnce(node.connect);
     resolveInitialized();
@@ -48,7 +48,7 @@ describe('Matter.ensureNodeConnected', () => {
       },
     };
 
-    const isConnected = await ensureNodeConnected(node, 10);
+    const isConnected = await ensureNodeConnected(node, { timeoutMs: 10 });
 
     assert.calledOnce(node.connect);
     expect(isConnected).to.equal(false);

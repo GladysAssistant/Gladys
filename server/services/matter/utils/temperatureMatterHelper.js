@@ -37,9 +37,14 @@ function emitTemperatureState(gladysEvent, deviceFeatureExternalId, value) {
 async function readAndEmitInitialTemperature(getValue, gladysEvent, deviceFeatureExternalId, matterLogger, logContext) {
   try {
     const value = await getValue();
+    if (value === null || value === undefined) {
+      matterLogger.info(`Matter: Initial ${logContext} is empty for ${deviceFeatureExternalId}`);
+      return;
+    }
     emitTemperatureState(gladysEvent, deviceFeatureExternalId, value);
+    matterLogger.info(`Matter: Initial ${logContext} for ${deviceFeatureExternalId}: ${value / 100}°C`);
   } catch (error) {
-    matterLogger.debug(`Matter: Failed to read initial ${logContext}: ${error.message}`);
+    matterLogger.warn(`Matter: Failed to read initial ${logContext} for ${deviceFeatureExternalId}: ${error.message}`);
   }
 }
 

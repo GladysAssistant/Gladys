@@ -112,8 +112,9 @@ async function handleNode(nodeDetail) {
     logger.warn(`Matter: Node ${nodeDetail.nodeId} has no device data`);
     return;
   }
+  const devicesCountBefore = this.devices.length;
   const node = await this.commissioningController.getNode(nodeDetail.nodeId);
-  const isConnected = await ensureNodeConnected(node);
+  const isConnected = await ensureNodeConnected(node, { nodeId: nodeDetail.nodeId });
   if (!isConnected) {
     logger.warn(`Matter: Node ${nodeDetail.nodeId} is unreachable, device discovery will continue without live state`);
   }
@@ -133,6 +134,12 @@ async function handleNode(nodeDetail) {
       '',
     );
   });
+  const devicesDiscovered = this.devices.length - devicesCountBefore;
+  logger.info(
+    `Matter: Node ${nodeDetail.nodeId} handled, ${devicesDiscovered} device(s) with features (${
+      isConnected ? 'connected' : 'offline'
+    })`,
+  );
 }
 
 module.exports = {
