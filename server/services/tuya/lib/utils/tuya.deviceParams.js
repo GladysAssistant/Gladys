@@ -1,5 +1,6 @@
 const { DEVICE_PARAM_NAME } = require('./tuya.constants');
 const { normalizeBoolean } = require('./tuya.normalize');
+const { buildLocalScanReport, withTuyaReport } = require('./tuya.report');
 
 const upsertParam = (params, name, value) => {
   if (value === undefined || value === null) {
@@ -53,7 +54,7 @@ const updateDiscoveredDeviceWithLocalInfo = (device, localInfo) => {
   upsertParam(updated.params, DEVICE_PARAM_NAME.IP_ADDRESS, updated.ip);
   upsertParam(updated.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, updated.protocol_version);
   upsertParam(updated.params, DEVICE_PARAM_NAME.PRODUCT_KEY, updated.product_key);
-  return updated;
+  return withTuyaReport(updated, buildLocalScanReport(localInfo));
 };
 
 const applyExistingLocalParams = (device, existingDevice) => {

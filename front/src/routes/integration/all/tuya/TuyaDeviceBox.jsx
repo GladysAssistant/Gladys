@@ -5,91 +5,45 @@ import { Link } from 'preact-router';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
-import { RequestStatus } from '../../../../utils/consts';
+import {
+  normalizeBoolean,
+  buildParamsMap,
+  getLocalOverrideValue,
+  getTuyaDeviceId,
+  getLocalPollDpsFromParams,
+  getUnknownDpsKeys,
+  getUnknownSpecificationCodes,
+  resolveOnlineStatus
+} from './commons/deviceHelpers';
+import TuyaLocalPollSection from './TuyaLocalPollSection';
+import TuyaGithubIssueSection from './discover-page/TuyaGithubIssueSection';
 
-const normalizeBoolean = value =>
-  value === true || value === 1 || value === '1' || value === 'true' || value === 'TRUE';
-const ONLINE_RECENT_MINUTES = 5;
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
 const CLOUD_POLL_FREQUENCY = 30 * 1000;
 
-const parseDate = dateValue => {
-  if (!dateValue) {
-    return null;
-  }
-  let date = new Date(dateValue);
-  if (!Number.isNaN(date.getTime())) {
-    return date;
-  }
-  if (typeof dateValue === 'string') {
-    const normalized = dateValue.replace(' ', 'T').replace(' +', '+');
-    date = new Date(normalized);
-  }
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date;
+const getDeviceDisplayData = device => {
+  const params = buildParamsMap(device);
+  return {
+    deviceId: params.DEVICE_ID || getTuyaDeviceId(device),
+    localKey: params.LOCAL_KEY || device.local_key || '',
+    productId: params.PRODUCT_ID || device.product_id || '',
+    productKey: params.PRODUCT_KEY || device.product_key || '',
+    localOverride: normalizeBoolean(getLocalOverrideValue(device)),
+    persistedLocalPollDps: getLocalPollDpsFromParams(device)
+  };
 };
-
-const getMostRecentFeatureDate = device => {
-  if (!Array.isArray(device && device.features)) {
-    return null;
-  }
-  return device.features.reduce((mostRecent, feature) => {
-    const featureDate = parseDate(feature && feature.last_value_changed);
-    if (!featureDate) {
-      return mostRecent;
-    }
-    if (!mostRecent || featureDate > mostRecent) {
-      return featureDate;
-    }
-    return mostRecent;
-  }, null);
-};
-
-const isReachableFromRecentFeatures = device => {
-  const mostRecentFeatureDate = getMostRecentFeatureDate(device);
-  if (!mostRecentFeatureDate) {
-    return false;
-  }
-  return Date.now() - mostRecentFeatureDate.getTime() <= ONLINE_RECENT_MINUTES * 60 * 1000;
-};
-
-const resolveOnlineStatus = device => {
-  if (isReachableFromRecentFeatures(device)) {
-    return true;
-  }
-  const online = device && device.online;
-  if (typeof online === 'boolean') {
-    return online;
-  }
-  if (online === 1 || online === 0) {
-    return online === 1;
-  }
-  return false;
-};
-
-const buildParamsMap = device =>
-  (Array.isArray(device && device.params) ? device.params : []).reduce((acc, param) => {
-    acc[param.name] = param.value;
-    return acc;
-  }, {});
 
 const buildComparableDevice = device => {
   if (!device) {
     return null;
   }
   const params = buildParamsMap(device);
-  const localOverrideRaw =
-    params.LOCAL_OVERRIDE !== undefined && params.LOCAL_OVERRIDE !== null
-      ? params.LOCAL_OVERRIDE
-      : device.local_override;
   return {
     name: device.name || '',
     room_id: device.room_id || null,
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    local_override: normalizeBoolean(localOverrideRaw)
+    local_override: normalizeBoolean(getLocalOverrideValue(device))
   };
 };
 
@@ -117,14 +71,10 @@ const getLocalConfig = device => {
     };
   }
   const params = buildParamsMap(device);
-  const localOverrideRaw =
-    params.LOCAL_OVERRIDE !== undefined && params.LOCAL_OVERRIDE !== null
-      ? params.LOCAL_OVERRIDE
-      : device.local_override;
   return {
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    localOverride: normalizeBoolean(localOverrideRaw)
+    localOverride: normalizeBoolean(getLocalOverrideValue(device))
   };
 };
 
@@ -139,12 +89,34 @@ const isLocalPollValidated = (validation, currentConfig) =>
   validation.ip === currentConfig.ip &&
   validation.protocol === currentConfig.protocol;
 
+const getLocalValidationState = (device, baselineDevice, localPollValidation) => {
+  const currentLocalConfig = getLocalConfig(device);
+  const baselineLocalConfig = getLocalConfig(baselineDevice);
+  const localConfigChanged = hasLocalConfigChanged(currentLocalConfig, baselineLocalConfig);
+  const requiresLocalPollValidation = currentLocalConfig.localOverride === true && localConfigChanged;
+  const localPollValidated = isLocalPollValidated(localPollValidation, currentLocalConfig);
+  return {
+    hasLocalChanges: hasDeviceChanged(device, baselineDevice),
+    requiresLocalPollValidation,
+    localPollValidated,
+    canSave: !requiresLocalPollValidation || localPollValidated
+  };
+};
+
+const getUnknownKeys = (device, effectiveLocalPollDps) => {
+  if (effectiveLocalPollDps) {
+    return getUnknownDpsKeys(effectiveLocalPollDps, device.features, device);
+  }
+  return getUnknownSpecificationCodes(device.specifications, device.features, device);
+};
+
 class TuyaDeviceBox extends Component {
   componentWillMount() {
     this.setState({
       device: this.props.device,
       baselineDevice: this.props.device,
-      localPollValidation: null
+      localPollValidation: null,
+      localPollDps: null
     });
   }
 
@@ -154,44 +126,31 @@ class TuyaDeviceBox extends Component {
     const isNewDevice = !currentDevice || currentDevice.external_id !== nextDevice.external_id;
     const baselineDevice = this.state.baselineDevice;
     const shouldRefreshBaseline = isNewDevice || !baselineDevice || baselineDevice.updated_at !== nextDevice.updated_at;
+    // Only carry forward specifications/tuya_report when refreshing the SAME device with a partial
+    // payload. Across devices (isNewDevice=true) we must never inherit the previous device's data.
+    let mergedNextDevice = nextDevice;
+    if (!isNewDevice && currentDevice) {
+      if (currentDevice.specifications && !mergedNextDevice.specifications) {
+        mergedNextDevice = { ...mergedNextDevice, specifications: currentDevice.specifications };
+      }
+      if (currentDevice.tuya_report && !mergedNextDevice.tuya_report) {
+        mergedNextDevice = { ...mergedNextDevice, tuya_report: currentDevice.tuya_report };
+      }
+    }
     if (isNewDevice) {
       this.setState({
-        device: nextDevice,
-        baselineDevice: nextDevice,
-        localPollValidation: null
+        device: mergedNextDevice,
+        baselineDevice: mergedNextDevice,
+        localPollValidation: null,
+        localPollDps: null
       });
       return;
     }
     this.setState({
-      device: nextDevice,
-      baselineDevice: shouldRefreshBaseline ? nextDevice : baselineDevice
+      device: mergedNextDevice,
+      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice
     });
   }
-
-  toggleIpMode = () => {
-    const device = this.state.device;
-    const params = Array.isArray(device.params) ? [...device.params] : [];
-    const overrideParam = params.find(param => param.name === 'LOCAL_OVERRIDE');
-    const localOverrideRaw = overrideParam ? overrideParam.value : device.local_override;
-    const currentOverride = normalizeBoolean(localOverrideRaw);
-    const nextOverride = currentOverride !== true;
-    const existingIndex = params.findIndex(param => param.name === 'LOCAL_OVERRIDE');
-    if (existingIndex >= 0) {
-      params[existingIndex] = { ...params[existingIndex], value: nextOverride };
-    } else {
-      params.push({ name: 'LOCAL_OVERRIDE', value: nextOverride });
-    }
-    this.setState({
-      device: {
-        ...device,
-        params,
-        local_override: nextOverride
-      },
-      localPollValidation: null,
-      localPollStatus: null,
-      localPollError: null
-    });
-  };
 
   updateName = e => {
     this.setState({
@@ -211,133 +170,8 @@ class TuyaDeviceBox extends Component {
     });
   };
 
-  updateProtocol = e => {
-    const protocolVersion = e.target.value;
-    const params = Array.isArray(this.state.device.params) ? [...this.state.device.params] : [];
-    const existingIndex = params.findIndex(param => param.name === 'PROTOCOL_VERSION');
-    if (existingIndex >= 0) {
-      params[existingIndex] = { ...params[existingIndex], value: protocolVersion };
-    } else {
-      params.push({ name: 'PROTOCOL_VERSION', value: protocolVersion });
-    }
-    this.setState({
-      device: {
-        ...this.state.device,
-        params
-      },
-      localPollValidation: null,
-      localPollStatus: null,
-      localPollError: null
-    });
-  };
-
-  pollLocal = async () => {
-    const currentDevice = this.state.device;
-    this.setState({
-      localPollStatus: RequestStatus.Getting,
-      localPollError: null,
-      localPollProtocol: null
-    });
-    const params = Array.isArray(currentDevice.params) ? currentDevice.params : [];
-    const getParam = name => {
-      const found = params.find(param => param.name === name);
-      return found ? found.value : undefined;
-    };
-    // Probe legacy protocols (3.3 / 3.1) first, newgen protocols (3.5 / 3.4) last:
-    // newgen attempts on a 3.3 device produce HMAC mismatch errors that put the
-    // device into a short-lived protective state and cause subsequent local
-    // connections to fail with ECONNRESET. Most Tuya consumer devices speak 3.3,
-    // so this order also returns faster in the common case.
-    const tryProtocols = ['3.3', '3.1', '3.5', '3.4'];
-    const selectedProtocol = getParam('PROTOCOL_VERSION') || currentDevice.protocol_version;
-    const protocolList = selectedProtocol ? [selectedProtocol] : tryProtocols;
-    try {
-      let result = null;
-      let usedProtocol = selectedProtocol;
-      let latestDevice = null;
-      const isValidResult = data => data && typeof data === 'object' && data.dps;
-      for (let i = 0; i < protocolList.length; i += 1) {
-        const protocolVersion = protocolList[i];
-        try {
-          this.setState({
-            localPollProtocol: protocolVersion
-          });
-          const response = await this.props.httpClient.post('/api/v1/service/tuya/local-poll', {
-            deviceId: currentDevice.external_id && currentDevice.external_id.split(':')[1],
-            ip: getParam('IP_ADDRESS') || currentDevice.ip,
-            localKey: getParam('LOCAL_KEY') || currentDevice.local_key,
-            protocolVersion,
-            timeoutMs: 3000,
-            fastScan: true
-          });
-          result = response && response.dps ? response : null;
-          const updatedDevice = response && response.device ? response.device : null;
-          if (updatedDevice) {
-            latestDevice = updatedDevice;
-          }
-          if (!isValidResult(result)) {
-            throw new Error('Invalid local poll response');
-          }
-          usedProtocol = protocolVersion;
-          break;
-        } catch (e) {
-          if (i === protocolList.length - 1) {
-            throw e;
-          }
-        }
-      }
-      const newParams = [...params];
-      if (usedProtocol) {
-        const protocolIndex = newParams.findIndex(param => param.name === 'PROTOCOL_VERSION');
-        if (protocolIndex >= 0) {
-          newParams[protocolIndex] = { ...newParams[protocolIndex], value: usedProtocol };
-        } else {
-          newParams.push({ name: 'PROTOCOL_VERSION', value: usedProtocol });
-        }
-      }
-      const baseDevice = latestDevice || currentDevice;
-      this.setState({
-        device: {
-          ...baseDevice,
-          params: newParams
-        },
-        localPollStatus: RequestStatus.Success,
-        localPollProtocol: null,
-        localPollValidation: {
-          ip: getParam('IP_ADDRESS') || currentDevice.ip || '',
-          protocol: usedProtocol || '',
-          localOverride: true
-        }
-      });
-    } catch (e) {
-      const message =
-        (e && e.response && e.response.data && e.response.data.message) || (e && e.message) || 'Unknown error';
-      this.setState({
-        localPollStatus: RequestStatus.Error,
-        localPollError: message,
-        localPollProtocol: null
-      });
-    }
-  };
-
-  updateIpAddress = e => {
-    const ipAddress = e.target.value;
-    const params = Array.isArray(this.state.device.params) ? [...this.state.device.params] : [];
-    const existingIndex = params.findIndex(param => param.name === 'IP_ADDRESS');
-    if (existingIndex >= 0) {
-      params[existingIndex] = { ...params[existingIndex], value: ipAddress };
-    } else {
-      params.push({ name: 'IP_ADDRESS', value: ipAddress });
-    }
-    this.setState({
-      device: {
-        ...this.state.device,
-        params
-      },
-      localPollValidation: null,
-      localPollStatus: null,
-      localPollError: null
-    });
+  handleLocalPollChange = patch => {
+    this.setState(patch);
   };
 
   saveDevice = async () => {
@@ -421,45 +255,42 @@ class TuyaDeviceBox extends Component {
       localPollStatus,
       localPollError,
       localPollProtocol,
-      localPollValidation
+      localPollValidation,
+      localPollDps
     }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = resolveOnlineStatus(device);
-    const paramsArray = Array.isArray(device.params) ? device.params : [];
-    const params = paramsArray.reduce((acc, param) => {
-      acc[param.name] = param.value;
-      return acc;
-    }, {});
-    const deviceId = params.DEVICE_ID || (device.external_id ? device.external_id.split(':')[1] : '');
-    const localKey = params.LOCAL_KEY || device.local_key || '';
-    const productId = params.PRODUCT_ID || device.product_id || '';
-    const productKey = params.PRODUCT_KEY || device.product_key || '';
-    const protocolVersion = params.PROTOCOL_VERSION || device.protocol_version || '';
-    const localOverrideRaw =
-      params.LOCAL_OVERRIDE !== undefined && params.LOCAL_OVERRIDE !== null
-        ? params.LOCAL_OVERRIDE
-        : device.local_override;
-    const localOverride = normalizeBoolean(localOverrideRaw);
-    const ipAddress = params.IP_ADDRESS || device.ip || '';
-    const cloudIp = params.CLOUD_IP || device.cloud_ip || '';
-    const showCloudIp = localOverride !== true;
-    const displayIp = showCloudIp ? cloudIp : ipAddress;
-    const isValidIp =
-      typeof ipAddress === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ipAddress);
-    const canPollLocal = localOverride === true && isValidIp && localKey;
-    const hasLocalChanges = hasDeviceChanged(device, this.state.baselineDevice);
-    const currentLocalConfig = getLocalConfig(device);
-    const baselineLocalConfig = getLocalConfig(this.state.baselineDevice);
-    const localConfigChanged = hasLocalConfigChanged(currentLocalConfig, baselineLocalConfig);
-    const requiresLocalPollValidation = currentLocalConfig.localOverride === true && localConfigChanged;
-    const localPollValidated = isLocalPollValidated(localPollValidation, currentLocalConfig);
-    const canSave = !requiresLocalPollValidation || localPollValidated;
+    const { deviceId, localKey, productId, productKey, localOverride, persistedLocalPollDps } = getDeviceDisplayData(
+      device
+    );
+    const { hasLocalChanges, requiresLocalPollValidation, localPollValidated, canSave } = getLocalValidationState(
+      device,
+      this.state.baselineDevice,
+      localPollValidation
+    );
     const isDiscoverPage = !deleteButton;
     const showUpdateButton =
       validModel && isDiscoverPage && (updateButton || (alreadyCreatedButton && hasLocalChanges));
     const showAlreadyCreatedButton = validModel && alreadyCreatedButton && !hasLocalChanges;
-    const pollProtocolLabel = localPollProtocol || protocolVersion || '-';
+    const effectiveLocalPollDps = localOverride ? localPollDps || persistedLocalPollDps : null;
+    const unknownKeys = getUnknownKeys(device, effectiveLocalPollDps);
+    const hasPartialSupport = validModel && unknownKeys.length > 0;
+    const partialCountLabelId =
+      isDiscoverPage && !device.created_at
+        ? 'integration.tuya.device.partialFeaturesCountDiscover'
+        : 'integration.tuya.device.partialFeaturesCount';
+
+    const renderGithubIssuePrepAlert = titleId => (
+      <div class="alert alert-warning mt-3 mb-3">
+        <div class="font-weight-bold h5 mb-2">
+          <Text id={titleId} />
+        </div>
+        <div>
+          <MarkupText id="integration.tuya.device.githubIssueLocalPrepInfo" />
+        </div>
+      </div>
+    );
 
     return (
       <div class="col-md-6">
@@ -534,6 +365,32 @@ class TuyaDeviceBox extends Component {
                 </div>
 
                 <div class="form-group">
+                  <label class="form-label" for={`room_${deviceIndex}`}>
+                    <Text id="integration.tuya.roomLabel" />
+                  </label>
+                  <select
+                    id={`room_${deviceIndex}`}
+                    onChange={this.updateRoom}
+                    class="form-control"
+                    disabled={!editable}
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    {housesWithRooms &&
+                      housesWithRooms.map(house => (
+                        <optgroup label={house.name}>
+                          {house.rooms.map(room => (
+                            <option selected={room.id === device.room_id} value={room.id}>
+                              {room.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                  </select>
+                </div>
+
+                <div class="form-group">
                   <label class="form-label" for={`product_id_${deviceIndex}`}>
                     <Text id="integration.tuya.device.productIdLabel" />
                   </label>
@@ -574,114 +431,31 @@ class TuyaDeviceBox extends Component {
                   />
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label" for={`ip_${deviceIndex}`}>
-                    <Text id="integration.tuya.device.ipAddressLabel" />
-                  </label>
-                  <div class="input-group">
-                    <input
-                      id={`ip_${deviceIndex}`}
-                      type="text"
-                      value={displayIp}
-                      class="form-control"
-                      onInput={!showCloudIp ? this.updateIpAddress : undefined}
-                      disabled={showCloudIp}
-                    />
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary" type="button" onClick={this.toggleIpMode}>
-                        <Text id={`integration.tuya.device.${showCloudIp ? 'ipModeCloud' : 'ipModeLocal'}`} />
-                      </button>
-                    </div>
-                  </div>
-                  <small class="form-text text-muted">
-                    <Text id="integration.tuya.device.localInfoHelp" />
-                  </small>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`protocol_${deviceIndex}`}>
-                    <Text id="integration.tuya.device.protocolVersionLabel" />
-                  </label>
-                  <select
-                    id={`protocol_${deviceIndex}`}
-                    class="form-control"
-                    value={protocolVersion}
-                    onChange={this.updateProtocol}
-                    disabled={showCloudIp}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    <option value="3.1">3.1</option>
-                    <option value="3.3">3.3</option>
-                    <option value="3.4">3.4</option>
-                    <option value="3.5">3.5</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <button
-                    onClick={this.pollLocal}
-                    class="btn btn-outline-secondary"
-                    disabled={!canPollLocal || localPollStatus === RequestStatus.Getting}
-                  >
-                    <Text id="integration.tuya.device.localPollButton" />
-                  </button>
-                  {localPollStatus === RequestStatus.Getting && (
-                    <span class="text-muted ml-2">
-                      <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" />
-                      <Text id="integration.tuya.device.localPollInProgress" fields={{ protocol: pollProtocolLabel }} />
-                    </span>
-                  )}
-                  {localPollStatus === RequestStatus.Success && (
-                    <span class="text-success ml-2">
-                      <Text id="integration.tuya.device.localPollSuccess" />
-                    </span>
-                  )}
-                  {localPollStatus === RequestStatus.Error && (
-                    <span class="text-danger ml-2">
-                      <Text id="integration.tuya.device.localPollError" /> {localPollError}
-                    </span>
-                  )}
-                  <small class="form-text text-muted mt-2">
-                    <Text id="integration.tuya.device.localPollHelp" />
-                  </small>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.tuya.roomLabel" />
-                  </label>
-                  <select
-                    id={`room_${deviceIndex}`}
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    disabled={!editable}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
+                <TuyaLocalPollSection
+                  httpClient={this.props.httpClient}
+                  device={device}
+                  deviceIndex={deviceIndex}
+                  localPollStatus={localPollStatus}
+                  localPollError={localPollError}
+                  localPollProtocol={localPollProtocol}
+                  onLocalPollChange={this.handleLocalPollChange}
+                />
 
                 {validModel && (
                   <div class="form-group">
                     <label class="form-label">
                       <Text id="integration.tuya.device.featuresLabel" />
+                      {hasPartialSupport && (
+                        <span class="text-muted ml-2">
+                          <Text id={partialCountLabelId} fields={{ count: unknownKeys.length }} />
+                        </span>
+                      )}
                     </label>
                     <DeviceFeatures features={device.features} />
                   </div>
                 )}
+
+                {hasPartialSupport && renderGithubIssuePrepAlert('integration.tuya.partiallyManagedModelButton')}
 
                 <div class="form-group">
                   {requiresLocalPollValidation && !localPollValidated && (
@@ -689,35 +463,47 @@ class TuyaDeviceBox extends Component {
                       <Text id="integration.tuya.device.localPollRequired" />
                     </div>
                   )}
-                  {showAlreadyCreatedButton && (
-                    <button class="btn btn-primary mr-2" disabled="true">
-                      <Text id="integration.tuya.alreadyCreatedButton" />
-                    </button>
-                  )}
+                  <div class="d-flex flex-wrap align-items-center justify-content-between">
+                    <div class="d-flex flex-wrap align-items-center">
+                      {showAlreadyCreatedButton && (
+                        <button class="btn btn-primary mr-2" disabled="true">
+                          <Text id="integration.tuya.alreadyCreatedButton" />
+                        </button>
+                      )}
 
-                  {showUpdateButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
-                      <Text id="integration.tuya.updateButton" />
-                    </button>
-                  )}
+                      {showUpdateButton && (
+                        <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
+                          <Text id="integration.tuya.updateButton" />
+                        </button>
+                      )}
 
-                  {validModel && saveButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
-                      <Text id="integration.tuya.saveButton" />
-                    </button>
-                  )}
+                      {validModel && saveButton && (
+                        <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
+                          <Text id="integration.tuya.saveButton" />
+                        </button>
+                      )}
 
-                  {validModel && deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
-                      <Text id="integration.tuya.deleteButton" />
-                    </button>
-                  )}
+                      {validModel && deleteButton && (
+                        <button onClick={this.deleteDevice} class="btn btn-danger">
+                          <Text id="integration.tuya.deleteButton" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
                   {!validModel && (
                     <div>
-                      <div class="alert alert-warning">
-                        <Text id="integration.tuya.unmanagedModelButton" />
-                      </div>
+                      {renderGithubIssuePrepAlert('integration.tuya.unmanagedModelButton')}
+                      {isDiscoverPage && (
+                        <TuyaGithubIssueSection
+                          actionLabelId="integration.tuya.device.createGithubIssue"
+                          device={device}
+                          localPollStatus={localPollStatus}
+                          localPollError={localPollError}
+                          localPollValidation={localPollValidation}
+                          localPollDps={localPollDps}
+                        />
+                      )}
                     </div>
                   )}
 
@@ -729,6 +515,16 @@ class TuyaDeviceBox extends Component {
                     </Link>
                   )}
                 </div>
+                {hasPartialSupport && isDiscoverPage && (
+                  <TuyaGithubIssueSection
+                    actionLabelId="integration.tuya.device.createGithubIssuePartial"
+                    device={device}
+                    localPollStatus={localPollStatus}
+                    localPollError={localPollError}
+                    localPollValidation={localPollValidation}
+                    localPollDps={localPollDps}
+                  />
+                )}
               </div>
             </div>
           </div>

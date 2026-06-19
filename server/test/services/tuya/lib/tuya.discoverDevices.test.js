@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const TuyaHandler = require('../../../../services/tuya/lib/index');
-const { STATUS } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { API, STATUS } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
@@ -215,6 +215,120 @@ describe('TuyaHandler.discoverDevices', () => {
         should_poll: true,
         thing_model: {
           services: [],
+        },
+        tuya_report: {
+          schema_version: 2,
+          cloud: {
+            assembled: {
+              specifications: {
+                details: 'details',
+                category: 'cz',
+                functions: [
+                  {
+                    code: 'switch_1',
+                    name: 'name',
+                    type: 'Boolean',
+                  },
+                ],
+                status: [
+                  {
+                    code: 'cur_power',
+                    name: 'cur_power',
+                    type: 'Integer',
+                  },
+                ],
+              },
+              properties: {
+                properties: [{ code: 'switch_1', value: true }],
+              },
+              thing_model: {
+                services: [],
+              },
+            },
+            raw: {
+              device_list_entry: {
+                request: {
+                  method: 'GET',
+                  path: '/v1.0/users/{sourceId}/devices',
+                },
+                response_item: {
+                  name: 'name',
+                  id: 'uuid',
+                  product_name: 'model',
+                  local_key: 'localKey',
+                  ip: '1.1.1.1',
+                  online: true,
+                },
+              },
+              device_specification: {
+                request: {
+                  method: 'GET',
+                  path: `${API.VERSION_1_2}/devices/uuid/specification`,
+                },
+                response: {
+                  result: {
+                    details: 'details',
+                    functions: [
+                      {
+                        name: 'name',
+                        code: 'switch_1',
+                        type: 'Boolean',
+                      },
+                    ],
+                    status: [
+                      {
+                        name: 'cur_power',
+                        code: 'cur_power',
+                        type: 'Integer',
+                      },
+                    ],
+                    category: 'cz',
+                  },
+                },
+                error: null,
+              },
+              device_details: {
+                request: {
+                  method: 'GET',
+                  path: `${API.VERSION_1_0}/devices/uuid`,
+                },
+                response: {
+                  result: {
+                    local_key: 'localKey',
+                    ip: '1.1.1.1',
+                  },
+                },
+                error: null,
+              },
+              thing_shadow_properties: {
+                request: {
+                  method: 'GET',
+                  path: `${API.VERSION_2_0}/thing/uuid/shadow/properties`,
+                },
+                response: {
+                  result: {
+                    properties: [{ code: 'switch_1', value: true }],
+                  },
+                },
+                error: null,
+              },
+              thing_model: {
+                request: {
+                  method: 'GET',
+                  path: `${API.VERSION_2_0}/thing/uuid/model`,
+                },
+                response: {
+                  result: {
+                    model: '{"services":[]}',
+                  },
+                },
+                error: null,
+              },
+            },
+          },
+          local: {
+            scan: null,
+          },
         },
         tuya_mapping: {
           ignored_cloud_codes: ['countdown', 'countdown_1'],
