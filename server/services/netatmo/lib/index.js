@@ -23,6 +23,7 @@ const {
   refreshNetatmoTokens,
   scheduleReconnectAttempt,
 } = require('./netatmo.pollRefreshingToken');
+const { handleApiAuthError } = require('./netatmo.handleApiAuthError');
 const { pollRefreshingValues, refreshNetatmoValues } = require('./netatmo.pollRefreshingValues');
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
@@ -88,6 +89,7 @@ NetatmoHandler.prototype.refreshNetatmoValues = refreshNetatmoValues;
 NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
 NetatmoHandler.prototype.refreshNetatmoTokens = refreshNetatmoTokens;
 NetatmoHandler.prototype.scheduleReconnectAttempt = scheduleReconnectAttempt;
+NetatmoHandler.prototype.handleApiAuthError = handleApiAuthError;
 NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;
 NetatmoHandler.prototype.updateNAPlug = updateNAPlug;

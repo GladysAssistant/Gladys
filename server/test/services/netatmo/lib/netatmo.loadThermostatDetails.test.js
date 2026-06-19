@@ -141,4 +141,22 @@ describe('Netatmo Load Thermostat Details', () => {
     expect(thermostats).to.be.an('array');
     expect(thermostats).to.have.lengthOf(0);
   });
+
+  it('should trigger handleApiAuthError on 401 from getthermostatsdata', async () => {
+    const authErrorSpy = sinon.spy(netatmoHandler, 'handleApiAuthError');
+    try {
+      netatmoMock
+        .intercept({
+          method: 'GET',
+          path: '/api/getthermostatsdata',
+        })
+        .reply(401, { error: { code: 2, message: 'invalid_token' } });
+
+      await netatmoHandler.loadThermostatDetails();
+
+      sinon.assert.calledWith(authErrorSpy, 401);
+    } finally {
+      authErrorSpy.restore();
+    }
+  });
 });
