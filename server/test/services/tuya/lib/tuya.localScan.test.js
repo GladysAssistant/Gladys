@@ -496,4 +496,32 @@ describe('TuyaHandler.buildLocalScanResponse', () => {
     expect(tuyaManager.discoveredDevices).to.have.length(1);
     expect(tuyaManager.discoveredDevices[0].external_id).to.equal('tuya:device2');
   });
+
+  it('should persist local-only devices when discoveredDevices is not an array', () => {
+    const { buildLocalScanResponse } = proxyquire('../../../../services/tuya/lib/tuya.localScan', {
+      './device/tuya.convertDevice': {
+        convertDevice: sinon.stub().callsFake((device) => ({
+          external_id: `tuya:${device.id}`,
+          params: [{ name: 'IP_ADDRESS', value: device.ip }],
+        })),
+      },
+    });
+    const tuyaManager = {
+      discoveredDevices: null,
+      gladys: {
+        stateManager: {
+          get: sinon.stub().returns(null),
+        },
+      },
+    };
+
+    const response = buildLocalScanResponse(tuyaManager, {
+      devices: { device2: { ip: '2.2.2.2', version: '3.3', productKey: 'pkey' } },
+      portErrors: {},
+    });
+
+    expect(response.devices).to.have.length(1);
+    expect(tuyaManager.discoveredDevices).to.have.length(1);
+    expect(tuyaManager.discoveredDevices[0].external_id).to.equal('tuya:device2');
+  });
 });

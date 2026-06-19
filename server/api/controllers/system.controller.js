@@ -71,6 +71,22 @@ module.exports = function SystemController(gladys) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/system/logs Get a chunk of the Gladys container logs
+   * @apiName getGladysLogs
+   * @apiGroup System
+   * @apiQuery {Number} [offset=0] Byte offset in the cached logs buffer.
+   * @apiQuery {Number} [limit] Maximum number of bytes to return.
+   * @apiQuery {Boolean} [refresh=false] Force refreshing the cached log buffer.
+   */
+  async function getGladysLogs(req, res) {
+    const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : undefined;
+    const refresh = req.query.refresh === 'true' || req.query.refresh === true;
+    const result = await gladys.system.getGladysLogs({ offset, limit, refresh });
+    res.json(result);
+  }
+
   return Object.freeze({
     installUpgrade: asyncMiddleware(installUpgrade),
     getSystemInfos: asyncMiddleware(getSystemInfos),
@@ -78,5 +94,6 @@ module.exports = function SystemController(gladys) {
     getContainers: asyncMiddleware(getContainers),
     shutdown: asyncMiddleware(shutdown),
     vacuum: asyncMiddleware(vacuum),
+    getGladysLogs: asyncMiddleware(getGladysLogs),
   });
 };

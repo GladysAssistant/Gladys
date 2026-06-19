@@ -1,6 +1,7 @@
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, NODE_RED_MAJOR_VERSIONS } = require('./constants');
+const { resolveNodeRedMajorVersion } = require('./nodeRedVersion');
 
 /**
  * @description Get Node-RED configuration.
@@ -22,11 +23,17 @@ async function getConfiguration() {
   // Gladys params
   const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
-  return {
+  const configuration = {
     nodeRedUsername,
     nodeRedPassword,
     dockerNodeRedVersion,
     timezone,
+  };
+
+  return {
+    ...configuration,
+    dockerNodeRedVersion: resolveNodeRedMajorVersion(configuration),
+    availableMajorVersions: NODE_RED_MAJOR_VERSIONS,
   };
 }
 

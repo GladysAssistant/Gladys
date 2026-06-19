@@ -15,26 +15,19 @@ const addLanguage = (arr, language) =>
   });
 
 /**
- * @description Return brain configuration.
- * @returns {object} Return brain configuration.
+ * @description Return brain answer templates from configuration files.
+ * @returns {Array<{ language: string, label: string, answers: string[] }>} Brain answers.
  * @example
- * const config = getConfiguration();
+ * const answers = getAnswers();
  */
-function getConfiguration() {
+function getAnswers() {
   const folders = getDirectories(dirname(__filename));
 
-  let questions = [];
   let answers = [];
 
   folders.forEach((folder) => {
     SUPPORTED_LANGUAGES.forEach((language) => {
-      const questionFile = join(folder, `questions.${language}.json`);
       const answerFile = join(folder, `answers.${language}.json`);
-
-      if (existsSync(questionFile)) {
-        const newQuestions = JSON.parse(readFileSync(questionFile, 'utf8'));
-        questions = questions.concat(addLanguage(newQuestions, language));
-      }
 
       if (existsSync(answerFile)) {
         const newAnswers = JSON.parse(readFileSync(answerFile, 'utf8'));
@@ -43,15 +36,10 @@ function getConfiguration() {
     });
   });
 
-  const brainConfig = {
-    questions,
-    answers,
-  };
-
-  return brainConfig;
+  return answers;
 }
 
 module.exports = {
-  getConfiguration,
+  getAnswers,
   SUPPORTED_LANGUAGES,
 };

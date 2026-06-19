@@ -22,7 +22,6 @@ async function init() {
     logger.debug(`Loading scene ${plainScene.name}`);
     try {
       this.addScene(plainScene, { skipDailyUpdate: true });
-      this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
       logger.debug(`Scene loaded with success`);
     } catch (e) {
       logger.warn(`Unable to load scene ${plainScene.name}`);

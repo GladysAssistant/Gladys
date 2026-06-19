@@ -44,6 +44,11 @@ async function getUsersKeys() {
       }
     });
 
+    const onlineUserIds = new Set(onlineUsers.map((user) => user.id));
+    localUsers = localUsers.filter((user) => onlineUserIds.has(user.id));
+
+    await this.saveUsersKeys(localUsers);
+
     return localUsers;
   } catch (e) {
     logger.debug(e);

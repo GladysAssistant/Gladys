@@ -52,6 +52,35 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/node-red/configuration Get Node-RED configuration
+   * @apiName getConfiguration
+   * @apiGroup Node-RED
+   */
+  async function getConfiguration(req, res) {
+    logger.debug('Get Node-RED configuration');
+    const configuration = await nodeRedManager.getConfiguration();
+    res.json({
+      dockerNodeRedVersion: configuration.dockerNodeRedVersion,
+      availableMajorVersions: configuration.availableMajorVersions,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/node-red/configuration Update Node-RED major version
+   * @apiName updateConfiguration
+   * @apiGroup Node-RED
+   */
+  async function updateConfiguration(req, res) {
+    logger.debug('Update Node-RED configuration');
+    const { dockerNodeRedVersion } = req.body || {};
+    const configuration = await nodeRedManager.updateMajorVersion(dockerNodeRedVersion);
+    res.json({
+      dockerNodeRedVersion: configuration.dockerNodeRedVersion,
+      availableMajorVersions: configuration.availableMajorVersions,
+    });
+  }
+
   return {
     'get /api/v1/service/node-red/status': {
       authenticated: true,
@@ -68,6 +97,14 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
     'post /api/v1/service/node-red/disconnect': {
       authenticated: true,
       controller: asyncMiddleware(disconnect),
+    },
+    'get /api/v1/service/node-red/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(getConfiguration),
+    },
+    'post /api/v1/service/node-red/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(updateConfiguration),
     },
   };
 };

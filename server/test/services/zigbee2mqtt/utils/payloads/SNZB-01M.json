@@ -1,0 +1,121 @@
+{
+  "name": "SNZB-01M",
+  "mqttDevice": {
+    "definition": {
+      "model": "SNZB-01M",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %, can take up to 24 hours before reported.",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Triggered action (e.g. a button click)",
+          "name": "action",
+          "property": "action",
+          "type": "enum",
+          "values": [
+            "single_button_1",
+            "double_button_1",
+            "long_button_1",
+            "triple_button_1",
+            "single_button_2",
+            "double_button_2",
+            "long_button_2",
+            "triple_button_2",
+            "single_button_3",
+            "double_button_3",
+            "long_button_3",
+            "triple_button_3",
+            "single_button_4",
+            "double_button_4",
+            "long_button_4",
+            "triple_button_4"
+          ]
+        }
+      ]
+    },
+    "friendly_name": "SNZB-01M device"
+  },
+  "gladysDevice": {
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
+    "external_id": "zigbee2mqtt:SNZB-01M device",
+    "name": "SNZB-01M device",
+    "model": "SNZB-01M",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:SNZB-01M device:battery:integer:battery",
+        "selector": "zigbee2mqtt-snzb-01m-device-battery-integer-battery"
+      },
+      {
+        "name": "Action",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 16,
+        "category": "button",
+        "type": "click",
+        "unit": null,
+        "external_id": "zigbee2mqtt:SNZB-01M device:button:click:action",
+        "selector": "zigbee2mqtt-snzb-01m-device-button-click-action"
+      }
+    ]
+  },
+  "values": [
+    {
+      "internal": 89,
+      "external": "single_button_1",
+      "property": "action"
+    },
+    {
+      "internal": 90,
+      "external": "double_button_1",
+      "property": "action"
+    },
+    {
+      "internal": 91,
+      "external": "long_button_1",
+      "property": "action"
+    },
+    {
+      "internal": 92,
+      "external": "triple_button_1",
+      "property": "action"
+    },
+    {
+      "internal": 93,
+      "external": "single_button_2",
+      "property": "action"
+    },
+    {
+      "internal": 98,
+      "external": "double_button_3",
+      "property": "action"
+    },
+    {
+      "internal": 103,
+      "external": "long_button_4",
+      "property": "action"
+    },
+    {
+      "internal": 104,
+      "external": "triple_button_4",
+      "property": "action"
+    }
+  ]
+}

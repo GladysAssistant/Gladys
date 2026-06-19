@@ -22,7 +22,12 @@ async function getDefaultElectricMeterFeatureId() {
     return null;
   }
   const feature = device.features.find((f) => f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR);
-  return feature ? feature.id : null;
+  if (!feature) {
+    return null;
+  }
+
+  const featureInDb = await db.DeviceFeature.findByPk(feature.id);
+  return featureInDb ? feature.id : null;
 }
 
 module.exports = { getDefaultElectricMeterFeatureId };

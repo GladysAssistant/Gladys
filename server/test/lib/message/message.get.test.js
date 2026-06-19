@@ -17,6 +17,9 @@ describe('message.get', () => {
         file: null,
         text: 'What time is it ?',
         is_read: true,
+        message_type: 'chat',
+        tool_name: null,
+        tool_status: null,
         created_at: new Date('2019-02-12T07:49:07.556Z'),
       },
     ]);
