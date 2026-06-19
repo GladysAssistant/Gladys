@@ -64,6 +64,7 @@
   },
   "device": {
     "searchPlaceHolder": "Chercher un appareil",
+    "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
     "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
   },
@@ -285,7 +286,9 @@
       "scene": "Scène",
       "music": "Musique",
       "gauge": "Jauge",
-      "energy-consumption": "Consommation Énergétique"
+      "energy-consumption": "Consommation Énergétique",
+      "voice-assistant": "Assistant vocal",
+      "link": "Lien"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -314,7 +317,8 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
-        "pushButton": "Appuyer"
+        "pushButton": "Appuyer",
+        "vacuumDock": "Retour à la base"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
@@ -453,6 +457,24 @@
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       },
+      "link": {
+        "editTitleLabel": "Titre",
+        "editTitlePlaceholder": "Ex : Tasmota - Prise salon",
+        "editUrlLabel": "URL",
+        "editUrlPlaceholder": "http://192.168.1.50",
+        "editIconLabel": "Icône",
+        "emptyUrl": "Aucune URL configurée.",
+        "icons": {
+          "link": "Lien",
+          "globe": "Site web",
+          "server": "Serveur",
+          "hard-drive": "Stockage (NAS)",
+          "wifi": "Réseau Wi-Fi",
+          "monitor": "Interface web",
+          "cpu": "Appareil connecté",
+          "home": "Maison"
+        }
+      },
       "alarm": {
         "armButton": "Armer",
         "disarmButton": "Désarmer",
@@ -474,7 +496,13 @@
         "selectDeviceLabel": "Sélectionner la fonctionnalité à afficher",
         "noDeviceFeatureSelector": "Aucune fonctionnalité sélectionnée",
         "errorLoadingDevice": "Une erreur est survenue lors du chargement de l'appareil",
-        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur"
+        "noDeviceFeatureLastValue": "Cette fonctionnalité n'a pour l'instant reçu aucune valeur",
+        "thresholdsLabel": "Configurer des seuils personnalisés",
+        "thresholdsNoRange": "La fonctionnalité sélectionnée n'a pas de valeur minimale ou maximale définie, les seuils ne peuvent pas être configurés.",
+        "colorLowLabel": "Couleur en dessous du seuil bas",
+        "colorInRangeLabel": "Couleur entre les seuils",
+        "colorHighLabel": "Couleur au-dessus du seuil haut",
+        "thresholdsLegendLabel": "Seuils :"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -492,6 +520,26 @@
         "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
         "showSubscriptionPrices": "Afficher les prix d'abonnement",
         "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
+      },
+      "voice-assistant": {
+        "speak": "Parler",
+        "stop": "Arrêter",
+        "listening": "J'écoute...",
+        "listeningHint": "Parlez, j'arrête d'enregistrer quand vous vous taisez.",
+        "processing": "Traitement...",
+        "speaking": "Réponse...",
+        "transcriptionLabel": "Vous avez dit",
+        "responseLabel": "Réponse",
+        "error": "Une erreur est survenue. Vérifiez que Gladys Plus est connecté.",
+        "errorInsecureContext": "Le micro nécessite une connexion sécurisée. Ouvrez Gladys sur Gladys Plus à <a href=\"https://plus.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">plus.gladysassistant.com</a>.",
+        "errorPermissionDenied": "Autorisez l'accès au micro pour Safari dans Réglages > Safari > Microphone.",
+        "errorNotSupported": "L'enregistrement vocal n'est pas disponible dans ce navigateur.",
+        "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
+        "errorMicrophoneUnavailable": "Le micro est indisponible. Vérifiez qu'il n'est pas utilisé par une autre application.",
+        "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
+        "errorNoTranscription": "Je n'ai pas compris votre message. Parlez plus près du micro et réessayez.",
+        "configDescription": "Ce widget utilise Gladys Plus pour la reconnaissance vocale, l'IA et la synthèse vocale. Connectez votre instance à Gladys Plus pour l'utiliser.",
+        "plusRequiredHint": "Connectez Gladys Plus pour activer le micro."
       }
     }
   },
@@ -515,6 +563,12 @@
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
+      "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
+      "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
+      "gatewayBanner": {
+        "title": "Votre appareil n'est pas dans la liste ?",
+        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel) ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Une fois connectés, ils sont contrôlables dans Gladys comme n'importe quel autre appareil."
+      },
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
@@ -883,6 +937,7 @@
         "connect": "Gladys est connectée à Netatmo",
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
+        "reconnecting": "Connexion à Netatmo temporairement perdue. Tentative de reconnexion automatique en cours...",
         "getDevicesValues": "Récupération des données en cours...",
         "dicoveringDevices": "Récupération des appareils en cours...",
         "errorConnecting": {
@@ -1116,7 +1171,9 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Statut",
-        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "URL de l'interface Zigbee2mqtt",
+        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {
           "title": "Réinitialiser l'intégration",
           "description": "Utilisez cette option si vous souhaitez repartir de zéro avec Zigbee2mqtt. Cela peut être utile si votre configuration est corrompue ou si vous souhaitez changer de coordinateur Zigbee.",
@@ -1145,6 +1202,9 @@
       "nameLabel": "Nom",
       "namePlaceholder": "Donner un nom à l'appareil",
       "roomLabel": "Pièce",
+      "ieeeAddressLabel": "Adresse IEEE",
+      "openInZ2mButton": "Ouvrir dans Zigbee2mqtt",
+      "noZ2mUrlMessage": "L'URL de l'interface Zigbee2mqtt n'est pas configurée, le lien direct vers les appareils ne sera pas disponible. Rendez-vous sur la <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">page de configuration</a> pour la renseigner.",
       "topicLabel": "Sujet MQTT",
       "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
       "featuresLabel": "Fonctionnalités",
@@ -1187,7 +1247,11 @@
         "gladys": "Gladys",
         "usernameLabel": "Nom d'utilisateur",
         "passwordLabel": "Mot de passe",
-        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)",
+        "majorVersionLabel": "Version majeure de Node-RED",
+        "majorVersionHelp": "Sélectionnez la version majeure de Node-RED à utiliser. Les installations existantes restent en version 3 par défaut. Les nouvelles installations utilisent la version 5.",
+        "majorVersionUpdateWarning": "Le changement de version va recréer le conteneur Node-RED. Vos flows et votre configuration seront conservés, mais pensez à faire une sauvegarde avant la mise à jour.",
+        "majorVersionUpdateButton": "Mettre à jour la version de Node-RED"
       }
     },
     "matterbridge": {
@@ -1923,6 +1987,10 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
+      "deprecatedWarning": {
+        "title": "Intégration obsolète",
+        "description": "Cette intégration repose sur le mode développeur des anciennes passerelles Xiaomi/Aqara, qui n'est plus accessible sur les modèles et applications récents. Elle n'est plus maintenue pour les nouveaux équipements. Les produits Xiaomi compatibles seront pris en charge via <a href=\"/dashboard/integration/device/matter\">Matter</a>. Si vous possédez déjà une passerelle configurée en mode développeur, elle peut continuer à fonctionner."
+      },
       "deviceTab": "Appareils",
       "documentation": "Documentation Xiaomi",
       "device": {
@@ -2132,18 +2200,42 @@
       }
     },
     "openai": {
-      "title": "OpenAI ChatGPT",
-      "documentation": "Documentation ChatGPT",
+      "title": "Intelligence Artificielle",
+      "documentation": "Documentation IA",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
-      "aFewExamples": "Quelques exemples :",
-      "turnOnTheLight": "Allume la lumière du salon !",
-      "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
-      "eggDuration": "Comment cuire les oeufs durs ?",
-      "showMeTheCameraInTheKitchen": "Montre-moi la caméra de la cuisine",
-      "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
-      "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
-      "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles IA open-weight, hébergés en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
+      "examplesIntro": "Voici ce que tu peux faire avec l'IA :",
+      "examplesChatTitle": "Dans le chat Gladys",
+      "examplesChatHint": "Actions disponibles : lumières et prises par pièce, caméras, scènes, température et humidité.",
+      "exampleChat1": "« Allume la lumière du salon. »",
+      "exampleChat2": "« Montre-moi la caméra du garage. »",
+      "exampleChat3": "« Lance la scène « Bonne nuit ». »",
+      "exampleChat4": "« Quelle température fait-il dans la chambre ? »",
+      "examplesSceneTitle": "Dans tes scènes (IA proactive)",
+      "examplesSceneIntro": "L'action « Demander à l'IA » peut s'exécuter à intervalle régulier pour surveiller ta maison et réagir automatiquement.",
+      "exampleScene1": "Toutes les 30 minutes : analyse la caméra de l'entrée et vérifie si la voiture garée devant correspond bien à ma plaque d'immatriculation.",
+      "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
+      "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
+      "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
+      "weeklyDigest": {
+        "title": "Bilan hebdomadaire de la maison",
+        "description": "Gladys t'envoie chaque semaine un résumé de ta maison connectée : confort, énergie, maintenance et conseils utiles.",
+        "dayLabel": "Jour",
+        "hourLabel": "Heure",
+        "sendNow": "Envoyer le bilan maintenant",
+        "loading": "Chargement des paramètres...",
+        "loadError": "Impossible de charger les paramètres du bilan hebdomadaire.",
+        "retry": "Réessayer",
+        "daySunday": "Dimanche",
+        "dayMonday": "Lundi",
+        "dayTuesday": "Mardi",
+        "dayWednesday": "Mercredi",
+        "dayThursday": "Jeudi",
+        "dayFriday": "Vendredi",
+        "daySaturday": "Samedi"
+      },
+      "rateLimit": "L'API d'IA étant payante, cette intégration est limitée à 3 000 requêtes texte et 500 requêtes avec image par mois et par compte.",
+      "notOnGladysPlus": "L'API d'IA étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
     },
     "callmebot": {
@@ -2325,7 +2417,7 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "askAi": {
-        "description": "Cette action enverra un message à l'IA (ChatGPT) via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
+        "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
         "userLabel": "Gladys répondra à",
         "cameraLabel": "Joindre une image de caméra (optionnel)",
         "textLabel": "Ma question pour l'IA",
@@ -2519,7 +2611,6 @@
       },
       "playNotification": {
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
-        "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
@@ -3046,7 +3137,12 @@
     "confirm": "Confirmer",
     "cancel": "Annuler",
     "purgeSQliteTitle": "Purger les états SQLite",
-    "purgeSQliteDescription": "Une fois que tous les états seront supprimés de SQLite, vous devrez faire un \"nettoyage de la base de données\" sur l'onglet à droite afin de relâcher l'espace disque. Cette étape peut prendre un certain temps."
+    "purgeSQliteDescription": "Une fois que tous les états seront supprimés de SQLite, vous devrez faire un \"nettoyage de la base de données\" sur l'onglet à droite afin de relâcher l'espace disque. Cette étape peut prendre un certain temps.",
+    "downloadLogsTitle": "Télécharger les logs",
+    "downloadLogsDescription": "Téléchargez un fichier contenant les derniers logs du conteneur Gladys. Pour éviter des téléchargements trop volumineux, seuls les 20 derniers Mo de logs sont exportés.",
+    "downloadLogsButton": "Télécharger les logs",
+    "downloadLogsProgress": "Téléchargement {{downloaded}} sur {{total}}...",
+    "downloadLogsError": "Impossible de télécharger les logs. Vérifiez que Gladys est lancée via Docker, puis réessayez."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
@@ -3114,7 +3210,7 @@
     "statusColumn": "Etat",
     "userRsaKey": "Clé RSA",
     "userEcdsaKey": "Clé ECDSA",
-    "usersListDescription": "Pour garantir la sécurité de votre instance locale, vous devez accorder manuellement l'accès à chaque utilisateur de cette liste.",
+    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour garantir la sécurité de votre instance, vous devez accorder manuellement l'accès à chaque utilisateur. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
     "disconnectTitle": "Déconnectez votre compte Gladys Plus",
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
@@ -3125,12 +3221,165 @@
   },
   "gatewayPricing": {
     "pricingTitle": "Gladys Plus",
-    "pricingSentence": "Gladys Assistant est gratuit à utiliser, mais vous pouvez vous abonner à Gladys Plus pour des fonctionnalités supplémentaires tel que l'accès à distance chiffré de bout en bout, les sauvegardes automatiques, l'accès à une API REST ouverte accessible de partout dans le monde.",
+    "pricingSentence": "Gladys Assistant est gratuit, mais tu peux t'abonner à Gladys Plus pour l'accès à distance chiffré de bout en bout, les sauvegardes automatiques et une API REST ouverte depuis n'importe où.",
+    "heroTitle": "Contrôle ta maison depuis n'importe où, en toute sécurité",
+    "heroSubtitle": "Gladys Plus débloque l'accès à distance chiffré, les sauvegardes automatiques et les intégrations avancées pour ton instance Gladys.",
+    "heroReassurance": "1 mois d'essai gratuit · Sans carte bancaire · Sans engagement",
+    "startFreeTrialButton": "Démarrer mon essai gratuit",
+    "alreadySubscriberButton": "J'ai déjà un compte",
+    "featuresTitle": "Tout ce qui est inclus",
+    "featuresSubtitle": "Une suite complète pour rendre ta domotique vraiment utile au quotidien.",
+    "features": {
+      "remoteAccess": {
+        "title": "Accès distant chiffré",
+        "description": "Contrôle ta maison de partout, chiffré de bout en bout, sans ouvrir de port."
+      },
+      "backups": {
+        "title": "Sauvegardes quotidiennes",
+        "description": "Sauvegardes chiffrées tous les jours, restauration en un clic."
+      },
+      "voiceAssistants": {
+        "title": "Google Home & Alexa",
+        "description": "Pilote Gladys à la voix avec Google Home et Amazon Alexa."
+      },
+      "ai": {
+        "title": "IA open-weight (France)",
+        "description": "Parle à ta maison avec des modèles IA open-weight hébergés en France chez Scaleway."
+      },
+      "cameraStreaming": {
+        "title": "Streaming caméra",
+        "description": "Visualise tes caméras à distance, en direct, chiffré de bout en bout."
+      },
+      "enedis": {
+        "title": "Intégration Enedis",
+        "description": "Suis ta consommation électrique directement depuis Gladys."
+      },
+      "mcp": {
+        "title": "Serveur MCP",
+        "description": "Branche tes IA préférées (Claude, Mistral…) sur Gladys via le protocole MCP."
+      },
+      "openApi": {
+        "title": "API REST ouverte",
+        "description": "Intègre Gladys à tes propres outils via une API ouverte et documentée."
+      }
+    },
+    "plansTitle": "Deux formules, sans surprise",
+    "plansSubtitle": "Lite pour l'essentiel, Plus pour l'expérience complète. Tu peux passer de l'une à l'autre à tout moment.",
+    "perMonth": "/ mois",
+    "litePlan": {
+      "name": "Lite",
+      "tagline": "L'essentiel pour l'accès à distance",
+      "price": "5,83 €",
+      "priceDetail": "Facturé 69,99 € par an (économise 17 %)",
+      "features": {
+        "remoteAccess": "Accès à distance chiffré de bout en bout",
+        "voiceAssistants": "Google Home & Amazon Alexa",
+        "openApi": "API REST ouverte",
+        "familyAccounts": "Comptes pour toute la famille"
+      }
+    },
+    "plusPlan": {
+      "name": "Plus",
+      "tagline": "Toutes les intégrations avancées",
+      "price": "8,33 €",
+      "priceDetail": "Facturé 99,99 € par an (économise 17 %)",
+      "popularBadge": "Le plus populaire",
+      "features": {
+        "everythingInLite": "Tout ce qui est dans Lite, et en plus :",
+        "backups": "Sauvegardes quotidiennes chiffrées",
+        "cameraStreaming": "Streaming caméra à distance",
+        "ai": "Intégration IA (modèles open-weight, hébergés en France)",
+        "enedis": "Intégration Enedis (consommation électrique)",
+        "mcp": "Serveur MCP pour brancher tes IA préférées"
+      }
+    },
+    "reassuranceBar": "1 mois d'essai gratuit · sans carte bancaire · satisfait ou remboursé · sans engagement",
+    "privacyTitle": "Privacy-first, hébergé en Europe",
+    "privacySubtitle": "Tes données restent les tiennes, on est très sérieux là-dessus.",
+    "privacy": {
+      "aiTitle": "IA hébergée en France",
+      "aiDescription": "Les modèles IA open-weight utilisés par Gladys Plus tournent chez Scaleway, en France. Rien ne sort du pays pour l'inférence IA.",
+      "infraTitle": "Infrastructure en Europe",
+      "infraDescription": "L'infrastructure Gladys Plus (API, sauvegardes, relais) est hébergée en France et en Allemagne, sous RGPD.",
+      "e2eTitle": "Chiffrement de bout en bout",
+      "e2eDescription": "Tes commandes et tes sauvegardes sont chiffrées avec des clés que seule ton instance locale possède."
+    },
     "whyIsGladysPlusPaid": "Pourquoi Gladys Plus est-il payant et pas gratuit comme Gladys ?",
-    "whyIsGladysPlusPaidAnswer": "Gladys Plus est un service en ligne qui a des coûts: hébergement, bande passante, stockage, développement et maintenance. Pour supporter ces coûts, nous préférons demander une modeste participation mensuelle plutôt que de mettre de la publicité, ou vendre les données des utilisateurs: ce n'est pas la philosophie du projet ! Nous sommes des fervents défenseurs du libre, et souhaitons que chacun reste propriétaire de ses données, surtout quand cela touche à un sujet aussi important que la maison connectée.",
-    "supportOpenSource": "En vous abonnant à Gladys Plus, vous supportez le développement d'une alternative open-source et respectueuse de la vie privée. Merci d'avance pour votre soutien ! 🙂",
+    "whyIsGladysPlusPaidAnswer": "Gladys et tout son code source sont gratuits et open-source pour toujours. Mais open-source ne veut pas dire gratuit à faire vivre : serveurs, bande passante, stockage, communauté, matériel, et surtout le temps passé sur le projet. Plutôt que d'ajouter de la publicité ou de revendre tes données, on préfère une modeste participation mensuelle. Pas d'investisseurs, pas de pub, pas de revente de données.",
+    "supportOpenSource": "En t'abonnant à Gladys Plus, tu soutiens le développement d'une alternative open-source et respectueuse de la vie privée. Merci pour ton soutien ! 🙂",
     "knowMoreButton": "En savoir plus sur Gladys Plus",
-    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier !"
+    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Connecte-toi ici !"
+  },
+  "gladysPlusUpsell": {
+    "freeTrialNotice": "1 mois d'essai gratuit, sans carte bancaire, sans engagement.",
+    "tryFreeButton": "Démarrer mon essai gratuit",
+    "upgradeButton": "Mettre à jour mon abonnement",
+    "learnMoreButton": "En savoir plus",
+    "backup": {
+      "subscribeTitle": "Active les sauvegardes automatiques avec Gladys Plus",
+      "subscribeDescription": "Sauvegarde ton instance Gladys tous les jours, chiffrée de bout en bout, et restaure-la en un clic, où que tu sois.",
+      "feature1": "Sauvegardes quotidiennes chiffrées (E2E)",
+      "feature2": "Restauration en un clic depuis n'importe quelle installation",
+      "feature3": "Accès distant sécurisé inclus",
+      "upgradeTitle": "Passe à la formule Plus pour activer les sauvegardes",
+      "upgradeDescription": "Les sauvegardes chiffrées sont incluses dans la formule Plus. Tu peux changer de formule depuis la facturation, en un clic."
+    },
+    "openai": {
+      "title": "Discute avec ta maison grâce à l'IA open-weight",
+      "description": "Gladys Plus inclut une IA conversationnelle pour discuter avec ta maison par message dans le chat Gladys. Modèles IA open-weight hébergés en France, rien ne sort du pays pour l'inférence.",
+      "feature1": "Allume la lumière, éteins le ventilateur, par message dans le chat",
+      "feature2": "IA proactive dans les scènes : exécute des questions domotiques à intervalle régulier (lire une plaque d'immatriculation, vérifier le niveau de CO₂, surveiller une caméra…)",
+      "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
+    },
+    "enedis": {
+      "title": "Suis ta consommation électrique avec Enedis",
+      "description": "Gladys Plus inclut l'intégration officielle Enedis pour récupérer ta consommation électrique, l'afficher sur tes dashboards et déclencher des scènes selon ta conso.",
+      "feature1": "Connexion officielle Enedis (data hub)",
+      "feature2": "Historique automatique, mis à jour chaque jour",
+      "feature3": "Scènes basées sur ta consommation"
+    },
+    "camera": {
+      "upgradeTitle": "Active le streaming caméra à distance",
+      "upgradeDescription": "Le streaming caméra à distance est inclus dans la formule Plus. Tu peux changer de formule en un clic depuis la facturation."
+    },
+    "alexa": {
+      "title": "Connecte Amazon Alexa à Gladys avec Gladys Plus",
+      "description": "Gladys Plus inclut l'intégration officielle Amazon Alexa pour piloter tes appareils Gladys à la voix depuis n'importe quelle enceinte Alexa.",
+      "feature1": "Allume la lumière à la voix",
+      "feature2": "Compatible avec toutes les enceintes Echo et appareils Alexa",
+      "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "googleHome": {
+      "title": "Connecte Google Home à Gladys avec Gladys Plus",
+      "description": "Gladys Plus inclut l'intégration officielle Google Home pour piloter tes appareils Gladys à la voix depuis Google Assistant.",
+      "feature1": "Allume la lumière à la voix",
+      "feature2": "Compatible avec Google Nest, Google Home et l'app Google Assistant",
+      "feature3": "Aucune ouverture de port, tout passe par Gladys Plus chiffré"
+    },
+    "voiceAssistant": {
+      "title": "Assistant vocal Gladys avec Gladys Plus",
+      "description": "Gladys Plus alimente l'assistant vocal du tableau de bord : transcription de ta voix, réponse par des modèles IA open-weight et lecture à voix haute.",
+      "compactDescription": "La reconnaissance vocale, l'IA et la synthèse vocale passent par Gladys Plus.",
+      "feature1": "Parle à Gladys depuis le tableau de bord",
+      "feature2": "Transcription et réponse en temps réel",
+      "feature3": "Réponse lue à voix haute sur ton appareil"
+    },
+    "askAi": {
+      "title": "Cette action nécessite Gladys Plus",
+      "description": "L'action « Demander à l'IA » utilise des modèles IA open-weight hébergés en France via Gladys Plus pour répondre à des questions et analyser des images de caméra dans tes scènes.",
+      "compactDescription": "Cette action utilise des modèles IA open-weight hébergés en France via Gladys Plus.",
+      "feature1": "Pose une question ouverte à l'IA dans une scène",
+      "feature2": "Joins une image de caméra et l'IA peut décrire ce qu'elle voit",
+      "feature3": "Modèles IA open-weight hébergés en France · pas de données revendues"
+    },
+    "tts": {
+      "title": "Cette action nécessite Gladys Plus",
+      "description": "L'action « Parler sur une enceinte » utilise les API Text-to-Speech via Gladys Plus pour faire parler Gladys sur tes enceintes (Sonos, Google Cast, etc.) avec une voix naturelle.",
+      "compactDescription": "Cette action utilise les API Text-to-Speech via Gladys Plus.",
+      "feature1": "Voix naturelles, multilingues",
+      "feature2": "Compatible Sonos, Google Cast, Chromecast…",
+      "feature3": "Utilisable dans n'importe quelle scène Gladys"
+    }
   },
   "gatewayLogin": {
     "cardTitle": "Connexion à Gladys Plus",
@@ -3260,6 +3509,7 @@
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
     "aqi": "Indice de Qualité de l'Air",
+    "ph": "pH",
     "milligram-per-cubic-meter": "Milligramme par mètre cube (mg/m³)",
     "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
     "nanogram-per-cubic-meter": "Nanogramme par mètre cube (ng/m³)",
@@ -3355,6 +3605,7 @@
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
     "aqi": "AQI",
+    "ph": "pH",
     "milligram-per-cubic-meter": "mg/m³",
     "microgram-per-cubic-meter": "µg/m³",
     "nanogram-per-cubic-meter": "ng/m³",
@@ -3447,6 +3698,22 @@
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
+        }
+      },
+      "vacuum-cleaner": {
+        "mode": {
+          "idle": "Repos",
+          "cleaning": "Nettoyer",
+          "mapping": "Cartographier"
+        },
+        "clean-mode": {
+          "auto": "Auto",
+          "quick": "Rapide",
+          "quiet": "Silencieux",
+          "low-noise": "Faible bruit",
+          "deep-clean": "Nettoyage profond",
+          "vacuum": "Aspiration",
+          "mop": "Serpillère"
         }
       }
     }
@@ -3548,7 +3815,56 @@
           "83": "Relâchement Centre",
           "84": "Relâchement Moins",
           "85": "On clic double",
-          "86": "Off clic double"
+          "86": "Off clic double",
+          "87": "Armer zones nuit",
+          "88": "Délai de sortie",
+          "89": "Bouton 1 clic simple",
+          "90": "Bouton 1 clic double",
+          "91": "Bouton 1 clic long",
+          "92": "Bouton 1 clic triple",
+          "93": "Bouton 2 clic simple",
+          "94": "Bouton 2 clic double",
+          "95": "Bouton 2 clic long",
+          "96": "Bouton 2 clic triple",
+          "97": "Bouton 3 clic simple",
+          "98": "Bouton 3 clic double",
+          "99": "Bouton 3 clic long",
+          "100": "Bouton 3 clic triple",
+          "101": "Bouton 4 clic simple",
+          "102": "Bouton 4 clic double",
+          "103": "Bouton 4 clic long",
+          "104": "Bouton 4 clic triple"
+        }
+      },
+      "fan": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Faible",
+          "2": "Moyen",
+          "3": "Fort",
+          "4": "Auto"
+        },
+        "percent": {},
+        "speed": {},
+        "airflow-direction": {
+          "0": "Avant",
+          "1": "Arrière"
+        },
+        "rock-setting": {
+          "0": "Désactivée",
+          "1": "Gauche/Droite",
+          "2": "Haut/Bas",
+          "3": "Gauche/Droite + Haut/Bas",
+          "4": "Rotation",
+          "5": "Gauche/Droite + Rotation",
+          "6": "Haut/Bas + Rotation",
+          "7": "Toutes"
+        },
+        "wind-setting": {
+          "0": "Désactivé",
+          "1": "Vent nuit",
+          "2": "Vent naturel",
+          "3": "Vent nuit + naturel"
         }
       },
       "heater": {
@@ -3645,12 +3961,33 @@
           "critical": "Critique"
         }
       },
+      "no2-matter-index-sensor": {
+        "integer": {
+          "unknown": "Inconnu",
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Élevé",
+          "critical": "Critique"
+        }
+      },
       "level-matter-index-sensor": {
         "level-state": {
           "1": "Faible",
           "2": "Moyen",
           "3": "Élevé",
           "4": "Critique"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Arrêté",
+          "1": "En cours",
+          "2": "En pause",
+          "3": "Erreur",
+          "4": "Retour à la base",
+          "5": "En charge",
+          "6": "Sur la base"
         }
       }
     }
@@ -4028,6 +4365,15 @@
       "shortCategoryName": "Capteur d'UV",
       "integer": "Indice UV"
     },
+    "fan": {
+      "shortCategoryName": "Ventilateur",
+      "mode": "Mode ventilateur",
+      "percent": "Vitesse (%)",
+      "speed": "Vitesse (niveau)",
+      "airflow-direction": "Direction du flux d'air",
+      "rock-setting": "Oscillation",
+      "wind-setting": "Mode vent"
+    },
     "hepa-filter-monitoring": {
       "shortCategoryName": "Surveillance filtre HEPA",
       "filter-life-remaining": "Durée de vie restante du filtre"
@@ -4048,6 +4394,10 @@
     "voc-matter-index-sensor": {
       "shortCategoryName": "Indice COV",
       "integer": "Indice COV (entier)"
+    },
+    "no2-matter-index-sensor": {
+      "shortCategoryName": "Indice NO₂",
+      "integer": "Indice NO₂ (entier)"
     },
     "shutter": {
       "shortCategoryName": "Volet",
@@ -4074,6 +4424,14 @@
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
+    },
+    "ph-sensor": {
+      "shortCategoryName": "Capteur de pH",
+      "decimal": "pH (Décimale)"
+    },
+    "orp-sensor": {
+      "shortCategoryName": "Capteur Redox / ORP",
+      "decimal": "Redox / ORP (Décimale)"
     },
     "text": {
       "shortCategoryName": "Texte",
@@ -4118,6 +4476,13 @@
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
+    },
+    "vacuum-cleaner": {
+      "shortCategoryName": "Aspirateur Robot",
+      "state": "État opérationnel",
+      "run-mode": "Mode de fonctionnement",
+      "clean-mode": "Mode de nettoyage",
+      "dock": "Retour à la base"
     }
   },
   "errorPage": {
@@ -4126,19 +4491,29 @@
     "goBack": "Retour"
   },
   "chat": {
-    "whatCanYouAsk": "Demandez moi...",
     "emptyStateMessage": "Envoie-moi un message !",
+    "emptyStateMessageNoPlus": "Le chat Gladys utilise l'IA Gladys Plus. Connecte ton instance à Gladys Plus pour discuter avec ta maison.",
     "messagePlaceholder": "Ecrivez votre message...",
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
-    "gpt3Integration": "Intégration avec ChatGPT",
-    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec ChatGPT, ce qui lui donne une intelligence sur-dimensionnée ! Pour en savoir plus,",
-    "gpt3ClickHere": "cliquez-ici !",
-    "examples": {
-      "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
-      "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",
-      "showCameraImage": "\"Montre moi la caméra de la cuisine\""
+    "sidebar": {
+      "title": "Comment fonctionne le chat ?",
+      "intro": "Le chat Gladys utilise l'intelligence artificielle Gladys Plus pour te permettre de communiquer naturellement avec ta maison connectée.",
+      "plusNotConfigured": "Connecte Gladys Plus pour utiliser le chat IA.",
+      "plusActive": "L'IA Gladys Plus est active dans ce chat.",
+      "upsellTitle": "Débloque l'IA avancée",
+      "upsellCompactDescription": "Gladys Plus donne accès à des modèles IA open-weight dans ce chat : questions ouvertes, analyse de caméras, et bien plus.",
+      "upsellDescription": "Discute naturellement avec ta maison connectée grâce à l'intelligence artificielle Gladys Plus.",
+      "upsellFeature1": "Pose des questions ouvertes à ta maison",
+      "upsellFeature2": "Analyse ce que voient tes caméras",
+      "upsellFeature3": "Modèles IA open-weight hébergés en France"
+    },
+    "toolCall": {
+      "statusUsed": "Utilisé",
+      "statusError": "Erreur",
+      "showDetails": "Afficher les détails",
+      "hideDetails": "Masquer les détails"
     }
   },
   "header": {

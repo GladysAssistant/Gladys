@@ -1,13 +1,12 @@
-import { Text, Localizer } from 'preact-i18n';
-import IntegrationMenu from './IntegrationMenu';
-import IntegrationCategory from './IntegrationCategory';
-import CardFilter from '../../components/layout/CardFilter';
+import { Text, MarkupText } from 'preact-i18n';
+import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
+import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
+import IntegrationPageHeader from './IntegrationPageHeader';
+import style from './style.css';
 
 const IntegrationPage = ({
-  category,
   integrations,
   totalSize,
-  currentUrl,
   searchKeyword,
   user,
   orderDir,
@@ -18,50 +17,63 @@ const IntegrationPage = ({
 }) => (
   <div class="page">
     <div class="page-main">
-      <div class="my-3 my-md-5">
+      <div class={`my-3 my-md-5 ${style.pageContainer}`}>
         {integrations && user && user.role && (
           <div class="container">
-            <div class="page-header">
-              <h1 class="page-title">
-                <Text id="integration.root.title" />
-              </h1>
-              <div class="page-subtitle">
-                <Text id="integration.root.subtitle" fields={{ length: integrations.length, total: totalSize }} />
-              </div>
-              <div class="page-options d-flex">
-                <Localizer>
-                  <CardFilter
-                    changeOrderDir={changeOrderDir}
-                    orderValue={orderDir}
-                    search={search}
-                    searchValue={searchKeyword}
-                    searchPlaceHolder={<Text id="integration.root.searchPlaceholder" />}
-                  />
-                </Localizer>
-              </div>
+            <IntegrationPageHeader
+              orderDir={orderDir}
+              changeOrderDir={changeOrderDir}
+              search={search}
+              searchKeyword={searchKeyword || ''}
+              integrationsLength={integrations.length}
+              totalSize={totalSize}
+            />
+            <IntegrationMenuMobile integrationCategories={integrationCategories} />
+            <div class="alert alert-info mb-4">
+              <h4 class="alert-title">
+                <Text id="integration.root.gatewayBanner.title" />
+              </h4>
+              <MarkupText id="integration.root.gatewayBanner.description" />
             </div>
             <div class="row">
-              <div class="col-lg-3">
+              <div class={`col-lg-3 ${style.desktopMenuCol}`}>
                 <IntegrationMenu integrationCategories={integrationCategories} />
               </div>
               <div class="col-lg-9">
-                <div class="row row-cards">
+                <div class={`list-group list-group-flush ${style.mobileList}`}>
                   {integrations.map(integration => (
-                    <IntegrationCategory
-                      currentUrl={currentUrl}
+                    <IntegrationListItem
+                      key={integration.key}
                       integration={integration}
-                      category={category}
                       toggleFavorite={toggleFavorite}
                     />
                   ))}
-                  {integrations.length === 0 && (
-                    <div class="col-12">
-                      <div class="text-center mt-6">
-                        <Text id="integration.root.noIntegrations" />
-                      </div>
-                    </div>
-                  )}
                 </div>
+                <div class={style.desktopGrid}>
+                  <div class="row row-cards">
+                    {integrations.map(integration => (
+                      <IntegrationCategory
+                        key={integration.key}
+                        integration={integration}
+                        toggleFavorite={toggleFavorite}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {integrations.length === 0 && (
+                  <div class="text-center mt-6">
+                    {searchKeyword && searchKeyword.length > 0 ? (
+                      <div>
+                        <p class="mb-3">
+                          <Text id="integration.root.noSearchResults" fields={{ searchKeyword }} />
+                        </p>
+                        <MarkupText id="integration.root.noSearchResultsSuggestion" />
+                      </div>
+                    ) : (
+                      <Text id="integration.root.noIntegrations" />
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

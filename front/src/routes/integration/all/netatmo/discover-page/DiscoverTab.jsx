@@ -53,6 +53,9 @@ class DiscoverTab extends Component {
         errorLoading: true
       });
     }
+    if (this.props.loadStatus) {
+      await this.props.loadStatus();
+    }
   };
   refreshDiscoveredDevices = async () => {
     this.setState({
@@ -71,6 +74,9 @@ class DiscoverTab extends Component {
         loading: false,
         errorLoading: true
       });
+    }
+    if (this.props.loadStatus) {
+      await this.props.loadStatus();
     }
   };
 

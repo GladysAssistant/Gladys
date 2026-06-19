@@ -50,11 +50,15 @@ async function discoverDevices() {
       const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
       return existInGladys === null;
     });
-    await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+    if (this.status !== STATUS.RECONNECTING && this.status !== STATUS.DISCONNECTED) {
+      await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+    }
     logger.debug(`${discoveredDevices.length} new Netatmo devices found`);
     return discoveredDevices;
   }
-  await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+  if (this.status !== STATUS.RECONNECTING && this.status !== STATUS.DISCONNECTED) {
+    await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+  }
   logger.debug('No devices found');
   return [];
 }

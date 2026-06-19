@@ -14,6 +14,8 @@ import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
 import ShutterButtons from '../../../../components/device/ShutterButtons';
 import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMode';
+import SelectFanMode from '../../../../components/device/SelectFanMode';
+import SelectFanFeatureValue from '../../../../components/device/SelectFanFeatureValue';
 
 class DeviceSetValue extends Component {
   constructor(props) {
@@ -147,6 +149,27 @@ class DeviceSetValue extends Component {
         <SelectPilotWireMode
           category={this.state.deviceFeature.category}
           type={this.state.deviceFeature.type}
+          updateValue={this.handleNewPureValue}
+          value={this.props.action.value}
+        />
+      );
+    }
+
+    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.MODE) {
+      return <SelectFanMode updateValue={this.handleNewPureValue} value={this.props.action.value} />;
+    }
+
+    if (
+      this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.FAN &&
+      [
+        DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+        DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+        DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
+      ].includes(this.state.deviceFeature.type)
+    ) {
+      return (
+        <SelectFanFeatureValue
+          deviceFeature={this.state.deviceFeature}
           updateValue={this.handleNewPureValue}
           value={this.props.action.value}
         />

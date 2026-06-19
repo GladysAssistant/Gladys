@@ -1,6 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 
 const AlexaWelcomePage = ({ user }) => (
   <div class="page">
@@ -30,6 +31,17 @@ const AlexaWelcomePage = ({ user }) => (
             </div>
 
             <div class="col-lg-9">
+              <GladysPlusUpsell
+                icon="fe-mic"
+                utmCampaign="integration_alexa"
+                titleKey="gladysPlusUpsell.alexa.title"
+                descriptionKey="gladysPlusUpsell.alexa.description"
+                featureKeys={[
+                  'gladysPlusUpsell.alexa.feature1',
+                  'gladysPlusUpsell.alexa.feature2',
+                  'gladysPlusUpsell.alexa.feature3'
+                ]}
+              />
               <div class="card">
                 <div class="card-header">
                   <h1 class="card-title">

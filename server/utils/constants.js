@@ -90,6 +90,28 @@ const BUTTON_STATUS = {
   RELEASE_MINUS: 84,
   ON_DOUBLE: 85,
   OFF_DOUBLE: 86,
+  ARM_NIGHT_ZONES: 87,
+  EXIT_DELAY: 88,
+  SINGLE_BUTTON_1: 89,
+  DOUBLE_BUTTON_1: 90,
+  LONG_BUTTON_1: 91,
+  TRIPLE_BUTTON_1: 92,
+  SINGLE_BUTTON_2: 93,
+  DOUBLE_BUTTON_2: 94,
+  LONG_BUTTON_2: 95,
+  TRIPLE_BUTTON_2: 96,
+  SINGLE_BUTTON_3: 97,
+  DOUBLE_BUTTON_3: 98,
+  LONG_BUTTON_3: 99,
+  TRIPLE_BUTTON_3: 100,
+  SINGLE_BUTTON_4: 101,
+  DOUBLE_BUTTON_4: 102,
+  LONG_BUTTON_4: 103,
+  TRIPLE_BUTTON_4: 104,
+};
+
+const BUTTON_PUSH = {
+  PRESSED: 1,
 };
 
 const COVER_STATE = {
@@ -125,6 +147,39 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const FAN_MODE = {
+  OFF: 0,
+  LOW: 1,
+  MEDIUM: 2,
+  HIGH: 3,
+  AUTO: 4,
+};
+
+const FAN_AIRFLOW_DIRECTION = {
+  FORWARD: 0,
+  REVERSE: 1,
+};
+
+// Fan oscillation modes (bitmap, same encoding as Matter FanControl RockSetting)
+const FAN_ROCK_SETTING = {
+  OFF: 0,
+  LEFT_RIGHT: 1,
+  UP_DOWN: 2,
+  LEFT_RIGHT_AND_UP_DOWN: 3,
+  ROUND: 4,
+  LEFT_RIGHT_AND_ROUND: 5,
+  UP_DOWN_AND_ROUND: 6,
+  ALL: 7,
+};
+
+// Fan wind emulation modes (bitmap, same encoding as Matter FanControl WindSetting)
+const FAN_WIND_SETTING = {
+  OFF: 0,
+  SLEEP: 1,
+  NATURAL: 2,
+  SLEEP_AND_NATURAL: 3,
+};
+
 const PILOT_WIRE_MODE = {
   OFF: 0,
   FROST_PROTECTION: 1,
@@ -156,6 +211,32 @@ const LEVEL_MATTER_STATE = {
   MEDIUM: 2,
   HIGH: 3,
   CRITICAL: 4,
+};
+
+const VACUUM_CLEANER_STATE = {
+  STOPPED: 0,
+  RUNNING: 1,
+  PAUSED: 2,
+  ERROR: 3,
+  RETURNING_TO_DOCK: 4,
+  CHARGING: 5,
+  DOCKED: 6,
+};
+
+const VACUUM_CLEANER_MODE = {
+  IDLE: 0,
+  CLEANING: 1,
+  MAPPING: 2,
+};
+
+const VACUUM_CLEANER_CLEAN_MODE = {
+  AUTO: 0,
+  QUICK: 1,
+  QUIET: 2,
+  LOW_NOISE: 3,
+  DEEP_CLEAN: 4,
+  VACUUM: 5,
+  MOP: 6,
 };
 
 const USER_ROLE = {
@@ -198,10 +279,12 @@ const SYSTEM_VARIABLE_NAMES = {
   GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
     'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
-  GLADYS_GATEWAY_OPEN_AI_ENABLED: 'GLADYS_GATEWAY_OPEN_AI_ENABLED',
   TIMEZONE: 'TIMEZONE',
   DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
   DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
+  AI_WEEKLY_DIGEST_ENABLED: 'AI_WEEKLY_DIGEST_ENABLED',
+  AI_WEEKLY_DIGEST_DAY: 'AI_WEEKLY_DIGEST_DAY',
+  AI_WEEKLY_DIGEST_HOUR: 'AI_WEEKLY_DIGEST_HOUR',
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   GLADYS_VERSION: 'GLADYS_VERSION',
 };
@@ -241,6 +324,7 @@ const EVENTS = {
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
+    SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
@@ -550,6 +634,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ELECTRICAL_VEHICLE_COMMAND: 'electrical-vehicle-command',
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
+  FAN: 'fan',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
   HUMIDITY_SENSOR: 'humidity-sensor',
@@ -562,6 +647,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  ORP_SENSOR: 'orp-sensor',
+  PH_SENSOR: 'ph-sensor',
   PM25_SENSOR: 'pm25-sensor',
   PM10_SENSOR: 'pm10-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
@@ -590,7 +677,9 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_SENSOR: 'voc-sensor',
   VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOC_MATTER_INDEX_SENSOR: 'voc-matter-index-sensor',
+  NO2_MATTER_INDEX_SENSOR: 'no2-matter-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
 };
@@ -678,6 +767,14 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+  },
+  FAN: {
+    MODE: 'mode',
+    PERCENT: 'percent',
+    SPEED: 'speed',
+    AIRFLOW_DIRECTION: 'airflow-direction',
+    ROCK_SETTING: 'rock-setting',
+    WIND_SETTING: 'wind-setting',
   },
   HEATER: {
     PILOT_WIRE_MODE: 'pilot-wire-mode',
@@ -861,6 +958,12 @@ const DEVICE_FEATURE_TYPES = {
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
   },
+  PH_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  ORP_SENSOR: {
+    DECIMAL: 'decimal',
+  },
   TEXT: {
     TEXT: 'text',
   },
@@ -930,7 +1033,44 @@ const DEVICE_FEATURE_TYPES = {
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
   },
+  VACUUM_CLEANER: {
+    STATE: 'state', // Operational state of the vacuum (integer - sensor)
+    RUN_MODE: 'run-mode', // Run mode of the vacuum (integer - command)
+    CLEAN_MODE: 'clean-mode', // Clean mode of the vacuum (integer - command)
+    DOCK: 'dock', // Send vacuum to dock (binary - command)
+  },
 };
+
+const FAN_SETTING_ENUM_BY_FEATURE_TYPE = {
+  [DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING]: FAN_ROCK_SETTING,
+  [DEVICE_FEATURE_TYPES.FAN.WIND_SETTING]: FAN_WIND_SETTING,
+  [DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION]: FAN_AIRFLOW_DIRECTION,
+};
+
+/**
+ * @description Get valid fan feature option values for a feature type within min/max bounds.
+ * @param {string} featureType - Device feature type (e.g. rock-setting).
+ * @param {number} min - Minimum value supported by the device.
+ * @param {number} max - Maximum value supported by the device.
+ * @returns {number[]} List of option values.
+ * @example
+ * const options = getFanFeatureOptions('rock-setting', 0, 3);
+ */
+function getFanFeatureOptions(featureType, min, max) {
+  const minValue = typeof min === 'number' ? min : 0;
+  const maxValue = typeof max === 'number' ? max : minValue;
+  const fanEnum = FAN_SETTING_ENUM_BY_FEATURE_TYPE[featureType];
+
+  if (fanEnum) {
+    return Object.values(fanEnum).filter((value) => value >= minValue && value <= maxValue);
+  }
+
+  const options = [];
+  for (let value = minValue; value <= maxValue; value += 1) {
+    options.push(value);
+  }
+  return options;
+}
 
 const DEVICE_FEATURE_UNITS = {
   // Temperature units
@@ -1039,6 +1179,8 @@ const DEVICE_FEATURE_UNITS = {
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
   // Airquality Index
   AQI: 'aqi',
+  // Water quality
+  PH: 'ph',
   // For air quality (pm2.5, pm10, formaldehyd)
   MILLIGRAM_PER_CUBIC_METER: 'milligram-per-cubic-meter',
   MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
@@ -1226,7 +1368,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.FAN]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
+  [DEVICE_FEATURE_CATEGORIES.PH_SENSOR]: [DEVICE_FEATURE_UNITS.PH],
+  [DEVICE_FEATURE_CATEGORIES.ORP_SENSOR]: [DEVICE_FEATURE_UNITS.MILLI_VOLT],
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [
     [DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER],
     [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
@@ -1298,6 +1443,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',
+    AI_THINKING: 'message.ai-thinking',
+  },
+  VOICE_ASSISTANT: {
+    TRANSCRIPTION: 'voice-assistant.transcription',
+    RESPONSE: 'voice-assistant.response',
+    PROCESSING: 'voice-assistant.processing',
+    ERROR: 'voice-assistant.error',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
@@ -1420,6 +1572,8 @@ const DASHBOARD_BOX_TYPE = {
   MUSIC: 'music',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
+  VOICE_ASSISTANT: 'voice-assistant',
+  LINK: 'link',
 };
 
 const ERROR_MESSAGES = {
@@ -1550,11 +1704,20 @@ const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.FAN_MODE = FAN_MODE;
+module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
+module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
+module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
+module.exports.getFanFeatureOptions = getFanFeatureOptions;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
+module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
+module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
+module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;

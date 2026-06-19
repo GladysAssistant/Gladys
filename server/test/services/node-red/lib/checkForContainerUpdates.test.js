@@ -4,7 +4,6 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const NodeRedManager = require('../../../../services/node-red/lib');
-const { DEFAULT } = require('../../../../services/node-red/lib/constants');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -34,60 +33,57 @@ describe('NodeRed checkForContainerUpdates', () => {
     sinon.reset();
   });
 
-  it('not updated, but no containers runnning -> it should only update config', async () => {
-    // PREPARE
+  it('should remove container when image does not match selected major version', async () => {
+    gladys.system.getContainers = fake.resolves([
+      {
+        id: 'container-id',
+        image: 'nodered/node-red:3.1',
+      },
+    ]);
     const config = {
-      dockerNodeRedVersion: 'BAD_REVISION',
+      dockerNodeRedVersion: '5',
     };
-    // EXECUTE
+
     await nodeRedManager.checkForContainerUpdates(config);
-    // ASSERT
+
     assert.calledWithExactly(gladys.system.getContainers, {
       all: true,
       filters: { name: ['gladys-node-red'] },
     });
-    assert.notCalled(gladys.system.removeContainer);
-
-    expect(config).deep.equal({
-      dockerNodeRedVersion: DEFAULT.DOCKER_NODE_RED_VERSION,
-    });
-  });
-
-  it('not updated, found both containers -> it should remove containers and update config', async () => {
-    // PREPARE
-    gladys.system.getContainers = fake.resolves([{ id: 'container-id' }]);
-    const config = {
-      dockerNodeRedVersion: 'BAD_REVISION',
-    };
-    // EXECUTE
-    await nodeRedManager.checkForContainerUpdates(config);
-    // ASSERT
-    assert.calledWithExactly(gladys.system.getContainers, {
-      all: true,
-      filters: { name: ['gladys-node-red'] },
-    });
-
     assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true });
-
-    expect(config).deep.equal({
-      dockerNodeRedVersion: DEFAULT.DOCKER_NODE_RED_VERSION,
-    });
   });
 
-  it('already updated -> it should do nothing', async () => {
-    // PREPARE
-    gladys.system.getContainers = fake.resolves([{ id: 'container-id' }]);
+  it('should do nothing when container image matches selected major version', async () => {
+    gladys.system.getContainers = fake.resolves([
+      {
+        id: 'container-id',
+        image: 'nodered/node-red:3.1',
+      },
+    ]);
     const config = {
-      dockerNodeRedVersion: DEFAULT.DOCKER_NODE_RED_VERSION,
+      dockerNodeRedVersion: '3',
     };
-    // EXECUTE
-    await nodeRedManager.checkForContainerUpdates(config);
-    // ASSERT
-    assert.notCalled(gladys.system.getContainers);
-    assert.notCalled(gladys.system.removeContainer);
 
+    await nodeRedManager.checkForContainerUpdates(config);
+
+    assert.calledWithExactly(gladys.system.getContainers, {
+      all: true,
+      filters: { name: ['gladys-node-red'] },
+    });
+    assert.notCalled(gladys.system.removeContainer);
+  });
+
+  it('should do nothing when no container is installed', async () => {
+    const config = {
+      dockerNodeRedVersion: '3',
+    };
+
+    await nodeRedManager.checkForContainerUpdates(config);
+
+    assert.calledOnce(gladys.system.getContainers);
+    assert.notCalled(gladys.system.removeContainer);
     expect(config).deep.equal({
-      dockerNodeRedVersion: DEFAULT.DOCKER_NODE_RED_VERSION,
+      dockerNodeRedVersion: '3',
     });
   });
 });

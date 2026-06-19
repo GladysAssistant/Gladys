@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const { assert, fake } = require('sinon');
 const EventEmitter = require('events');
 const MessageHandler = require('../../../lib/message');
@@ -125,5 +126,82 @@ describe('message.reply', () => {
       {},
     );
     assert.notCalled(nextCloudTalkService.message.send);
+  });
+
+  it('should persist tool_call but not forward externally for AI source', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'AI',
+        source_user_id: 'XXXX',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'device_get_state()',
+      {},
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'device_get_state',
+        toolStatus: 'success',
+      },
+    );
+    assert.notCalled(telegramService.message.send);
+    assert.notCalled(nextCloudTalkService.message.send);
+    assert.notCalled(callmebotService.message.send);
+  });
+
+  it('should persist tool_call but not forward externally for api-client source', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'api-client',
+        source_user_id: 'XXXX',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'device_get_state()',
+      {},
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'device_get_state',
+        toolStatus: 'success',
+      },
+    );
+    assert.notCalled(apiClientSource.message.send);
+  });
+
+  it('should forward tool_call to telegram with compact status text', async () => {
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'telegram',
+        source_user_id: 'telegram-chat-id',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'scene_create({"name":"test"})',
+      {},
+      null,
+      {
+        messageType: 'tool_call',
+        toolName: 'scene_create',
+        toolStatus: 'error',
+      },
+    );
+    assert.calledOnce(telegramService.message.send);
+    const [chatId, payload] = telegramService.message.send.firstCall.args;
+    expect(chatId).to.equal('telegram-chat-id');
+    expect(payload.text).to.equal('❌ scene_create');
+    expect(payload.message_type).to.equal('tool_call');
+    expect(payload.tool_name).to.equal('scene_create');
+    expect(payload.tool_status).to.equal('error');
   });
 });

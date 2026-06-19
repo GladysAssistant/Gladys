@@ -3,8 +3,17 @@ const { assert: chaiAssert } = require('chai');
 
 const { fake, assert } = sinon;
 
+// eslint-disable-next-line import/no-unresolved
+const { FanControl } = require('@matter/main/clusters');
+
 const MatterHandler = require('../../../../services/matter/lib');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  COVER_STATE,
+  FAN_MODE,
+  FAN_AIRFLOW_DIRECTION,
+} = require('../../../../utils/constants');
 
 describe('Matter.setValue', () => {
   let matterHandler;
@@ -564,5 +573,447 @@ describe('Matter.setValue', () => {
 
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device not found for path 1:child_endpoint:2');
+  });
+  it('should set fan mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:mode`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+      setPercentSettingAttribute: fake.resolves(null),
+      setSpeedSettingAttribute: fake.resolves(null),
+      setRockSettingAttribute: fake.resolves(null),
+      setWindSettingAttribute: fake.resolves(null),
+      setAirflowDirectionAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, FAN_MODE.AUTO);
+    assert.calledOnceWithExactly(clusterClient.setFanModeAttribute, 5);
+  });
+  it('should set fan percent speed', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:percent`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+      setPercentSettingAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 75);
+    assert.calledOnceWithExactly(clusterClient.setPercentSettingAttribute, 75);
+  });
+  it('should set fan airflow direction', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:airflow-direction`,
+    };
+
+    const clusterClient = {
+      setAirflowDirectionAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, FAN_AIRFLOW_DIRECTION.REVERSE);
+    assert.calledOnceWithExactly(clusterClient.setAirflowDirectionAttribute, FAN_AIRFLOW_DIRECTION.REVERSE);
+  });
+
+  it('should set fan speed, rock and wind settings', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const clusterClient = {
+      setSpeedSettingAttribute: fake.resolves(null),
+      setRockSettingAttribute: fake.resolves(null),
+      setWindSettingAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:speed`,
+      },
+      5,
+    );
+    assert.calledOnceWithExactly(clusterClient.setSpeedSettingAttribute, 5);
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:rock`,
+      },
+      1,
+    );
+    assert.calledOnceWithExactly(clusterClient.setRockSettingAttribute, 1);
+
+    await matterHandler.setValue(
+      gladysDevice,
+      {
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+        external_id: `matter:12345:1:${FanControl.Complete.id}:wind`,
+      },
+      2,
+    );
+    assert.calledOnceWithExactly(clusterClient.setWindSettingAttribute, 2);
+  });
+
+  it('should return an error when fan control cluster is missing', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:mode`,
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => null,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, FAN_MODE.LOW);
+    await chaiAssert.isRejected(promise, 'Device does not support FanControl cluster');
+  });
+
+  it('should return an error for unsupported fan feature suffix', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+      type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      external_id: `matter:12345:1:${FanControl.Complete.id}:invalid`,
+    };
+
+    const clusterClient = {
+      setFanModeAttribute: fake.resolves(null),
+    };
+    const clusterClients = new Map();
+    clusterClients.set(FanControl.Complete.id, clusterClient);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, 0);
+    await chaiAssert.isRejected(promise, 'Unsupported FanControl feature suffix: invalid');
+  });
+  it('should send vacuum cleaner to dock', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1:child_endpoint:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const rvcOperationalStateCluster = {
+      goHome: fake.resolves(null),
+    };
+    clusterClients.set(97, rvcOperationalStateCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getChildEndpoints: () => [
+            {
+              number: 2,
+              getClusterClientById: (id) => clusterClients.get(id),
+              getChildEndpoints: () => [],
+            },
+          ],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnce(rvcOperationalStateCluster.goHome);
+  });
+  it('should throw error when dock value is not 1', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1:child_endpoint:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 0;
+
+    const clusterClients = new Map();
+
+    const rvcOperationalStateCluster = {
+      goHome: fake.resolves(null),
+    };
+    clusterClients.set(97, rvcOperationalStateCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getChildEndpoints: () => [
+            {
+              number: 2,
+              getClusterClientById: (id) => clusterClients.get(id),
+              getChildEndpoints: () => [],
+            },
+          ],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Unsupported dock command value: 0. Only value 1 (go home) is supported.');
+    assert.notCalled(rvcOperationalStateCluster.goHome);
+  });
+  it('should change vacuum cleaner run mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    const rvcRunModeCluster = {
+      changeToMode: fake.resolves(null),
+    };
+    clusterClients.set(84, rvcRunModeCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnceWithExactly(rvcRunModeCluster.changeToMode, { newMode: 1 });
+  });
+  it('should change vacuum cleaner clean mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+    };
+
+    const value = 2;
+
+    const clusterClients = new Map();
+
+    const rvcCleanModeCluster = {
+      changeToMode: fake.resolves(null),
+    };
+    clusterClients.set(85, rvcCleanModeCluster);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, value);
+    assert.calledOnceWithExactly(rvcCleanModeCluster.changeToMode, { newMode: 2 });
+  });
+  it('should throw error when RvcOperationalState cluster is not available for dock', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcOperationalState cluster');
+  });
+  it('should throw error when RvcRunMode cluster is not available', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcRunMode cluster');
+  });
+  it('should throw error when RvcCleanMode cluster is not available', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:2',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+      type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+    };
+
+    const value = 1;
+
+    const clusterClients = new Map();
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 2,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
+    await chaiAssert.isRejected(promise, 'Device does not support RvcCleanMode cluster');
   });
 });

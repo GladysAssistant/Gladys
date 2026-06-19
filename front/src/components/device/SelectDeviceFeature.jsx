@@ -8,19 +8,25 @@ import withIntlAsProp from '../../utils/withIntlAsProp';
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
-      // we get the rooms with the devices
       const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
       const deviceOptions = [];
 
       const deviceDictionnary = {};
       const deviceFeaturesDictionnary = {};
 
-      // and compose the multi-level options
-      rooms.forEach(room => {
-        const roomDeviceFeatures = [];
-        room.devices.forEach(device => {
+      const sortByLabel = (a, b) => {
+        if (a.label < b.label) {
+          return -1;
+        }
+        if (a.label > b.label) {
+          return 1;
+        }
+        return 0;
+      };
+
+      const pushDeviceFeatures = (devices, targetFeatures) => {
+        devices.forEach(device => {
           device.features.forEach(feature => {
-            // keep device / deviceFeature in dictionnary
             deviceFeaturesDictionnary[feature.selector] = feature;
             deviceDictionnary[feature.selector] = device;
 
@@ -28,27 +34,44 @@ class SelectDeviceFeature extends Component {
               return;
             }
 
-            roomDeviceFeatures.push({
+            targetFeatures.push({
               value: feature.selector,
               label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
             });
           });
         });
+      };
+
+      rooms.forEach(room => {
+        const roomDeviceFeatures = [];
+        pushDeviceFeatures(room.devices, roomDeviceFeatures);
         if (roomDeviceFeatures.length > 0) {
-          roomDeviceFeatures.sort((a, b) => {
-            if (a.label < b.label) {
-              return -1;
-            } else if (a.label > b.label) {
-              return 1;
-            }
-            return 0;
-          });
+          roomDeviceFeatures.sort(sortByLabel);
           deviceOptions.push({
             label: room.name,
             options: roomDeviceFeatures
           });
         }
       });
+
+      let devicesWithoutRoom = [];
+      try {
+        const allDevices = await this.props.httpClient.get('/api/v1/device');
+        devicesWithoutRoom = allDevices.filter(device => !device.room_id);
+      } catch (e) {
+        console.error('Could not load devices without room', e);
+      }
+
+      const noRoomDeviceFeatures = [];
+      pushDeviceFeatures(devicesWithoutRoom, noRoomDeviceFeatures);
+      if (noRoomDeviceFeatures.length > 0) {
+        noRoomDeviceFeatures.sort(sortByLabel);
+        deviceOptions.push({
+          label: this.props.intl.dictionary.device.noRoom,
+          options: noRoomDeviceFeatures
+        });
+      }
+
       await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
       return deviceOptions;

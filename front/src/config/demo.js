@@ -984,6 +984,28 @@ const data = {
       ]
     }
   ],
+  'get /api/v1/device': [
+    {
+      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      name: 'Unassigned sensor',
+      selector: 'unassigned-sensor',
+      room_id: null,
+      features: [
+        {
+          name: 'Temperature',
+          selector: 'unassigned-temperature-sensor',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          min: -20,
+          max: 255,
+          read_only: true,
+          last_value: 21,
+          unit: 'celsius',
+          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+        }
+      ]
+    }
+  ],
   'post /api/v1/light/main-lamp/on': {
     type: 'light.turn-on',
     device: 'main-lamp',

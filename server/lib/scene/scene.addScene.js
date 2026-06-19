@@ -142,7 +142,6 @@ async function addScene(sceneRaw, { skipDailyUpdate = false } = {}) {
   }
 
   this.scenes[scene.selector] = scene;
-  this.brain.addNamedEntity('scene', scene.selector, scene.name);
   if (!skipDailyUpdate && (hasSunriseSunsetTrigger(scene) || hadSunriseSunset)) {
     await this.dailyUpdate();
   }

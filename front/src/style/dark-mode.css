@@ -159,6 +159,13 @@ body.dark-mode {
   filter: none; /* Don't apply the double invert */
 }
 
+/* Voice assistant dashboard widget — custom dark/light theme (not inverted card gray) */
+.dark-mode .card.voice-assistant-card,
+.dark-mode .card.voice-assistant-card .card-header,
+.dark-mode .card.voice-assistant-card .card-body {
+  background-color: transparent !important;
+}
+
 /** EDF Tempo icon for example **/
 .dark-mode .dark-mode-no-invert .fe {
   filter: none;
