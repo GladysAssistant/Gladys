@@ -53,4 +53,20 @@ describe('Matter.ensureNodeConnected', () => {
     assert.calledOnce(node.connect);
     expect(isConnected).to.equal(false);
   });
+
+  it('should return false when connect throws synchronously', async () => {
+    const node = {
+      isConnected: false,
+      connect: () => {
+        throw new Error('Connect failed');
+      },
+      events: {
+        initialized: new Promise(() => {}),
+      },
+    };
+
+    const isConnected = await ensureNodeConnected(node, { nodeId: 12345n });
+
+    expect(isConnected).to.equal(false);
+  });
 });

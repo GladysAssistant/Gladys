@@ -33,10 +33,10 @@ async function ensureNodeConnected(node, options = {}) {
   }
 
   logger.info(`Matter: Connecting ${nodeLabel}...`);
-  node.connect();
 
   let timeoutId;
   try {
+    node.connect();
     await Promise.race([
       node.events.initialized,
       new Promise((_, reject) => {
