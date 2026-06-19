@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { RECONNECT_BACKOFF_MS, RECONNECT_RECURRENT_MS } = require('./utils/netatmo.constants');
+const { STATUS, RECONNECT_BACKOFF_MS, RECONNECT_RECURRENT_MS } = require('./utils/netatmo.constants');
 
 /**
  * @description Schedule the next short-retry attempt after a transient refresh failure.
@@ -18,10 +18,20 @@ function scheduleReconnectAttempt() {
   this.reconnectTimeout = setTimeout(async () => {
     try {
       await this.refreshingTokens();
-      this.reconnectAttempt = 0;
       this.reconnectTimeout = undefined;
       clearInterval(this.pollRefreshToken);
       await this.pollRefreshingToken();
+      if (!this.pollRefreshValues) {
+        await this.refreshNetatmoValues();
+      }
+      if (this.status === STATUS.RECONNECTING) {
+        this.scheduleReconnectAttempt();
+        return;
+      }
+      if (!this.pollRefreshValues) {
+        await this.pollRefreshingValues();
+      }
+      this.reconnectAttempt = 0;
     } catch (e) {
       if (e && e.transient) {
         this.scheduleReconnectAttempt();

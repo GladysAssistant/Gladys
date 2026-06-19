@@ -168,6 +168,105 @@ describe('Netatmo pollRefreshingToken', () => {
     refreshingTokensSpy.restore();
   });
 
+  it('should bootstrap value polling on retry success when not already started', async () => {
+    const transient = new Error('transient');
+    transient.transient = true;
+    netatmoHandler.refreshingTokens = sinon
+      .stub()
+      .onFirstCall()
+      .rejects(transient)
+      .onSecondCall()
+      .resolves({ success: true });
+    const refreshNetatmoValuesStub = sinon.stub().resolves();
+    const pollRefreshingValuesStub = sinon.stub();
+    netatmoHandler.refreshNetatmoValues = refreshNetatmoValuesStub;
+    netatmoHandler.pollRefreshingValues = pollRefreshingValuesStub;
+    netatmoHandler.pollRefreshValues = undefined;
+
+    await netatmoHandler.pollRefreshingToken();
+
+    clock.tick(3600 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    clock.tick(30 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    sinon.assert.calledOnce(refreshNetatmoValuesStub);
+    sinon.assert.calledOnce(pollRefreshingValuesStub);
+
+    netatmoHandler.refreshingTokens = refreshingTokens;
+  });
+
+  it('should skip arming pollRefreshingValues and keep reconnectAttempt > 0 when bootstrap leaves status RECONNECTING', async () => {
+    const transient = new Error('transient');
+    transient.transient = true;
+    netatmoHandler.refreshingTokens = sinon
+      .stub()
+      .onFirstCall()
+      .rejects(transient)
+      .onSecondCall()
+      .resolves({ success: true });
+    const pollRefreshingValuesStub = sinon.stub();
+    netatmoHandler.refreshNetatmoValues = sinon.stub().callsFake(async () => {
+      netatmoHandler.status = 'reconnecting';
+    });
+    netatmoHandler.pollRefreshingValues = pollRefreshingValuesStub;
+    netatmoHandler.pollRefreshValues = undefined;
+
+    await netatmoHandler.pollRefreshingToken();
+
+    clock.tick(3600 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    clock.tick(30 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    sinon.assert.notCalled(pollRefreshingValuesStub);
+    expect(netatmoHandler.reconnectAttempt).to.be.greaterThan(0);
+
+    clearTimeout(netatmoHandler.reconnectTimeout);
+    netatmoHandler.reconnectTimeout = undefined;
+    netatmoHandler.reconnectAttempt = 0;
+    netatmoHandler.refreshingTokens = refreshingTokens;
+  });
+
+  it('should not bootstrap value polling on retry success when already started', async () => {
+    const transient = new Error('transient');
+    transient.transient = true;
+    netatmoHandler.refreshingTokens = sinon
+      .stub()
+      .onFirstCall()
+      .rejects(transient)
+      .onSecondCall()
+      .resolves({ success: true });
+    const refreshNetatmoValuesStub = sinon.stub().resolves();
+    const pollRefreshingValuesStub = sinon.stub();
+    netatmoHandler.refreshNetatmoValues = refreshNetatmoValuesStub;
+    netatmoHandler.pollRefreshingValues = pollRefreshingValuesStub;
+    netatmoHandler.pollRefreshValues = setInterval(() => {}, 120 * 1000);
+
+    await netatmoHandler.pollRefreshingToken();
+
+    clock.tick(3600 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    clock.tick(30 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+    sinon.assert.notCalled(refreshNetatmoValuesStub);
+    sinon.assert.notCalled(pollRefreshingValuesStub);
+
+    clearInterval(netatmoHandler.pollRefreshValues);
+    netatmoHandler.pollRefreshValues = undefined;
+    netatmoHandler.refreshingTokens = refreshingTokens;
+  });
+
   it('should schedule a 30s retry after a transient error', async () => {
     const transient = new Error('transient');
     transient.transient = true;
@@ -187,6 +286,9 @@ describe('Netatmo pollRefreshingToken', () => {
     expect(netatmoHandler.reconnectAttempt).to.equal(1);
 
     clock.tick(30 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
     await Promise.resolve();
     await Promise.resolve();
     sinon.assert.calledTwice(netatmoHandler.refreshingTokens);

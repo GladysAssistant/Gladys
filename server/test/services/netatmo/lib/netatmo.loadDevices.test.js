@@ -191,6 +191,26 @@ describe('Netatmo Load Devices', () => {
     expect(devices).to.deep.eq([]);
   });
 
+  it('should trigger handleApiAuthError on 403 from homesdata', async () => {
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
+    const authErrorSpy = sinon.spy(netatmoHandler, 'handleApiAuthError');
+    try {
+      netatmoMock
+        .intercept({
+          method: 'GET',
+          path: '/api/homesdata',
+        })
+        .reply(403, { error: { code: 13, message: 'forbidden' } });
+
+      await netatmoHandler.loadDevices();
+
+      sinon.assert.calledWith(authErrorSpy, 403);
+    } finally {
+      authErrorSpy.restore();
+    }
+  });
+
   it('should handle unexpected API responses', async () => {
     netatmoHandler.configuration.energyApi = true;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves({ plugs: [], thermostats: [] });
