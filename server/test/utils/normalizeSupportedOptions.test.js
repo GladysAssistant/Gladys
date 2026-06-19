@@ -50,6 +50,14 @@ describe('normalizeSupportedOptions', () => {
     expect(normalizeSupportedOptions([])).to.deep.equal([]);
   });
 
+  it('should reject undefined input', () => {
+    expect(() => normalizeSupportedOptions(undefined)).to.throw(BadParameters);
+  });
+
+  it('should reject null input', () => {
+    expect(() => normalizeSupportedOptions(null)).to.throw(BadParameters);
+  });
+
   it('should keep sort_order when it is zero', () => {
     expect(normalizeSupportedOptions([{ value: 0, label: 'Off', sort_order: 0 }])).to.deep.equal([
       { value: 0, label: 'Off', sort_order: 0 },

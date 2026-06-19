@@ -19,6 +19,7 @@ const supportedOptionSchema = Joi.object({
 
 const supportedOptionsSchema = Joi.array()
   .items(supportedOptionSchema)
+  .required()
   .custom((options, helpers) => {
     const values = options.map((option) => option.value);
     const uniqueValues = new Set(values);
