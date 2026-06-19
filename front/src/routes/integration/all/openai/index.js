@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
+import AiChatDebugDownload from './AiChatDebugDownload';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -116,6 +117,7 @@ class OpenAIGateway extends Component {
           </div>
         </div>
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
+        {gladysPlusConnected === true && <AiChatDebugDownload />}
       </Layout>
     );
   }

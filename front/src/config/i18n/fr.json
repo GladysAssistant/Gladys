@@ -2217,6 +2217,12 @@
       "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
       "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
       "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
+      "debugContext": {
+        "title": "Debug IA",
+        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 10 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
+        "downloadButton": "Télécharger le contexte JSON pour debug",
+        "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
+      },
       "weeklyDigest": {
         "title": "Bilan hebdomadaire de la maison",
         "description": "Gladys t'envoie chaque semaine un résumé de ta maison connectée : confort, énergie, maintenance et conseils utiles.",
