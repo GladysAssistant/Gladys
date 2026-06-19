@@ -24,12 +24,7 @@ async function create(selector, room) {
 
   room.house_id = house.id;
   const roomCreated = await db.Room.create(room);
-  const roomPlain = roomCreated.get({ plain: true });
-
-  // add room to the brain
-  this.brain.addNamedEntity('room', roomPlain.id, roomPlain.name);
-
-  return roomPlain;
+  return roomCreated.get({ plain: true });
 }
 
 module.exports = {

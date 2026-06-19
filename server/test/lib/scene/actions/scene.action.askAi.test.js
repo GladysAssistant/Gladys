@@ -31,7 +31,7 @@ describe('scene.ask-ai', () => {
       },
     };
     const gateway = {
-      forwardMessageToOpenAI: fake.resolves({ answer: 'answer' }),
+      forwardMessageToAiChat: fake.resolves({ answer: 'answer' }),
     };
     const scope = {};
     await executeActions(
@@ -55,7 +55,7 @@ describe('scene.ask-ai', () => {
       ],
       scope,
     );
-    assert.calledWith(gateway.forwardMessageToOpenAI, {
+    assert.calledWith(gateway.forwardMessageToAiChat, {
       message: {
         source: 'AI',
         user: {

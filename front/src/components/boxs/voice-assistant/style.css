@@ -1,0 +1,560 @@
+/* CSS Modules — import: import style from './style.css' */
+/* Gladys dark mode: class dark-mode-no-invert + cardDark via props.darkMode */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  color: var(--va-text);
+  background: var(--va-card-bg);
+  border: 1px solid var(--va-border);
+  box-shadow: var(--va-card-shadow);
+}
+
+.cardLight {
+  /* Gladys brand: #0052D4 #65C7F7 #9CECFB #16193B */
+  --va-blue-deep: #0052d4;
+  --va-blue-mid: #65c7f7;
+  --va-blue-light: #9cecfb;
+  --va-blue-navy: #16193b;
+  --va-cyan: var(--va-blue-mid);
+  --va-violet: var(--va-blue-deep);
+  --va-magenta: var(--va-blue-deep);
+  --va-text: #1e293b;
+  --va-title: var(--va-blue-navy);
+  --va-status: var(--va-blue-deep);
+  --va-error: #dc2626;
+  --va-label: #64748b;
+  --va-label-cyan: var(--va-blue-deep);
+  --va-label-violet: #003d9e;
+  --va-border: rgba(0, 82, 212, 0.28);
+  --va-header-border: rgba(101, 199, 247, 0.35);
+  --va-grid-line: rgba(22, 25, 59, 0.06);
+  --va-card-bg:
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(0, 82, 212, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(156, 236, 251, 0.35) 0%, transparent 50%),
+    linear-gradient(165deg, #f4fbff 0%, #eef8fe 45%, #e3f4fd 100%);
+  --va-card-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+    0 12px 40px -12px rgba(22, 25, 59, 0.1),
+    0 0 60px -24px rgba(101, 199, 247, 0.35);
+  --va-orb-btn-bg: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.4) 0%, transparent 45%),
+    linear-gradient(145deg, #9cecfb 0%, #65c7f7 40%, #0052d4 75%, #16193b 100%);
+  --va-orb-btn-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3) inset, 0 0 36px rgba(101, 199, 247, 0.45),
+    0 8px 28px rgba(0, 82, 212, 0.25);
+  --va-orb-btn-hover-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 48px rgba(156, 236, 251, 0.65),
+    0 12px 32px rgba(0, 82, 212, 0.3);
+  --va-msg-t-bg: linear-gradient(135deg, rgba(156, 236, 251, 0.35) 0%, rgba(255, 255, 255, 0.75) 100%);
+  --va-msg-t-border: rgba(101, 199, 247, 0.45);
+  --va-msg-r-bg: linear-gradient(135deg, rgba(0, 82, 212, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%);
+  --va-msg-r-border: rgba(0, 82, 212, 0.22);
+  --va-ring1: rgba(101, 199, 247, 0.45);
+  --va-ring2: rgba(0, 82, 212, 0.28);
+  --va-ring3: rgba(156, 236, 251, 0.35);
+  --va-mic-glow: rgba(101, 199, 247, 0.7);
+  --va-label-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
+  --va-listening-ring: rgba(0, 82, 212, 0.55);
+  --va-listening-glow: rgba(101, 199, 247, 0.45);
+  --va-listening-orb: linear-gradient(145deg, #9cecfb 0%, #65c7f7 50%, #0052d4 100%);
+  --va-listening-orb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 0 50px rgba(101, 199, 247, 0.55),
+    0 0 80px rgba(0, 82, 212, 0.2);
+  --va-active-orb: linear-gradient(145deg, #9cecfb 0%, #65c7f7 45%, #0052d4 100%);
+  --va-active-orb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 0 45px rgba(156, 236, 251, 0.5);
+  --va-bar-gradient: linear-gradient(to top, #0052d4, #9cecfb);
+  --va-bar-glow: rgba(101, 199, 247, 0.55);
+}
+
+.cardDark {
+  --va-blue-deep: #0052d4;
+  --va-blue-mid: #65c7f7;
+  --va-blue-light: #9cecfb;
+  --va-blue-navy: #16193b;
+  --va-cyan: var(--va-blue-light);
+  --va-violet: var(--va-blue-mid);
+  --va-magenta: var(--va-blue-deep);
+  --va-text: #e8ecf4;
+  --va-title: #f0f7ff;
+  --va-status: var(--va-blue-light);
+  --va-error: #ff6b8a;
+  --va-label: rgba(180, 195, 220, 0.75);
+  --va-label-cyan: var(--va-blue-light);
+  --va-label-violet: var(--va-blue-mid);
+  --va-border: rgba(101, 199, 247, 0.22);
+  --va-header-border: rgba(0, 82, 212, 0.35);
+  --va-grid-line: rgba(156, 236, 251, 0.05);
+  --va-card-bg:
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(0, 82, 212, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(101, 199, 247, 0.18) 0%, transparent 50%),
+    linear-gradient(165deg, #16193b 0%, #1a2048 45%, #12152e 100%);
+  --va-card-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 16px 48px -16px rgba(0, 0, 0, 0.5),
+    0 0 100px -40px rgba(0, 82, 212, 0.35);
+  --va-orb-btn-bg: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 45%),
+    linear-gradient(145deg, rgba(156, 236, 251, 0.4) 0%, rgba(101, 199, 247, 0.35) 40%, rgba(0, 82, 212, 0.55) 70%, #16193b 100%);
+  --va-orb-btn-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 40px rgba(101, 199, 247, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.45);
+  --va-orb-btn-hover-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 0 60px rgba(156, 236, 251, 0.45),
+    0 12px 40px rgba(0, 82, 212, 0.35);
+  --va-msg-t-bg: linear-gradient(135deg, rgba(101, 199, 247, 0.12) 0%, rgba(22, 25, 59, 0.2) 100%);
+  --va-msg-t-border: rgba(156, 236, 251, 0.22);
+  --va-msg-r-bg: linear-gradient(135deg, rgba(0, 82, 212, 0.2) 0%, rgba(22, 25, 59, 0.15) 100%);
+  --va-msg-r-border: rgba(0, 82, 212, 0.35);
+  --va-ring1: rgba(156, 236, 251, 0.4);
+  --va-ring2: rgba(0, 82, 212, 0.35);
+  --va-ring3: rgba(101, 199, 247, 0.2);
+  --va-mic-glow: rgba(156, 236, 251, 0.85);
+  --va-label-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  --va-listening-ring: rgba(156, 236, 251, 0.65);
+  --va-listening-glow: rgba(101, 199, 247, 0.5);
+  --va-listening-orb: linear-gradient(145deg, rgba(156, 236, 251, 0.55) 0%, rgba(101, 199, 247, 0.45) 50%, rgba(0, 82, 212, 0.65) 100%);
+  --va-listening-orb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 50px rgba(156, 236, 251, 0.45),
+    0 0 80px rgba(0, 82, 212, 0.35);
+  --va-active-orb: linear-gradient(145deg, rgba(156, 236, 251, 0.45) 0%, rgba(101, 199, 247, 0.4) 50%, rgba(0, 82, 212, 0.55) 100%);
+  --va-active-orb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 45px rgba(101, 199, 247, 0.4);
+  --va-bar-gradient: linear-gradient(to top, #0052d4, #9cecfb);
+  --va-bar-glow: rgba(156, 236, 251, 0.55);
+
+  background: var(--va-card-bg) !important;
+  border-color: var(--va-border) !important;
+  box-shadow: var(--va-card-shadow) !important;
+}
+
+/* Same element: beats .dark-mode .card when transparent bg is set in dark-mode.css */
+:global(.dark-mode .card.voice-assistant-card.dark-mode-no-invert).cardDark {
+  background: var(--va-card-bg) !important;
+  border-color: var(--va-border) !important;
+  box-shadow: var(--va-card-shadow) !important;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--va-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--va-grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 40%, black 15%, transparent 78%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cardHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: transparent !important;
+  border-bottom: 1px solid var(--va-header-border);
+}
+
+.cardTitle {
+  color: var(--va-title);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cardBody {
+  position: relative;
+  z-index: 1;
+  padding: 1.25rem 1.25rem 1.5rem;
+  background: transparent !important;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.orbStage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 1.5rem 1rem 1rem;
+  gap: 1.25rem;
+}
+
+.orb {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring1 {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  pointer-events: none;
+  inset: -8px;
+  border-color: var(--va-ring1);
+  animation: vaRingSpin 12s linear infinite;
+}
+
+.ring2 {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  pointer-events: none;
+  inset: -22px;
+  border-color: var(--va-ring2);
+  border-style: dashed;
+  animation: vaRingSpinReverse 18s linear infinite;
+}
+
+.ring3 {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  inset: -36px;
+  opacity: 0;
+  border: 1px solid var(--va-ring3);
+  transition: opacity 0.4s ease;
+}
+
+.orbIdle .ring3 {
+  opacity: 1;
+  animation: vaRingBreathe 3s ease-in-out infinite;
+}
+
+.orbListening .ring1 {
+  border-color: var(--va-listening-ring);
+  animation: vaRingPulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 30px var(--va-listening-glow);
+}
+
+.orbListening .ring2 {
+  border-color: rgba(0, 82, 212, 0.35);
+  animation: vaRingSpin 6s linear infinite;
+}
+
+/* Rings extend below the orb box; reserve space so the hint text does not overlap */
+.orbListening {
+  margin-bottom: 2rem;
+}
+
+.orbProcessing .ring1,
+.orbSpeaking .ring1 {
+  border: none;
+  background: conic-gradient(from 0deg, transparent, var(--va-cyan), var(--va-violet), var(--va-cyan), transparent);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: vaRingSpin 1.4s linear infinite;
+}
+
+.orbProcessing .ring2,
+.orbSpeaking .ring2 {
+  inset: -28px;
+  opacity: 0.6;
+  animation: vaRingSpinReverse 2.5s linear infinite;
+}
+
+.orbButton {
+  position: relative;
+  z-index: 2;
+  width: 112px;
+  height: 112px;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0;
+  color: #fff;
+  background: var(--va-orb-btn-bg);
+  box-shadow: var(--va-orb-btn-shadow);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.orbButton::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.orbButton:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: var(--va-orb-btn-hover-shadow);
+}
+
+.orbButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.orbButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  filter: grayscale(0.4);
+}
+
+.orbListening .orbButton {
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 45%), var(--va-listening-orb);
+  box-shadow: var(--va-listening-orb-shadow);
+  animation: vaOrbHeartbeat 1.2s ease-in-out infinite;
+}
+
+.orbProcessing .orbButton,
+.orbSpeaking .orbButton {
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.12) 0%, transparent 45%), var(--va-active-orb);
+  box-shadow: var(--va-active-orb-shadow);
+}
+
+.micIcon {
+  font-size: 2.25rem;
+  line-height: 1;
+  text-shadow: 0 0 16px var(--va-mic-glow);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+.stopIcon {
+  font-size: 1.5rem;
+}
+
+.orbListening .micIcon {
+  display: none;
+}
+
+.orbLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.95;
+  text-shadow: var(--va-label-shadow);
+}
+
+.visualizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  margin-bottom: 2px;
+}
+
+.bar {
+  width: 4px;
+  min-height: 8px;
+  border-radius: 2px;
+  background: var(--va-bar-gradient);
+  box-shadow: 0 0 12px var(--va-bar-glow);
+  animation: vaBarDance 0.55s ease-in-out infinite alternate;
+}
+
+.bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.bar:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.bar:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.bar:nth-child(4) {
+  animation-delay: 0.24s;
+}
+.bar:nth-child(5) {
+  animation-delay: 0.12s;
+}
+.bar:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.bar:nth-child(7) {
+  animation-delay: 0.04s;
+}
+
+.status {
+  margin: 0;
+  padding: 0 0.5rem;
+  max-width: 18rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: var(--va-status);
+  text-align: center;
+}
+
+.error {
+  color: var(--va-error);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.messages {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.messageTranscription {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--va-text);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: var(--va-msg-t-bg);
+  border: 1px solid var(--va-msg-t-border);
+}
+
+.messageResponse {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--va-text);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: var(--va-msg-r-bg);
+  border: 1px solid var(--va-msg-r-border);
+}
+
+.messageLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--va-label);
+  margin-bottom: 0.35rem;
+}
+
+.messageTranscription .messageLabel {
+  color: var(--va-label-cyan);
+}
+
+.messageResponse .messageLabel {
+  color: var(--va-label-violet);
+}
+
+.plusBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.orbStageMuted {
+  opacity: 0.55;
+}
+
+.plusRequiredHint {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--va-status);
+  text-align: center;
+}
+
+.plusRequiredHint a,
+.error a {
+  color: var(--va-blue-deep);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cardDark .plusRequiredHint a,
+.cardDark .error a {
+  color: var(--va-blue-light);
+}
+
+.upsellWrap {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0.75rem;
+}
+
+@keyframes vaRingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vaRingSpinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes vaRingBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.9;
+  }
+}
+
+@keyframes vaRingPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.75;
+  }
+}
+
+@keyframes vaOrbHeartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes vaBarDance {
+  from {
+    height: 10px;
+    opacity: 0.6;
+  }
+  to {
+    height: 32px;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring1,
+  .ring2,
+  .ring3,
+  .orbButton,
+  .bar {
+    animation: none !important;
+  }
+
+  .orbButton:hover:not(:disabled) {
+    transform: none;
+  }
+}

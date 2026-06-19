@@ -3,8 +3,9 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
@@ -62,6 +63,11 @@ describe('gateway.getUsersKeys', () => {
         accepted: false,
       },
     ]);
+    assert.calledOnceWithExactly(
+      variable.setValue,
+      SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS,
+      JSON.stringify(users),
+    );
   });
   it('should merge new user keys with old user', async () => {
     const oldUsers = [
@@ -116,5 +122,36 @@ describe('gateway.getUsersKeys', () => {
         accepted: false,
       },
     ]);
+  });
+  it('should remove users deleted from Gladys Plus', async () => {
+    const oldUsers = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+      },
+      {
+        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        name: 'Removed user',
+        rsa_public_key: 'old-fingerprint',
+        ecdsa_public_key: 'old-fingerprint',
+        gladys_4_user_id: '11111111-2222-3333-4444-555555555555',
+        connected: false,
+        accepted: true,
+      },
+    ];
+    variable.getValue = fake.resolves(JSON.stringify(oldUsers));
+
+    const users = await gateway.getUsersKeys();
+    expect(users).to.deep.equal([oldUsers[0]]);
+    assert.calledOnceWithExactly(
+      variable.setValue,
+      SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS,
+      JSON.stringify([oldUsers[0]]),
+    );
   });
 });

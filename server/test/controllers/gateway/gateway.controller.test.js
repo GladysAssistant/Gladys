@@ -107,18 +107,111 @@ describe('GET /api/v1/gateway/backup/restore/status', () => {
   });
 });
 
-describe('POST /api/v1/gateway/openai/ask', () => {
-  it('should return GPT-3 response', async () => {
+describe('POST /api/v1/gateway/aichat/chat', () => {
+  it('should return AI chat response', async () => {
     nock(config.gladysGatewayServerUrl)
       .post('/openai/ask')
       .reply(200, {
-        answer: 'this is my answer',
+        choices: [
+          {
+            message: {
+              content: 'this is my answer',
+            },
+          },
+        ],
       });
     const response = await authenticatedRequest
-      .post('/api/v1/gateway/openai/ask')
+      .post('/api/v1/gateway/aichat/chat')
+      .send({
+        messages: [{ role: 'user', content: 'hello' }],
+        tools: [],
+        tool_choice: 'auto',
+      })
       .expect('Content-Type', /json/)
       .expect(200);
-    expect(response.body).to.have.property('answer', 'this is my answer');
+    expect(response.body).to.deep.equal({
+      choices: [
+        {
+          message: {
+            content: 'this is my answer',
+          },
+        },
+      ],
+    });
+  });
+});
+
+describe('POST /api/v1/gateway/stt', () => {
+  it('should return stt response', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/stt')
+      .reply(200, { text: 'bonjour gladys' });
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/stt')
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.from('fake-audio'))
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.deep.equal({ text: 'bonjour gladys' });
+  });
+
+  it('should return 400 when audio body is empty', async () => {
+    await authenticatedRequest
+      .post('/api/v1/gateway/stt')
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.alloc(0))
+      .expect(400);
+  });
+});
+
+describe('POST /api/v1/gateway/voice', () => {
+  beforeEach(() => {
+    global.TEST_GLADYS_INSTANCE.stateManager.setState('service', 'mcp', {
+      mcpHandler: {
+        getAllTools: async () => [],
+      },
+    });
+  });
+
+  it('should process voice message end-to-end', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/stt')
+      .reply(200, { text: 'allume la lumière' });
+    nock(config.gladysGatewayServerUrl)
+      .post('/openai/ask')
+      .reply(200, {
+        choices: [
+          {
+            message: {
+              content: 'La lumière est allumée.',
+            },
+          },
+        ],
+      });
+    nock(config.gladysGatewayServerUrl)
+      .post('/tts/token')
+      .reply(200, { url: 'http://tts.test/audio.mp3' });
+
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/voice')
+      .set('Content-Type', 'audio/wav')
+      .send(Buffer.from('fake-audio'))
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).to.deep.equal({
+      transcription: 'allume la lumière',
+      answer: 'La lumière est allumée.',
+      ttsUrl: 'http://tts.test/audio.mp3',
+    });
+  });
+
+  it('should return 400 when audio body is empty', async () => {
+    await authenticatedRequest
+      .post('/api/v1/gateway/voice')
+      .set('Content-Type', 'audio/webm')
+      .send(Buffer.alloc(0))
+      .expect(400);
   });
 });
 
