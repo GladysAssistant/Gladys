@@ -3,12 +3,13 @@ import cx from 'classnames';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import debounce from 'debounce';
-import get from 'get-value';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
+import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
+import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam } from '../../../../utils/device';
@@ -55,15 +56,6 @@ const compareDevices = (deviceA, deviceB) => {
     }
   }
   return true;
-};
-
-const getMatterSaveError = e => {
-  let errorMessage = 'integration.matter.error.defaultError';
-  if (e.response && e.response.status === 409) {
-    errorMessage = 'integration.matter.error.conflictError';
-  }
-  const errorDetail = get(e, 'response.data.message') || get(e, 'response.data.error') || null;
-  return { errorMessage, errorDetail };
 };
 
 class MatterDevices extends Component {
@@ -249,7 +241,7 @@ class MatterDevices extends Component {
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
-      this.setPairedDeviceError(externalId, getMatterSaveError(e));
+      this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -267,7 +259,11 @@ class MatterDevices extends Component {
       });
 
       if (!gladysDevice) {
-        this.setPairedDeviceError(externalId, getMatterSaveError({}));
+        this.setPairedDeviceError(externalId, {
+          errorMessage: 'integration.matter.error.replaceDeviceNotFound',
+          errorDetail: null,
+          isKnownError: true
+        });
         return;
       }
 
@@ -298,7 +294,7 @@ class MatterDevices extends Component {
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
-      this.setPairedDeviceError(externalId, getMatterSaveError(e));
+      this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
     } finally {
       this.setPairedDeviceLoading(externalId, false);
     }
@@ -469,10 +465,11 @@ class MatterDevices extends Component {
                                 <div class="dimmer-content">
                                   <div class="card-body">
                                     {pairedError && (
-                                      <div class="alert alert-danger">
-                                        <Text id={pairedError.errorMessage} />
-                                        {pairedError.errorDetail && <div>{pairedError.errorDetail}</div>}
-                                      </div>
+                                      <MatterDeviceSaveErrorAlert
+                                        errorMessage={pairedError.errorMessage}
+                                        errorDetail={pairedError.errorDetail}
+                                        isKnownError={pairedError.isKnownError}
+                                      />
                                     )}
                                     {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
                                       <div class="alert alert-info">
