@@ -1,3 +1,4 @@
+const fs = require('fs');
 const os = require('os');
 const semver = require('semver');
 
@@ -25,6 +26,14 @@ async function getInfos() {
     latest_gladys_version: this.latestGladysVersion,
     is_docker: await this.isDocker(),
   };
+  let cpuTemperature = null;
+  try {
+    const raw = fs.readFileSync('/sys/class/thermal/thermal_zone0/temp', 'utf8');
+    cpuTemperature = Math.round(parseInt(raw.trim(), 10) / 100) / 10;
+  } catch (e) {
+    // not available on all platforms
+  }
+  infos.cpu_temperature = cpuTemperature;
   if (this.latestGladysVersion && this.gladysVersion) {
     infos.new_release_available = semver.gt(this.latestGladysVersion, this.gladysVersion);
   } else {
