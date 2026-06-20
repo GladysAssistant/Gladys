@@ -167,24 +167,24 @@ const EditHouse = ({ children, ...props }) => (
           </div>
         </div>
       </div>
-      <div class="form-group">
-        <button onClick={props.saveHouse} class="btn btn-success" disabled={Object.keys(props.errors).length > 0}>
+      <div class="form-group d-flex flex-wrap">
+        <button onClick={props.saveHouse} class="btn btn-success flex-fill mr-2 mb-2" disabled={Object.keys(props.errors).length > 0}>
           <Text id="signup.configureHouse.saveHouse" />
         </button>
         {!props.wantToDeleteHouse && (
-          <button onClick={props.deleteHouse} class="btn btn-danger ml-4">
+          <button onClick={props.deleteHouse} class="btn btn-danger flex-fill mr-2 mb-2">
             <Text id="signup.configureHouse.deleteHouse" />
           </button>
         )}
         {props.wantToDeleteHouse && (
-          <span class="ml-4">
-            <button onClick={props.confirmDeleteHouse} class="btn btn-danger">
+          <>
+            <button onClick={props.confirmDeleteHouse} class="btn btn-danger flex-fill mr-2 mb-2">
               <Text id="signup.configureHouse.confirmDeleteHouse" />
             </button>
-            <button onClick={props.cancelDeleteHouse} class="btn btn-primary ml-4">
+            <button onClick={props.cancelDeleteHouse} class="btn btn-primary flex-fill mr-2 mb-2">
               <Text id="signup.configureHouse.cancelDeleteHouse" />
             </button>
-          </span>
+          </>
         )}
       </div>
     </div>
