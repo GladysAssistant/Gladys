@@ -871,3 +871,82 @@ describe('TuyaHandler.poll additional branch coverage', () => {
     expect(warnConnectorMessages.length).to.equal(0);
   });
 });
+
+describe('TuyaHandler.poll degraded backoff', () => {
+  const buildDevice = () => ({
+    external_id: 'tuya:device-degraded',
+    params: [
+      { name: 'IP_ADDRESS', value: '1.1.1.1' },
+      { name: 'LOCAL_KEY', value: 'key' },
+      { name: 'PROTOCOL_VERSION', value: '3.3' },
+      { name: 'LOCAL_OVERRIDE', value: true },
+    ],
+    features: [{ external_id: 'tuya:device-degraded:switch_1', category: 'switch', type: 'binary' }],
+  });
+
+  it('should skip local and use cloud when device is in degraded backoff', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: true } });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+        degradedDevices: {
+          'device-degraded': { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+        },
+      },
+      buildDevice(),
+    );
+
+    expect(localPoll.called).to.equal(false);
+    expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should record local failure on ECONNRESET so subsequent polls reach the threshold', async () => {
+    const localPoll = sinon.stub().rejects(Object.assign(new Error('connect ECONNRESET'), { code: 'ECONNRESET' }));
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const request = sinon.stub().resolves({ result: [] });
+    const emit = sinon.stub();
+    const degradedDevices = {};
+
+    const ctx = {
+      connector: { request },
+      gladys: { event: { emit } },
+      degradedDevices,
+    };
+    for (let i = 0; i < 3; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await poll.call(ctx, buildDevice());
+    }
+    expect(degradedDevices['device-degraded']).to.not.equal(undefined);
+    expect(degradedDevices['device-degraded'].status).to.equal('degraded');
+  });
+
+  it('should clear degraded entry on successful local poll', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: true } });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const degradedDevices = {
+      'device-degraded': { status: 'ok', until: 0, failureTimestamps: [1, 2] },
+    };
+
+    await poll.call(
+      {
+        connector: { request: sinon.stub() },
+        gladys: { event: { emit: sinon.stub() } },
+        degradedDevices,
+      },
+      buildDevice(),
+    );
+
+    expect(degradedDevices['device-degraded']).to.equal(undefined);
+  });
+});

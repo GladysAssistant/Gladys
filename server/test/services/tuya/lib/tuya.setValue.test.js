@@ -552,3 +552,104 @@ describe('TuyaHandler.setValue', () => {
     expect(warnMessages.some((msg) => msg.includes('connector unavailable'))).to.equal(true);
   });
 });
+
+describe('TuyaHandler.setValue degraded backoff', () => {
+  const buildDevice = () => ({
+    params: [
+      { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+      { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+      { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+      { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+    ],
+  });
+  const deviceFeature = {
+    external_id: 'tuya:device-degraded:switch_1',
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+  };
+
+  it('should skip local and use cloud when device is in degraded backoff', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+    const request = sinon.stub().resolves({ success: true });
+    const ctx = {
+      connector: { request },
+      gladys: {},
+      degradedDevices: {
+        'device-degraded': { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+      },
+    };
+
+    await setValue.call(ctx, buildDevice(), deviceFeature, 1);
+
+    expect(connect.called).to.equal(false);
+    expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should record local failure on ECONNRESET reaching threshold', async () => {
+    const connect = sinon.stub().rejects(Object.assign(new Error('connect ECONNRESET'), { code: 'ECONNRESET' }));
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = sinon.stub();
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+    const degradedDevices = {};
+    const ctx = {
+      connector: { request: sinon.stub().resolves({ success: true }) },
+      gladys: {},
+      degradedDevices,
+    };
+    for (let i = 0; i < 3; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await setValue.call(ctx, buildDevice(), deviceFeature, 1);
+    }
+    expect(degradedDevices['device-degraded']).to.not.equal(undefined);
+    expect(degradedDevices['device-degraded'].status).to.equal('degraded');
+  });
+
+  it('should clear degraded entry on successful local set', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+    const degradedDevices = {
+      'device-degraded': { status: 'ok', until: 0, failureTimestamps: [1, 2] },
+    };
+
+    await setValue.call(
+      {
+        connector: { request: sinon.stub() },
+        gladys: {},
+        degradedDevices,
+      },
+      buildDevice(),
+      deviceFeature,
+      1,
+    );
+
+    expect(degradedDevices['device-degraded']).to.equal(undefined);
+  });
+});

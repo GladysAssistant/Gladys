@@ -8,6 +8,7 @@ const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { localPoll } = require('./tuya.localPoll');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
+const { isLocalSkipNeeded, recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 
 const SAME_VALUE_EMIT_INTERVAL_MS = 3 * 60 * 1000;
 
@@ -250,7 +251,13 @@ async function poll(device) {
     );
   }
 
-  if (hasLocalConfig) {
+  const localSkipped = hasLocalConfig && isLocalSkipNeeded(this.degradedDevices, topic);
+  if (localSkipped) {
+    fallbackReason = 'device_degraded';
+    logger.debug(`[Tuya][poll] device=${topic} skipping local (degraded backoff active), falling back to cloud`);
+  }
+
+  if (hasLocalConfig && !localSkipped) {
     try {
       const localResult = await localPoll({
         deviceId: topic,
@@ -307,6 +314,7 @@ async function poll(device) {
 
         if (pendingCloudFeatures.length === 0) {
           modeUsed = 'local';
+          recordLocalSuccess(this.degradedDevices, topic);
           logger.debug(
             `[Tuya][poll] device=${topic} mode=${modeUsed} local_handled=${localHandled} local_changed=${localChanged} cloud_handled=0 cloud_changed=0 cloud_missing=0 fallback=${fallbackReason}`,
           );
@@ -314,6 +322,7 @@ async function poll(device) {
         }
 
         fallbackReason = 'partial_local_mapping';
+        recordLocalSuccess(this.degradedDevices, topic);
         try {
           cloudSummary = await pollCloudFeatures(this, device, pendingCloudFeatures, topic);
         } catch (e) {
@@ -332,6 +341,7 @@ async function poll(device) {
     } catch (e) {
       logger.warn(`[Tuya][poll] local poll failed for ${topic}, falling back to cloud`, e);
       fallbackReason = 'local_poll_failed';
+      recordLocalFailure(this.degradedDevices, topic, e);
     }
   }
 

@@ -16,6 +16,7 @@ const tuyaManager = {
       params: [],
     },
   ],
+  degradedDevices: {},
 };
 const defaultLocalScan = tuyaManager.localScan;
 
@@ -199,5 +200,73 @@ describe('TuyaController POST /api/v1/service/tuya/disconnect', () => {
     await controller['post /api/v1/service/tuya/disconnect'].controller(req, res);
     assert.calledOnce(tuyaManager.manualDisconnect);
     assert.calledWith(res.json, { success: true });
+  });
+});
+
+describe('TuyaController GET /api/v1/service/tuya/local-status', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = TuyaController(tuyaManager);
+    sinon.resetHistory();
+  });
+
+  it('should return all degraded devices when no deviceId is given', async () => {
+    tuyaManager.degradedDevices = {
+      d1: { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+      d2: { status: 'ok', until: 0, failureTimestamps: [] },
+    };
+    const res = { json: fake.returns(null) };
+    await controller['get /api/v1/service/tuya/local-status'].controller({ query: {} }, res);
+    const payload = res.json.firstCall.args[0];
+    expect(payload).to.have.property('devices');
+    expect(payload.devices).to.have.property('d1');
+    expect(payload.devices).to.not.have.property('d2');
+  });
+
+  it('should return only the requested device status', async () => {
+    tuyaManager.degradedDevices = {
+      d1: { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+    };
+    const res = { json: fake.returns(null) };
+    await controller['get /api/v1/service/tuya/local-status'].controller({ query: { deviceId: 'd1' } }, res);
+    const payload = res.json.firstCall.args[0];
+    expect(payload.deviceId).to.equal('d1');
+    expect(payload.status).to.have.property('status', 'degraded');
+  });
+
+  it('should return null status for an unknown deviceId', async () => {
+    tuyaManager.degradedDevices = {};
+    const res = { json: fake.returns(null) };
+    await controller['get /api/v1/service/tuya/local-status'].controller({ query: { deviceId: 'd1' } }, res);
+    expect(res.json.firstCall.args[0]).to.deep.equal({ deviceId: 'd1', status: null });
+  });
+
+  it('should fall back to empty query object when req.query is missing', async () => {
+    tuyaManager.degradedDevices = {};
+    const res = { json: fake.returns(null) };
+    await controller['get /api/v1/service/tuya/local-status'].controller({}, res);
+    expect(res.json.firstCall.args[0]).to.deep.equal({ devices: {} });
+  });
+});
+
+describe('TuyaController POST /api/v1/service/tuya/local-poll resets degraded backoff', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = TuyaController(tuyaManager);
+    sinon.resetHistory();
+  });
+
+  it('should clear the degraded entry for the requested device before polling', async () => {
+    tuyaManager.degradedDevices = {
+      device1: { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+    };
+    const req = { body: { deviceId: 'device1', ip: '1.1.1.1', localKey: 'key', protocolVersion: '3.3' } };
+    const res = { json: fake.returns(null) };
+
+    await controller['post /api/v1/service/tuya/local-poll'].controller(req, res);
+
+    expect(tuyaManager.degradedDevices.device1).to.equal(undefined);
   });
 });

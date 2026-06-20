@@ -6,7 +6,49 @@ import { pollLocalDevice } from './commons/localPoll';
 
 const PROTOCOL_OPTIONS = ['3.1', '3.3', '3.4', '3.5'];
 
+const formatUntilTime = until => {
+  if (!until || typeof until !== 'number') {
+    return '';
+  }
+  const date = new Date(until);
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+};
+
 class TuyaLocalPollSection extends Component {
+  state = {
+    localStatus: null
+  };
+
+  componentDidMount() {
+    this.refreshLocalStatus();
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevId = getTuyaDeviceId(prevProps.device);
+    const nextId = getTuyaDeviceId(this.props.device);
+    if (prevId !== nextId) {
+      this.refreshLocalStatus();
+    }
+  }
+
+  refreshLocalStatus = async () => {
+    const { httpClient, device } = this.props;
+    const deviceId = getTuyaDeviceId(device);
+    if (!httpClient || !deviceId) {
+      return;
+    }
+    try {
+      const response = await httpClient.get(
+        `/api/v1/service/tuya/local-status?deviceId=${encodeURIComponent(deviceId)}`
+      );
+      this.setState({ localStatus: (response && response.status) || null });
+    } catch (e) {
+      this.setState({ localStatus: null });
+    }
+  };
+
   toggleIpMode = () => {
     const { device, onLocalPollChange } = this.props;
     if (!device || typeof onLocalPollChange !== 'function') {
@@ -117,6 +159,7 @@ class TuyaLocalPollSection extends Component {
         },
         localPollDps: pollResult.dps
       });
+      this.refreshLocalStatus();
     } catch (e) {
       const message =
         (e && e.response && e.response.data && e.response.data.message) || (e && e.message) || 'Unknown error';
@@ -126,10 +169,11 @@ class TuyaLocalPollSection extends Component {
         localPollProtocol: null,
         localPollDps: null
       });
+      this.refreshLocalStatus();
     }
   };
 
-  render({ device, deviceIndex, localPollStatus, localPollError, localPollProtocol }) {
+  render({ device, deviceIndex, localPollStatus, localPollError, localPollProtocol }, { localStatus }) {
     const params = buildParamsMap(device);
     const deviceId = params.DEVICE_ID || getTuyaDeviceId(device);
     const localKey = params.LOCAL_KEY || (device && device.local_key) || '';
@@ -141,9 +185,16 @@ class TuyaLocalPollSection extends Component {
     const displayIp = showCloudIp ? cloudIp : ipAddress;
     const canPollLocal = localOverride === true && !!localKey && !!deviceId;
     const pollProtocolLabel = localPollProtocol || protocolVersion || '-';
+    const isDegraded = localStatus && localStatus.status === 'degraded';
+    const degradedUntilLabel = isDegraded ? formatUntilTime(localStatus.until) : '';
 
     return (
       <>
+        {isDegraded && (
+          <div class="alert alert-warning mb-2" role="alert">
+            <Text id="integration.tuya.device.localStatusDegraded" fields={{ time: degradedUntilLabel }} />
+          </div>
+        )}
         <div class="form-group">
           <label class="form-label" for={`ip_${deviceIndex}`}>
             <Text id="integration.tuya.device.ipAddressLabel" />
