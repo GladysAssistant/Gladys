@@ -10,17 +10,19 @@ import CardFilter from '../../../components/layout/CardFilter';
 const HousePage = ({ children, ...props }) => (
   <SettingsLayout>
     <div class="page-header">
-      <div class="page-options d-flex">
-        <Localizer>
-          <CardFilter
-            changeOrderDir={props.changeOrderDir}
-            orderValue={props.getHousesOrderDir}
-            search={props.debouncedSearch}
-            searchValue={props.housesSearch}
-            searchPlaceHolder={<Text id="housesSettings.searchPlaceholder" />}
-          />
-        </Localizer>
-        <button onClick={props.addHouse} class="btn btn-outline-primary ml-2">
+      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-sm-end w-100">
+        <div class="d-flex">
+          <Localizer>
+            <CardFilter
+              changeOrderDir={props.changeOrderDir}
+              orderValue={props.getHousesOrderDir}
+              search={props.debouncedSearch}
+              searchValue={props.housesSearch}
+              searchPlaceHolder={<Text id="housesSettings.searchPlaceholder" />}
+            />
+          </Localizer>
+        </div>
+        <button onClick={props.addHouse} class="btn btn-outline-primary mt-2 mt-sm-0 ml-sm-2 flex-shrink-0">
           <Text id="housesSettings.newButton" /> <i class="fe fe-plus" />
         </button>
       </div>
