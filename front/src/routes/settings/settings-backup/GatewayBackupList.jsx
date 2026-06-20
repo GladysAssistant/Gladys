@@ -5,11 +5,11 @@ import GatewayBackupRow from './GatewayBackupRow';
 
 const GatewayPage = ({ children, ...props }) => (
   <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-sm-between">
       <h2 class="page-title">
         <Text id="gatewayBackup.title" />
       </h2>
-      <div class="page-options d-flex">
+      <div class="mt-2 mt-sm-0">
         {props.gatewayCreateBackupStatus === RequestStatus.Success ? (
           <Text id="gatewayBackup.backupStarted" />
         ) : (
