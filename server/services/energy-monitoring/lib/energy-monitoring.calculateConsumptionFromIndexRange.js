@@ -14,22 +14,43 @@ const { ENERGY_INDEX_FEATURE_TYPES } = require('../utils/constants');
 const ENERGY_INDEX_LAST_PROCESSED = 'ENERGY_INDEX_LAST_PROCESSED';
 
 /**
- * @description Calculate consumption from index for all 30-minute windows from the beginning.
- * This function finds the oldest device state for energy index devices and processes all 30-minute windows.
+ * @description Calculate consumption from index for all 30-minute windows in a date range.
+ * Both bounds are optional: missing start falls back to the oldest device state,
+ * missing end falls back to now (preserving the "from beginning" semantics).
+ * @param {Date|string|null} startAt - Optional start date (YYYY-MM-DD string or Date).
  * @param {Array<string>} featureSelectors - Optional whitelist of consumption feature selectors.
+ * @param {Date|string|null} endAt - Optional end date (YYYY-MM-DD string or Date).
  * @param {string} jobId - The job id.
  * @returns {Promise<null>} Return null when finished.
- * @example <caption>Recalculate full history</caption>
- * calculateConsumptionFromIndexFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
+ * @example <caption>Recalculate a date range for all features</caption>
+ * calculateConsumptionFromIndexRange('2025-01-01', [], '2025-06-01', '12345678-1234-1234-1234-1234567890ab');
  */
-async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobId) {
+async function calculateConsumptionFromIndexRange(startAt, featureSelectors, endAt, jobId) {
   const selectors = Array.isArray(featureSelectors)
     ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
     : [];
   const selectorSet = new Set(selectors);
   return queueWrapper(this.queue, async () => {
     const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-    logger.info(`Calculating consumption from index from beginning in timezone ${systemTimezone}`);
+    logger.info(`Calculating consumption from index on a date range in timezone ${systemTimezone}`);
+
+    const parseDateWithBoundary = (value, boundary) => {
+      if (value instanceof Date) {
+        return value;
+      }
+      if (typeof value !== 'string') {
+        return null;
+      }
+      const suffix = boundary === 'end' ? '23:59:59' : '00:00:00';
+      const parsed = dayjs.tz(`${value} ${suffix}`, systemTimezone);
+      return parsed.isValid() ? parsed.toDate() : null;
+    };
+    const parsedStartAt = parseDateWithBoundary(startAt, 'start');
+    const parsedEndAt = parseDateWithBoundary(endAt, 'end');
+    const nowDate = dayjs()
+      .tz(systemTimezone)
+      .toDate();
+    const effectiveEndAt = parsedEndAt && parsedEndAt < nowDate ? parsedEndAt : nowDate;
 
     // Get all energy sensor devices
     const energyDevices = await this.gladys.device.get({
@@ -82,7 +103,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
       }
     });
 
-    const shouldRestoreLastProcessedByContext = selectorSet.size > 0;
+    const shouldRestoreLastProcessedByContext = Boolean((parsedEndAt && parsedEndAt < nowDate) || selectorSet.size > 0);
     const originalLastProcessedByDeviceId = new Map();
     devicesWithBothFeatures.forEach(({ device }) => {
       const params = Array.isArray(device.params) ? device.params : [];
@@ -114,22 +135,38 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
       oldestStateTime = new Date(result[0].oldest_created_at);
     }
 
-    if (!oldestStateTime) {
+    if (oldestStateTime) {
+      logger.info(`Oldest device state found at: ${oldestStateTime}`);
+    } else {
       logger.info('No device states found, nothing to process');
+    }
+
+    let effectiveStartAt = parsedStartAt || oldestStateTime;
+    if (effectiveStartAt && parsedStartAt && oldestStateTime && parsedStartAt < oldestStateTime) {
+      effectiveStartAt = oldestStateTime;
+    }
+
+    if (!effectiveStartAt) {
+      logger.info('No valid start date found, nothing to process');
+      return null;
+    }
+
+    if (effectiveStartAt > effectiveEndAt) {
+      logger.info('Start date is after end date, nothing to process');
       return null;
     }
 
     // Round the start time down to the nearest 30-minute mark
-    const startTime = dayjs(oldestStateTime).tz(systemTimezone);
+    const startTime = dayjs(effectiveStartAt).tz(systemTimezone);
     const roundedStartTime = startTime
       .minute(startTime.minute() < 30 ? 0 : 30)
       .second(0)
       .millisecond(0);
 
-    // Get current time and round up to the next 30-minute mark
-    const now = dayjs().tz(systemTimezone);
-    const currentMinute = now.minute();
-    const roundedEndTime = now
+    // Round end time up to the next 30-minute mark
+    const endTime = dayjs(effectiveEndAt).tz(systemTimezone);
+    const currentMinute = endTime.minute();
+    const roundedEndTime = endTime
       .minute(currentMinute < 30 ? 30 : 60)
       .second(0)
       .millisecond(0);
@@ -152,6 +189,7 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
     );
 
     const deletionStartTime = roundedStartTime.toDate();
+    const deletionEndTime = roundedEndTime.toDate();
     const consumptionFeaturesToReset = new Map();
     devicesWithBothFeatures.forEach((deviceWithBothFeatures) => {
       (deviceWithBothFeatures.consumptionFeatures || []).forEach((feature) => {
@@ -161,7 +199,11 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
 
     await Promise.each(Array.from(consumptionFeaturesToReset.values()), async (feature) => {
       const { selector } = feature;
-      await this.gladys.device.destroyStatesFrom(selector, deletionStartTime);
+      if (parsedEndAt) {
+        await this.gladys.device.destroyStatesFrom(selector, deletionStartTime, deletionEndTime);
+      } else {
+        await this.gladys.device.destroyStatesFrom(selector, deletionStartTime);
+      }
     });
 
     // Process each window sequentially
@@ -223,5 +265,5 @@ async function calculateConsumptionFromIndexFromBeginning(featureSelectors, jobI
 }
 
 module.exports = {
-  calculateConsumptionFromIndexFromBeginning,
+  calculateConsumptionFromIndexRange,
 };

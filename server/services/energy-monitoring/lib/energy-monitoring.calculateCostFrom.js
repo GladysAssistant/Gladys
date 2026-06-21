@@ -22,16 +22,41 @@ const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDay
 const isNullOrEmpty = (value) => value === null || value === undefined || value === '';
 
 /**
- * @description Calculate energy monitoring cost from a specific date.
- * @param {Date} startAt - The start date.
+ * @description Calculate energy monitoring cost from a specific date, optionally bounded by an end date.
+ * @param {Date|string} startAt - The start date (Date or YYYY-MM-DD string).
+ * @param {Array<string>} featureSelectors - Optional whitelist of cost feature selectors to process.
  * @param {string} jobId - The job id.
+ * @param {Date|string|null} [endAt] - Optional end date (Date or YYYY-MM-DD string). Defaults to now,
+ *   preserving the original "calculate cost from `startAt` onwards" behavior for existing callers.
  * @returns {Promise<null>} Return null when finished.
  * @example
- * calculateCostFrom(new Date(), '12345678-1234-1234-1234-1234567890ab');
+ * calculateCostFrom(new Date(), [], '12345678-1234-1234-1234-1234567890ab');
+ * calculateCostFrom('2025-01-01', [], '12345678-1234-1234-1234-1234567890ab', '2025-06-01');
  */
-async function calculateCostFrom(startAt, jobId) {
+async function calculateCostFrom(startAt, featureSelectors, jobId, endAt) {
+  const selectors = Array.isArray(featureSelectors)
+    ? featureSelectors.filter((s) => typeof s === 'string' && s.length > 0)
+    : [];
+  const selectorSet = new Set(selectors);
   const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
   logger.info(`Calculating cost in timezone ${systemTimezone}`);
+  const parseDateWithBoundary = (value, boundary) => {
+    if (value instanceof Date) {
+      return value;
+    }
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const suffix = boundary === 'end' ? '23:59:59' : '00:00:00';
+    const parsed = dayjs.tz(`${value} ${suffix}`, systemTimezone);
+    return parsed.isValid() ? parsed.toDate() : null;
+  };
+  const parsedStartAt = parseDateWithBoundary(startAt, 'start');
+  const resolvedEndAt = parseDateWithBoundary(endAt, 'end') || new Date();
+  if (endAt && parsedStartAt && parsedStartAt > resolvedEndAt) {
+    logger.info('Start date is after end date, nothing to process');
+    return null;
+  }
   const energyDevices = await this.gladys.device.get({
     device_feature_category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   });
@@ -103,99 +128,111 @@ async function calculateCostFrom(startAt, jobId) {
 
       // For each energy consumption feature
       await Promise.each(energyConsumptionFeatures, async (ecf) => {
-        // Get the feature of the root electrical meter device
-        const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
-          ecf.consumptionFeature,
-        );
-        // Skip if no valid root electric meter feature found (broken hierarchy)
-        if (!electricMeterFeature) {
-          logger.warn(
-            `Device ${energyDevice.name}: skipping consumption feature ${ecf.consumptionFeature.id} - no valid root electric meter found (broken hierarchy)`,
+        try {
+          if (selectorSet.size > 0 && !selectorSet.has(ecf.consumptionCostFeature.selector)) {
+            return;
+          }
+          // Get the feature of the root electrical meter device
+          const electricMeterFeature = this.gladys.device.energySensorManager.getRootElectricMeterDevice(
+            ecf.consumptionFeature,
           );
-          return;
-        }
-        // First, clean the cost feature states
-        logger.debug(`Destroying states from ${ecf.consumptionCostFeature.selector} from ${startAt}`);
-        await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, startAt);
-        // Get the energy prices from this electrical meter device
-        const energyPrices = await this.gladys.energyPrice.get({
-          electric_meter_device_id: electricMeterFeature.device_id,
-        });
-        const hasTempo = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.EDF_TEMPO);
-        if (hasTempo && !edfTempoHistoricalMap) {
-          logger.info(
-            `Device ${electricMeterFeature.device_id} has tempo prices and Map is empty, getting EDF tempo historical`,
-          );
-          // Subtract 1 day to ensure we have tempo data for hours before 6AM that use previous day's color
-          const startDateAsDayString = dayjs
-            .tz(startAt, systemTimezone)
-            .subtract(1, 'day')
-            .format('YYYY-MM-DD');
-          edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
-        }
-        logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
-        // We get all the states of the consumption feature in the time range
-        const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
-          ecf.consumptionFeature.selector,
-          startAt,
-          new Date(),
-        );
-        const deviceFeatureCostStatesToInsert = [];
-        logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
-        // For each state
-        await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
-          const createdAtRemoved30Minutes = dayjs
-            .tz(deviceFeatureState.created_at, systemTimezone)
-            .subtract(30, 'minutes')
-            .toDate();
-          // Get the prices for this date
-          const energyPricesForDate = energyPrices.filter((price) => {
-            // We only keep consumption prices (no subscription)
-            return (
-              price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
-              // We only keep prices that are valid for this date
-              dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
-              (isNullOrEmpty(price.end_date) ||
-                dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).toDate() >= createdAtRemoved30Minutes)
-            );
-          });
-          if (energyPricesForDate.length === 0) {
-            logger.debug(
-              `No energy price found for device ${electricMeterFeature.device_id} at ${deviceFeatureState.created_at}`,
+          // Skip if no valid root electric meter feature found (broken hierarchy)
+          if (!electricMeterFeature) {
+            logger.warn(
+              `Device ${energyDevice.name}: skipping consumption feature ${ecf.consumptionFeature.id} - no valid root electric meter found (broken hierarchy)`,
             );
             return;
           }
-
-          // We take the contract from the first price.
-          // It's not possible to have multiple contracts for the same electrical meter device.
-          const { contract } = energyPricesForDate[0];
-
-          // Convert the value in the correct unit
-          const valueInKwh = convertEnergyUnit(
-            deviceFeatureState.value,
-            ecf.consumptionFeature.unit,
-            DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          // First, clean the cost feature states
+          logger.debug(
+            `Destroying states from ${ecf.consumptionCostFeature.selector} from ${parsedStartAt} to ${resolvedEndAt}`,
           );
-
-          // Calculate the cost per contract
-          const cost = await contracts[contract](
-            energyPricesForDate,
-            createdAtRemoved30Minutes,
-            valueInKwh,
-            systemTimezone,
-            { edfTempoHistoricalMap },
-          );
-          deviceFeatureCostStatesToInsert.push({
-            value: cost,
-            created_at: deviceFeatureState.created_at,
+          await this.gladys.device.destroyStatesFrom(ecf.consumptionCostFeature.selector, parsedStartAt, resolvedEndAt);
+          // Get the energy prices from this electrical meter device
+          const energyPrices = await this.gladys.energyPrice.get({
+            electric_meter_device_id: electricMeterFeature.device_id,
           });
-        });
+          const hasTempo = energyPrices.some((p) => p.contract === ENERGY_CONTRACT_TYPES.EDF_TEMPO);
+          if (hasTempo && !edfTempoHistoricalMap) {
+            logger.info(
+              `Device ${electricMeterFeature.device_id} has tempo prices and Map is empty, getting EDF tempo historical`,
+            );
+            // Subtract 1 day to ensure we have tempo data for hours before 6AM that use previous day's color
+            const startDateAsDayString = dayjs
+              .tz(parsedStartAt, systemTimezone)
+              .subtract(1, 'day')
+              .format('YYYY-MM-DD');
+            edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
+          }
+          logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
+          // We get all the states of the consumption feature in the time range
+          const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
+            ecf.consumptionFeature.selector,
+            parsedStartAt,
+            resolvedEndAt,
+          );
+          const deviceFeatureCostStatesToInsert = [];
+          logger.debug(`Found ${deviceFeatureStates.length} states for device ${ecf.consumptionFeature.selector}`);
+          // For each state
+          await Promise.each(deviceFeatureStates, async (deviceFeatureState) => {
+            const createdAtRemoved30Minutes = dayjs
+              .tz(deviceFeatureState.created_at, systemTimezone)
+              .subtract(30, 'minutes')
+              .toDate();
+            // Get the prices for this date
+            const energyPricesForDate = energyPrices.filter((price) => {
+              // We only keep consumption prices (no subscription)
+              return (
+                price.price_type === ENERGY_PRICE_TYPES.CONSUMPTION &&
+                // We only keep prices that are valid for this date
+                dayjs.tz(`${price.start_date} 00:00:00`, systemTimezone).toDate() <= createdAtRemoved30Minutes &&
+                (isNullOrEmpty(price.end_date) ||
+                  dayjs.tz(`${price.end_date} 23:59:59`, systemTimezone).toDate() >= createdAtRemoved30Minutes)
+              );
+            });
+            if (energyPricesForDate.length === 0) {
+              logger.debug(
+                `No energy price found for device ${electricMeterFeature.device_id} at ${deviceFeatureState.created_at}`,
+              );
+              return;
+            }
 
-        // Save all the cost in DB at once
-        await this.gladys.device.saveMultipleHistoricalStates(
-          ecf.consumptionCostFeature.id,
-          deviceFeatureCostStatesToInsert,
-        );
+            // We take the contract from the first price.
+            // It's not possible to have multiple contracts for the same electrical meter device.
+            const { contract } = energyPricesForDate[0];
+
+            // Convert the value in the correct unit
+            const valueInKwh = convertEnergyUnit(
+              deviceFeatureState.value,
+              ecf.consumptionFeature.unit,
+              DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+            );
+
+            // Calculate the cost per contract
+            const cost = await contracts[contract](
+              energyPricesForDate,
+              createdAtRemoved30Minutes,
+              valueInKwh,
+              systemTimezone,
+              { edfTempoHistoricalMap },
+            );
+            deviceFeatureCostStatesToInsert.push({
+              value: cost,
+              created_at: deviceFeatureState.created_at,
+            });
+          });
+
+          // Save all the cost in DB at once
+          await this.gladys.device.saveMultipleHistoricalStates(
+            ecf.consumptionCostFeature.id,
+            deviceFeatureCostStatesToInsert,
+          );
+        } catch (e) {
+          logger.error(
+            `Cost calculation failed for device ${energyDevice.name} (consumption=${ecf.consumptionFeature.selector}, cost=${ecf.consumptionCostFeature.selector})`,
+            e,
+          );
+        }
       });
     } catch (e) {
       logger.error(e);
