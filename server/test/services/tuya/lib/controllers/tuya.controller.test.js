@@ -10,6 +10,7 @@ const tuyaManager = {
   localScan: fake.resolves({ devices: { device1: { ip: '1.1.1.1', version: '3.3' } }, portErrors: {} }),
   getStatus: fake.resolves({ status: 'connected' }),
   manualDisconnect: fake.resolves(),
+  saveConfiguration: fake.resolves({ baseUrl: 'apiUrl', accessKey: 'a', secretKey: 's', appAccountId: 'u' }),
   discoveredDevices: [
     {
       external_id: 'tuya:device1',
@@ -105,6 +106,13 @@ describe('TuyaController POST /api/v1/service/tuya/local-poll', () => {
     expect(localKeyParam).to.equal(undefined);
     assert.calledOnce(res.json);
   });
+
+  it('should default to empty body when req.body is missing on local-poll', async () => {
+    const req = {};
+    const res = { json: fake.returns([]) };
+    await controller['post /api/v1/service/tuya/local-poll'].controller(req, res);
+    assert.calledOnce(tuyaManager.localPoll);
+  });
 });
 
 describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
@@ -165,6 +173,13 @@ describe('TuyaController POST /api/v1/service/tuya/local-scan', () => {
       port_errors: {},
     });
   });
+
+  it('should default to empty body when req.body is missing', async () => {
+    const req = {};
+    const res = { json: fake.returns([]) };
+    await controller['post /api/v1/service/tuya/local-scan'].controller(req, res);
+    assert.calledOnce(tuyaManager.localScan);
+  });
 });
 
 describe('TuyaController GET /api/v1/service/tuya/status', () => {
@@ -182,6 +197,24 @@ describe('TuyaController GET /api/v1/service/tuya/status', () => {
     await controller['get /api/v1/service/tuya/status'].controller(req, res);
     assert.calledOnce(tuyaManager.getStatus);
     assert.calledWith(res.json, { status: 'connected' });
+  });
+});
+
+describe('TuyaController POST /api/v1/service/tuya/configuration', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = TuyaController(tuyaManager);
+    sinon.resetHistory();
+  });
+
+  it('should save configuration', async () => {
+    const req = { body: { baseUrl: 'apiUrl', accessKey: 'a', secretKey: 's', appAccountId: 'u' } };
+    const res = { json: fake.returns([]) };
+
+    await controller['post /api/v1/service/tuya/configuration'].controller(req, res);
+    assert.calledOnce(tuyaManager.saveConfiguration);
+    assert.calledOnce(res.json);
   });
 });
 

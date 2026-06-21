@@ -95,6 +95,12 @@ describe('tuya.degraded.recordLocalSuccess / resetLocalStatus', () => {
     resetLocalStatus(map, 'd1');
     expect(map.d1).to.equal(undefined);
   });
+
+  it('resetLocalStatus is a no-op on bad input', () => {
+    expect(() => resetLocalStatus(null, 'd1')).to.not.throw();
+    expect(() => resetLocalStatus({}, null)).to.not.throw();
+    expect(() => resetLocalStatus({}, '')).to.not.throw();
+  });
 });
 
 describe('tuya.degraded.getLocalStatus / isLocalSkipNeeded / getAllDegraded', () => {
