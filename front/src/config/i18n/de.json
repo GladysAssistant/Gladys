@@ -288,7 +288,8 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link"
+      "link": "Link",
+      "weather-meteo-france": "Météo-France"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -307,6 +308,15 @@
           "dailyForecast": "Vorhersage für die nächsten 5 Tage"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
+      },
+      "weatherMeteoFrance": {
+        "vigilanceTitle": "Météo-France Unwetterwarnung",
+        "editDeptLabel": "Departementnummer (für Unwetterwarnungen)",
+        "editDeptPlaceholder": "z.B.: 06, 75, 69...",
+        "editDeptHelp": "Leer lassen, um Unwetterwarnungen zu deaktivieren.",
+        "error": "Météo-France-Wetterdaten konnten nicht abgerufen werden.",
+        "noCoordinates": "Das Haus hat keine GPS-Koordinaten. Konfiguriere sie in den Einstellungen.",
+        "noHouseConfigured": "Bitte konfiguriere ein Haus in den Widget-Einstellungen."
       },
       "devicesInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -1275,6 +1285,19 @@
       "apiKeyPlaceholder": "OpenWeather-API-Schlüssel eingeben",
       "saveButton": "Sichern",
       "instructionsToUse": "Um diese Integration zu verwenden, gehe zum Dashboard und erstelle eine Wetter-Box."
+    },
+    "meteoFrance": {
+      "title": "Météo-France API",
+      "documentation": "Météo-France API Portal",
+      "description": "Zeige Météo-France Unwetterwarnungen in Gladys an.",
+      "introduction": "Diese Integration verbindet sich mit der offiziellen Météo-France API, um Wetterdaten und Unwetterwarnungen (gelb, orange, rot, violett) abzurufen.",
+      "instructions": "Erstelle ein Konto auf dem Météo-France API-Portal: <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, abonniere dann kostenlos die <strong>DPVigilance</strong>-API und hole dir deinen API-Schlüssel.",
+      "apiKeyLabel": "Gib hier deinen API-Schlüssel ein:",
+      "apiKeyPlaceholder": "Météo-France API-Schlüssel eingeben",
+      "saveButton": "Sichern",
+      "saveSuccess": "API-Schlüssel erfolgreich gespeichert.",
+      "saveError": "Fehler beim Speichern. Bitte überprüfe deinen API-Schlüssel.",
+      "instructionsToUse": "Sobald der Schlüssel konfiguriert ist, kannst du ein farbiges Wetter-Widget mit Unwetterwarnungen zum Dashboard hinzufügen."
     },
     "tuya": {
       "title": "Tuya",

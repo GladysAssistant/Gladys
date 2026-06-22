@@ -1,4 +1,5 @@
 import EditWeatherBox from '../../../components/boxs/weather/EditWeatherBox';
+import EditWeatherMeteoFranceBox from '../../../components/boxs/weather-meteo-france/EditWeatherMeteoFranceBox';
 import EditRoomTemperatureBox from '../../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditRoomHumidityBox from '../../../components/boxs/room-humidity/EditRoomHumidityBox';
 import EditMusicBox from '../../../components/boxs/music/EditMusicBox';
@@ -24,6 +25,8 @@ const Box = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
       return <EditWeatherBox {...props} />;
+    case 'weather-meteo-france':
+      return <EditWeatherMeteoFranceBox {...props} />;
     case 'user-presence':
       return <EditAtHomeBox {...props} />;
     case 'camera':

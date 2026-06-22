@@ -48,6 +48,7 @@ const boxesSchema = Joi.array().items(
       show_subscription_prices: Joi.boolean(),
       url: Joi.string().uri({ scheme: ['http', 'https'] }),
       icon: Joi.string(),
+      dept: Joi.string(),
     }),
   ),
 );

@@ -288,7 +288,8 @@
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
-      "link": "Lien"
+      "link": "Lien",
+      "weather-meteo-france": "Météo-France"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -307,6 +308,15 @@
           "dailyForecast": "Prévisions pour les 5 prochains jours"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
+      },
+      "weatherMeteoFrance": {
+        "vigilanceTitle": "Vigilance Météo-France",
+        "editDeptLabel": "Numéro de département (pour les alertes de vigilance)",
+        "editDeptPlaceholder": "Ex : 06, 75, 69...",
+        "editDeptHelp": "Laissez vide pour désactiver les alertes de vigilance.",
+        "error": "Impossible de récupérer la météo Météo-France.",
+        "noCoordinates": "La maison n'a pas de coordonnées GPS. Configurez-les dans les paramètres.",
+        "noHouseConfigured": "Veuillez configurer une maison dans les paramètres du widget."
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -1408,6 +1418,19 @@
       "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
+    },
+    "meteoFrance": {
+      "title": "API Météo-France",
+      "documentation": "Portail API Météo-France",
+      "description": "Affichez les alertes de vigilance Météo-France dans Gladys.",
+      "introduction": "Cette intégration vous connecte à l'API officielle Météo-France pour obtenir les données météo et les alertes de vigilance (jaune, orange, rouge, violet).",
+      "instructions": "Créez un compte sur le portail API Météo-France : <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, puis souscrivez gratuitement à l'API <strong>DPVigilance</strong> et récupérez votre clé API.",
+      "apiKeyLabel": "Saisissez votre clé API ici :",
+      "apiKeyPlaceholder": "Entrer la clé API Météo-France",
+      "saveButton": "Sauvegarder",
+      "saveSuccess": "Clé API sauvegardée avec succès.",
+      "saveError": "Erreur lors de la sauvegarde. Vérifiez votre clé API.",
+      "instructionsToUse": "Une fois la clé configurée, vous pourrez ajouter un widget météo avec alertes de vigilance sur votre tableau de bord."
     },
     "tuya": {
       "title": "Tuya",

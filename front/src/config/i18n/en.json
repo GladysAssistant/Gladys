@@ -288,7 +288,8 @@
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
-      "link": "Link"
+      "link": "Link",
+      "weather-meteo-france": "Météo-France"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -307,6 +308,15 @@
           "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
+      },
+      "weatherMeteoFrance": {
+        "vigilanceTitle": "Météo-France Vigilance",
+        "editDeptLabel": "Department number (for vigilance alerts)",
+        "editDeptPlaceholder": "E.g.: 06, 75, 69...",
+        "editDeptHelp": "Leave empty to disable vigilance alerts.",
+        "error": "Unable to fetch Météo-France weather data.",
+        "noCoordinates": "The house has no GPS coordinates. Configure them in settings.",
+        "noHouseConfigured": "Please configure a house in the widget settings."
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -1170,6 +1180,19 @@
       "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "meteoFrance": {
+      "title": "Météo-France API",
+      "documentation": "Météo-France API Portal",
+      "description": "Display Météo-France weather vigilance alerts in Gladys.",
+      "introduction": "This integration connects to the official Météo-France API to get weather data and vigilance alerts (yellow, orange, red, violet).",
+      "instructions": "Create an account on the Météo-France API portal: <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, then subscribe for free to the <strong>DPVigilance</strong> API and retrieve your API key.",
+      "apiKeyLabel": "Enter your API key here:",
+      "apiKeyPlaceholder": "Enter Météo-France API key",
+      "saveButton": "Save",
+      "saveSuccess": "API key saved successfully.",
+      "saveError": "Error saving the key. Please check your API key.",
+      "instructionsToUse": "Once the key is configured, you will be able to add a color weather widget with vigilance alerts to your dashboard."
     },
     "tuya": {
       "title": "Tuya",
