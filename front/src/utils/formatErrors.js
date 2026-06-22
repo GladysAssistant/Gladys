@@ -1,5 +1,13 @@
 import get from 'get-value';
 
+const safeJsonStringify = value => {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch (e) {
+    return String(value);
+  }
+};
+
 const serializeApiResponseBody = data => {
   if (!data) {
     return null;
@@ -7,11 +15,7 @@ const serializeApiResponseBody = data => {
   if (typeof data === 'string') {
     return data;
   }
-  try {
-    return JSON.stringify(data, null, 2);
-  } catch (e) {
-    return String(data);
-  }
+  return safeJsonStringify(data);
 };
 
 const formatConflictErrorObject = error => {
@@ -29,7 +33,7 @@ const formatConflictErrorObject = error => {
     if (error.attribute) {
       parts.push(`${error.attribute}${error.value !== undefined && error.value !== null ? `: ${error.value}` : ''}`);
     }
-    return parts.join(' — ') || JSON.stringify(error);
+    return parts.join(' — ') || safeJsonStringify(error);
   }
   return String(error);
 };
@@ -43,7 +47,7 @@ const formatValidationProperties = properties => {
       if (typeof property === 'string') {
         return property;
       }
-      return property.message || JSON.stringify(property);
+      return property.message || safeJsonStringify(property);
     })
     .join('; ');
 };
@@ -86,11 +90,7 @@ const getUnknownErrorDetail = error => {
   if (typeof error === 'string') {
     return error;
   }
-  try {
-    return JSON.stringify(error, null, 2);
-  } catch (e) {
-    return String(error);
-  }
+  return safeJsonStringify(error);
 };
 
 const getMatterDeviceSaveError = error => {
@@ -115,7 +115,7 @@ const getMatterDeviceSaveError = error => {
   if (status === 400) {
     return {
       errorMessage: 'integration.matter.error.badRequestError',
-      errorDetail: data && typeof data.message === 'string' ? data.message : formatApiErrorDetail(error),
+      errorDetail: formatApiErrorDetail(error) || serializeApiResponseBody(data),
       isKnownError: true
     };
   }
@@ -166,7 +166,7 @@ const formatHttpError = error => {
     }
     if (responseData.error && Object.keys(responseData.error).length > 0) {
       errorDetailString += ': ';
-      errorDetailString += JSON.stringify(responseData.error);
+      errorDetailString += safeJsonStringify(responseData.error);
     }
   }
   return { errorString, errorDetailString };
