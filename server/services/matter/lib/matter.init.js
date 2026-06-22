@@ -9,7 +9,7 @@ const logger = require('../../../utils/logger');
  * @example matter.init();
  */
 async function init() {
-  const { Environment, StorageService, Logger, LogLevel } = this.MatterMain;
+  const { Environment, Logger, LogLevel } = this.MatterMain;
   const { CommissioningController } = this.ProjectChipMatter;
 
   // Reset memory
@@ -36,8 +36,9 @@ async function init() {
   // Log levels are defined here:
   // https://github.com/project-chip/matter.js/blob/b0ffc2ff3c8acd7fef19918337d4fd95dfa466e6/packages/general/src/log/LogLevel.ts
   Logger.level = LogLevel('notice');
-  const storageService = environment.get(StorageService);
-  storageService.location = storagePath;
+  // Matter.js 0.17+ configures storage via environment variables (StorageService.location is read-only)
+  environment.vars.set('storage.path', storagePath);
+  environment.vars.set('path.root', storagePath);
 
   // Create the commissioning controller
   this.commissioningController = new CommissioningController({
@@ -45,9 +46,7 @@ async function init() {
       environment,
       id: 'matter-controller-data',
     },
-    // Set autoConnect to undefined to fix matter-js bug (https://github.com/matter-js/matter.js/pull/3436)
-    // Once the fix is live in matter-js, we can switch back to true
-    autoConnect: undefined,
+    autoConnect: true,
     adminFabricLabel: 'Gladys Assistant',
   });
 

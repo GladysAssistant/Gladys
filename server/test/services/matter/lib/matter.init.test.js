@@ -42,6 +42,9 @@ describe('Matter.init', () => {
         location: '',
       }),
       default: {},
+      vars: {
+        set: fake.returns(null),
+      },
     };
 
     storageService = {
