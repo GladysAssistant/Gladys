@@ -1,6 +1,9 @@
 const { expect } = require('chai');
-// eslint-disable-next-line import/no-unresolved
-const { encodeGeneric, decodeGeneric } = require('@blackwell-systems/gcf');
+const path = require('path');
+// GCF is installed in the MCP service's own node_modules
+const { encodeGeneric, decodeGeneric } = require(
+  path.join(__dirname, '..', '..', '..', '..', 'services', 'mcp', 'node_modules', '@blackwell-systems', 'gcf'),
+);
 
 describe('GCF integration: encode/decode round-trip with Gladys data', () => {
   it('should round-trip device states (get-all-devices-states tool response)', () => {
