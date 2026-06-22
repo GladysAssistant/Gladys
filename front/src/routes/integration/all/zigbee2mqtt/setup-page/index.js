@@ -15,10 +15,22 @@ const VARIABLE_MAP = {
   Z2M_MQTT_MODE: 'mqttMode',
   Z2M_MQTT_URL: 'mqttUrl',
   GLADYS_MQTT_USERNAME: 'mqttUsername',
-  GLADYS_MQTT_PASSWORD: 'mqttPassword'
+  GLADYS_MQTT_PASSWORD: 'mqttPassword',
+  Z2M_FRONTEND_URL: 'z2mFrontendUrl'
 };
 
 class Zigbee2mqttSetupPage extends Component {
+  getZ2mUrl = configuration => {
+    if (configuration.mqttMode === MQTT_MODE.LOCAL && this.props.session.gatewayClient === undefined) {
+      const url = new URL(config.localApiUrl);
+      return `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort || '8080'}`;
+    }
+    if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
+      return configuration.z2mFrontendUrl || null;
+    }
+    return null;
+  };
+
   handleZ2MStatus = zigbee2mqttStatus => {
     this.setState({ zigbee2mqttStatus });
   };
@@ -43,13 +55,9 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
+        z2mUrl: this.getZ2mUrl(configuration),
         loadZigbee2mqttConfig: RequestStatus.Success
       });
-      if (this.props.session.gatewayClient === undefined && configuration.mqttMode === MQTT_MODE.LOCAL) {
-        const url = new URL(config.localApiUrl);
-        const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort || '8080'}`;
-        this.setState({ z2mUrl });
-      }
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
       this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
@@ -68,6 +76,7 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
+        z2mUrl: this.getZ2mUrl(configuration),
         setupZigee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {

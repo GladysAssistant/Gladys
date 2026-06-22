@@ -58,6 +58,9 @@ const compareDevices = (deviceA, deviceB) => {
   return true;
 };
 
+const findGladysDeviceByExternalId = (matterDevices, externalId) =>
+  matterDevices.find(device => device.external_id === externalId);
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -212,23 +215,27 @@ class MatterDevices extends Component {
   };
 
   setPairedDeviceLoading = (externalId, loading) => {
-    const pairedDeviceLoading = new Map(this.state.pairedDeviceLoading);
-    if (loading) {
-      pairedDeviceLoading.set(externalId, true);
-    } else {
-      pairedDeviceLoading.delete(externalId);
-    }
-    this.setState({ pairedDeviceLoading });
+    this.setState(prevState => {
+      const pairedDeviceLoading = new Map(prevState.pairedDeviceLoading);
+      if (loading) {
+        pairedDeviceLoading.set(externalId, true);
+      } else {
+        pairedDeviceLoading.delete(externalId);
+      }
+      return { pairedDeviceLoading };
+    });
   };
 
   setPairedDeviceError = (externalId, error) => {
-    const pairedDeviceErrors = new Map(this.state.pairedDeviceErrors);
-    if (error) {
-      pairedDeviceErrors.set(externalId, error);
-    } else {
-      pairedDeviceErrors.delete(externalId);
-    }
-    this.setState({ pairedDeviceErrors });
+    this.setState(prevState => {
+      const pairedDeviceErrors = new Map(prevState.pairedDeviceErrors);
+      if (error) {
+        pairedDeviceErrors.set(externalId, error);
+      } else {
+        pairedDeviceErrors.delete(externalId);
+      }
+      return { pairedDeviceErrors };
+    });
   };
 
   addDeviceToGladys = async device => {
@@ -439,9 +446,12 @@ class MatterDevices extends Component {
                       {sortedPairedDevices.map(device => {
                         const pairedError = pairedDeviceErrors.get(device.external_id);
                         const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
+                        const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
+                        const existingGladysDevice = findGladysDeviceByExternalId(matterDevices, device.external_id);
+                        const isUpdate = existingGladysDevice && !isNodeIdChanged;
 
                         return (
-                          <div class="col-md-6">
+                          <div key={device.external_id} class="col-md-6">
                             <div class="card">
                               <div class="card-header">
                                 {device.name || device.model}
@@ -471,9 +481,14 @@ class MatterDevices extends Component {
                                         isKnownError={pairedError.isKnownError}
                                       />
                                     )}
-                                    {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    {isNodeIdChanged && (
                                       <div class="alert alert-info">
                                         <Text id="integration.matter.device.deviceAlreadyExist" />
+                                      </div>
+                                    )}
+                                    {isUpdate && (
+                                      <div class="alert alert-info">
+                                        <Text id="integration.matter.device.deviceHasUpdates" />
                                       </div>
                                     )}
                                     {device.features && device.features.length > 0 && (
@@ -484,7 +499,7 @@ class MatterDevices extends Component {
                                         <DeviceFeatures features={device.features} />
                                       </div>
                                     )}
-                                    {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    {isNodeIdChanged && (
                                       <div class="form-group">
                                         <button
                                           onClick={() => this.replaceGladysDevice(device)}
@@ -497,16 +512,22 @@ class MatterDevices extends Component {
                                         </button>
                                       </div>
                                     )}
-                                    {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
+                                    {!isNodeIdChanged && (
                                       <div class="form-group">
                                         <button
                                           onClick={() => this.addDeviceToGladys(device)}
-                                          class={cx('btn btn-success', {
+                                          class={cx('btn', isUpdate ? 'btn-info' : 'btn-success', {
                                             loading: isPairedDeviceLoading
                                           })}
                                           disabled={isPairedDeviceLoading}
                                         >
-                                          <Text id="integration.matter.device.addToGladys" />
+                                          <Text
+                                            id={
+                                              isUpdate
+                                                ? 'integration.matter.device.updateInGladys'
+                                                : 'integration.matter.device.addToGladys'
+                                            }
+                                          />
                                         </button>
                                       </div>
                                     )}

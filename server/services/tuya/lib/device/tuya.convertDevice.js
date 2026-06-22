@@ -2,6 +2,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
+const { mergeTuyaReport } = require('../utils/tuya.report');
 const { convertFeature } = require('./tuya.convertFeature');
 const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
 const logger = require('../../../../utils/logger');
@@ -30,6 +31,7 @@ function convertDevice(tuyaDevice) {
     thing_model: thingModel,
     specifications = {},
     category,
+    tuya_report: tuyaReport,
   } = tuyaDevice;
   const externalId = `tuya:${id}`;
   const { functions = [], status = [] } = specifications;
@@ -159,6 +161,9 @@ function convertDevice(tuyaDevice) {
   };
   if (online !== undefined) {
     device.online = online;
+  }
+  if (tuyaReport) {
+    device.tuya_report = mergeTuyaReport(null, tuyaReport);
   }
   addSelector(device);
   return device;

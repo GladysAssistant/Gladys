@@ -933,7 +933,9 @@
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
-        "connectionUrl": "Zigbee2mqtt Interface URL: <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>",
+        "connectionUrl": "Zigbee2mqtt Interface URL: <a href=\"{{url}}\" target=\"_blank\" rel=\"noopener noreferrer\">{{url}}</a>",
+        "z2mFrontendUrlLabel": "Zigbee2mqtt Interface URL",
+        "z2mFrontendUrlPlaceholder": "http://192.168.1.x:8080",
         "reset": {
           "title": "Reset Integration",
           "description": "Use this option if you want to start from scratch with Zigbee2mqtt. This can be useful if your configuration is corrupted or if you want to change your Zigbee coordinator.",
@@ -962,6 +964,9 @@
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
       "roomLabel": "Room",
+      "ieeeAddressLabel": "IEEE Address",
+      "openInZ2mButton": "Open in Zigbee2mqtt",
+      "noZ2mUrlMessage": "The Zigbee2mqtt interface URL is not configured, direct links to devices will not be available. Go to the <a href=\"/dashboard/integration/device/zigbee2mqtt/setup\">configuration page</a> to set it up.",
       "topicLabel": "Topic",
       "topicPlaceholder": "%topic% Zigbee2mqtt MQTT value",
       "featuresLabel": "Features",
@@ -1174,6 +1179,7 @@
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
       "unmanagedModelButton": "Model not managed or available",
+      "partiallyManagedModelButton": "Model partially managed",
       "localModeLimitInfo": "Local mode is still being improved. For some devices, commands or state updates may still use Tuya cloud even if Local mode is selected.",
       "status": {
         "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
@@ -1201,7 +1207,20 @@
         "localPollSuccess": "Local poll OK.",
         "localPollError": "Local poll failed:",
         "productIdLabel": "Product ID",
-        "productKeyLabel": "Product Key"
+        "productKeyLabel": "Product Key",
+        "createGithubIssue": "Suggest this device",
+        "createGithubIssuePartial": "Suggest new functions",
+        "githubIssueLocalPrepInfo": "To include all local information in the issue, you can first run <strong>Local auto scan</strong> from the discovery page to enrich all devices with their local data.<br />Then switch the device to local mode if needed, fill in the IP and protocol, and run a successful <strong>Poll local DPS</strong> before clicking the suggestion button.",
+        "githubIssueInfo": "A report will be sent with the device details. Sensitive data (local key and IP) is masked.",
+        "githubIssuePayloadCopied": "Issue details copied to clipboard. Paste them into the GitHub issue body.",
+        "githubIssuePayloadInfo": "The issue details are too long for the URL. Copy the content below and paste it into the GitHub issue body.",
+        "githubIssuePayloadCopyButton": "Copy content",
+        "githubIssuePayloadOpenEmptyButton": "Create empty issue",
+        "githubIssueExistsInfo": "An issue already exists for this device. A developer will take care of it soon. Feel free to ask on the forum <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">community.gladysassistant.com</a>.<br /><br />You can view related issues on GitHub here: <a href=\"{{issuesUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\">issues list</a>.",
+        "githubIssueCreateAnywayInfo": "If needed, you can still create a follow-up issue based on the latest one (#{{issueNumber}}). Before creating a new one, check whether another similar open issue already exists. If so, and you own it, close it or update it if needed before creating a new one.",
+        "githubIssueCreateAnywayButton": "Create follow-up issue",
+        "partialFeaturesCount": "({{count}} not implemented)",
+        "partialFeaturesCountDiscover": "({{count}} not yet supported)"
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
@@ -2198,6 +2217,12 @@
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
       "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
+      "debugContext": {
+        "title": "AI debug",
+        "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 10 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
+        "downloadButton": "Download JSON context for debug",
+        "error": "Unable to generate debug context. Make sure the MCP service is running."
+      },
       "weeklyDigest": {
         "title": "Weekly home digest",
         "description": "Gladys sends you a weekly summary of your connected home: comfort, energy, maintenance, and useful tips.",
@@ -2295,6 +2320,8 @@
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
         "addToGladys": "Add to Gladys",
+        "updateInGladys": "Update",
+        "deviceHasUpdates": "This device already exists in Gladys with new or updated features. You can update it using the button below.",
         "deviceAlreadyExist": "A device with the same unique identifier already exists. You can update it using the button below.",
         "replaceExisting": "Update existing device",
         "nodeDisconnected": "Disconnected"
@@ -3059,7 +3086,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energy cost calculation (from beginning)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energy consumption calculation from index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)",
-      "service-enedis-sync": "Enedis data synchronization"
+      "service-enedis-sync": "Enedis data synchronization",
+      "ai-weekly-digest": "AI weekly digest"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."

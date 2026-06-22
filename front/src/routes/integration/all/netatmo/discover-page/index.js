@@ -108,7 +108,10 @@ class NetatmoDiscoverPage extends Component {
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatus);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING,
+      this.updateStatusError
+    );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
       this.updateStatus
@@ -123,6 +126,7 @@ class NetatmoDiscoverPage extends Component {
           {...state}
           loading={loading}
           loadProps={this.loadProps}
+          loadStatus={this.loadStatus}
           updateStateInIndex={this.handleStateUpdateFromChild}
         />
       </NetatmoPage>
