@@ -1,5 +1,5 @@
 const z = require('zod/v4');
-const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -71,9 +71,40 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: ['read'],
+        access: this.isWritableSensorFeature(feature, device) ? ['write', 'read'] : ['read'],
       })),
     };
+
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
+  });
+
+  const textDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.TEXT);
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.TEXT),
+    }));
+
+  textDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: this.isWritableSensorFeature(feature, device) ? ['write', 'read'] : ['read'],
+      })),
+    };
+
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
 
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
@@ -231,8 +262,14 @@ async function getAllTools(userId) {
         .flat(),
     ),
   ];
+  const writableSensorDevices = allDevices
+    .filter((device) => device.features.some((feature) => this.isWritableSensorFeature(feature, device)))
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isWritableSensorFeature(feature, device)),
+    }));
 
-  return [
+  const tools = [
     {
       intent: 'camera.get-image',
       config: {
@@ -574,6 +611,108 @@ async function getAllTools(userId) {
         };
       },
     },
+  ];
+
+  if (writableSensorDevices.length > 0) {
+    tools.push({
+      intent: 'sensor.set-state',
+      config: {
+        title: 'Set sensor state',
+        description:
+          'Write a value to an MQTT virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates. Only MQTT virtual devices are supported.',
+        inputSchema: {
+          device: z
+            .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
+            .describe('MQTT virtual sensor device name (read-only sensor).'),
+          feature: z
+            .string()
+            .optional()
+            .describe(
+              `Sensor feature name on the selected device. Required when the device has multiple features. Available: ${writableSensorDevices
+                .map((d) => `${d.name}: [${d.features.map((f) => f.name).join(', ')}]`)
+                .join('; ')}`,
+            ),
+          value: z
+            .union([z.number(), z.string()])
+            .describe('Value to write. Use a number for numeric sensors and a string for text sensors.'),
+        },
+      },
+      cb: async ({ device, feature, value }) => {
+        const selectedDevice = this.findBySimilarity(writableSensorDevices, device);
+        const writableFeatures = selectedDevice.features;
+
+        let selectedFeature;
+        if (feature) {
+          selectedFeature = this.findBySimilarity(writableFeatures, feature);
+          if (!writableFeatures.some((writableFeature) => writableFeature.id === selectedFeature.id)) {
+            throw new Error(
+              `sensor.set-state validation failed (422): feature "${feature}" is not available on device ${selectedDevice.name}`,
+            );
+          }
+        } else if (writableFeatures.length === 1) {
+          [selectedFeature] = writableFeatures;
+        } else {
+          throw new Error(
+            'sensor.set-state validation failed (422): feature is required when device has multiple writable sensor features',
+          );
+        }
+
+        const isTextFeature = selectedFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+        let parsedValue;
+        let useStringValue;
+
+        if (isTextFeature) {
+          useStringValue = true;
+          parsedValue = String(value);
+        } else {
+          if (typeof value === 'string' && Number.isNaN(Number(value))) {
+            throw new Error('sensor.set-state validation failed (422): value must be a number for numeric sensors');
+          }
+
+          parsedValue = Number(value);
+          useStringValue = false;
+
+          if (Number.isNaN(parsedValue)) {
+            throw new Error('sensor.set-state validation failed (422): value must be a number for numeric sensors');
+          }
+        }
+
+        try {
+          await this.gladys.device.setValue(selectedDevice, selectedFeature, parsedValue);
+        } catch (e) {
+          if (useStringValue) {
+            await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
+          } else {
+            await this.gladys.device.saveState(selectedFeature, parsedValue);
+          }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+              },
+            ],
+          };
+        }
+
+        if (useStringValue) {
+          await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  tools.push(
     {
       intent: 'web.fetch',
       config: {
@@ -647,7 +786,9 @@ async function getAllTools(userId) {
         };
       },
     },
-  ];
+  );
+
+  return tools;
 }
 
 module.exports = {

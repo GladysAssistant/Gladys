@@ -80,8 +80,21 @@ const isHistoryFeature = (deviceFeature) => {
   );
 };
 
+const isWritableSensorFeature = (deviceFeature, device) => {
+  if (deviceFeature.read_only !== true) {
+    return false;
+  }
+
+  if (device?.service?.name !== 'mqtt') {
+    return false;
+  }
+
+  return isSensorFeature(deviceFeature) || deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
+};
+
 module.exports = {
   isSensorFeature,
   isSwitchableFeature,
   isHistoryFeature,
+  isWritableSensorFeature,
 };

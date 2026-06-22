@@ -13,6 +13,7 @@ const {
   isSensorFeature,
   isSwitchableFeature,
   isHistoryFeature,
+  isWritableSensorFeature,
 } = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
 const { SCENE_CREATE_TOOL_DESCRIPTION } = require('../../../../services/mcp/lib/sceneSchemas');
@@ -116,6 +117,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
@@ -204,6 +206,104 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.get.callCount).to.eq(1);
   });
 
+  it('should include text virtual sensors in home structure resources schema', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const devices = [
+      {
+        selector: 'device-sensor-text',
+        name: 'Mixed Sensor',
+        service: { name: 'mqtt' },
+        room: { selector: 'salon' },
+        features: [
+          {
+            id: 1,
+            selector: 'device-sensor-text-temp',
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+          },
+          {
+            id: 2,
+            selector: 'device-sensor-text-plate',
+            name: 'Plate',
+            category: 'text',
+            type: 'text',
+            read_only: true,
+          },
+        ],
+      },
+      {
+        selector: 'device-text-only',
+        name: 'License Plate Sensor',
+        service: { name: 'mqtt' },
+        room: { selector: 'salon' },
+        features: [
+          {
+            id: 3,
+            selector: 'device-text-only-value',
+            name: 'Plate',
+            category: 'text',
+            type: 'text',
+            read_only: true,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllResources,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        device: { get: stub().resolves(devices) },
+      },
+    };
+
+    const resources = await mcpHandler.getAllResources();
+    const result = await resources[0].cb({ href: 'schema://home' });
+    const homeSchema = JSON.parse(result.contents[0].text);
+
+    expect(homeSchema.salon.devices['device-sensor-text']).to.deep.equal({
+      name: 'Mixed Sensor',
+      selector: 'device-sensor-text',
+      features: [
+        {
+          name: 'Temperature',
+          selector: 'device-sensor-text-temp',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          access: ['write', 'read'],
+        },
+        {
+          name: 'Plate',
+          selector: 'device-sensor-text-plate',
+          category: 'text',
+          type: 'text',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+
+    expect(homeSchema.salon.devices['device-text-only']).to.deep.equal({
+      name: 'License Plate Sensor',
+      selector: 'device-text-only',
+      features: [
+        {
+          name: 'Plate',
+          selector: 'device-text-only-value',
+          category: 'text',
+          type: 'text',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+  });
+
   it('should handle devices without room assignment in getAllResources', async () => {
     const rooms = [
       {
@@ -264,6 +364,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       gladys: {
         room: {
           getAll: stub().resolves(rooms),
@@ -376,6 +477,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -819,6 +921,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -892,6 +995,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -1003,6 +1107,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
         value: feature.last_value,
         unit: feature.unit,
@@ -1093,6 +1198,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({ value: feature.last_value })),
       findBySimilarity,
       gladys: {
@@ -1134,6 +1240,7 @@ describe('build schemas', () => {
       isSensorFeature,
       isSwitchableFeature,
       isHistoryFeature,
+      isWritableSensorFeature,
       formatValue: stub().returns({ value: 1 }),
       findBySimilarity,
       toon: stub().callsFake((value) => JSON.stringify(value)),
@@ -1199,5 +1306,625 @@ describe('build schemas', () => {
       lookupStub.restore();
       nock.cleanAll();
     }
+  });
+
+  it('should expose sensor.set-state for writable virtual sensors', async () => {
+    const writableSensorDevice = {
+      selector: 'virtual-ph-sensor',
+      name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 10,
+          selector: 'virtual-ph-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+          last_value: 7.2,
+        },
+      ],
+    };
+    const writableTextDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 11,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableSensorDevice, writableTextDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+    expect(sensorSetStateTool.config.title).to.eq('Set sensor state');
+
+    const numericResult = await sensorSetStateTool.cb({
+      device: 'Virtual pH Sensor',
+      value: 7.4,
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(7.4);
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(0);
+    expect(numericResult.content[0].text).to.eq('sensor.set-state: set Virtual pH Sensor / pH to 7.4');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const textResult = await sensorSetStateTool.cb({
+      device: 'License Plate Sensor',
+      value: 'AB-123-CD',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq('AB-123-CD');
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('AB-123-CD');
+    expect(textResult.content[0].text).to.eq('sensor.set-state: set License Plate Sensor / Plate to AB-123-CD');
+  });
+
+  it('should save sensor state locally when setValue is unavailable', async () => {
+    const writableSensorDevice = {
+      selector: 'virtual-sensor',
+      name: 'Virtual Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 12,
+          selector: 'virtual-sensor-value',
+          name: 'Value',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableSensorDevice]),
+          setValue: stub().rejects(new Error('setValue unavailable')),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    await sensorSetStateTool.cb({
+      device: 'Virtual Sensor',
+      value: 21.5,
+    });
+
+    expect(mcpHandler.gladys.device.saveState.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.saveState.firstCall.args[1]).to.eq(21.5);
+  });
+
+  it('should validate sensor.set-state inputs and support explicit feature selection', async () => {
+    const writableSensorDevice = {
+      selector: 'virtual-multi-sensor',
+      name: 'Virtual Multi Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 13,
+          selector: 'virtual-multi-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+        {
+          id: 14,
+          selector: 'virtual-multi-sensor-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableSensorDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    let missingFeatureError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual Multi Sensor',
+        value: 7.1,
+      });
+    } catch (e) {
+      missingFeatureError = e;
+    }
+    expect(missingFeatureError).to.be.an('error');
+    expect(missingFeatureError.message).to.contain(
+      'feature is required when device has multiple writable sensor features',
+    );
+
+    let invalidValueError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual Multi Sensor',
+        feature: 'pH',
+        value: Number.NaN,
+      });
+    } catch (e) {
+      invalidValueError = e;
+    }
+    expect(invalidValueError).to.be.an('error');
+    expect(invalidValueError.message).to.contain('value must be a number for numeric sensors');
+
+    let nonNumericStringError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual Multi Sensor',
+        feature: 'pH',
+        value: 'abc',
+      });
+    } catch (e) {
+      nonNumericStringError = e;
+    }
+    expect(nonNumericStringError).to.be.an('error');
+    expect(nonNumericStringError.message).to.contain('value must be a number for numeric sensors');
+
+    const explicitFeatureResult = await sensorSetStateTool.cb({
+      device: 'Virtual Multi Sensor',
+      feature: 'Temperature',
+      value: 24.5,
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].name).to.eq('Temperature');
+    expect(explicitFeatureResult.content[0].text).to.eq(
+      'sensor.set-state: set Virtual Multi Sensor / Temperature to 24.5',
+    );
+  });
+
+  it('should save string sensor state locally when setValue is unavailable', async () => {
+    const writableTextDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 15,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableTextDevice]),
+          setValue: stub().rejects(new Error('setValue unavailable')),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    await sensorSetStateTool.cb({
+      device: 'License Plate Sensor',
+      value: 'EF-456-GH',
+    });
+
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('EF-456-GH');
+  });
+
+  it('should reject feature names that belong to another device', async () => {
+    const phSensorDevice = {
+      selector: 'virtual-ph-sensor',
+      name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 20,
+          selector: 'virtual-ph-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+    const plateSensorDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 21,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([phSensorDevice, plateSensorDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(4) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    let crossDeviceFeatureError = null;
+    try {
+      await sensorSetStateTool.cb({
+        device: 'Virtual pH Sensor',
+        feature: 'Plate',
+        value: 7.2,
+      });
+    } catch (e) {
+      crossDeviceFeatureError = e;
+    }
+
+    expect(crossDeviceFeatureError).to.be.an('error');
+    expect(crossDeviceFeatureError.message).to.contain('feature "Plate" is not available on device Virtual pH Sensor');
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+  });
+
+  it('should not expose sensor.set-state for physical sensors from other integrations', async () => {
+    const mqttVirtualSensor = {
+      selector: 'virtual-ph-sensor',
+      name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 30,
+          selector: 'virtual-ph-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+    const physicalTemperatureSensor = {
+      selector: 'zigbee-temp-1',
+      name: 'Living Room Temperature',
+      service: { name: 'zigbee2mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 31,
+          selector: 'zigbee-temp-1-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([mqttVirtualSensor, physicalTemperatureSensor]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+    expect(sensorSetStateTool.config.inputSchema.device.options).to.deep.equal(['Virtual pH Sensor']);
+  });
+
+  it('should not register sensor.set-state when only physical sensors are available', async () => {
+    const physicalTemperatureSensor = {
+      selector: 'hue-temp-1',
+      name: 'Living Room Temperature',
+      service: { name: 'philips-hue' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 32,
+          selector: 'hue-temp-1-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([physicalTemperatureSensor]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.equal(undefined);
+  });
+
+  it('should not expose sensor.set-state for actuators (read_only false)', async () => {
+    const devices = [
+      {
+        selector: 'virtual-ph-sensor',
+        name: 'Virtual pH Sensor',
+        service: { name: 'mqtt' },
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 10,
+            selector: 'virtual-ph-sensor-ph',
+            name: 'pH',
+            category: 'level-sensor',
+            type: 'decimal',
+            read_only: true,
+          },
+        ],
+      },
+      {
+        selector: 'actuator-valve',
+        name: 'Pool Valve',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 17,
+            selector: 'actuator-valve-switch',
+            name: 'Valve',
+            category: 'switch',
+            type: 'binary',
+            read_only: false,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(devices),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+    expect(sensorSetStateTool.config.inputSchema.device.options).to.deep.equal(['Virtual pH Sensor']);
+  });
+
+  it('should expose sensor.set-state for read-only virtual sensors', async () => {
+    const writableTextDevice = {
+      selector: 'virtual-plate-sensor',
+      name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 16,
+          selector: 'virtual-plate-sensor-text',
+          name: 'Plate',
+          category: 'text',
+          type: 'text',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([writableTextDevice]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+
+    await sensorSetStateTool.cb({
+      device: 'License Plate Sensor',
+      value: 'AB-123-CD',
+    });
+
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
   });
 });
