@@ -6,11 +6,32 @@ describe('GCF integration: encode/decode round-trip with Gladys data', () => {
   it('should round-trip device states (get-all-devices-states tool response)', () => {
     const states = [
       { room: 'Living Room', device: 'Ceiling Light', feature: 'On/Off', category: 'light', value: 'on', unit: null },
-      { room: 'Living Room', device: 'Temperature Sensor', feature: 'Temperature', category: 'temperature-sensor', value: 22.5, unit: '°C' },
+      {
+        room: 'Living Room',
+        device: 'Temperature Sensor',
+        feature: 'Temperature',
+        category: 'temperature-sensor',
+        value: 22.5,
+        unit: '°C',
+      },
       { room: 'Kitchen', device: 'Smart Plug', feature: 'On/Off', category: 'switch', value: 'off', unit: null },
       { room: 'Bedroom', device: 'Motion Sensor', feature: 'Motion', category: 'motion-sensor', value: 1, unit: null },
-      { room: 'Bedroom', device: 'Humidity Sensor', feature: 'Humidity', category: 'humidity-sensor', value: 45, unit: '%' },
-      { room: 'Garage', device: 'Door Sensor', feature: 'Status', category: 'opening-sensor', value: 'open', unit: null },
+      {
+        room: 'Bedroom',
+        device: 'Humidity Sensor',
+        feature: 'Humidity',
+        category: 'humidity-sensor',
+        value: 45,
+        unit: '%',
+      },
+      {
+        room: 'Garage',
+        device: 'Door Sensor',
+        feature: 'Status',
+        category: 'opening-sensor',
+        value: 'open',
+        unit: null,
+      },
     ];
 
     const encoded = encodeGeneric(states);
@@ -35,9 +56,19 @@ describe('GCF integration: encode/decode round-trip with Gladys data', () => {
   it('should round-trip calendar events', () => {
     const events = {
       events: [
-        { name: 'Team Meeting', start: '2026-06-22T10:00:00.000Z', end: '2026-06-22T11:00:00.000Z', location: 'Office' },
+        {
+          name: 'Team Meeting',
+          start: '2026-06-22T10:00:00.000Z',
+          end: '2026-06-22T11:00:00.000Z',
+          location: 'Office',
+        },
         { name: 'Lunch', start: '2026-06-22T12:00:00.000Z', end: '2026-06-22T13:00:00.000Z', location: null },
-        { name: 'Dentist', start: '2026-06-22T15:00:00.000Z', end: '2026-06-22T16:00:00.000Z', location: 'Downtown Clinic' },
+        {
+          name: 'Dentist',
+          start: '2026-06-22T15:00:00.000Z',
+          end: '2026-06-22T16:00:00.000Z',
+          location: 'Downtown Clinic',
+        },
       ],
     };
 
@@ -62,9 +93,7 @@ describe('GCF integration: encode/decode round-trip with Gladys data', () => {
         name: 'Thermostat',
         selector: 'thermostat',
         room: 'Hallway',
-        features: [
-          { category: 'temperature-sensor', type: 'decimal', last_value: 21.3 },
-        ],
+        features: [{ category: 'temperature-sensor', type: 'decimal', last_value: 21.3 }],
       },
     ];
 
