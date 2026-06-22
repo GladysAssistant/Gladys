@@ -57,7 +57,34 @@ function gladysFanModeToMatter(gladysFanMode) {
   return gladysFanMode;
 }
 
+/**
+ * @description Convert a Matter attribute value to a numeric value.
+ * Matter.js may return bitmap attributes as objects (e.g. { rockLeftRight: true }).
+ * @param {number|object} value - Attribute value from Matter device.
+ * @param {object} [schema] - Matter attribute schema used to encode bitmap values.
+ * @returns {number|undefined} Numeric attribute value.
+ * @example
+ * const rockSupport = matterAttributeToNumber({ rockLeftRight: true }, rockSupportSchema);
+ */
+function matterAttributeToNumber(value, schema) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (value !== null && value !== undefined && typeof value === 'object' && schema) {
+    const encoded = schema.encode(value);
+    return encoded[encoded.length - 1];
+  }
+  if (value !== null && value !== undefined) {
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+  }
+  return undefined;
+}
+
 module.exports = {
   matterFanModeToGladys,
   gladysFanModeToMatter,
+  matterAttributeToNumber,
 };

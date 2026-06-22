@@ -27,7 +27,7 @@ const {
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
-const { matterFanModeToGladys } = require('../utils/fanMatterMapping');
+const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -495,20 +495,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
 
     if (fanControl.supportedFeatures.rocking) {
       fanControl.addRockSettingAttributeListener((value) => {
-        logger.debug(`Matter: FanControl RockSetting attribute changed to ${value}`);
+        logger.debug(`Matter: FanControl RockSetting attribute changed to ${JSON.stringify(value)}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${fanBaseExternalId}:rock`,
-          state: value,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.rockSetting.schema),
         });
       });
     }
 
     if (fanControl.supportedFeatures.wind) {
       fanControl.addWindSettingAttributeListener((value) => {
-        logger.debug(`Matter: FanControl WindSetting attribute changed to ${value}`);
+        logger.debug(`Matter: FanControl WindSetting attribute changed to ${JSON.stringify(value)}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${fanBaseExternalId}:wind`,
-          state: value,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.windSetting.schema),
         });
       });
     }

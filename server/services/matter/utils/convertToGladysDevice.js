@@ -37,6 +37,7 @@ const {
   FAN_WIND_SETTING,
 } = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
+const { matterAttributeToNumber } = require('./fanMatterMapping');
 
 /**
  * @description Convert the Matter measurement unit attribute to Gladys attribute.
@@ -484,7 +485,11 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
 
         if (features.multiSpeed) {
-          const speedMax = await clusterClient.getSpeedMaxAttribute();
+          const speedMax =
+            matterAttributeToNumber(
+              await clusterClient.getSpeedMaxAttribute(),
+              FanControl.Complete.attributes.speedMax.schema,
+            ) ?? 255;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed)`,
             selector: slugify(`matter-${device.name}-${clusterClient.name}-speed`, true),
@@ -510,7 +515,11 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         }
 
         if (features.rocking) {
-          const rockSupport = await clusterClient.getRockSupportAttribute();
+          const rockSupport =
+            matterAttributeToNumber(
+              await clusterClient.getRockSupportAttribute(),
+              FanControl.Complete.attributes.rockSupport.schema,
+            ) ?? FAN_ROCK_SETTING.ALL;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Oscillation)`,
             selector: slugify(`matter-${device.name}-${clusterClient.name}-rock`, true),
@@ -525,7 +534,11 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         }
 
         if (features.wind) {
-          const windSupport = await clusterClient.getWindSupportAttribute();
+          const windSupport =
+            matterAttributeToNumber(
+              await clusterClient.getWindSupportAttribute(),
+              FanControl.Complete.attributes.windSupport.schema,
+            ) ?? FAN_WIND_SETTING.SLEEP_AND_NATURAL;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Wind mode)`,
             selector: slugify(`matter-${device.name}-${clusterClient.name}-wind`, true),

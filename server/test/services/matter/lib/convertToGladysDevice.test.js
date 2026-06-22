@@ -93,8 +93,8 @@ describe('Matter.convertToGladysDevice', () => {
         airflowDirection: true,
       },
       getSpeedMaxAttribute: async () => 10,
-      getRockSupportAttribute: async () => 7,
-      getWindSupportAttribute: async () => 3,
+      getRockSupportAttribute: async () => ({ rockLeftRight: true, rockUpDown: true, rockRound: true }),
+      getWindSupportAttribute: async () => ({ sleepWind: true, naturalWind: true }),
     };
 
     const device = {
@@ -128,6 +128,57 @@ describe('Matter.convertToGladysDevice', () => {
       max: 10,
       min: 0,
     });
+
+    const rockFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':rock'));
+    expect(rockFeature).to.deep.include({
+      category: 'fan',
+      type: 'rock-setting',
+      read_only: false,
+      max: 7,
+      min: 0,
+    });
+
+    const windFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':wind'));
+    expect(windFeature).to.deep.include({
+      category: 'fan',
+      type: 'wind-setting',
+      read_only: false,
+      max: 3,
+      min: 0,
+    });
+  });
+
+  it('should use fallback fan attribute bounds when Matter values are missing', async () => {
+    const clusterClient = {
+      id: FanControl.Complete.id,
+      name: 'FanControl',
+      endpointId: 1,
+      supportedFeatures: {
+        multiSpeed: true,
+        rocking: true,
+        wind: true,
+      },
+      getSpeedMaxAttribute: async () => null,
+      getRockSupportAttribute: async () => null,
+      getWindSupportAttribute: async () => null,
+    };
+
+    const device = {
+      name: 'Fan Device',
+      number: 3,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '3');
+
+    const speedFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':speed'));
+    const rockFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':rock'));
+    const windFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':wind'));
+
+    expect(speedFeature.max).to.eq(255);
+    expect(rockFeature.max).to.eq(7);
+    expect(windFeature.max).to.eq(3);
   });
 
   it('should create vacuum cleaner features for RvcOperationalState cluster', async () => {

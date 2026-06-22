@@ -580,10 +580,10 @@ describe('Matter.listenToStateChange', () => {
         callback(5);
       },
       addRockSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ rockLeftRight: true });
       },
       addWindSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ sleepWind: true });
       },
       addAirflowDirectionAttributeListener: (callback) => {
         callback(0);
@@ -602,6 +602,14 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:percent`,
       state: 50,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:rock`,
+      state: 1,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:wind`,
+      state: 1,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,
