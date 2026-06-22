@@ -28,7 +28,6 @@ const {
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
-const { emitTemperatureState } = require('../utils/temperatureMatterHelper');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -151,11 +150,13 @@ async function listenToStateChange(nodeId, devicePath, device) {
     logger.debug(`Matter: Adding state change listener for TemperatureMeasurement cluster ${temperatureSensor.name}`);
     this.stateChangeListeners.add(temperatureSensor);
     const temperatureMeasurementExternalId = `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`;
-    const emitTemperatureMeasurementState = (value) => {
+    temperatureSensor.addMeasuredValueAttributeListener((value) => {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
-      emitTemperatureState(this.gladys.event, temperatureMeasurementExternalId, value);
-    };
-    temperatureSensor.addMeasuredValueAttributeListener(emitTemperatureMeasurementState);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: temperatureMeasurementExternalId,
+        state: value / 100,
+      });
+    });
   }
 
   const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
@@ -343,11 +344,13 @@ async function listenToStateChange(nodeId, devicePath, device) {
     logger.debug(`Matter: Adding state change listener for Thermostat cluster ${thermostat.name}`);
     this.stateChangeListeners.add(thermostat);
     const localTemperatureExternalId = `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`;
-    const emitLocalTemperatureState = (value) => {
+    thermostat.addLocalTemperatureAttributeListener((value) => {
       logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
-      emitTemperatureState(this.gladys.event, localTemperatureExternalId, value);
-    };
-    thermostat.addLocalTemperatureAttributeListener(emitLocalTemperatureState);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: localTemperatureExternalId,
+        state: value / 100,
+      });
+    });
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
