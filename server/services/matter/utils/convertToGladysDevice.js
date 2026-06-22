@@ -267,6 +267,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: 100,
         });
       } else if (clusterIndex === Thermostat.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Local temperature)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-local-temperature`, true),
+          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:local-temperature`,
+          min: -100,
+          max: 200,
+        });
         if (clusterClient.supportedFeatures.heating) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Heating)`,

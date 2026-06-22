@@ -43,6 +43,7 @@ describe('Matter.restoreBackup', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };

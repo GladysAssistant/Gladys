@@ -27,6 +27,7 @@ const {
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { emitTemperatureState } = require('../utils/temperatureMatterHelper');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE } = require('../../../utils/constants');
 const {
@@ -110,9 +111,11 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   const temperatureSensor = device.getClusterClientById(TemperatureMeasurement.Complete.id);
   if (temperatureSensor) {
     const value = await safeReadAttribute(() => temperatureSensor.getMeasuredValueAttribute());
-    if (value !== undefined) {
-      emitState(`matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`, value / 100);
-    }
+    emitTemperatureState(
+      this.gladys.event,
+      `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`,
+      value,
+    );
   }
 
   const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
@@ -192,6 +195,12 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
 
   const thermostat = device.getClusterClientById(Thermostat.Complete.id);
   if (thermostat) {
+    const localTemperature = await safeReadAttribute(() => thermostat.getLocalTemperatureAttribute());
+    emitTemperatureState(
+      this.gladys.event,
+      `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`,
+      localTemperature,
+    );
     if (thermostat.supportedFeatures.heating) {
       const value = await safeReadAttribute(() => thermostat.getOccupiedHeatingSetpointAttribute());
       if (value !== undefined) {

@@ -28,6 +28,7 @@ const {
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { emitTemperatureState } = require('../utils/temperatureMatterHelper');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -149,14 +150,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
   if (temperatureSensor && !this.stateChangeListeners.has(temperatureSensor)) {
     logger.debug(`Matter: Adding state change listener for TemperatureMeasurement cluster ${temperatureSensor.name}`);
     this.stateChangeListeners.add(temperatureSensor);
-    // Subscribe to TemperatureMeasurement attribute changes
-    temperatureSensor.addMeasuredValueAttributeListener((value) => {
+    const temperatureMeasurementExternalId = `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`;
+    const emitTemperatureMeasurementState = (value) => {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`,
-        state: value / 100,
-      });
-    });
+      emitTemperatureState(this.gladys.event, temperatureMeasurementExternalId, value);
+    };
+    temperatureSensor.addMeasuredValueAttributeListener(emitTemperatureMeasurementState);
   }
 
   const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
@@ -343,6 +342,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
   if (thermostat && !this.stateChangeListeners.has(thermostat)) {
     logger.debug(`Matter: Adding state change listener for Thermostat cluster ${thermostat.name}`);
     this.stateChangeListeners.add(thermostat);
+    const localTemperatureExternalId = `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`;
+    const emitLocalTemperatureState = (value) => {
+      logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
+      emitTemperatureState(this.gladys.event, localTemperatureExternalId, value);
+    };
+    thermostat.addLocalTemperatureAttributeListener(emitLocalTemperatureState);
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
