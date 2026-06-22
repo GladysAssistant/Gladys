@@ -52,40 +52,36 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg">
-        <div class="card p-3">
-          <div class="d-flex flex-row align-items-center flex-sm-column">
-            <span
-              class={`stamp stamp-md mr-3 mr-sm-0 mb-sm-2 ${
-                props.systemInfos && props.systemInfos.cpu_temperature !== null
-                  ? props.systemInfos.cpu_temperature >= 75
+      {props.systemInfos && props.systemInfos.cpu_temperature !== null && (
+        <div class="col-sm-6 col-lg">
+          <div class="card p-3">
+            <div class="d-flex flex-row align-items-center flex-sm-column">
+              <span
+                class={`stamp stamp-md mr-3 mr-sm-0 mb-sm-2 ${
+                  props.systemInfos.cpu_temperature >= 75
                     ? 'bg-red'
                     : props.systemInfos.cpu_temperature >= 60
                     ? 'bg-orange'
                     : 'bg-green'
-                  : 'bg-secondary'
-              }`}
-            >
-              <i class="fe fe-cpu" />
-            </span>
-            <div class="text-sm-center">
-              <h4 class="m-0">
-                <Text id="systemSettings.cpuTemperature" />
-              </h4>
-              <small class="text-muted">
-                {props.systemInfos && props.systemInfos.cpu_temperature !== null ? (
+                }`}
+              >
+                <i class="fe fe-thermometer" />
+              </span>
+              <div class="text-sm-center">
+                <h4 class="m-0">
+                  <Text id="systemSettings.cpuTemperature" />
+                </h4>
+                <small class="text-muted">
                   <Text
                     id="systemSettings.cpuTemperatureValue"
                     fields={{ value: props.systemInfos.cpu_temperature }}
                   />
-                ) : (
-                  <Text id="global.notAvailable" />
-                )}
-              </small>
+                </small>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div class="col-sm-6 col-lg">
         <div class="card p-3">

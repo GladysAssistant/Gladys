@@ -3162,7 +3162,7 @@
     "downloadLogsButton": "Logs herunterladen",
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
     "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
-    "cpuTemperature": "Temperatur",
+    "cpuTemperature": "CPU-Temp.",
     "cpuTemperatureValue": "{{value}} °C"
   },
   "newArea": {
