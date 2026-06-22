@@ -33,6 +33,9 @@ describe('Matter.backupController', () => {
         location: '',
       }),
       default: {},
+      vars: {
+        set: fake.returns(null),
+      },
     };
 
     storageService = {
