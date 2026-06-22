@@ -228,7 +228,7 @@ describe('Device', () => {
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
         name: 'New device feature',
-        selector: 'new-device-feature',
+        selector: 'test-device-feature',
         device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
         energy_parent_id: null,
         external_id: 'hue:binary:1',
@@ -336,7 +336,7 @@ describe('Device', () => {
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
         name: 'New device feature',
-        selector: 'new-device-feature',
+        selector: 'test-device-feature',
         device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
         energy_parent_id: null,
         external_id: 'hue:binary:1',
