@@ -152,10 +152,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
     const temperatureMeasurementExternalId = `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`;
     temperatureSensor.addMeasuredValueAttributeListener((value) => {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: temperatureMeasurementExternalId,
-        state: value / 100,
-      });
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: temperatureMeasurementExternalId,
+          state: value / 100,
+        });
+      }
     });
   }
 
@@ -346,10 +348,12 @@ async function listenToStateChange(nodeId, devicePath, device) {
     const localTemperatureExternalId = `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`;
     thermostat.addLocalTemperatureAttributeListener((value) => {
       logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: localTemperatureExternalId,
-        state: value / 100,
-      });
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: localTemperatureExternalId,
+          state: value / 100,
+        });
+      }
     });
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {

@@ -110,7 +110,7 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   const temperatureSensor = device.getClusterClientById(TemperatureMeasurement.Complete.id);
   if (temperatureSensor) {
     const value = await safeReadAttribute(() => temperatureSensor.getMeasuredValueAttribute());
-    if (value !== undefined) {
+    if (value !== null && value !== undefined) {
       emitState(`matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`, value / 100);
     }
   }
@@ -193,7 +193,7 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   const thermostat = device.getClusterClientById(Thermostat.Complete.id);
   if (thermostat) {
     const localTemperature = await safeReadAttribute(() => thermostat.getLocalTemperatureAttribute());
-    if (localTemperature !== undefined) {
+    if (localTemperature !== null && localTemperature !== undefined) {
       emitState(`matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`, localTemperature / 100);
     }
     if (thermostat.supportedFeatures.heating) {

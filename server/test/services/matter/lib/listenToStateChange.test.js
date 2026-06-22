@@ -244,6 +244,21 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.notCalled(gladys.event.emit);
   });
+  it('should ignore null TemperatureMeasurement listener value', async () => {
+    const clusterClient = {
+      id: TemperatureMeasurement.Complete.id,
+      getMeasuredValueAttribute: fake.resolves(null),
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
   it('should listen to state change (RelativeHumidityMeasurement)', async () => {
     const clusterClient = {
       id: RelativeHumidityMeasurement.Complete.id,

@@ -470,6 +470,19 @@ describe('Matter.readInitialDeviceStates', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should skip temperature when read returns null', async () => {
+    const temperature = {
+      getMeasuredValueAttribute: fake.resolves(null),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === TemperatureMeasurement.Complete.id ? temperature : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should read onOff off state and boolean on state', async () => {
     const clusterClients = {
       [OnOff.Complete.id]: {
