@@ -1,18 +1,10 @@
 const { expect } = require('chai');
-const path = require('path');
-// GCF is installed in the MCP service's own node_modules
-const { encodeGeneric, decodeGeneric } = require(path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '..',
-  'services',
-  'mcp',
-  'node_modules',
-  '@blackwell-systems',
-  'gcf',
-));
+/* eslint-disable import/no-dynamic-require */
+const {
+  encodeGeneric,
+  decodeGeneric,
+} = require(`${__dirname}/../../../../services/mcp/node_modules/@blackwell-systems/gcf`);
+/* eslint-enable import/no-dynamic-require */
 
 describe('GCF integration: encode/decode round-trip with Gladys data', () => {
   it('should round-trip device states (get-all-devices-states tool response)', () => {
@@ -127,7 +119,7 @@ describe('GCF integration: encode/decode round-trip with Gladys data', () => {
 
   it('should produce output smaller than JSON', () => {
     const states = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 20; i += 1) {
       states.push({
         room: `Room ${i % 5}`,
         device: `Device ${i}`,
