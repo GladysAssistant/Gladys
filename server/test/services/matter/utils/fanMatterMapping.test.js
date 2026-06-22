@@ -47,10 +47,19 @@ describe('Matter fanMatterMapping', () => {
     ).to.eq(7);
     expect(matterAttributeToNumber({ sleepWind: true, naturalWind: true }, windSupportSchema)).to.eq(3);
     expect(matterAttributeToNumber({ rockLeftRight: true }, rockSupportSchema)).to.eq(1);
+    expect(matterAttributeToNumber({}, rockSupportSchema)).to.eq(0);
     expect(matterAttributeToNumber(null, rockSupportSchema)).to.eq(undefined);
     expect(matterAttributeToNumber('7')).to.eq(7);
     expect(matterAttributeToNumber(undefined, rockSupportSchema)).to.eq(undefined);
     expect(matterAttributeToNumber({})).to.eq(undefined);
+  });
+
+  it('should use legacy schema.encode when available', () => {
+    const legacySchema = {
+      encode: (value) => [0, 5],
+    };
+
+    expect(matterAttributeToNumber({ rockLeftRight: true }, legacySchema)).to.eq(5);
   });
 
   it('should convert Gladys rock and wind settings to Matter bitmap objects', () => {
