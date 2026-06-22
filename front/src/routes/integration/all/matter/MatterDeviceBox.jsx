@@ -5,6 +5,8 @@ import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { connect } from 'unistore/preact';
+import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
+import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import style from './style.css';
 
 class MatterDeviceBox extends Component {
@@ -43,7 +45,9 @@ class MatterDeviceBox extends Component {
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
+      errorDetail: null,
+      isKnownError: true
     });
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
@@ -55,13 +59,8 @@ class MatterDeviceBox extends Component {
         device: savedDevice
       });
     } catch (e) {
-      let errorMessage = 'integration.matter.error.defaultError';
-      if (e.response.status === 409) {
-        errorMessage = 'integration.matter.error.conflictError';
-      }
-      this.setState({
-        errorMessage
-      });
+      console.error(e);
+      this.setState(getMatterDeviceSaveError(e));
     }
     this.setState({
       loading: false
@@ -106,7 +105,7 @@ class MatterDeviceBox extends Component {
 
   render(
     { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber, showParams }
+    { device, loading, errorMessage, errorDetail, isKnownError, tooMuchStatesError, statesNumber, showParams }
   ) {
     const validModel = device.features && device.features.length > 0;
     const nodeId = device.external_id.split(':')[1];
@@ -137,9 +136,11 @@ class MatterDeviceBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 {errorMessage && (
-                  <div class="alert alert-danger">
-                    <Text id={errorMessage} />
-                  </div>
+                  <MatterDeviceSaveErrorAlert
+                    errorMessage={errorMessage}
+                    errorDetail={errorDetail}
+                    isKnownError={isKnownError !== false}
+                  />
                 )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">

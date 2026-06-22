@@ -2303,6 +2303,16 @@
       "error": {
         "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
         "conflictError": "Un appareil avec ce nom existe déjà",
+        "selectorConflictError": "Un autre endpoint de cet appareil Matter utilise déjà le même identifiant interne. Cela arrive souvent avec les appareils multi-capteurs (ex. Dyson via Matterbridge).",
+        "externalIdConflictError": "Cet appareil Matter est déjà enregistré dans Gladys.",
+        "badRequestError": "La requête est invalide.",
+        "validationError": "Les données de l'appareil sont invalides.",
+        "forbiddenError": "Vous n'avez pas les droits pour effectuer cette action.",
+        "notFoundError": "L'appareil demandé est introuvable.",
+        "unexpectedError": "Une erreur inattendue s'est produite.",
+        "replaceDeviceNotFound": "Impossible de trouver l'appareil Gladys à mettre à jour. Rafraîchissez la page puis réessayez.",
+        "technicalDetail": "Détail technique :",
+        "apiFullResponse": "Réponse complète de l'API :",
         "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
         "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
       },

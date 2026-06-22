@@ -2343,6 +2343,16 @@
       "error": {
         "defaultError": "An error occurred while saving the device",
         "conflictError": "A device with this name already exists",
+        "selectorConflictError": "Another endpoint of this Matter device already uses the same internal identifier. This often happens with multi-sensor devices (e.g. Dyson via Matterbridge).",
+        "externalIdConflictError": "This Matter device is already registered in Gladys.",
+        "badRequestError": "The request is invalid.",
+        "validationError": "The device data is invalid.",
+        "forbiddenError": "You do not have permission to perform this action.",
+        "notFoundError": "The requested device could not be found.",
+        "unexpectedError": "An unexpected error occurred.",
+        "replaceDeviceNotFound": "Could not find the Gladys device to update. Refresh the page and try again.",
+        "technicalDetail": "Technical detail:",
+        "apiFullResponse": "Full API response:",
         "defaultDeletionError": "An error occurred while deleting the device",
         "getDevicesError": "An error occurred while getting the devices list"
       }

@@ -2343,6 +2343,16 @@
       "error": {
         "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten",
         "conflictError": "Ein Gerät mit diesem Namen existiert bereits",
+        "selectorConflictError": "Ein anderer Endpunkt dieses Matter-Geräts verwendet bereits dieselbe interne Kennung. Das passiert oft bei Geräten mit mehreren Sensoren (z. B. Dyson über Matterbridge).",
+        "externalIdConflictError": "Dieses Matter-Gerät ist bereits in Gladys registriert.",
+        "badRequestError": "Die Anfrage ist ungültig.",
+        "validationError": "Die Gerätedaten sind ungültig.",
+        "forbiddenError": "Sie haben keine Berechtigung für diese Aktion.",
+        "notFoundError": "Das angeforderte Gerät wurde nicht gefunden.",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+        "replaceDeviceNotFound": "Das zu aktualisierende Gladys-Gerät wurde nicht gefunden. Seite aktualisieren und erneut versuchen.",
+        "technicalDetail": "Technisches Detail:",
+        "apiFullResponse": "Vollständige API-Antwort:",
         "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten",
         "getDevicesError": "Beim Abrufen der Geräteliste ist ein Fehler aufgetreten"
       }
