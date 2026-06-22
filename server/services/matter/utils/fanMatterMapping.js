@@ -47,6 +47,28 @@ const GLADYS_WIND_SETTING_TO_MATTER = {
   [FAN_WIND_SETTING.SLEEP_AND_NATURAL]: { sleepWind: true, naturalWind: true },
 };
 
+const MATTER_BITMAP_BITS = {
+  RockBitmap: { rockLeftRight: 0, rockUpDown: 1, rockRound: 2 },
+  WindBitmap: { sleepWind: 0, naturalWind: 1 },
+};
+
+/**
+ * @description Encode a Matter bitmap object to a numeric value.
+ * @param {object} value - Bitmap object (e.g. { rockLeftRight: true }).
+ * @param {object} bitMap - Bit positions for each field.
+ * @returns {number} Encoded bitmap value.
+ * @example
+ * encodeMatterBitmap({ rockLeftRight: true }, { rockLeftRight: 0, rockUpDown: 1 });
+ */
+function encodeMatterBitmap(value, bitMap) {
+  return Object.entries(bitMap).reduce((result, [key, bit]) => {
+    if (value[key]) {
+      return result + 2 ** bit;
+    }
+    return result;
+  }, 0);
+}
+
 /**
  * @description Convert Matter FanMode attribute value to Gladys fan mode.
  * @param {number} matterFanMode - FanMode value from Matter device.
@@ -89,8 +111,14 @@ function matterAttributeToNumber(value, schema) {
     return value;
   }
   if (value !== null && value !== undefined && typeof value === 'object' && schema) {
-    const encoded = schema.encode(value);
-    return encoded[encoded.length - 1];
+    if (typeof schema.encode === 'function') {
+      const encoded = schema.encode(value);
+      return encoded[encoded.length - 1];
+    }
+    const bitMap = MATTER_BITMAP_BITS[schema.type];
+    if (bitMap) {
+      return encodeMatterBitmap(value, bitMap);
+    }
   }
   if (value !== null && value !== undefined) {
     const numericValue = Number(value);
