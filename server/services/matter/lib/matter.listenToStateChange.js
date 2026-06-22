@@ -615,6 +615,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     }
   }
+  await this.readInitialDeviceStates(nodeId, devicePath, device);
 }
 
 module.exports = {

@@ -11,7 +11,10 @@ const {
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
-const { convertToGladysDevice } = require('../../../../services/matter/utils/convertToGladysDevice');
+const {
+  convertToGladysDevice,
+  matterExternalIdToSelector,
+} = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -40,7 +43,7 @@ describe('Matter.convertToGladysDevice', () => {
     expect(gladysDevice.features).to.have.lengthOf(1);
     expect(gladysDevice.features[0]).to.deep.equal({
       name: 'BooleanState - 1',
-      selector: gladysDevice.features[0].selector,
+      selector: matterExternalIdToSelector('matter:12345:1:69'),
       category: 'switch',
       type: 'binary',
       read_only: true,
@@ -49,6 +52,29 @@ describe('Matter.convertToGladysDevice', () => {
       min: 0,
       max: 1,
     });
+  });
+
+  it('should build stable selectors from external_id', async () => {
+    expect(matterExternalIdToSelector('matter:12345:1:514:mode')).to.eq('matter-12345-1-514-mode');
+
+    const clusterClient = {
+      id: BooleanState.Complete.id,
+      name: 'BooleanState',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Renamed Device',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.selector).to.eq(matterExternalIdToSelector('matter:12345:1'));
+    expect(gladysDevice.features[0].selector).to.eq(matterExternalIdToSelector('matter:12345:1:69'));
+    expect(gladysDevice.features[0].selector).to.not.match(/-[a-z0-9]{4}$/);
   });
 
   it('should create a button click feature for Switch cluster', async () => {

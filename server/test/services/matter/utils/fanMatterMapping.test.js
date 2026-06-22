@@ -4,11 +4,13 @@ const {
   FanControl,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
-const { FAN_MODE } = require('../../../../utils/constants');
+const { FAN_MODE, FAN_ROCK_SETTING, FAN_WIND_SETTING } = require('../../../../utils/constants');
 const {
   matterFanModeToGladys,
   gladysFanModeToMatter,
   matterAttributeToNumber,
+  gladysRockSettingToMatter,
+  gladysWindSettingToMatter,
 } = require('../../../../services/matter/utils/fanMatterMapping');
 
 describe('Matter fanMatterMapping', () => {
@@ -49,5 +51,22 @@ describe('Matter fanMatterMapping', () => {
     expect(matterAttributeToNumber('7')).to.eq(7);
     expect(matterAttributeToNumber(undefined, rockSupportSchema)).to.eq(undefined);
     expect(matterAttributeToNumber({})).to.eq(undefined);
+  });
+
+  it('should convert Gladys rock and wind settings to Matter bitmap objects', () => {
+    expect(gladysRockSettingToMatter(FAN_ROCK_SETTING.OFF)).to.deep.equal({});
+    expect(gladysRockSettingToMatter(FAN_ROCK_SETTING.LEFT_RIGHT)).to.deep.equal({ rockLeftRight: true });
+    expect(gladysRockSettingToMatter(FAN_ROCK_SETTING.ALL)).to.deep.equal({
+      rockLeftRight: true,
+      rockUpDown: true,
+      rockRound: true,
+    });
+    expect(gladysWindSettingToMatter(FAN_WIND_SETTING.SLEEP)).to.deep.equal({ sleepWind: true });
+    expect(gladysWindSettingToMatter(FAN_WIND_SETTING.SLEEP_AND_NATURAL)).to.deep.equal({
+      sleepWind: true,
+      naturalWind: true,
+    });
+    expect(gladysRockSettingToMatter(99)).to.deep.equal({});
+    expect(gladysWindSettingToMatter(99)).to.deep.equal({});
   });
 });

@@ -1,4 +1,4 @@
-const { FAN_MODE } = require('../../../utils/constants');
+const { FAN_MODE, FAN_ROCK_SETTING, FAN_WIND_SETTING } = require('../../../utils/constants');
 
 // Matter FanControl cluster FanModeEnum values (Matter spec 4.4.5.5)
 const MATTER_FAN_MODE = {
@@ -27,6 +27,24 @@ const GLADYS_FAN_MODE_TO_MATTER = {
   [FAN_MODE.MEDIUM]: MATTER_FAN_MODE.MEDIUM,
   [FAN_MODE.HIGH]: MATTER_FAN_MODE.HIGH,
   [FAN_MODE.AUTO]: MATTER_FAN_MODE.AUTO,
+};
+
+const GLADYS_ROCK_SETTING_TO_MATTER = {
+  [FAN_ROCK_SETTING.OFF]: {},
+  [FAN_ROCK_SETTING.LEFT_RIGHT]: { rockLeftRight: true },
+  [FAN_ROCK_SETTING.UP_DOWN]: { rockUpDown: true },
+  [FAN_ROCK_SETTING.LEFT_RIGHT_AND_UP_DOWN]: { rockLeftRight: true, rockUpDown: true },
+  [FAN_ROCK_SETTING.ROUND]: { rockRound: true },
+  [FAN_ROCK_SETTING.LEFT_RIGHT_AND_ROUND]: { rockLeftRight: true, rockRound: true },
+  [FAN_ROCK_SETTING.UP_DOWN_AND_ROUND]: { rockUpDown: true, rockRound: true },
+  [FAN_ROCK_SETTING.ALL]: { rockLeftRight: true, rockUpDown: true, rockRound: true },
+};
+
+const GLADYS_WIND_SETTING_TO_MATTER = {
+  [FAN_WIND_SETTING.OFF]: {},
+  [FAN_WIND_SETTING.SLEEP]: { sleepWind: true },
+  [FAN_WIND_SETTING.NATURAL]: { naturalWind: true },
+  [FAN_WIND_SETTING.SLEEP_AND_NATURAL]: { sleepWind: true, naturalWind: true },
 };
 
 /**
@@ -83,8 +101,38 @@ function matterAttributeToNumber(value, schema) {
   return undefined;
 }
 
+/**
+ * @description Convert Gladys rock setting to Matter RockSetting bitmap object.
+ * @param {number} gladysRockSetting - Gladys FAN_ROCK_SETTING value.
+ * @returns {object} Matter RockSetting bitmap object.
+ * @example
+ * const matterRock = gladysRockSettingToMatter(1);
+ */
+function gladysRockSettingToMatter(gladysRockSetting) {
+  if (Object.prototype.hasOwnProperty.call(GLADYS_ROCK_SETTING_TO_MATTER, gladysRockSetting)) {
+    return GLADYS_ROCK_SETTING_TO_MATTER[gladysRockSetting];
+  }
+  return {};
+}
+
+/**
+ * @description Convert Gladys wind setting to Matter WindSetting bitmap object.
+ * @param {number} gladysWindSetting - Gladys FAN_WIND_SETTING value.
+ * @returns {object} Matter WindSetting bitmap object.
+ * @example
+ * const matterWind = gladysWindSettingToMatter(2);
+ */
+function gladysWindSettingToMatter(gladysWindSetting) {
+  if (Object.prototype.hasOwnProperty.call(GLADYS_WIND_SETTING_TO_MATTER, gladysWindSetting)) {
+    return GLADYS_WIND_SETTING_TO_MATTER[gladysWindSetting];
+  }
+  return {};
+}
+
 module.exports = {
   matterFanModeToGladys,
   gladysFanModeToMatter,
   matterAttributeToNumber,
+  gladysRockSettingToMatter,
+  gladysWindSettingToMatter,
 };

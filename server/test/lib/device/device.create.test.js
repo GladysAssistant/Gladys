@@ -251,6 +251,40 @@ describe('Device', () => {
       },
     ]);
   });
+  it('should preserve device and feature selectors when updating an existing device', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const newDevice = await device.create({
+      name: 'RENAMED_DEVICE',
+      selector: 'new-random-device-selector',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      features: [
+        {
+          name: 'Updated device feature',
+          selector: 'new-random-feature-selector',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+      params: [
+        {
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+        },
+      ],
+    });
+
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice.features[0]).to.have.property('selector', 'test-device-feature');
+  });
   it('should update device which already exist, update a feature and a param (by external_id)', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);

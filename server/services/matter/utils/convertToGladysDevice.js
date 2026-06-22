@@ -40,6 +40,17 @@ const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 
 /**
+ * @description Build a stable Gladys selector from a Matter external_id.
+ * @param {string} externalId - Matter external_id.
+ * @returns {string} Gladys selector.
+ * @example
+ * const selector = matterExternalIdToSelector('matter:12345:1:514:mode');
+ */
+function matterExternalIdToSelector(externalId) {
+  return slugify(externalId.replace(/:/g, '-'), false);
+}
+
+/**
  * @description Convert the Matter measurement unit attribute to Gladys attribute.
  * @param {any} measurementUnit - Attribute sent by Matter.
  * @example const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
@@ -86,7 +97,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
   const gladysDevice = {
     name: device.name,
     external_id: `matter:${nodeId}:${devicePath}`,
-    selector: slugify(`matter-${device.name}`, true),
     service_id: serviceId,
     should_poll: false,
     features: [],
@@ -122,7 +132,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       const clusterIndex = clusterClient.id;
       const commonNewFeature = {
         name: `${clusterClient.name} - ${clusterClient.endpointId}`,
-        selector: slugify(`matter-${device.name}-${clusterClient.name}`, true),
       };
       if (clusterIndex === OnOff.Complete.id) {
         gladysDevice.features.push({
@@ -149,7 +158,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       } else if (clusterIndex === Switch.Complete.id) {
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Click)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-click`, true),
           category: DEVICE_FEATURE_CATEGORIES.BUTTON,
           type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
           read_only: true,
@@ -196,7 +204,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       } else if (clusterIndex === WindowCovering.Complete.id) {
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Position)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-position`, true),
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           read_only: false,
@@ -208,7 +215,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-state`, true),
           category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
           type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
           read_only: false,
@@ -239,7 +245,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (clusterClient.supportedFeatures.hueSaturation) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Color)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-color`, true),
             category: DEVICE_FEATURE_CATEGORIES.LIGHT,
             type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
             read_only: false,
@@ -265,7 +270,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (clusterClient.supportedFeatures.heating) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Heating)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-heating`, true),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
             type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
             read_only: false,
@@ -279,7 +283,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (clusterClient.supportedFeatures.cooling) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Cooling)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-cooling`, true),
             category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
             type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
             read_only: false,
@@ -364,7 +367,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         // Add ActivePower feature
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Power)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-power`, true),
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
           read_only: true,
@@ -380,7 +382,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           if (voltage !== undefined) {
             gladysDevice.features.push({
               name: `${clusterClient.name} - ${clusterClient.endpointId} (Voltage)`,
-              selector: slugify(`matter-${device.name}-${clusterClient.name}-voltage`, true),
               category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
               type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
               read_only: true,
@@ -400,7 +401,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           if (activeCurrent !== undefined) {
             gladysDevice.features.push({
               name: `${clusterClient.name} - ${clusterClient.endpointId} (Current)`,
-              selector: slugify(`matter-${device.name}-${clusterClient.name}-current`, true),
               category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
               type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
               read_only: true,
@@ -419,7 +419,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.cumulativeEnergy) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Energy)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-energy`, true),
             category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
             type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
             read_only: true,
@@ -448,7 +447,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Mode)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-mode`, true),
           category: DEVICE_FEATURE_CATEGORIES.FAN,
           type: DEVICE_FEATURE_TYPES.FAN.MODE,
           read_only: false,
@@ -460,7 +458,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed %)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-percent`, true),
           category: DEVICE_FEATURE_CATEGORIES.FAN,
           type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
           read_only: false,
@@ -473,7 +470,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
 
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed % current)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-percent-current`, true),
           category: DEVICE_FEATURE_CATEGORIES.FAN,
           type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
           read_only: true,
@@ -492,7 +488,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             ) ?? 255;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-speed`, true),
             category: DEVICE_FEATURE_CATEGORIES.FAN,
             type: DEVICE_FEATURE_TYPES.FAN.SPEED,
             read_only: false,
@@ -503,7 +498,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           });
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed current)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-speed-current`, true),
             category: DEVICE_FEATURE_CATEGORIES.FAN,
             type: DEVICE_FEATURE_TYPES.FAN.SPEED,
             read_only: true,
@@ -522,7 +516,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             ) ?? FAN_ROCK_SETTING.ALL;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Oscillation)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-rock`, true),
             category: DEVICE_FEATURE_CATEGORIES.FAN,
             type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
             read_only: false,
@@ -541,7 +534,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             ) ?? FAN_WIND_SETTING.SLEEP_AND_NATURAL;
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Wind mode)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-wind`, true),
             category: DEVICE_FEATURE_CATEGORIES.FAN,
             type: DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
             read_only: false,
@@ -555,7 +547,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (features.airflowDirection) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Airflow direction)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-airflow-direction`, true),
             category: DEVICE_FEATURE_CATEGORIES.FAN,
             type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
             read_only: false,
@@ -568,7 +559,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       } else if (clusterIndex === RvcOperationalState.Complete.id) {
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-state`, true),
           category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
           type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE,
           read_only: true,
@@ -579,7 +569,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         });
         gladysDevice.features.push({
           name: `${clusterClient.name} - ${clusterClient.endpointId} (Dock)`,
-          selector: slugify(`matter-${device.name}-${clusterClient.name}-dock`, true),
           category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
           type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
           read_only: false,
@@ -614,7 +603,6 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
         if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Battery)`,
-            selector: slugify(`matter-${device.name}-${clusterClient.name}-battery`, true),
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
             type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
             read_only: true,
@@ -628,10 +616,16 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
       }
     });
   }
+  gladysDevice.selector = matterExternalIdToSelector(gladysDevice.external_id);
+  gladysDevice.features = gladysDevice.features.map((feature) => ({
+    ...feature,
+    selector: matterExternalIdToSelector(feature.external_id),
+  }));
   return gladysDevice;
 }
 
 module.exports = {
   convertToGladysDevice,
   convertMeasurementUnitToDeviceFeatureUnits,
+  matterExternalIdToSelector,
 };

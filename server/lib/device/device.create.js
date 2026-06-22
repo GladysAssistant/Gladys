@@ -144,7 +144,9 @@ async function create(device) {
       }
 
       // or update it
-      await deviceInDb.update(device, { transaction });
+      const deviceToUpdate = { ...device };
+      delete deviceToUpdate.selector;
+      await deviceInDb.update(deviceToUpdate, { transaction });
 
       // we delete all features which doesn't exist anymore
       await Promise.map(deviceInDb.features, async (existingFeature, index) => {
@@ -185,7 +187,9 @@ async function create(device) {
             id: matchedFeature.id,
           },
         });
-        await deviceFeature.update(feature, { transaction });
+        const featureToUpdate = { ...feature };
+        delete featureToUpdate.selector;
+        await deviceFeature.update(featureToUpdate, { transaction });
         if (deviceFeature.keep_history === false) {
           deviceFeaturesIdsToPurge.push(deviceFeature.id);
         }

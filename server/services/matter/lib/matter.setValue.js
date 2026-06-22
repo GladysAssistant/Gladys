@@ -13,7 +13,11 @@ const {
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
-const { gladysFanModeToMatter } = require('../utils/fanMatterMapping');
+const {
+  gladysFanModeToMatter,
+  gladysRockSettingToMatter,
+  gladysWindSettingToMatter,
+} = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 
 /**
@@ -220,10 +224,10 @@ async function setValue(gladysDevice, gladysFeature, value) {
         await fanControl.setSpeedSettingAttribute(value);
         break;
       case 'rock':
-        await fanControl.setRockSettingAttribute(value);
+        await fanControl.setRockSettingAttribute(gladysRockSettingToMatter(value));
         break;
       case 'wind':
-        await fanControl.setWindSettingAttribute(value);
+        await fanControl.setWindSettingAttribute(gladysWindSettingToMatter(value));
         break;
       case 'airflow-direction':
         await fanControl.setAirflowDirectionAttribute(value);
