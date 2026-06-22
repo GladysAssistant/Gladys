@@ -93,6 +93,7 @@ const Gateway = function Gateway(
     logger,
   });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
+  this.sendWeeklyDigest = this.job.wrapper(JOB_TYPES.AI_WEEKLY_DIGEST, this.sendWeeklyDigest.bind(this));
 
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
   this.event.on(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED, eventFunctionWrapper(this.checkIfBackupNeeded.bind(this)));
