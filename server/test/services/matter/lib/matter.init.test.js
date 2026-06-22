@@ -21,6 +21,7 @@ const MatterHandler = require('../../../../services/matter/lib');
 const { VARIABLES } = require('../../../../services/matter/utils/constants');
 const {
   convertMeasurementUnitToDeviceFeatureUnits,
+  matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.init', () => {
@@ -357,6 +358,9 @@ describe('Matter.init', () => {
       variable: {
         getValue: fake.resolves(null),
       },
+      event: {
+        emit: fake.returns(null),
+      },
     };
 
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
@@ -371,15 +375,8 @@ describe('Matter.init', () => {
     // Wait for background refreshDevices() to complete
     await matterHandler.refreshDevicesPromise;
     expect(matterHandler.devices).to.have.lengthOf(2);
-    // Device selector should be a slug of the name with 4 random characters at the end
-    expect(matterHandler.devices[0].selector).to.satisfy(
-      (selector) => selector.startsWith('matter-test-device-') && selector.length === 'matter-test-device-'.length + 4,
-    );
-    // Feature selector should be a slug of the name with 4 random characters at the end
-    expect(matterHandler.devices[0].features[0].selector).to.satisfy(
-      (selector) =>
-        selector.startsWith('matter-test-device-onoff-') && selector.length === 'matter-test-device-onoff-'.length + 4,
-    );
+    expect(matterHandler.devices[0].selector).to.equal(matterExternalIdToSelector('matter:12345:1'));
+    expect(matterHandler.devices[0].features[0].selector).to.equal(matterExternalIdToSelector('matter:12345:1:6'));
     expect(matterHandler.devices).to.deep.equal([
       {
         name: 'Test Vendor (Test Product) 1',

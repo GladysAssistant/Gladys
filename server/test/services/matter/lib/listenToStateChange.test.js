@@ -244,6 +244,21 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     assert.notCalled(gladys.event.emit);
   });
+  it('should ignore null TemperatureMeasurement listener value', async () => {
+    const clusterClient = {
+      id: TemperatureMeasurement.Complete.id,
+      getMeasuredValueAttribute: fake.resolves(null),
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
   it('should listen to state change (RelativeHumidityMeasurement)', async () => {
     const clusterClient = {
       id: RelativeHumidityMeasurement.Complete.id,
@@ -502,11 +517,7 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     // We need to make sure that we called all 4 functions before checking the events
     await promise;
-    assert.calledTwice(gladys.event.emit);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'matter:1234:1:768:color',
-      state: 14090213,
-    });
+    assert.calledThrice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:768:color',
       state: 14090213,
@@ -637,10 +648,10 @@ describe('Matter.listenToStateChange', () => {
         callback(5);
       },
       addRockSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ rockLeftRight: true });
       },
       addWindSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ sleepWind: true });
       },
       addAirflowDirectionAttributeListener: (callback) => {
         callback(0);
@@ -659,6 +670,14 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:percent`,
       state: 50,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:rock`,
+      state: 1,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:wind`,
+      state: 1,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,

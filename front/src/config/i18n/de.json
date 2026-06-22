@@ -2320,6 +2320,8 @@
         "noDeviceFound": "Keine Matter-Geräte gefunden",
         "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
         "addToGladys": "Zu Gladys hinzufügen",
+        "updateInGladys": "Aktualisieren",
+        "deviceHasUpdates": "Dieses Gerät existiert bereits in Gladys mit neuen oder geänderten Funktionen. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "deviceAlreadyExist": "Ein Gerät mit derselben eindeutigen Kennung existiert bereits. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "replaceExisting": "Vorhandenes Gerät aktualisieren",
         "nodeDisconnected": "Nicht verbunden"

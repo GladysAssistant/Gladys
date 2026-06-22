@@ -56,6 +56,9 @@ const compareDevices = (deviceA, deviceB) => {
   return true;
 };
 
+const findGladysDeviceByExternalId = (matterDevices, externalId) =>
+  matterDevices.find(device => device.external_id === externalId);
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -389,54 +392,74 @@ class MatterDevices extends Component {
                       <Text id="integration.matter.device.pairedDevicesTitle" />
                     </h4>
                     <div class="row mt-4">
-                      {sortedPairedDevices.map(device => (
-                        <div class="col-md-6">
-                          <div class="card">
-                            <div class="card-header">
-                              {device.name || device.model}
-                              {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                                <div class="page-options d-flex">
-                                  <div class="tag tag-danger">
-                                    <Text id="integration.matter.device.nodeDisconnected" />
-                                    <span class="tag-addon">
-                                      <i class="fe fe-wifi-off" />
-                                    </span>
+                      {sortedPairedDevices.map(device => {
+                        const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
+                        const existingGladysDevice = findGladysDeviceByExternalId(matterDevices, device.external_id);
+                        const isUpdate = existingGladysDevice && !isNodeIdChanged;
+
+                        return (
+                          <div class="col-md-6">
+                            <div class="card">
+                              <div class="card-header">
+                                {device.name || device.model}
+                                {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                                  <div class="page-options d-flex">
+                                    <div class="tag tag-danger">
+                                      <Text id="integration.matter.device.nodeDisconnected" />
+                                      <span class="tag-addon">
+                                        <i class="fe fe-wifi-off" />
+                                      </span>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                            <div class="card-body">
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="alert alert-info">
-                                  <Text id="integration.matter.device.deviceAlreadyExist" />
-                                </div>
-                              )}
-                              {device.features && device.features.length > 0 && (
-                                <div class="form-group">
-                                  <label class="form-label">
-                                    <Text id="integration.matter.featuresLabel" />
-                                  </label>
-                                  <DeviceFeatures features={device.features} />
-                                </div>
-                              )}
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
-                                    <Text id="integration.matter.device.replaceExisting" />
-                                  </button>
-                                </div>
-                              )}
-                              {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
-                                    <Text id="integration.matter.device.addToGladys" />
-                                  </button>
-                                </div>
-                              )}
+                                )}
+                              </div>
+                              <div class="card-body">
+                                {isNodeIdChanged && (
+                                  <div class="alert alert-info">
+                                    <Text id="integration.matter.device.deviceAlreadyExist" />
+                                  </div>
+                                )}
+                                {isUpdate && (
+                                  <div class="alert alert-info">
+                                    <Text id="integration.matter.device.deviceHasUpdates" />
+                                  </div>
+                                )}
+                                {device.features && device.features.length > 0 && (
+                                  <div class="form-group">
+                                    <label class="form-label">
+                                      <Text id="integration.matter.featuresLabel" />
+                                    </label>
+                                    <DeviceFeatures features={device.features} />
+                                  </div>
+                                )}
+                                {isNodeIdChanged && (
+                                  <div class="form-group">
+                                    <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
+                                      <Text id="integration.matter.device.replaceExisting" />
+                                    </button>
+                                  </div>
+                                )}
+                                {!isNodeIdChanged && (
+                                  <div class="form-group">
+                                    <button
+                                      onClick={() => this.addDeviceToGladys(device)}
+                                      class={cx('btn', isUpdate ? 'btn-info' : 'btn-success')}
+                                    >
+                                      <Text
+                                        id={
+                                          isUpdate
+                                            ? 'integration.matter.device.updateInGladys'
+                                            : 'integration.matter.device.addToGladys'
+                                        }
+                                      />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

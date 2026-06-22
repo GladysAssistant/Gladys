@@ -27,8 +27,7 @@ const {
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
-const { matterFanModeToGladys } = require('../utils/fanMatterMapping');
-const { emitTemperatureState, readAndEmitInitialTemperature } = require('../utils/temperatureMatterHelper');
+const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -151,18 +150,15 @@ async function listenToStateChange(nodeId, devicePath, device) {
     logger.debug(`Matter: Adding state change listener for TemperatureMeasurement cluster ${temperatureSensor.name}`);
     this.stateChangeListeners.add(temperatureSensor);
     const temperatureMeasurementExternalId = `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`;
-    const emitTemperatureMeasurementState = (value) => {
+    temperatureSensor.addMeasuredValueAttributeListener((value) => {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
-      emitTemperatureState(this.gladys.event, temperatureMeasurementExternalId, value);
-    };
-    temperatureSensor.addMeasuredValueAttributeListener(emitTemperatureMeasurementState);
-    await readAndEmitInitialTemperature(
-      () => temperatureSensor.getMeasuredValueAttribute(),
-      this.gladys.event,
-      temperatureMeasurementExternalId,
-      logger,
-      'TemperatureMeasurement value',
-    );
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: temperatureMeasurementExternalId,
+          state: value / 100,
+        });
+      }
+    });
   }
 
   const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
@@ -350,18 +346,15 @@ async function listenToStateChange(nodeId, devicePath, device) {
     logger.debug(`Matter: Adding state change listener for Thermostat cluster ${thermostat.name}`);
     this.stateChangeListeners.add(thermostat);
     const localTemperatureExternalId = `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`;
-    const emitLocalTemperatureState = (value) => {
+    thermostat.addLocalTemperatureAttributeListener((value) => {
       logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
-      emitTemperatureState(this.gladys.event, localTemperatureExternalId, value);
-    };
-    thermostat.addLocalTemperatureAttributeListener(emitLocalTemperatureState);
-    await readAndEmitInitialTemperature(
-      () => thermostat.getLocalTemperatureAttribute(),
-      this.gladys.event,
-      localTemperatureExternalId,
-      logger,
-      'Thermostat localTemperature',
-    );
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: localTemperatureExternalId,
+          state: value / 100,
+        });
+      }
+    });
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
@@ -514,20 +507,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
 
     if (fanControl.supportedFeatures.rocking) {
       fanControl.addRockSettingAttributeListener((value) => {
-        logger.debug(`Matter: FanControl RockSetting attribute changed to ${value}`);
+        logger.debug(`Matter: FanControl RockSetting attribute changed to ${JSON.stringify(value)}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${fanBaseExternalId}:rock`,
-          state: value,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.rockSetting.schema),
         });
       });
     }
 
     if (fanControl.supportedFeatures.wind) {
       fanControl.addWindSettingAttributeListener((value) => {
-        logger.debug(`Matter: FanControl WindSetting attribute changed to ${value}`);
+        logger.debug(`Matter: FanControl WindSetting attribute changed to ${JSON.stringify(value)}`);
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${fanBaseExternalId}:wind`,
-          state: value,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.windSetting.schema),
         });
       });
     }
@@ -634,6 +627,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     }
   }
+  await this.readInitialDeviceStates(nodeId, devicePath, device);
 }
 
 module.exports = {

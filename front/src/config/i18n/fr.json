@@ -2280,6 +2280,8 @@
         "noDeviceFound": "Aucun appareil Matter trouvé",
         "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
         "addToGladys": "Ajouter à Gladys",
+        "updateInGladys": "Mettre à jour",
+        "deviceHasUpdates": "Cet appareil existe déjà dans Gladys avec de nouvelles fonctionnalités ou des modifications. Vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "replaceExisting": "Mettre à jour l'appareil existant",
         "nodeDisconnected": "Déconnecté"
