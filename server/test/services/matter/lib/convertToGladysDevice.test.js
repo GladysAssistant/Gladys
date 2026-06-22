@@ -8,6 +8,7 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  Thermostat,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -285,5 +286,52 @@ describe('Matter.convertToGladysDevice', () => {
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
 
     expect(gladysDevice.features).to.have.lengthOf(0);
+  });
+
+  it('should create thermostat local temperature and setpoint features for Thermostat cluster', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 4,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+      },
+    };
+
+    const device = {
+      name: 'Water Heater',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
+
+    expect(gladysDevice.features).to.have.lengthOf(3);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'Thermostat - 4 (Local temperature)',
+      selector: gladysDevice.features[0].selector,
+      category: 'temperature-sensor',
+      type: 'decimal',
+      read_only: true,
+      has_feedback: true,
+      unit: 'celsius',
+      external_id: 'matter:12345:1:child_endpoint:4:513:local-temperature',
+      min: -100,
+      max: 200,
+    });
+    expect(gladysDevice.features[1]).to.deep.include({
+      name: 'Thermostat - 4 (Heating)',
+      category: 'thermostat',
+      type: 'target-temperature',
+      external_id: 'matter:12345:1:child_endpoint:4:513:heating',
+    });
+    expect(gladysDevice.features[2]).to.deep.include({
+      name: 'Thermostat - 4 (Cooling)',
+      category: 'air-conditioning',
+      type: 'target-temperature',
+      external_id: 'matter:12345:1:child_endpoint:4:513:cooling',
+    });
   });
 });
