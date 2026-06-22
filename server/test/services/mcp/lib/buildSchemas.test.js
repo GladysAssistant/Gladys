@@ -212,6 +212,7 @@ describe('build schemas', () => {
       {
         selector: 'device-sensor-text',
         name: 'Mixed Sensor',
+        service: { name: 'mqtt' },
         room: { selector: 'salon' },
         features: [
           {
@@ -235,6 +236,7 @@ describe('build schemas', () => {
       {
         selector: 'device-text-only',
         name: 'License Plate Sensor',
+        service: { name: 'mqtt' },
         room: { selector: 'salon' },
         features: [
           {
@@ -1310,6 +1312,7 @@ describe('build schemas', () => {
     const writableSensorDevice = {
       selector: 'virtual-ph-sensor',
       name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1326,6 +1329,7 @@ describe('build schemas', () => {
     const writableTextDevice = {
       selector: 'virtual-plate-sensor',
       name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1396,6 +1400,7 @@ describe('build schemas', () => {
     const writableSensorDevice = {
       selector: 'virtual-sensor',
       name: 'Virtual Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1450,6 +1455,7 @@ describe('build schemas', () => {
     const writableSensorDevice = {
       selector: 'virtual-multi-sensor',
       name: 'Virtual Multi Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1555,6 +1561,7 @@ describe('build schemas', () => {
     const writableTextDevice = {
       selector: 'virtual-plate-sensor',
       name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1609,6 +1616,7 @@ describe('build schemas', () => {
     const phSensorDevice = {
       selector: 'virtual-ph-sensor',
       name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1624,6 +1632,7 @@ describe('build schemas', () => {
     const plateSensorDevice = {
       selector: 'virtual-plate-sensor',
       name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {
@@ -1681,11 +1690,127 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
   });
 
+  it('should not expose sensor.set-state for physical sensors from other integrations', async () => {
+    const mqttVirtualSensor = {
+      selector: 'virtual-ph-sensor',
+      name: 'Virtual pH Sensor',
+      service: { name: 'mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 30,
+          selector: 'virtual-ph-sensor-ph',
+          name: 'pH',
+          category: 'level-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+    const physicalTemperatureSensor = {
+      selector: 'zigbee-temp-1',
+      name: 'Living Room Temperature',
+      service: { name: 'zigbee2mqtt' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 31,
+          selector: 'zigbee-temp-1-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([mqttVirtualSensor, physicalTemperatureSensor]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.not.equal(undefined);
+    expect(sensorSetStateTool.config.inputSchema.device.options).to.deep.equal(['Virtual pH Sensor']);
+  });
+
+  it('should not register sensor.set-state when only physical sensors are available', async () => {
+    const physicalTemperatureSensor = {
+      selector: 'hue-temp-1',
+      name: 'Living Room Temperature',
+      service: { name: 'philips-hue' },
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 32,
+          selector: 'hue-temp-1-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          read_only: true,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([physicalTemperatureSensor]),
+          setValue: stub().resolves(),
+          saveState: stub().resolves(),
+          saveStringState: stub().resolves(),
+        },
+      },
+      levenshtein: { distance: stub().returns(0) },
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const sensorSetStateTool = tools.find((tool) => tool.intent === 'sensor.set-state');
+
+    expect(sensorSetStateTool).to.equal(undefined);
+  });
+
   it('should not expose sensor.set-state for actuators (read_only false)', async () => {
     const devices = [
       {
         selector: 'virtual-ph-sensor',
         name: 'Virtual pH Sensor',
+        service: { name: 'mqtt' },
         room: { selector: 'salon', name: 'Salon' },
         features: [
           {
@@ -1751,6 +1876,7 @@ describe('build schemas', () => {
     const writableTextDevice = {
       selector: 'virtual-plate-sensor',
       name: 'License Plate Sensor',
+      service: { name: 'mqtt' },
       room: { selector: 'salon', name: 'Salon' },
       features: [
         {

@@ -71,7 +71,7 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: this.isWritableSensorFeature(feature) ? ['write', 'read'] : ['read'],
+        access: this.isWritableSensorFeature(feature, device) ? ['write', 'read'] : ['read'],
       })),
     };
 
@@ -96,7 +96,7 @@ async function getAllResources() {
         selector: feature.selector,
         category: feature.category,
         type: feature.type,
-        access: this.isWritableSensorFeature(feature) ? ['write', 'read'] : ['read'],
+        access: this.isWritableSensorFeature(feature, device) ? ['write', 'read'] : ['read'],
       })),
     };
 
@@ -263,10 +263,10 @@ async function getAllTools(userId) {
     ),
   ];
   const writableSensorDevices = allDevices
-    .filter((device) => device.features.some((feature) => this.isWritableSensorFeature(feature)))
+    .filter((device) => device.features.some((feature) => this.isWritableSensorFeature(feature, device)))
     .map((device) => ({
       ...device,
-      features: device.features.filter((feature) => this.isWritableSensorFeature(feature)),
+      features: device.features.filter((feature) => this.isWritableSensorFeature(feature, device)),
     }));
 
   const tools = [
@@ -619,11 +619,11 @@ async function getAllTools(userId) {
       config: {
         title: 'Set sensor state',
         description:
-          'Write a value to a virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates.',
+          'Write a value to an MQTT virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates. Only MQTT virtual devices are supported.',
         inputSchema: {
           device: z
             .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
-            .describe('Virtual sensor device name (read-only sensor).'),
+            .describe('MQTT virtual sensor device name (read-only sensor).'),
           feature: z
             .string()
             .optional()
