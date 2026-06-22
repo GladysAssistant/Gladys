@@ -398,66 +398,66 @@ class MatterDevices extends Component {
                         const isUpdate = existingGladysDevice && !isNodeIdChanged;
 
                         return (
-                        <div class="col-md-6">
-                          <div class="card">
-                            <div class="card-header">
-                              {device.name || device.model}
-                              {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                                <div class="page-options d-flex">
-                                  <div class="tag tag-danger">
-                                    <Text id="integration.matter.device.nodeDisconnected" />
-                                    <span class="tag-addon">
-                                      <i class="fe fe-wifi-off" />
-                                    </span>
+                          <div class="col-md-6">
+                            <div class="card">
+                              <div class="card-header">
+                                {device.name || device.model}
+                                {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                                  <div class="page-options d-flex">
+                                    <div class="tag tag-danger">
+                                      <Text id="integration.matter.device.nodeDisconnected" />
+                                      <span class="tag-addon">
+                                        <i class="fe fe-wifi-off" />
+                                      </span>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                            <div class="card-body">
-                              {isNodeIdChanged && (
-                                <div class="alert alert-info">
-                                  <Text id="integration.matter.device.deviceAlreadyExist" />
-                                </div>
-                              )}
-                              {isUpdate && (
-                                <div class="alert alert-info">
-                                  <Text id="integration.matter.device.deviceHasUpdates" />
-                                </div>
-                              )}
-                              {device.features && device.features.length > 0 && (
-                                <div class="form-group">
-                                  <label class="form-label">
-                                    <Text id="integration.matter.featuresLabel" />
-                                  </label>
-                                  <DeviceFeatures features={device.features} />
-                                </div>
-                              )}
-                              {isNodeIdChanged && (
-                                <div class="form-group">
-                                  <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
-                                    <Text id="integration.matter.device.replaceExisting" />
-                                  </button>
-                                </div>
-                              )}
-                              {!isNodeIdChanged && (
-                                <div class="form-group">
-                                  <button
-                                    onClick={() => this.addDeviceToGladys(device)}
-                                    class={cx('btn', isUpdate ? 'btn-info' : 'btn-success')}
-                                  >
-                                    <Text
-                                      id={
-                                        isUpdate
-                                          ? 'integration.matter.device.updateInGladys'
-                                          : 'integration.matter.device.addToGladys'
-                                      }
-                                    />
-                                  </button>
-                                </div>
-                              )}
+                                )}
+                              </div>
+                              <div class="card-body">
+                                {isNodeIdChanged && (
+                                  <div class="alert alert-info">
+                                    <Text id="integration.matter.device.deviceAlreadyExist" />
+                                  </div>
+                                )}
+                                {isUpdate && (
+                                  <div class="alert alert-info">
+                                    <Text id="integration.matter.device.deviceHasUpdates" />
+                                  </div>
+                                )}
+                                {device.features && device.features.length > 0 && (
+                                  <div class="form-group">
+                                    <label class="form-label">
+                                      <Text id="integration.matter.featuresLabel" />
+                                    </label>
+                                    <DeviceFeatures features={device.features} />
+                                  </div>
+                                )}
+                                {isNodeIdChanged && (
+                                  <div class="form-group">
+                                    <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
+                                      <Text id="integration.matter.device.replaceExisting" />
+                                    </button>
+                                  </div>
+                                )}
+                                {!isNodeIdChanged && (
+                                  <div class="form-group">
+                                    <button
+                                      onClick={() => this.addDeviceToGladys(device)}
+                                      class={cx('btn', isUpdate ? 'btn-info' : 'btn-success')}
+                                    >
+                                      <Text
+                                        id={
+                                          isUpdate
+                                            ? 'integration.matter.device.updateInGladys'
+                                            : 'integration.matter.device.addToGladys'
+                                        }
+                                      />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
                         );
                       })}
                     </div>
