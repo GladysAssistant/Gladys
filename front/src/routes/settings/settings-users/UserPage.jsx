@@ -9,7 +9,7 @@ const UserPage = ({ children, ...props }) => (
       <h1 class="page-title">
         <Text id="usersSettings.title" />
       </h1>
-      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center mt-2 mt-sm-0">
+      <div class="d-flex align-items-center mt-2 mt-sm-0">
         <div class="d-flex">
           <Localizer>
             <CardFilter
@@ -21,8 +21,11 @@ const UserPage = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
-        <Link href="/dashboard/settings/user/new" class="btn btn-outline-primary mt-2 mt-sm-0 ml-sm-2 flex-shrink-0">
-          <Text id="usersSettings.newUserButton" /> <i class="fe fe-plus" />
+        <Link href="/dashboard/settings/user/new" class="btn btn-outline-primary ml-2 flex-shrink-0">
+          <span class="d-none d-lg-inline-block mr-2">
+            <Text id="usersSettings.newUserButton" />
+          </span>
+          <i class="fe fe-plus" />
         </Link>
       </div>
     </div>
