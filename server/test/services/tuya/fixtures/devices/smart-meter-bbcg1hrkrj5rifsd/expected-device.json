@@ -64,7 +64,7 @@
   },
   "features": [
     {
-      "name": "energy_reserse_b",
+      "name": "Reverse energy B",
       "external_id": "tuya:smart-meter-device-id:energy_reserse_b",
       "selector": "tuya-smart-meter-device-id-energy-reserse-b",
       "category": "energy-sensor",
@@ -77,7 +77,7 @@
       "scale": 2
     },
     {
-      "name": "energy_reverse_a",
+      "name": "Reverse energy A",
       "external_id": "tuya:smart-meter-device-id:energy_reverse_a",
       "selector": "tuya-smart-meter-device-id-energy-reverse-a",
       "category": "energy-sensor",
@@ -90,7 +90,7 @@
       "scale": 2
     },
     {
-      "name": "reverse_energy_total",
+      "name": "Reverse energy total",
       "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
       "selector": "tuya-smart-meter-device-id-reverse-energy-total",
       "category": "energy-sensor",
@@ -103,7 +103,7 @@
       "scale": 2
     },
     {
-      "name": "current_a",
+      "name": "Current A",
       "external_id": "tuya:smart-meter-device-id:current_a",
       "selector": "tuya-smart-meter-device-id-current-a",
       "category": "energy-sensor",
@@ -116,7 +116,7 @@
       "scale": 0
     },
     {
-      "name": "current_b",
+      "name": "Current B",
       "external_id": "tuya:smart-meter-device-id:current_b",
       "selector": "tuya-smart-meter-device-id-current-b",
       "category": "energy-sensor",
@@ -129,7 +129,7 @@
       "scale": 0
     },
     {
-      "name": "energy_forword_a",
+      "name": "Forward energy A",
       "external_id": "tuya:smart-meter-device-id:energy_forword_a",
       "selector": "tuya-smart-meter-device-id-energy-forword-a",
       "category": "energy-sensor",
@@ -142,7 +142,7 @@
       "scale": 2
     },
     {
-      "name": "energy_forword_b",
+      "name": "Forward energy B",
       "external_id": "tuya:smart-meter-device-id:energy_forword_b",
       "selector": "tuya-smart-meter-device-id-energy-forword-b",
       "category": "energy-sensor",
@@ -155,7 +155,7 @@
       "scale": 2
     },
     {
-      "name": "forward_energy_total",
+      "name": "Forward energy total",
       "external_id": "tuya:smart-meter-device-id:forward_energy_total",
       "selector": "tuya-smart-meter-device-id-forward-energy-total",
       "category": "energy-sensor",
@@ -168,7 +168,7 @@
       "scale": 2
     },
     {
-      "name": "power_a",
+      "name": "Power A",
       "external_id": "tuya:smart-meter-device-id:power_a",
       "selector": "tuya-smart-meter-device-id-power-a",
       "category": "energy-sensor",
@@ -181,7 +181,7 @@
       "scale": 1
     },
     {
-      "name": "power_b",
+      "name": "Power B",
       "external_id": "tuya:smart-meter-device-id:power_b",
       "selector": "tuya-smart-meter-device-id-power-b",
       "category": "energy-sensor",
@@ -194,7 +194,7 @@
       "scale": 1
     },
     {
-      "name": "total_power",
+      "name": "Total power",
       "external_id": "tuya:smart-meter-device-id:total_power",
       "selector": "tuya-smart-meter-device-id-total-power",
       "category": "energy-sensor",
@@ -207,7 +207,7 @@
       "scale": 1
     },
     {
-      "name": "voltage_a",
+      "name": "Voltage A",
       "external_id": "tuya:smart-meter-device-id:voltage_a",
       "selector": "tuya-smart-meter-device-id-voltage-a",
       "category": "energy-sensor",
