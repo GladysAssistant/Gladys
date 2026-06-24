@@ -33,20 +33,37 @@ function readCpuTemperature() {
       .readdirSync(THERMAL_ZONE_DIR)
       .filter((name) => name.startsWith('thermal_zone'));
     let zoneTemp = null;
+    let fallbackZoneTemp = null;
     zones.forEach((zone) => {
       if (zoneTemp !== null) {
         return;
       }
       try {
+        let type = '';
+        try {
+          type = fs.readFileSync(path.join(THERMAL_ZONE_DIR, zone, 'type'), 'utf8').trim().toLowerCase();
+        } catch (e) {
+          // no type file available
+        }
+        const isCpuType =
+          type.includes('cpu') || type.includes('package') || type.includes('core') || type.includes('soc');
+
         const raw = fs.readFileSync(path.join(THERMAL_ZONE_DIR, zone, 'temp'), 'utf8');
         const temp = parseThermalValue(raw);
         if (temp !== null) {
-          zoneTemp = temp;
+          if (isCpuType) {
+            zoneTemp = temp;
+          } else if (!type && fallbackZoneTemp === null) {
+            fallbackZoneTemp = temp;
+          }
         }
       } catch (e) {
         // skip unreadable zone
       }
     });
+    if (zoneTemp === null) {
+      zoneTemp = fallbackZoneTemp;
+    }
     if (zoneTemp !== null) {
       return zoneTemp;
     }

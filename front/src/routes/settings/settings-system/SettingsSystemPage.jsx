@@ -52,7 +52,7 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      {props.systemInfos && props.systemInfos.cpu_temperature !== null && (
+      {props.systemInfos && props.systemInfos.cpu_temperature != null && (
         <div class="col-sm-6 col-lg">
           <div class="card p-3">
             <div class="d-flex flex-row align-items-center flex-sm-column">
