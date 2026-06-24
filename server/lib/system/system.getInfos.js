@@ -47,7 +47,11 @@ function readCpuTemperature() {
           // no type file available
         }
         const isCpuType =
-          type.includes('cpu') || type.includes('package') || type.includes('core') || type.includes('soc');
+          type.includes('cpu') ||
+          type.includes('package') ||
+          type.includes('x86_pkg') ||
+          type.includes('core') ||
+          type.includes('soc');
 
         const raw = fs.readFileSync(path.join(THERMAL_ZONE_DIR, zone, 'temp'), 'utf8');
         const temp = parseThermalValue(raw);

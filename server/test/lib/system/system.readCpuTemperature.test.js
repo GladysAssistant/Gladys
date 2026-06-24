@@ -50,23 +50,17 @@ describe('readCpuTemperature', () => {
   });
 
   describe('thermal_zone', () => {
-    it('should return CPU temperature from zone with cpu type', () => {
+    it('should return CPU temperature from zone with x86_pkg_temp type', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0', 'thermal_zone1']);
       fsMock.readFileSync
         .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
         .returns('x86_pkg_temp');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('65000');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8')
-        .returns('cpu-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8')
-        .returns('42000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('65000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8').returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8').returns('42000');
 
       const temp = readCpuTemperature();
-      expect(temp).to.equal(42);
+      expect(temp).to.equal(65);
     });
 
     it('should return temperature from zone with package type', () => {
@@ -74,9 +68,7 @@ describe('readCpuTemperature', () => {
       fsMock.readFileSync
         .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
         .returns('package-temp0');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('50000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('50000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(50);
@@ -84,12 +76,8 @@ describe('readCpuTemperature', () => {
 
     it('should return temperature from zone with core type', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('core0');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('48000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('core0');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('48000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(48);
@@ -97,12 +85,8 @@ describe('readCpuTemperature', () => {
 
     it('should return temperature from zone with soc type', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('soc-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('51000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('soc-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('51000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(51);
@@ -110,18 +94,10 @@ describe('readCpuTemperature', () => {
 
     it('should skip non-CPU zones like wifi', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0', 'thermal_zone1']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('iwlwifi_1');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('40000');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8')
-        .returns('cpu-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8')
-        .returns('55000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('iwlwifi_1');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('40000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8').returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8').returns('55000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(55);
@@ -132,9 +108,7 @@ describe('readCpuTemperature', () => {
       fsMock.readFileSync
         .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
         .throws(new Error('ENOENT'));
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('43000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('43000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(43);
@@ -145,15 +119,9 @@ describe('readCpuTemperature', () => {
       fsMock.readFileSync
         .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
         .throws(new Error('ENOENT'));
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('30000');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8')
-        .returns('cpu-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8')
-        .returns('55000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('30000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8').returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8').returns('55000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(55);
@@ -161,18 +129,12 @@ describe('readCpuTemperature', () => {
 
     it('should skip unreadable zone temp', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0', 'thermal_zone1']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('cpu-thermal');
       fsMock.readFileSync
         .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
         .throws(new Error('EACCES'));
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8')
-        .returns('cpu-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8')
-        .returns('47000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'type'), 'utf8').returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone1', 'temp'), 'utf8').returns('47000');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(47);
@@ -180,12 +142,8 @@ describe('readCpuTemperature', () => {
 
     it('should return null when all zones are non-CPU', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('iwlwifi_1');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('40000');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('iwlwifi_1');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('40000');
       fsMock.readdirSync.withArgs(HWMON_DIR).throws(new Error('ENOENT'));
 
       const temp = readCpuTemperature();
@@ -200,21 +158,11 @@ describe('readCpuTemperature', () => {
 
     it('should return CPU temperature from hwmon with cpu label', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
-      fsMock.readdirSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0'))
-        .returns(['temp1_input', 'temp2_input']);
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8')
-        .returns('38000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8')
-        .returns('GPU');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_input'), 'utf8')
-        .returns('52000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_label'), 'utf8')
-        .returns('CPU');
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input', 'temp2_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('38000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').returns('GPU');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_input'), 'utf8').returns('52000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_label'), 'utf8').returns('CPU');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(52);
@@ -222,15 +170,9 @@ describe('readCpuTemperature', () => {
 
     it('should return CPU temperature from hwmon with package label', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
-      fsMock.readdirSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0'))
-        .returns(['temp1_input']);
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8')
-        .returns('60000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8')
-        .returns('Package id 0');
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('60000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').returns('Package id 0');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(60);
@@ -238,15 +180,9 @@ describe('readCpuTemperature', () => {
 
     it('should return CPU temperature from hwmon with core label', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
-      fsMock.readdirSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0'))
-        .returns(['temp1_input']);
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8')
-        .returns('45000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8')
-        .returns('Core 0');
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('45000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').returns('Core 0');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(45);
@@ -254,15 +190,9 @@ describe('readCpuTemperature', () => {
 
     it('should use fallback when no CPU label found', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
-      fsMock.readdirSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0'))
-        .returns(['temp1_input']);
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8')
-        .returns('39000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8')
-        .throws(new Error('ENOENT'));
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('39000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').throws(new Error('ENOENT'));
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(39);
@@ -270,18 +200,10 @@ describe('readCpuTemperature', () => {
 
     it('should skip unreadable hwmon input', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
-      fsMock.readdirSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0'))
-        .returns(['temp1_input', 'temp2_input']);
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8')
-        .throws(new Error('EACCES'));
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_input'), 'utf8')
-        .returns('44000');
-      fsMock.readFileSync
-        .withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_label'), 'utf8')
-        .returns('CPU');
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input', 'temp2_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').throws(new Error('EACCES'));
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_input'), 'utf8').returns('44000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_label'), 'utf8').returns('CPU');
 
       const temp = readCpuTemperature();
       expect(temp).to.equal(44);
@@ -299,12 +221,8 @@ describe('readCpuTemperature', () => {
 
     it('should return null when zones have no readable temp', () => {
       fsMock.readdirSync.withArgs(THERMAL_ZONE_DIR).returns(['thermal_zone0']);
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8')
-        .returns('cpu-thermal');
-      fsMock.readFileSync
-        .withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8')
-        .returns('invalid');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'type'), 'utf8').returns('cpu-thermal');
+      fsMock.readFileSync.withArgs(path.join(THERMAL_ZONE_DIR, 'thermal_zone0', 'temp'), 'utf8').returns('invalid');
       fsMock.readdirSync.withArgs(HWMON_DIR).throws(new Error('ENOENT'));
 
       const temp = readCpuTemperature();
