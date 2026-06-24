@@ -72,10 +72,7 @@ const SystemPage = ({ children, ...props }) => (
                   <Text id="systemSettings.cpuTemperature" />
                 </h4>
                 <small class="text-muted">
-                  <Text
-                    id="systemSettings.cpuTemperatureValue"
-                    fields={{ value: props.systemInfos.cpu_temperature }}
-                  />
+                  <Text id="systemSettings.cpuTemperatureValue" fields={{ value: props.systemInfos.cpu_temperature }} />
                 </small>
               </div>
             </div>

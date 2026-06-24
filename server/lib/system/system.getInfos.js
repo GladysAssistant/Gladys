@@ -29,9 +29,7 @@ function parseThermalValue(raw) {
  */
 function readCpuTemperature() {
   try {
-    const zones = fs
-      .readdirSync(THERMAL_ZONE_DIR)
-      .filter((name) => name.startsWith('thermal_zone'));
+    const zones = fs.readdirSync(THERMAL_ZONE_DIR).filter((name) => name.startsWith('thermal_zone'));
     let zoneTemp = null;
     let fallbackZoneTemp = null;
     zones.forEach((zone) => {
@@ -41,7 +39,10 @@ function readCpuTemperature() {
       try {
         let type = '';
         try {
-          type = fs.readFileSync(path.join(THERMAL_ZONE_DIR, zone, 'type'), 'utf8').trim().toLowerCase();
+          type = fs
+            .readFileSync(path.join(THERMAL_ZONE_DIR, zone, 'type'), 'utf8')
+            .trim()
+            .toLowerCase();
         } catch (e) {
           // no type file available
         }
@@ -92,7 +93,10 @@ function readCpuTemperature() {
             const labelFile = file.replace('_input', '_label');
             let label = '';
             try {
-              label = fs.readFileSync(path.join(hwmonPath, labelFile), 'utf8').trim().toLowerCase();
+              label = fs
+                .readFileSync(path.join(hwmonPath, labelFile), 'utf8')
+                .trim()
+                .toLowerCase();
             } catch (e) {
               // no label
             }
