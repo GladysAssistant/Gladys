@@ -160,4 +160,6 @@ async function getInfos() {
 
 module.exports = {
   getInfos,
+  readCpuTemperature,
+  parseThermalValue,
 };
