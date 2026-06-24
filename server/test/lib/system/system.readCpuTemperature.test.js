@@ -198,6 +198,31 @@ describe('readCpuTemperature', () => {
       expect(temp).to.equal(39);
     });
 
+    it('should stop scanning hwmons once CPU temp is found', () => {
+      fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0', 'hwmon1']);
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('62000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').returns('CPU');
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon1')).returns(['temp1_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon1', 'temp1_input'), 'utf8').returns('99000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon1', 'temp1_label'), 'utf8').returns('CPU');
+
+      const temp = readCpuTemperature();
+      expect(temp).to.equal(62);
+    });
+
+    it('should stop scanning files once CPU temp is found in same hwmon', () => {
+      fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
+      fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input', 'temp2_input']);
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_input'), 'utf8').returns('58000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp1_label'), 'utf8').returns('Core 0');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_input'), 'utf8').returns('70000');
+      fsMock.readFileSync.withArgs(path.join(HWMON_DIR, 'hwmon0', 'temp2_label'), 'utf8').returns('Core 1');
+
+      const temp = readCpuTemperature();
+      expect(temp).to.equal(58);
+    });
+
     it('should skip unreadable hwmon input', () => {
       fsMock.readdirSync.withArgs(HWMON_DIR).returns(['hwmon0']);
       fsMock.readdirSync.withArgs(path.join(HWMON_DIR, 'hwmon0')).returns(['temp1_input', 'temp2_input']);
