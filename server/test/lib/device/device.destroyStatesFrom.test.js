@@ -159,6 +159,93 @@ describe('Device.destroyStatesFrom', () => {
     await assert.isRejected(promise, 'DeviceFeature not found');
   });
 
+  it('should destroy states between two dates when "to" is provided', async () => {
+    // Insert test data
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      {
+        value: 1,
+        created_at: new Date('2025-08-28T10:00:00.000Z'),
+      },
+      {
+        value: 2,
+        created_at: new Date('2025-08-28T11:00:00.000Z'),
+      },
+      {
+        value: 3,
+        created_at: new Date('2025-08-28T12:00:00.000Z'),
+      },
+      {
+        value: 4,
+        created_at: new Date('2025-08-28T13:00:00.000Z'),
+      },
+      {
+        value: 5,
+        created_at: new Date('2025-08-28T14:00:00.000Z'),
+      },
+    ]);
+
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns(null),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+
+    // Destroy only states inside [11:00, 13:00]
+    await deviceInstance.destroyStatesFrom(
+      'test-device-feature',
+      new Date('2025-08-28T11:00:00.000Z'),
+      new Date('2025-08-28T13:00:00.000Z'),
+    );
+
+    // Verify only states outside the range remain (values 1 at 10:00, 5 at 14:00)
+    const remainingStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ? ORDER BY created_at',
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
+
+    expect(remainingStates).to.have.lengthOf(2);
+    expect(remainingStates[0].value).to.equal(1);
+    expect(remainingStates[1].value).to.equal(5);
+  });
+
+  it('should not destroy any states when "from" is after "to"', async () => {
+    // Insert test data
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      {
+        value: 1,
+        created_at: new Date('2025-08-28T10:00:00.000Z'),
+      },
+      {
+        value: 2,
+        created_at: new Date('2025-08-28T11:00:00.000Z'),
+      },
+    ]);
+
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns(null),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+
+    // Inverted range: from > to → silent no-op
+    await deviceInstance.destroyStatesFrom(
+      'test-device-feature',
+      new Date('2025-08-28T12:00:00.000Z'),
+      new Date('2025-08-28T09:00:00.000Z'),
+    );
+
+    const remainingStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ? ORDER BY created_at',
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
+
+    expect(remainingStates).to.have.lengthOf(2);
+  });
+
   it('should only destroy states for the specified device feature', async () => {
     const now = new Date();
     const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
