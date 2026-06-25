@@ -1,5 +1,5 @@
 const z = require('zod/v4');
-const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -140,6 +140,37 @@ async function getAllResources() {
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
+  const shutterDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isShutterFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isShutterFeature(feature)),
+    }));
+
+  shutterDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: ['write', 'read'],
+      })),
+    };
+
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
+
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
+  });
+
   return [
     {
       name: 'home',
@@ -211,6 +242,24 @@ async function getAllTools(userId) {
   const availableSwitchableFeatureCategories = [
     ...new Set(
       switchableDevices
+        .map((device) => {
+          return device.features.map((feature) => feature.category);
+        })
+        .flat(),
+    ),
+  ];
+  const shutterDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isShutterFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter((feature) => this.isShutterFeature(feature)),
+    }));
+  const availableShutterFeatureCategories = [
+    ...new Set(
+      shutterDevices
         .map((device) => {
           return device.features.map((feature) => feature.category);
         })
@@ -371,7 +420,13 @@ async function getAllTools(userId) {
             .optional()
             .describe('Room to get information from, leave empty to select multiple rooms.'),
           device_type: z
-            .enum([...new Set([...availableSensorFeatureCategories, ...availableSwitchableFeatureCategories])])
+            .enum([
+              ...new Set([
+                ...availableSensorFeatureCategories,
+                ...availableSwitchableFeatureCategories,
+                ...availableShutterFeatureCategories,
+              ]),
+            ])
             .optional()
             .describe('Type of device to query, leave empty to retrieve all devices.'),
         },
@@ -379,7 +434,7 @@ async function getAllTools(userId) {
       cb: async ({ room, device_type: deviceType }) => {
         const states = [];
 
-        let selectedDevices = [...sensorDevices, ...switchableDevices];
+        let selectedDevices = [...sensorDevices, ...switchableDevices, ...shutterDevices];
 
         if (room && room !== '') {
           const { selector } = this.findBySimilarity(rooms, room);
@@ -612,6 +667,159 @@ async function getAllTools(userId) {
       },
     },
   ];
+
+  if (shutterDevices.length > 0) {
+    tools.push({
+      intent: 'device.set-shutter',
+      config: {
+        title: 'Control shutters and curtains',
+        description:
+          'Open, close, stop or set the position of shutters and curtains. Use action for open/close/stop commands, or position (0-100) to set a percentage. Select the device by name, or by room and device category.',
+        inputSchema: {
+          action: z
+            .enum(['open', 'close', 'stop'])
+            .optional()
+            .describe('Action to perform on the shutter or curtain.'),
+          position: z
+            .number()
+            .min(0)
+            .max(100)
+            .optional()
+            .describe('Target position as a percentage from 0 (fully closed) to 100 (fully open).'),
+          device: z
+            .enum([...new Set(shutterDevices.map(({ name }) => name))])
+            .describe('Device name to control.')
+            .optional(),
+          room: z
+            .enum(rooms.map(({ name }) => name))
+            .describe("Device's room if specified, required if device_category is specified.")
+            .optional(),
+          device_category: z
+            .enum(availableShutterFeatureCategories)
+            .describe('Type of device to control only if user has not specified device name.')
+            .optional(),
+        },
+      },
+      cb: async ({ action, position, device, room, device_category: deviceCategory }) => {
+        if (!action && position === undefined) {
+          return {
+            content: [{ type: 'text', text: 'device.set-shutter: action or position is required' }],
+          };
+        }
+
+        const actionToState = {
+          open: COVER_STATE.OPEN,
+          close: COVER_STATE.CLOSE,
+          stop: COVER_STATE.STOP,
+        };
+
+        let selectedDevices = shutterDevices;
+
+        if (room && room !== '') {
+          const { selector } = this.findBySimilarity(rooms, room);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        }
+
+        if (device) {
+          const selectedDevice = this.findBySimilarity(selectedDevices, device);
+          if (selectedDevice?.name) {
+            selectedDevices = [selectedDevice];
+          } else {
+            return {
+              content: [{ type: 'text', text: 'device.set-shutter: no device found' }],
+            };
+          }
+        } else if (room && deviceCategory) {
+          selectedDevices = selectedDevices.filter((d) => d.features.some((f) => f.category === deviceCategory));
+        }
+
+        if (selectedDevices.length === 0) {
+          return {
+            content: [{ type: 'text', text: 'device.set-shutter: no device found' }],
+          };
+        }
+
+        const requestedPosition = position !== undefined;
+        const requestedAction = Boolean(action);
+        const dispatchResults = [];
+
+        await Promise.all(
+          selectedDevices.map(async (d) => {
+            const sent = [];
+            const missing = [];
+
+            if (requestedPosition) {
+              const positionFeature = d.features.find((f) => f.type === 'position');
+              if (positionFeature) {
+                await this.gladys.device.setValue(d, positionFeature, position);
+                sent.push(`position ${position}%`);
+              } else {
+                missing.push('position');
+              }
+            }
+
+            if (requestedAction) {
+              const stateFeature = d.features.find((f) => f.type === 'state');
+              if (stateFeature) {
+                await this.gladys.device.setValue(d, stateFeature, actionToState[action]);
+                sent.push(action);
+              } else {
+                missing.push('state');
+              }
+            }
+
+            dispatchResults.push({ device: d.name, sent, missing });
+          }),
+        );
+
+        const successfulDevices = dispatchResults.filter((result) => result.sent.length > 0);
+        const devicesWithMissingFeatures = dispatchResults.filter((result) => result.missing.length > 0);
+
+        if (successfulDevices.length === 0) {
+          const missingByDevice = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-shutter: no command sent, no matching feature on ${missingByDevice}`,
+              },
+            ],
+          };
+        }
+
+        const successMessage = successfulDevices
+          .map((result) => `${result.sent.join(' and ')} command sent for ${result.device}`)
+          .join('; ');
+
+        if (devicesWithMissingFeatures.length > 0) {
+          const partialFailures = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-shutter: ${successMessage}; could not dispatch for ${partialFailures}`,
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `device.set-shutter: ${successMessage}`,
+            },
+          ],
+        };
+      },
+    });
+  }
 
   if (writableSensorDevices.length > 0) {
     tools.push({

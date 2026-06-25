@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { stub, fake } = require('sinon');
 const nock = require('nock');
 const dns = require('dns');
-const { SYSTEM_VARIABLE_NAMES } = require('../../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, COVER_STATE } = require('../../../../utils/constants');
 const {
   getAllResources,
   getAllTools,
@@ -12,6 +12,7 @@ const {
 const {
   isSensorFeature,
   isSwitchableFeature,
+  isShutterFeature,
   isHistoryFeature,
   isWritableSensorFeature,
 } = require('../../../../services/mcp/lib/selectFeature');
@@ -116,6 +117,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       gladys: {
@@ -256,6 +258,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       gladys: {
@@ -363,6 +366,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       gladys: {
@@ -476,6 +480,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
@@ -920,6 +925,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
@@ -994,6 +1000,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
@@ -1106,6 +1113,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({
@@ -1197,6 +1205,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().callsFake((feature) => ({ value: feature.last_value })),
@@ -1239,6 +1248,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 1 }),
@@ -1348,6 +1358,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1419,6 +1430,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1482,6 +1494,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1580,6 +1593,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1651,6 +1665,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1729,6 +1744,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1779,6 +1795,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1845,6 +1862,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1895,6 +1913,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
       findBySimilarity,
@@ -1926,5 +1945,358 @@ describe('build schemas', () => {
     });
 
     expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
+  });
+
+  it('should expose shutters in home schema and device.set-shutter tool', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const shutterDevice = {
+      selector: 'device-shutter-1',
+      name: 'Living Room Shutter',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 1,
+          selector: 'device-shutter-1-state',
+          name: 'State',
+          category: 'shutter',
+          type: 'state',
+          last_value: COVER_STATE.CLOSE,
+        },
+        {
+          id: 2,
+          selector: 'device-shutter-1-position',
+          name: 'Position',
+          category: 'shutter',
+          type: 'position',
+          last_value: 0,
+          unit: 'percent',
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllResources,
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([shutterDevice]),
+          getBySelector: stub().resolves(shutterDevice),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const resources = await mcpHandler.getAllResources();
+    const homeSchema = JSON.parse((await resources[0].cb({ href: 'schema://home' })).contents[0].text);
+
+    expect(homeSchema.salon.devices['device-shutter-1']).to.deep.equal({
+      name: 'Living Room Shutter',
+      selector: 'device-shutter-1',
+      features: [
+        {
+          name: 'State',
+          selector: 'device-shutter-1-state',
+          category: 'shutter',
+          type: 'state',
+          access: ['write', 'read'],
+        },
+        {
+          name: 'Position',
+          selector: 'device-shutter-1-position',
+          category: 'shutter',
+          type: 'position',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+
+    const tools = await mcpHandler.getAllTools();
+    const setShutterTool = tools.find((tool) => tool.intent === 'device.set-shutter');
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    expect(setShutterTool).to.not.equal(undefined);
+
+    const openResult = await setShutterTool.cb({ action: 'open', device: 'Living Room Shutter' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].type).to.eq('state');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(COVER_STATE.OPEN);
+    expect(openResult.content[0].text).to.eq('device.set-shutter: open command sent for Living Room Shutter');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const positionResult = await setShutterTool.cb({ position: 50, device: 'Living Room Shutter' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].type).to.eq('position');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(50);
+    expect(positionResult.content[0].text).to.eq(
+      'device.set-shutter: position 50% command sent for Living Room Shutter',
+    );
+
+    const stateResult = await getStateTool.cb({ room: 'salon', device_type: 'shutter' });
+    expect(stateResult.content[0].text).to.eq('toonmockdata');
+  });
+
+  it('should merge shutter features into an existing device in home schema', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const combinedDevice = {
+      selector: 'device-combined-shutter',
+      name: 'Smart Shutter',
+      room: { selector: 'salon' },
+      features: [
+        {
+          id: 1,
+          selector: 'device-combined-shutter-temp',
+          name: 'Temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+        },
+        {
+          id: 2,
+          selector: 'device-combined-shutter-state',
+          name: 'State',
+          category: 'shutter',
+          type: 'state',
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllResources,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        device: { get: stub().resolves([combinedDevice]) },
+      },
+    };
+
+    const resources = await mcpHandler.getAllResources();
+    const homeSchema = JSON.parse((await resources[0].cb({ href: 'schema://home' })).contents[0].text);
+
+    expect(homeSchema.salon.devices['device-combined-shutter'].features).to.deep.equal([
+      {
+        name: 'Temperature',
+        selector: 'device-combined-shutter-temp',
+        category: 'temperature-sensor',
+        type: 'decimal',
+        access: ['read'],
+      },
+      {
+        name: 'State',
+        selector: 'device-combined-shutter-state',
+        category: 'shutter',
+        type: 'state',
+        access: ['write', 'read'],
+      },
+    ]);
+  });
+
+  it('should cover device.set-shutter error and filtering branches', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre' },
+    ];
+    const shutterDevices = [
+      {
+        selector: 'device-shutter-salon',
+        name: 'Salon Shutter',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          { id: 1, selector: 'f-state', name: 'State', category: 'shutter', type: 'state' },
+          { id: 2, selector: 'f-position', name: 'Position', category: 'shutter', type: 'position' },
+        ],
+      },
+      {
+        selector: 'device-curtain-chambre',
+        name: 'Bedroom Curtain',
+        room: { selector: 'chambre', name: 'Chambre' },
+        features: [
+          { id: 3, selector: 'c-state', name: 'State', category: 'curtain', type: 'state' },
+          { id: 4, selector: 'c-position', name: 'Position', category: 'curtain', type: 'position' },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 0 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(shutterDevices),
+          getBySelector: stub().resolves(shutterDevices[0]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const setShutterTool = tools.find((tool) => tool.intent === 'device.set-shutter');
+
+    const missingArgsResult = await setShutterTool.cb({});
+    expect(missingArgsResult.content[0].text).to.eq('device.set-shutter: action or position is required');
+
+    const unknownDeviceResult = await setShutterTool.cb({ action: 'open', device: 'Unknown Shutter' });
+    expect(unknownDeviceResult.content[0].text).to.eq('device.set-shutter: no device found');
+
+    const noDeviceInRoomResult = await setShutterTool.cb({
+      action: 'close',
+      room: 'chambre',
+      device_category: 'shutter',
+    });
+    expect(noDeviceInRoomResult.content[0].text).to.eq('device.set-shutter: no device found');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const roomCategoryResult = await setShutterTool.cb({
+      action: 'stop',
+      room: 'chambre',
+      device_category: 'curtain',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[0].name).to.eq('Bedroom Curtain');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(COVER_STATE.STOP);
+    expect(roomCategoryResult.content[0].text).to.eq('device.set-shutter: stop command sent for Bedroom Curtain');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const roomResult = await setShutterTool.cb({ action: 'close', room: 'salon' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[0].name).to.eq('Salon Shutter');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(COVER_STATE.CLOSE);
+    expect(roomResult.content[0].text).to.eq('device.set-shutter: close command sent for Salon Shutter');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const combinedResult = await setShutterTool.cb({
+      action: 'open',
+      position: 75,
+      device: 'Salon Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(2);
+    expect(combinedResult.content[0].text).to.eq(
+      'device.set-shutter: position 75% and open command sent for Salon Shutter',
+    );
+  });
+
+  it('should report when device.set-shutter cannot dispatch a matching feature', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const stateOnlyShutter = {
+      selector: 'device-shutter-state-only',
+      name: 'State Only Shutter',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [{ id: 1, selector: 'f-state', name: 'State', category: 'shutter', type: 'state' }],
+    };
+    const positionOnlyShutter = {
+      selector: 'device-shutter-position-only',
+      name: 'Position Only Shutter',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [{ id: 2, selector: 'f-position', name: 'Position', category: 'shutter', type: 'position' }],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 0 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([stateOnlyShutter, positionOnlyShutter]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const setShutterTool = tools.find((tool) => tool.intent === 'device.set-shutter');
+
+    const missingPositionResult = await setShutterTool.cb({
+      position: 50,
+      device: 'State Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingPositionResult.content[0].text).to.eq(
+      'device.set-shutter: no command sent, no matching feature on State Only Shutter (missing position feature)',
+    );
+
+    const missingStateResult = await setShutterTool.cb({
+      action: 'open',
+      device: 'Position Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingStateResult.content[0].text).to.eq(
+      'device.set-shutter: no command sent, no matching feature on Position Only Shutter (missing state feature)',
+    );
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const partialResult = await setShutterTool.cb({
+      action: 'open',
+      position: 50,
+      device: 'State Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(partialResult.content[0].text).to.eq(
+      'device.set-shutter: open command sent for State Only Shutter; could not dispatch for State Only Shutter (missing position feature)',
+    );
   });
 });

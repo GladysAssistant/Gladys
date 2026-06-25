@@ -44,6 +44,17 @@ const isSwitchableFeature = (deviceFeature) => {
   );
 };
 
+const shutterFeatures = [
+  `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.STATE}`,
+  `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`,
+  `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`,
+  `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`,
+];
+
+const isShutterFeature = (deviceFeature) => {
+  return shutterFeatures.some((types) => `${deviceFeature.category}:${deviceFeature.type}`.startsWith(types));
+};
+
 const historyFeatures = [
   DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
   DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
@@ -95,6 +106,7 @@ const isWritableSensorFeature = (deviceFeature, device) => {
 module.exports = {
   isSensorFeature,
   isSwitchableFeature,
+  isShutterFeature,
   isHistoryFeature,
   isWritableSensorFeature,
 };
