@@ -33,9 +33,18 @@ async function setValue(device, deviceFeature, value) {
       break;
     default:
       logger.debug(`Philips Hue : Feature type = "${deviceFeature.type}" not handled`);
-      break;
+      return;
   }
-  await hueApi.lights.setLightState(lightId, state);
+  try {
+    await hueApi.lights.setLightState(lightId, state);
+  } catch (e) {
+    if (!e.message || !e.message.includes('was not found on this bridge')) {
+      throw e;
+    }
+    logger.debug(`Philips Hue: Light ${lightId} not found in cache, syncing with bridge ${bridgeSerialNumber}`);
+    await this.syncBridgeBySerialNumber(bridgeSerialNumber);
+    await hueApi.lights.setLightState(lightId, state);
+  }
 }
 
 module.exports = {
