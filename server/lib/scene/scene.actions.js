@@ -266,7 +266,9 @@ const actionsFunc = {
     self.execute(action.scene, cloneDeep(scope));
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
-    const textWithVariables = Handlebars.compile(action.text)(scope);
+    const textWithVariables = Handlebars.compile(action.text, {
+      noEscape: true,
+    })(scope);
     await self.message.sendToUser(action.user, textWithVariables);
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
@@ -275,7 +277,9 @@ const actionsFunc = {
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
   [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
-    const textWithVariables = Handlebars.compile(action.text)(scope);
+    const textWithVariables = Handlebars.compile(action.text, {
+      noEscape: true,
+    })(scope);
     let image;
     if (action.camera) {
       image = await self.device.camera.getLiveImage(action.camera);
@@ -598,7 +602,7 @@ const actionsFunc = {
       DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
     );
     // replace variable in text
-    const messageWithVariables = Handlebars.compile(action.text)(scope);
+    const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
     // Get TTS URL
     const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
     // Play TTS Notification on device
@@ -608,7 +612,7 @@ const actionsFunc = {
     const freeMobileService = self.service.getService('free-mobile');
 
     if (freeMobileService) {
-      const textWithVariables = Handlebars.compile(action.text)(scope);
+      const textWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
       freeMobileService.sms.send(textWithVariables);
     }
   },
