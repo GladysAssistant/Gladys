@@ -9,7 +9,13 @@ const {
 } = require('../../../utils/constants');
 const { DIRECTIVE_NAMESPACES } = require('./alexa.constants');
 const { BadParameters, NotFoundError } = require('../../../utils/coreErrors');
-const { writeValues, readValues } = require('./deviceMappings');
+const { writeValues, readValues, mappings } = require('./deviceMappings');
+
+const COVER_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN];
+
+const findCoverFeature = (device, type) => {
+  return device.features.find((feature) => COVER_CATEGORIES.includes(feature.category) && feature.type === type);
+};
 
 /**
  * @public
@@ -118,6 +124,22 @@ function onExecute(body) {
       // Make sure the light is on if we change the light color
       controlPower(deviceFeature.category, 1);
       break;
+    case DIRECTIVE_NAMESPACES.ModeController:
+      deviceFeature = findCoverFeature(deviceInMemory, DEVICE_FEATURE_TYPES.SHUTTER.STATE);
+      value = writeValues[DIRECTIVE_NAMESPACES.ModeController](get(body, 'directive.payload.mode'));
+      nameOfAlexaFeature = 'mode';
+      break;
+    case DIRECTIVE_NAMESPACES.RangeController:
+      deviceFeature = findCoverFeature(deviceInMemory, DEVICE_FEATURE_TYPES.SHUTTER.POSITION);
+      value = writeValues[DIRECTIVE_NAMESPACES.RangeController](
+        directiveName,
+        get(body, 'directive.payload'),
+        deviceFeature.last_value,
+        null,
+        deviceFeature,
+      );
+      nameOfAlexaFeature = 'rangeValue';
+      break;
     default:
       throw new BadParameters(`Unknown directive ${directiveNamespace}`);
   }
@@ -131,6 +153,7 @@ function onExecute(body) {
     feature_type: deviceFeature.type,
   };
   this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+  const capabilityMapping = get(mappings, `${deviceFeature.category}.capabilities.${deviceFeature.type}`);
   const response = {
     event: {
       header: {
@@ -147,6 +170,7 @@ function onExecute(body) {
       properties: [
         {
           namespace: directiveNamespace,
+          ...(capabilityMapping?.instance && { instance: capabilityMapping.instance }),
           name: nameOfAlexaFeature,
           value: readValues[deviceFeature.category][deviceFeature.type](value, deviceFeature),
           timeOfSample: new Date().toISOString(),

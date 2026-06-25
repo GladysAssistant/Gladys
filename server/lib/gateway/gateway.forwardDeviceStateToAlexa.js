@@ -4,7 +4,7 @@ const uuid = require('uuid');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 const { mappings, readValues } = require('../../services/alexa/lib/deviceMappings');
-const { syncDeviceConverter } = require('../../services/alexa/lib/syncDeviceConverter');
+const { syncDeviceConverter, isFeatureExposedToAlexa } = require('../../services/alexa/lib/syncDeviceConverter');
 
 // eslint-disable-next-line jsdoc/require-returns
 /**
@@ -32,7 +32,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
     const func = get(readValues, `${gladysFeature.category}.${gladysFeature.type}`);
     const mapping = get(mappings, `${gladysFeature.category}.capabilities.${gladysFeature.type}`);
 
-    if (!func || !mapping) {
+    if (!func || !mapping || !isFeatureExposedToAlexa(gladysDevice, gladysFeature)) {
       logger.debug(`Gladys Gateway: Not forwarding state, device feature doesnt seems handled.`);
       return;
     }
@@ -42,6 +42,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
     const properties = [
       {
         namespace: mapping.interface,
+        ...(mapping.instance && { instance: mapping.instance }),
         name: get(mapping, 'properties.supported.0.name'),
         value: func(gladysFeature.last_value, gladysFeature),
         timeOfSample: now,
@@ -75,6 +76,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
     };
 
     await gladysGatewayClient.alexaReportState(payload);
+    logger.debug(`Gladys Gateway: Alexa ChangeReport sent: ${JSON.stringify(payload)}`);
   } catch (e) {
     logger.warn(`Gladys Gateway: Unable to forward alexa reportState`);
     logger.warn(e);
