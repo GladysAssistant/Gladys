@@ -251,7 +251,7 @@ describe('PhilipsHueService', () => {
       1,
     );
 
-    assert.calledOnce(setLightStateStub);
+    assert.notCalled(setLightStateStub);
   });
   it('should rethrow error when setLightState fails for another reason', async () => {
     const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');

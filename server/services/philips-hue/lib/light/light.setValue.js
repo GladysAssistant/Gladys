@@ -33,7 +33,7 @@ async function setValue(device, deviceFeature, value) {
       break;
     default:
       logger.debug(`Philips Hue : Feature type = "${deviceFeature.type}" not handled`);
-      break;
+      return;
   }
   try {
     await hueApi.lights.setLightState(lightId, state);
