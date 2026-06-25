@@ -2218,7 +2218,85 @@ describe('build schemas', () => {
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(2);
     expect(combinedResult.content[0].text).to.eq(
-      'device.set-shutter: open and position 75% command sent for Salon Shutter',
+      'device.set-shutter: position 75% and open command sent for Salon Shutter',
+    );
+  });
+
+  it('should report when device.set-shutter cannot dispatch a matching feature', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const stateOnlyShutter = {
+      selector: 'device-shutter-state-only',
+      name: 'State Only Shutter',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [{ id: 1, selector: 'f-state', name: 'State', category: 'shutter', type: 'state' }],
+    };
+    const positionOnlyShutter = {
+      selector: 'device-shutter-position-only',
+      name: 'Position Only Shutter',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [{ id: 2, selector: 'f-position', name: 'Position', category: 'shutter', type: 'position' }],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 0 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([stateOnlyShutter, positionOnlyShutter]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const setShutterTool = tools.find((tool) => tool.intent === 'device.set-shutter');
+
+    const missingPositionResult = await setShutterTool.cb({
+      position: 50,
+      device: 'State Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingPositionResult.content[0].text).to.eq(
+      'device.set-shutter: no command sent, no matching feature on State Only Shutter (missing position feature)',
+    );
+
+    const missingStateResult = await setShutterTool.cb({
+      action: 'open',
+      device: 'Position Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingStateResult.content[0].text).to.eq(
+      'device.set-shutter: no command sent, no matching feature on Position Only Shutter (missing state feature)',
+    );
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const partialResult = await setShutterTool.cb({
+      action: 'open',
+      position: 50,
+      device: 'State Only Shutter',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(partialResult.content[0].text).to.eq(
+      'device.set-shutter: open command sent for State Only Shutter; could not dispatch for State Only Shutter (missing position feature)',
     );
   });
 });

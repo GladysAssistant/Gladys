@@ -739,42 +739,81 @@ async function getAllTools(userId) {
           };
         }
 
-        await Promise.all(
-          selectedDevices.map((d) => {
-            const commands = [];
+        const requestedPosition = position !== undefined;
+        const requestedAction = Boolean(action);
+        const dispatchResults = [];
 
-            if (position !== undefined) {
+        await Promise.all(
+          selectedDevices.map(async (d) => {
+            const sent = [];
+            const missing = [];
+
+            if (requestedPosition) {
               const positionFeature = d.features.find((f) => f.type === 'position');
               if (positionFeature) {
-                commands.push(this.gladys.device.setValue(d, positionFeature, position));
+                await this.gladys.device.setValue(d, positionFeature, position);
+                sent.push(`position ${position}%`);
+              } else {
+                missing.push('position');
               }
             }
 
-            if (action) {
+            if (requestedAction) {
               const stateFeature = d.features.find((f) => f.type === 'state');
               if (stateFeature) {
-                commands.push(this.gladys.device.setValue(d, stateFeature, actionToState[action]));
+                await this.gladys.device.setValue(d, stateFeature, actionToState[action]);
+                sent.push(action);
+              } else {
+                missing.push('state');
               }
             }
 
-            return Promise.all(commands);
+            dispatchResults.push({ device: d.name, sent, missing });
           }),
         );
 
-        const deviceNames = selectedDevices.map((d) => d.name).join(', ');
-        const commandParts = [];
-        if (action) {
-          commandParts.push(action);
+        const successfulDevices = dispatchResults.filter((result) => result.sent.length > 0);
+        const devicesWithMissingFeatures = dispatchResults.filter((result) => result.missing.length > 0);
+
+        if (successfulDevices.length === 0) {
+          const missingByDevice = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-shutter: no command sent, no matching feature on ${missingByDevice}`,
+              },
+            ],
+          };
         }
-        if (position !== undefined) {
-          commandParts.push(`position ${position}%`);
+
+        const successMessage = successfulDevices
+          .map((result) => `${result.sent.join(' and ')} command sent for ${result.device}`)
+          .join('; ');
+
+        if (devicesWithMissingFeatures.length > 0) {
+          const partialFailures = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-shutter: ${successMessage}; could not dispatch for ${partialFailures}`,
+              },
+            ],
+          };
         }
 
         return {
           content: [
             {
               type: 'text',
-              text: `device.set-shutter: ${commandParts.join(' and ')} command sent for ${deviceNames}`,
+              text: `device.set-shutter: ${successMessage}`,
             },
           ],
         };
