@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const get = require('get-value');
 
 const { mappings, readValues } = require('./deviceMappings');
+const { isFeatureExposedToAlexa } = require('./syncDeviceConverter');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
@@ -23,9 +24,10 @@ function onReportState(body) {
   device.features.forEach((feature) => {
     const func = get(readValues, `${feature.category}.${feature.type}`);
     const mapping = get(mappings, `${feature.category}.capabilities.${feature.type}`);
-    if (func && mapping && feature.read_only === false) {
+    if (func && mapping && isFeatureExposedToAlexa(device, feature)) {
       properties.push({
         namespace: mapping.interface,
+        ...(mapping.instance && { instance: mapping.instance }),
         name: get(mapping, 'properties.supported.0.name'),
         value: func(feature.last_value, feature),
         timeOfSample: now,

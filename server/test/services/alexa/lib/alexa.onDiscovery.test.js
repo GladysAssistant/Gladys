@@ -4,6 +4,7 @@ const get = require('get-value');
 
 const { assert, fake } = sinon;
 const AlexaHandler = require('../../../../services/alexa/lib');
+const { mappings } = require('../../../../services/alexa/lib/deviceMappings');
 
 const gladys = {
   stateManager: {
@@ -154,5 +155,116 @@ describe('alexa.onDiscovery', () => {
       },
     };
     expect(result).to.deep.eq(expectedResult);
+  });
+
+  it('return one shutter with position capability when state and position are available', async () => {
+    gladys.stateManager.state.device = {
+      device_shutter: {
+        get: fake.returns({
+          name: 'Living Room Shutter',
+          selector: 'device-shutter',
+          external_id: 'device-shutter-external-id',
+          features: [
+            {
+              read_only: false,
+              category: 'shutter',
+              type: 'state',
+            },
+            {
+              read_only: false,
+              category: 'shutter',
+              type: 'position',
+            },
+          ],
+          model: 'device-model',
+          room: {
+            name: 'living-room',
+          },
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const result = alexaHandler.onDiscovery();
+
+    expect(result.event.payload.endpoints).to.deep.equal([
+      {
+        endpointId: 'device-shutter',
+        friendlyName: 'Living Room Shutter',
+        manufacturerName: 'Gladys Assistant',
+        description: 'Living Room Shutter',
+        additionalAttributes: {},
+        displayCategories: ['INTERIOR_BLIND'],
+        capabilities: [
+          mappings.shutter.capabilities.position,
+          { type: 'AlexaInterface', interface: 'Alexa', version: '3' },
+        ],
+      },
+    ]);
+  });
+
+  it('return one shutter with mode capability when only state is available', async () => {
+    gladys.stateManager.state.device = {
+      device_shutter: {
+        get: fake.returns({
+          name: 'Living Room Shutter',
+          selector: 'device-shutter',
+          external_id: 'device-shutter-external-id',
+          features: [
+            {
+              read_only: false,
+              category: 'shutter',
+              type: 'state',
+            },
+          ],
+          model: 'device-model',
+          room: {
+            name: 'living-room',
+          },
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const result = alexaHandler.onDiscovery();
+
+    expect(result.event.payload.endpoints).to.deep.equal([
+      {
+        endpointId: 'device-shutter',
+        friendlyName: 'Living Room Shutter',
+        manufacturerName: 'Gladys Assistant',
+        description: 'Living Room Shutter',
+        additionalAttributes: {},
+        displayCategories: ['INTERIOR_BLIND'],
+        capabilities: [
+          mappings.shutter.capabilities.state,
+          { type: 'AlexaInterface', interface: 'Alexa', version: '3' },
+        ],
+      },
+    ]);
+  });
+
+  it('should ignore unmapped writable features', async () => {
+    gladys.stateManager.state.device = {
+      device_sensor: {
+        get: fake.returns({
+          name: 'Temperature sensor',
+          selector: 'device-sensor',
+          external_id: 'device-sensor-external-id',
+          features: [
+            {
+              read_only: false,
+              category: 'temperature-sensor',
+              type: 'decimal',
+            },
+          ],
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const result = alexaHandler.onDiscovery();
+
+    expect(result.event.payload.endpoints).to.deep.equal([]);
   });
 });
