@@ -16,12 +16,14 @@ class SendMessageParams extends Component {
           value: user.selector
         });
       });
-      await this.setState({ userOptions });
+      let selectedOption = '';
       if (!this.props.action.user && userOptions.length > 0) {
         this.props.updateActionProperty(this.props.path, 'user', userOptions[0].value);
-      } else {
-        this.refreshSelectedOptions(this.props);
+        selectedOption = userOptions[0];
+      } else if (this.props.action.user) {
+        selectedOption = userOptions.find(option => option.value === this.props.action.user) || '';
       }
+      this.setState({ userOptions, selectedOption });
       return userOptions;
     } catch (e) {
       console.error(e);
