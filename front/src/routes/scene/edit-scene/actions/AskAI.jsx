@@ -28,8 +28,9 @@ class AskAI extends Component {
 
       let selectedUserOption = '';
       let selectedCameraOption = '';
+      const actionUpdates = [];
       if (!this.props.action.user && userOptions.length > 0) {
-        this.props.updateActionProperty(this.props.path, 'user', userOptions[0].value);
+        actionUpdates.push(['user', userOptions[0].value]);
         selectedUserOption = userOptions[0];
       } else if (this.props.action.user) {
         selectedUserOption = userOptions.find(option => option.value === this.props.action.user) || '';
@@ -37,7 +38,9 @@ class AskAI extends Component {
       if (this.props.action.camera) {
         selectedCameraOption = cameraOptions.find(option => option.value === this.props.action.camera) || '';
       }
-      this.setState({ userOptions, cameraOptions, selectedUserOption, selectedCameraOption });
+      this.setState({ userOptions, cameraOptions, selectedUserOption, selectedCameraOption }, () => {
+        actionUpdates.forEach(([key, value]) => this.props.updateActionProperty(this.props.path, key, value));
+      });
       return userOptions;
     } catch (e) {
       console.error(e);
