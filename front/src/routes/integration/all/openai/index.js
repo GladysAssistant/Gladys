@@ -5,6 +5,7 @@ import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
+import AiQuotaDisplay from './AiQuotaDisplay';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -111,11 +112,14 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
-            <p>
-              <Text id="integration.openai.rateLimit" />
-            </p>
+            {gladysPlusConnected !== true && (
+              <p>
+                <Text id="integration.openai.rateLimit" />
+              </p>
+            )}
           </div>
         </div>
+        {gladysPlusConnected === true && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}
       </Layout>

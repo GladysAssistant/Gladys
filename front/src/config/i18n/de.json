@@ -2217,6 +2217,17 @@
       "exampleScene2": "Jeden Morgen um 7 Uhr: wenn der CO₂-Sensor im Wohnzimmer 1.000 ppm überschreitet, schicke mir eine Nachricht und schalte die Lüftung ein.",
       "exampleScene3": "Wenn der Alarm auslöst: bitte die KI, das Bild der Außenkamera zu analysieren und mir eine Zusammenfassung der Situation zu senden.",
       "chatEnabledByDefault": "Die KI ist im Gladys-Chat standardmäßig aktiviert.",
+      "quota": {
+        "title": "KI-Kontingentnutzung",
+        "textLabel": "Textanfragen an die KI",
+        "imageLabel": "KI-Bildanalyse in Szenen",
+        "remaining": "{{remaining}} / {{max}} Anfragen verbleibend",
+        "resetIn": "Zurücksetzung in {{duration}}",
+        "resetNow": "Kontingent verfügbar",
+        "loading": "Kontingente werden geladen...",
+        "loadError": "KI-Kontingente konnten nicht geladen werden.",
+        "retry": "Erneut versuchen"
+      },
       "debugContext": {
         "title": "KI-Debug",
         "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 10 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",

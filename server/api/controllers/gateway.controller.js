@@ -147,6 +147,16 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/gateway/aichat/quota
+   * @apiName getOpenAIQuota
+   * @apiGroup Gateway
+   */
+  async function getOpenAIQuota(req, res) {
+    const quota = await gladys.gateway.getOpenAIQuota();
+    res.json(quota);
+  }
+
+  /**
    * @api {post} /api/v1/gateway/stt
    * @apiName stt
    * @apiGroup Gateway
@@ -231,6 +241,7 @@ module.exports = function GatewayController(gladys) {
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
     aiChat: asyncMiddleware(aiChat),
     getAiChatDebugContext: asyncMiddleware(getAiChatDebugContext),
+    getOpenAIQuota: asyncMiddleware(getOpenAIQuota),
     stt: asyncMiddleware(stt),
     processVoice: asyncMiddleware(processVoice),
     getTtsUrl: asyncMiddleware(getTtsUrl),
