@@ -2217,6 +2217,17 @@
       "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
       "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
       "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
+      "quota": {
+        "title": "Utilisation des quotas IA",
+        "textLabel": "Requêtes textuelles à l'IA",
+        "imageLabel": "Analyse d'image par l'IA dans les scènes",
+        "remaining": "{{remaining}} / {{max}} requêtes restantes",
+        "resetIn": "Réinitialisation dans {{duration}}",
+        "resetNow": "Quota disponible",
+        "loading": "Chargement des quotas...",
+        "loadError": "Impossible de charger les quotas IA.",
+        "retry": "Réessayer"
+      },
       "debugContext": {
         "title": "Debug IA",
         "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 10 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
