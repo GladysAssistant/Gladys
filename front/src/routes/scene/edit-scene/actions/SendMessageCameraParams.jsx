@@ -24,7 +24,18 @@ class SendMessageCameraParams extends Component {
       }));
 
       await this.setState({ userOptions, cameraOptions });
-      this.refreshSelectedOptions(this.props);
+      let updated = false;
+      if (!this.props.action.user && userOptions.length > 0) {
+        this.props.updateActionProperty(this.props.path, 'user', userOptions[0].value);
+        updated = true;
+      }
+      if (!this.props.action.camera && cameraOptions.length > 0) {
+        this.props.updateActionProperty(this.props.path, 'camera', cameraOptions[0].value);
+        updated = true;
+      }
+      if (!updated) {
+        this.refreshSelectedOptions(this.props);
+      }
       return userOptions;
     } catch (e) {
       console.error(e);

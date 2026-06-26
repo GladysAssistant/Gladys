@@ -27,7 +27,11 @@ class AskAI extends Component {
       }));
 
       await this.setState({ userOptions, cameraOptions });
-      this.refreshSelectedOptions(this.props);
+      if (!this.props.action.user && userOptions.length > 0) {
+        this.props.updateActionProperty(this.props.path, 'user', userOptions[0].value);
+      } else {
+        this.refreshSelectedOptions(this.props);
+      }
       return userOptions;
     } catch (e) {
       console.error(e);
