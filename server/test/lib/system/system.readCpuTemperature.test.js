@@ -24,7 +24,7 @@ describe('readCpuTemperature', () => {
   });
 
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   describe('parseThermalValue', () => {
