@@ -33,6 +33,9 @@ describe('Matter.backupController', () => {
         location: '',
       }),
       default: {},
+      vars: {
+        set: fake.returns(null),
+      },
     };
 
     storageService = {
@@ -44,6 +47,7 @@ describe('Matter.backupController', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };

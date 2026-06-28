@@ -104,6 +104,18 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
     ]),
     ttsGetToken: fake.resolves({ url: 'http://test.com' }),
     stt: fake.resolves({ text: 'hello world' }),
+    openAIGetQuota: fake.resolves({
+      text: {
+        remaining: 100,
+        max: 100,
+        reset_in_seconds: 0,
+      },
+      image: {
+        remaining: 100,
+        max: 100,
+        reset_in_seconds: 0,
+      },
+    }),
   };
 };
 
