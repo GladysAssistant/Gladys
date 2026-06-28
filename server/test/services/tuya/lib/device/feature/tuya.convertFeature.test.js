@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
 const { DEVICE_TYPES } = require('../../../../../../services/tuya/lib/mappings');
@@ -26,7 +27,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1000,
       min: 100,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
@@ -50,7 +51,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1,
       min: 0,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
@@ -93,7 +94,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 8,
       min: 2,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
@@ -120,21 +121,36 @@ describe('Tuya convert feature', () => {
   });
 
   it('should fall back to the Tuya code as name when the mapping has no name', () => {
-    const result = convertFeature(
+    // Force a mapping that has category/type but no curated name to exercise
+    // the `mapping.name || code` fallback (all real mappings now carry a name).
+    const { convertFeature: convertFeatureNoName } = proxyquire(
+      '../../../../../../services/tuya/lib/device/tuya.convertFeature',
       {
-        code: 'switch_1',
+        '../mappings': {
+          getFeatureMapping: () => ({ category: 'switch', type: 'binary' }),
+          getIgnoredCloudCodes: () => [],
+          normalizeCode: (value) =>
+            value
+              ? String(value)
+                  .trim()
+                  .toLowerCase()
+              : null,
+        },
+      },
+    );
+
+    const result = convertFeatureNoName(
+      {
+        code: 'unnamed_code',
         type: 'Boolean',
-        name: 'Switch one',
+        name: 'Thing model name',
         readOnly: false,
         values: {},
       },
       'externalId',
-      {
-        deviceType: DEVICE_TYPES.SMART_SOCKET,
-      },
     );
 
-    expect(result.name).to.equal('switch_1');
+    expect(result.name).to.equal('unnamed_code');
   });
 
   it('should keep scale from values payload', () => {
