@@ -101,6 +101,9 @@ class Zigbee2mqttSetupPage extends Component {
       this.setState({
         toggleZigee2mqttStatus: RequestStatus.Success
       });
+      if (enable) {
+        await this.loadZ2MConfig();
+      }
     } catch (e) {
       console.error(e);
       this.setState({
