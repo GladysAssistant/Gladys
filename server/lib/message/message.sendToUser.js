@@ -7,11 +7,14 @@ const db = require('../../models');
  * @param {string} userSelector - The selector of the user.
  * @param {string} text - The answer to send.
  * @param {string} [file] - An optional file sent with the message.
+ * @param {object} [options] - Extra message options.
+ * @param {string} [options.messageType='chat'] - Message display type.
  * @returns {Promise} Resolve with created message.
  * @example
- * reply(originalMessage, 'thanks!');
+ * sendToUser('tony', 'Bonjour, voici votre bilan.', null, { messageType: 'notification' });
  */
-async function sendToUser(userSelector, text, file = null) {
+async function sendToUser(userSelector, text, file = null, options = {}) {
+  const { messageType = 'chat' } = options;
   const user = this.state.get('user', userSelector);
   if (user === null) {
     throw new NotFoundError(`User ${userSelector} not found`);
@@ -22,6 +25,7 @@ async function sendToUser(userSelector, text, file = null) {
     file,
     sender_id: null, // message sent by gladys
     receiver_id: user.id,
+    message_type: messageType,
   };
   const messageCreated = (await db.Message.create(messageToInsert)).get({ plain: true });
   // send the message through websocket

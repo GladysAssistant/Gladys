@@ -3,11 +3,14 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { mcpToolsToChatApiFormat } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
-const { isChatHistoryMessage } = require('../message/message.getPreviousQuestionsForUser');
+const {
+  buildExchangesFromMessages,
+  exchangesToApiMessages,
+  FETCH_MESSAGE_LIMIT,
+} = require('../message/message.getPreviousQuestionsForUser');
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
-const DEBUG_MESSAGE_LIMIT = 50;
 
 /**
  * @description Return MCP handler from service manager.
@@ -69,7 +72,7 @@ function dbMessageToApiMessage(message, userId) {
 /**
  * @public
  * @description Build the AI chat request payload for debug/replay purposes.
- * Includes the system prompt, the last 50 conversation messages, and available MCP tools.
+ * Uses the same history rules as live AI chat.
  * @param {string} userId - Gladys user id.
  * @returns {Promise<object>} OpenAI-compatible chat request body.
  * @example
@@ -89,14 +92,15 @@ async function getAiChatDebugContext(userId) {
     },
     attributes: ['sender_id', 'text', 'file', 'message_type', 'created_at'],
     order: [['created_at', 'desc']],
-    limit: DEBUG_MESSAGE_LIMIT,
+    limit: FETCH_MESSAGE_LIMIT,
   });
 
-  const messagesForApi = [{ role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) }];
-  recentMessages
-    .reverse()
-    .filter((message) => isChatHistoryMessage(message.get({ plain: true })))
-    .forEach((message) => messagesForApi.push(dbMessageToApiMessage(message.get({ plain: true }), userId)));
+  const plainMessages = recentMessages.map((message) => message.get({ plain: true }));
+  const exchanges = buildExchangesFromMessages(plainMessages.reverse());
+  const messagesForApi = [
+    { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) },
+    ...exchangesToApiMessages(exchanges),
+  ];
 
   return {
     messages: messagesForApi,
@@ -107,6 +111,7 @@ async function getAiChatDebugContext(userId) {
       userId,
       timezone: timezoneName,
       messageCount: recentMessages.length,
+      exchangeCount: exchanges.length,
       note: 'Replay this payload via POST /api/v1/gateway/aichat/chat (remove the _debug field first).',
     },
   };
