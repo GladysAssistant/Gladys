@@ -2237,7 +2237,7 @@
       },
       "debugContext": {
         "title": "AI debug",
-        "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 10 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
+        "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 50 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
         "downloadButton": "Download JSON context for debug",
         "error": "Unable to generate debug context. Make sure the MCP service is running."
       },

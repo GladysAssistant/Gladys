@@ -2237,7 +2237,7 @@
       },
       "debugContext": {
         "title": "KI-Debug",
-        "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 10 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
+        "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 50 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
         "downloadButton": "JSON-Kontext für Debug herunterladen",
         "error": "Debug-Kontext konnte nicht erstellt werden. Stelle sicher, dass der MCP-Dienst läuft."
       },

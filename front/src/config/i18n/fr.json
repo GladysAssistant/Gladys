@@ -2237,7 +2237,7 @@
       },
       "debugContext": {
         "title": "Debug IA",
-        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 10 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
+        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 50 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
         "downloadButton": "Télécharger le contexte JSON pour debug",
         "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
       },
