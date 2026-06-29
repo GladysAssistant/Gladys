@@ -13,13 +13,13 @@ import SettingsSystemDownloadLogs from './SettingsSystemDownloadLogs';
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
     <div class="row">
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="card p-3">
-          <div class="d-flex align-items-center">
-            <span class="stamp stamp-md bg-blue mr-3">
+          <div class="d-flex flex-row align-items-center flex-sm-column">
+            <span class="stamp stamp-md bg-blue mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-activity" />
             </span>
-            <div>
+            <div class="text-sm-center">
               <h4 class="m-0">
                 <Text id="systemSettings.connected" />
               </h4>
@@ -31,13 +31,13 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="card p-3">
-          <div class="d-flex align-items-center">
-            <span class="stamp stamp-md bg-green mr-3">
+          <div class="d-flex flex-row align-items-center flex-sm-column">
+            <span class="stamp stamp-md bg-green mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-hard-drive" />
             </span>
-            <div>
+            <div class="text-sm-center">
               <h4 class="m-0">
                 <Text id="systemSettings.disk" />
               </h4>
@@ -52,13 +52,41 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg-3">
+      {props.systemInfos && props.systemInfos.cpu_temperature != null && (
+        <div class="col-sm-6 col-lg">
+          <div class="card p-3">
+            <div class="d-flex flex-row align-items-center flex-sm-column">
+              <span
+                class={`stamp stamp-md mr-3 mr-sm-0 mb-sm-2 ${
+                  props.systemInfos.cpu_temperature >= 75
+                    ? 'bg-red'
+                    : props.systemInfos.cpu_temperature >= 60
+                    ? 'bg-orange'
+                    : 'bg-green'
+                }`}
+              >
+                <i class="fe fe-thermometer" />
+              </span>
+              <div class="text-sm-center">
+                <h4 class="m-0">
+                  <Text id="systemSettings.cpuTemperature" />
+                </h4>
+                <small class="text-muted">
+                  <Text id="systemSettings.cpuTemperatureValue" fields={{ value: props.systemInfos.cpu_temperature }} />
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div class="col-sm-6 col-lg">
         <div class="card p-3">
-          <div class="d-flex align-items-center">
-            <span class="stamp stamp-md bg-red mr-3">
+          <div class="d-flex flex-row align-items-center flex-sm-column">
+            <span class="stamp stamp-md bg-red mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-heart" />
             </span>
-            <div>
+            <div class="text-sm-center">
               <h4 class="m-0">
                 <Text id="systemSettings.uptime" />
               </h4>
@@ -68,13 +96,13 @@ const SystemPage = ({ children, ...props }) => (
         </div>
       </div>
 
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-sm-6 col-lg">
         <div class="card p-3">
-          <div class="d-flex align-items-center">
-            <span class="stamp stamp-md bg-yellow mr-3">
+          <div class="d-flex flex-row align-items-center flex-sm-column">
+            <span class="stamp stamp-md bg-yellow mr-3 mr-sm-0 mb-sm-2">
               <i class="fe fe-git-commit" />
             </span>
-            <div>
+            <div class="text-sm-center">
               <h4 class="m-0">
                 <Text id="systemSettings.gladysVersion" />
               </h4>

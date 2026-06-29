@@ -3179,7 +3179,9 @@
     "downloadLogsDescription": "Lade eine Datei mit den letzten Logs des Gladys-Containers herunter. Um sehr große Downloads zu vermeiden, werden nur die letzten 20 MB exportiert.",
     "downloadLogsButton": "Logs herunterladen",
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
-    "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut."
+    "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
+    "cpuTemperature": "CPU-Temp.",
+    "cpuTemperatureValue": "{{value}} °C"
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
