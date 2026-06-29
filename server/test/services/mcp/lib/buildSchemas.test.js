@@ -18,6 +18,7 @@ const {
 } = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
 const { SCENE_CREATE_TOOL_DESCRIPTION } = require('../../../../services/mcp/lib/sceneSchemas');
+const { mcpToolsToChatApiFormat } = require('../../../../services/mcp/lib/mcpToolsToChatApiFormat');
 
 describe('build schemas', () => {
   it('should build home structure resources schema', async () => {
@@ -774,6 +775,19 @@ describe('build schemas', () => {
     // Tool: device.turn-on-off by device
     expect(tools[4].intent).to.eq('device.turn-on-off');
     expect(tools[4].config.title).to.eq('Turn on/off devices');
+    expect(tools[4].config.requireDeviceTargeting).to.eq(true);
+
+    const turnOnOffApiTool = mcpToolsToChatApiFormat(tools).find((tool) => tool.function.name === 'device_turn_on_off');
+    expect(turnOnOffApiTool.function.parameters.anyOf).to.deep.equal([
+      { required: ['action', 'device'] },
+      { required: ['action', 'room', 'device_category'] },
+    ]);
+
+    const missingTargetResult = await tools[4].cb({ action: 'off' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingTargetResult.content[0].text).to.eq(
+      'device.turn-off: missing target. Provide device name, or both room and device_category. Never call with only action.',
+    );
 
     const turnOnResult = await tools[4].cb({ action: 'on', device: 'Living Room Light' });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
