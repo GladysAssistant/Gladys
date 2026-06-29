@@ -34,10 +34,10 @@ class SetupForm extends Component {
     }
   };
 
-  copyValue = async value => {
+  copyValue = async (fieldId, value) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(value);
-      this.setState({ copiedField: value });
+      this.setState({ copiedField: fieldId });
       if (this.copyTimer) {
         clearTimeout(this.copyTimer);
       }
@@ -56,7 +56,7 @@ class SetupForm extends Component {
     }
   }
 
-  renderCopyButton = (value, dataCy) => {
+  renderCopyButton = (fieldId, value, dataCy) => {
     const canCopy = typeof window !== 'undefined' && window.isSecureContext;
 
     if (!canCopy || !value) {
@@ -65,22 +65,27 @@ class SetupForm extends Component {
 
     return (
       <span class="input-group-append">
-        <button type="button" class="btn btn-outline-secondary" onClick={() => this.copyValue(value)} data-cy={dataCy}>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          onClick={() => this.copyValue(fieldId, value)}
+          data-cy={dataCy}
+        >
           <i class="fe fe-copy" />
         </button>
       </span>
     );
   };
 
-  renderCopiedFeedback = value => {
+  renderCopiedFeedback = fieldId => {
     const canCopy = typeof window !== 'undefined' && window.isSecureContext;
 
-    if (!canCopy || this.state.copiedField !== value) {
+    if (!canCopy || this.state.copiedField !== fieldId) {
       return null;
     }
 
     return (
-      <small class="text-success">
+      <small class="text-success d-block mt-1">
         <Text id="integration.mqtt.feature.copied" />
       </small>
     );
@@ -106,9 +111,9 @@ class SetupForm extends Component {
                 disabled={props.useEmbeddedBroker || gladysNotAvailable}
               />
             </Localizer>
-            {this.renderCopyButton(props.mqttUrl, 'mqtt-setup-url-copy-button')}
+            {this.renderCopyButton('mqttUrl', props.mqttUrl, 'mqtt-setup-url-copy-button')}
           </div>
-          {this.renderCopiedFeedback(props.mqttUrl)}
+          {this.renderCopiedFeedback('mqttUrl')}
         </div>
 
         <div class="form-group">
@@ -128,9 +133,9 @@ class SetupForm extends Component {
                 disabled={gladysNotAvailable}
               />
             </Localizer>
-            {this.renderCopyButton(props.mqttUsername, 'mqtt-setup-username-copy-button')}
+            {this.renderCopyButton('mqttUsername', props.mqttUsername, 'mqtt-setup-username-copy-button')}
           </div>
-          {this.renderCopiedFeedback(props.mqttUsername)}
+          {this.renderCopiedFeedback('mqttUsername')}
         </div>
 
         <div class="form-group">
@@ -165,14 +170,14 @@ class SetupForm extends Component {
               <button
                 type="button"
                 class="btn btn-outline-secondary"
-                onClick={() => this.copyValue(props.mqttPassword)}
+                onClick={() => this.copyValue('mqttPassword', props.mqttPassword)}
                 data-cy="mqtt-setup-password-copy-button"
               >
                 <i class="fe fe-copy" />
               </button>
             )}
-            {this.renderCopiedFeedback(props.mqttPassword)}
           </div>
+          {this.renderCopiedFeedback('mqttPassword')}
         </div>
 
         <div class="form-group">
