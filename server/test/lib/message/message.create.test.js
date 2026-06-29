@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { fake, assert } = require('sinon');
+const { Op } = require('sequelize');
 const db = require('../../../models');
 const MessageHandler = require('../../../lib/message');
 
@@ -9,8 +10,17 @@ const brain = {
 const service = {
   getService: () => null,
 };
+const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
 describe('message.create', () => {
+  beforeEach(async () => {
+    await db.Message.destroy({
+      where: {
+        [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
+      },
+    });
+  });
+
   it('should reply with Gladys Plus required when gateway is not configured', async () => {
     const variable = {
       getValue: fake.resolves(null),
@@ -24,9 +34,9 @@ describe('message.create', () => {
       text: 'Turn on the light in the kitchen',
       language: 'en',
       source: 'client-api',
-      source_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      source_user_id: userId,
       user: {
-        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        id: userId,
         language: 'en',
       },
       id: '5cd30aef-9c4e-4a23-88e3-3547971296e5',
@@ -48,9 +58,9 @@ describe('message.create', () => {
       text: 'Turn on the light in the kitchen',
       language: 'en',
       source: 'client-api',
-      source_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      source_user_id: userId,
       user: {
-        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        id: userId,
         language: 'en',
       },
       id: '5cd30aef-9c4e-4a23-88e3-3547971296e5',
@@ -58,7 +68,7 @@ describe('message.create', () => {
     const newMessage = await messageHandler.create(message);
     expect(newMessage).to.have.property('message');
     assert.calledWith(event.emit, 'message.new-for-open-ai', {
-      context: { user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5', language: 'en' } },
+      context: { user: { id: userId, language: 'en' } },
       message,
       previousQuestions: [],
     });
@@ -73,7 +83,7 @@ describe('message.create', () => {
     };
     await db.Message.create({
       text: 'Question 1',
-      sender_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      sender_id: userId,
       receiver_id: null,
       is_read: true,
       created_at: new Date('2023-02-09T09:55:05.766Z'),
@@ -81,13 +91,13 @@ describe('message.create', () => {
     await db.Message.create({
       text: 'Answer 1',
       sender_id: null,
-      receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      receiver_id: userId,
       is_read: true,
       created_at: new Date('2023-02-09T09:56:05.766Z'),
     });
     await db.Message.create({
       text: 'Question 2',
-      sender_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      sender_id: userId,
       receiver_id: null,
       is_read: true,
       created_at: new Date('2023-02-09T09:57:05.766Z'),
@@ -95,14 +105,14 @@ describe('message.create', () => {
     await db.Message.create({
       text: 'Answer 2',
       sender_id: null,
-      receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      receiver_id: userId,
       is_read: true,
       created_at: new Date('2023-02-09T09:58:05.766Z'),
     });
     await db.Message.create({
       text: 'Spontaneous message 3',
       sender_id: null,
-      receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      receiver_id: userId,
       is_read: true,
       created_at: new Date('2023-02-09T10:00:05.766Z'),
     });
@@ -111,9 +121,9 @@ describe('message.create', () => {
       text: 'Turn on the light in the kitchen',
       language: 'en',
       source: 'client-api',
-      source_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      source_user_id: userId,
       user: {
-        id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        id: userId,
         language: 'en',
       },
       id: '5cd30aef-9c4e-4a23-88e3-3547971296e5',
@@ -125,15 +135,14 @@ describe('message.create', () => {
     expect(event.emit.getCall(0).args[1]).to.deep.equal({
       context: {
         user: {
-          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          id: userId,
           language: 'en',
         },
       },
       message,
       previousQuestions: [
-        { answer: 'Answer 1', question: null },
-        { answer: 'Answer 2', question: 'Question 2' },
-        { answer: 'Spontaneous message 3', question: null },
+        { question: 'Question 1', answer: 'Answer 1' },
+        { question: 'Question 2', answer: 'Answer 2' },
       ],
     });
   });
