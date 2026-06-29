@@ -65,7 +65,9 @@ describe('gateway.sendWeeklyDigest', () => {
     expect(result).to.deep.equal({ sent: 1 });
     assert.calledOnceWithExactly(gateway.user.getByRole, USER_ROLE.ADMIN);
     assert.calledOnce(gateway.aiChat);
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'tony', 'Bonjour, voici votre bilan.');
+    assert.calledOnceWithExactly(gateway.message.sendToUser, 'tony', 'Bonjour, voici votre bilan.', null, {
+      messageType: 'notification',
+    });
   });
 
   it('should force send when requested', async () => {
@@ -134,7 +136,9 @@ describe('gateway.sendWeeklyDigest', () => {
     const result = await sendWeeklyDigest.call(gateway);
 
     expect(result).to.deep.equal({ sent: 1 });
-    assert.calledOnceWithExactly(gateway.message.sendToUser, 'pierre', 'Digest OK');
+    assert.calledOnceWithExactly(gateway.message.sendToUser, 'pierre', 'Digest OK', null, {
+      messageType: 'notification',
+    });
   });
 });
 

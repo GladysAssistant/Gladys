@@ -75,10 +75,14 @@ describe('gateway.getAiChatDebugContext', () => {
     messageFindAll.resolves([]);
   });
 
-  it('should build debug payload with system prompt, messages and tools', async () => {
+  it('should build debug payload with system prompt, exchanges and tools', async () => {
     messageFindAll.resolves([
-      { get: () => ({ sender_id: null, text: 'Bonjour', file: null }) },
-      { get: () => ({ sender_id: 'user-1', text: 'Salut', file: null }) },
+      {
+        get: () => ({ sender_id: null, text: 'Bonjour', file: null, message_type: 'chat' }),
+      },
+      {
+        get: () => ({ sender_id: 'user-1', text: 'Salut', file: null, message_type: 'chat' }),
+      },
     ]);
 
     const ctx = {
@@ -113,9 +117,51 @@ describe('gateway.getAiChatDebugContext', () => {
     expect(payload._debug.userId).to.equal('user-1');
     // eslint-disable-next-line no-underscore-dangle
     expect(payload._debug.messageCount).to.equal(2);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.exchangeCount).to.equal(1);
 
     assert.calledOnce(messageFindAll);
-    expect(messageFindAll.firstCall.args[0].limit).to.equal(50);
+    expect(messageFindAll.firstCall.args[0].limit).to.equal(30);
+  });
+
+  it('should default timezone when not configured', async () => {
+    messageFindAll.resolves([
+      {
+        get: () => ({ sender_id: 'user-1', text: 'Salut', file: null, message_type: 'chat' }),
+      },
+    ]);
+
+    const buildSystemPromptWithCurrentTime = (timezone) => `system prompt (${timezone})`;
+    const { getAiChatDebugContext: getDebugContext } = proxyquire(
+      '../../../lib/gateway/gateway.getAiChatDebugContext',
+      {
+        '../../models': {
+          Message: {
+            findAll: messageFindAll,
+          },
+        },
+        './gateway.forwardMessageToAiChat': {
+          buildSystemPromptWithCurrentTime,
+        },
+      },
+    );
+
+    const ctx = {
+      serviceManager: {
+        getService: fake.returns({
+          mcpHandler: {
+            getAllTools: fake.resolves([]),
+          },
+        }),
+      },
+      variable: {
+        getValue: fake.resolves(null),
+      },
+    };
+
+    const payload = await getDebugContext.call(ctx, 'user-1');
+
+    expect(payload.messages[0].content).to.equal('system prompt (Europe/Paris)');
   });
 
   it('should throw when MCP service is not running', async () => {
