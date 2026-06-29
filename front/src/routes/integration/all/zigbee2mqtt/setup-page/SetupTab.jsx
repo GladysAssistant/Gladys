@@ -8,6 +8,7 @@ import { MQTT_MODE } from './constants';
 import SetupPanel from './SetupPanel';
 import EnableStatus from './status/EnableStatus';
 import RunningStatus from './status/RunningStatus';
+import MqttExternalCredentials from './local/MqttExternalCredentials';
 
 class SetupTab extends Component {
   showConfirmReset = () => {
@@ -49,6 +50,7 @@ class SetupTab extends Component {
       resetZigbee2mqttStatus === RequestStatus.Getting;
     const disabled = loading || saving;
     const isLocalMode = configuration.mqttMode === MQTT_MODE.LOCAL;
+    const { mqttRunning = false } = props.zigbee2mqttStatus || {};
 
     return (
       <div class="card" data-cy="z2m-setup-wizard">
@@ -114,6 +116,12 @@ class SetupTab extends Component {
                 <li class="list-group-item" data-cy="z2m-running-status">
                   <RunningStatus {...props} disabled={disabled} />
                 </li>
+
+                {isLocalMode && success && (
+                  <li class="list-group-item" data-cy="z2m-mqtt-external-section">
+                    <MqttExternalCredentials configuration={configuration} mqttRunning={mqttRunning} />
+                  </li>
+                )}
 
                 {isLocalMode && (
                   <li class="list-group-item" data-cy="z2m-reset-section">

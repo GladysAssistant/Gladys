@@ -888,6 +888,13 @@
               "unknownDongle": "Not defined",
               "tcpPort": "TCP Port"
             },
+            "externalMqtt": {
+              "title": "External tools connection",
+              "description": "Read-only credentials to connect external tools (e.g. Node-RED) to the MQTT broker managed by Gladys. If the tool runs on another machine, replace \"localhost\" in the URL with the IP address of your Gladys machine.",
+              "credentialsPending": "Credentials will be available after the service is activated for the first time.",
+              "brokerNotRunning": "The MQTT broker is not running yet. These credentials will work once the service is started.",
+              "copied": "Copied"
+            },
             "containerErrors": {
               "EZSP_PROTOCOL_VERSION": "Warning: Your Ember coordinator firmware is outdated. Firmware version 7.4.x or higher is required. Please follow the <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">firmware flashing guide</a> to update it. Otherwise, select the dongle (legacy ezsp) in the configuration.",
               "unknownErrorPrefix": "Zigbee2MQTT container error: "
