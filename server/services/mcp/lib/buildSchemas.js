@@ -517,15 +517,19 @@ async function getAllTools(userId) {
           };
         }
 
-        let selectedDevices = switchableDevices;
-
-        if (room && room !== '') {
-          const { selector } = this.findBySimilarity(rooms, room);
-          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        if (device && (room || deviceCategory)) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.turn-${actionValue}: mixed targeting. Provide device name only, or both room and device_category without device.`,
+              },
+            ],
+          };
         }
 
         if (device) {
-          const selectedDevice = this.findBySimilarity(selectedDevices, device);
+          const selectedDevice = this.findBySimilarity(switchableDevices, device);
           if (selectedDevice?.name) {
             await Promise.all(
               selectedDevice.features.map((f) => {
@@ -537,35 +541,45 @@ async function getAllTools(userId) {
               content: [{ type: 'text', text: `device.turn-${actionValue} command sent for ${selectedDevice.name}` }],
             };
           }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.turn-${actionValue} command not sent, no device found matching "${device}"`,
+              },
+            ],
+          };
         }
 
-        if (room && deviceCategory) {
-          selectedDevices = selectedDevices.filter((d) => d.features.some((f) => f.category === deviceCategory));
+        let selectedDevices = switchableDevices;
+        const { selector } = this.findBySimilarity(rooms, room);
+        selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        selectedDevices = selectedDevices.filter((d) => d.features.some((f) => f.category === deviceCategory));
 
-          if (selectedDevices.length > 0) {
-            await Promise.all(
-              selectedDevices.map((d) => {
-                return Promise.all(
-                  d.features.map((f) => {
-                    if (f.category === deviceCategory) {
-                      return this.gladys.device.setValue(d, f, actionValue === 'on' ? 1 : 0);
-                    }
+        if (selectedDevices.length > 0) {
+          await Promise.all(
+            selectedDevices.map((d) => {
+              return Promise.all(
+                d.features.map((f) => {
+                  if (f.category === deviceCategory) {
+                    return this.gladys.device.setValue(d, f, actionValue === 'on' ? 1 : 0);
+                  }
 
-                    return null;
-                  }),
-                );
-              }),
-            );
+                  return null;
+                }),
+              );
+            }),
+          );
 
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `device.turn-${actionValue} command sent for devices in room ${room} with category ${deviceCategory}`,
-                },
-              ],
-            };
-          }
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.turn-${actionValue} command sent for devices in room ${room} with category ${deviceCategory}`,
+              },
+            ],
+          };
         }
 
         return {
