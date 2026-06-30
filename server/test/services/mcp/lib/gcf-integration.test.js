@@ -1,10 +1,5 @@
 const { expect } = require('chai');
-/* eslint-disable import/no-dynamic-require */
-const {
-  encodeGeneric,
-  decodeGeneric,
-} = require(`${__dirname}/../../../../services/mcp/node_modules/@blackwell-systems/gcf`);
-/* eslint-enable import/no-dynamic-require */
+const { encodeGeneric, decodeGeneric } = require('../../../../services/mcp/node_modules/@blackwell-systems/gcf');
 
 describe('GCF integration: encode/decode round-trip with Gladys data', () => {
   it('should round-trip device states (get-all-devices-states tool response)', () => {
