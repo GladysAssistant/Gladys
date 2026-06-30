@@ -2218,6 +2218,23 @@
       "exampleScene2": "Every morning at 7 a.m.: if the living room CO₂ sensor goes above 1,000 ppm, send me a message and turn on the ventilation.",
       "exampleScene3": "When the alarm is triggered: ask the AI to analyse the outdoor camera image and send me a summary of what's happening.",
       "chatEnabledByDefault": "AI is enabled by default in Gladys chat.",
+      "quota": {
+        "title": "AI quota usage",
+        "textLabel": "Text requests to AI",
+        "imageLabel": "AI image analysis in scenes",
+        "remaining": "{{remaining}} / {{max}} requests remaining",
+        "resetIn": "Resets in {{duration}}",
+        "resetNow": "Quota available",
+        "loading": "Loading quotas...",
+        "loadError": "Unable to load AI quotas.",
+        "retry": "Retry"
+      },
+      "debugContext": {
+        "title": "AI debug",
+        "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 10 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
+        "downloadButton": "Download JSON context for debug",
+        "error": "Unable to generate debug context. Make sure the MCP service is running."
+      },
       "weeklyDigest": {
         "title": "Weekly home digest",
         "description": "Gladys sends you a weekly summary of your connected home: comfort, energy, maintenance, and useful tips.",
@@ -2315,6 +2332,8 @@
         "noDeviceFound": "No Matter devices found",
         "pairedDevicesTitle": "Paired Devices Not Added to Gladys",
         "addToGladys": "Add to Gladys",
+        "updateInGladys": "Update",
+        "deviceHasUpdates": "This device already exists in Gladys with new or updated features. You can update it using the button below.",
         "deviceAlreadyExist": "A device with the same unique identifier already exists. You can update it using the button below.",
         "replaceExisting": "Update existing device",
         "nodeDisconnected": "Disconnected"
@@ -2336,6 +2355,16 @@
       "error": {
         "defaultError": "An error occurred while saving the device",
         "conflictError": "A device with this name already exists",
+        "selectorConflictError": "Another endpoint of this Matter device already uses the same internal identifier. This often happens with multi-sensor devices (e.g. Dyson via Matterbridge).",
+        "externalIdConflictError": "This Matter device is already registered in Gladys.",
+        "badRequestError": "The request is invalid.",
+        "validationError": "The device data is invalid.",
+        "forbiddenError": "You do not have permission to perform this action.",
+        "notFoundError": "The requested device could not be found.",
+        "unexpectedError": "An unexpected error occurred.",
+        "replaceDeviceNotFound": "Could not find the Gladys device to update. Refresh the page and try again.",
+        "technicalDetail": "Technical detail:",
+        "apiFullResponse": "Full API response:",
         "defaultDeletionError": "An error occurred while deleting the device",
         "getDevicesError": "An error occurred while getting the devices list"
       }
@@ -3069,7 +3098,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energy cost calculation (from beginning)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energy consumption calculation from index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)",
-      "service-enedis-sync": "Enedis data synchronization"
+      "service-enedis-sync": "Enedis data synchronization",
+      "ai-weekly-digest": "AI weekly digest"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."

@@ -2218,6 +2218,23 @@
       "exampleScene2": "Jeden Morgen um 7 Uhr: wenn der CO₂-Sensor im Wohnzimmer 1.000 ppm überschreitet, schicke mir eine Nachricht und schalte die Lüftung ein.",
       "exampleScene3": "Wenn der Alarm auslöst: bitte die KI, das Bild der Außenkamera zu analysieren und mir eine Zusammenfassung der Situation zu senden.",
       "chatEnabledByDefault": "Die KI ist im Gladys-Chat standardmäßig aktiviert.",
+      "quota": {
+        "title": "KI-Kontingentnutzung",
+        "textLabel": "Textanfragen an die KI",
+        "imageLabel": "KI-Bildanalyse in Szenen",
+        "remaining": "{{remaining}} / {{max}} Anfragen verbleibend",
+        "resetIn": "Zurücksetzung in {{duration}}",
+        "resetNow": "Kontingent verfügbar",
+        "loading": "Kontingente werden geladen...",
+        "loadError": "KI-Kontingente konnten nicht geladen werden.",
+        "retry": "Erneut versuchen"
+      },
+      "debugContext": {
+        "title": "KI-Debug",
+        "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 10 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
+        "downloadButton": "JSON-Kontext für Debug herunterladen",
+        "error": "Debug-Kontext konnte nicht erstellt werden. Stelle sicher, dass der MCP-Dienst läuft."
+      },
       "weeklyDigest": {
         "title": "Wöchentlicher Hausbericht",
         "description": "Gladys sendet dir jede Woche eine Zusammenfassung deines vernetzten Zuhauses: Komfort, Energie, Wartung und nützliche Tipps.",
@@ -2315,6 +2332,8 @@
         "noDeviceFound": "Keine Matter-Geräte gefunden",
         "pairedDevicesTitle": "Gepaarte Geräte, die nicht zu Gladys hinzugefügt wurden",
         "addToGladys": "Zu Gladys hinzufügen",
+        "updateInGladys": "Aktualisieren",
+        "deviceHasUpdates": "Dieses Gerät existiert bereits in Gladys mit neuen oder geänderten Funktionen. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "deviceAlreadyExist": "Ein Gerät mit derselben eindeutigen Kennung existiert bereits. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "replaceExisting": "Vorhandenes Gerät aktualisieren",
         "nodeDisconnected": "Nicht verbunden"
@@ -2336,6 +2355,16 @@
       "error": {
         "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten",
         "conflictError": "Ein Gerät mit diesem Namen existiert bereits",
+        "selectorConflictError": "Ein anderer Endpunkt dieses Matter-Geräts verwendet bereits dieselbe interne Kennung. Das passiert oft bei Geräten mit mehreren Sensoren (z. B. Dyson über Matterbridge).",
+        "externalIdConflictError": "Dieses Matter-Gerät ist bereits in Gladys registriert.",
+        "badRequestError": "Die Anfrage ist ungültig.",
+        "validationError": "Die Gerätedaten sind ungültig.",
+        "forbiddenError": "Sie haben keine Berechtigung für diese Aktion.",
+        "notFoundError": "Das angeforderte Gerät wurde nicht gefunden.",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+        "replaceDeviceNotFound": "Das zu aktualisierende Gladys-Gerät wurde nicht gefunden. Seite aktualisieren und erneut versuchen.",
+        "technicalDetail": "Technisches Detail:",
+        "apiFullResponse": "Vollständige API-Antwort:",
         "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten",
         "getDevicesError": "Beim Abrufen der Geräteliste ist ein Fehler aufgetreten"
       }
@@ -3069,7 +3098,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energieverbrauchsberechnung aus Index (30 Minuten)",
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
-      "service-enedis-sync": "Enedis-Datensynchronisation"
+      "service-enedis-sync": "Enedis-Datensynchronisation",
+      "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."

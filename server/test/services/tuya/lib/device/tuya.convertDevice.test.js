@@ -239,8 +239,8 @@ describe('tuya.convertDevice', () => {
     expect(voltageFeature.scale).to.equal(1);
     expect(reverseTotalFeature).to.not.equal(undefined);
     expect(reverseTotalFeature.scale).to.equal(2);
-    expect(reverseTotalFeature.category).to.equal('energy-sensor');
-    expect(reverseTotalFeature.type).to.equal('export-index');
+    expect(reverseTotalFeature.category).to.equal('energy-production-sensor');
+    expect(reverseTotalFeature.type).to.equal('index');
   });
 
   it('should ignore malformed groups and preserve merged values fallbacks', () => {

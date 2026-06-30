@@ -215,6 +215,7 @@ describe('Matter.listenToStateChange', () => {
   it('should listen to state change (TemperatureMeasurement)', async () => {
     const clusterClient = {
       id: TemperatureMeasurement.Complete.id,
+      getMeasuredValueAttribute: fake.resolves(2150),
       addMeasuredValueAttributeListener: (callback) => {
         callback(2150);
       },
@@ -224,10 +225,39 @@ describe('Matter.listenToStateChange', () => {
       getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
     };
     await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledTwice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1026',
       state: 21.5,
     });
+  });
+  it('should ignore failed initial TemperatureMeasurement read', async () => {
+    const clusterClient = {
+      id: TemperatureMeasurement.Complete.id,
+      getMeasuredValueAttribute: fake.rejects(new Error('Read failed')),
+      addMeasuredValueAttributeListener: fake.returns(null),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
+  it('should ignore null TemperatureMeasurement listener value', async () => {
+    const clusterClient = {
+      id: TemperatureMeasurement.Complete.id,
+      getMeasuredValueAttribute: fake.resolves(null),
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
   });
   it('should listen to state change (RelativeHumidityMeasurement)', async () => {
     const clusterClient = {
@@ -337,6 +367,8 @@ describe('Matter.listenToStateChange', () => {
       supportedFeatures: {
         heating: true,
       },
+      getLocalTemperatureAttribute: fake.resolves(null),
+      addLocalTemperatureAttributeListener: fake.returns(null),
       addOccupiedHeatingSetpointAttributeListener: (callback) => {
         callback(2000);
       },
@@ -351,12 +383,52 @@ describe('Matter.listenToStateChange', () => {
       state: 20,
     });
   });
+  it('should listen to state change (Thermostat local temperature)', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      supportedFeatures: {},
+      getLocalTemperatureAttribute: fake.resolves(5220),
+      addLocalTemperatureAttributeListener: (callback) => {
+        callback(5210);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:local-temperature',
+      state: 52.2,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:513:local-temperature',
+      state: 52.1,
+    });
+  });
+  it('should ignore failed initial Thermostat localTemperature read', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      supportedFeatures: {},
+      getLocalTemperatureAttribute: fake.rejects(new Error('Read failed')),
+      addLocalTemperatureAttributeListener: fake.returns(null),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
   it('should listen to state change (Thermostat cooling)', async () => {
     const clusterClient = {
       id: Thermostat.Complete.id,
       supportedFeatures: {
         cooling: true,
       },
+      getLocalTemperatureAttribute: fake.resolves(null),
+      addLocalTemperatureAttributeListener: fake.returns(null),
       addOccupiedCoolingSetpointAttributeListener: (callback) => {
         callback(2000);
       },
@@ -445,11 +517,7 @@ describe('Matter.listenToStateChange', () => {
     await matterHandler.listenToStateChange(1234n, '1', device);
     // We need to make sure that we called all 4 functions before checking the events
     await promise;
-    assert.calledTwice(gladys.event.emit);
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'matter:1234:1:768:color',
-      state: 14090213,
-    });
+    assert.calledThrice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:768:color',
       state: 14090213,
@@ -580,10 +648,10 @@ describe('Matter.listenToStateChange', () => {
         callback(5);
       },
       addRockSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ rockLeftRight: true });
       },
       addWindSettingAttributeListener: (callback) => {
-        callback(1);
+        callback({ sleepWind: true });
       },
       addAirflowDirectionAttributeListener: (callback) => {
         callback(0);
@@ -602,6 +670,14 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:percent`,
       state: 50,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:rock`,
+      state: 1,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `${fanBaseExternalId}:wind`,
+      state: 1,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,

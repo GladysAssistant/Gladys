@@ -34,7 +34,11 @@ async function handleAlexaMessage(data, rawMessage, cb) {
     }
     const directiveNamespace = get(body, 'directive.header.namespace');
     const directiveName = get(body, 'directive.header.name');
-    logger.debug(`gateway.handleAlexaMessage: New message : ${directiveNamespace}`);
+    logger.debug(
+      `gateway.handleAlexaMessage: Request ${directiveNamespace}.${directiveName || 'unknown'}: ${JSON.stringify(
+        body,
+      )}`,
+    );
     let response;
     if (directiveNamespace === 'Alexa.Discovery') {
       response = service.alexaHandler.onDiscovery();
@@ -48,8 +52,15 @@ async function handleAlexaMessage(data, rawMessage, cb) {
       };
     }
 
+    logger.debug(
+      `gateway.handleAlexaMessage: Response ${directiveNamespace}.${directiveName || 'unknown'}: ${JSON.stringify(
+        response,
+      )}`,
+    );
+
     cb(response);
   } catch (e) {
+    logger.error(`gateway.handleAlexaMessage: Error handling Alexa request: ${e.message}`);
     logger.error(e);
     cb({ status: 400 });
   }
