@@ -1126,6 +1126,13 @@
               "unknownDongle": "Non défini",
               "tcpPort": "Port TCP"
             },
+            "externalMqtt": {
+              "title": "Connexion pour outils externes",
+              "description": "Identifiants en lecture seule pour connecter des outils externes (ex. Node-RED) au broker MQTT géré par Gladys. Si l'outil est sur une autre machine, remplacez \"localhost\" dans l'URL par l'adresse IP de votre machine Gladys.",
+              "credentialsPending": "Les identifiants seront disponibles après la première activation du service.",
+              "brokerNotRunning": "Le broker MQTT n'est pas encore démarré. Ces identifiants seront utilisables une fois le service lancé.",
+              "copied": "Copié"
+            },
             "containerErrors": {
               "EZSP_PROTOCOL_VERSION": "Attention : Le firmware de votre coordinateur Ember est obsolète. La version 7.4.x ou supérieure est requise. Vous pouvez suivre ce <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">guide</a> pour le mettre à jour. Dans le cas contraire, sélectionner le dongle (legacy ezsp) dans la configuration.",
               "unknownErrorPrefix": "Erreur du conteneur Zigbee2MQTT : "
@@ -2230,7 +2237,7 @@
       },
       "debugContext": {
         "title": "Debug IA",
-        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 10 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
+        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 50 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
         "downloadButton": "Télécharger le contexte JSON pour debug",
         "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
       },
@@ -3172,7 +3179,9 @@
     "downloadLogsDescription": "Téléchargez un fichier contenant les derniers logs du conteneur Gladys. Pour éviter des téléchargements trop volumineux, seuls les 20 derniers Mo de logs sont exportés.",
     "downloadLogsButton": "Télécharger les logs",
     "downloadLogsProgress": "Téléchargement {{downloaded}} sur {{total}}...",
-    "downloadLogsError": "Impossible de télécharger les logs. Vérifiez que Gladys est lancée via Docker, puis réessayez."
+    "downloadLogsError": "Impossible de télécharger les logs. Vérifiez que Gladys est lancée via Docker, puis réessayez.",
+    "cpuTemperature": "T° CPU",
+    "cpuTemperatureValue": "{{value}} °C"
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
