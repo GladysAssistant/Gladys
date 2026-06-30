@@ -65,6 +65,11 @@ const validateAppAccount = async (connector, appAccountId) => {
       page_size: 1,
     },
   });
+  if (!response) {
+    const error = new Error('TUYA_APP_ACCOUNT_UID_INVALID');
+    error.code = 'TUYA_APP_ACCOUNT_UID_INVALID';
+    throw error;
+  }
   if (response && response.success === false) {
     const error = new Error(response.msg || response.message || 'TUYA_APP_ACCOUNT_UID_INVALID');
     error.code = response.code || 'TUYA_APP_ACCOUNT_UID_INVALID';

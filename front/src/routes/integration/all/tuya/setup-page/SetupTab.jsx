@@ -126,7 +126,10 @@ class SetupTab extends Component {
       });
     } catch (e) {
       this.setState({
-        tuyaStatusLoading: false
+        tuyaStatusLoading: false,
+        tuyaConnectionStatus: RequestStatus.Error,
+        tuyaConnectionError:
+          (e && e.response && e.response.data && e.response.data.message) || e.message || 'Status fetch failed'
       });
     }
   }

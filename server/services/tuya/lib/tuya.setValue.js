@@ -8,6 +8,7 @@ const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
+const { isLocalSkipNeeded, recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 
 /**
  * @description Send the new device value over device protocol.
@@ -47,8 +48,12 @@ async function setValue(device, deviceFeature, value) {
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
   const localDps = getLocalDpsFromCode(command, device);
+  const localSkipped = hasLocalConfig && isLocalSkipNeeded(this.degradedDevices, topic);
+  if (localSkipped) {
+    logger.debug(`[Tuya][setValue] device=${topic} skipping local (degraded backoff active), using cloud`);
+  }
 
-  if (hasLocalConfig && localDps !== null) {
+  if (hasLocalConfig && localDps !== null && !localSkipped) {
     const isProtocol34 = protocolVersion === '3.4';
     const isProtocol35 = protocolVersion === '3.5';
     const isNewGenProtocol = isProtocol34 || isProtocol35;
@@ -65,6 +70,7 @@ async function setValue(device, deviceFeature, value) {
     if (isProtocol35) {
       tuyaOptions.keepAlive = false;
     }
+    const { degradedDevices } = this;
     const runLocalSet = async () => {
       const tuyaLocal = new TuyaLocalApi(tuyaOptions);
       // Absorb async socket errors so they do not bubble up as uncaughtException
@@ -81,9 +87,11 @@ async function setValue(device, deviceFeature, value) {
         await tuyaLocal.connect();
         await tuyaLocal.set({ dps: localDps, set: transformedValue });
         logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
+        recordLocalSuccess(degradedDevices, topic);
         return true;
       } catch (e) {
         logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+        recordLocalFailure(degradedDevices, topic, e);
         return false;
       } finally {
         // Always close the socket — even if connect() failed — so the device

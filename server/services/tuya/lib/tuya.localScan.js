@@ -85,10 +85,11 @@ async function localScan(input = 10) {
     }
 
     const isNew = !devices[deviceId];
+    const previous = devices[deviceId] || {};
     devices[deviceId] = {
-      ip: resolvedIp,
-      version,
-      productKey,
+      ip: resolvedIp || previous.ip,
+      version: version || previous.version,
+      productKey: productKey || previous.productKey,
     };
     if (isNew) {
       logger.info(`[Tuya][localScan] Found device ${deviceId} ip=${ip || 'unknown'} version=${version || 'unknown'}`);

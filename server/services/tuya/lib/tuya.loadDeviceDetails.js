@@ -51,10 +51,11 @@ async function loadDeviceDetails(tuyaDevice) {
     logger.warn(`[Tuya] Failed to load thing model for ${deviceId}: ${reason}`);
   }
 
-  const specifications = specResult.status === 'fulfilled' ? specResult.value.result || {} : {};
-  const details = detailsResult.status === 'fulfilled' ? detailsResult.value.result || {} : {};
-  const properties = propsResult.status === 'fulfilled' ? propsResult.value.result || {} : {};
-  const modelPayload = modelResult.status === 'fulfilled' ? modelResult.value.result || null : null;
+  const specifications = specResult.status === 'fulfilled' ? (specResult.value && specResult.value.result) || {} : {};
+  const details = detailsResult.status === 'fulfilled' ? (detailsResult.value && detailsResult.value.result) || {} : {};
+  const properties = propsResult.status === 'fulfilled' ? (propsResult.value && propsResult.value.result) || {} : {};
+  const modelPayload =
+    modelResult.status === 'fulfilled' ? (modelResult.value && modelResult.value.result) || null : null;
   const rawModel =
     modelPayload && Object.prototype.hasOwnProperty.call(modelPayload, 'model') ? modelPayload.model : modelPayload;
   let thingModel = null;

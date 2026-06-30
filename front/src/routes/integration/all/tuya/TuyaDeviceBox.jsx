@@ -136,6 +136,9 @@ class TuyaDeviceBox extends Component {
       if (currentDevice.tuya_report && !mergedNextDevice.tuya_report) {
         mergedNextDevice = { ...mergedNextDevice, tuya_report: currentDevice.tuya_report };
       }
+      if (currentDevice.tuya_mapping && !mergedNextDevice.tuya_mapping) {
+        mergedNextDevice = { ...mergedNextDevice, tuya_mapping: currentDevice.tuya_mapping };
+      }
     }
     if (isNewDevice) {
       this.setState({
@@ -180,14 +183,37 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
+      const localConfig = getLocalConfig(this.state.device);
+      const baselineFeatures = this.state.baselineDevice && this.state.baselineDevice.features;
+      const currentFeatures = this.state.device && this.state.device.features;
+      const shouldFallbackToBaselineFeatures =
+        !!this.state.device.created_at &&
+        localConfig.localOverride === true &&
+        Array.isArray(baselineFeatures) &&
+        baselineFeatures.length > 0 &&
+        (!Array.isArray(currentFeatures) || currentFeatures.length === 0);
+
       const payload = {
         ...this.state.device,
-        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+        poll_frequency: localConfig.localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
       };
+      if (shouldFallbackToBaselineFeatures) {
+        payload.features = baselineFeatures;
+      }
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
+      // Gladys core does not persist Tuya transient enrichment (tuya_mapping,
+      // specifications, tuya_report). Carry them forward so the partial-support
+      // UI keeps using the correct ignored_local_dps right after save.
+      const previousDevice = this.state.device || {};
+      const mergedDevice = {
+        ...savedDevice,
+        tuya_mapping: savedDevice.tuya_mapping || previousDevice.tuya_mapping,
+        specifications: savedDevice.specifications || previousDevice.specifications,
+        tuya_report: savedDevice.tuya_report || previousDevice.tuya_report
+      };
       this.setState({
-        device: savedDevice,
-        baselineDevice: savedDevice
+        device: mergedDevice,
+        baselineDevice: mergedDevice
       });
       if (typeof this.props.onDeviceSaved === 'function') {
         this.props.onDeviceSaved(savedDevice);

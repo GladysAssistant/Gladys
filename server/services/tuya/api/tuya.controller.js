@@ -2,6 +2,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 const { updateDiscoveredDeviceAfterLocalPoll } = require('../lib/tuya.localPoll');
 const { buildLocalScanResponse } = require('../lib/tuya.localScan');
+const { getAllDegraded, getLocalStatus, resetLocalStatus } = require('../lib/utils/tuya.degraded');
 
 module.exports = function TuyaController(tuyaManager) {
   /**
@@ -21,6 +22,9 @@ module.exports = function TuyaController(tuyaManager) {
    */
   async function localPoll(req, res) {
     const payload = req.body || {};
+    // Manual user-triggered local poll resets the degraded backoff so the test
+    // can attempt the local path even if the automatic poll has marked it.
+    resetLocalStatus(tuyaManager.degradedDevices, payload.deviceId);
     const result = await tuyaManager.localPoll(payload);
     const updatedDevice = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
       ...payload,
@@ -82,6 +86,21 @@ module.exports = function TuyaController(tuyaManager) {
     res.json({ success: true });
   }
 
+  /**
+   * @api {get} /api/v1/service/tuya/local-status Get the current degraded-local backoff state for Tuya devices.
+   * @apiName localStatus
+   * @apiGroup Tuya
+   */
+  async function localStatus(req, res) {
+    const { deviceId } = req.query || {};
+    if (deviceId) {
+      const entryStatus = getLocalStatus(tuyaManager.degradedDevices, deviceId);
+      res.json({ deviceId, status: entryStatus });
+      return;
+    }
+    res.json({ devices: getAllDegraded(tuyaManager.degradedDevices) });
+  }
+
   return {
     'get /api/v1/service/tuya/discover': {
       authenticated: true,
@@ -106,6 +125,10 @@ module.exports = function TuyaController(tuyaManager) {
     'post /api/v1/service/tuya/disconnect': {
       authenticated: true,
       controller: asyncMiddleware(disconnect),
+    },
+    'get /api/v1/service/tuya/local-status': {
+      authenticated: true,
+      controller: asyncMiddleware(localStatus),
     },
   };
 };
