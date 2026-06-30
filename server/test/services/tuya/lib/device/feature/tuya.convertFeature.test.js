@@ -100,6 +100,43 @@ describe('Tuya convert feature', () => {
     });
   });
 
+  it('should use the curated mapping name and keep the Tuya code (typo) as key', () => {
+    const result = convertFeature(
+      {
+        code: 'energy_forword_a',
+        type: 'Integer',
+        name: 'Forward Energy-A',
+        readOnly: true,
+        values: {},
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_METER,
+      },
+    );
+
+    expect(result.name).to.equal('Forward energy A');
+    expect(result.external_id).to.equal('externalId:energy_forword_a');
+  });
+
+  it('should fall back to the Tuya code as name when the mapping has no name', () => {
+    const result = convertFeature(
+      {
+        code: 'switch_1',
+        type: 'Boolean',
+        name: 'Switch one',
+        readOnly: false,
+        values: {},
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result.name).to.equal('switch_1');
+  });
+
   it('should keep scale from values payload', () => {
     const result = convertFeature(
       {
