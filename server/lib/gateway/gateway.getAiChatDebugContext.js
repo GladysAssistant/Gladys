@@ -6,7 +6,7 @@ const { mcpToolsToChatApiFormat } = require('../../services/mcp/lib/mcpToolsToCh
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
-const DEBUG_MESSAGE_LIMIT = 10;
+const DEBUG_MESSAGE_LIMIT = 50;
 
 /**
  * @description Return MCP handler from service manager.
@@ -68,7 +68,7 @@ function dbMessageToApiMessage(message, userId) {
 /**
  * @public
  * @description Build the AI chat request payload for debug/replay purposes.
- * Includes the system prompt, the last 10 conversation messages, and available MCP tools.
+ * Includes the system prompt, the last 50 conversation messages, and available MCP tools.
  * @param {string} userId - Gladys user id.
  * @returns {Promise<object>} OpenAI-compatible chat request body.
  * @example

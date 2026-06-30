@@ -44,6 +44,10 @@ class SettingsSystem extends Component {
       this.props.ping();
     }, 3000);
 
+    this.refreshInfosIntervalId = setInterval(() => {
+      this.getInfos();
+    }, 30000);
+
     // Listen to Watchtower logs
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG, this.handleWatchtowerLog);
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
@@ -51,6 +55,7 @@ class SettingsSystem extends Component {
 
   componentWillUnmount() {
     clearInterval(this.refreshPingIntervalId);
+    clearInterval(this.refreshInfosIntervalId);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
       this.handleWatchtowerLog
