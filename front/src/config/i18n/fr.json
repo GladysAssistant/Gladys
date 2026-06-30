@@ -2217,6 +2217,23 @@
       "exampleScene2": "Chaque matin à 7 h : si le capteur CO₂ du salon dépasse 1 000 ppm, envoie-moi un message et ouvre la VMC.",
       "exampleScene3": "Quand l'alarme passe en mode déclenché : demande à l'IA d'analyser l'image de la caméra extérieure et de m'envoyer un résumé de la situation.",
       "chatEnabledByDefault": "L'IA est activée par défaut dans le chat Gladys.",
+      "quota": {
+        "title": "Utilisation des quotas IA",
+        "textLabel": "Requêtes textuelles à l'IA",
+        "imageLabel": "Analyse d'image par l'IA dans les scènes",
+        "remaining": "{{remaining}} / {{max}} requêtes restantes",
+        "resetIn": "Réinitialisation dans {{duration}}",
+        "resetNow": "Quota disponible",
+        "loading": "Chargement des quotas...",
+        "loadError": "Impossible de charger les quotas IA.",
+        "retry": "Réessayer"
+      },
+      "debugContext": {
+        "title": "Debug IA",
+        "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 10 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
+        "downloadButton": "Télécharger le contexte JSON pour debug",
+        "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
+      },
       "weeklyDigest": {
         "title": "Bilan hebdomadaire de la maison",
         "description": "Gladys t'envoie chaque semaine un résumé de ta maison connectée : confort, énergie, maintenance et conseils utiles.",
@@ -2274,6 +2291,8 @@
         "noDeviceFound": "Aucun appareil Matter trouvé",
         "pairedDevicesTitle": "Appareils appairés non ajoutés à Gladys",
         "addToGladys": "Ajouter à Gladys",
+        "updateInGladys": "Mettre à jour",
+        "deviceHasUpdates": "Cet appareil existe déjà dans Gladys avec de nouvelles fonctionnalités ou des modifications. Vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "replaceExisting": "Mettre à jour l'appareil existant",
         "nodeDisconnected": "Déconnecté"
@@ -2295,6 +2314,16 @@
       "error": {
         "defaultError": "Une erreur est survenue lors de l'enregistrement de l'appareil",
         "conflictError": "Un appareil avec ce nom existe déjà",
+        "selectorConflictError": "Un autre endpoint de cet appareil Matter utilise déjà le même identifiant interne. Cela arrive souvent avec les appareils multi-capteurs (ex. Dyson via Matterbridge).",
+        "externalIdConflictError": "Cet appareil Matter est déjà enregistré dans Gladys.",
+        "badRequestError": "La requête est invalide.",
+        "validationError": "Les données de l'appareil sont invalides.",
+        "forbiddenError": "Vous n'avez pas les droits pour effectuer cette action.",
+        "notFoundError": "L'appareil demandé est introuvable.",
+        "unexpectedError": "Une erreur inattendue s'est produite.",
+        "replaceDeviceNotFound": "Impossible de trouver l'appareil Gladys à mettre à jour. Rafraîchissez la page puis réessayez.",
+        "technicalDetail": "Détail technique :",
+        "apiFullResponse": "Réponse complète de l'API :",
         "defaultDeletionError": "Une erreur est survenue lors de la suppression de l'appareil",
         "getDevicesError": "Une erreur est survenue lors de la récupération de la liste des appareils"
       },
@@ -3068,7 +3097,8 @@
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
-      "service-enedis-sync": "Synchronisation des données Enedis"
+      "service-enedis-sync": "Synchronisation des données Enedis",
+      "ai-weekly-digest": "Résumé hebdomadaire IA"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."

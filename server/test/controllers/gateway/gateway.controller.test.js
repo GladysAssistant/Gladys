@@ -141,6 +141,30 @@ describe('POST /api/v1/gateway/aichat/chat', () => {
   });
 });
 
+describe('GET /api/v1/gateway/aichat/debug-context', () => {
+  beforeEach(() => {
+    global.TEST_GLADYS_INSTANCE.stateManager.setState('service', 'mcp', {
+      mcpHandler: {
+        getAllTools: async () => [],
+      },
+    });
+  });
+
+  it('should return AI chat debug context', async () => {
+    const response = await authenticatedRequest
+      .get('/api/v1/gateway/aichat/debug-context')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).to.have.property('messages');
+    expect(response.body).to.have.property('tools');
+    expect(response.body.tool_choice).to.equal('auto');
+    // eslint-disable-next-line no-underscore-dangle
+    expect(response.body._debug).to.have.property('generatedAt');
+    expect(response.body.messages[0].role).to.equal('system');
+  });
+});
+
 describe('POST /api/v1/gateway/stt', () => {
   it('should return stt response', async () => {
     nock(config.gladysGatewayServerUrl)

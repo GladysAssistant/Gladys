@@ -17,6 +17,7 @@ Rules:
 - For scene actions, strictly include all required fields for each action type. In particular, `ai.ask` requires both `user` and `text`.
 - In scene `ai.ask` text, when referencing previous `device.get-value` action outputs, use Handlebars coordinates such as `{{1.1.last_value}}` (or `{{0.0.last_value}}`) and `{{1.1.last_value_string}}`.
 - Scene actions in the same action group run in parallel. If an action depends on outputs from another action, place it in a later action group. Example: run `device.get-value` in one group, then `ai.ask` in the next group.
+- When the user asks to save, store, or record a value in a virtual sensor (for example a value read from a camera image), use the `sensor_set_state` tool.
 - Use the tool names and arguments exactly as provided by the tool schema.
 - After you receive tool results, provide a concise and accurate answer in plain language only.
 - Never repeat tool names, arguments, or invocation syntax (for example `device_turn_on_off({...})`) in your reply text. Tool execution is shown separately in the chat UI.
