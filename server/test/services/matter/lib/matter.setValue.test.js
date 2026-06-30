@@ -299,6 +299,106 @@ describe('Matter.setValue', () => {
     });
     assert.calledOnce(onOff.on);
   });
+  it('should set light brightness without turning on when level is zero', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+    };
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      moveToLevel: fake.resolves(null),
+    };
+    clusterClients.set(8, clusterClient);
+
+    const onOff = {
+      on: fake.resolves(null),
+    };
+    clusterClients.set(6, onOff);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 0);
+
+    assert.calledOnce(clusterClient.moveToLevel);
+    assert.notCalled(onOff.on);
+  });
+  it('should stop a shutter', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+    };
+
+    const clusterClient = {
+      stopMotion: fake.resolves(null),
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => clusterClient,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, COVER_STATE.STOP);
+
+    assert.calledOnce(clusterClient.stopMotion);
+  });
+  it('should ignore unknown shutter state values', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+    };
+
+    const clusterClient = {
+      upOrOpen: fake.resolves(null),
+      downOrClose: fake.resolves(null),
+      stopMotion: fake.resolves(null),
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => clusterClient,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 99);
+
+    assert.notCalled(clusterClient.upOrOpen);
+    assert.notCalled(clusterClient.downOrClose);
+    assert.notCalled(clusterClient.stopMotion);
+  });
   it('should control a light color', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',
@@ -574,6 +674,29 @@ describe('Matter.setValue', () => {
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device not found for path 1:child_endpoint:2');
   });
+  it('should return an error when device has no child endpoints', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1:2',
+    };
+
+    const gladysFeature = {
+      type: 'binary',
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => null,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    const promise = matterHandler.setValue(gladysDevice, gladysFeature, 1);
+    await chaiAssert.isRejected(promise, 'Device not found for path 1:2');
+  });
   it('should set fan mode', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',
@@ -718,7 +841,7 @@ describe('Matter.setValue', () => {
       },
       1,
     );
-    assert.calledOnceWithExactly(clusterClient.setRockSettingAttribute, 1);
+    assert.calledOnceWithExactly(clusterClient.setRockSettingAttribute, { rockLeftRight: true });
 
     await matterHandler.setValue(
       gladysDevice,
@@ -729,7 +852,7 @@ describe('Matter.setValue', () => {
       },
       2,
     );
-    assert.calledOnceWithExactly(clusterClient.setWindSettingAttribute, 2);
+    assert.calledOnceWithExactly(clusterClient.setWindSettingAttribute, { naturalWind: true });
   });
 
   it('should return an error when fan control cluster is missing', async () => {

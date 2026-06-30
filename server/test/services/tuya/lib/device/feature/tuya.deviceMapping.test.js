@@ -166,15 +166,15 @@ describe('Tuya device mapping', () => {
         ]('149241', { scale: 2 });
         expect(result).to.eq(1492.41);
       });
-      it('export index uses default scale when feature scale is missing', () => {
-        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX
+      it('production index uses default scale when feature scale is missing', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR][
+          DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX
         ]('48401');
         expect(result).to.eq(484.01);
       });
-      it('export index with scale', () => {
-        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR][
-          DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX
+      it('production index with scale', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR][
+          DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX
         ]('43222', { scale: 2 });
         expect(result).to.eq(432.22);
       });

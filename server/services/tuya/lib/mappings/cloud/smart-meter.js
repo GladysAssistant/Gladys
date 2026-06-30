@@ -85,23 +85,25 @@ module.exports = {
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   energy_reverse_a: {
+    // Reverse energy = energy injected back to the grid (production), hence
+    // the ENERGY_PRODUCTION_SENSOR category rather than ENERGY_SENSOR.
     name: 'Reverse energy A',
-    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   energy_reserse_b: {
     // Tuya code carries a typo ("reserse"); kept as the API key but the
     // user-facing name is corrected to "Reverse energy B".
     name: 'Reverse energy B',
-    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   reverse_energy_total: {
     name: 'Reverse energy total',
-    category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-    type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
+    category: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    type: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
 };

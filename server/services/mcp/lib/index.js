@@ -3,7 +3,13 @@ const { stopServer } = require('./stopServer');
 const { getAllResources, getAllTools } = require('./buildSchemas');
 const { formatValue } = require('./formatValue');
 const { proxy } = require('./mcp.proxy');
-const { isSensorFeature, isSwitchableFeature, isHistoryFeature } = require('./selectFeature');
+const {
+  isSensorFeature,
+  isSwitchableFeature,
+  isShutterFeature,
+  isHistoryFeature,
+  isWritableSensorFeature,
+} = require('./selectFeature');
 const { findBySimilarity } = require('./findBySimilarity');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
@@ -35,7 +41,9 @@ MCPHandler.prototype.getAllResources = getAllResources;
 MCPHandler.prototype.getAllTools = getAllTools;
 MCPHandler.prototype.isSensorFeature = isSensorFeature;
 MCPHandler.prototype.isSwitchableFeature = isSwitchableFeature;
+MCPHandler.prototype.isShutterFeature = isShutterFeature;
 MCPHandler.prototype.isHistoryFeature = isHistoryFeature;
+MCPHandler.prototype.isWritableSensorFeature = isWritableSensorFeature;
 MCPHandler.prototype.findBySimilarity = findBySimilarity;
 MCPHandler.prototype.formatValue = formatValue;
 MCPHandler.prototype.proxy = proxy;

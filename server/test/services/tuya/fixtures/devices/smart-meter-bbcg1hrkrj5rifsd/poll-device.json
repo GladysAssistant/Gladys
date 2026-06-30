@@ -63,8 +63,8 @@
     {
       "external_id": "tuya:smart-meter-device-id:energy_reverse_a",
       "selector": "tuya-smart-meter-device-id-energy-reverse-a",
-      "category": "energy-sensor",
-      "type": "export-index",
+      "category": "energy-production-sensor",
+      "type": "index",
       "last_value": 0,
       "scale": 2
     },
@@ -79,8 +79,8 @@
     {
       "external_id": "tuya:smart-meter-device-id:energy_reserse_b",
       "selector": "tuya-smart-meter-device-id-energy-reserse-b",
-      "category": "energy-sensor",
-      "type": "export-index",
+      "category": "energy-production-sensor",
+      "type": "index",
       "last_value": 0,
       "scale": 2
     },
@@ -127,8 +127,8 @@
     {
       "external_id": "tuya:smart-meter-device-id:reverse_energy_total",
       "selector": "tuya-smart-meter-device-id-reverse-energy-total",
-      "category": "energy-sensor",
-      "type": "export-index",
+      "category": "energy-production-sensor",
+      "type": "index",
       "scale": 2,
       "last_value": 0
     }
